@@ -26,5 +26,8 @@ $app->get('/date', function () use ($app) {
 
 ///////rutas de api de profit articulo
 $app->get('articulo/{id}',"Api\\PrfArticuloController@getArtById");
+
+$app->get('profit', 'Api\\PrfArticuloController@getProductosProfit');
+
 $app->get('/api/info', 'Api\UserController@info');
 $app->get('test', 'Admin\AccountController@main');

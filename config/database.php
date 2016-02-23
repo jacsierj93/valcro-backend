@@ -18,13 +18,25 @@ return array(
             'prefix'    => '',
         ),
 
-        # Our secondary database connection
+        # base de datoa de profit
         'profit' => array(
             'driver'    => 'sqlsrv',
             'host'      => 'valcro-main\psql',
             'database'  => 'VAL_INV',
             'username'  => 'profit',
             'password'  => 'profit',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ),
+
+        # base de datos viejo sistema valcro
+        'valcro2' => array(
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'valcro_datos',
+            'username'  => 'userVal',
+            'password'  => 'ntmJX2zn92CQFc6P',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
