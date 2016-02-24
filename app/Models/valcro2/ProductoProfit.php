@@ -20,7 +20,7 @@ class ProductoProfit extends Model
   //  protected $primaryKey = "id";
     protected $connection = "valcro2";
 
-
+   //prueba de push desde phphstorm
 
     public function execSp(){
         return DB::select('call valcro_datos.sp_query1(); ');
