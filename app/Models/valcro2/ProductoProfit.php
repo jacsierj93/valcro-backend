@@ -22,6 +22,10 @@ class ProductoProfit extends Model
 
 
 
+    public function execSp(){
+        return DB::select('call valcro_datos.sp_query1(); ');
+    }
+
 
 
 }

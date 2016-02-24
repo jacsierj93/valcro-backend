@@ -46,4 +46,11 @@ class PrfArticuloController extends BaseController
     }
 
 
+    public function execSP(){
+        $prod = new ProductoProfit();
+        $data = $prod->execSp();
+        return $data;
+    }
+
+
 }

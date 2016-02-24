@@ -29,5 +29,7 @@ $app->get('articulo/{id}',"Api\\PrfArticuloController@getArtById");
 
 $app->get('profit', 'Api\\PrfArticuloController@getProductosProfit');
 
+$app->get('contraPedido', 'Api\\PrfArticuloController@execSP');
+
 $app->get('/api/info', 'Api\UserController@info');
 $app->get('test', 'Admin\AccountController@main');
