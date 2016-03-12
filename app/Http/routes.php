@@ -12,7 +12,7 @@
 */
 
 $app->get('/', function () use ($app) {
-    return $app->welcome();
+    return view('home');
 });
 
 $app->get('/hola', function () use ($app) {
@@ -33,3 +33,32 @@ $app->get('contraPedido', 'Api\\PrfArticuloController@execSP');
 
 $app->get('/api/info', 'Api\UserController@info');
 $app->get('test', 'Admin\AccountController@main');
+
+
+/**
+ * rutas de la administración
+ * con AdminLTE
+ */
+
+$app->get('/home', function () use ($app) {
+    return view('home');
+});
+
+
+$app->get('/login', function () use ($app) {
+    return view('auth.login');
+});
+
+
+
+$app->get('/password/reset', function () use ($app) {
+    return view('auth.passwords.reset');
+});
+
+
+$app->get('/register', function () use ($app) {
+    return view('auth.register');
+});
+
+
+
