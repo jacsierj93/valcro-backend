@@ -122,28 +122,28 @@
                         <ul class="dropdown-menu">
                             <!-- The user image in the menu -->
                             <li class="user-header">
-                                <img src="/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
+                                <img src="{{url('/img/user2-160x160.jpg')}}" class="img-circle" alt="{{ Session::get('DATAUSER')->user }}" />
                                 <p>
                                     {{ Session::get('DATAUSER')->nombre }}
-                                    <small>Member since Nov. 2012</small>
+                                    <small>Ult. Login Nov. 2015</small>
                                 </p>
                             </li>
                             <!-- Menu Body -->
                             <li class="user-body">
                                 <div class="col-xs-4 text-center">
-                                    <a href="#">Followers</a>
+                                    <a href="#">Órdenes</a>
                                 </div>
                                 <div class="col-xs-4 text-center">
-                                    <a href="#">Sales</a>
+                                    <a href="#">Ventas</a>
                                 </div>
                                 <div class="col-xs-4 text-center">
-                                    <a href="#">Friends</a>
+                                    <a href="#">Contactos</a>
                                 </div>
                             </li>
                             <!-- Menu Footer-->
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                    <a href="#" class="btn btn-default btn-flat">Perfil</a>
                                 </div>
                                 <div class="pull-right">
                                     <a href="{{ url('/logout') }}" class="btn btn-default btn-flat">Cerrar Sesión</a>
