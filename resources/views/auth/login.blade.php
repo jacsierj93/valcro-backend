@@ -14,7 +14,7 @@
 
     <div class="login-box-body">
     <p class="login-box-msg">Inicia una Sesión como usuario</p>
-    <form action="{{ url('/login') }}" method="post">
+    <form name="form1" id="form1">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="form-group has-feedback">
             <input type="text" class="form-control" placeholder="Usuario" name="user"/>
@@ -36,7 +36,7 @@
 
             <!-- /.col -->
             <div class="col-xs-4">
-                <button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+                <a href="javascript:userLogin()" class="btn btn-primary btn-block btn-flat">Entrar</a>
             </div><!-- /.col -->
         </div>
     </form>
@@ -52,17 +52,11 @@
 
 </div><!-- /.login-box -->
 
-    @include('layouts.partials.scripts_auth')
+    @include('layouts.partials.scripts')
 
-    <script>
-        $(function () {
-            $('input').iCheck({
-                checkboxClass: 'icheckbox_square-blue',
-                radioClass: 'iradio_square-blue',
-                increaseArea: '20%' // optional
-            });
-        });
-    </script>
+
+    <script src="{{url("js/module/account.js")}}"></script>
+
 </body>
 
 @endsection

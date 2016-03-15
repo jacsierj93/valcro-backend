@@ -9,10 +9,10 @@ return array(
         # Our primary database connection
         'valcrosis' => array(
             'driver'    => 'mysql',
-            'host'      => 'localhost',
+            'host'      => 'userver',
             'database'  => 'valcro_db',
-            'username'  => 'userVal',
-            'password'  => 'ntmJX2zn92CQFc6P',
+            'username'  => 'root',
+            'password'  => 'delimce',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',

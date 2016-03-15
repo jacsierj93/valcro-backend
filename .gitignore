@@ -1,4 +1,4 @@
 /.idea
 /vendor
 /public/plugins
-.env
+/config/database.php

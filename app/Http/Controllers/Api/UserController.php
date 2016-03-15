@@ -24,4 +24,57 @@ class UserController extends BaseController
     }
 
 
+    /**metodo que permite el acceso al sistema requiere el 'usuario' y 'password' de la persona
+     * @param Request $request
+     */
+    public function login(Request $request)
+    {
+
+        $dataInput = $request->only('email', 'password');
+        $resp = new RestApi();
+
+        $usuarios = new User();
+        $datos = $usuarios->where('email', $dataInput["email"])->first();
+
+
+        ///////comparacion con el password de la base de datos
+        if (Hash::check($dataInput['password'], $datos["password"])) {
+            // The passwords match...
+
+            ////verificando que este activo
+            if ($datos["estatus"] == 1) {
+
+
+                /////modulos a los que puede acceder
+                $modulos = $datos->profile->moduleSelected()->get();
+                foreach ($modulos as $mod)
+                    $mods[] = $mod->modulo_id;
+                $datos["accesos"] = (isset($mods)) ? $mods : 0; ///trae los accesos sino 0
+                ////////
+
+
+                $request->session()->put('DATAUSER', $datos); ///datos del usuario
+                $resp->setContent($datos);
+
+            } else {
+                $resp->setError("El usuario se encuentra inactivo");
+            }
+
+        } else {
+            ///it doesn't match
+            $resp->setError("Usuario ó Clave inválidos");
+        }
+
+        return $resp->responseJson();
+
+    }
+
+
+    public function newPass($word)
+    {
+        return Hash::make($word);
+    }
+
+
+
 }

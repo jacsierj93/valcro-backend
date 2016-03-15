@@ -11,9 +11,6 @@
 |
 */
 
-$app->get('/', function () use ($app) {
-    return view('home');
-});
 
 $app->get('/hola', function () use ($app) {
     return "hola";
@@ -40,25 +37,22 @@ $app->get('test', 'Admin\AccountController@main');
  * con AdminLTE
  */
 
+$app->get('/', 'Account\AccountController@main');
+
+$app->get('/login', [
+    'as' => 'login', 'uses' => 'Account\AccountController@showLogin'
+]);
+
+
+
+
 $app->get('/home', function () use ($app) {
     return view('home');
 });
 
 
-$app->get('/login', function () use ($app) {
-    return view('auth.login');
-});
-
-
-
 $app->get('/password/reset', function () use ($app) {
     return view('auth.passwords.reset');
 });
-
-
-$app->get('/register', function () use ($app) {
-    return view('auth.register');
-});
-
 
 
