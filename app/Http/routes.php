@@ -21,6 +21,8 @@ $app->get('/date', function () use ($app) {
     return date("Y-m-d H:i:s");
 });
 
+$app->get('pass/{word}','Api\UserController@newPass');
+
 ///////rutas de api de profit articulo
 $app->get('articulo/{id}',"Api\\PrfArticuloController@getArtById");
 
@@ -37,22 +39,11 @@ $app->get('test', 'Admin\AccountController@main');
  * con AdminLTE
  */
 
-$app->get('/', 'Account\AccountController@main');
-
+$app->get('/', 'Account\AccountController@main'); ///pagina principal
 $app->get('/login', [
     'as' => 'login', 'uses' => 'Account\AccountController@showLogin'
-]);
-
-
-
-
-$app->get('/home', function () use ($app) {
-    return view('home');
-});
-
-
-$app->get('/password/reset', function () use ($app) {
-    return view('auth.passwords.reset');
-});
+]); ///login
+$app->post("api/user/login",'Api\UserController@login'); ///login api
+$app->get('/logout', 'Account\AccountController@logout'); ///logout
 
 

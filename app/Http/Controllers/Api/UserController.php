@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Libs\Api\RestApi;
 use App\Models\Obra;
-use App\Models\User;
+use App\Models\Sistema\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -30,11 +30,11 @@ class UserController extends BaseController
     public function login(Request $request)
     {
 
-        $dataInput = $request->only('email', 'password');
+        $dataInput = $request->only('usuario', 'password');
         $resp = new RestApi();
 
         $usuarios = new User();
-        $datos = $usuarios->where('email', $dataInput["email"])->first();
+        $datos = $usuarios->where('user', $dataInput["usuario"])->first();
 
 
         ///////comparacion con el password de la base de datos
@@ -42,15 +42,15 @@ class UserController extends BaseController
             // The passwords match...
 
             ////verificando que este activo
-            if ($datos["estatus"] == 1) {
+            if ($datos["status"] == 1) {
 
 
-                /////modulos a los que puede acceder
-                $modulos = $datos->profile->moduleSelected()->get();
-                foreach ($modulos as $mod)
-                    $mods[] = $mod->modulo_id;
-                $datos["accesos"] = (isset($mods)) ? $mods : 0; ///trae los accesos sino 0
-                ////////
+            /*    /////modulos a los que puede acceder
+                                $modulos = $datos->profile->moduleSelected()->get();
+                                foreach ($modulos as $mod)
+                                    $mods[] = $mod->modulo_id;
+                                $datos["accesos"] = (isset($mods)) ? $mods : 0; ///trae los accesos sino 0
+                                ////////*/
 
 
                 $request->session()->put('DATAUSER', $datos); ///datos del usuario

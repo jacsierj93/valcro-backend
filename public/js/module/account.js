@@ -25,7 +25,7 @@ var userLogin = function () {
                 msg = '<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' + response.error + '</div>';
                 $("#message").html(msg);
             } else { ///loging
-                var adminurl = PATHAPP + 'admin';
+                var adminurl = PATHAPP;
                 location.replace(adminurl);
             }
 
