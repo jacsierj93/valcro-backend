@@ -40,10 +40,13 @@ $app->get('test', 'Admin\AccountController@main');
  */
 
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
-$app->get('/login', [
+$app->get('login', [
     'as' => 'login', 'uses' => 'Account\AccountController@showLogin'
 ]); ///login
 $app->post("api/user/login",'Api\UserController@login'); ///login api
-$app->get('/logout', 'Account\AccountController@logout'); ///logout
+$app->get('logout', 'Account\AccountController@logout'); ///logout
 
+/////cargos
+$app->get('position', 'Catalogs\PositionController@getForm'); ///form de cargos
+$app->get('positionList', 'Catalogs\PositionController@getList'); ///lista de cargos
 
