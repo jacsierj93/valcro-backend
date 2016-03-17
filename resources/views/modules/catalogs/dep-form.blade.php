@@ -20,7 +20,8 @@
                 <div class="col-sm-5">
                     <div class="form-group">
                         <label>Nombre</label>
-                        <input class="form-control" name="nombre" placeholder="Escriba..." type="text" required>
+                        <input class="form-control" name="nombre" value="{{$data->nombre}}" placeholder="Escriba..."
+                               type="text" required>
                     </div>
                 </div>
 
@@ -28,7 +29,8 @@
                 <div class="col-sm-5">
                     <div class="form-group">
                         <label>Descripción</label>
-                        <input class="form-control" name="descripcion" placeholder="Escriba..." type="text" required>
+                        <input class="form-control" name="descripcion" value="{{$data->descripcion}}"
+                               placeholder="Escriba..." type="text" required>
                     </div>
                 </div>
 
@@ -36,9 +38,12 @@
 
             <div class="row">
                 <div class="col-sm-11">
+
+                    @if ($data->id !="")<input type="hidden" name="id" value="{{$data->id}}"> @endif
+
                     <button type="button" id="save" class="btn bg-orange margin">Guardar</button>
 
-                    <button onclick="history.back()" id="save" class="btn bg-gray margin">Cancelar</button>
+                    <button onclick="history.back()" id="save" class="btn bg-gray margin">Regresar</button>
                 </div>
 
             </div>
@@ -59,9 +64,9 @@
         $(function () {
 
 
-            $("#save").on("click",function(){
+            $("#save").on("click", function () {
 
-               saveOrUpdateDep();
+                saveOrUpdateDep();
 
             });
 

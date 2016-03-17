@@ -40,7 +40,7 @@
                                     <span class="sr-only">Toggle Dropdown</span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li><a href="#">Editar</a></li>
+                                    <li><a href="{{url('catalogs/departamentForm?id='.$result->id)}}">Editar</a></li>
                                     <li><a href="javascript:deleteDep({{$result->id}})">Borrar</a></li>
                                 </ul>
                             </div>

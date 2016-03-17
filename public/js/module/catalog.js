@@ -11,18 +11,27 @@ var saveOrUpdateDep = function () {
         type: 'POST',
         dataType: 'json',
         data: form.serialize(),
-        /*        beforeSend: function (xhr) {
-         // xhr.setRequestHeader( "Authorization", "BEARER " + access_token );
-         },*/
-        beforeSend: function () {
-            $("#save").val("Enviando...")
+        beforeSend:  function () {
+            $("#save").html("Enviando...");
+            $('#save').prop('disabled', true);
         },
         success: function (response) {
-            location.replace(PATHAPP + '/catalogs/departamentList')
+
+            $("#save").html("Guardar");
+            $('#save').prop('disabled', false);
+
+            if(response.action=='new'){
+                location.replace(PATHAPP+'catalogs/departamentList')
+            }else{
+
+            }
+
+
         }
     });
 
 };
+
 
 var deleteDep = function (id) {
     $.confirm({

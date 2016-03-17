@@ -32,7 +32,14 @@ class DepartamentController extends BaseController
     public function getForm(Request $req)
     {
 
-        return view('modules.catalogs.dep-form');
+        $datos = new Departament();
+
+        if ($req->has('id')) {
+            $datos = Departament::find($req->id);
+        }
+
+
+        return view('modules.catalogs.dep-form', ["data" => $datos]);
 
     }
 
@@ -46,15 +53,19 @@ class DepartamentController extends BaseController
 
         ]);
 
-        if ($validator->fails()) {
-            return 'error en campos de formulario';
+        if ($validator->fails()) { ///ups... erorres
 
-        } else {
+            $result = array("error" => "errores en campos de formulario");
+
+        } else {  ///ok
+
+            $result = array("success" => "Registro guardado con éxito","action"=>"new");
 
             $model = new Departament();
             //////////condicion para editar
             if ($req->has('id')) {
                 $model = $model->find($req->id);
+                $result["action"]="edit";
             }
 
             $model->nombre = $req->nombre;
@@ -63,11 +74,14 @@ class DepartamentController extends BaseController
 
 
         }
+
+        return response()->json($result); /// respuesta json
+
     }
 
 
-
-    public function delete(Request $req){
+    public function delete(Request $req)
+    {
 
 
         $model = new Departament();
