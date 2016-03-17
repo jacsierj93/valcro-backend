@@ -1,13 +1,11 @@
 @extends('layouts.app')
 
-
 @section('htmlheader_title')
-    Maestro de departamentos
+    Maestro de Cargos
 @endsection
 
 @section('head_adds')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    <link rel="stylesheet" href="{{url('plugins/select2/select2.min.css')}}">
 @stop
 
 
@@ -54,12 +52,13 @@
 
     </form>
 
+
 @endsection
+
 
 
 @section('scripts_adds')
 
-    <script src="{{url('plugins/select2/select2.full.min.js')}}"></script>
     <script src="{{url("js/module/catalog.js")}}"></script>
 
     <script>

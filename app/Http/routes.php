@@ -47,11 +47,13 @@ $app->post("api/user/login",'Api\UserController@login'); ///login api
 $app->get('logout', 'Account\AccountController@logout'); ///logout
 
 /////cargos
-$app->get('catalogs/position', 'Catalogs\PositionController@getForm'); ///form de cargos
+$app->get('catalogs/positionForm', 'Catalogs\PositionController@getForm'); ///form de cargos
 $app->get('catalogs/positionList', 'Catalogs\PositionController@getList'); ///lista de cargos
+$app->post("catalogs/positionSave",'Catalogs\PositionController@saveOrUpdate'); ///guardar cargo
+$app->post("catalogs/positionDel",'Catalogs\PositionController@delete'); ///borrar cargo
 
 ////departamentos
 $app->get('catalogs/departamentList', 'Catalogs\DepartamentController@getList'); ///lista de dep
 $app->get('catalogs/departamentForm', 'Catalogs\DepartamentController@getForm'); ///nuevo dep
 $app->post("catalogs/departamentSave",'Catalogs\DepartamentController@saveOrUpdate'); ///guardar dep
-$app->post("catalogs/departamentDel",'Catalogs\DepartamentController@delete'); ///guardar dep
+$app->post("catalogs/departamentDel",'Catalogs\DepartamentController@delete'); ///borrar dep
