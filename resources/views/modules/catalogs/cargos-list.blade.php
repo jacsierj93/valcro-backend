@@ -63,7 +63,7 @@
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Departamento</th>
-                    <th>Engine version</th>
+                    <th>Creado</th>
                 </tr>
                 </tfoot>
             </table>

@@ -6,6 +6,7 @@
 
 @section('head_adds')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    {!! Html::style('plugins/select2/select2.css') !!}
 @stop
 
 
@@ -35,6 +36,16 @@
 
             </div>
 
+
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        {!! Form::select('departamento_id',$deps,$data->departamento_id, array('class' => 'form-control select2','id'=>'departamento_id'))  !!}
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-sm-11">
 
@@ -60,6 +71,7 @@
 @section('scripts_adds')
 
     <script src="{{url("js/module/catalog.js")}}"></script>
+    {!! Html::script('plugins/select2/select2.full.min.js') !!}
 
     <script>
         $(function () {
@@ -67,9 +79,11 @@
 
             $("#save").on("click", function () {
 
-                saveOrUpdateDep();
+                saveOrUpdatePos();
 
             });
+
+            $(".select2").select2();
 
 
         });

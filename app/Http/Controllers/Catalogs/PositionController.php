@@ -41,7 +41,7 @@ class PositionController extends BaseController
         $deps = Departament::lists('nombre', 'id')->all();
 
 
-        return view('modules.catalogs.dep-form', ["data" => $datos, 'deps' => $deps]);
+        return view('modules.catalogs.cargos-form', ["data" => $datos, 'deps' => $deps]);
 
     }
 
@@ -55,6 +55,49 @@ class PositionController extends BaseController
 
 
     }
+
+
+
+    public function saveOrUpdate(Request $req)
+    {
+
+        //////////validation
+        $validator = Validator::make($req->all(), [
+            'nombre' => 'required',
+            'departamento_id' => 'required'
+
+        ]);
+
+        if ($validator->fails()) { ///ups... erorres
+
+            $result = array("error" => "errores en campos de formulario");
+
+        } else {  ///ok
+
+            $result = array("success" => "Registro guardado con éxito","action"=>"new");
+
+            $model = new Position();
+            //////////condicion para editar
+            if ($req->has('id')) {
+                $model = $model->find($req->id);
+                $result["action"]="edit";
+            }
+
+            $model->nombre = $req->nombre;
+            $model->descripcion = $req->descripcion;
+            $model->departamento_id =  $req->departamento_id;
+            $model->save(); ////edita/inserta aviso
+
+
+        }
+
+        return response()->json($result); /// respuesta json
+
+    }
+
+
+
+
 
 
 }
