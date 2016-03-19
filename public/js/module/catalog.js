@@ -124,3 +124,65 @@ var deletePos = function (id) {
     });
 
 }
+
+
+
+var saveOrUpdateSuc = function () {
+
+    ////entrada de datos
+    var form = $('#form1');
+
+    jQuery.ajax({
+        url: PATHAPP + 'catalogs/sucursalSave',
+        type: 'POST',
+        dataType: 'json',
+        data: form.serialize(),
+        beforeSend:  function () {
+            $("#save").html("Enviando...");
+            $('#save').prop('disabled', true);
+        },
+        success: function (response) {
+
+            $("#save").html("Guardar");
+            $('#save').prop('disabled', false);
+
+            if(response.action=='new'){
+                location.replace(PATHAPP+'catalogs/sucursalList')
+            }else{
+
+            }
+
+
+        }
+    });
+
+};
+
+var deleteSuc = function (id) {
+    $.confirm({
+        text: "Esta seguro que desea borrar este registro?",
+        title: "Borrar Sucursal",
+        confirm: function () {
+            jQuery.ajax({
+                url: PATHAPP + 'catalogs/sucursalDel',
+                type: 'POST',
+                data: {"id": id},
+                success: function (response) {
+                    location.reload();
+                }
+
+            });
+        },
+        cancel: function (button) {
+            // nothing to do
+        },
+        confirmButton: "Si, lo estoy",
+        cancelButton: "No",
+        post: true,
+        confirmButtonClass: "btn-danger",
+        cancelButtonClass: "btn-default",
+        dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+    });
+
+}
+

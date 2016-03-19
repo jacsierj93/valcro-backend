@@ -57,3 +57,9 @@ $app->get('catalogs/departamentList', 'Catalogs\DepartamentController@getList');
 $app->get('catalogs/departamentForm', 'Catalogs\DepartamentController@getForm'); ///nuevo dep
 $app->post("catalogs/departamentSave",'Catalogs\DepartamentController@saveOrUpdate'); ///guardar dep
 $app->post("catalogs/departamentDel",'Catalogs\DepartamentController@delete'); ///borrar dep
+
+/////sucursal
+$app->get('catalogs/sucursalForm', 'Catalogs\SucursalController@getForm'); ///form
+$app->get('catalogs/sucursalList', 'Catalogs\SucursalController@getList'); ///lista
+$app->post("catalogs/sucursalSave",'Catalogs\SucursalController@saveOrUpdate'); ///guardar
+$app->post("catalogs/sucursalDel",'Catalogs\SucursalController@delete'); ///borrar

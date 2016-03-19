@@ -39,7 +39,7 @@
                 <ul class="treeview-menu">
                     <li><a href="{{url('catalogs/departamentList')}}">Departamentos</a></li>
                     <li><a href="{{url('catalogs/positionList')}}">Cargos</a></li>
-                    <li><a href="#">Sucursales</a></li>
+                    <li><a href="{{url('catalogs/sucursalList')}}">Sucursales</a></li>
                 </ul>
             </li>
         </ul><!-- /.sidebar-menu -->
