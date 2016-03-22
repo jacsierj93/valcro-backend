@@ -2,7 +2,7 @@
 <section class="content-header">
     <h1>
         @yield('contentheader_title', 'Page Header here')
-        <small>@yield('contentheader_description')</small>
+        <small>@yield('contentheader_description','descripción aqui')</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>

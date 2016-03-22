@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('htmlheader_title')
+@section('contentheader_title')
     Maestro de Cargos
 @endsection
 

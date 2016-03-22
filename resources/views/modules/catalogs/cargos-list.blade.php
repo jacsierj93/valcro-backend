@@ -6,9 +6,11 @@
 @stop
 
 
-@section('htmlheader_title')
+@section('contentheader_title')
     Maestro de cargos
 @endsection
+
+
 
 
 @section('main-content')
