@@ -34,8 +34,17 @@
             <li class="header">HEADER</li>
             <!-- Optionally, you can add icons to the links -->
             <li class="active"><a href="{{ url('/') }}"><i class='fa fa-link'></i> <span>Inicio</span></a></li>
+
             <li class="treeview">
-                <a href="#"><i class='fa fa-link'></i> <span>Catalogo</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <a href="#"><i class='fa fa-users'></i> <span>Usuarios</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <ul class="treeview-menu">
+                    <li><a href="{{url('users/usersList')}}"><i class='fa fa-user'></i> Usuarios</a></li>
+                </ul>
+            </li>
+
+
+            <li class="treeview">
+                <a href="#"><i class='fa fa-database'></i> <span>Catalogo</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                     <li><a href="{{url('catalogs/departamentList')}}">Departamentos</a></li>
                     <li><a href="{{url('catalogs/positionList')}}">Cargos</a></li>

@@ -13,6 +13,12 @@ final class User extends Model
     protected $table = 'tbl_usuario';
 
 
+    ///foreing key
+    public function position()
+    {
+        return $this->belongsTo('App\Models\Sistema\Position', 'cargo_id');
+    }
+
     protected $dates = ['deleted_at'];
 
 }

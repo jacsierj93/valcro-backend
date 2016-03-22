@@ -46,6 +46,10 @@ $app->get('login', [
 $app->post("api/user/login",'Api\UserController@login'); ///login api
 $app->get('logout', 'Account\AccountController@logout'); ///logout
 
+
+////usuarios
+$app->get('users/usersList', 'Users\UserController@getList'); ///lista de usuarios
+
 /////cargos
 $app->get('catalogs/positionForm', 'Catalogs\PositionController@getForm'); ///form de cargos
 $app->get('catalogs/positionList', 'Catalogs\PositionController@getList'); ///lista de cargos
