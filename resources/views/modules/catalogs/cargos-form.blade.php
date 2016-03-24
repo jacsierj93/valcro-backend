@@ -6,7 +6,7 @@
 
 @section('head_adds')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    {!! Html::style('plugins/select2/select2.css') !!}
+    {!! Html::style('bower_components/select2/dist/css/select2.css') !!}
 @stop
 
 
@@ -71,7 +71,7 @@
 @section('scripts_adds')
 
     <script src="{{url("js/module/catalog.js")}}"></script>
-    {!! Html::script('plugins/select2/select2.full.min.js') !!}
+    {!! Html::script('bower_components/select2/dist/js/select2.full.min.js') !!}
 
     <script>
         $(function () {

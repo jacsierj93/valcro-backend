@@ -2,7 +2,7 @@
 
 @section('head_adds')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    <link rel="stylesheet" href="{{url('plugins/datatables/dataTables.bootstrap.css')}}">
+    {!! Html::style('bower_components/datatables/media/css/dataTables.bootstrap.min.css') !!}
 @stop
 
 
@@ -75,9 +75,11 @@
 @endsection
 
 @section('scripts_adds')
-    <script src="{{url('plugins/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{url('plugins/datatables/dataTables.bootstrap.min.js')}}"></script>
-    <script src="{{url('plugins/jQuery/jquery.confirm.min.js')}}"></script>
+
+    {!! Html::script('bower_components/datatables/media/js/jquery.dataTables.min.js') !!}
+    {!! Html::script('bower_components/datatables/media/js/dataTables.bootstrap.min.js') !!}
+    {!! Html::script('bower_components/jquery-confirm/jquery.confirm.min.js') !!}
+
     <script src="{{url("js/module/catalog.js")}}"></script>
 
     <script>

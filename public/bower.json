@@ -1,0 +1,24 @@
+{
+  "name": "valcro-backed",
+  "authors": [
+    "luis D'Lima <delimce@gmail.com>"
+  ],
+  "description": "libs javascript para el sistema de valcro",
+  "main": "valcro",
+  "moduleType": [],
+  "keywords": [
+    "jquery",
+    "laravel",
+    "lumen",
+    "adminlte"
+  ],
+  "license": "MIT",
+  "homepage": "www.delimce.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
