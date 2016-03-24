@@ -5,6 +5,18 @@
   ],
   "description": "libs javascript para el sistema de valcro",
   "main": "valcro",
+  "dependencies": {
+    "bootstrap": "*",
+    "jquery": "*",
+    "jqueryui": "*",
+    "jquery-confirm": "*",
+    "bootstrap-slider": "*",
+    "bootstrap-switch": "*",
+    "twitter-bootstrap-wizard": "*",
+    "DataTables": "*",
+    "pace": "*",
+    "select2": "^4.0.2"
+  },
   "moduleType": [],
   "keywords": [
     "jquery",

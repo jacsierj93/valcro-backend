@@ -1,9 +1,9 @@
 <!-- REQUIRED JS SCRIPTS -->
 
 <!-- jQuery 2.1.4 -->
-{!! Html::script('bower_components/jquery/dist/jquery.min.js') !!}
+{!! Html::script('components/jquery/dist/jquery.min.js') !!}
 <!-- Bootstrap 3.3.6 JS -->
-{!! Html::script('bower_components/bootstrap/dist/js/bootstrap.min.js') !!}
+{!! Html::script('components/bootstrap/dist/js/bootstrap.min.js') !!}
 <!-- AdminLTE App -->
 <script src="{{ url('/js/app.min.js') }}" type="text/javascript"></script>
 <script src="{{ url('/js/settings.js') }}" type="text/javascript"></script>

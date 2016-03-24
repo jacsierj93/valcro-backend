@@ -2,4 +2,4 @@
 /vendor
 /config/database.php
 /public/js/settings.js
-/public/bower_components
+/public/components

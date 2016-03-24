@@ -2,8 +2,8 @@
 
 @section('head_adds')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    {!! Html::style('bower_components/select2/dist/css/select2.css') !!}
-    {!! Html::style('bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css') !!}
+    {!! Html::style('components/select2/dist/css/select2.css') !!}
+    {!! Html::style('components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css') !!}
 @stop
 
 
@@ -233,9 +233,9 @@
 
 @section('scripts_adds')
 
-    {!! Html::script('bower_components/twitter-bootstrap-wizard/jquery.bootstrap.wizard.min.js') !!}
-    {!! Html::script('bower_components/select2/dist/js/select2.full.min.js') !!}
-    {!! Html::script('bower_components/bootstrap-switch/dist/js/bootstrap-switch.min.js') !!}
+    {!! Html::script('components/twitter-bootstrap-wizard/jquery.bootstrap.wizard.min.js') !!}
+    {!! Html::script('components/select2/dist/js/select2.full.min.js') !!}
+    {!! Html::script('components/bootstrap-switch/dist/js/bootstrap-switch.min.js') !!}
 
 
     <script src="{{url("js/module/users.js")}}"></script>

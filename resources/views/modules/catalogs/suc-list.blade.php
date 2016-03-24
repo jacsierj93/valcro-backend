@@ -2,7 +2,7 @@
 
 @section('head_adds')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    {!! Html::style('bower_components/datatables/media/css/dataTables.bootstrap.min.css') !!}
+    {!! Html::style('components/DataTables/media/css/dataTables.bootstrap.min.css') !!}
 @stop
 
 
@@ -72,9 +72,9 @@
 @endsection
 
 @section('scripts_adds')
-    {!! Html::script('bower_components/datatables/media/js/jquery.dataTables.min.js') !!}
-    {!! Html::script('bower_components/datatables/media/js/dataTables.bootstrap.min.js') !!}
-    {!! Html::script('bower_components/jquery-confirm/jquery.confirm.min.js') !!}
+    {!! Html::script('components/DataTables/media/js/jquery.dataTables.min.js') !!}
+    {!! Html::script('components/DataTables/media/js/dataTables.bootstrap.min.js') !!}
+    {!! Html::script('components/jquery-confirm/jquery.confirm.min.js') !!}
     <script src="{{url("js/module/catalog.js")}}"></script>
 
     <script>
