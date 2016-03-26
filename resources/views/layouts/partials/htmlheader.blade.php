@@ -3,7 +3,7 @@
     <title> Sistema Valcro - @yield('contentheader_title', 'Your title here') </title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.4 -->
-    <link href="{{ url('/css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- Font Awesome Icons -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Ionicons -->
@@ -17,7 +17,7 @@
     <link href="{{ url('/css/skins/skin-blue.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url('/css/skins/skin-yellow.css') }}" rel="stylesheet" type="text/css" />
     <!-- iCheck -->
-    <link href="{{ url('/plugins/iCheck/square/blue.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/components/iCheck/skins/square/yellow.css') }}" rel="stylesheet" type="text/css" />
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

@@ -49,6 +49,9 @@ $app->get('logout', 'Account\AccountController@logout'); ///logout
 
 ////usuarios
 $app->get('users/usersList', 'Users\UserController@getList'); ///lista de usuarios
+$app->get('users/userForm', 'Users\UserController@getForm'); ///form de usuarios
+$app->post('users/saveOrUpdate', 'Users\UserController@saveOrUpdate'); ///guardar usuario
+$app->post("users/userDel",'Users\UserController@delete'); ///borrar usuario
 
 /////cargos
 $app->get('catalogs/positionForm', 'Catalogs\PositionController@getForm'); ///form de cargos

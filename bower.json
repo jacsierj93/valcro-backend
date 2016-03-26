@@ -15,7 +15,8 @@
     "twitter-bootstrap-wizard": "*",
     "DataTables": "*",
     "pace": "*",
-    "select2": "^4.0.2"
+    "select2": "^4.0.2",
+    "iCheck": "icheck#^1.0.2"
   },
   "moduleType": [],
   "keywords": [

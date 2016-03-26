@@ -2592,6 +2592,7 @@ a:focus {
 }
 .products-list .product-img {
   float: left;
+  padding: 10px;
 }
 .products-list .product-img img {
   width: 50px;

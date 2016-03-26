@@ -49,7 +49,7 @@
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{url('users/userForm?id='.$result->id)}}">Editar</a></li>
-                                    <li><a href="javascript:deletePos({{$result->id}})">Borrar</a></li>
+                                    <li><a href="javascript:deleteUser({{$result->id}})">Borrar</a></li>
                                 </ul>
                             </div>
                         </td>
