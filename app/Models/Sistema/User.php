@@ -19,6 +19,16 @@ final class User extends Model
         return $this->belongsTo('App\Models\Sistema\Position', 'cargo_id');
     }
 
+
+    ////foreing key
+    public function preferences()
+    {
+        return $this->hasOne('App\Models\UserPreference', 'usuario_id');
+    }
+
+
+
+
     protected $dates = ['deleted_at'];
 
 }

@@ -16,13 +16,13 @@ var userLogin = function () {
          // xhr.setRequestHeader( "Authorization", "BEARER " + access_token );
          },*/
         beforeSend: function () {
-            $("#message").html("<p class='text-center'><img src='" + PATHAPP + "/assets/images/ajax-loader.gif'></p>")
+            $("#message").html("<p class='text-center'>Procesando...</p>")
         },
         success: function (response) {
             // response
             var msg = "";
             if (response.success == 'false') { ///nolog
-                msg = '<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' + response.error + '</div>';
+                msg = '<div style="text-align: center; font-weight: bold; padding: 5px">' + response.error + '</div>';
                 $("#message").html(msg);
             } else { ///loging
                 var adminurl = PATHAPP;

@@ -51,6 +51,7 @@ $app->get('logout', 'Account\AccountController@logout'); ///logout
 $app->get('users/usersList', 'Users\UserController@getList'); ///lista de usuarios
 $app->get('users/userForm', 'Users\UserController@getForm'); ///form de usuarios
 $app->post('users/saveOrUpdate', 'Users\UserController@saveOrUpdate'); ///guardar usuario
+$app->post('users/savePrefs', 'Users\UserController@savePreferences'); ///guardar usuario prefs
 $app->post("users/userDel",'Users\UserController@delete'); ///borrar usuario
 
 /////cargos
