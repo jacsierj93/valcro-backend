@@ -44,7 +44,7 @@ class UserController extends BaseController
 
 
         if ($req->has('id')) {
-            $datos = User::find($req->id);
+            $datos = User::findOrFail($req->id);
             Session::put('UserId',$req->id); ///si es editar un usuario
         }
 

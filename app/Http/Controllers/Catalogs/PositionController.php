@@ -34,7 +34,7 @@ class PositionController extends BaseController
         $datos = new Position();
 
         if ($req->has('id')) {
-            $datos = Position::find($req->id);
+            $datos = Position::findOrFail($req->id);
         }
 
         ////lista de departamentos
@@ -79,7 +79,7 @@ class PositionController extends BaseController
             $model = new Position();
             //////////condicion para editar
             if ($req->has('id')) {
-                $model = $model->find($req->id);
+                $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
 

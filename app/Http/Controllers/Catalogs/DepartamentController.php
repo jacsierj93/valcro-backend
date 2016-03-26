@@ -35,7 +35,7 @@ class DepartamentController extends BaseController
         $datos = new Departament();
 
         if ($req->has('id')) {
-            $datos = Departament::find($req->id);
+            $datos = Departament::findOrFail($req->id);
         }
 
 
@@ -64,7 +64,7 @@ class DepartamentController extends BaseController
             $model = new Departament();
             //////////condicion para editar
             if ($req->has('id')) {
-                $model = $model->find($req->id);
+                $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
 

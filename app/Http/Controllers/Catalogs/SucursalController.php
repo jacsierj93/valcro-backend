@@ -35,7 +35,7 @@ class SucursalController extends BaseController
         $datos = new Sucursal();
 
         if ($req->has('id')) {
-            $datos = Sucursal::find($req->id);
+            $datos = Sucursal::findOrFail($req->id);
         }
 
 
@@ -64,7 +64,7 @@ class SucursalController extends BaseController
             $model = new Sucursal();
             //////////condicion para editar
             if ($req->has('id')) {
-                $model = $model->find($req->id);
+                $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
 
