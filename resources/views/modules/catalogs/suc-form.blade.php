@@ -20,7 +20,7 @@
                 <div class="col-sm-5">
                     <div class="form-group">
                         <label>Nombre</label>
-                        <input class="form-control" name="nombre" value="{{$data->nombre}}" placeholder="Escriba..."
+                        <input class="form-control" name="nombre" value="{{$data->nombre}}" placeholder="Nombre de la sucursal..."
                                type="text" required>
                     </div>
                 </div>

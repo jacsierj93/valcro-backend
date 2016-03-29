@@ -49,6 +49,8 @@
                     <li><a href="{{url('catalogs/departamentList')}}">Departamentos</a></li>
                     <li><a href="{{url('catalogs/positionList')}}">Cargos</a></li>
                     <li><a href="{{url('catalogs/sucursalList')}}">Sucursales</a></li>
+                    <li><a href="{{url('catalogs/providerTypesList')}}">Tipos de Provedor</a></li><!---add for miguel -->
+                    <li><a href="{{url('catalogs/providerTypesSendList')}}">Tipos de Envíos</a></li><!---lista tipos de envios -->
                 </ul>
             </li>
         </ul><!-- /.sidebar-menu -->
