@@ -41,11 +41,15 @@ class UserController extends BaseController
     {
 
         $datos = new User();
+        $prefs = new UserPreference();
         Session::put('UserId', 0); ///vacio la variable de sesion si es insertar nuevo
 
 
         if ($req->has('id')) {
             $datos = User::findOrFail($req->id);
+            $prefs = UserPreference::where("usuario_id",$req->id)->first();
+            if($prefs==null) $prefs = new UserPreference();
+
             Session::put('UserId', $req->id); ///si es editar un usuario
         }
 
@@ -57,6 +61,7 @@ class UserController extends BaseController
         $tipos = array("OFICINA" => "OFICINA", "MOVIL" => "MOVIL", "HOGAR" => "HOGAR");
 
         return view('modules.users.users-form', ["data" => $datos,
+            "prefs"=>$prefs,
             "cargos" => $cargos, "niveles" => $niveles,
             "paises" => $paises, "lenguajes" => $lenguajes,
             "sucursales" => $sucursales, "tipos" => $tipos]);
@@ -143,7 +148,6 @@ class UserController extends BaseController
     }
 
 
-
     public function savePreferences(Request $req)
     {
 
@@ -154,11 +158,11 @@ class UserController extends BaseController
 
             $result = array("success" => "Registro guardado con éxito");
 
-            $model = new UserPreference();
 
-            if ($userId) {
-                $model = UserPreference::where("usuario_id", $userId);
-            }
+            $model = UserPreference::where("usuario_id", $userId)->first(); ///intenta buscarlo
+
+            if($model==null) $model = new UserPreference();
+
 
             $model->usuario_id = $userId; ///id del usuario
 
@@ -183,7 +187,6 @@ class UserController extends BaseController
         }
 
         return response()->json($result); /// respuesta json
-
 
     }
 

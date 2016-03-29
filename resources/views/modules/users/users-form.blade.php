@@ -74,7 +74,7 @@
 
                             <div class="col-sm-5">
                                 <div class="form-group">
-                                    <label>Cargo</label>
+                                    <label>Cargo</label><br>
                                     {!! Form::select('cargo_id',$cargos,$data->cargo_id, array('class' => 'form-control select2','id'=>'cargo_id'))  !!}
                                 </div>
                             </div>
@@ -123,7 +123,7 @@
 
                             <div class="col-sm-5">
                                 <div class="form-group">
-                                    <label>Nivel de usuario</label>
+                                    <label>Nivel de usuario</label><br>
                                     {!! Form::select('nivel_id',$niveles,$data->nivel_id, array('class' => 'form-control select2','id'=>'nivel_id'))  !!}
                                 </div>
                             </div>
@@ -144,7 +144,7 @@
 
                             <div class="col-sm-5">
                                 <div class="form-group">
-                                    <label>Reptita Password</label>
+                                    <label>Repita Password</label>
                                     <input class="form-control" name="password" value="{{$data->password}}"
                                            placeholder="escriba una clave" type="password" required>
                                 </div>
@@ -158,7 +158,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Activo</label><br>
-                                    <input type="checkbox" name="status" id="status" checked>
+                                    <input type="checkbox" name="status" id="status" @if ($data->status == 1) checked @endif >
                                 </div>
                             </div>
 
@@ -268,7 +268,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Pais</label><br>
-                                    {!! Form::select('pais_id',$paises,$data->pais_id, array('class' => 'form-control select2','id'=>'pais_id'))  !!}
+                                    {!! Form::select('pais_id',$paises,$prefs->pais_id, array('class' => 'form-control select2','id'=>'pais_id'))  !!}
                                 </div>
                             </div>
 
@@ -276,7 +276,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Idioma</label><br>
-                                    {!! Form::select('idioma_id',$lenguajes,$data->idioma_id, array('class' => 'form-control select2','id'=>'idioma_id'))  !!}
+                                    {!! Form::select('idioma_id',$lenguajes,$prefs->idioma_id, array('class' => 'form-control select2','id'=>'idioma_id'))  !!}
                                 </div>
                             </div>
 
@@ -288,8 +288,8 @@
 
                             <div class="col-sm-5">
                                 <div class="form-group">
-                                    <label>Sucursal</label>
-                                    {!! Form::select('sucursal_id',$sucursales,$data->sucursal_id, array('class' => 'form-control select2','id'=>'sucursal_id'))  !!}
+                                    <label>Sucursal</label><br>
+                                    {!! Form::select('sucursal_id',$sucursales,$prefs->sucursal_id, array('class' => 'form-control select2','id'=>'sucursal_id'))  !!}
                                 </div>
                             </div>
 
@@ -309,9 +309,14 @@
                     <a href="#" class="btn bg-orange margin">Guardar</a>
                 </li>
 
+
                 <li id="ncontact" class="contact" style="display: none;float: left">
                     <a type="button" data-toggle="modal" data-target="#myModal" class="btn bg-orange margin">
                         Nuevo contácto</a>
+                </li>
+
+                <li id="classfinal" class="bfinal" style="display: none;float: left">
+                    <a href="#" id="bfinal" class="btn bg-orange margin">Finalizar</a>
                 </li>
 
 
@@ -437,10 +442,20 @@
                     if (index == 2) {
                         saveAccess();
                         $("#ncontact").show();
+
                     }else{
                         $("#ncontact").hide();
                     }
 
+                    ////finalizar y guardar preferencias
+                    if(index == 3) {
+
+                        $("#classfinal").show();
+                        $(".next").hide();
+                    }else{
+                        $(".next").show();
+                        $("#classfinal").hide();
+                    }
 
 
 
@@ -456,7 +471,14 @@
         $.fn.bootstrapSwitch.defaults.offText = 'NO';
         $.fn.bootstrapSwitch.defaults.size = 'large';
         $('#status').bootstrapSwitch();
+        $(".select2").select2({ width: '300px', dropdownCssClass: "bigdrop" });
 
+        ///////////boton finalizar
+        $("#bfinal").on("click",function(){
+
+            savePreferences();
+
+        });
 
     </script>
 
