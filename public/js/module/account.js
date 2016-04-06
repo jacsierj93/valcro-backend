@@ -29,6 +29,8 @@ var userLogin = function () {
                 location.replace(adminurl);
             }
 
+        }, error : function(response){
+            console.log(response);
         }
     });
 
