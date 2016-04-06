@@ -17,7 +17,8 @@
     "pace": "*",
     "select2": "^4.0.2",
     "iCheck": "icheck#^1.0.2",
-    "jqwidgets": "^4.1.0"
+    "jqwidgets": "^4.1.0",
+    "angular-material": "^1.0.7"
   },
   "moduleType": [],
   "keywords": [
