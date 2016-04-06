@@ -50,7 +50,10 @@
                     <li><a href="{{url('catalogs/positionList')}}">Cargos</a></li>
                     <li><a href="{{url('catalogs/sucursalList')}}">Sucursales</a></li>
                     <li><a href="{{url('catalogs/providerTypesList')}}">Tipos de Provedor</a></li><!---add for miguel -->
-                    <li><a href="{{url('catalogs/providerTypesSendList')}}">Tipos de Envíos</a></li><!---lista tipos de envios -->
+                    <li><a href="{{url('catalogs/providerTypesSendList')}}">Tipo de Envíos</a></li><!---tipos de envio d proveedor -->
+                    <li><a href="{{url('catalogs/CondPagoProvList')}}">Condiciones de Pago a Proveedor</a></li><!---add for miguel -->
+                    <li><a href="{{url('catalogs/tiemAproTranList')}}">Tiempo Aproximado de Transito</a></li><!---tiempo de transito -->
+
                 </ul>
             </li>
         </ul><!-- /.sidebar-menu -->
