@@ -24,6 +24,9 @@ class TiemAproTran extends Model
 
     protected $dates = ['deleted_at'];
 
+    protected $fillabled = ['id', 'min_dia', 'max_dia', 'id_pais'];
 
-
+    public function getPaisName(){
+        return $this->hasOne('App\Models\Sistema\Country', 'id', 'id_pais');
+    }
 }
