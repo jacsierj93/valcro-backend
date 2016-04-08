@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ProviderType extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_provedor_tipo";
+    protected $table = "tbl_prov_tipo";
 
 
 }
