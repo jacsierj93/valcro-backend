@@ -20,7 +20,7 @@ class TiemAproTran extends Model
 {
 
     use SoftDeletes;
-    protected $table = "tbl_prov_tiemAproTran";
+    protected $table = "tbl_prov_tiempo_tran";
 
     protected $dates = ['deleted_at'];
 

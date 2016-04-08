@@ -20,7 +20,7 @@ class ProvTipoEnvio extends Model
 {
 
     use SoftDeletes;
-    protected $table = "tbl_prov_tipoEnvio";
+    protected $table = "tbl_prov_tipo_envio";
 
     protected $dates = ['deleted_at'];
 
