@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ProviderCondPayItem extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_provedor_cond_pag_item";
+    protected $table = "tbl_prov_cond_pag_item";
 
 
 }

@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ProviderCondPay extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_provedor_cond_pag";
+    protected $table = "tbl_prov_cond_pag";
 
     public function getItems(){
         return $this->hasOne('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
