@@ -258,10 +258,8 @@
     </div>
 
 
+    <?=HTML::script('js/app.js')?>
 
-
-
-    <script src="app.js"></script>
 
 </body>
 
