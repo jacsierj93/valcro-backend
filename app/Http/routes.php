@@ -40,6 +40,9 @@ $app->get('test', 'Admin\AccountController@main');
  */
 
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
+
+$app->get('/angular', 'Account\AccountController@prueba'); ///pagina principal
+
 $app->get('login', [
     'as' => 'login', 'uses' => 'Account\AccountController@showLogin'
 ]); ///login

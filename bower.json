@@ -1,39 +1,26 @@
 {
-  "name": "valcro-backed",
-  "authors": [
-    "luis D'Lima <delimce@gmail.com>"
-  ],
-  "description": "libs javascript para el sistema de valcro",
-  "main": "valcro",
-  "dependencies": {
-    "bootstrap": "*",
-    "jquery": "*",
-    "jqueryui": "*",
-    "jquery-confirm": "*",
-    "bootstrap-slider": "*",
-    "bootstrap-switch": "*",
-    "twitter-bootstrap-wizard": "*",
-    "DataTables": "*",
-    "pace": "*",
-    "select2": "^4.0.2",
-    "iCheck": "icheck#^1.0.2",
-    "jqwidgets": "^4.1.0",
-    "angular-material": "^1.0.7"
-  },
-  "moduleType": [],
+  "name": "angularmaterials",
+  "description": "Vista modulos valcro con materials y angular",
+  "main": "",
   "keywords": [
-    "jquery",
-    "laravel",
-    "lumen",
-    "adminlte"
+    "vista"
+  ],
+  "authors": [
+    "Luis Navarro"
   ],
   "license": "MIT",
-  "homepage": "www.delimce.com",
+  "homepage": "index.html",
+  "private": true,
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "angular-material": "^1.0.7",
+    "angular-messages": "^1.5.3",
+    "font-awesome": "fontawesome#^4.5.0"
+  }
 }

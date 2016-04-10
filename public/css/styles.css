@@ -1,0 +1,93 @@
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: rgba(221, 221, 221, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    width: 15px;
+    background-color: rgba(221, 221, 221, 1);
+}
+
+/*md-input-container{
+    margin: 0 !important;
+}*/
+
+
+body[ng-cloak] {
+    display: none;
+}
+
+body {
+    background-image: url("http://10.15.2.111/valcrodev/images/login_bg_white.jpg");
+    background-position: bottom center;
+}
+
+.sideBar {
+    width: 192px;
+    /*background-color: #03a9f4;*/
+    height: 100%;
+}
+
+.content {
+    /*background-color: #b388ff;*/
+    height: 100%;
+}
+
+.inputdemoErrors .inputErrorsApp {
+    min-height: 48px;
+}
+
+.inputdemoErrors md-input-container > p {
+    font-size: 0.8em;
+    text-align: left;
+    width: 100%;
+}
+
+.cabezera {
+    height: 48px;
+    /*background-color: #323232;*/
+
+}
+
+.barraHerramientas {
+    width: 48px;
+}
+
+.barraHerramientas > div {
+    width: 48px;
+    height: 38px;
+}
+
+.barraLateral {
+    width: 192px;
+}
+
+.contenido {
+
+}
+
+.middle {
+
+}
+
+.pie {
+    height: 48px;
+    /*background-color: #ff8a80;*/
+}
+
+.pie > div {
+    width: 38px;
+    height: 48px;
+}
+
+
+
+/**********************************************/
+.titulo_formulario{
+    border-bottom: solid 1px rgb(84, 180, 234);
+    height: 24px;
+}

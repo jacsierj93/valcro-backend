@@ -1,160 +1,79 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:400);
 
 body {
-  background-color: #f2f2f2;
-    font-family: "Lato";
-    font-weight: 300;
-    font-size: 16px;
-    color: #555;
-    padding-top: 50px;
-
-    -webkit-font-smoothing: antialiased;
-    -webkit-overflow-scrolling: touch;
+    font-family: 'Lato', sans-serif;
 }
 
-/* Titles */
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Raleway";
-    font-weight: 300;
-    color: #333;
+.container { width: 95%; }
+
+.main-container {  position: relative;  }
+
+table tr th, h1 {  color: #5e5d5d;  }
+
+textarea {  resize: none;  }
+
+#add_todo_form {
+    background-color: #fff;
+    position: absolute;
+    border: 1px solid #ccc;
+    padding: 30px 20px;
+    top: 20%;
+    border-radius: 5px;
+    box-shadow: 0 0 20px #afafaf;
+    z-index: 10;
 }
 
-
-/* Paragraph & Typographic */
-p {
-    line-height: 28px;
-    margin-bottom: 25px;
+#add-form-container h3 {
+    text-align: center;
+    color: #afafaf;
+    margin-top: 0;
 }
 
-.centered {
+input[type=checkbox] {
+    display: block;
+    margin-left: 30px;
+}
+
+#add_todo_form .close-add-form {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    color: #d9dadb;
+
+}
+
+.completedtrue {
+    text-decoration: line-through;
+    color: #9b9b9b;
+}
+
+.form-error {
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: block;
+    color: #db1a1a;
+}
+
+.todo-name {
+    cursor: pointer;
+}
+
+.todo-name:hover {
+    color: #3388cc;
+    text-decoration: underline;
+}
+
+.loading-gif {
+    position: absolute; top: -50px;
+    margin-top: 30px;
+}
+
+.submit-button {
+    position: relative;
     text-align: center;
 }
 
-/* Links */
-a {
-    color: #3bc492;
-    word-wrap: break-word;
-
-    -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -o-transition: color 0.1s ease-in, background 0.1s ease-in;
-    transition: color 0.1s ease-in, background 0.1s ease-in;
+.add-form-button {
+    margin-top: 25px;
 }
-
-a:hover,
-a:focus {
-    color: #c0392b;
-    text-decoration: none;
-    outline: 0;
-}
-
-a:before,
-a:after {
-    -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -o-transition: color 0.1s ease-in, background 0.1s ease-in;
-    transition: color 0.1s ease-in, background 0.1s ease-in;
-}
-
- hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
-}
-
-
-/* ==========================================================================
-   Wrap Sections
-   ========================================================================== */
-
-#headerwrap {
-	background-color: #34495e;
-	padding-top: 60px;
-}
-
-#headerwrap h1 {
-	margin-top: 30px;
-	color: white;
-	font-size: 70px;
-	
-}
-
-#headerwrap h3 {
-	color: white;
-	font-size: 30px;
-}
-
-#headerwrap h5 {
-	color: white;
-	font-weight: 700;
-	text-align: left;
-}
-
-#headerwrap p {
-	text-align: left;
-	color: white
-}
-
-/* intro Wrap */
-
-#intro {
-	padding-top: 50px;
-	border-top: #bdc3c7 solid 5px;
-}
-
-#features {
-	padding-top: 50px;
-	padding-bottom: 50px;
-}
-
-#features .ac a{
-	font-size: 20px;
-}
-
-/* Showcase Wrap */
-
-#showcase {
-	display: block;
-	background-color: #34495e;
-	padding-top: 50px;
-	padding-bottom: 50px;
-}
-
-#showcase h1 {
-	color: white;
-}
-
-#footerwrap {
-	background-color: #2f2f2f;
-	color: white;
-	padding-top: 40px;
-	padding-bottom: 60px;
-	text-align: left;
-}
-
-#footerwrap h3 {
-	font-size: 28px;
-	color: white;
-}
-
-#footerwrap p {
-	color: white;
-	font-size: 18px;
-}
-
-/* Copyright Wrap */
-
-#c {
-	background: #222222;
-	padding-top: 15px;
-	text-align: center;
-}
-
-#c p {
-	color: white
-}
-

@@ -38,8 +38,8 @@ class AccountController extends BaseController
     public function __construct()
     {
 
-        $this->middleware('auth', ['except' => ['showLogin', 'doLogin']]);
-        $this->middleware('guest', ['only' => ['showLogin', 'doLogin']]);
+        $this->middleware('auth', ['except' => ['showLogin', 'doLogin','prueba']]);
+        $this->middleware('guest', ['only' => ['showLogin', 'doLogin','prueba']]);
     }
 
 
@@ -64,6 +64,14 @@ class AccountController extends BaseController
 
         return view("home");
     }
+
+
+    public function prueba()
+    {
+
+        return view("index");
+    }
+
 
 
     /**
