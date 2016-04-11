@@ -2,7 +2,7 @@
 
 return array(
 
-    'default' => 'valcrosis',
+    'default' => 'valcro2',
 
     'connections' => array(
 
@@ -10,7 +10,7 @@ return array(
         'valcrosis' => array(
             'driver'    => 'mysql',
             'host'      => 'userver',
-            'database'  => 'valcro_db',
+            'database'  => 'valcro_db2',
             'username'  => 'root',
             'password'  => 'delimce',
             'charset'   => 'utf8',
@@ -34,7 +34,7 @@ return array(
         'valcro2' => array(
             'driver'    => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'valcro_datos',
+            'database'  => 'valcro_db2',
             'username'  => 'userVal',
             'password'  => 'ntmJX2zn92CQFc6P',
             'charset'   => 'utf8',

@@ -69,7 +69,7 @@ class AccountController extends BaseController
     public function prueba()
     {
 
-        return view("home");
+        return view("index");
     }
 
 

@@ -22,14 +22,29 @@ body {
     background-position: bottom center;
 }
 
+#holderAll{
+    z-index: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+}
 /**************************** Login *********************************/
+#holderLogin{
+    z-index: 2;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/login_bg_lines.gif");
+    background-position: bottom center;
+}
+
 md-input-container .md-input {
     border-color: #ffffff !important;
 }
 
 #login {
-    background-image: url("../images/login_bg_lines.gif");
-    background-position: bottom center;
+
 }
 
 #loginBottom {
