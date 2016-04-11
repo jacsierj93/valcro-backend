@@ -13,11 +13,13 @@
     <?=HTML::style("css/styles.css") ?>
     <?=HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
-    <?=HTML::script("components/angular/angular.js") ?>
-    <?=HTML::script("components/angular-animate/angular-animate.js") ?>
-    <?=HTML::script("components/angular-aria/angular-aria.js") ?>
-    <?=HTML::script("components/angular-messages/angular-messages.js") ?>
-    <?=HTML::script("components/angular-material/angular-material.js") ?>
+    <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
+    <?= HTML::script("components/angular/angular.js") ?>
+    <?= HTML::script("components/angular-animate/angular-animate.js") ?>
+    <?= HTML::script("components/angular-aria/angular-aria.js") ?>
+    <?= HTML::script("components/angular-messages/angular-messages.js") ?>
+    <?= HTML::script("components/angular-material/angular-material.js") ?>
+    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
 
 </head>
 
@@ -153,10 +155,10 @@
 
         <div class="barraHerramientas" layout="column" layout-align="center center" ng-controller="ListHerramientas">
 
-            <div layout="column" layout-align="center center" ng-repeat="item in tools"><img src="{{item.icon}}" alt="{{item.tool}}"></div>
+            <div layout="column" layout-align="center center" ng-repeat="item in tools"><img src="{{item.icon}}" title="{{item.tool}}"></div>
 
         </div>
-        <md-content class="barraLateral" ng-view ng-controller="ListProv">
+        <md-content class="barraLateral" ng-controller="ListProv">
 
             <div flex style="height: 192px;" ng-repeat="item in todos" ng-click="null">
                 <div style="height:96px;">{{ item.who }}</div>
