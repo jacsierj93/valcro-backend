@@ -1,3 +1,4 @@
+/**************************** Global *********************************/
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -12,35 +13,35 @@
     background-color: rgba(221, 221, 221, 1);
 }
 
-/*md-input-container{
-    margin: 0 !important;
-}*/
-
-
 body[ng-cloak] {
     display: none;
 }
 
 body {
-    background-image: url("http://10.15.2.111/valcrodev/images/login_bg_white.jpg");
+    background-image: url("../images/login_bg_white.jpg");
     background-position: bottom center;
 }
 
 /**************************** Login *********************************/
-md-input-container .md-input{
-    border-color:#ffffff !important;
+md-input-container .md-input {
+    border-color: #ffffff !important;
 }
 
-#login{
+#login {
     background-image: url("../images/login_bg_lines.gif");
     background-position: bottom center;
 }
 
-#loginBottom{
+#loginBottom {
     height: 80px;
 
 }
-.msjBienvenida{
+
+#lgnForm {
+    width: 400px;
+}
+
+.msjBienvenida {
     width: 333px;
     height: 287px;
     background-image: url("../images/login_exagono_bg.png");
@@ -51,26 +52,55 @@ md-input-container .md-input{
     font-size: 21px;
     font-weight: 100;
 }
-.md-input-focused{
+
+.md-input-focused {
     border-color: #ffffff !important;
 }
-.btnHolder{
+
+.btnHolder {
     width: 48px;
     height: 80px;
 }
-.btnHolder i{
+
+.btnHolder i {
     color: #ffffff;
     font-size: 28px;
     cursor: pointer;
 }
 
-.logoHolder{
+.logoHolder {
     width: 200px;
     height: 80px;
 
 }
 
+/**************************** Inicio *********************************/
+#inicio {
+    background-image: url("../images/login_bg_white.jpg");
+    background-position: bottom center;
+}
 
+#inicio md-content {
+    background-color: transparent !important;
+}
+
+#inicio .contenido {
+    font-weight: 100;
+    color: #999999;
+}
+
+#inicio .contenido h1 {
+    font-size: 72px;
+    font-weight: 100;
+    padding: 0;
+    margin: 0;
+}
+
+#inicio .contenido i {
+    font-size: 36px;
+}
+
+/**************************** Proveedores *********************************/
 .sideBar {
     width: 192px;
     /*background-color: #03a9f4;*/
@@ -129,10 +159,8 @@ md-input-container .md-input{
     height: 48px;
 }
 
-
-
 /**********************************************/
-.titulo_formulario{
+.titulo_formulario {
     border-bottom: solid 1px rgb(84, 180, 234);
     height: 24px;
 }

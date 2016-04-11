@@ -7,16 +7,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1"/>
-    <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic") ?>
-    <?=HTML::style("components/angular-material/angular-material.css") ?>
-    <?=HTML::style("css/styles.css") ?>
-    <?=HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
+    <?= HTML::style("http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic") ?>
+    <?= HTML::style("components/angular-material/angular-material.css") ?>
+    <?= HTML::style("css/styles.css") ?>
+    <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
-    <?=HTML::script("components/angular/angular.js") ?>
-    <?=HTML::script("components/angular-animate/angular-animate.js") ?>
-    <?=HTML::script("components/angular-aria/angular-aria.js") ?>
-    <?=HTML::script("components/angular-messages/angular-messages.js") ?>
-    <?=HTML::script("components/angular-material/angular-material.js") ?>
+    <?= HTML::script("components/angular/angular.js") ?>
+    <?= HTML::script("components/angular-animate/angular-animate.js") ?>
+    <?= HTML::script("components/angular-aria/angular-aria.js") ?>
+    <?= HTML::script("components/angular-messages/angular-messages.js") ?>
+    <?= HTML::script("components/angular-material/angular-material.js") ?>
 
 
 </head>
@@ -31,28 +31,30 @@
 
 </div>
 
-<div id="loginBottom" layout="row" ng-controller="login">
+<div id="loginBottom" layout="row">
 
     <div class="logoHolder" layout layout-align="center center">
-        <?=HTML::image("images/login_logo.png") ?>
+        <?= HTML::image("images/login_logo.png") ?>
     </div>
     <div flex>
     </div>
-    <md-input-container>
-        <label style="color: #ffffff">Usuario</label>
-        <input ng-model="user.usr"  style="color: #ffffff">
-    </md-input-container>
-    <md-input-container>
-        <label  style="color: #ffffff">Clave</label>
-        <input ng-model="user.pss" type="password" style="color: #ffffff">
-    </md-input-container>
-    <div class="btnHolder" layout layout-align="center center">
-        <i class="fa fa-angle-right"></i>
-    </div>
+    <form id="lgnForm" name="lgnForm" ng-controller="login" layout="row">
+        <md-input-container>
+            <label style="color: #ffffff">Usuario</label>
+            <input ng-model="user.usr" name="usr" style="color: #ffffff">
+        </md-input-container>
+        <md-input-container>
+            <label style="color: #ffffff">Clave</label>
+            <input ng-model="user.pss" name="pss" type="password" style="color: #ffffff">
+        </md-input-container>
+        <div class="btnHolder" layout layout-align="center center">
+            <i class="fa fa-angle-right" ng-click="lgn()"></i>
+        </div>
+    </form>
 </div>
 
 
-<?=HTML::script('js/app.js')?>
+<?= HTML::script('js/app.js') ?>
 
 </body>
 </html>

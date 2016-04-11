@@ -1,7 +1,25 @@
 var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages']);
 
-MyApp.controller('login', ['$scope', function($scope) {
+MyApp.controller('login', ['$scope', '$http', function ($scope) {
 
+    var usr = lgnForm.usr;
+    var pss = lgnForm.pss;
+
+    $scope.lgn = function () {
+        console.log(usr.value, pss.value);
+
+        $http({
+            method: 'POST',
+            url: 'usuarios.json'
+        }).then(function successCallback(response) {
+            console.log(response);
+        }, function errorCallback(response) {
+            console.log(response);
+
+        });
+
+
+    }
 
 }]);
 
@@ -11,6 +29,7 @@ MyApp.controller('AppCtrl', function ($scope) {
      description: 'Nuclear Missile Defense System',
      rate: 500
      };*/
+
     $scope.states = ('Fabrica Trader Agente Trader/Fabrica').split(' ').map(function (state) {
         return {abbrev: state};
     });
@@ -27,7 +46,7 @@ MyApp.controller('AppCtrl', function ($scope) {
 });
 
 MyApp.controller('ListSecciones', function ($scope) {
-    var imagePath = 'http://10.15.2.111/valcrodev/images/btn_dot.png';
+    var imagePath = 'imgs/btn_dot.png';
     $scope.secc = [
         {
             icon: imagePath,
@@ -49,7 +68,7 @@ MyApp.controller('ListSecciones', function ($scope) {
 });
 
 MyApp.controller('ListHerramientas', function ($scope) {
-    var imagePath = 'http://10.15.2.111/valcrodev/images/btn_dot.png';
+    var imagePath = 'imgs/btn_dot.png';
     $scope.tools = [
         {
             icon: imagePath,
