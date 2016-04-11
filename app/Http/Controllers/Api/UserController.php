@@ -34,9 +34,9 @@ class UserController extends BaseController
         $resp = new RestApi();
 
         $usuarios = new User();
-        $datos = $usuarios->where('user', $dataInput["usr"])->first();
+        $datos = $usuarios->where('user', $dataInput["usr"])->select("id","nivel_id","nombre","apellido","email","password")->first();
 
-
+       
         ///////comparacion con el password de la base de datos
         if (Hash::check($dataInput['pss'], $datos["password"])) {
             // The passwords match...
