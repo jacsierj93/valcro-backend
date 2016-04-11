@@ -30,12 +30,25 @@ class ProveedorController extends BaseController
 
     public function getList()
     {
+
+
         $provs = new Proveedor();
-        $data = $provs->where("deleted_at",NULL)->get();
-        foreach($data as $k => $v){
-            $v['moneda']=$v->proveedor_moneda()->get();
+        $dato = $provs->find(1);
+        $dato['monedas_rel'] = $dato->proveedor_moneda()->get();
+       // dd($dato);
+        foreach($dato['monedas_rel'] as $d){
+            $d['nomMoneda'] = $d->moneda()->get();
         }
-        return $data;
+        //dd($dato);
+ /*       $data = $provs->where("deleted_at",NULL)->get();
+        foreach($data as $k => $v){
+            $v['prov_moneda']=$v->proveedor_moneda()->get();
+          foreach($data as $v){
+              $v['nomb_moneda']= $v->moneda;
+          }
+        }*/
+        return $dato;
+        //return $data;
     }
 
     public function gettoken(){
