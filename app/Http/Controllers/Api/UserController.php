@@ -34,9 +34,10 @@ class UserController extends BaseController
         $resp = new RestApi();
 
         $usuarios = new User();
-        $datos = $usuarios->where('user', $dataInput["usr"])->select("id","nivel_id","nombre","apellido","email","password")->first();
+        $datos = $usuarios->where('user', $dataInput["usr"])->select("id", "nivel_id", "nombre", "apellido", "email", "password", "status")->first();
 
-       
+        //$datos = $usuarios->where('user', $dataInput["usr"])->first();
+
         ///////comparacion con el password de la base de datos
         if (Hash::check($dataInput['pss'], $datos["password"])) {
             // The passwords match...
@@ -45,16 +46,22 @@ class UserController extends BaseController
             if ($datos["status"] == 1) {
 
 
-            /*    /////modulos a los que puede acceder
-                                $modulos = $datos->profile->moduleSelected()->get();
-                                foreach ($modulos as $mod)
-                                    $mods[] = $mod->modulo_id;
-                                $datos["accesos"] = (isset($mods)) ? $mods : 0; ///trae los accesos sino 0
-                                ////////*/
+                /*    /////modulos a los que puede acceder
+                                    $modulos = $datos->profile->moduleSelected()->get();
+                                    foreach ($modulos as $mod)
+                                        $mods[] = $mod->modulo_id;
+                                    $datos["accesos"] = (isset($mods)) ? $mods : 0; ///trae los accesos sino 0
+                                    ////////*/
+
+                $dataUser = array("id" => $datos->id
+                , "nombre" => $datos->nombre
+                , "apellido" => $datos->apellido
+                , "nivel" => $datos->nivel_id
+                , "email" => $datos->email);
 
 
-                $request->session()->put('DATAUSER', $datos); ///datos del usuario
-                $resp->setContent($datos);
+                $request->session()->put('DATAUSER', $dataUser); ///datos del usuario
+                $resp->setContent($dataUser);
 
             } else {
                 $resp->setError("El usuario se encuentra inactivo");
@@ -74,7 +81,6 @@ class UserController extends BaseController
     {
         return Hash::make($word);
     }
-
 
 
 }
