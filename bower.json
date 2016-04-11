@@ -22,7 +22,8 @@
     "angular-material": "^1.0.7",
     "angular-messages": "^1.5.3",
     "font-awesome": "fontawesome#^4.5.0",
-    "jquery": "1.11.0"
+    "jquery": "1.11.0",
+    "angular-route": "^1.5.3"
   },
   "resolutions": {
     "jquery": "1.11.0"
