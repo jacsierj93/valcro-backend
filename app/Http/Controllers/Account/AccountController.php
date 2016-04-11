@@ -48,7 +48,7 @@ class AccountController extends BaseController
      */
     public function showLogin()
     {
-        return view('auth.login');
+        return view('login');
     }
 
     public function showUnauth()

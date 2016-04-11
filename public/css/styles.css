@@ -26,6 +26,51 @@ body {
     background-position: bottom center;
 }
 
+/**************************** Login *********************************/
+md-input-container .md-input{
+    border-color:#ffffff !important;
+}
+
+#login{
+    background-image: url("../images/login_bg_lines.gif");
+    background-position: bottom center;
+}
+
+#loginBottom{
+    height: 80px;
+
+}
+.msjBienvenida{
+    width: 333px;
+    height: 287px;
+    background-image: url("../images/login_exagono_bg.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+    color: #ffffff;
+    text-align: center;
+    font-size: 21px;
+    font-weight: 100;
+}
+.md-input-focused{
+    border-color: #ffffff !important;
+}
+.btnHolder{
+    width: 48px;
+    height: 80px;
+}
+.btnHolder i{
+    color: #ffffff;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.logoHolder{
+    width: 200px;
+    height: 80px;
+
+}
+
+
 .sideBar {
     width: 192px;
     /*background-color: #03a9f4;*/

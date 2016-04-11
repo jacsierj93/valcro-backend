@@ -1,4 +1,12 @@
-angular.module('MyApp', ['ngMaterial', 'ngMessages']).controller('AppCtrl', function ($scope) {
+var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages']);
+
+MyApp.controller('login', ['$scope', function($scope) {
+
+
+}]);
+
+
+MyApp.controller('AppCtrl', function ($scope) {
     /*$scope.project = {
      description: 'Nuclear Missile Defense System',
      rate: 500
@@ -16,85 +24,86 @@ angular.module('MyApp', ['ngMaterial', 'ngMessages']).controller('AppCtrl', func
         cb1: true
     };
 
+});
 
-
-
-
-
-}).controller('ListSecciones', function ($scope) {
+MyApp.controller('ListSecciones', function ($scope) {
     var imagePath = 'http://10.15.2.111/valcrodev/images/btn_dot.png';
     $scope.secc = [
         {
-            icon : imagePath,
+            icon: imagePath,
             secc: 'Inicio',
             url: '/inicio'
-        },{
-            icon : imagePath,
+        }, {
+            icon: imagePath,
             secc: 'Proveedores',
             url: '/proveedores'
-        },{
-            icon : imagePath,
+        }, {
+            icon: imagePath,
             secc: 'Productos',
             url: '/productos'
-        },{
-            icon : imagePath,
+        }, {
+            icon: imagePath,
             secc: 'Pagos',
             url: '/pagos'
         }];
-}).controller('ListHerramientas', function ($scope) {
+});
+
+MyApp.controller('ListHerramientas', function ($scope) {
     var imagePath = 'http://10.15.2.111/valcrodev/images/btn_dot.png';
     $scope.tools = [
         {
-            icon : imagePath,
+            icon: imagePath,
             tool: 'Calculadora',
             url: '/inicio'
-        },{
-            icon : imagePath,
+        }, {
+            icon: imagePath,
             tool: 'Extensiones',
             url: '/proveedores'
-        },{
-            icon : imagePath,
+        }, {
+            icon: imagePath,
             tool: 'Hora Mundial',
             url: '/productos'
-        },{
-            icon : imagePath,
+        }, {
+            icon: imagePath,
             secc: 'Factor de conversion',
             url: '/pagos'
         }];
-}).controller('ListProv', function ($scope) {
+});
+
+MyApp.controller('ListProv', function ($scope) {
 
     var imagePath = 'https://material.angularjs.org/latest/img/list/60.jpeg?0';
     $scope.todos = [
         {
-            face : imagePath,
+            face: imagePath,
             what: 'Brunch this weekend?',
             who: 'Min Li Chan',
             when: '3:08PM',
             notes: " I'll be in your neighborhood doing errands"
         },
         {
-            face : imagePath,
+            face: imagePath,
             what: 'Brunch this weekend?',
             who: 'Min Li Chan',
             when: '3:08PM',
             notes: " I'll be in your neighborhood doing errands"
         },
         {
-            face : imagePath,
+            face: imagePath,
             what: 'Brunch this weekend?',
             who: 'Min Li Chan',
             when: '3:08PM',
             notes: " I'll be in your neighborhood doing errands"
         },
         {
-            face : imagePath,
+            face: imagePath,
             what: 'Brunch this weekend?',
             who: 'Min Li Chan',
             when: '3:08PM',
             notes: " I'll be in your neighborhood doing errands"
         },
         {
-            face : imagePath,
+            face: imagePath,
             what: 'Brunch this weekend?',
             who: 'Min Li Chan',
             when: '3:08PM',
