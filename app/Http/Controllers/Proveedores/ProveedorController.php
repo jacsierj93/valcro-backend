@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Models\Sistema\Proveedor;
 use App\Models\Sistema\Contactos;
+use App\Models\Sistema\Monedas;
+use App\Models\Sistema\ProvMoneda;
 use App\Models\Sistema\NombreValcro;
 use Session;
 use Validator;
@@ -31,7 +33,7 @@ class ProveedorController extends BaseController
         $provs = new Proveedor();
         $data = $provs->where("deleted_at",NULL)->get();
         foreach($data as $k => $v){
-            $v['nombreValcro']=$v->nombres_valcro()->get();
+            $v['moneda']=$v->proveedor_moneda()->get();
         }
         return $data;
     }
@@ -54,6 +56,18 @@ class ProveedorController extends BaseController
     {
         $cont = new Contactos();
         $data = $cont->where("deleted_at",NULL)->get();
+        return $data;
+    }
+    public function Monedas()
+    {
+        $mon = new Moneda();
+        $data = $mon->where("deleted_at",NULL)->get();
+        return $data;
+    }
+    public function listMonedas()
+    {
+        $provmon = new ProvMoneda();
+        $data = $provmon->where("deleted_at",NULL)->get();
         return $data;
     }
 

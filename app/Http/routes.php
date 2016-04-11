@@ -106,4 +106,5 @@ $app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); //
 
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
-
+$app->get("monedas/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
+$app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'); ///obtener lista general

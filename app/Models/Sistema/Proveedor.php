@@ -17,5 +17,8 @@ class Proveedor extends  Model
     {
         return $this->hasMany('App\Models\Sistema\NombreValcro', 'prov_id');
     }
-
+    public function proveedor_moneda()
+    {
+        return $this->hasMany('App\Models\Sistema\ProvMoneda', 'prov_id');
+    }
 }
