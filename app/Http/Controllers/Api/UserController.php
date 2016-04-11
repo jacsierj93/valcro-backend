@@ -30,15 +30,15 @@ class UserController extends BaseController
     public function login(Request $request)
     {
 
-        $dataInput = $request->only('usuario', 'password');
+        $dataInput = $request->only('usr', 'pss');
         $resp = new RestApi();
 
         $usuarios = new User();
-        $datos = $usuarios->where('user', $dataInput["usuario"])->first();
+        $datos = $usuarios->where('user', $dataInput["usr"])->first();
 
 
         ///////comparacion con el password de la base de datos
-        if (Hash::check($dataInput['password'], $datos["password"])) {
+        if (Hash::check($dataInput['pss'], $datos["password"])) {
             // The passwords match...
 
             ////verificando que este activo
