@@ -46,7 +46,7 @@ MyApp.controller('AppCtrl', function ($scope) {
 });
 
 MyApp.controller('ListSecciones', function ($scope) {
-    var imagePath = 'imgs/btn_dot.png';
+    var imagePath = 'images/btn_dot.png';
     $scope.secc = [
         {
             icon: imagePath,
@@ -68,7 +68,7 @@ MyApp.controller('ListSecciones', function ($scope) {
 });
 
 MyApp.controller('ListHerramientas', function ($scope) {
-    var imagePath = 'imgs/btn_dot.png';
+    var imagePath = 'images/btn_dot.png';
     $scope.tools = [
         {
             icon: imagePath,
