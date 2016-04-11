@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1"/>
 
-    <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic") ?>
+    <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto:100,400,500,700,400italic") ?>
     <?=HTML::style("components/angular-material/angular-material.css") ?>
     <?=HTML::style("css/styles.css") ?>
     <?=HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
