@@ -72,7 +72,6 @@ $app->get('catalogs/sucursalList', 'Catalogs\SucursalController@getList'); ///li
 $app->post("catalogs/sucursalSave",'Catalogs\SucursalController@saveOrUpdate'); ///guardar
 $app->post("catalogs/sucursalDel",'Catalogs\SucursalController@delete'); ///borrar
 
-
 ////tipo de provedores
 $app->get('catalogs/providerTypesList', 'Catalogs\ProviderTypesController@getList'); ///lista de tipo de prov
 $app->get('catalogs/providerTypesForm', 'Catalogs\ProviderTypesController@getForm'); ///nuevo tipo prov
@@ -104,3 +103,7 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 $app->get("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
 $app->get("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
 $app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
+
+///contactos-proveedores
+$app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
+

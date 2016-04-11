@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Models\Sistema\Proveedor;
+use App\Models\Sistema\Contactos;
 use App\Models\Sistema\NombreValcro;
 use Session;
 use Validator;
@@ -49,7 +50,14 @@ class ProveedorController extends BaseController
         dd($req);
     }
 
-/*    public function saveDataProv(){
+    public function listContactos()
+    {
+        $cont = new Contactos();
+        $data = $cont->where("deleted_at",NULL)->get();
+        return $data;
+    }
 
-    }*/
+    /*    public function saveDataProv(){
+
+        }*/
 }

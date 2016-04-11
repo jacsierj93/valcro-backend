@@ -41,7 +41,7 @@ var saveOrUpdateDep = function () {
 var deleteDep = function (id) {
     $.confirm({
         text: "Esta seguro que desea borrar este registro?",
-        title: "Borrar Departamento",
+        title: "Borrar Tipo de Envio",
         confirm: function () {
             jQuery.ajax({
                 url: PATHAPP + 'catalogs/providerTypesSendDel',
