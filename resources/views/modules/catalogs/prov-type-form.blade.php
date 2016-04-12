@@ -2,7 +2,7 @@
 
 
 @section('contentheader_title')
-    Maestro de departamentos
+    Maestro de Tipo de Provedor
 @endsection
 
 @section('head_adds')
@@ -20,8 +20,8 @@
                 <div class="col-sm-5">
                     <div class="form-group">
                         <label>Nombre</label>
-                        <input class="form-control" name="nombre" value="{{$data->nombre}}" placeholder="Escriba..."
-                               type="text" required>
+                        <input class="form-control" name="nombre"  maxlength="19" value="{{$data->nombre}}" placeholder="Escriba..."
+                               type="text" required >
                     </div>
                 </div>
 
@@ -29,7 +29,7 @@
                 <div class="col-sm-5">
                     <div class="form-group">
                         <label>Descripción</label>
-                        <input class="form-control" name="descripcion" value="{{$data->descripcion}}"
+                        <input class="form-control" name="descripcion"  maxlength="49" value="{{$data->descripcion}}"
                                placeholder="Escriba..." type="text" required>
                     </div>
                 </div>
@@ -58,7 +58,8 @@
 
 @section('scripts_adds')
 
-    <script src="{{url("js/module/catalog.js")}}"></script>
+    <script src="{{url("js/module/prov-types-ctrl.js")}}"></script>
+    {!! Html::script('components/jquery-confirm/jquery.confirm.min.js') !!}
 
 
     <script>
@@ -67,7 +68,7 @@
 
             $("#save").on("click", function () {
 
-                saveOrUpdateDep();
+                saveOrUpdateProvType();
 
             });
 

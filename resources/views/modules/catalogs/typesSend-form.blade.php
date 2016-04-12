@@ -2,7 +2,7 @@
 
 
 @section('contentheader_title')
-    Maestro de departamentos
+    Maestro de tipos de envio de proveedores
 @endsection
 
 @section('head_adds')
@@ -21,7 +21,7 @@
                     <div class="form-group">
                         <label>Nombre</label>
                         <input class="form-control" name="nombre" value="{{$data->nombre}}" placeholder="Escriba..."
-                               type="text" required>
+                               type="text" maxlength="50" required>
                     </div>
                 </div>
 
@@ -30,7 +30,7 @@
                     <div class="form-group">
                         <label>Descripción</label>
                         <input class="form-control" name="descripcion" value="{{$data->descripcion}}"
-                               placeholder="Escriba..." type="text" required>
+                               placeholder="Escriba..." type="text" maxlength="255" required>
                     </div>
                 </div>
 
@@ -58,8 +58,8 @@
 
 @section('scripts_adds')
 
-    <script src="{{url("js/module/catalog.js")}}"></script>
-
+    <script src="{{url("js/module/prov-typesEnv.js")}}"></script>
+    {!! Html::script('components/jquery-confirm/jquery.confirm.min.js') !!}
 
     <script>
         $(function () {

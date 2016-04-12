@@ -50,6 +50,30 @@ var saveAccess = function () {
 
 };
 
+var savePreferences = function () {
+
+    ////entrada de datos basicos
+    var form = $('#form4');
+
+    jQuery.ajax({
+        url: PATHAPP + 'users/savePrefs',
+        type: 'POST',
+        dataType: 'json',
+        data: form.serialize(),
+        beforeSend: function () {
+        },
+        success: function (response) {
+            // response
+            var msg = "";
+
+
+        }
+    });
+
+};
+
+
+
 var deleteUser = function (id) {
     $.confirm({
         text: "Esta seguro que desea borrar este registro?",
