@@ -11,7 +11,7 @@ class Monedas extends  Model
 
     use SoftDeletes;
     protected $table = 'tbl_moneda';
-    protected $dates = ['deleted_at'];
+
     ////foreing key
     public function moneda_proveedor()
     {

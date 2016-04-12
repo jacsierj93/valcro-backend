@@ -11,15 +11,11 @@ class ProvMoneda extends  Model
 
     use SoftDeletes;
     protected $table = 'tbl_prov_moneda';
-    protected $dates = ['deleted_at'];
     ////foreing key
     public function moneda()
     {
-        return $this->belongsTo('App\Models\Sistema\Monedas', 'id');
+        return $this->belongsToMany('App\Models\Sistema\Proveedor', 'tbl_prov_moneda','prov_id','moneda_id');
     }
 
-    public function proveedor()
-    {
-        return $this->belongsTo('App\Models\Sistema\Proveedor', 'id', 'nombre');
-    }
+
 }
