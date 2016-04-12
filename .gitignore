@@ -2,4 +2,5 @@
 /vendor
 /config/database.php
 /public/components
+/public/js/settings.js
 /public/.htaccces

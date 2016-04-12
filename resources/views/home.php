@@ -45,7 +45,7 @@
     </md-content>-->
     <!-- ######################### CONTENIDO #############################33-->
 
-    <data-ng-view></data-ng-view>
+    <ng-view layout="column" layout-padding flex></ng-view>
 
 
 </div>

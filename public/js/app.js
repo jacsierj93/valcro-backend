@@ -4,12 +4,12 @@ var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages', 'ngRoute','ngRe
 MyApp.config(['$routeProvider', '$locationProvider',
     function($routeProvider, $locationProvider){
         $routeProvider.
-        when('/beta', {
+        when('/home', {
             templateUrl : 'modules/home/index'
         }).
 
         otherwise({
-            redirectTo : '/'
+            redirectTo : '/home'
         });
         $locationProvider.html5Mode(true);
     }
@@ -44,7 +44,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
                     opacity: 0
                 }, 1000, function () {
 
-                    location.replace('angular/#beta');
+                    location.replace('angular/#home');
                 });
             }
         }, function errorCallback(response) {
