@@ -53,6 +53,7 @@
                     <li><a href="{{url('catalogs/providerTypesSendList')}}">Tipo de Envíos</a></li><!---tipos de envio d proveedor -->
                     <li><a href="{{url('catalogs/CondPagoProvList')}}">Condiciones de Pago a Proveedor</a></li><!---add for miguel -->
                     <li><a href="{{url('catalogs/tiemAproTranList')}}">Tiempo Aproximado de Transito</a></li><!---tiempo de transito -->
+                    <li><a href="{{url('catalogs/PayTypesList')}}">Tipo de Pago</a></li><!---Tipo de pagoo -->
 
                 </ul>
             </li>
