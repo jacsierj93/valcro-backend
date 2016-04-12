@@ -21,7 +21,6 @@
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
 
-
     <base href="/angular/">
 </head>
 
@@ -30,7 +29,7 @@
 
 <div class="cabezera" layout="row" layout-align="start center">
     <div style="width: 132px; height: 48px;">
-        <?=HTML::image("images/logo_inicio.png") ?>
+        <?= HTML::image("images/logo_inicio.png") ?>
     </div>
     <div flex></div>
     <div layout style="width: 132px; height: 48px;">
@@ -46,21 +45,12 @@
     <div class="barraHerramientas" layout="column" layout-align="center center" ng-controller="ListHerramientas">
 
         <div layout="column" layout-align="center center" ng-repeat="item in tools">
-
-
-
-            <img src="<?=url('images/btn_dot.png')?>" title="{{item.tool}}">
+            <img src="<?= url('images/btn_dot.png') ?>" title="{{item.tool}}">
         </div>
 
     </div>
 
-    <!--<md-content class="contenido" layout="column" layout-padding layout-align="end center" flex>
-        <h1>Bienvenido!</h1>
-        Para acceder a una seccion haga click en los puntos de larte inferior!
-        <i class="fa fa-angle-down"></i>
-    </md-content>-->
-    <!-- ######################### CONTENIDO #############################33-->
-
+    <!-- ######################### CONTENIDO #############################-->
     <ng-view layout="column" layout-padding flex></ng-view>
 
 
@@ -70,12 +60,11 @@
 
     <div layout="column" layout-align="center center" ng-repeat="item in secc">
         <a ng-href="{{item.url}}">
-            <img src="<?=url('images/btn_dot.png')?>" alt="{{item.secc}}">
-            </a>
-        </div>
+            <img src="<?= url('images/btn_dot.png') ?>" alt="{{item.secc}}">
+        </a>
+    </div>
 
 </div>
-
 
 
 <?= HTML::script('js/app.js') ?>
