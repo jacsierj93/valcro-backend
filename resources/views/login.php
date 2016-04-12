@@ -14,12 +14,14 @@
 
     <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
     <?= HTML::script("components/angular/angular.js") ?>
+    <?= HTML::script("components/angular-resource/angular-resource.min.js") ?>
+    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
     <?= HTML::script("components/angular-animate/angular-animate.js") ?>
     <?= HTML::script("components/angular-aria/angular-aria.js") ?>
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
-    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
 
+    <base href="/angular/">
 </head>
 
 <body id="login" ng-app="MyApp" ng-cloak layout="column">

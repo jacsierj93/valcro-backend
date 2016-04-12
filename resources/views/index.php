@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" ng-app="MyApp">
 <head>
     <title>Angular Material - Starter App</title>
 
@@ -15,15 +15,17 @@
 
     <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
     <?= HTML::script("components/angular/angular.js") ?>
+    <?= HTML::script("components/angular-resource/angular-resource.min.js") ?>
+    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
     <?= HTML::script("components/angular-animate/angular-animate.js") ?>
     <?= HTML::script("components/angular-aria/angular-aria.js") ?>
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
-    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
+
 
 </head>
 
-<body ng-app="MyApp" ng-cloak layout="column">
+<body  ng-cloak layout="column">
 
 
 

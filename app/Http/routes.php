@@ -41,6 +41,7 @@ $app->get('test', 'Admin\AccountController@main');
 
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
 
+
 $app->get('/angular', 'Account\AccountController@prueba'); ///pagina principal
 
 $app->get('login', [
@@ -48,6 +49,12 @@ $app->get('login', [
 ]); ///login
 $app->post("api/user/login",'Api\UserController@login'); ///login api
 $app->get('logout', 'Account\AccountController@logout'); ///logout
+
+////carga de vistas dinamica
+$app->get('/modules/{resource}/{action}', function ($resource, $action) {
+    return view("/modules/$resource/$action");
+});
+
 
 
 ////usuarios

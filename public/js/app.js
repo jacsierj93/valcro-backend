@@ -1,82 +1,13 @@
-var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages', 'ngRoute']);
+var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages', 'ngRoute','ngResource']);
 
-/*MyApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider){
-    $routeProvider.when('/', {
-        templateUrl: 'modules/home.html',
-        controller: 'homeController'
-    });
-    $locationProvider.html5Mode(true);
-}]);
 
-MyApp.controller('homeController', function ($scope) {
-    $scope.message = 'Everyone come and see how good I look!';
-});*/
-
-/*
-videoclubApp.config(['$routeProvider', '$locationProvider',
+MyApp.config(['$routeProvider', '$locationProvider',
     function($routeProvider, $locationProvider){
         $routeProvider.
-        //directors
-        when('/directors', {
-            templateUrl : 'partials/directors/index',
-            controller : 'directorsCtrl'
+        when('/beta', {
+            templateUrl : 'modules/home/index'
         }).
-        when('/directors/new', {
-            templateUrl : 'partials/directors/new',
-            controller : 'directorsCtrl'
-        }).
-        when('/directors/:director_id', {
-            templateUrl : 'partials/directors/edit',
-            controller : 'directorsCtrl'
-        }).
-        when('/genres', {
-            templateUrl : 'partials/genres/index',
-            controller : 'genresCtrl'
-        }).
-        when('/genres/new', {
-            templateUrl : 'partials/genres/new',
-            controller : 'genresCtrl'
-        }).
-        when('/genres/:genre_id', {
-            templateUrl : 'partials/genres/edit',
-            controller : 'genresCtrl'
-        }).
-        when('/clients', {
-            templateUrl : 'partials/clients/index',
-            controller : 'clientsCtrl'
-        }).
-        when('/clients/new', {
-            templateUrl : 'partials/clients/new',
-            controller : 'clientsCtrl'
-        }).
-        when('/clients/:client_id', {
-            templateUrl : 'partials/clients/edit',
-            controller : 'clientsCtrl'
-        }).
-        when('/movies', {
-            templateUrl : 'partials/movies/index',
-            controller : 'moviesCtrl'
-        }).
-        when('/movies/new', {
-            templateUrl : 'partials/movies/new',
-            controller : 'moviesCtrl'
-        }).
-        when('/movies/:movie_id', {
-            templateUrl : 'partials/movies/edit',
-            controller : 'moviesCtrl'
-        }).
-        when('/rents', {
-            templateUrl : 'partials/rents/index',
-            controller : 'rentsCtrl'
-        }).
-        when('/rents/new', {
-            templateUrl : 'partials/rents/new',
-            controller : 'rentsCtrl'
-        }).
-        when('/rents/:rent_id', {
-            templateUrl : 'partials/rents/edit',
-            controller : 'rentsCtrl'
-        }).
+
         otherwise({
             redirectTo : '/'
         });
@@ -84,18 +15,13 @@ videoclubApp.config(['$routeProvider', '$locationProvider',
     }
 ]);
 
-videoclubApp.run(['$route', function($route)  {
-    $route.reload();
-}]);
-*/
-
 
 
 
 
 /*MyApp.config(['$routeProvider',function($routeProvider){
     $routeProvider
-        .when('/home',  {templateUrl:"modules/home.html"})
+        .when('/home',  {templateUrl:"modules/home"})
 }]);*/
 
 
@@ -117,7 +43,8 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
                 $("#holderLogin").animate({
                     opacity: 0
                 }, 1000, function () {
-                    location.replace('angular/');
+
+                    location.replace('angular/#beta');
                 });
             }
         }, function errorCallback(response) {
@@ -194,6 +121,14 @@ MyApp.controller('ListHerramientas', function ($scope) {
             url: '/pagos'
         }];
 });
+
+
+/*
+MyApp.run(['$route', function($route)  {
+    $route.reload();
+}]);*/
+
+
 
 MyApp.controller('ListProv', function ($scope) {
 

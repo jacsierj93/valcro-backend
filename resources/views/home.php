@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" ng-app="MyApp">
 <head>
     <title>Valcro Sistema</title>
 
@@ -12,16 +12,13 @@
     <?= HTML::style("css/styles.css") ?>
     <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
-    <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
-    <?= HTML::script("components/angular/angular.js") ?>
-    <?= HTML::script("components/angular-animate/angular-animate.js") ?>
-    <?= HTML::script("components/angular-aria/angular-aria.js") ?>
-    <?= HTML::script("components/angular-messages/angular-messages.js") ?>
-    <?= HTML::script("components/angular-material/angular-material.js") ?>
-    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
+
+
+
+    <base href="/angular/">
 </head>
 
-<body id="inicio" ng-app="MyApp" ng-cloak layout="column">
+<body id="inicio" ng-cloak layout="column">
 
 
 <div class="cabezera" layout="row" layout-align="start center">
@@ -34,7 +31,10 @@
     <div class="barraHerramientas" layout="column" layout-align="center center" ng-controller="ListHerramientas">
 
         <div layout="column" layout-align="center center" ng-repeat="item in tools">
-            <img src="{{item.icon}}" title="{{item.tool}}">
+
+
+
+            <img src="<?=url('images/btn_dot.png')?>" title="{{item.tool}}">
         </div>
 
     </div>
@@ -44,18 +44,26 @@
         <i class="fa fa-angle-down"></i>
     </md-content>-->
     <!-- ######################### CONTENIDO #############################33-->
-    Home
-    <ng-view layout="column" layout-padding flex></ng-view>
+
+    <data-ng-view></data-ng-view>
 
 
 </div>
 
 <div class="pie" layout="row" layout-align="start center" ng-controller="ListSecciones">
 
-    <div layout="column" layout-align="center center" ng-repeat="item in secc"><img src="{{item.icon}}" alt="{{item.secc}}"></div>
+    <div layout="column" layout-align="center center" ng-repeat="item in secc"><img src="<?=url('images/btn_dot.png')?>" alt="{{item.secc}}"></div>
 
 </div>
 
+<?= HTML::script("components/jquery/dist/jquery.min.js") ?>
+<?= HTML::script("components/angular/angular.js") ?>
+<?= HTML::script("components/angular-resource/angular-resource.min.js") ?>
+<?= HTML::script("components/angular-route/angular-route.min.js") ?>
+<?= HTML::script("components/angular-animate/angular-animate.js") ?>
+<?= HTML::script("components/angular-aria/angular-aria.js") ?>
+<?= HTML::script("components/angular-messages/angular-messages.js") ?>
+<?= HTML::script("components/angular-material/angular-material.js") ?>
 
 <?= HTML::script('js/app.js') ?>
 </body>
