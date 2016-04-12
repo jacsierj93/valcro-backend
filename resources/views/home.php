@@ -12,7 +12,14 @@
     <?= HTML::style("css/styles.css") ?>
     <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
-
+    <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
+    <?= HTML::script("components/angular/angular.js") ?>
+    <?= HTML::script("components/angular-resource/angular-resource.min.js") ?>
+    <?= HTML::script("components/angular-route/angular-route.min.js") ?>
+    <?= HTML::script("components/angular-animate/angular-animate.js") ?>
+    <?= HTML::script("components/angular-aria/angular-aria.js") ?>
+    <?= HTML::script("components/angular-messages/angular-messages.js") ?>
+    <?= HTML::script("components/angular-material/angular-material.js") ?>
 
 
     <base href="/angular/">
@@ -22,7 +29,15 @@
 
 
 <div class="cabezera" layout="row" layout-align="start center">
-    <?= HTML::image("images/logo_inicio.png") ?>
+    <div style="width: 132px; height: 48px;">
+        <?=HTML::image("images/logo_inicio.png") ?>
+    </div>
+    <div flex></div>
+    <div layout style="width: 132px; height: 48px;">
+        <a ng-href="logout">
+            Salir
+        </a>
+    </div>
 </div>
 
 
@@ -38,6 +53,7 @@
         </div>
 
     </div>
+
     <!--<md-content class="contenido" layout="column" layout-padding layout-align="end center" flex>
         <h1>Bienvenido!</h1>
         Para acceder a una seccion haga click en los puntos de larte inferior!
@@ -52,18 +68,15 @@
 
 <div class="pie" layout="row" layout-align="start center" ng-controller="ListSecciones">
 
-    <div layout="column" layout-align="center center" ng-repeat="item in secc"><img src="<?=url('images/btn_dot.png')?>" alt="{{item.secc}}"></div>
+    <div layout="column" layout-align="center center" ng-repeat="item in secc">
+        <a ng-href="{{item.url}}">
+            <img src="<?=url('images/btn_dot.png')?>" alt="{{item.secc}}">
+            </a>
+        </div>
 
 </div>
 
-<?= HTML::script("components/jquery/dist/jquery.min.js") ?>
-<?= HTML::script("components/angular/angular.js") ?>
-<?= HTML::script("components/angular-resource/angular-resource.min.js") ?>
-<?= HTML::script("components/angular-route/angular-route.min.js") ?>
-<?= HTML::script("components/angular-animate/angular-animate.js") ?>
-<?= HTML::script("components/angular-aria/angular-aria.js") ?>
-<?= HTML::script("components/angular-messages/angular-messages.js") ?>
-<?= HTML::script("components/angular-material/angular-material.js") ?>
+
 
 <?= HTML::script('js/app.js') ?>
 </body>

@@ -4,12 +4,16 @@ var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages', 'ngRoute','ngRe
 MyApp.config(['$routeProvider', '$locationProvider',
     function($routeProvider, $locationProvider){
         $routeProvider.
-        when('/home', {
+        when('/', {
             templateUrl : 'modules/home/index'
+        }).when('/proveedores', {
+            templateUrl : 'modules/proveedores/index'
+        }).when('/logout', {
+            redirectTo : 'logout'
         }).
-
         otherwise({
-            redirectTo : '/home'
+            redirectTo : '/'
+            //templateUrl : 'modules/home/404'
         });
         $locationProvider.html5Mode(true);
     }
@@ -40,12 +44,14 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
             }
         }).then(function successCallback(response) {
             if (response.data.success) {
-                $("#holderLogin").animate({
+
+                location.replace('angular/#home');
+
+                /*$("#holderLogin").animate({
                     opacity: 0
                 }, 1000, function () {
-
                     location.replace('angular/#home');
-                });
+                });*/
             }
         }, function errorCallback(response) {
             console.log(response);
@@ -84,11 +90,11 @@ MyApp.controller('ListSecciones', function ($scope) {
         {
             icon: imagePath,
             secc: 'Inicio',
-            url: '/inicio'
+            url: 'home'
         }, {
             icon: imagePath,
             secc: 'Proveedores',
-            url: '/proveedores'
+            url: 'proveedores'
         }, {
             icon: imagePath,
             secc: 'Productos',
@@ -123,8 +129,8 @@ MyApp.controller('ListHerramientas', function ($scope) {
 });
 
 
-/*
-MyApp.run(['$route', function($route)  {
+
+/*MyApp.run(['$route', function($route)  {
     $route.reload();
 }]);*/
 

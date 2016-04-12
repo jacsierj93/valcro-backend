@@ -22,6 +22,7 @@
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
 
+    <base href="/angular/">
 
 </head>
 
@@ -148,7 +149,16 @@
 
 
     <div class="cabezera" layout="row" layout-align="start center">
-        <?=HTML::image("images/logo_inicio.png") ?>
+        <div style="width: 132px; height: 48px;">
+            <?=HTML::image("images/logo_inicio.png") ?>
+        </div>
+        <div flex></div>
+        <div layout style="width: 132px; height: 48px;">
+            <a href="logout">
+                Salir
+            </a>
+        </div>
+
     </div>
 
    <!-- -->
@@ -257,7 +267,11 @@
 
     <div class="pie" layout="row" layout-align="start center" ng-controller="ListSecciones">
 
-        <div layout="column" layout-align="center center" ng-repeat="item in secc"><img src="{{item.icon}}" alt="{{item.secc}}"></div>
+        <div layout="column" layout-align="center center" ng-repeat="item in secc">
+            <a href="{{item.url}}">
+                <img src="{{item.icon}}" alt="{{item.secc}}">
+            </a>
+        </div>
 
     </div>
 
