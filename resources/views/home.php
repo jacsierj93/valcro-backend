@@ -24,7 +24,7 @@
     <base href="/angular/">
 </head>
 
-<body id="inicio" ng-cloak layout="column">
+<body id="inicio" ng-cloak layout="column" ng-controller="AppCtrl">
 
 
 <div class="cabezera" layout="row" layout-align="start center">
@@ -51,17 +51,16 @@
     </div>
 
     <!-- ######################### CONTENIDO #############################-->
-    <ng-view layout="column" layout-padding flex></ng-view>
+    <!--<ng-view layout="column" layout-padding flex></ng-view>-->
+    <div id="contentHolder" flex ng-include="template.url" layout="column"></div>
 
 
 </div>
 
-<div class="pie" layout="row" layout-align="start center" ng-controller="ListSecciones">
+<div class="pie" layout="row" layout-align="start center">
 
     <div layout="column" layout-align="center center" ng-repeat="item in secc">
-        <a ng-href="{{item.url}}">
-            <img src="<?= url('images/btn_dot.png') ?>" alt="{{item.secc}}">
-        </a>
+        <img src="<?= url('images/btn_dot.png') ?>" ng-click="seccLink(this)" alt="{{item.secc}}">
     </div>
 
 </div>

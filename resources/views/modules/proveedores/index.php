@@ -1,5 +1,4 @@
-<div layout="row" flex class="middle" style="background-color: #ffffff;">
-
+<div layout="row" flex>
 
     <md-content class="barraLateral" ng-controller="ListProv">
 
@@ -8,12 +7,13 @@
             <div style="height:48px; font-size:31px;">{{$index}}00000</div>
             <div style="height:48px;">
                 <i class="fa fa-gift" style="font-size:24px;"></i>
-                <i class="fa fa-paper-plane"  style="font-size:18px; color: #03a9f4;"></i>
+                <i class="fa fa-paper-plane" style="font-size:18px; color: #03a9f4;"></i>
             </div>
         </div>
 
     </md-content>
-    <md-content class="contenido" layout="column" layout-padding flex ng-controller="AppCtrl">
+
+    <md-content layout="column" layout-padding flex ng-controller="AppCtrl">
 
         <form name="projectForm">
 
@@ -56,7 +56,6 @@
                 </md-input-container>
 
 
-
             </div>
 
             <div layout="row">
@@ -89,8 +88,6 @@
             </div>
 
         </form>
-
-
 
     </md-content>
 

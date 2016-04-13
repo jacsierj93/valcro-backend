@@ -27,8 +27,6 @@
 <body id="login" ng-app="MyApp" ng-cloak layout="column">
 
 
-<div id="holderLogin" layout="column" flex>
-
     <div id="loginTop" flex layout layout-align="center center">
 
         <div class="msjBienvenida" layout layout-align="center center">
@@ -61,29 +59,7 @@
     </div>
 
 
-</div>
 
-<div id="holderAll" layout="column" flex>
-    <div class="cabezera" layout="row" layout-align="start center">
-        <?= HTML::image("images/logo_inicio.png") ?>
-    </div>
-
-    <div layout="row" flex class="middle">
-
-        <div class="barraHerramientas" layout="column" layout-align="center center" ng-controller="ListHerramientas">
-            <div layout="column" layout-align="center center" ng-repeat="item in tools"><img src="{{item.icon}}" alt="{{item.tool}}"></div>
-        </div>
-
-        <!-- ######################### CONTENIDO #############################33-->
-        <ng-view layout="column" layout-padding flex></ng-view>
-
-    </div>
-
-    <div class="pie" layout="row" layout-align="start center" ng-controller="ListSecciones">
-        <div layout="column" layout-align="center center" ng-repeat="item in secc"><img src="{{item.icon}}" alt="{{item.secc}}"></div>
-    </div>
-
-</div>
 
 
 <?= HTML::script('js/settings.js') ?>

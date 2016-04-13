@@ -1,7 +1,7 @@
 var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages', 'ngRoute','ngResource']);
 
 
-MyApp.config(['$routeProvider', '$locationProvider',
+/*MyApp.config(['$routeProvider', '$locationProvider',
     function($routeProvider, $locationProvider){
         $routeProvider.
         when('/', {
@@ -17,10 +17,7 @@ MyApp.config(['$routeProvider', '$locationProvider',
         });
         $locationProvider.html5Mode(true);
     }
-]);
-
-
-
+]);*/
 
 
 /*MyApp.config(['$routeProvider',function($routeProvider){
@@ -69,22 +66,14 @@ MyApp.controller('AppCtrl', function ($scope) {
      rate: 500
      };*/
 
-    $scope.states = ('Fabrica Trader Agente Trader/Fabrica').split(' ').map(function (state) {
-        return {abbrev: state};
-    });
+    $scope.templates =[
+        { url: 'modules/home/index'},
+        { url: 'modules/proveedores/index'},
+        { url: 'modules/home/logedout'},
+        { url: 'modules/home/404'}
+    ];
+    $scope.template = $scope.templates[0];
 
-    $scope.envios = ('Aereo Maritimo Terrestre').split(' ').map(function (envio) {
-        return {tipo: envio};
-    });
-
-
-    $scope.data = {
-        cb1: true
-    };
-
-});
-
-MyApp.controller('ListSecciones', function ($scope) {
     var imagePath = 'images/btn_dot.png';
     $scope.secc = [
         {
@@ -104,7 +93,51 @@ MyApp.controller('ListSecciones', function ($scope) {
             secc: 'Pagos',
             url: '/pagos'
         }];
+
+    $scope.seccLink = function (indx){
+        console.log(indx.$index);
+        $scope.template = $scope.templates[indx.$index];
+    }
+
+
+
+
+    $scope.states = ('Fabrica Trader Agente Trader/Fabrica').split(' ').map(function (state) {
+        return {abbrev: state};
+    });
+
+    $scope.envios = ('Aereo Maritimo Terrestre').split(' ').map(function (envio) {
+        return {tipo: envio};
+    });
+
+
+    $scope.data = {
+        cb1: true
+    };
+
 });
+
+/*MyApp.controller('ListSecciones', function ($scope) {
+    var imagePath = 'images/btn_dot.png';
+    $scope.secc = [
+        {
+            icon: imagePath,
+            secc: 'Inicio',
+            url: 'home'
+        }, {
+            icon: imagePath,
+            secc: 'Proveedores',
+            url: 'proveedores'
+        }, {
+            icon: imagePath,
+            secc: 'Productos',
+            url: '/productos'
+        }, {
+            icon: imagePath,
+            secc: 'Pagos',
+            url: '/pagos'
+        }];
+});*/
 
 MyApp.controller('ListHerramientas', function ($scope) {
     var imagePath = 'images/btn_dot.png';
