@@ -17,7 +17,7 @@
 
         <form name="projectForm">
 
-            <div class="titulo_formulario" layout="row">
+            <div class="titulo_formulario" layout="row" layout-align="start center">
                 Datos Proveedor
             </div>
             <div layout="row">
@@ -73,11 +73,13 @@
                     </div>
                 </md-input-container>
 
-                <md-input-container class="md-block" flex>
+                <md-input-container class="md-block">
                     <md-switch class="md-primary" ng-model="data.cb1" aria-label="Contrapedidos">
                         Contrapedidos?
                     </md-switch>
                 </md-input-container>
+
+                <div flex></div>
 
             </div>
         </form>
