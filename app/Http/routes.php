@@ -104,7 +104,11 @@ $app->get("proveedores/provList",'Proveedores\ProveedorController@getList'); ///
 $app->get("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
 $app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
 
-///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
 $app->get("monedas/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
 $app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'); ///obtener lista general
+
+
+$app->get("creditoProv/creditoProvList",'Proveedores\ProveedorController@listLimitCred'); ///obtener lista general
+$app->get("factConvProv/factorProvList",'Proveedores\ProveedorController@listConvPro'); ///obtener lista general
+
