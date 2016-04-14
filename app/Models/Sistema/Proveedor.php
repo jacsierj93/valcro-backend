@@ -21,4 +21,16 @@ class Proveedor extends  Model
     {
         return $this->hasMany('App\Models\Sistema\ProvMoneda', 'prov_id');
     }
+
+    public function proveedor_product()
+    {
+        return $this->hasMany('App\Models\Sistema\Product', 'prov_id');
+    }
+
+    /**
+    */
+    public function monedas(){
+        return $this->belongsToMany('App\Models\Sistema\Monedas', 'tbl_prov_moneda', 'prov_id','moneda_id');
+    }
+
 }
