@@ -117,6 +117,14 @@ MyApp.controller('AppCtrl', function ($scope) {
 
 });
 
+
+
+MyApp.controller('TipoDirecc', function ($scope) {
+    $scope.tipos = ('Facturacion Fabrica Almacen').split(' ').map(function (tipo) {
+        return {nombre : tipo};
+    });
+});
+
 /*MyApp.controller('ListSecciones', function ($scope) {
     var imagePath = 'images/btn_dot.png';
     $scope.secc = [

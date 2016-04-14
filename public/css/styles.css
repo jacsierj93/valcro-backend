@@ -23,6 +23,10 @@ md-switch.md-checked.md-primary .md-ink-ripple{
 }
 
 
+form{
+    padding: 0 !important;
+}
+
 /*==================================================*/
 /*==================================================*/
 md-input-container{
@@ -295,8 +299,36 @@ body {
 }
 
 /**********************************************/
+.menuBarHolder{
+    height: 48px !important;
+    background-color: #ffffff;
+}
+
+.menu{
+    width: 192px;
+    background-color: #cccccc;
+    padding-left: 8px;
+}
+
+.boxList{
+    height: 176px;
+    padding: 8px;
+    color: #999999;
+}
+
 .titulo_formulario {
-    border-bottom: solid 1px rgb(84, 180, 234);
     color: rgb(84, 180, 234);
     height: 39px;
+    padding-right: 8px;
+}
+
+.titulo_formulario div{
+    border-bottom: solid 1px rgb(84, 180, 234);
+    width: 100%;
+    padding-top: 10px;
+    height: 19px;
+}
+
+.cntLayerHolder{
+    padding: 10px 16px 24px 24px !important;
 }
