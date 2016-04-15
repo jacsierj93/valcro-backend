@@ -79,27 +79,6 @@
 
                         </div>
 
-                        <div class="row">
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Aprobado Gerencia</label><br>
-                                    <input class="checkbox" id="ventas"  type="checkbox" name="ventas" value="{{$data->aprob_gerencia}}"
-                                           placeholder="....."
-                                           type="text" required>
-
-                                </div>
-                            </div>
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Aprobado Ventas</label><br>
-                                    <input class="checkbox" id="gerencia"  type="checkbox" name="gerenca" value="{{$data->aprob_venta}}"
-                                           placeholder="....."
-                                           type="text" required>
-                                </div>
-                            </div>
-
-                        </div>
-
                     </div>
 
                     {{--parte del formulario de usuario que guardará--}}
@@ -133,23 +112,15 @@
                                     </thead>
                                     <tbody>
                                     @foreach ($data->getItems()->get() as $result)
-                                        <tr class="itemOld" >
+                                        <tr class="itemOld" id="{{ $result->id}}">
                                             <td>{{ $result->producto_profit_id}}</td>
-                                            <td>{{ $result->getProductoProfit()->first()->descripcion_profit}}</td>
+                                            <td id="$result->getProductoProfit()->first()->descripcion_profit}}">{{ $result->getProductoProfit()->first()->descripcion_profit}}</td>
                                             <td>{{ $result->cantidad}}</td>
                                             <td>{{ $result->unidad}}</td>
                                             <td>
-                                                <div class='btn-group'>
-                                                    <button type='button' class='btn btn-default btn-flat dropdown-toggle' data-toggle='dropdown'>
-                                                        <span class='caret'></span>
-                                                        <span class='sr-only'>Toggle Dropdown</span>
-                                                    </button>
-                                                    <ul class='dropdown-menu' role='menu'>
-                                                        <li><a href='' class='opEdit'>Editar</a></li>
-                                                        <li><a href='' class='opDel'>Borrar</a></li>
-                                                    </ul>
-                                                </div>
-                                                "</td>
+                                                <input type='button' class='' style='background-color: white; border: 0px;' onclick='javascript:delRow(this)' value='Borrar'/>
+                                                <input type='button' class='' style='background-color: white; border: 0px;' onclick='javascript:editRow(this)' value='Editar'/>
+                                            </td>
                                         </tr>
                                     @endforeach
 
@@ -164,6 +135,7 @@
                                     <th width="80px"><label id="cod_prod">0000</label></th>
                                     <th>
                                         {!! Form::select('p',Array(), null , array('class' => 'form-control select2','id'=>'product_id'))  !!}
+                                        <input type="hidden" id="itemid" value="-1">
                                     </th>
                                     <th width="80px"><input type="text"  id="cant_prod" style="width: 50px" class="numer"> </th>
                                     <th width="80px"><input type="text" id="uni_proc"  maxlength="3" style="width: 50px"> </th>

@@ -27,8 +27,6 @@
                     <th>Nro Orden</th>
                     <th>Proveedor</th>
                     <th>Motivo</th>
-                    <th>Aprov. Venta</th>
-                    <th>Aprov. Genrencia</th>
                     <th>Comentario</th>
                 </tr>
                 </thead>
@@ -44,7 +42,7 @@
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{url('catalogs/PurchasingOrderForm?id='.$result->id)}}">Editar</a></li>
-                                    <li><a href="javascript:deleteDep({{$result->id}})">Borrar</a></li>
+                                    <li><a href="javascript:deleteOrderComp({{$result->id}})">Borrar</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -52,19 +50,6 @@
                         <td>{{$result->nro_orden}}</td>
                         <td>{{$result->getProveedor()->first()->razon_social}}</td>
                         <td>{{$result->getReason()->first()->motivo}}</td>
-                        @if($result->aprob_venta)
-                            <td>Si</td>
-                        @else
-                            <td>No</td>
-
-                        @endif
-
-                        @if($result->aprob_gerencia)
-                            <td>Si</td>
-                        @else
-                            <td>No</td>
-
-                        @endif
                         <td>{{$result->comentario}}</td>
 
                     </tr>
@@ -78,8 +63,6 @@
                     <th>Nro Orden</th>
                     <th>Proveedor</th>
                     <th>Motivo</th>
-                    <th>Aprov. Venta</th>
-                    <th>Aprov. Genrencia</th>
                     <th>Comentario</th>
                 </tr>
                 </tfoot>
@@ -93,7 +76,7 @@
     {!! Html::script('components/DataTables/media/js/jquery.dataTables.min.js') !!}
     {!! Html::script('components/DataTables/media/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('components/jquery-confirm/jquery.confirm.min.js') !!}
-    <script src="{{url("js/module/catalog.js")}}"></script>
+    <script src="{{url("js/module/purchasing-order.js")}}"></script>
 
     <script>
         $(function () {

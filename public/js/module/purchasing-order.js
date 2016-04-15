@@ -2,7 +2,7 @@
  * Created by delimce on 14/3/2016.
  */
 
-
+var itemsDel= new Array();// items eliminados
 $(document).ready(function(){
     console.log("asdfasf");
     loadProduct($("#prov_id").val());
@@ -24,8 +24,40 @@ $(document).ready(function(){
 
     $("#save").click(save);
 
+    $(".opDel").on("click",function(e){
+        e.preventDefault();
+    });
+
 });
 
+var deleteOrderComp = function (id) {
+    $.confirm({
+        text: "Esta seguro que desea borrar este registro?",
+        title: "Borrar Orden de Compra",
+        confirm: function () {
+            jQuery.ajax({
+                url: PATHAPP + 'catalogs/PurchasingOrderDel',
+                type: 'POST',
+                data: {"id": id},
+                success: function (response) {
+                    //  location.reload();
+                }
+
+            });
+            alert("");
+        },
+        cancel: function (button) {
+            // nothing to do
+        },
+        confirmButton: "Si, lo estoy",
+        cancelButton: "No",
+        post: true,
+        confirmButtonClass: "btn-danger",
+        cancelButtonClass: "btn-default",
+        dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+    });
+
+}
 
 function  isGuardable(){
 
@@ -33,6 +65,31 @@ function  isGuardable(){
         return false;
     }
     return true;
+}
+
+function  delRow(obj){
+    var fila = $(obj).parents("tr");
+    console.log('obj', fila);
+    if(fila.attr('id')!='-1'){
+        itemsDel.push(fila.attr('id'));
+    }
+    fila.remove();
+}
+function  editRow(obj){
+    var fila = $(obj).parents("tr");
+    console.log('obj', fila);
+    if(fila.attr('id')!='-1'){
+        $("#itemid").val(fila.attr('id'));
+    }
+    var celds= fila.contents('td');
+    $("#cod_prod").text(celds.eq(0).text());
+    $("#product_id").val(fila.attr("id"));
+    $("#cant_prod").val(celds.eq(2).text());
+    $("#uni_proc").val(celds.eq(3).text());
+    $("#select2-product_id-container").val(celds.eq(1).text());
+
+    console.log('celdas', celds);
+    fila.remove();
 }
 
 function verifGuadable(){
@@ -44,46 +101,33 @@ function verifGuadable(){
 }
 /**agrega una nueva fila*/
 function addRow(){
-    var codi= $("#product_id").val();
+    var codi= $("#cod_prod").text();
     var desc= $("#product_id option:selected").html();
     var cant= $("#cant_prod").val();
     var unidad= $("#uni_proc").val();
+    var profit= $("#product_id").val();
     var tabla =$("#producProv  tbody");
-    //if(isValid((//codi,desc,cant,unidad))){
-    tabla.append(newRow(codi,desc,cant,unidad));
-    //}
+   var id= $("#itemid").val();
+    tabla.append(newRow(id,codi,desc,cant,unidad,profit ));
+    $("#itemid").val('-1');
     verifGuadable();
 
-    function newRow(codi,desc, cant, unidad){
+}
 
-        var fila = $("<tr></tr>");
-        fila.html("" +
-            "<td>"+codi+"</td>"+
-            "<td>"+desc+"</td>"+
-            "<td>"+cant+"</td>"+
-            "<td>"+unidad+"</td>"+
-            "<td>" +"<div class='btn-group'>" +"<button type='button' class='btn btn-default btn-flat dropdown-toggle' data-toggle='dropdown'>" +
-            "<span class='caret'></span>" +
-            "<span class='sr-only'>Toggle Dropdown</span>" +
-            "</button>" +
-            "<ul class='dropdown-menu' role='menu'>" +
-            "<li><a href='' class='opEdit'>Editar</a></li>" +
-            "<li><a href='' class='opDel'>Borrar</a></li>" +
-            "</ul>" +
-            "</div>" +
-            "</td>"+
-            "");
-        return fila;
-    }
-    function isValid(codi,desc, cant, unidad){
-        if( unidad.length<1 || cant.length<1){
-            return false;
-        }
-        if(parseInt(cant)<1){
-            return false;
-        }
-        return true;
-    }
+function newRow(id, codi,desc, cant, unidad, profi){
+    var fila = $("<tr id='"+id+"'></tr>");
+    fila.html("" +
+        "<td>"+codi+"</td>"+
+        "<td id='"+profi+"'>"
+        +desc+"</td>"+
+        "<td>"+cant+"</td>"+
+        "<td>"+unidad+"</td>"+
+        "<td><input type='button' class='' style='background-color: white; border: 0px;' " +
+        "onclick='javascript:delRow(this)' value='Borrar'/>" +
+        "<input type='button' class='' style='background-color: white; border: 0px;' onclick='javascript:editRow(this)' value='Editar'/>" +
+        "</td>"+
+        "");
+    return fila;
 }
 
 /**carga los productos del provedor
@@ -111,8 +155,6 @@ function loadProduct(id ){
         }
     });
     verifGuadable();
-
-
 }
 
 function save(){
@@ -133,7 +175,7 @@ function save(){
             $('#save').prop('disabled', false);
 
             if(response.action=='new'){
-                //  location.replace(PATHAPP+'catalogs/departamentList')
+                // location.replace(PATHAPP+'catalogs/PurchasingOrderList')
             }else{
 
             }
@@ -142,42 +184,41 @@ function save(){
 
     function getData(){
         var id=-1;
-        if($("#id").length>0){
-            id=$("#id").val();
-            var data= {
-                id:id,
-                prov_id: $("#prov_id").val(),
-                motivo_id:$("#motivo_id").val(),
-                comentario:$("#coment").val(),
-                aprob_venta:$("#ventas").val(),
-                aprob_gerencia:$("#gerencia").val(),
-                items:getItems()
 
-            }
-            return data;
-        }else {
-            var data= {
-                prov_id: $("#prov_id").val(),
-                motivo_id:$("#motivo_id").val(),
-                comentario:$("#coment").val(),
-                aprob_venta:$("#ventas").val(),
-                aprob_gerencia:$("#gerencia").val(),
-                items:getItems()
+        var data= {
+            prov_id: $("#prov_id").val(),
+            motivo_id:$("#motivo_id").val(),
+            comentario:$("#coment").val(),
+            aprovada: 0,
+            nro_orden:$("#nro_orden").val(),
+            items:getItems(),
+            del:itemsDel
 
-            }
-            return data;
         }
+        if($("#id").length>0){
+           data.id=$("#id").val();
+        }
+        return data;
+
         function  getItems(){
             var filas =$("#producProv  tbody").contents().filter("tr");
             var data= new Array();
-            var cod,cantida,unidad;
+            var cod,cantida,unidad,id;
             console.log("data", filas);
             for(var i=0;i<filas.size();i++){
                 var fila=$(filas[i]);
+                console.log('fila ',fila);
                 cod=$(fila).contents().filter("td").eq(0).text();
                 cantida=$(fila).contents().filter("td").eq(2).text();
                 unidad=$(fila).contents().filter("td").eq(3).text();
-                data.push({'producto_id':cod,'cantidad':cantida,'unidad':unidad});
+                id=fila.attr('id');
+                console.log('id row',id);
+                if(id != "-1"){
+                     data.push({id:id,'producto_id':cod,'cantidad':cantida,'unidad':unidad});
+                }else{
+                    data.push({'producto_id':cod,'cantidad':cantida,'unidad':unidad});
+                }
+
             }
             return data;
         }
