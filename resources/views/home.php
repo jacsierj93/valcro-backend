@@ -70,5 +70,6 @@
 
 
 <?= HTML::script('js/app.js') ?>
+<?= HTML::script('js/appTemp.js') ?>
 </body>
 </html>

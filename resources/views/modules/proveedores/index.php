@@ -245,51 +245,52 @@
 
                 </div>
 
-                <div layout="row">
+                <div ng-controller="DemoCtrl3 as ctrl" layout="row">
+                    <md-autocomplete flex required
+                                     md-input-name="autocompleteField"
+                                     md-input-minlength="2"
+                                     md-input-maxlength="18"
+                                     md-no-cache="ctrl.noCache"
+                                     md-selected-item="ctrl.selectedItem"
+                                     md-search-text="ctrl.searchText"
+                                     md-items="item in ctrl.querySearch(ctrl.searchText)"
+                                     md-item-text="item.display"
+                                     md-floating-label="Cargos">
+                        <md-item-template>
+                            <span md-highlight-text="ctrl.searchText">{{item.display}}</span>
+                        </md-item-template>
+                        <div ng-messages="searchForm.autocompleteField.$error" ng-if="searchForm.autocompleteField.$touched">
+                            <div ng-message="required">Debe indicar un cargo</div>
+                            <div ng-message="minlength">Your entry is not long enough.</div>
+                            <div ng-message="maxlength">Your entry is too long.</div>
+                        </div>
+                    </md-autocomplete>
 
-                    <div ng-controller="CustomInputDemoCtrl as ctrl">
-                        <md-chips ng-model="ctrl.selectedVegetables"
-                                  md-autocomplete-snap
-                                  md-transform-chip="ctrl.transformChip($chip)"
-                                  md-require-match="ctrl.autocompleteDemoRequireMatch">
-                            <md-autocomplete flex
+
+                    <div ng-controller="CustomInputDemoCtrl as ctrl" layout="column" ng-cloak="" class="chipsdemoCustomInputs" ng-app="MyApp">
+
+                        <md-chips
+                            ng-model="ctrl.selectedVegetables"
+                            md-autocomplete-snap=""
+                            md-transform-chip="ctrl.transformChip($chip)"
+                            md-require-match="ctrl.autocompleteDemoRequireMatch">
+                            <md-autocomplete
                                 md-selected-item="ctrl.selectedItem"
                                 md-search-text="ctrl.searchText"
                                 md-items="item in ctrl.querySearch(ctrl.searchText)"
                                 md-item-text="item.name"
-                                placeholder="Cargos">
-                                <span md-highlight-text="ctrl.searchText">{{item.name}} :: {{item.type}}</span>
+                                md-floating-label="Cargos">
+                                <span md-highlight-text="ctrl.searchText">{{item.name}}</span>
                             </md-autocomplete>
                             <md-chip-template>
                                 <span>
-                                  <strong>{{$chip.name}}</strong>
-                                  <em>({{$chip.type}})</em>
+                                  {{$chip.name}}
                                 </span>
                             </md-chip-template>
                         </md-chips>
+
+
                     </div>
-
-                <!--<div ng-controller="DemoCtrl as ctrl">
-                    <md-autocomplete
-                        ng-disabled="ctrl.isDisabled"
-                        md-no-cache="ctrl.noCache"
-                        md-selected-item="ctrl.selectedItem"
-                        md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
-                        md-search-text="ctrl.searchText"
-                        md-selected-item-change="ctrl.selectedItemChange(item)"
-                        md-items="item in ctrl.querySearch(ctrl.searchText)"
-                        md-item-text="item.display"
-                        md-min-length="0"
-                        placeholder="What is your favorite US state?">
-                        <md-item-template>
-                            <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
-                        </md-item-template>
-                        <md-not-found>
-
-                            <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
-                        </md-not-found>
-                    </md-autocomplete>
-                </div>-->
 
                 </div>
             </form>
