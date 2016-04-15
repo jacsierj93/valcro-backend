@@ -6,7 +6,7 @@
  * Time: 03:02 PM
  */
 
-namespace App\Models\Sistema;
+namespace App\Models\Sistema\Purchase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -29,6 +29,6 @@ class PurchaseOrder extends Model
     }
 
     public function getItems(){
-        return $this->hasMany('App\Models\Sistema\PurchaseOrderItem', 'compra_orden_id', 'id');
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrderItem', 'compra_orden_id', 'id');
     }
 }
