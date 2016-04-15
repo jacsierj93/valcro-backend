@@ -54,6 +54,8 @@
                     <li><a href="{{url('catalogs/CondPagoProvList')}}">Condiciones de Pago a Proveedor</a></li><!---add for miguel -->
                     <li><a href="{{url('catalogs/tiemAproTranList')}}">Tiempo Aproximado de Transito</a></li><!---tiempo de transito -->
                     <li><a href="{{url('catalogs/PayTypesList')}}">Tipo de Pago</a></li><!---Tipo de pagoo -->
+                    <li><a href="{{url('catalogs/PurchasingDocumentTypeList')}}">Tipo de Documento de Compra</a></li><!---Tipo de pagoo -->
+                    <li><a href="{{url('catalogs/PurchasingOrderList')}}">Ordenes de Compras</a></li><!---Tipo de pagoo -->
 
                 </ul>
             </li>

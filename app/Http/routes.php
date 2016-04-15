@@ -152,3 +152,21 @@ $app->get('catalogs/PayTypesList', 'Catalogs\PayTypesController@getList'); ///li
 $app->get('catalogs/PayTypesForm', 'Catalogs\PayTypesController@getForm'); ///nuevo tiempo aproximado d transito
 $app->post("catalogs/PayTypesSave",'Catalogs\PayTypesController@saveOrUpdate'); ///guardar tiempo apro. transito
 $app->post("catalogs/PayTypesDel",'Catalogs\PayTypesController@delete'); ///borrar tiempo aprox. trans.
+
+
+//******Maestro de tipo de docuemnto de compra******/
+$app->get('catalogs/PurchasingDocumentTypeList', 'Catalogs\PurchasingDocumentTypeController@getList'); ///lista
+$app->get('catalogs/PurchasingDocumentTypeForm', 'Catalogs\PurchasingDocumentTypeController@getForm'); ///form
+$app->post("catalogs/PurchasingDocumentTypeSave",'Catalogs\PurchasingDocumentTypeController@saveOrUpdate'); ///guardar o editar
+$app->post("catalogs/PurchasingDocumentTypeDel",'Catalogs\PurchasingDocumentTypeController@delete'); ///borrar
+
+
+
+//******Orden de compra******/
+$app->get('catalogs/PurchasingOrderList', 'Catalogs\PurchasingOrderController@getList'); ///lista
+$app->get('catalogs/PurchasingOrderForm', 'Catalogs\PurchasingOrderController@getForm'); ///form
+$app->post("catalogs/PurchasingOrderSave",'Catalogs\PurchasingOrderController@saveOrUpdate'); ///guardar o editar
+$app->post("catalogs/PurchasingOrderDel",'Catalogs\PurchasingOrderController@delete'); ///borrar
+$app->post("catalogs/ProviderProduct",'Catalogs\PurchasingOrderController@getProviderProduct'); ///getProductos de provedor
+
+

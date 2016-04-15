@@ -18,6 +18,4 @@ class Product extends Model
     protected $table = "tbl_producto";
 
 
-
-
 }

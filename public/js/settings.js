@@ -2,7 +2,7 @@
  * Created by delimce on 14/3/2016.
  */
 /////variable global de la ruta de la aplicacion
-var PATHAPP = "http://userver/valcro/public/";
+var PATHAPP = "http://localhost/valcro-backend/public/";
 
 /////////token para los request ajax
 $.ajaxSetup({
