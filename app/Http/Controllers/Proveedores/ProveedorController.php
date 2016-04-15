@@ -28,10 +28,10 @@ class ProveedorController extends BaseController
     public function getList()
     {
         $provs = new Proveedor();
-        $data = $provs->where("deleted_at",NULL)->get();
-        foreach($data as $k => $v){
+        $data = $provs->select("razon_social as who")->where("deleted_at",NULL)->get();
+        /*   foreach($data as $k => $v){
             $v['nombreValcro']=$v->nombres_valcro()->get();
-        }
+        }*/
         return $data;
     }
 
