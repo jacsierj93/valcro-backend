@@ -110,6 +110,11 @@ $app->get("monedas/monedaList",'Proveedores\ProveedorController@listMonedas'); /
 $app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'); ///obtener lista general
 
 
+$app->get("creditoProv/creditoProvList",'Proveedores\ProveedorController@listLimitCred'); ///obtener lista general
+$app->get("factConvProv/factorProvList",'Proveedores\ProveedorController@listConvPro'); ///obtener lista general
+
+
+
 ////tipo de provedores
 $app->get('catalogs/providerTypesList', 'Catalogs\ProviderTypesController@getList'); ///lista de tipo de prov
 $app->get('catalogs/providerTypesForm', 'Catalogs\ProviderTypesController@getForm'); ///nuevo tipo prov
