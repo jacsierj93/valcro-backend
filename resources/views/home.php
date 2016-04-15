@@ -24,15 +24,15 @@
     <base href="/angular/">
 </head>
 
-<body id="inicio" ng-cloak layout="column" ng-controller="AppCtrl">
+<body id="inicio" ng-cloak layout="column" ng-controller="AppCtrl" style="overflow: hidden;">
 
 
 <div class="cabezera" layout="row" layout-align="start center">
-    <div style="width: 132px; height: 48px;">
+    <div layout layout-align="start center" style="width: 132px; height: 48px;">
         <?= HTML::image("images/logo_inicio.png") ?>
     </div>
     <div flex></div>
-    <div layout style="width: 132px; height: 48px;">
+    <div layout layout-align="start center" style="width: 132px; height: 48px;">
         <a ng-href="logout">
             Salir
         </a>
@@ -45,22 +45,22 @@
     <div class="barraHerramientas" layout="column" layout-align="center center" ng-controller="ListHerramientas">
 
         <div layout="column" layout-align="center center" ng-repeat="item in tools">
-            <img src="<?= url('images/btn_dot.png') ?>" title="{{item.tool}}">
+            <div class="btnDot" title="{{item.tool}}"></div>
         </div>
 
     </div>
 
     <!-- ######################### CONTENIDO #############################-->
     <!--<ng-view layout="column" layout-padding flex></ng-view>-->
-    <div id="contentHolder" flex ng-include="template.url" layout="column"></div>
+    <div id="contentHolder" flex ng-include="seccion.url" layout="column"></div>
 
 
 </div>
 
 <div class="pie" layout="row" layout-align="start center">
 
-    <div layout="column" layout-align="center center" ng-repeat="item in secc">
-        <img src="<?= url('images/btn_dot.png') ?>" ng-click="seccLink(this)" alt="{{item.secc}}">
+    <div layout="column" layout-align="center center" ng-repeat="item in secciones">
+        <div class="btnDot" ng-click="seccLink(this)" title="{{item.secc}}"></div>
     </div>
 
 </div>

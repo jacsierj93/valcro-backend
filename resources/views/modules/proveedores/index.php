@@ -4,6 +4,21 @@
         <div layout layout-align="start center" class="menu md-whiteframe-1dp">
             Menu
         </div>
+        <div class="botonera" layout layout-align="start center">
+            <div layout="column" layout-align="center center">
+
+            </div>
+            <div layout="column" layout-align="center center" ng-click="toggleLeft()">
+                <i class="fa fa-plus"></i>
+            </div>
+            <div layout="column" layout-align="center center" ng-click="toggleRight()">
+                <i class="fa fa-filter"></i>
+            </div>
+            <div layout="column" layout-align="center center" ng-click="toggleOtro()">
+                <i class="fa fa-minus"></i>
+            </div>
+        </div>
+
     </div>
 
     <div class="contentHolder" layout="row" flex>
@@ -16,12 +31,19 @@
                 <div style="height:40px;">
                     <i class="fa fa-gift" style="font-size:24px;"></i>
                     <i class="fa fa-paper-plane" style="font-size:18px; color: #03a9f4;"></i>
+                    <i class="fa fa-plane" style="font-size:20px;"></i>
                 </div>
             </div>
 
         </md-content>
 
-        <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+            <i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>
+        </div>
+
+
+        <md-content class="md-whiteframe-2dp cntLayerHolder" layout="column" layout-padding flex
+                    ng-controller="AppCtrl">
 
             <form name="projectForm">
 
@@ -143,17 +165,145 @@
                         </div>
                     </md-input-container>
 
-                </div>
+                    <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
+                        <label>Pais</label>
+                        <md-select ng-model="user.pais">
+                            <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
+                                {{pais.nombre}}
+                            </md-option>
+                        </md-select>
+                        <div ng-messages="user.pais.$error">
+                            <div ng-message="required">Campo Obligatorio.</div>
 
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="40">
+                        <label>Telefono</label>
+                        <input name="provTelf" required md-no-asterisk ng-model="project.provTelf"
+                               ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
+                        <div ng-messages="nomvalcroForm.provTelf.$error">
+                            <div ng-message="required">Campo Obligatorio.</div>
+                            <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
+                        </div>
+                    </md-input-container>
+
+                </div>
 
 
             </form>
 
 
+            <form name="provContactosForm">
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Contactos Proveedor
+                    </div>
+                </div>
+                <div layout="row">
 
+                    <md-input-container class="md-block" flex="40">
+                        <label>Nombre y Apellido</label>
+                        <input name="nombreCont" md-maxlength="55" required md-no-asterisk
+                               ng-model="project.nombreCont">
+                        <div ng-messages="provContactosForm.nombreCont.$error">
+                            <div ng-message="required">Campo Obligatorio.</div>
+                            <div ng-message="md-maxlength">Debe tener maximo 55 caracteres.</div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="30">
+                        <label>Email</label>
+                        <input name="emailCont" minlength="10" maxlength="100" required ng-model="project.emailCont"
+                               ng-pattern="/^.+@.+\..+$/"/>
+                        <div ng-messages="provContactosForm.emailCont.$error">
+                            <div ng-message="required">Campo Obligatorio.</div>
+                            <div ng-message="pattern">Inserte un email valido.</div>
+                            <!--<div ng-message-exp="['minlength', 'maxlength']">
+                                El debe tener entre 10 y 100 caracteres.
+                            </div>-->
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="30">
+                        <label>Telefono</label>
+                        <input name="contTelf" required md-no-asterisk ng-model="project.contTelf"
+                               ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
+                        <div ng-messages="provContactosForm.contTelf.$error">
+                            <div ng-message="required">Campo Obligatorio.</div>
+                            <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
+                        </div>
+                    </md-input-container>
+
+                </div>
+
+                <div layout="row">
+
+                    <div ng-controller="CustomInputDemoCtrl as ctrl">
+                        <md-chips ng-model="ctrl.selectedVegetables"
+                                  md-autocomplete-snap
+                                  md-transform-chip="ctrl.transformChip($chip)"
+                                  md-require-match="ctrl.autocompleteDemoRequireMatch">
+                            <md-autocomplete flex
+                                md-selected-item="ctrl.selectedItem"
+                                md-search-text="ctrl.searchText"
+                                md-items="item in ctrl.querySearch(ctrl.searchText)"
+                                md-item-text="item.name"
+                                placeholder="Cargos">
+                                <span md-highlight-text="ctrl.searchText">{{item.name}} :: {{item.type}}</span>
+                            </md-autocomplete>
+                            <md-chip-template>
+                                <span>
+                                  <strong>{{$chip.name}}</strong>
+                                  <em>({{$chip.type}})</em>
+                                </span>
+                            </md-chip-template>
+                        </md-chips>
+                    </div>
+
+                <!--<div ng-controller="DemoCtrl as ctrl">
+                    <md-autocomplete
+                        ng-disabled="ctrl.isDisabled"
+                        md-no-cache="ctrl.noCache"
+                        md-selected-item="ctrl.selectedItem"
+                        md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+                        md-search-text="ctrl.searchText"
+                        md-selected-item-change="ctrl.selectedItemChange(item)"
+                        md-items="item in ctrl.querySearch(ctrl.searchText)"
+                        md-item-text="item.display"
+                        md-min-length="0"
+                        placeholder="What is your favorite US state?">
+                        <md-item-template>
+                            <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
+                        </md-item-template>
+                        <md-not-found>
+
+                            <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
+                        </md-not-found>
+                    </md-autocomplete>
+                </div>-->
+
+                </div>
+            </form>
         </md-content>
 
+
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
+            UNO
+        </md-sidenav>
+
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="right">
+            DOS
+        </md-sidenav>
+
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="otro">
+            TRES
+        </md-sidenav>
+
     </div>
+
+
+
 
 
 

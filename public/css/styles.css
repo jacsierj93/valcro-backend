@@ -1,4 +1,14 @@
 /**************************** Global *********************************/
+*:focus {
+    outline: 0;
+}
+
+html {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+}
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -14,33 +24,44 @@
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-md-switch.md-checked.md-primary .md-thumb{
+md-switch.md-checked.md-primary .md-thumb {
     background-color: rgb(84, 180, 234) !important;
 }
 
-md-switch.md-checked.md-primary .md-ink-ripple{
-    color: rgb(84, 180, 234)!important;
+md-switch.md-checked.md-primary .md-ink-ripple {
+    color: rgb(84, 180, 234) !important;
 }
-
-
-form{
+/*==================================================*/
+/*==================================================*/
+form {
     padding: 0 !important;
 }
+/*==================================================*/
+/*==================================================*/
+/*@media screen and (min-width: 600px) md-sidenav{
+    max-width: 100% !important;
+}*/
+md-backdrop{
+    display: none !important;
+}
+md-sidenav{
+    max-width: 100% !important;
+}
 
 /*==================================================*/
 /*==================================================*/
-md-input-container{
+md-input-container {
     padding: 0 8px 0 0 !important;
     margin: 10px 0 0 0 !important;
 }
 
 /*==================================================*/
 /*==================== INPUT =======================*/
-md-input-container:not(.md-input-invalid).md-input-focused .md-input{
+md-input-container:not(.md-input-invalid).md-input-focused .md-input {
     border-color: rgb(84, 180, 234) !important;
 }
 
-md-input-container:not(.md-input-invalid).md-input-focused label{
+md-input-container:not(.md-input-invalid).md-input-focused label {
     color: rgb(84, 180, 234);
 }
 
@@ -54,91 +75,88 @@ md-input-container.md-input-has-value label:not(.md-no-float) {
     transform: translate3d(0, 10px, 0) scale(0.65) !important;
 }
 
-md-input-container label:not(.md-no-float):not(.md-container-ignore){
+md-input-container label:not(.md-no-float):not(.md-container-ignore) {
     -webkit-transform: translate3d(0, 18px, 0) scale(1);
     transform: translate3d(0, 18px, 0) scale(1);
 }
 
-md-input-container.md-input-focused label:not(.md-no-float){
+md-input-container.md-input-focused label:not(.md-no-float) {
     -webkit-transform: translate3d(0, 10px, 0) scale(0.65) !important;
     transform: translate3d(0, 10px, 0) scale(0.65) !important;
 }
 
 /*==================== ERROR MENSAJE ====================*/
-md-input-container [ng-message]{
+md-input-container [ng-message] {
     font-size: 9px !important;
     line-height: 9px !important;
     padding-top: 1px !important;
 }
 
 /*==================== ERROR SIZE =======================*/
-md-input-container .md-char-counter{
+md-input-container .md-char-counter {
     font-size: 9px !important;
     line-height: 9px !important;
 }
 
-md-input-container .md-errors-spacer{
+md-input-container .md-errors-spacer {
     min-height: 10px !important;
 }
 
-md-input-container .md-char-counter{
+md-input-container .md-char-counter {
     padding-top: 1px;
 }
 
-md-input-container.md-input-focused .md-input{
+md-input-container.md-input-focused .md-input {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
     border-width: 0 0 1px 0;
 }
 
-md-input-container .md-input.ng-invalid.ng-dirty{
+md-input-container .md-input.ng-invalid.ng-dirty {
     padding-bottom: 0;
     border-width: 0 0 1px 0;
 }
 
-md-input-container [ng-message]:not(.md-char-counter){
+md-input-container [ng-message]:not(.md-char-counter) {
     padding-right: 12px;
     padding-left: 0;
 }
 
-md-input-container .md-input{
+md-input-container .md-input {
     height: 20px;
     line-height: 20px;
 }
 
-
-
 /*==================================================*/
 /*=================== SELECTOR =====================*/
-.md-select-value{
+.md-select-value {
     min-height: 19px !important;
     padding: 0 !important;
 }
 
-md-select:not([disable]):focus .md-select-value{
+md-select:not([disable]):focus .md-select-value {
     border-bottom-width: 1px;
     border-bottom-color: rgb(84, 180, 234);
 }
 
-.md-select-value .md-select-icon:after{
+.md-select-value .md-select-icon:after {
     color: #999999 !important;
 }
 
-.md-select-value *:first-child{
+.md-select-value *:first-child {
     -webkit-transform: translate3d(0, 0px, 0) !important;
     transform: translate3d(0, 0px, 0) !important;
 }
 
 /*==================================================*/
 /*=================== SWITCH =====================*/
-md-switch{
+md-switch {
     margin: 0 !important;
 }
 
-md-switch.md-checked.md-primary .md-bar{
-    background-color: rgba(0,0,0,0.12);
+md-switch.md-checked.md-primary .md-bar {
+    background-color: rgba(0, 0, 0, 0.12);
 }
-
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 body[ng-cloak] {
@@ -150,15 +168,16 @@ body {
     background-position: bottom center;
 }
 
-#holderAll{
+#holderAll {
     z-index: 1;
     position: absolute;
     width: 100%;
     height: 100%;
 
 }
+
 /**************************** Login *********************************/
-#holderLogin{
+#holderLogin {
     z-index: 2;
     position: absolute;
     width: 100%;
@@ -170,6 +189,10 @@ body {
 
 #login md-input-container .md-input {
     border-color: #ffffff !important;
+}
+
+#login md-input-container label {
+    font-weight: 100;
 }
 
 #login {
@@ -270,6 +293,7 @@ body {
 
 .cabezera {
     height: 48px;
+    padding-left: 48px;
     /*background-color: #323232;*/
 
 }
@@ -288,8 +312,17 @@ body {
 }
 
 /**********************************************/
+.btnDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
 .pie {
     height: 48px;
+    padding-left: 48px;
     /*background-color: #ff8a80;*/
 }
 
@@ -299,18 +332,26 @@ body {
 }
 
 /**********************************************/
-.menuBarHolder{
+.menuBarHolder {
     height: 48px !important;
     background-color: #ffffff;
 }
 
-.menu{
+.menu {
     width: 192px;
     background-color: #cccccc;
     padding-left: 8px;
+    color: #ffffff;
 }
 
-.boxList{
+.botonera div{
+    width: 48px;
+    height: 48px;
+    color: #999999;
+}
+
+
+.boxList {
     height: 176px;
     padding: 8px;
     color: #999999;
@@ -322,13 +363,13 @@ body {
     padding-right: 8px;
 }
 
-.titulo_formulario div{
+.titulo_formulario div {
     border-bottom: solid 1px rgb(84, 180, 234);
     width: 100%;
     padding-top: 10px;
     height: 19px;
 }
 
-.cntLayerHolder{
+.cntLayerHolder {
     padding: 10px 16px 24px 24px !important;
 }
