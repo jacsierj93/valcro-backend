@@ -168,10 +168,10 @@ $app->post("catalogs/PurchasingDocumentTypeDel",'Catalogs\PurchasingDocumentType
 
 
 //******Orden de compra******/
-$app->get('catalogs/PurchasingOrderList', 'Catalogs\PurchasingOrderController@getList'); ///lista
-$app->get('catalogs/PurchasingOrderForm', 'Catalogs\PurchasingOrderController@getForm'); ///form
-$app->post("catalogs/PurchasingOrderSave",'Catalogs\PurchasingOrderController@saveOrUpdate'); ///guardar o editar
-$app->post("catalogs/PurchasingOrderDel",'Catalogs\PurchasingOrderController@delete'); ///borrar
-$app->post("catalogs/ProviderProduct",'Catalogs\PurchasingOrderController@getProviderProduct'); ///getProductos de provedor
+$app->get('catalogs/PurchasingOrderList', 'Purchases\PurchasingOrderController@getList'); ///lista
+$app->get('catalogs/PurchasingOrderForm', 'Purchases\PurchasingOrderController@getForm'); ///form
+$app->post("catalogs/PurchasingOrderSave",'Purchases\PurchasingOrderController@saveOrUpdate'); ///guardar o editar
+$app->post("catalogs/PurchasingOrderDel",'Purchases\PurchasingOrderController@delete'); ///borrar
+$app->post("catalogs/ProviderProduct",'Purchases\PurchasingOrderController@getProviderProduct'); ///getProductos de provedor
 
 
