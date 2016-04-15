@@ -247,6 +247,10 @@ body {
 
 }
 
+.contentHolder{
+    background-color: #ffffff;
+}
+
 /**************************** Inicio *********************************/
 #inicio {
     background-image: url("../images/login_bg_white.jpg");

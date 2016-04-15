@@ -41,9 +41,17 @@
             <i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>
         </div>
 
+        <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+            <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                P
+            </div>
+            <br>
+            Selecciones un Proveedor
+        </div>
 
-        <md-content class="md-whiteframe-2dp cntLayerHolder" layout="column" layout-padding flex
-                    ng-controller="AppCtrl">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
+
+        <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
             <form name="projectForm">
 
@@ -288,8 +296,9 @@
         </md-content>
 
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
-            UNO
+
+
+
         </md-sidenav>
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="right">
