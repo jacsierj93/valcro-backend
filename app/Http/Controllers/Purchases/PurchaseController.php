@@ -7,7 +7,7 @@
  */
 
 
-namespace App\Http\Controllers\Catalogs;
+namespace App\Http\Controllers\Purchases;
 use App\Models\Sistema\Purchase;
 use App\Models\Sistema\Purchaseitem;
 use Laravel\Lumen\Routing\Controller as BaseController;

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Catalogs;
+namespace App\Http\Controllers\Purchases;
 
 use App\Models\Sistema\OrderReason;
-use App\Models\Sistema\PurchaseOrder;
-use App\Models\Sistema\PurchaseOrderItem;
+use App\Models\Sistema\Purchase\PurchaseOrder;
+use App\Models\Sistema\Purchase\PurchaseOrderItem;
 use App\Models\Sistema\Proveedor;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -122,7 +122,7 @@ class PurchasingOrderController extends BaseController
         $id = $req->input("id", 0);
         $items= $model->getItems()->get();
         for($i=0;$i<sizeof($items);$i++){
-            $item= new ProviderCondPayItem();
+            $item= new PurchaseOrderItem();
             $item->destroy($items[$i]->id);
         }
         $model->destroy($id);

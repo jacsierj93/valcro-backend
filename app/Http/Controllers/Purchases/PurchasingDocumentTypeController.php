@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Catalogs;
+namespace App\Http\Controllers\Purchases;
 
 use App\Models\Sistema\PurchasingDocumentType;
 use Illuminate\Http\Request;
