@@ -24,7 +24,7 @@ class PurchasingOrderController extends BaseController
     public function getList()
     {
 
-        $data = PurchaseOrder::all();
+        $data = PurchaseOrder::where('aprovada',0)->get();
 
         return view('modules.catalogs.purchasing-order-list', ['data' => $data]);
     }
@@ -56,8 +56,6 @@ class PurchasingOrderController extends BaseController
         $validator = Validator::make($req->all(), [
             'prov_id' => 'required',
             'motivo_id' => 'required',
-            'items' =>'required'
-
         ]);
 
         if ($validator->fails()) { ///ups... erorres
@@ -75,24 +73,34 @@ class PurchasingOrderController extends BaseController
 
             }
 
-            $model->aprob_venta = $req->aprob_venta;
+            $model->aprovada = $req->aprovada;
+            $model->nro_orden = $req->nro_orden;
             $model->prov_id = $req->prov_id;
             $model->motivo_id = $req->motivo_id;
             $model->comentario = $req->comentario;
-            $model->aprob_gerencia = $req->aprob_gerencia;
             $model->save();
-
-            for($i=0;$i<sizeof($req->items);$i++){
-                $item= new PurchaseOrderItem();
-                if(isset($req->items[$i]["id"])){
-                    $item = $item->findOrFail(trim($req->items[$i]["id"]));
-                    $result["action2"]="edit";
+            if ($req->has('items')) {
+                for($i=0;$i<sizeof($req->items);$i++){
+                    $item= new PurchaseOrderItem();
+                    if(isset($req->items[$i]["id"])){
+                        $item = $item->findOrFail(trim($req->items[$i]["id"]));
+                        $result["action2"]="edit";
+                    }
+                    $item->compra_orden_id= $model->id;
+                    $item->producto_profit_id= trim($req->items[$i]["producto_id"]);
+                    $item->cantidad= trim($req->items[$i]["cantidad"]);
+                    $item->unidad= trim($req->items[$i]["unidad"]);
+                    $item->save();
                 }
-                $item->compra_orden_id= $model->id;
-                $item->producto_profit_id= trim($req->items[$i]["producto_id"]);
-                $item->cantidad= trim($req->items[$i]["cantidad"]);
-                $item->unidad= trim($req->items[$i]["unidad"]);
-                $item->save();
+            }
+
+
+            if ($req->has("del")) {
+                $result['data']="iset";
+                for($i=0;$i<sizeof($req->del);$i++){
+                    $item= new PurchaseOrderItem();
+                    $item->destroy(trim($req->del[$i]));
+                }
             }
 
 
