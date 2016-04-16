@@ -55,14 +55,14 @@ function DemoCtrl3($timeout, $q) {
 MyApp.controller('DemoCtrl3', DemoCtrl3);
 
 
-function DemoCtrl($timeout, $q) {
+MyApp.controller('DemoCtrl4',['$http',function($http) {
     var self = this;
 
     self.readonly = false;
     self.selectedItem = null;
     self.searchText = null;
     self.querySearch = querySearch;
-    self.vegetables = loadVegetables();
+    self.vegetables = loadVegetables($http);
     self.selectedVegetables = [];
     self.numberChips = [];
     self.numberChips2 = [];
@@ -103,7 +103,22 @@ function DemoCtrl($timeout, $q) {
 
     }
 
-    function loadVegetables() {
+    function loadVegetables($http) {
+
+        console.log("idiomas");
+        //var veggies;
+
+        /*$http({
+            method: 'GET',
+            url: 'catalogs/positionList'
+        }).then(function successCallback(response) {
+           console.log(response.data);
+            veggies = response.data;
+        }, function errorCallback(response) {
+            console.log("error=>",response)
+        });*/
+
+
         var veggies = [
             {
                 'name': 'Español'
@@ -127,6 +142,14 @@ function DemoCtrl($timeout, $q) {
             return veg;
         });
     }
-}
+}]);
 
-MyApp.controller('DemoCtrl4', DemoCtrl);
+
+/*
+MyApp.controller('DemoCtrl4', ['$http',DemoCtrl4($http)]);
+
+
+va.controller('directorsCtrl', ['$scope', '$http', '$location', '$routeParams', '$resource',
+    function($scope, $http, $location, $routeParams, $resource){
+
+}*/

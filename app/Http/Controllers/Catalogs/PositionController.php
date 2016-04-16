@@ -24,7 +24,8 @@ class PositionController extends BaseController
 
         $data = Position::all();
 
-        return view('modules.catalogs.cargos-list', ['data' => $data]);
+        return $data;
+        //return view('modules.catalogs.cargos-list', ['data' => $data]);
     }
 
 

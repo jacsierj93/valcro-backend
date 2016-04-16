@@ -111,9 +111,9 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 
 ///Proveedores
 
-$app->get("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->get("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
-$app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
+$app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
+$app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
+$app->post("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
 
 //MASTERS
-$app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
+$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores

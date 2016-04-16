@@ -267,7 +267,7 @@
                     </md-autocomplete>
 
 
-                    <div ng-controller="CustomInputDemoCtrl as ctrl" layout="column" ng-cloak="" class="chipsdemoCustomInputs" ng-app="MyApp">
+                    <div ng-controller="DemoCtrl4 as ctrl" layout="column" ng-cloak="" class="chipsdemoCustomInputs" ng-app="MyApp">
 
                         <md-chips
                             ng-model="ctrl.selectedVegetables"

@@ -128,7 +128,7 @@ MyApp.controller('TipoDirecc', function ($scope) {
 
 MyApp.controller('ListPaises', function ($scope,$http) {
     $http({
-        method: 'GET',
+        method: 'POST',
         url: 'master/getCountries'
     }).then(function successCallback(response) {
         $scope.paises = response.data;
@@ -161,7 +161,7 @@ MyApp.controller('ListHerramientas', function ($scope) {
 
 MyApp.controller('ListProv', function ($scope,$http) {
     $http({
-        method: 'GET',
+        method: 'POST',
         url: 'proveedores/provList'
     }).then(function successCallback(response) {
         $scope.todos = response.data;
@@ -241,84 +241,7 @@ MyApp.controller('ListProv', function ($scope,$http) {
     }
 
 
-MyApp.controller('DemoCtrl', DemoCtrl1);
 
-
-
-    function DemoCtrl2 ($timeout, $q) {
-        var self = this;
-        self.readonly = false;
-        self.selectedItem = null;
-        self.searchText = null;
-        self.querySearch = querySearch;
-        self.vegetables = loadVegetables();
-        self.selectedVegetables = [];
-        self.numberChips = [];
-        self.numberChips2 = [];
-        self.numberBuffer = '';
-        self.autocompleteDemoRequireMatch = true;
-        self.transformChip = transformChip;
-        /**
-         * Return the proper object when the append is called.
-         */
-        function transformChip(chip) {
-            // If it is an object, it's already a known chip
-            if (angular.isObject(chip)) {
-                return chip;
-            }
-            // Otherwise, create a new one
-            return { name: chip, type: 'new' }
-        }
-        /**
-         * Search for vegetables.
-         */
-        function querySearch (query) {
-            var results = query ? self.vegetables.filter(createFilterFor(query)) : [];
-            return results;
-        }
-        /**
-         * Create filter function for a query string
-         */
-        function createFilterFor(query) {
-            var lowercaseQuery = angular.lowercase(query);
-            return function filterFn(vegetable) {
-                return (vegetable._lowername.indexOf(lowercaseQuery) === 0) ||
-                    (vegetable._lowertype.indexOf(lowercaseQuery) === 0);
-            };
-        }
-        function loadVegetables() {
-            var veggies = [
-                {
-                    'name': 'Ingles',
-                    'type': 'Brassica'
-                },
-                {
-                    'name': 'Español',
-                    'type': 'Brassica'
-                },
-                {
-                    'name': 'Italiano',
-                    'type': 'Umbelliferous'
-                },
-                {
-                    'name': 'Chino',
-                    'type': 'Composite'
-                },
-                {
-                    'name': 'Aleman',
-                    'type': 'Goosefoot'
-                }
-            ];
-            return veggies.map(function (veg) {
-                veg._lowername = veg.name.toLowerCase();
-                veg._lowertype = veg.type.toLowerCase();
-                return veg;
-            });
-        }
-    }
-
-
-MyApp.controller('CustomInputDemoCtrl', DemoCtrl2);
 
 
 

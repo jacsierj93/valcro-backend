@@ -1,6 +1,6 @@
 var login = angular.module('login', []);
 
-login.controller('login', ['$scope', '$http', function ($scope, $http) {
+login.controller('loginCtrll', ['$scope', '$http', function ($scope, $http) {
     var usr = lgnForm.usr;
     var pss = lgnForm.pss;
 
