@@ -18,7 +18,7 @@ class PurchaseOrderItem extends Model
     protected $table = "tbl_compra_orden_item";
 
     public  function getProductoProfit(){
-        return $this->belongsTo('App\Models\Sistema\Product', 'producto_profit_id', 'codigo_profit');
+        return $this->belongsTo('App\Models\Sistema\Product', 'producto_id', 'id');
 
     }
 
