@@ -33,4 +33,10 @@ class Proveedor extends  Model
         return $this->belongsToMany('App\Models\Sistema\Monedas', 'tbl_prov_moneda', 'prov_id','moneda_id');
     }
 
+    /**
+     * obtiene las direcciones de almacen de los proveedor
+    */
+    public function getDireciones(){
+        return $this->hasMany('App\Models\Sistema\ProviderAddress','prov_id');
+    }
 }
