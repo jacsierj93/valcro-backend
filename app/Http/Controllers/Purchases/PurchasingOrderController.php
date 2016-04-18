@@ -6,9 +6,12 @@ use App\Models\Sistema\OrderReason;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Purchase\PurchaseOrderItem;
 use App\Models\Sistema\Proveedor;
+use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
+
+
 
 
 class PurchasingOrderController extends BaseController
@@ -73,12 +76,14 @@ class PurchasingOrderController extends BaseController
 
             }
 
+            $model->direccion_id = $req->direccion_id;
             $model->aprovada = $req->aprovada;
             $model->nro_orden = $req->nro_orden;
             $model->prov_id = $req->prov_id;
             $model->motivo_id = $req->motivo_id;
             $model->comentario = $req->comentario;
             $model->save();
+
             if ($req->has('items')) {
                 for($i=0;$i<sizeof($req->items);$i++){
                     $item= new PurchaseOrderItem();
@@ -87,7 +92,7 @@ class PurchasingOrderController extends BaseController
                         $result["action2"]="edit";
                     }
                     $item->compra_orden_id= $model->id;
-                    $item->producto_profit_id= trim($req->items[$i]["producto_id"]);
+                    $item->producto_id= trim($req->items[$i]["producto_id"]);
                     $item->cantidad= trim($req->items[$i]["cantidad"]);
                     $item->unidad= trim($req->items[$i]["unidad"]);
                     $item->save();
@@ -122,6 +127,21 @@ class PurchasingOrderController extends BaseController
         }
         return $model->proveedor_product()->get();
     }
+
+
+    /**
+     * obtiene las direcioness de almacen del proveedor
+     **/
+    public function getProviderAlmacenDir(Request $req){
+        $model = new Proveedor();
+        //////////condicion para editar
+        if ($req->has('id')) {
+            $model = $model->findOrFail($req->id);
+        }
+        return $model->getDireciones()->where('tipo_dir', 1)->get();
+
+    }
+
     public function delete(Request $req)
     {
 
