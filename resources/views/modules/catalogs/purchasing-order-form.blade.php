@@ -58,6 +58,14 @@
                                 </div>
                             </div>
 
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Direccion</label><br>
+                                    {!! Form::select('direccion_id',Array(), $data->direccion_iddireccion_id, array('class' => 'form-control select2','id'=>'direccion_id'))  !!}
+
+                                </div>
+                            </div>
+
                         </div>
 
                         <div class="row">
@@ -113,7 +121,7 @@
                                     <tbody>
                                     @foreach ($data->getItems()->get() as $result)
                                         <tr class="itemOld" id="{{ $result->id}}">
-                                            <td>{{ $result->producto_profit_id}}</td>
+                                            <td>{{ $result->producto_id}}</td>
                                             <td id="$result->getProductoProfit()->first()->descripcion_profit}}">{{ $result->getProductoProfit()->first()->descripcion_profit}}</td>
                                             <td>{{ $result->cantidad}}</td>
                                             <td>{{ $result->unidad}}</td>

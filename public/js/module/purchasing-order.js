@@ -9,6 +9,8 @@ $(document).ready(function(){
 
     $("#prov_id").change(function(){
         loadProduct($(this).val());
+        loadDireccion($(this).val());
+        //loadDireccion
     });
 
     $("#product_id").change(function(){
@@ -142,13 +144,42 @@ function loadProduct(id ){
         data:{id:id},
         beforeSend: function () {
         },
-        success: function llenarProductos(response){
+        success: function (response){
             var select= $("#product_id");
             select.html("");
             for(var i=0;i<response.length;i++){
                 select.append("<option value="
-                    +response[i]['codigo_profit']+
+                    +response[i]['id']+
                     ">"+response[i]['descripcion_profit']+"</option>")
+            }
+            verifGuadable();
+            loadDireccion(id);
+
+        }
+    });
+    verifGuadable();
+}
+
+/**carga los productos del provedor
+ * segun provedor selecionado
+ * */
+function loadDireccion(id ){
+    console.log(id);
+    jQuery.ajax({
+        url: PATHAPP + 'catalogs/ProviderAlmacenDir',
+        type: 'POST',
+        dataType: 'json',
+        data:{id:id},
+        beforeSend: function () {
+        },
+        success: function llenarProductos(response){
+            var select= $("#direccion_id");
+            select.html("");
+            console.log(response);
+            for(var i=0;i<response.length;i++){
+                select.append("<option value="
+                    +response[i]['id']+
+                    ">"+response[i]['direccion']+"</option>")
             }
             verifGuadable();
 
@@ -191,6 +222,7 @@ function save(){
             comentario:$("#coment").val(),
             aprovada: 0,
             nro_orden:$("#nro_orden").val(),
+            direccion_id:$("#direccion_id").val(),
             items:getItems(),
             del:itemsDel
 
