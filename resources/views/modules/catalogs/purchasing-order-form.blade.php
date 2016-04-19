@@ -57,16 +57,31 @@
 
                                 </div>
                             </div>
+                            </div>
+                            <div class="row">
 
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <label>Aprobada</label><br>
+                                        <input  type="checkbox"  id="aprobada"
+                                        @if ($data->aprovada == true)
+                                           checked
+                                        @endif
+
+                                        />
+
+
+                                    </div>
+                                </div>
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Direccion</label><br>
-                                    {!! Form::select('direccion_id',Array(), $data->direccion_iddireccion_id, array('class' => 'form-control select2','id'=>'direccion_id'))  !!}
+                                    {!! Form::select('direccion_id',Array(), $data->direccion_id, array('class' => 'form-control select2','id'=>'direccion_id'))  !!}
 
                                 </div>
                             </div>
 
-                        </div>
+                            </div>
 
                         <div class="row">
                             <div class="col-sm-5">

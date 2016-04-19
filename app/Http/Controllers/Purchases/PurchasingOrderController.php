@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Purchases;
 
-use App\Models\Sistema\OrderReason;
+use App\Models\Sistema\Purchase\OrderReason;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Purchase\PurchaseOrderItem;
 use App\Models\Sistema\Proveedor;

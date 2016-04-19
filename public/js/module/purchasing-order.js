@@ -30,6 +30,7 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
+
 });
 
 var deleteOrderComp = function (id) {
@@ -214,21 +215,26 @@ function save(){
     });
 
     function getData(){
-        var id=-1;
 
         var data= {
             prov_id: $("#prov_id").val(),
             motivo_id:$("#motivo_id").val(),
             comentario:$("#coment").val(),
-            aprovada: 0,
             nro_orden:$("#nro_orden").val(),
             direccion_id:$("#direccion_id").val(),
             items:getItems(),
             del:itemsDel
 
         }
+
         if($("#id").length>0){
            data.id=$("#id").val();
+        }
+
+        if($("#aprobada").checked){
+            data.aprovada=1;
+        }else {
+            data.aprovada=0;
         }
         return data;
 
