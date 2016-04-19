@@ -49,8 +49,10 @@ class ProveedorController extends BaseController
 
 
     public function saveOrUpdateProv(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
             $prov =  Proveedor::findOrFail($req->id);
+            $result['action']="update";
         }else{
             $prov =  new Proveedor();
         }
@@ -61,7 +63,8 @@ class ProveedorController extends BaseController
         $prov->contrapedido = $req->contraped;
 
         $prov->save();
-        return $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>$prov->id);
+        $result['id']=$prov->id;
+        return $result;
     }
 
     public function provNombreval(Request $req)

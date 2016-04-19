@@ -29,7 +29,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv) {
         cb1: true
     };
     $scope.setProv = function(prov){
-        setGetProv.setProv(prov)
+        setGetProv.setProv(prov.item)
         $mdSidenav("left").close().then(function(){
             $mdSidenav("left").open();
         })
@@ -86,6 +86,7 @@ MyApp.controller('ListProv', function ($scope,$http,setGetProv) {
         url: 'proveedores/provList'
     }).then(function successCallback(response) {
         $scope.todos = response.data;
+        setGetProv.setList($scope.todos);
     }, function errorCallback(response) {
         console.log("errorrr");
     });
@@ -247,6 +248,7 @@ MyApp.controller('CustomInputDemoCtrl', DemoCtrl2);
 MyApp.service("setGetProv",function($http){
     var prov = {id:false,type:"",description:"",siglas:"",envio:"",contraped:true,limCred:0};
     var itemsel = {};
+    var list = {};
     return {
         getProv: function () {
             return prov;
@@ -254,7 +256,7 @@ MyApp.service("setGetProv",function($http){
         setProv: function(index) {
             if (index){
                 itemsel = index;
-                id = itemsel.item.id;
+                id = itemsel.id;
                 $http({
                     method: 'POST',
                     url: "proveedores/getProv",
@@ -277,9 +279,16 @@ MyApp.service("setGetProv",function($http){
             }
         },
         updateItem: function(upd){
-            itemsel.item.description = upd.description;
-            itemsel.item.limCred = upd.limCred;
-            itemsel.item.contraped = upd.contraped;
+            itemsel.description = upd.description;
+            itemsel.limCred = upd.limCred;
+            itemsel.contraped = upd.contraped;
+        },
+        setList : function(val){
+            list = val;
+            itemsel.list[0];
+        },
+        addToList : function(elem){
+            list.unshift(elem);
         }
 
     };
@@ -287,7 +296,19 @@ MyApp.service("setGetProv",function($http){
 //###########################################################################################3
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
-MyApp.controller('DataProvController', function ($scope,setGetProv,$http) {
+MyApp.controller('DataProvController', function ($scope,setGetProv,$http,$mdToast) {
+    $scope.showSimpleToast = function() {
+        //var pinTo = $scope.getToastPosition();
+
+        $mdToast.show(/*{
+            template: "<md-toast style='width:100%'>prueba</md-toast>",
+            hideDelay: 6000,
+            position: 'bottom right'}*/
+            $mdToast.simple()
+                .textContent('guardado!')
+                .hideDelay(3000)
+        );
+    };
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
         console.log($scope.projectForm)
@@ -297,9 +318,14 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$http) {
                 url: "proveedores/saveProv",
                 data: $scope.dtaPrv,
             }).then(function successCallback(response) {
-                $scope.dtaPrv.id = response.data.id
+                $scope.dtaPrv.id = response.data.id;
                 $scope.projectForm.$setPristine();
                 setGetProv.updateItem($scope.dtaPrv);
+                if(response.data.action=="new"){
+                    var newProv = angular.copy($scope.dtaPrv);
+                    setGetProv.addToList(newProv);
+                    $scope.showSimpleToast();
+                }
             }, function errorCallback(response) {
                 console.log("error=>", response)
             });
