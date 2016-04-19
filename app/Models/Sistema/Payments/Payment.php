@@ -23,17 +23,17 @@ class Payment extends Model
 
     /**@return Proveedor de pago*/
     public function getProveedor(){
-        return $this->hasOne('App\Models\Sistema\Proveedor', 'id', 'prov_id');
+        return $this->belongsTo('App\Models\Sistema\Proveedor', 'prov_id');
     }
 
     /**@return BankAccount bancaria**/
     public function getBankAccount(){
-        return $this->hasOne('App\Models\Sistema\BankAccount', 'id', 'cuenta_id');
+        return $this->belongsTo('App\Models\Sistema\BankAccount', 'cuenta_id');
     }
 
     /**@return BankAccountProvidert  de provedor**/
     public function getBankAccountProvider(){
-        return $this->hasOne('App\Models\Sistema\BankAccountProvider', 'id', 'prov_cuenta_id');
+        return $this->belongsTo('App\Models\Sistema\BankAccountProvider', 'prov_cuenta_id');
     }
 
 
