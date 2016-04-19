@@ -24,7 +24,7 @@
     <base href="/angular/">
 </head>
 
-<body id="inicio" ng-cloak layout="column" ng-controller="AppCtrl" style="overflow: hidden;">
+<body id="inicio" ng-cloak layout="column" ng-controller="AppMain" style="overflow: hidden;">
 
 
 <div class="cabezera" layout="row" layout-align="start center">
@@ -70,5 +70,6 @@
 
 <?= HTML::script('js/app.js') ?>
 <?= HTML::script('js/appTemp.js') ?>
+<?= HTML::script('js/modules/proveedores/proveedoresController.js') ?>
 </body>
 </html>

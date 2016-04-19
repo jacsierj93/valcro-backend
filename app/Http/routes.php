@@ -112,8 +112,10 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 ///Proveedores
 
 $app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
-$app->post("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
+$app->post("proveedores/saveProv",'Proveedores\ProveedorController@saveOrUpdateProv'); ///obtener lista general de proveedores
+$app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
 
 //MASTERS
-$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
+$app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
+$app->post("master/getProviderType",'Masters\MasterController@getProviderType'); ///obtener listado de tipos de proveedores
+$app->post("master/getProviderTypeSend",'Masters\MasterController@getProviderTypeSend'); ///obtener listado de tipos de envio de proveedores

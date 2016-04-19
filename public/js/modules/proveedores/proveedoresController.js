@@ -1,28 +1,53 @@
-var proveedores = angular.module('proveedores', []);
+//var proveedores = angular.module('proveedores', []);
 
-proveedores.controller('AppCtrl', function ($scope,$mdSidenav) {
-    $scope.states = ('Fabrica Trader Agente Trader/Fabrica').split(' ').map(function (state) {
-        return {abbrev: state};
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv) {
+    /*$scope.project = {
+     description: 'Nuclear Missile Defense System',
+     rate: 500
+     };*/
+
+
+    $http({
+        method: 'POST',
+        url: 'master/getProviderType'
+    }).then(function successCallback(response) {
+        $scope.states = response.data
+    }, function errorCallback(response) {
+        console.log("error=>",response)
     });
 
-    $scope.envios = ('Aereo Maritimo Terrestre').split(' ').map(function (envio) {
-        return {tipo: envio};
+    $http({
+        method: 'POST',
+        url: 'master/getProviderTypeSend'
+    }).then(function successCallback(response) {
+        $scope.envios = response.data
+    }, function errorCallback(response) {
+        console.log("error=>",response)
     });
 
     $scope.data = {
         cb1: true
     };
+    $scope.setProv = function(prov){
+        setGetProv.setProv(prov)
+        $mdSidenav("left").close().then(function(){
+            $mdSidenav("left").open();
+        })
+
+    }
+
 
 });
 
 
-proveedores.controller('TipoDirecc', function ($scope) {
+MyApp.controller('TipoDirecc', function ($scope) {
+
     $scope.tipos = ('Facturacion Fabrica Almacen').split(' ').map(function (tipo) {
         return {nombre : tipo};
     });
 });
 
-proveedores.controller('ListPaises', function ($scope,$http) {
+MyApp.controller('ListPaises', function ($scope,$http) {
     $http({
         method: 'GET',
         url: 'master/getCountries'
@@ -34,7 +59,7 @@ proveedores.controller('ListPaises', function ($scope,$http) {
 });
 
 
-proveedores.controller('ListHerramientas', function ($scope) {
+MyApp.controller('ListHerramientas', function ($scope) {
     $scope.tools = [
         {
             tool: 'Calculadora',
@@ -51,13 +76,13 @@ proveedores.controller('ListHerramientas', function ($scope) {
         }];
 });
 
-/*proveedores.run(['$route', function($route)  {
+/*MyApp.run(['$route', function($route)  {
  $route.reload();
  }]);*/
 
-proveedores.controller('ListProv', function ($scope,$http) {
+MyApp.controller('ListProv', function ($scope,$http,setGetProv) {
     $http({
-        method: 'GET',
+        method: 'POST',
         url: 'proveedores/provList'
     }).then(function successCallback(response) {
         $scope.todos = response.data;
@@ -137,7 +162,7 @@ function DemoCtrl1 ($timeout, $q, $log) {
 }
 
 
-proveedores.controller('DemoCtrl', DemoCtrl1);
+MyApp.controller('DemoCtrl', DemoCtrl1);
 
 
 
@@ -214,4 +239,91 @@ function DemoCtrl2 ($timeout, $q) {
 }
 
 
-proveedores.controller('CustomInputDemoCtrl', DemoCtrl2);
+MyApp.controller('CustomInputDemoCtrl', DemoCtrl2);
+
+//###########################################################################################3
+//###################Service Proveedores (comunication betwen controllers)###################3
+//###########################################################################################3
+MyApp.service("setGetProv",function($http){
+    var prov = {id:false,type:"",description:"",siglas:"",envio:"",contraped:true,limCred:0};
+    var itemsel = {};
+    return {
+        getProv: function () {
+            return prov;
+        },
+        setProv: function(index) {
+            if (index){
+                itemsel = index;
+                id = itemsel.item.id;
+                $http({
+                    method: 'POST',
+                    url: "proveedores/getProv",
+                    data: {
+                        id: id
+                    }
+                }).then(function successCallback(response) {
+                    data = response.data;
+                    prov.id = data.id;
+                    prov.description = data.description;
+                    prov.siglas = data.siglas;
+                    prov.type = data.type;
+                    prov.envio = data.envio;
+                    prov.contraped = data.contraped;
+                }, function errorCallback(response) {
+                    console.log("error=>", response)
+                });
+            }else{
+                prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
+            }
+        },
+        updateItem: function(upd){
+            itemsel.item.description = upd.description;
+            itemsel.item.limCred = upd.limCred;
+            itemsel.item.contraped = upd.contraped;
+        }
+
+    };
+})
+//###########################################################################################3
+//##############################FORM CONTROLLERS#############################################3
+//###########################################################################################3
+MyApp.controller('DataProvController', function ($scope,setGetProv,$http) {
+    $scope.dtaPrv = setGetProv.getProv();
+    $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
+        console.log($scope.projectForm)
+        if(nuevo[0] && !nuevo[1]) {
+            $http({
+                method: 'POST',
+                url: "proveedores/saveProv",
+                data: $scope.dtaPrv,
+            }).then(function successCallback(response) {
+                $scope.dtaPrv.id = response.data.id
+                $scope.projectForm.$setPristine();
+                setGetProv.updateItem($scope.dtaPrv);
+            }, function errorCallback(response) {
+                console.log("error=>", response)
+            });
+        }
+    });
+
+});
+
+//###########################################################################################3
+
+
+
+MyApp.controller('idiomasController', function($scope) {
+    $scope.idiomas = [
+        { name: 'Español' },
+        { name: 'Ingles' },
+        { name: 'Frances' },
+        { name: 'Portugues' },
+        { name: 'Aleman' },
+        { name: 'Chino' },
+        { name: 'Ruso' },
+        { name: 'Papiamento' }
+    ];
+
+    $scope.idiomasSeleccionados = [];
+
+});

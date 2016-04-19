@@ -2,7 +2,7 @@
  * Created by delimce on 14/3/2016.
  */
 /////variable global de la ruta de la aplicacion
-var PATHAPP = "http://userver/angular/";
+var PATHAPP = "http://valcrolindes01/angular/";
 
 /////////token para los request ajax
 $.ajaxSetup({

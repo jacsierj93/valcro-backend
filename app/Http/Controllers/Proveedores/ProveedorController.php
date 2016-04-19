@@ -28,19 +28,40 @@ class ProveedorController extends BaseController
     public function getList()
     {
         $provs = new Proveedor();
-        $data = $provs->select("razon_social as who")->where("deleted_at",NULL)->get();
+        $data = $provs->select("id","razon_social as description","contrapedido as contraped","limite_credito  as limCred", "siglas")->where("deleted_at",NULL)->get();
         /*   foreach($data as $k => $v){
             $v['nombreValcro']=$v->nombres_valcro()->get();
         }*/
         return $data;
     }
 
-    public function gettoken(){
-        echo csrf_token();
+    public function getProv(request $prv)
+    {
+
+        //$prov = new Proveedor();
+        $data = Proveedor::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
+        /*   foreach($data as $k => $v){
+            $v['nombreValcro']=$v->nombres_valcro()->get();
+        }*/
+        $data->contraped = ($data->contraped == 1);
+        return $data;
     }
 
-    public function saveOrUpdateProv(Request $req){
 
+    public function saveOrUpdateProv(request $req){
+        if($req->id){
+            $prov =  Proveedor::findOrFail($req->id);
+        }else{
+            $prov =  new Proveedor();
+        }
+        $prov->razon_social = $req->description;
+        $prov->tipo_id = $req->type;
+        $prov->siglas = $req->siglas;
+        $prov->tipo_envio_id = $req->envio;
+        $prov->contrapedido = $req->contraped;
+
+        $prov->save();
+        return $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>$prov->id);
     }
 
     public function provNombreval(Request $req)

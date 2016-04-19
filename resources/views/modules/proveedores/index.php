@@ -1,4 +1,5 @@
-<div layout="column" class="md-whiteframe-1dp" flex>
+
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="AppCtrl">
 
     <div layout="row" flex="none" class="menuBarHolder">
         <div layout layout-align="start center" class="menu md-whiteframe-1dp">
@@ -25,11 +26,11 @@
 
         <md-content class="barraLateral" ng-controller="ListProv">
 
-            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="null">
-                <div flex>{{ item.who }}</div>
-                <div style="height:40px; font-size:31px;">{{$index}}00000</div>
+            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)">
+                <div flex>{{ item.description }}</div>
+                <div style="height:40px; font-size:31px;">{{item.limCred}}00000</div>
                 <div style="height:40px;">
-                    <i class="fa fa-gift" style="font-size:24px;"></i>
+                    <i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>
                     <i class="fa fa-paper-plane" style="font-size:18px; color: #03a9f4;"></i>
                     <i class="fa fa-plane" style="font-size:20px;"></i>
                 </div>
@@ -53,7 +54,7 @@
 
         <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
-            <form name="projectForm">
+            <form name="projectForm" ng-controller="DataProvController">
 
                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                     <div>
@@ -64,12 +65,13 @@
 
                     <md-input-container class="md-block" flex="20">
                         <label>Tipo de Proveedor</label>
-                        <md-select ng-model="user.state">
-                            <md-option ng-repeat="state in states" value="{{state.abbrev}}">
-                                {{state.abbrev}}
+                        <md-select ng-model="dtaPrv.type" name ="state">
+                            <md-option ng-repeat="state in states" value="{{state.id}}">
+                                {{state.nombre}}
                             </md-option>
                         </md-select>
-                        <div ng-messages="user.state.$error">
+
+                        <div ng-messages="projectForm.type.$error">
                             <div ng-message="required">Campo Obligatorio.</div>
                             <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
                         </div>
@@ -79,7 +81,7 @@
                     <md-input-container class="md-block" flex>
                         <label>Razon Social</label>
                         <input md-maxlength="80" required md-no-asterisk name="description"
-                               ng-model="project.description">
+                               ng-model="dtaPrv.description">
                         <div ng-messages="projectForm.description.$error">
                             <div ng-message="required">Campo Obligatorio.</div>
                             <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
@@ -88,7 +90,7 @@
 
                     <md-input-container class="md-block" flex="10">
                         <label>Siglas</label>
-                        <input md-maxlength="4" required name="siglas" ng-model="project.siglas">
+                        <input md-maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" >
                         <div ng-messages="projectForm.siglas.$error">
                             <div ng-message="required">Obligatorio.</div>
                             <div ng-message="md-maxlength">maximo 4</div>
@@ -102,19 +104,18 @@
 
                     <md-input-container class="md-block" flex="20">
                         <label>Tipo de Envio</label>
-                        <md-select ng-model="project.envio">
-                            <md-option ng-repeat="envio in envios" value="{{envio.tipo}}">
-                                {{envio.tipo}}
+                        <md-select ng-model="dtaPrv.envio">
+                            <md-option ng-repeat="envio in envios" value="{{envio.id}}">
+                                {{envio.nombre}}
                             </md-option>
                         </md-select>
-                        <div ng-messages="project.envio.$error">
+                        <div ng-messages="envio.$error">
                             <div ng-message="required">Campo Obligatorio.</div>
-                            <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
                         </div>
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <md-switch class="md-primary" ng-model="data.cb1" aria-label="Contrapedidos">
+                        <md-switch class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos">
                             Contrapedidos?
                         </md-switch>
                     </md-input-container>
@@ -245,7 +246,7 @@
 
                 </div>
 
-                <div ng-controller="DemoCtrl3 as ctrl" layout="row">
+                <!--<div ng-controller="DemoCtrl3 as ctrl" layout="row">
                     <md-autocomplete flex required
                                      md-input-name="autocompleteField"
                                      md-input-minlength="2"
@@ -292,7 +293,25 @@
 
                     </div>
 
+                </div>-->
+
+
+                <div ng-controller="idiomasController" layout="row">
+                    <md-input-container flex>
+                        <label>Idiomas</label>
+                        <md-select ng-model="idiomasSeleccionados" multiple="">
+                            <md-option ng-value="idioma.name" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
+                            </md-optgroup>
+                        </md-select>
+                    </md-input-container>
                 </div>
+
+
+
+
+
+
+
             </form>
         </md-content>
 
@@ -318,3 +337,4 @@
 
 
 </div>
+

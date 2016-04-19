@@ -1,4 +1,5 @@
-var MyApp = angular.module('MyApp', ['ngMaterial', 'ngMessages', 'ngRoute','ngResource']);
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages'];
+var MyApp = angular.module('MyApp', dependency);
 
 
 /*MyApp.config(['$routeProvider', '$locationProvider',
@@ -60,7 +61,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 }]);
 
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav) {
+MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
     /*$scope.project = {
      description: 'Nuclear Missile Defense System',
      rate: 500
@@ -86,23 +87,20 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav) {
         $scope.seccion = $scope.secciones[indx.$index];
     }
 
-    $scope.states = ('Fabrica Trader Agente Trader/Fabrica').split(' ').map(function (state) {
-        return {abbrev: state};
-    });
 
-    $scope.envios = ('Aereo Maritimo Terrestre').split(' ').map(function (envio) {
-        return {tipo: envio};
-    });
-
-    $scope.data = {
-        cb1: true
-    };
 
     //###########################################################################################3
     //###########################################################################################3
     //###########################################################################################3
     //###########################################################################################3
-    $scope.toggleLeft = buildToggler('left');
+    //$scope.toggleLeft = buildToggler('left');
+
+    $scope.toggleLeft = function() {
+        setGetProv.setProv(false)
+        $mdSidenav("left").close().then(function () {
+            $mdSidenav("left").open();
+        })
+    }
     $scope.toggleRight = buildToggler('right');
     $scope.toggleOtro = buildToggler('otro');
     function buildToggler(navID) {
@@ -120,12 +118,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav) {
 });
 
 
-MyApp.controller('TipoDirecc', function ($scope) {
-    $scope.tipos = ('Facturacion Fabrica Almacen').split(' ').map(function (tipo) {
-        return {nombre : tipo};
-    });
-});
 
+/*
 MyApp.controller('ListPaises', function ($scope,$http) {
     $http({
         method: 'POST',
@@ -136,6 +130,7 @@ MyApp.controller('ListPaises', function ($scope,$http) {
         console.log("error=>",response)
     });
 });
+*/
 
 
 MyApp.controller('ListHerramientas', function ($scope) {
