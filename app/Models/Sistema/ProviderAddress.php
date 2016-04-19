@@ -18,7 +18,7 @@ class ProviderAddress extends Model
     protected $table = "tbl_prov_direccion";
 
     public function getPais(){
-        return $this->hasOne('App\Models\Sistema\Country', 'id','pais_id');
+        return $this->belongsTo('App\Models\Sistema\Country','pais_id');
     }
 
 }
