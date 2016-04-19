@@ -25,7 +25,7 @@ class PurchaseOrder extends Model
 
     /**@return Proveedor de pago*/
     public function getReason(){
-        return $this->hasOne('App\Models\Sistema\OrderReason', 'id', 'motivo_id');
+        return $this->hasOne('App\Models\Sistema\Purchase\OrderReason', 'id', 'motivo_id');
     }
 
     public function getItems(){
