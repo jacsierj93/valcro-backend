@@ -13,7 +13,7 @@
 @section('main-content')
 
     <div class="panel-body">
-        <a type="button" href="{{url("catalogs/OrderControllerForm")}}" class="btn bg-orange margin">Crear Nuevo</a>
+        <a type="button" href="{{url("catalogs/OrderForm")}}" class="btn bg-orange margin">Crear Nuevo</a>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">

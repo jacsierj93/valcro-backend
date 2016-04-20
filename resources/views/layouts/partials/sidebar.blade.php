@@ -46,7 +46,7 @@
             <li class="treeview">
                 <a href="#"><i class='fa fa-database'></i> <span>Catalogo</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
-                    <li><a href="{{url('catalogs/departamentList')}}">Departamentos</a></li>
+                   <!-- <li><a href="{{url('catalogs/departamentList')}}">Departamentos</a></li>
                     <li><a href="{{url('catalogs/positionList')}}">Cargos</a></li>
                     <li><a href="{{url('catalogs/sucursalList')}}">Sucursales</a></li>
                     <li><a href="{{url('catalogs/providerTypesList')}}">Tipos de Provedor</a></li><!---add for miguel -->
@@ -56,6 +56,7 @@
                     <li><a href="{{url('catalogs/PayTypesList')}}">Tipo de Pago</a></li><!---Tipo de pagoo -->
                     <li><a href="{{url('catalogs/PurchasingDocumentTypeList')}}">Tipo de Documento de Compra</a></li><!---Tipo de pagoo -->
                     <li><a href="{{url('catalogs/PurchasingOrderList')}}">Ordenes de Compras</a></li><!---Tipo de pagoo -->
+                    <li><a href="{{url('catalogs/OrderList')}}">Pedidos</a></li><!---Tipo de pagoo -->
 
                 </ul>
             </li>
