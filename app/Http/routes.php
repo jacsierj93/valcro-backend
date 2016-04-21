@@ -106,7 +106,7 @@ $app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); //
 
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
-$app->get("monedas/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
+$app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
 $app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'); ///obtener lista general
 
 
@@ -149,7 +149,7 @@ $app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); //
 
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
-$app->get("monedas/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
+$app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
 $app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'); ///obtener lista general
 
 //******Maestro de tipos de pago******/
@@ -166,12 +166,30 @@ $app->post("catalogs/PurchasingDocumentTypeSave",'Catalogs\PurchasingDocumentTyp
 $app->post("catalogs/PurchasingDocumentTypeDel",'Catalogs\PurchasingDocumentTypeController@delete'); ///borrar
 
 
-
 //******Orden de compra******/
 $app->get('catalogs/PurchasingOrderList', 'Purchases\PurchasingOrderController@getList'); ///lista
 $app->get('catalogs/PurchasingOrderForm', 'Purchases\PurchasingOrderController@getForm'); ///form
 $app->post("catalogs/PurchasingOrderSave",'Purchases\PurchasingOrderController@saveOrUpdate'); ///guardar o editar
 $app->post("catalogs/PurchasingOrderDel",'Purchases\PurchasingOrderController@delete'); ///borrar
+
+
+/******Pedidos *****/
+$app->get('catalogs/OrderProviderList', 'Purchases\OrderController@getListForm'); ///view for
+$app->get('catalogs/OrderForm', 'Purchases\OrderController@getForm'); ///form
+$app->post("catalogs/OrderSave",'Purchases\OrderController@saveOrUpdate'); ///guardar o editar
+$app->post("catalogs/OrderDel",'Purchases\OrderController@delete'); ///borrar
+$app->post('catalogs/OrderList', 'Purchases\OrderController@getList'); ///lista
+
+//anexar a Proveedores
+$app->post("catalogs/ProviderOrder",'Purchases\OrderController@getProviderOrder'); ///ontiene los pedidos de un proveedor de provedor
+$app->post("catalogs/ProviderCountry",'Purchases\OrderController@getProviderCountry'); ///ontiene los pedidos de un proveedor de provedor
+$app->post("catalogs/ProviderCoins",'Purchases\OrderController@getProviderCoins'); ///ontiene los pedidos de un proveedor de provedor
 $app->post("catalogs/ProviderProduct",'Purchases\PurchasingOrderController@getProviderProduct'); ///getProductos de provedor
+$app->post("catalogs/ProviderAdressStore",'Purchases\OrderController@getProviderAdressStore'); ///getProductos de provedor
+$app->post("catalogs/ProviderPaymentCondition",'Purchases\OrderController@getProviderPaymentCondition'); ///getProductos de provedor
+
+
+//anexar a Orden
+$app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'); ///getProductos de provedor
 
 
