@@ -322,7 +322,7 @@ function save(){
             $('#save').prop('disabled', false);
 
             if(response.action=='new'){
-                // location.replace(PATHAPP+'catalogs/PurchasingOrderList')
+                 location.replace(PATHAPP+'catalogs/PurchasingOrderList')
             }else{
 
             }
