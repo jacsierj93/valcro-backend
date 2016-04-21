@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class TypeOrders extends Model
+class OrderType extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_pedido_tipo";

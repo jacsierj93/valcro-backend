@@ -17,5 +17,22 @@ class Order extends Model
     use SoftDeletes;
     protected $table = "tbl_pedido";
 
+    /**
+     */
+    public function PurchaseOrder(){
+        return $this->belongsToMany('App\Models\Sistema\Purchase', 'tbl_compra_orden', 'pedido_id','orden_compra_id');
+    }
+
+    /**
+     */
+    public function getOrders(){
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrder', 'pedido_id');
+    }
+
+    /**
+     */
+    public function getTypeOrder(){
+        return $this->belongsTo('App\Models\Sistema\Purchase\OrderType', 'tipo_pedido_id');
+    }
 
 }

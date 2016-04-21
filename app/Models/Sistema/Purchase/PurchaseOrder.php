@@ -29,6 +29,8 @@ class PurchaseOrder extends Model
     }
 
     public function getItems(){
-        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrderItem', 'compra_orden_id', 'id');
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrderItem', 'compra_orden_id');
     }
+
+
 }
