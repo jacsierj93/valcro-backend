@@ -17,10 +17,6 @@ class Proveedor extends  Model
     {
         return $this->hasMany('App\Models\Sistema\NombreValcro', 'prov_id');
     }
-    public function proveedor_moneda()
-    {
-        return $this->hasMany('App\Models\Sistema\ProvMoneda', 'prov_id');
-    }
 
     public function proveedor_product()
     {
@@ -29,14 +25,28 @@ class Proveedor extends  Model
 
     /**
     */
-    public function monedas(){
+    public function getProviderCoin(){
         return $this->belongsToMany('App\Models\Sistema\Monedas', 'tbl_prov_moneda', 'prov_id','moneda_id');
     }
 
     /**
      * obtiene las direcciones de almacen de los proveedor
     */
-    public function getDireciones(){
+    public function getAddress(){
         return $this->hasMany('App\Models\Sistema\ProviderAddress','prov_id');
+    }
+
+    /**
+     * obtiene las condiciones de pago asignadas al proveedor
+     */
+    public function getPaymentCondition(){
+        return $this->hasMany('App\Models\Sistema\ProviderCondPay','prov_id');
+    }
+
+    /**
+     * obtiene las condiciones de pago asignadas al proveedor
+     */
+    public function getOrders(){
+        return $this->hasMany('App\Models\Sistema\Purchase\Order','prov_id');
     }
 }

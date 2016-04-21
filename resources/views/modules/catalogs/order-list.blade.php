@@ -25,12 +25,11 @@
                 <thead>
                 <tr>
                     <th width="30px">&nbsp;</th>
-                    <th>Tipo</th>
-                    <th>Nro Pedido</th>
+                    <th>Documento</th>
                     <th>Proforma</th>
-                    <th>Factura </th>
-                    <th>Fecha</th>
-                    <th>Comentario</th>
+                    <th>Emision </th>
+                    <th>Factura</th>
+                    <th>Monto</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -38,12 +37,11 @@
                 <tfoot>
                 <tr>
                     <th width="30px">&nbsp;</th>
-                    <th>Tipo</th>
-                    <th>Nro Pedido</th>
+                    <th>Documento</th>
                     <th>Proforma</th>
-                    <th>Factura </th>
-                    <th>Fecha</th>
-                    <th>Comentario</th>
+                    <th>Emision </th>
+                    <th>Factura</th>
+                    <th>Monto</th>
                 </tr>
                 </tfoot>
             </table>
@@ -56,7 +54,7 @@
     {!! Html::script('components/DataTables/media/js/jquery.dataTables.min.js') !!}
     {!! Html::script('components/DataTables/media/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('components/jquery-confirm/jquery.confirm.min.js') !!}
-    <script src="{{url("pedido-lispedido-list-ctrl.js")}}"></script>
+    <script src="{{url("js/module/pedido-list-ctrl.js")}}"></script>
 
     <script>
         $(function () {

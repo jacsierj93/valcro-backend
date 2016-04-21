@@ -59,6 +59,7 @@ class PurchasingOrderController extends BaseController
         $validator = Validator::make($req->all(), [
             'prov_id' => 'required',
             'motivo_id' => 'required',
+            'nro_orden'=>'required'
         ]);
 
         if ($validator->fails()) { ///ups... erorres
@@ -138,7 +139,7 @@ class PurchasingOrderController extends BaseController
         if ($req->has('id')) {
             $model = $model->findOrFail($req->id);
         }
-        return $model->getDireciones()->where('tipo_dir', 1)->get();
+        return $model->getAddress()->where('tipo_dir', 1)->get();
 
     }
 

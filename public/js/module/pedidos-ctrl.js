@@ -4,12 +4,30 @@
 
 var itemsDel= new Array();// items eliminados
 $(document).ready(function(){
-    console.log("id", $("#prov_id"));
-    loadOrdenesdeCompra($("#prov_id").val());
-    loadDireccionProv(1);
+    loadOrdenesdeCompra(1);
+    loadPaisesProv(1);
     loadMonedaProv(1);
+    loadDirecciAlmcProv(1,235);
+    loadCondPagoProv(1);
 
+    $("#add").click(function(){
+        var id=$("#items").val();
+        loadOrder(id, function(response){
+            var tabla= $("#example1 tbody");
+            var fila= $("<tr></tr>");
+            fila.attr('id',response['id']);
+            fila.html("" +
+                "<td width='30px'><input type='button' class='btn' value='Borrar' onclick='javascript:delRow(this)'></td>" +
+                "<td>"+response['id']+"</td>"+
+                "<td>"+response['nro_orden']+"</td>"+
+                "<td>"+response['comentario']+"</td>"+
+                "<td>"+response['emision']+"</td>"+
+                "");
+            tabla.append(fila);
+            $("#items option[value='"+id+"']").remove();
+        })
 
+    })
 });
 
 var deleteOrderComp = function (id) {
@@ -44,15 +62,14 @@ var deleteOrderComp = function (id) {
 function  isGuardable(){
 
     /*if($("#nro_orden").val().length<4){
-        return false;
-    }*/
+     return false;
+     }*/
     return true;
 }
 
 function  delRow(obj){
     var fila = $(obj).parents("tr");
-    console.log('obj', fila);
-    if(fila.attr('id')!='-1'){
+    if(fila.attr('old')){
         itemsDel.push(fila.attr('id'));
     }
     fila.remove();
@@ -60,7 +77,6 @@ function  delRow(obj){
 
 function  editRow(obj){
     var fila = $(obj).parents("tr");
-    console.log('obj', fila);
     if(fila.attr('id')!='-1'){
         $("#itemid").val(fila.attr('id'));
     }
@@ -71,7 +87,6 @@ function  editRow(obj){
     $("#uni_proc").val(celds.eq(3).text());
     $("#select2-product_id-container").val(celds.eq(1).text());
 
-    console.log('celdas', celds);
     fila.remove();
 }
 
@@ -113,11 +128,11 @@ function newRow(id, codi,desc, cant, unidad, profi){
     return fila;
 }
 
-/**carga los productos del provedor
+/**
+ * carga los paises del provedor
  * segun provedor selecionado
  * */
-function loadDireccionProv(id ){
-    console.log(id);
+function loadPaisesProv(id ){
     jQuery.ajax({
         url: PATHAPP + 'catalogs/ProviderCountry',
         type: 'POST',
@@ -128,13 +143,76 @@ function loadDireccionProv(id ){
         success: function (response){
             var select= $("#pais_id");
             select.html("");
-            console.log(response);
             for(var i=0;i<response.length;i++){
                 select.append("<option value="
                     +response[i]['id']+
                     ">"+response[i]['pais']+"</option>")
             };
-    console.log(response);
+
+
+        }, error: function(er){
+            console.log('error');
+        }
+
+    });
+    verifGuadable();
+}
+/**carga las getProviderCoin del proveedor
+ * segun proveeodr selecionado*/
+
+/**
+ * carga la direccion de almacen del provedor
+ * segun provedor selecionado
+ * @param id id del proveedor
+ * @param pais_id id del pais selecionado
+ * */
+function loadDirecciAlmcProv(id , pais_id ){
+    jQuery.ajax({
+        url: PATHAPP + 'catalogs/ProviderAdressStore',
+        type: 'POST',
+        dataType: 'json',
+        data:{id:id, pais_id:pais_id},
+        beforeSend: function () {
+        },
+        success: function (response){
+            var select= $("#direccion_almacen_id");
+            select.html("");
+            for(var i=0;i<response.length;i++){
+                select.append("<option value="
+                    +response[i]['id']+
+                    ">"+response[i]['direccion']+"</option>")
+            };
+
+
+        }, error: function(er){
+            console.log('error');
+        }
+
+    });
+    verifGuadable();
+}
+/**
+ * carga los maestro de pago de un proveedor del provedor
+ * segun provedor selecionado
+ * @param id id del proveedor
+ * @param pais_id id del pais selecionado
+ * */
+function loadCondPagoProv(id  ){
+    jQuery.ajax({
+        url: PATHAPP + 'catalogs/ProviderPaymentCondition',
+        type: 'POST',
+        dataType: 'json',
+        data:{id:id},
+        beforeSend: function () {
+        },
+        success: function (response){
+            var select= $("#condicion_pago_id");
+            select.html("");
+            for(var i=0;i<response.length;i++){
+                select.append("<option value="
+                    +response[i]['id']+
+                    ">"+response[i]['titulo']+"</option>")
+            };
 
 
         }, error: function(er){
@@ -145,8 +223,34 @@ function loadDireccionProv(id ){
     verifGuadable();
 }
 
+
+/**
+ * carga los maestro de pago de un proveedor del provedor
+ * segun provedor selecionado
+ * @param id id del proveedor
+ * @param pais_id id del pais selecionado
+ * */
+function loadOrder(id , callback ){
+    jQuery.ajax({
+        url: PATHAPP + 'catalogs/PurchaseOrder',
+        type: 'POST',
+        dataType: 'json',
+        data:{id:id},
+        beforeSend: function () {
+        },
+        success: callback
+        , error: function(er){
+            console.log('error');
+        }
+
+    });
+    verifGuadable();
+}
+
+
+/**carga las getProviderCoin del proveedor
+ * segun proveeodr selecionado*/
 function loadMonedaProv(id ){
-    console.log(id);
     jQuery.ajax({
         url: PATHAPP + 'catalogs/ProviderCoins',
         type: 'POST',
@@ -155,15 +259,13 @@ function loadMonedaProv(id ){
         beforeSend: function () {
         },
         success: function (response){
-            var select= $("#moneda_id");
+            var select= $("#prov_moneda_id");
             select.html("");
-            console.log(response);
             for(var i=0;i<response.length;i++){
                 select.append("<option value="
                     +response[i]['id']+
                     ">"+response[i]['nombre']+"</option>")
             };
-            console.log(response);
 
 
         }, error: function(er){
@@ -174,56 +276,45 @@ function loadMonedaProv(id ){
     verifGuadable();
 }
 
-
-/**carga los productos del provedor
+/**carga las ordenes de compra del provedor
  * segun provedor selecionado
  * */
 function loadOrdenesdeCompra(id ){
-    console.log(id);
     jQuery.ajax({
         url: PATHAPP + 'catalogs/ProviderOrder',
         type: 'POST',
         dataType: 'json',
-        data:{id:'1'},
+        data:{id:id},
         beforeSend: function () {
         },
         success: function (response){
-            var tabla =$("#example1  tbody");
-            tabla.html('');
-            var fila;
+            var select= $("#items");
+            select.html("");
             for(var i=0;i<response.length;i++){
-                fila=$("<tr></tr>");
-                fila.html("" +
-                    "<td>" +" <input type='button' class='btn' id=''"+response[i]['id']+"' value='Detalles' >"+"</td>"+
-                    "<td>" +response[i]['id']+"</td>"+
-                    "<td>" +response[i]['nro_orden']+"</td>"+
-                    "<td> <input type='checkbox' value='" +response[i]['aprovada']+"' disabled/></td>"+
-                    "<td>" +response[i]['comentario']+"</td>"+
-                    "<td>" +response[i]['emicion']+"</td>"+
-                    "<td>" +response[i]['size']+"</td>"+
-                    "");
-                tabla.append(fila);
+                select.append("<option value="
+                    +response[i]['id']+
+                    ">"+response[i]['nro_orden']+"</option>")
             }
 
+
         }, error: function(er){
-            console.log('error');
         }
 
     });
     verifGuadable();
 }
 
+
 function save(){
-    console.log("sadfas");
     ////entrada de datos
     jQuery.ajax({
-        url: PATHAPP + 'catalogs/PurchasingOrderSave',
+        url: PATHAPP + 'catalogs/OrderSave',
         type: 'POST',
         dataType: 'json',
         data: getData(),
         beforeSend:  function () {
             $("#save").html("Enviando...");
-            $('#save').prop('disabled', true);
+         //   $('#save').prop('disabled', true);
         },
         success: function (response) {
 
@@ -242,38 +333,61 @@ function save(){
         var id=-1;
 
         var data= {
-            prov_id: $("#prov_id").val(),
-            motivo_id:$("#motivo_id").val(),
-            comentario:$("#coment").val(),
-            aprovada: 0,
-            nro_orden:$("#nro_orden").val(),
-            direccion_id:$("#direccion_id").val(),
+            tipo_pedido_id: $("#tipo_id").val(),
+            monto:$("#monto").val(),
+            prov_id:$("#prov_id").val(),
+            pais_id:$("#pais_id").val(),
+            condicion_pago_id:$("#condicion_pago_id").val(),
+            motivo_pedido_id:$("#motivo_pedido_id").val(),
+            prioridad_id:$("#prioridad_id").val(),
+            pedido_estado_id:$("#pedido_estado_id").val(),
+            prov_moneda_id:$("#prov_moneda_id").val(),
+            direccion_almacen_id:$("#direccion_almacen_id").val(),
+            condicion_pedido_id:$("#condicion_pedido_id").val(),
+            nro_proforma:$("#nro_proforma").val(),
+            nro_factura:$("#nro_factura").val(),
+            comentario:$("#comentario").val(),
+            mt3:$("#mt3").val(),
+            peso:$("#peso").val(),
+            nro_doc:$("#nro_doc").val(),
             items:getItems(),
-            del:itemsDel
 
         }
+        console.log(data);
         if($("#id").length>0){
             data.id=$("#id").val();
         }
+        if($("#tasa_fija")[0].checked){
+            data.tasa=$("#tasa").val();
+        }
+        if(itemsDel.length>0){
+            data.del=itemsDel;
+        }
+        if($("#comentario_cancelacion").val().length>0 || $("#cancelacion").val().length>0 ){
+            data.comentario_cancelacion=($("#comentario_cancelacion").val());
+            data.cancelacion=($("#cancelacion").val());
+        }
+
         return data;
 
         function  getItems(){
-            var filas =$("#producProv  tbody").contents().filter("tr");
             var data= new Array();
-            var cod,cantida,unidad,id;
-            console.log("data", filas);
+            var filas =$("#example1  tbody").contents().filter("tr");
+
+            var id;
+
             for(var i=0;i<filas.size();i++){
                 var fila=$(filas[i]);
-                console.log('fila ',fila);
-                cod=$(fila).contents().filter("td").eq(0).text();
-                cantida=$(fila).contents().filter("td").eq(2).text();
-                unidad=$(fila).contents().filter("td").eq(3).text();
-                id=fila.attr('id');
-                console.log('id row',id);
-                if(id != "-1"){
-                    data.push({id:id,'producto_id':cod,'cantidad':cantida,'unidad':unidad});
+                console.log(fila.contents().filter("td"));
+                id=$(fila).contents().filter("td").eq(1).text();
+                if(fila.attr('old')){
+                    data.push({
+                        old:1, id:id
+                    });
                 }else{
-                    data.push({'producto_id':cod,'cantidad':cantida,'unidad':unidad});
+                    data.push({
+                        id:id
+                    });
                 }
 
             }

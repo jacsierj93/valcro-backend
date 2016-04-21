@@ -8,10 +8,12 @@
 
 
 namespace App\Http\Controllers\Purchases;
+use App\Models\Sistema\Monedas;
 use App\Models\Sistema\Proveedor;
-use App\Models\Sistema\Purchase\TypeOrders;
+use App\Models\Sistema\Purchase\OrderType;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Purchase\Order;
+use App\Models\Sistema\Purchase\OrderStatus;
 use App\Models\Sistema\Purchase\OrderCondition;
 use App\Models\Sistema\Purchase\OrderReason;
 use App\Models\Sistema\ProviderAddress;
@@ -30,7 +32,7 @@ class OrderController  extends BaseController{
         $this->middleware('auth');
     }
 
-    public function getList()
+    public function getListForm()
     {
 
         $provedores = Proveedor::lists('razon_social', 'id')->all();
@@ -38,7 +40,25 @@ class OrderController  extends BaseController{
         return view('modules.catalogs.order-list', ['provedores' => $provedores]);
     }
 
-    /**carga formulario
+    /**
+     * regresa la lista de pedidos segun id del provedor
+    */
+    public function getList(Request $req)
+    {
+        $orders= Proveedor::findOrFail($req->id)->getOrders()
+            ->select('id','nro_doc','nro_proforma', 'emision', 'nro_factura', 'monto', 'tipo_pedido_id')
+            ->get();
+        $i=0;
+        foreach($orders as $aux){
+            $orders[$i]['tipo']=OrderType::findOrFail($orders[$i]->tipo_pedido_id)->first()->tipo;
+            $i++;
+        }
+        return $orders;
+
+    }
+
+    /**
+     * carga formulario
      * @param Request $req
      */
     public function getForm(Request $req)
@@ -46,10 +66,12 @@ class OrderController  extends BaseController{
 
         $datos = new Order();
         $provedores = Proveedor::lists('razon_social', 'id')->all();
-        $TypeOrders = TypeOrders::lists('tipo', 'id')->all();
+        $TypeOrders = OrderType::lists('tipo', 'id')->all();
         $OrderReason = OrderReason::lists('motivo', 'id')->all();
         $PriorityOrders = PriorityOrders::lists('descripcion', 'id')->all();
         $OrderCondition = OrderCondition::lists('nombre', 'id')->all();
+        $OrderStatus = OrderStatus::lists('estado', 'id')->all();
+        //
         if ($req->has('id')) {
             $datos = Order::findOrFail($req->id);
         }
@@ -62,14 +84,19 @@ class OrderController  extends BaseController{
                 'motivoPedido' => $OrderReason,
                 'PriorityOrders' => $PriorityOrders,
                 'OrderCondition' => $OrderCondition,
+                'OrderStatus' => $OrderStatus,
             ]);
 
     }
 
-
+    /**
+     * Obtiene las ordenes de compra de un provedor
+     ***/
     public function getProviderOrder(Request $req){
         $model = new PurchaseOrder();
-        $data = $model->where('prov_id',$req->id)->get();
+        $data = $model->where('prov_id',$req->id)->
+            where('pedido_id',null)
+                ->get();
         $i=0;
         foreach( $data as $aux){
             $data[$i]['size']= $aux->getItems()->count();
@@ -77,18 +104,17 @@ class OrderController  extends BaseController{
         }
         return $data;
     }
-
-    public function getProviderAddresStore(Request $req){
-        /*$model = new PurchaseOrder();
-        $data = $model->where('prov_id',$req->id)->get();
-        $i=0;
-        foreach( $data as $aux){
-            $data[$i]['size']= $aux->getItems()->count();
-            $i++;
-        }*/
-        return null;
+    /**
+     * Obtiene las ordenes de compra de un provedor
+     ***/
+    public function getPurchaseOrder(Request $req){
+        return PurchaseOrder::where('id',$req->id)->first();
     }
 
+    /**
+     * obtiene los paises en que un provedor tiene
+     * almacen
+     **/
     public function getProviderCountry(Request $req){
         $model=  ProviderAddress::where('prov_id',$req->id)->get();
         $data= Array();
@@ -102,14 +128,38 @@ class OrderController  extends BaseController{
         return $data;
     }
 
+    /**
+     * Las getProviderCoin de un proveedro
+     * @see
+     **/
     public function getProviderCoins(Request $req){
         $model=  Proveedor::findOrFail($req->id);
-        return $model->monedas()->get();
+        return $model->getProviderCoin()->get();
+    }
+    /**
+     * Condiciones de pago de un proveedor
+     **/
+    public function getProviderPaymentCondition(Request $req){
+        $model=  Proveedor::findOrFail($req->id);
+        return $model->getPaymentCondition()->get();
     }
 
+    /**
+     * obtiene las direcioness de almacen del proveedor
+     **/
+    public function getProviderAdressStore(Request $req){
+        $data = Proveedor::findOrFail($req->id)->getAddress();
+
+        if ($req->has('pais_id')) {
+            $data->where('pais_id', $req->pais_id);
+        }
+
+        return $data->get();
+
+    }
 
     /***
-     * Guarda un registro en la bse de datos
+     * Guarda un registro en la base de datos
      * @param $req la data del registro a guradar
      * @return json donde el primer valor representa 'error' en caso de q falle y
      * 'succes' si se realizo la accion
@@ -119,7 +169,11 @@ class OrderController  extends BaseController{
 
         //////////validation
         $validator = Validator::make($req->all(), [
-            'titulo' => 'required'
+            'tipo_pedido_id' => 'required',
+            'prov_id' => 'required',
+            'pais_id' => 'required',
+            'items' => 'required'
+            //    'nro_doc' =>'required|min 20'
         ]);
 
         if ($validator->fails()) { ///ups... erorres
@@ -130,37 +184,67 @@ class OrderController  extends BaseController{
 
             $result = array("success" => "Registro guardado con éxito","action"=>"new");
 
-            $model = new ProviderCondPay();
+            $model = new Order();
             //////////condicion para editar
             if ($req->has('id')) {
                 $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
 
-            $model->titulo = $req->titulo;
+            $model->tipo_pedido_id = $req->tipo_pedido_id;
+            $model->nro_proforma = $req->nro_proforma;
+            $model->nro_factura = $req->nro_factura;
+            $model->monto = $req->monto;
+            $model->comentario = $req->comentario;
+            $model->prov_id = $req->prov_id;
+            $model->pais_id = $req->pais_id;
+            $model->prioridad_id = $req->prioridad_id;
+            $model->pedido_estado_id = $req->pedido_estado_id;
+            $model->prov_moneda_id = $req->prov_moneda_id;
+            $model->direccion_almacen_id = $req->direccion_almacen_id;
+            $model->condicion_pedido_id = $req->condicion_pedido_id;
+            $model->motivo_pedido_id = $req->motivo_pedido_id;
+            $model->mt3 = $req->mt3;
+            $model->peso = $req->peso;
+            $model->nro_doc = $req->nro_doc;
+
+
+            if($req->has('comentario_cancelacion','cancelacion')){
+                $model->comentario_cancelacion = $req->comentario_cancelacion;
+                $model->cancelacion = $req->cancelacion;
+            }
+
+            if($req->has('aprob_compras')){
+                $model->aprob_compras = $req->aprob_compras;
+            }
+
+            if($req->has('aprob_gerencia')){
+                $model->aprob_gerencia = $req->aprob_gerencia;
+            }
+
+            if($req->has('tasa')){
+                $model->tasa_fija=1;
+                $model->tasa=$req->tasa;
+            }else{
+                $model->tasa_fija=0;
+                $model->tasa=  Monedas::findOrFail($req->prov_moneda_id)->precio_usd;
+            }
             $model->save();
 
             for($i=0;$i<sizeof($req->items);$i++){
-                $item= new ProviderCondPayItem();
-                if(isset($req->items[$i]["id"])){
-                    $item = $item->findOrFail(trim($req->items[$i]["id"]));
-                    $result["action2"]="edit";
-                }
-                $item->id_condicion= $model->id;
-                $item->porcentaje=trim($req->items[$i]["porcentaje"]);
-                $item->dias= trim($req->items[$i]["dias"]);
-                $item->descripcion=trim( $req->items[$i]["descripcion"]);
-                $item->save();
+
+                $item= PurchaseOrder::findOrFail(trim($req->items[$i]['id']));
+                $item->pedido_id=$model->id;
+                 $item->save();
             }
 
             if ($req->has("del")) {
                 $result['data']="iset";
                 for($i=0;$i<sizeof($req->del);$i++){
                     $item= new ProviderCondPayItem();
-                    $item->destroy(trim($req->del[$i]));
+                    // $item->destroy(trim($req->del[$i]));
                 }
             }
-
 
         }
 

@@ -5,6 +5,7 @@
     {!! Html::style('components/select2/dist/css/select2.css') !!}
     {!! Html::style('components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css') !!}
     {!! Html::style('components/DataTables/media/css/dataTables.bootstrap.min.css') !!}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
 @stop
 
@@ -24,8 +25,10 @@
                 <div class="container">
                     <ul>
                         <li><a href="#tab1" data-toggle="tab">Datos Básicos</a></li>
-                        <li><a href="#tab2" data-toggle="tab">Datos Orden de compras</a></li>
-                        <li><a href="#tab3" data-toggle="tab">Informacion de pago</a></li>
+                        <li><a href="#tab2" data-toggle="tab">Orden de compras</a></li>
+                        <li><a href="#tab3" data-toggle="tab">Acuerdo de Pago</a></li>
+                        <li><a href="#tab4" data-toggle="tab">Embarque </a></li>
+                        <li><a href="#tab5" data-toggle="tab">Aprovacion/Cancelacion </a></li>
                     </ul>
                 </div>
             </div>
@@ -44,8 +47,18 @@
                         <div class="row">
                             <div class="col-sm-5">
                                 <div class="form-group">
+                                    <label>Nro Documento</label><br>
+                                    <input type="text" class="form-control" id="nro_doc" value="{{$data->nro_doc}}">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
                                     <label>Proveedor</label><br>
-                                    {!! Form::select('prove_id',$provedores, null , array('class' => 'form-control select2','id'=>'prove_id'))  !!}
+                                    {!! Form::select('prov_id',$provedores, null , array('class' => 'form-control select2','id'=>'prov_id'))  !!}
                                 </div>
                             </div>
 
@@ -64,7 +77,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Motivo Pedido</label><br>
-                                    {!! Form::select('motivo_id',$motivoPedido, null , array('class' => 'form-control select2','id'=>'motivo_id')) !!}
+                                    {!! Form::select('motivo_pedido_id',$motivoPedido, null , array('class' => 'form-control select2','id'=>'motivo_pedido_id')) !!}
 
                                 </div>
                             </div>
@@ -84,7 +97,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Prioridad</label><br>
-                                    {!! Form::select('prio_id',$PriorityOrders, null , array('class' => 'form-control select2','id'=>'prio_id'))  !!}
+                                    {!! Form::select('prioridad_id',$PriorityOrders, null , array('class' => 'form-control select2','id'=>'prioridad_id'))  !!}
 
                                 </div>
                             </div>
@@ -96,6 +109,34 @@
 
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Almacen</label><br>
+                                    {!! Form::select('direccion_almacen_id',Array(), 0 , array('class' => 'form-control select2','id'=>'direccion_almacen_id'))  !!}
+
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Estado</label><br>
+                                    {!! Form::select('pedido_estado_id',$OrderStatus, $data->status_pedido_id , array('class' => 'form-control select2','id'=>'pedido_estado_id'))  !!}
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Comentario</label><br>
+                                    <input type="text" id="comentario" class="form-control" value="{{$data->comentario}}">
+
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -119,28 +160,51 @@
                                 <th width="30px"></th>
                                 <th>Id</th>
                                 <th>Nro Orden</th>
-                                <th>Aprovada</th>
                                 <th>Comentario</th>
                                 <th>Creada</th>
-                                <th>Items</th>
                             </tr>
                             </thead>
                             <tbody>
+                            @foreach ($data->getOrders()->get() as $result)
+                                <tr old >
+                                    <td width="30px"><input type="button" class="btn" value="Borrar" onclick='javascript:delRow(this)'></td>
+                                    <td>{{$result->id}}</td>
+                                    <td>{{$result->nro_orden}}</td>
+                                    <td>{{$result->comentario}}</td>
+                                    <td>{{$result->emision}}</td>
+                                </tr>
+                            @endforeach
+
                             </tbody>
                             <tfoot>
                             <tr>
                                 <th width="30px"></th>
                                 <th>Id</th>
                                 <th>Nro Orden</th>
-                                <th>Aprovada</th>
                                 <th>Comentario</th>
                                 <th>Creada</th>
-                                <th>Items</th>
                             </tr>
                             </tfoot>
                         </table>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th width="300px">
+                                    {!! Form::select('items',Array(),null , array('class' => 'form-control select2','id'=>'items'))  !!}
+                                </th>
+                                <th>Comentario</th>
+                                <th width="100px">
+                                    <a type="button" data-toggle="modal" data-target="#myModal" class="btn bg-orange">
+                                        Detalle</a>
 
-
+                                </th>
+                                <th width="100px"> <input type="button" id="add"  class="btn" value="Agregar"></th>
+                            </tr>
+                            </thead>
+                        </table>
+                        @if($data->id)
+                            <input type="hidden" id="id" value="{{$data->id}}">
+                        @endif
                     </div>
 
 
@@ -161,13 +225,13 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Monto</label><br>
-                                    <input type="text" id="monto" value="{{$data->monto}}" />
+                                    <input type="text" id="monto" class="form-control" value="{{$data->monto}}" />
                                 </div>
                             </div>
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Moneda</label><br>
-                                    {!! Form::select('moneda_id',Array(), null , array('class' => 'form-control select2','id'=>'moneda_id'))  !!}
+                                    {!! Form::select('prov_moneda_id',Array(), null , array('class' => 'form-control select2','id'=>'prov_moneda_id'))  !!}
 
                                 </div>
                             </div>
@@ -188,14 +252,64 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Tasa</label><br>
-                                    <input  type="text"  id="tasa" value="{{$data->tasa}}"/>
+                                    <input  type="text" class="form-control" id="tasa" value="{{$data->tasa}}"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Condicion de Pago</label><br>
+                                    {!! Form::select('condicion_pago_id',Array(), null , array('class' => 'form-control select2','id'=>'condicion_pago_id'))  !!}
+
                                 </div>
                             </div>
 
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Punto Compra</label><br>
+                                    <input id="img_punto_compra" type="file" class="file" value="{{$data->img_punto_compra}}">
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Nro Proforma</label><br>
+                                    <input  type="text"  class="form-control" id="nro_proforma" value="{{$data->nro_proforma}}"/>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Proforma</label><br>
+                                    <input id="img_proforma" type="file" class="filevalue="{{$data->img_proforma}}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Nro Factura</label><br>
+                                    <input  type="text"  id="nro_factura" class="form-control"value="{{$data->nro_factura}}"/>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-5" >
+                                <div class="form-group">
+                                    <label>Factura</label><br>
+                                    <input id="img_factura" type="file" class="file"  value="{{$data->img_factura}}">
+                                </div>
+                            </div>
 
                         </div>
-                    </div>
 
+
+                    </div>
 
                 </form>
 
@@ -208,37 +322,65 @@
                       data-toggle="validator" novalidate="true">
 
                     <div class="box-body">
-
                         <div class="row">
-
                             <div class="col-sm-5">
                                 <div class="form-group">
-                                    <label>Pais</label><br>
+                                    <label>Mt3</label><br>
+                                    <input  type="text"  id="mt3" class="form-control" value="{{$data->mt3}}"/>
                                 </div>
                             </div>
 
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Peso</label><br>
+                                    <input id="peso" type="text" class="form-control" value="{{$data->peso}}">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="tab-pane" id="tab5">
+                <form name="form4" id="form4" role="form"
+                      data-toggle="validator" novalidate="true">
+
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Aprovacion gerencia</label><br>
+                                    <input  type="checkbox"  id="aprob_gerencia"  value="{{$data->aprob_gerencia}}"/>
+                                </div>
+                            </div>
 
                             <div class="col-sm-5">
                                 <div class="form-group">
-                                    <label>Idioma</label><br>
+                                    <label>Aprovacaion Compras</label><br>
+                                    <input id="img_factura" type="checkbox" value="{{$data->aprob_compras}}">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Fecha Cancelacion</label><br>
+                                    <input  type="date"  id="cancelacion"  class="datepicker form-control" value="{{$data->cancelacion}}"/>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label>Motivo Cancelacion</label><br>
+                                    <input  type="text"  id="comentario_cancelacion"  class="form-control" value="{{$data->comentario_cancelacion}}"/>
                                 </div>
                             </div>
 
 
                         </div>
-
-
-                        <div class="row">
-
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Sucursal</label><br>
-                                </div>
-                            </div>
-
-                        </div>
-
-
                     </div>
 
                 </form>
@@ -249,11 +391,11 @@
                     <a href="#" class="btn bg-orange margin">Anterior</a>
                 </li>
                 <li class="next" style="float: left">
-                    <a href="#" class="btn bg-orange margin">Guardar</a>
+                    <a href="#" class="btn bg-orange margin">Siguient</a>
                 </li>
 
-                <li id="classfinal" class="bfinal" style="display: none;float: left">
-                    <a href="#" id="bfinal" class="btn bg-orange margin">Finalizar</a>
+                <li  style="float: left">
+                    <input  id="save" type="button" class="btn bg-orange " value="Guardar"/>
                 </li>
 
 
@@ -263,10 +405,7 @@
     <!-- form wizard content ends -->
 
 
-
-
-
-    {{--Modal de los contactos--}}
+    {{--Modal de ordenes de compra--}}
 
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -275,82 +414,86 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Crear / editar Contácto de usuario</h4>
+                    <h4 class="modal-title">Detalle de Orden Compra</h4>
                 </div>
                 <div class="modal-body">
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                Nro
+                            </td>
+                            <td>
+                                <span id="m_nro_orden"></span>
+                            </td>
+                            <td>
+                                Provedor
+                            </td>
+                            <td>
+                                <span id="mProvedor"></span>
+                            </td>
 
-                    <form name="form-contact" id="form3" role="form"
-                          data-toggle="validator" novalidate="true">
+                        </tr>
+                        <tr>
+                            <td>
+                                Aprovado
+                            </td>
+                            <td>
+                                <span id="mAprovado"></span>
+                            </td>
+                            <td>
+                                Direccion
+                            </td>
+                            <td>
+                                <span id="mDir"></span>
+                            </td>
 
-                        <div class="row">
+                        </tr>
 
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Tipo</label><br>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Pais</label><br>
-                                </div>
-                            </div>
+                        <tr>
+                            <td>
+                                Comentario
+                            </td>
+                            <td colspan="3">
+                                <span id="mComent"></span>
+                            </td>
 
 
-                        </div>
+                        </tr>
 
 
-                        <div class="row">
+                    </table>
 
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Telefono</label><br>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                                        <input type="telefono" class="form-control" placeholder="telefono">
-                                    </div>
-                                </div>
-                            </div>
+                    <table  class="table table-bordered table-striped" id="prodOrden" style=" height: 150px;overflow: scroll;">
+                        <thead>
+                        <tr>
+                            <th width="80px">Cod</th>
+                            <th>Descripcion</th>
+                            <th width="80px">Cantidad</th>
+                            <th width="80px">Unidad</th>
+                            <th width="100px"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th width="80px">Cod</th>
+                            <th>Descripcion</th>
+                            <th width="80px">Cantidad</th>
+                            <th width="80px">Unidad</th>
+                            <th width="100px"></th>
+                        </tr>
+                        </tfoot>
+                    </table>
 
-                            <div class="col-sm-5">
-                                <div class="form-group">
-                                    <label>Email</label><br>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                                        <input type="email" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-
-                            <div class="col-sm-10">
-                                <div class="form-group">
-                                    <label>Dirección</label><br>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
-                                        <input type="text" class="form-control" placeholder="dirección">
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </form>
 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary">Guardar</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-
-
-
 
 @endsection
 
@@ -362,12 +505,20 @@
     {!! Html::script('components/DataTables/media/js/jquery.dataTables.min.js') !!}
     {!! Html::script('components/DataTables/media/js/dataTables.bootstrap.min.js') !!}
 
+    {!! Html::script('components/jqueryui/jquery-ui.min.js') !!}
 
 
 
     <script src="{{url("js/module/pedidos-ctrl.js")}}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
+
+            ///////////boton finalizar
+            $("#save").click(function(){
+                save();
+            })
+            console.log( $("#save"));
+
             $('#rootwizard').bootstrapWizard({
                 onTabShow: function (tab, navigation, index) {
 
@@ -394,6 +545,7 @@
                         $("#classfinal").hide();
                     }
 
+                    $(".datepicker").datepicker();
 
 
                     var $total = navigation.find('li').length;
@@ -410,19 +562,10 @@
         $('#status').bootstrapSwitch();
         $(".select2").select2({ width: '300px', dropdownCssClass: "bigdrop" });
 
-        ///////////boton finalizar
-        $("#bfinal").on("click",function(){
 
-            savePreferences();
 
-        });
+
 
     </script>
-
-    <script>
-
-    </script>
-
-
 
 @stop
