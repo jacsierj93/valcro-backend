@@ -377,3 +377,34 @@ body {
 .cntLayerHolder {
     padding: 10px 16px 24px 24px !important;
 }
+
+/*======================== GRIDS ================================*/
+.headGridHolder {
+    height: 40px;
+    padding-right: 8px;
+}
+
+.headGrid {
+    margin-top: 10px;
+    margin-bottom: 9px;
+    padding-bottom: 2px;
+    text-overflow: ellipsis;
+    border-bottom: solid 2px #cccccc;
+}
+/*----------------------------------------------------------------*/
+.cellGridHolder {
+    height: 40px;
+    padding-right: 8px;
+}
+
+.cellGridHolder:hover{
+    background-color: #f1f1f1;
+}
+
+.cellGrid {
+    margin-top: 10px;
+    margin-bottom: 9px;
+    padding-bottom: 2px;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #f1f1f1;
+}
