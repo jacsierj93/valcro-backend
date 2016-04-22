@@ -83,7 +83,7 @@ MyApp.controller('ListHerramientas', function ($scope) {
 MyApp.controller('ListProv', function ($scope,$http,setGetProv) {
     $http({
         method: 'POST',
-        url: 'proveedores/provList'
+        url: 'provider/provList'
     }).then(function successCallback(response) {
         $scope.todos = response.data;
         setGetProv.setList($scope.todos);
@@ -243,7 +243,7 @@ function DemoCtrl2 ($timeout, $q) {
 MyApp.controller('CustomInputDemoCtrl', DemoCtrl2);
 
 //###########################################################################################3
-//###################Service Proveedores (comunication betwen controllers)###################3
+//###################Service Providers (comunication betwen controllers)###################3
 //###########################################################################################3
 MyApp.service("setGetProv",function($http){
     var prov = {id:false,type:"",description:"",siglas:"",envio:"",contraped:true,limCred:0};
@@ -259,7 +259,7 @@ MyApp.service("setGetProv",function($http){
                 id = itemsel.id;
                 $http({
                     method: 'POST',
-                    url: "proveedores/getProv",
+                    url: "provider/getProv",
                     data: {
                         id: id
                     }
@@ -315,7 +315,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$http,$mdToas
         if(nuevo[0] && !nuevo[1]) {
             $http({
                 method: 'POST',
-                url: "proveedores/saveProv",
+                url: "provider/saveProv",
                 data: $scope.dtaPrv,
             }).then(function successCallback(response) {
                 $scope.dtaPrv.id = response.data.id;

@@ -7,7 +7,7 @@
  * Time: 16:08
  */
 
-namespace App\Http\Controllers\Proveedores;
+namespace App\Http\Controllers\Providers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +17,7 @@ use App\Models\Sistema\NombreValcro;
 use Session;
 use Validator;
 
-class ProveedorController extends BaseController
+class ProvidersController extends BaseController
 {
 /*    public function __construct()
     {
