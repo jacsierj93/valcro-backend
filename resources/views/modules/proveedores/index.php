@@ -142,7 +142,7 @@
                 </md-input-container>
             </form>
 
-            <form name="nomvalcroForm">
+            <form name="direccionesForm">
                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                     <div>
                         Direcciones
@@ -196,6 +196,23 @@
                             <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
                         </div>
                     </md-input-container>
+
+                </div>
+
+
+
+                <div layout="column">
+
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid"> Encabezado Uno</div><div flex class="headGrid"> Encabezado Dos</div><div flex class="headGrid"> Encabezado Tres</div>
+                    </div>
+                    <div id="grid">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex class="cellGrid"> Data Uno</div><div flex class="cellGrid"> Data Dos</div><div flex class="cellGrid"> Data Tres</div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
