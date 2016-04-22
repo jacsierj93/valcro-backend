@@ -10,6 +10,7 @@
     <?= HTML::style("http://fonts.googleapis.com/css?family=Roboto:100,400,500,700,400italic") ?>
     <?= HTML::style("components/angular-material/angular-material.css") ?>
     <?= HTML::style("css/styles.css") ?>
+    <?= HTML::style("css/pagos.css") ?>
     <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
     <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
@@ -71,5 +72,6 @@
 <?= HTML::script('js/app.js') ?>
 <?= HTML::script('js/appTemp.js') ?>
 <?= HTML::script('js/modules/proveedores/proveedoresController.js') ?>
+<?= HTML::script('js/modules/pagos/pagosController.js') ?>
 </body>
 </html>

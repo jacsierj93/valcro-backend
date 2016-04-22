@@ -79,7 +79,7 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
             url: 'modules/home/logedout'
         }, {
             secc: 'Pagos',
-            url: 'modules/home/404'
+            url: 'modules/pagos/index'
         }];
     $scope.seccion = $scope.secciones[0];
 
