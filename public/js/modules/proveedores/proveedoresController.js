@@ -28,15 +28,19 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv) {
     $scope.data = {
         cb1: true
     };
+
     $scope.setProv = function(prov){
-        setGetProv.setProv(prov.item)
+        setGetProv.setProv(prov.item);
+
+        console.log(prov.$index);
+        console.log(prov.$parent.todos);
+
+
+
         $mdSidenav("left").close().then(function(){
             $mdSidenav("left").open();
-        })
-
+        });
     }
-
-
 });
 
 

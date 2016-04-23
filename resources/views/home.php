@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1"/>
-    <?= HTML::style("http://fonts.googleapis.com/css?family=Roboto:100,400,500,700,400italic") ?>
+    <?= HTML::style("http://fonts.googleapis.com/css?family=Roboto:100,200,300,400,500,700,400italic") ?>
     <?= HTML::style("components/angular-material/angular-material.css") ?>
     <?= HTML::style("css/styles.css") ?>
     <?= HTML::style("css/pagos.css") ?>
@@ -22,7 +22,7 @@
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
 
-    <base href="/valcro-backend/public/">
+    <base href="/angular/">
 </head>
 
 <body id="inicio" ng-cloak layout="column" ng-controller="AppMain" style="overflow: hidden;">
@@ -60,7 +60,7 @@
 <div class="pie" layout="row" layout-align="start center">
 
     <div layout="column" layout-align="center center" ng-repeat="item in secciones">
-        <div class="btnDot" ng-click="seccLink(this)" title="{{item.secc}}"></div>
+        <div class="{{item.selct}}" ng-click="seccLink(this)" title="{{item.secc}}"></div>
     </div>
     <div flex layout="row" layout-align="end center" style="font-size: 24px; font-weight: 100; color: #999999; padding-right: 24px;">
         {{seccion.secc}}
