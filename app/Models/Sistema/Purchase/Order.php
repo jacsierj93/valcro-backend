@@ -35,4 +35,9 @@ class Order extends Model
         return $this->belongsTo('App\Models\Sistema\Purchase\OrderType', 'tipo_pedido_id');
     }
 
+    public function getEmisionAttribute($value)
+    {
+        return date("d/m/Y", strtotime($value));;
+    }
+
 }

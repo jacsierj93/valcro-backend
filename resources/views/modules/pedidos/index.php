@@ -82,11 +82,11 @@
         <md-content class="barraLateral" >
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex ng-click="setProv(this)">
+            <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item.id)">
 
                 <div class="boxList" layout="column" flex >
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">Nombre del proveedodddddddddddddddr</div>
+                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
 
                     <div layout="row" style="height: 40px;">
                         <div flex layout layout-align="center center">
@@ -146,9 +146,41 @@
         </div>
 
         <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="right">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex>
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+
+                <form name="projectForm">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Pedidos : <span>{{provSelec.razon_social}}</span>
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex="5" class="headGrid"> - </div>
+                        <div flex="15" class="headGrid"> N° Pedido</div>
+                        <div flex="15" class="headGrid"> N° Proforma</div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex="15" class="headGrid"> N° Factura</div>
+                        <div flex class="headGrid"> Monto</div>
+                        <div flex class="headGrid"> Comentario</div>
+                    </div>
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
+                                <div flex="15" class="cellGrid"> {{pedido.nro_doc}}</div>
+                                <div flex="15" class="cellGrid"> {{pedido.nro_proforma}}</div>
+                                <div flex="10" class="cellGrid"> {{pedido.emision  }}</div>
+                                <div flex="15" class="cellGrid"> {{pedido.nro_factura}}</div>
+                                <div flex class="cellGrid"> {{pedido.monto}}</div>
+                                <div flex class="cellGrid">{{pedido.comentario}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
 
             </md-content>
         </md-sidenav>

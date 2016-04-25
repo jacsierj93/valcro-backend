@@ -207,5 +207,8 @@ $app->post("catalogs/ProviderPaymentCondition",'Purchases\OrderController@getPro
 
 //anexar a Orden
 $app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'); ///getProductos de provedor
+//
 
-
+// pedidos
+$app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///getProductos de provedor
+$app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///getProductos de provedor
