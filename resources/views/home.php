@@ -11,6 +11,7 @@
     <?= HTML::style("components/angular-material/angular-material.css") ?>
     <?= HTML::style("css/styles.css") ?>
     <?= HTML::style("css/pagos.css") ?>
+    <?= HTML::style("css/pedidos.css") ?>
     <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
     <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
@@ -73,5 +74,6 @@
 <?= HTML::script('js/appTemp.js') ?>
 <?= HTML::script('js/modules/proveedores/proveedoresController.js') ?>
 <?= HTML::script('js/modules/pagos/pagosController.js') ?>
+<?= HTML::script('js/modules/pedidos/pedidosController.js') ?>
 </body>
 </html>

@@ -84,6 +84,11 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
             secc: 'Pagos',
             url: 'modules/pagos/index',
             selct: 'btnDot'
+        }
+        , {
+            secc: 'Pedidos',
+            url: 'modules/pedidos/index',
+            selct: 'btnDot'
         }];
     $scope.seccion = $scope.secciones[0];
     $scope.seccLink = function (indx){
