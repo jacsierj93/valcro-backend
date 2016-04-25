@@ -1,19 +1,32 @@
-MyApp.controller('pagosCtrll', function ($scope,$mdSidenav,$http,setGetProv) {
+MyApp.controller('pagosCtrll', function ($scope,$mdSidenav) {
 
-
+    var historial= [20];
     $scope.toggleLeft = function() {
-        setGetProv.setProv(false)
         $mdSidenav("left").close().then(function () {
             $mdSidenav("left").open();
         })
     }
 
-    //$scope.toggleRight = buildToggler(navID);
     $scope.lyrOpenClose = function(navID) {
         $mdSidenav(navID).toggle();
     }
 
 
+    function init(){
+        // cargar proveedores
+    }
 
 
 });
+/*
+MyApp.controller('ListProvPag', function ($scope,$http) {
+    $http({
+        method: 'POST',
+        url: 'provider/provList'
+    }).then(function successCallback(response) {
+        $scope.todos = response.data;
+    }, function errorCallback(response) {
+        console.log("errorrr");
+    });
+
+});*/

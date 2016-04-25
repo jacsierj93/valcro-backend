@@ -1,3 +1,5 @@
+
+
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="pagosCtrll">
 
     <div layout="row" flex="none" class="menuBarHolder">
@@ -82,37 +84,37 @@
 
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
-                <form name="projectForm">
+            <form name="projectForm">
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Pagos Pendientes
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Pagos Pendientes
+                    </div>
+                </div>
+                <div layout="row" class="headGridHolder">
+                    <div flex class="headGrid"> N° Factura</div>
+                    <div flex class="headGrid"> Emitido</div>
+                    <div flex class="headGrid"> Tipo</div>
+                    <div flex class="headGrid"> Pagado</div>
+                    <div flex class="headGrid"> Resta</div>
+                    <div flex class="headGrid"> 000000</div>
+                </div>
+                <div id="grid">
+                    <div flex>
+                        <div layout="row" class="cellGridHolder">
+                            <div flex class="cellGrid"> Data 1</div>
+                            <div flex class="cellGrid"> Data 2</div>
+                            <div flex class="cellGrid"> Data 3</div>
+                            <div flex class="cellGrid"> Data 4</div>
+                            <div flex class="cellGrid"> Data 5</div>
+                            <div flex class="cellGrid"> Data 6</div>
                         </div>
                     </div>
-                    <div layout="row" class="headGridHolder">
-                        <div flex class="headGrid"> N° Factura</div>
-                        <div flex class="headGrid"> Emitido</div>
-                        <div flex class="headGrid"> Tipo</div>
-                        <div flex class="headGrid"> Pagado</div>
-                        <div flex class="headGrid"> Resta</div>
-                        <div flex class="headGrid"> 000000</div>
-                    </div>
-                    <div id="grid">
-                        <div flex>
-                            <div layout="row" class="cellGridHolder">
-                                <div flex class="cellGrid"> Data 1</div>
-                                <div flex class="cellGrid"> Data 2</div>
-                                <div flex class="cellGrid"> Data 3</div>
-                                <div flex class="cellGrid"> Data 4</div>
-                                <div flex class="cellGrid"> Data 5</div>
-                                <div flex class="cellGrid"> Data 6</div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
 
-                </form>
+            </form>
 
-            </md-content>
+                </md-content>
         </md-sidenav>
 
 

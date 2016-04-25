@@ -18,7 +18,7 @@ class ProviderCondPay extends Model
     protected $table = "tbl_prov_cond_pag";
 
     public function getItems(){
-        return $this->hasOne('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
+        return $this->hasMany('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
     }
 
 
