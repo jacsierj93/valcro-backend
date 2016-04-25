@@ -7,17 +7,17 @@
  * Time: 16:08
  */
 
-namespace App\Http\Controllers\Proveedores;
+namespace App\Http\Controllers\Providers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
-use App\Models\Sistema\Proveedor;
+use App\Models\Sistema\Provider;
 use App\Models\Sistema\NombreValcro;
 use Session;
 use Validator;
 
-class ProveedorController extends BaseController
+class ProvidersController extends BaseController
 {
 /*    public function __construct()
     {
@@ -27,7 +27,7 @@ class ProveedorController extends BaseController
 
     public function getList()
     {
-        $provs = new Proveedor();
+        $provs = new Provider();
         $data = $provs->select("id","razon_social as description","contrapedido as contraped","limite_credito  as limCred", "siglas")->where("deleted_at",NULL)->get();
         /*   foreach($data as $k => $v){
             $v['nombreValcro']=$v->nombres_valcro()->get();
@@ -39,7 +39,7 @@ class ProveedorController extends BaseController
     {
 
         //$prov = new Proveedor();
-        $data = Proveedor::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
+        $data = Provider::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
         /*   foreach($data as $k => $v){
             $v['nombreValcro']=$v->nombres_valcro()->get();
         }*/
@@ -51,10 +51,10 @@ class ProveedorController extends BaseController
     public function saveOrUpdateProv(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
-            $prov =  Proveedor::findOrFail($req->id);
+            $prov =  Provider::findOrFail($req->id);
             $result['action']="update";
         }else{
-            $prov =  new Proveedor();
+            $prov =  new Provider();
         }
         $prov->razon_social = $req->description;
         $prov->tipo_id = $req->type;

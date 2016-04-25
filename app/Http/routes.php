@@ -109,11 +109,11 @@ $app->post("catalogs/tiemAproTranSave",'Catalogs\ProvTiemAproTranController@save
 $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delete'); ///borrar tiempo aprox. trans.
 
 
-///Proveedores
+///Providers
 
-$app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->post("proveedores/saveProv",'Proveedores\ProveedorController@saveOrUpdateProv'); ///obtener lista general de proveedores
-$app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
+$app->post("provider/provList",'Providers\ProvidersController@getList'); ///obtener lista general de proveedores
+$app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///obtener lista general de proveedores
+$app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obtener datos especificos de un prov
 
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
