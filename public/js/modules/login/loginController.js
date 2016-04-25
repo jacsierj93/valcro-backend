@@ -16,7 +16,7 @@ login.controller('loginCtrll', ['$scope', '$http', function ($scope, $http) {
         }).then(function successCallback(response) {
             if (response.data.success) {
 
-                location.replace('angular/#home');
+                location.replace('/valcroAngular/public/#home');
 
                 /*$("#holderLogin").animate({
                  opacity: 0

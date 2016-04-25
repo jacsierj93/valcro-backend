@@ -46,7 +46,7 @@
         <form id="lgnForm" name="lgnForm" ng-controller="login" layout="row">
             <md-input-container>
                 <label style="color: #ffffff">Usuario</label>
-                <input ng-model="user.usr" name="usr" style="color: #ffffff">
+                <input ng-model="user.usr" name="usr" autocomplete="off" style="color: #ffffff">
             </md-input-container>
             <md-input-container>
                 <label style="color: #ffffff">Clave</label>

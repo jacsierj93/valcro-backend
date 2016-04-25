@@ -70,22 +70,32 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
     $scope.secciones = [
         {
             secc: 'Inicio',
-            url: 'modules/home/index'
+            url: 'modules/home/index',
+            selct: 'btnDot'
         }, {
-            secc: 'Providers',
-            url: 'modules/proveedores/index'
+            secc: 'Proveedores',
+            url: 'modules/proveedores/index',
+            selct: 'btnDot'
         }, {
             secc: 'Productos',
-            url: 'modules/home/logedout'
+            url: 'modules/home/logedout',
+            selct: 'btnDot'
         }, {
             secc: 'Pagos',
-            url: 'modules/home/404'
+            url: 'modules/pagos/index',
+            selct: 'btnDot'
         }];
     $scope.seccion = $scope.secciones[0];
-
     $scope.seccLink = function (indx){
         $scope.seccion = $scope.secciones[indx.$index];
-    }
+        angular.forEach($scope.secciones, function(value, key) {
+            if(key == indx.$index){
+                value.selct = 'btnLine';
+            }else{
+                value.selct = 'btnDot';
+            }
+        });
+    };
 
 
 
