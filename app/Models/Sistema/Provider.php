@@ -6,7 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Proveedor extends  Model
+class Provider extends  Model
 {
 
     use SoftDeletes;
