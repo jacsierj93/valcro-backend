@@ -83,9 +83,12 @@
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
             <div class="boxList" layout="column" flex ng-click="setProv(this)">
-                <div class="boxList" layout="column" flex>
-                    <div flex>Nombre del proveedor</div>
-                    <div layout="row" style="height: 24px;">
+
+                <div class="boxList" layout="column" flex >
+
+                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">Nombre del proveedodddddddddddddddr</div>
+
+                    <div layout="row" style="height: 40px;">
                         <div flex layout layout-align="center center">
                             <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
                                 85
@@ -112,12 +115,48 @@
                             </div>
                         </div>
                     </div>
+                    <div style="height:40px;" layout="row" layout-align="start end">
+                        <div flex="">$1000</div>
+                        <div flex="">860</div>
+                        <div flex="" layout="row">
+                            <div style="margin: 4px;">860</div>
+                            <img  style="float: left;" src="images/contra_pedido.png"/>
+                        </div>
 
+
+                    </div>
 
                 </div>
             </div>
 
         </md-content>
+
+        <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+            <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
+            <?= HTML::image("images/btn_prevArrow.png") ?>
+        </div>
+        <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
+        <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+            <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                P
+            </div>
+            <br>
+            Selecciones un Proveedor
+        </div>
+
+        <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="right">
+            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+            <md-content class="cntLayerHolder" layout="row" flex>
+
+            </md-content>
+        </md-sidenav>
+
+
     </div>
 
+
+
 </div>
+
