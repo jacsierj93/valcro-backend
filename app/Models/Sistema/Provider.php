@@ -18,4 +18,9 @@ class Provider extends  Model
         return $this->hasMany('App\Models\Sistema\NombreValcro', 'prov_id');
     }
 
+    public function address()
+    {
+        return $this->hasMany('App\Models\Sistema\ProviderAddress', 'prov_id');
+    }
+
 }

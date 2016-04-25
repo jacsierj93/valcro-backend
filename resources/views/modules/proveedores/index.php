@@ -258,8 +258,8 @@
                 </form>
 
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                <form name="direccionesForm" ng-controller="provAddrsController">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click="showGrid()">
                         <div>
                             Direcciones
                         </div>
@@ -267,7 +267,7 @@
 
                     <md-input-container class="md-block" flex>
                         <label>Direccion</label>
-                        <input maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="project.direccProv">
+                        <input maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         <!--<div ng-messages="nomvalcroForm.direccProv.$error">
                             <div ng-message="required">Campo Obligatorio.</div>
                             <div ng-message="md-maxlength">La direccion debe tener maximo 250 caracteres.</div>
@@ -279,7 +279,7 @@
 
                         <md-input-container class="md-block" flex="20" ng-controller="TipoDirecc">
                             <label>Tipo de Direccion</label>
-                            <md-select ng-model="user.tipo">
+                            <md-select ng-model="dir.tipo">
                                 <md-option ng-repeat="tipo in tipos" value="{{tipo.nombre}}">
                                     {{tipo.nombre}}
                                 </md-option>
@@ -292,7 +292,7 @@
 
                         <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
                             <label>Pais</label>
-                            <md-select ng-model="user.pais">
+                            <md-select ng-model="dir.pais">
                                 <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
                                     {{pais.nombre}}
                                 </md-option>
@@ -305,7 +305,7 @@
 
                         <md-input-container class="md-block" flex="40">
                             <label>Telefono</label>
-                            <input name="provTelf" required md-no-asterisk ng-model="project.provTelf"
+                            <input name="provTelf" required md-no-asterisk ng-model="dir.provTelf"
                                    ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
                             <!--<div ng-messages="nomvalcroForm.provTelf.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
@@ -319,17 +319,17 @@
                         <div layout="row" class="headGridHolder">
                             <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
                         </div>
-                        <div id="grid">
-                            <div flex>
+                        <div id="grid" style="overflow-y: auto">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+<!--                            <div flex>
                                 <div layout="row" layout-wrap class="cellGridHolder">
                                     <div flex="10" class="cellGrid"> Facbrica</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
                                 </div>
-                            </div>
-                            <div flex>
-                                <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> Facbrica</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
-                                </div>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
 

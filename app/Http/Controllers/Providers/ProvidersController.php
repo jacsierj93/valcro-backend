@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\NombreValcro;
+use App\Models\Sistema\ProviderAddress as Address;
 use Session;
 use Validator;
 
@@ -67,13 +68,40 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function provNombreval(Request $req)
+    public function saveProvDir(request $req)
     {
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
 
-        dd($req);
+        if($req->id){
+            $addr = Address::findOrFail($req->id);
+            $result['action']="update";
+        }else{
+            $addr = new Address();
+        }
+        $addr->direccion = $req->direccProv;
+        $addr->prov_id = $req->id_prov;
+        $addr->pais_id = $req->pais;
+        $addr->tipo_dir = $req->tipo;
+        $addr->telefono = $req->provTelf;
+        $addr->save();
+
+        $result['id'] = $addr->id;
+        return $result;
     }
 
-/*    public function saveDataProv(){
+    public function listProvAddr($id)
+    {
+        if($id){
+            $addrs = Provider::find($id)->address()->get();
+            foreach($addrs as $v){
+                $v['pais'] = $v->country()->select("short_name")->first();
+            }
+            return $addrs;
+        }else{
+            return [];
+        }
 
-    }*/
+    }
+
+
 }
