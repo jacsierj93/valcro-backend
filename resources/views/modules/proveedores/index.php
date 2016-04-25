@@ -44,9 +44,10 @@
                 <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.description }}</div>
                 <div style="height:40px; font-size:31px;">{{item.limCred}}00000</div>
                 <div style="height:40px;">
-                    <i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>
-                    <i class="fa fa-paper-plane" style="font-size:18px; color: #03a9f4;"></i>
-                    <i class="fa fa-plane" style="font-size:20px;"></i>
+                    <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
+                    <img ng-show="(item.contraped==1)" src="images/contra_pedido.png"/>
+                    <img src="images/aereo.png"/>
+                    <img src="images/maritimo.png"/>
                 </div>
             </div>
 
@@ -67,13 +68,104 @@
             Selecciones un Proveedor
         </div>
 
-        <!-- 10) ########################################## LAYER (1) INFORMACION DEL PROVEEDOR ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
+        <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="right">
+            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+            <md-content class="cntLayerHolder" layout="row" flex>
+                <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
+                <div layout="column" flex>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Proveedor
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <div class="textResm" flex="70" layout="Column" layout-align="start start">
+                            <div>
+                                CECRISA REVESTIMIENTO CERAMICOS, S.A
+                            </div>
+                        </div>
 
-            <!-- 11) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
+                        <div class="textResm" flex="30" layout="Column" layout-align="start start">
+                            <div>
+                                CRCSA
+                            </div>
+                        </div>
+                    </div>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Nombres Valcro
+                        </div>
+                    </div>
+                    <md-grid-list md-cols="2" md-gutter="6px" md-row-height="4:1" style="margin-right: 8px;">
+                        <md-grid-tile>
+                            <div class="textResm" flex layout="Column" layout-align="start start">
+                                <div style="overflow: hidden; text-overflow: ellipsis;">
+                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
+                                </div>
+                            </div>
+                        </md-grid-tile>
+                        <md-grid-tile>
+                            <div class="textResm" flex layout="Column" layout-align="start start">
+                                <div style="overflow: hidden; text-overflow: ellipsis;">
+                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
+                                </div>
+                            </div>
+                        </md-grid-tile>
+                        <md-grid-tile>
+                            <div class="textResm" flex layout="Column" layout-align="start start">
+                                <div style="overflow: hidden; text-overflow: ellipsis;">
+                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
+                                </div>
+                            </div>
+                        </md-grid-tile>
+                        <md-grid-tile>
+                            <div class="textResm" flex layout="Column" layout-align="start start">
+                                <div style="overflow: hidden; text-overflow: ellipsis;">
+                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
+                                </div>
+                            </div>
+                        </md-grid-tile>
+                    </md-grid-list>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Tipo de envio
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <div flex>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
+                <div layout="column" flex>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Datos Proveedor
+                        </div>
+                    </div>
+                </div>
+                <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
+                <div layout="column" flex>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Datos Proveedor
+                        </div>
+                    </div>
+                </div>
+            </md-content>
+        </md-sidenav>
+
+
+        <!-- 15) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PROVEEDOR ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
+
+            <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
-                <!-- 12) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
+                <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
                 <form name="projectForm" ng-controller="DataProvController">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
@@ -83,8 +175,8 @@
                     </div>
                     <div layout="row">
 
-                        <md-input-container class="md-block" flex="20">
-                            <label>Tipo de Proveedor</label>
+                        <md-input-container class="md-block" flex="15">
+                            <label>Tipo</label>
                             <md-select ng-model="dtaPrv.type" name ="state">
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.nombre}}
@@ -117,12 +209,7 @@
                             </div>-->
                         </md-input-container>
 
-
-                    </div>
-
-                    <div layout="row">
-
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
                             <md-select ng-model="dtaPrv.envio">
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
@@ -140,12 +227,19 @@
                             </md-switch>
                         </md-input-container>
 
+
+
+                    </div>
+
+                    <div layout="row">
+
+
                         <div flex></div>
 
                     </div>
                 </form>
 
-                <!-- 13) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
+                <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
                 <form name="nomvalcroForm">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -163,7 +257,7 @@
                     </md-input-container>
                 </form>
 
-                <!-- 14) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
+                <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
                 <form name="direccionesForm">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -241,7 +335,7 @@
 
                 </form>
 
-                <!-- 15) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
+                <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
                 <form name="provContactosForm">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -250,7 +344,7 @@
                     </div>
                     <div layout="row">
 
-                        <md-input-container class="md-block" flex="40">
+                        <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
                             <input name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk
                                    ng-model="project.nombreCont">
@@ -260,7 +354,7 @@
                             </div>-->
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="30">
+                        <md-input-container class="md-block" flex="35">
                             <label>Email</label>
                             <input name="emailCont" minlength="10" maxlength="100" required ng-model="project.emailCont"
                                    ng-pattern="/^.+@.+\..+$/"/>
@@ -273,7 +367,7 @@
                             </div>-->
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="30">
+                        <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
                             <input name="contTelf" required md-no-asterisk ng-model="project.contTelf"
                                    ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
@@ -282,6 +376,17 @@
                                 <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
                             </div>-->
                         </md-input-container>
+
+
+                        <md-input-container class="md-block" flex="15" ng-controller="ListPaises">
+                            <label>Pais de Residencia</label>
+                            <md-select ng-model="user.pais">
+                                <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
+                                    {{pais.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
 
                     </div>
 
@@ -337,29 +442,39 @@
 
                     </div>-->
 
+                    <div layout="row">
+                        <div ng-controller="idiomasController" layout="row" flex="10">
+                            <md-input-container flex>
+                                <label>Idiomas</label>
+                                <md-select ng-model="idiomasSeleccionados" multiple="">
+                                    <md-option ng-value="idioma.name" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
+                                    </md-optgroup>
+                                </md-select>
+                            </md-input-container>
+                        </div>
 
-                    <div ng-controller="idiomasController" layout="row">
-                        <md-input-container flex>
-                            <label>Idiomas</label>
-                            <md-select ng-model="idiomasSeleccionados" multiple="">
-                                <md-option ng-value="idioma.name" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
-                                </md-optgroup>
-                            </md-select>
+                        <md-input-container class="md-block" flex="40">
+                            <label>Responsabilidades</label>
+                            <input name="cntcRespon" maxlength="100" ng-minlength="3" required>
                         </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Direccion de Oficina</label>
+                            <input name="cntcDirOfc" maxlength="200" ng-minlength="3" required>
+                        </md-input-container>
+
                     </div>
-
-
 
 
                     <div layout="column">
 
                         <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                            <div flex="10" class="headGrid"> Nombre</div><div flex="20" class="headGrid"> Email</div><div flex class="headGrid"> Telefono</div><div flex="20" class="headGrid"> Pais</div>
                         </div>
                         <div id="grid">
                             <div flex>
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> Facbrica</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
+                                    <div flex="10" class="cellGrid"> Email</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
                                 </div>
                             </div>
                             <div flex>
@@ -380,9 +495,7 @@
         </md-sidenav>
 
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="right">
-            DOS
-        </md-sidenav>
+
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="otro">
             TRES

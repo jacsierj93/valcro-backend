@@ -9,7 +9,7 @@ html {
     -khtml-user-select: none;
 }
 
-button, select, html, div, textarea, input{
+button, select, html, div, textarea, input {
     font-weight: 300 !important;
 
 }
@@ -36,20 +36,23 @@ md-switch.md-checked.md-primary .md-thumb {
 md-switch.md-checked.md-primary .md-ink-ripple {
     color: rgb(84, 180, 234) !important;
 }
+
 /*==================================================*/
 /*==================================================*/
 form {
     padding: 0 !important;
 }
+
 /*==================================================*/
 /*==================================================*/
 /*@media screen and (min-width: 600px) md-sidenav{
     max-width: 100% !important;
 }*/
-md-backdrop{
+md-backdrop {
     display: none !important;
 }
-md-sidenav{
+
+md-sidenav {
     max-width: 100% !important;
 }
 
@@ -157,7 +160,7 @@ md-select:not([disable]):focus .md-select-value {
     transform: translate3d(0, 0px, 0) !important;
 }
 
-.md-select-value .md-select-icon:after{
+.md-select-value .md-select-icon:after {
     background-position-x: 12px !important;
     content: '' !important;
     height: 12px !important;
@@ -175,6 +178,44 @@ md-switch {
 
 md-switch.md-checked.md-primary .md-bar {
     background-color: rgba(0, 0, 0, 0.12);
+}
+
+md-switch .md-bar {
+    background-color: #ffffff !important;
+    -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.2);
+    -moz-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.2);
+    box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.2);
+    left: -2px !important;
+    width: 40px !important;
+    top: 0px !important;
+    height: 17px !important;
+    border-radius: 8px !important;
+    position: absolute !important;
+}
+
+md-switch .md-thumb {
+    background-color: #ff6f4c;
+    position: absolute !important;
+    margin: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    outline: none !important;
+    height: 13px !important;
+    width: 20px !important;
+    border-radius: 6px !important;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px 0px rgba(0, 0, 0, 0), 0px 2px 0px 0px rgba(0, 0, 0, 0) !important;
+    /*box-shadow: 0 !important;*/
+}
+
+md-switch.md-focused:not([disabled]) .md-thumb:before {
+left: 0 !important;
+top: 0 !important;
+right: 0 !important;
+bottom: 0 !important;
+}
+
+md-switch.md-focused:not([disabled]):not(.md-checked) .md-thumb:before {
+background-color: rgba(0, 0, 0, 0.12) !important;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -266,7 +307,7 @@ body {
 
 }
 
-.contentHolder{
+.contentHolder {
     background-color: #ffffff;
 }
 
@@ -375,12 +416,11 @@ body {
     color: #999999;
 }
 
-.botonera div{
+.botonera div {
     width: 48px;
     height: 48px;
     color: #999999;
 }
-
 
 .boxList {
     height: 176px;
@@ -409,6 +449,17 @@ body {
     padding: 10px 16px 24px 24px !important;
 }
 
+/*========================== TEXTOS RESUMEN ===============================*/
+.textResm {
+    height: 39px;
+    padding-right: 8px;
+}
+
+.textResm div {
+    width: 100%;
+    padding-top: 10px;
+    height: 19px;
+}
 /*======================== GRIDS ================================*/
 .headGridHolder {
     height: 40px;
@@ -425,13 +476,14 @@ body {
     font-size: 15px;
     font-weight: 400;
 }
+
 /*----------------------------------------------------------------*/
 .cellGridHolder {
     height: 40px;
     padding-right: 8px;
 }
 
-.cellGridHolder:hover{
+.cellGridHolder:hover {
     background-color: #f1f1f1;
 }
 
