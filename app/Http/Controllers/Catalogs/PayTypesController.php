@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Catalogs;
 
-use App\Models\Sistema\TiemAproTran;
-use App\Models\Sistema\Country;
+use App\Models\Sistema\PaymentType;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
 
 
-class ProvTiemAproTranController extends BaseController
+class PayTypesController extends BaseController
 {
 
     public function __construct()
@@ -22,10 +21,9 @@ class ProvTiemAproTranController extends BaseController
     public function getList()
     {
 
-        $data = TiemAproTran::all();
+        $data = PaymentType::all();
 
-
-        return view('modules.catalogs.tiemAproTran-list', ['data' => $data]);
+        return view('modules.catalogs.payment-type-list', ['data' => $data]);
     }
 
     /**carga formulario
@@ -33,15 +31,15 @@ class ProvTiemAproTranController extends BaseController
      */
     public function getForm(Request $req)
     {
-        
-        $datos = new TiemAproTran();
+
+        $datos = new PaymentType();
 
         if ($req->has('id')) {
-            $datos = TiemAproTran::findOrFail($req->id);
+            $datos = PaymentType::findOrFail($req->id);
         }
 
-        $paises = ['' => 'Seleccionar'] + Country::lists('short_name', 'id')->all();
-        return view('modules.catalogs.tiemAproTran-form', ["data" => $datos, 'paises' => $paises]);
+
+        return view('modules.catalogs.payment-type-form', ["data" => $datos]);
 
     }
 
@@ -50,30 +48,26 @@ class ProvTiemAproTranController extends BaseController
 
         //////////validation
         $validator = Validator::make($req->all(), [
-            'min_dia' => 'required',
-            'max_dia' => 'required',
-            'id_pais' => 'required'
+            'descripcion' => 'required'
 
         ]);
 
         if ($validator->fails()) { ///ups... erorres
 
-            $result = array("error" => "Debe llenar todos Los campos del formulario ");
+            $result = array("error" => "errores en campos de formulario");
 
         } else {  ///ok
 
             $result = array("success" => "Registro guardado con éxito","action"=>"new");
 
-            $model = new TiemAproTran();
+            $model = new PaymentType();
             //////////condicion para editar
             if ($req->has('id')) {
                 $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
 
-            $model->min_dias = $req->min_dia;
-            $model->max_dias = $req->max_dia;
-            $model->id_pais = $req->id_pais;
+            $model->descripcion = $req->descripcion;
             $model->save(); ////edita/inserta aviso
 
 
@@ -88,7 +82,7 @@ class ProvTiemAproTranController extends BaseController
     {
 
 
-        $model = new TiemAproTran();
+        $model = new PaymentType();
         $id = $req->input("id", 0);
         $model->destroy($id);
 

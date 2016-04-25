@@ -12,14 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class ProviderCondPay extends Model
+class ProviderListPrice extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_prov_cond_pag";
-
-    public function getItems(){
-        return $this->hasMany('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
-    }
-
+    protected $table = "tbl_prov_lista_precio";
 
 }

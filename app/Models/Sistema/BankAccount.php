@@ -12,14 +12,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class ProviderCondPay extends Model
+class BankAccount extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_prov_cond_pag";
+    protected $table = "tbl_cuenta_bancaria";
 
-    public function getItems(){
-        return $this->hasMany('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
+    public  function getAdvancePaymentProvider(){
+
+        return $this->belongsTo('App\Models\Sistema\AdvancePaymentProvider', 'cuenta_id');
     }
+
 
 
 }

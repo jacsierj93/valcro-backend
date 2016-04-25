@@ -6,19 +6,19 @@
  * Time: 03:02 PM
  */
 
-namespace App\Models\Sistema;
+namespace App\Models\Sistema\Purchase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class ProviderCondPay extends Model
+class Purchase extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_prov_cond_pag";
+    protected $table = "tbl_compra";
 
     public function getItems(){
-        return $this->hasMany('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
+        return $this->hasMany('App\Models\Sistema\Purchaseitem', 'compra_id', 'id');
     }
 
 

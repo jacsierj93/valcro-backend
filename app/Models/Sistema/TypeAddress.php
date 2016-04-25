@@ -12,14 +12,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class ProviderCondPay extends Model
+class TypeAddress extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_prov_cond_pag";
+    protected $table = "tbl_tipo_direccion";
 
-    public function getItems(){
-        return $this->hasMany('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
-    }
 
 
 }
