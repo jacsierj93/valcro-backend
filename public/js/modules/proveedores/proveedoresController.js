@@ -58,7 +58,7 @@ MyApp.controller('ListProv', function ($scope,$http,setGetProv) {
         url: 'provider/provList'
     }).then(function successCallback(response) {
         $scope.todos = response.data;
-        setGetProv.setList($scope.todos||[]);
+        setGetProv.setList($scope.todos);
     }, function errorCallback(response) {
         console.log("errorrr");
     });
@@ -262,13 +262,22 @@ MyApp.service("setGetProv",function($http){
         },
         addToList : function(elem){
             list.unshift(elem);
-        },
-        getSel : function(){
-            return prov;
         }
 
     };
 })
+
+//###########################################################################################3
+//##############################REST service (factory)#############################################3
+//###########################################################################################3
+MyApp.factory('masters', ['$resource',
+    function ($resource) {
+        return $resource('master/:type', {}, {
+            query: {method: 'GET', params: {type: ""}, isArray: true},
+        });
+    }
+]);
+
 
 //###########################################################################################3
 //##############################REST service (factory)#############################################3

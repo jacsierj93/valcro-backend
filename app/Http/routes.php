@@ -162,10 +162,12 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 
 ///Proveedores
 
-$app->get("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->get("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
-$app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
+$app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
+$app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
+$app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
 
+//MASTERS
+$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
 $app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS

@@ -1,4 +1,12 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
+MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
+    $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
+
+    $scope.envios = masters.query({ type:"getProviderTypeSend"});
+
+    $scope.data = {
+        cb1: true
+    };
+
 
     var historia= [15];
     var index=0;
@@ -29,6 +37,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
 
     /**inicializacion**/
+   // init();
+    $scope.setPed= function(ped){
+       // setGetPed.setPed(ped.item);
+        $mdSidenav(ped).close().then(function(){
+            $mdSidenav(ped).open();
+        });
+    }
     function init(){
         $http({
             method: 'POST',
@@ -41,5 +56,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         });
     }
 
-
+    MyApp.factory('masters', ['$resource',
+        function ($resource) {
+            return $resource('master/:type', {}, {
+                query: {method: 'GET', params: {type: ""}, isArray: true},
+            });
+        }
+    ]);
 });
