@@ -16,7 +16,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center" >
+            <div layout="column" layout-align="center center" ng-click="setPed('agrPed')">
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
@@ -78,6 +78,7 @@
     </div><!---fin menu-->
 
     <div class="contentHolder" layout="row" flex>
+
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
         <md-content class="barraLateral" >
 
@@ -124,13 +125,11 @@
                         </div>
 
 
-                    </div>
-
                 </div>
+
             </div>
 
         </md-content>
-
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
         <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
@@ -495,8 +494,8 @@
 
         <!-- 12) ########################################## LAYER (3)ORDENES DE COMPRAS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="odc">
-            <!-- 11) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
+            <!--) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
                 <form name="projectForm" ng-controller="PedidosCtrll">
 
@@ -514,10 +513,10 @@
                         <div flex class="headGrid"> Status</div>
                         <div flex class="headGrid"> Comentarios</div>
                     </div>
-                    <div id="grid">
+                    <div id="gridOdc">
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-click="setPed('resumenodc')">
-                                <div flex class="cellGrid">
+                                <div class="cellGrid">
                                     <md-switch class="md-primary" ng-model="dtaPrv.cb1"></md-switch>
                                 </div>
                                 <div flex class="cellGrid"> Data 2</div>
@@ -532,12 +531,10 @@
                 </form>
             </md-content>
         </md-sidenav>
-
-
-        <!-- 11) ########################################## LAYER (2) RESUMEN ODC ########################################## -->
+        <!-- 13) ########################################## LAYER (4) RESUMEN ODC ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 360px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenodc">
-            <!-- 11) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
+            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
                 <form name="projectForm" ng-controller="PedidosCtrll">
 
@@ -550,13 +547,13 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Nº ODC:</label>
-                            <md-select ng-model="dtaPed.type" name ="odc">
+                            <md-select ng-model="dtaPed.odc" name ="odc">
                                 <md-option ng-repeat="states in states" value="{{index}}">
                                     {{states.abbrev}}
                                 </md-option>
                             </md-select>
 
-                            <div ng-messages="projectForm.type.$error">
+                            <div ng-messages="projectForm.odc.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
                             </div>
@@ -605,7 +602,7 @@
                             </div>
                         </md-input-container>
                     </div>
-                    <div class="titulo_formulario"  style='margin-top: 20px;' layout="Column" layout-align="start start">
+                    <div class="titulo_formulario"  style='margin-top: 20px;' layout="column" layout-align="start start">
                         <div>
                             Productos a Solicitar
                         </div>
@@ -619,9 +616,9 @@
                         <div flex class="headGrid"> Comentarios</div>
                         <div flex class="headGrid"> Adjuntos</div>
                     </div>
-                    <div id="grid">
+                    <div id="gridResOdc">
                         <div flex>
-                            <div layout="row" class="cellGridHolder" ng-click="setPed('agrPed')">
+                            <div layout="row" class="cellGridHolder">
                                 <div flex class="cellGrid"> Data 1</div>
                                 <div flex class="cellGrid"> Data 2</div>
                                 <div flex class="cellGrid"> Data 3</div>
@@ -632,11 +629,123 @@
                             </div>
                         </div>
                     </div>
-                    <form>
+                </form>
+            </md-content>
+        </md-sidenav>
+
+        <!-- 14) ########################################## LAYER (5) Agregar Pedidos ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed">
+            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
+            <md-content  layout="row" style="'margin-top:0px;'" layout-padding flex>
+
+                <!--<div class="titulo_formulario" layout="row" flex>-->
+                        <div layout="column" flex>
+                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                                <div>
+                                    Contrapedidos
+                                </div>
+                                <div ng-click="setPed('agrContPed')">
+                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div layout="Column" flex>
+                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                                <div>
+                                   Kitchen Boxs
+                                </div>
+                                <div ng-click="setPed('agrKitBoxs')">
+                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div layout="Column" flex>
+                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                                <div>
+                                   Pedidos a Sustituir
+                                </div>
+                                <div>
+                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                                </div>
+                            </div>
+                        </div>
+                <!--</div>-->
+            </md-content>
+        </md-sidenav>
+
+        <!-- 15) ########################################## LAYER (6) Agregar Contrapedidos ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrContPed">
+            <!-- ) ########################################## CONTENDOR Agregar Contrapedidos ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Agregar Contrapedidos
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid"> Nº de Contrapedido</div>
+                        <div flex class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Comentarios</div>
+                        <div flex class="headGrid"> Fecha Aprox</div>
+                        <div flex class="headGrid"> Monto</div>
+
+                    </div>
+                    <div id="gridContPed">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex class="cellGrid"> Data 1</div>
+                                <div flex class="cellGrid"> Data 2</div>
+                                <div flex class="cellGrid"> Data 3</div>
+                                <div flex class="cellGrid"> Data 4</div>
+                                <div flex class="cellGrid"> Data 5</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
+        <!-- 16) ########################################## LAYER (7) Agregar KITCHEN BOXS ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrKitBoxs">
+            <!-- ) ########################################## CONTENDOR Agregar KITCHEN BOXS ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Agregar Kitchen Boxs
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid">ID</div>
+                        <div flex class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Nº de Proforma</div>
+                        <div flex class="headGrid"> IMG Proforma</div>
+                        <div flex class="headGrid"> Monto</div>
+                        <div flex class="headGrid"> Precio</div>
+                        <div flex class="headGrid"> Tiemp. Aprox. de Entrega</div>
+
+                    </div>
+                    <div id="gridKitBoxs">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex class="cellGrid"> Data 1</div>
+                                <div flex class="cellGrid"> Data 2</div>
+                                <div flex class="cellGrid"> Data 3</div>
+                                <div flex class="cellGrid"> Data 4</div>
+                                <div flex class="cellGrid"> Data 5</div>
+                                <div flex class="cellGrid"> Data 6</div>
+                                <div flex class="cellGrid"> Data 7</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </md-content>
         </md-sidenav>
     </div>
-
 
 
 </div>
