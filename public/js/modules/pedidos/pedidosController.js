@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     var historia= [15];
     var index=0;
@@ -78,6 +78,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
     }
 
+    $scope.openLayer= function(name){
+        $mdSidenav(name).open();
+        index++;
+        historia[index]='name';
+
+    }
+
+
     $scope.selecPedido= function(arg){
         $mdSidenav("detallePedido").open();
         index++;
@@ -98,11 +106,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
          */
     }
 
+    $scope.closeLayer= function (){
+        var layer=historia[index];
+        index--;
+        $mdSidenav(layer).close();
+
+
+
+    }
     $scope.setPed= function(ped){
-        // setGetPed.setPed(ped.item);
         $mdSidenav(ped).close().then(function(){
             $mdSidenav(ped).open();
         });
+        index++;
+        historia[index]=ped;
     }
 
     MyApp.factory('masters', ['$resource',

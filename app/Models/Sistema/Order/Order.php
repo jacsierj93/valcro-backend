@@ -6,7 +6,7 @@
  * Time: 03:02 PM
  */
 
-namespace App\Models\Sistema\Purchase;
+namespace App\Models\Sistema\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -20,19 +20,19 @@ class Order extends Model
     /**
      */
     public function PurchaseOrder(){
-        return $this->belongsToMany('App\Models\Sistema\Purchase', 'tbl_compra_orden', 'pedido_id','orden_compra_id');
+        return $this->belongsToMany('App\Models\Sistema\Purchase\Purchase', 'tbl_compra_orden', 'pedido_id','orden_compra_id');
     }
 
     /**
      */
     public function getOrders(){
-        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrder', 'pedido_id');
+        return $this->hasMany('App\Models\Sistema\Order\PurchaseOrder', 'pedido_id');
     }
 
     /**
      */
     public function getTypeOrder(){
-        return $this->belongsTo('App\Models\Sistema\Purchase\OrderType', 'tipo_pedido_id');
+        return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
     }
 
     public function getEmisionAttribute($value)

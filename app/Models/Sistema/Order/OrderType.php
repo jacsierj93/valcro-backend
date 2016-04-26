@@ -6,7 +6,7 @@
  * Time: 03:02 PM
  */
 
-namespace App\Models\Sistema\Purchase;
+namespace App\Models\Sistema\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
