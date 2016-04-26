@@ -52,6 +52,17 @@ class Provider extends  Model
      * obtiene las condiciones de pago asignadas al proveedor
      */
     public function getOrders(){
-        return $this->hasMany('App\Models\Sistema\Purchase\Order','prov_id');
+        return $this->hasMany('App\Models\Sistema\Order\Order','prov_id');
     }
+
+    /**
+     * obtiene las condiciones de pago asignadas al proveedor
+     */
+    /**
+     * obtiene las condiciones de pago asignadas al proveedor
+     */
+    public function getFullPaymentOrders(){
+        return $this->getOrders()->sum('monto');
+    }
+
 }
