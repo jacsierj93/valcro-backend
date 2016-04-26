@@ -1,4 +1,34 @@
 MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
+
+    var historia= [15];
+    var index=0;
+    $scope.provSelec={
+        razon_social:'Desconocido',
+        pedidos: new Array()
+    }
+    $scope.pedidoSelec={
+        id:'-1',
+        ordenes:'100000,0000,000,',
+        nro_doc:'',
+        tipo:-1
+
+    }
+    $scope.formData={
+        pedidos: new Array()
+    }
+    init();
+
+    function init(){
+        $http({
+            method: 'POST',
+            url: 'Order/OrderProvList'
+        }).then(function successCallback(response) {
+            $scope.todos = response.data;
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
     $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
 
     $scope.envios = masters.query({ type:"getProviderTypeSend"});
@@ -8,13 +38,27 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     };
 
 
-    var historia= [15];
-    var index=0;
     $scope.provSelec={
-        razon_social:'Desconocido',
-        pedidos: new Array()
+        razon_social:''
     }
-    init();
+
+
+    function init(){
+        $http({
+            method: 'POST',
+            url: 'Order/OrderProvList'
+        }).then(function successCallback(response) {
+            $scope.todos = response.data;
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+
+
+    /********************************************EVENTOS ********************************************/
+        //selecionar provedor
     $scope.setProv= function(arg){
         $mdSidenav("listPedido").open();
         index++;
@@ -34,25 +78,30 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
     }
 
+    $scope.selecPedido= function(arg){
+        $mdSidenav("detallePedido").open();
+        index++;
+        historia[index]='detallePedido';
+        /*
+         //get de pedidos
+         $http({
+         method: 'POST',
+         url: 'Order/OrderForm',
+         data:{ id:arg.id}
+         }).then(function successCallback(response) {
+         $scope.pedidoSelec=response.data.pedido;
+         console.log(response.data);
 
+         }, function errorCallback(response) {
+         console.log("errorrr");
+         });
+         */
+    }
 
-    /**inicializacion**/
-   // init();
     $scope.setPed= function(ped){
-       // setGetPed.setPed(ped.item);
+        // setGetPed.setPed(ped.item);
         $mdSidenav(ped).close().then(function(){
             $mdSidenav(ped).open();
-        });
-    }
-    function init(){
-        $http({
-            method: 'POST',
-            url: 'Order/OrderProvList'
-        }).then(function successCallback(response) {
-            $scope.todos = response.data;
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
         });
     }
 
