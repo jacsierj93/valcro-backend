@@ -78,61 +78,61 @@
     </div><!---fin menu-->
 
     <div class="contentHolder" layout="row" flex>
-
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
         <md-content class="barraLateral" >
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
             <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item.id)">
 
-                <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
+                <div class="boxList" layout="column" flex >
 
-                <div layout="row" style="height: 40px;">
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
-                            85
+                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
+
+                    <div layout="row" style="height: 40px;">
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
+                                85
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
+                                85
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
+                                85
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
+                                85
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
+                                85
+                            </div>
                         </div>
                     </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
-                            85
+                    <div style="height:40px;" layout="row" layout-align="start end">
+                        <div flex="">$1000</div>
+                        <div flex="">860</div>
+                        <div flex="" layout="row">
+                            <div style="margin: 4px;">860</div>
+                            <img  style="float: left;" src="images/contra_pedido.png"/>
                         </div>
+
+
                     </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
-                            85
-                        </div>
-                    </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
-                            85
-                        </div>
-                    </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
-                            85
-                        </div>
-                    </div>
+
                 </div>
-
-                <div style="height: 24px"></div>
-                <div style="height:40px;" layout="row" layout-align="start end">
-                    <div flex="">$1000</div>
-                    <div flex="">860</div>
-                    <div flex="" layout="row">
-                        <div style="margin: 4px;">860</div>
-                        <img  style="float: left;" src="images/contra_pedido.png"/>
-                    </div>
-
-
-                </div>
-
             </div>
 
         </md-content>
+
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <!--agregar-->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
             <?= HTML::image("images/btn_prevArrow.png") ?>
         </div>
@@ -142,10 +142,10 @@
                 P
             </div>
             <br>
-            Seleccione un Proveedor
+            Selecciones un Proveedor
         </div>
 
-        <!-- 10) ########################################## LAYER (1) Lista de pedidos ########################################## -->
+        <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -166,7 +166,7 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="selecPedido(pedido)">
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
@@ -636,6 +636,7 @@
             </md-content>
         </md-sidenav>
     </div>
+
 
 
 </div>

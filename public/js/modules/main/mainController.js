@@ -11,7 +11,7 @@ main.controller('AppCtrl', function ($scope,$mdSidenav) {
             secc: 'Inicio',
             url: 'modules/home/index'
         }, {
-            secc: 'Providers',
+            secc: 'Proveedores',
             url: 'modules/proveedores/index'
         }, {
             secc: 'Productos',

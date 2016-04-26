@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     var historia= [15];
     var index=0;
