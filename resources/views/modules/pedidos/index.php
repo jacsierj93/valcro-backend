@@ -262,7 +262,7 @@
                     </div>
                     <div id="grid">
                         <div flex>
-                            <div layout="row" class="cellGridHolder">
+                            <div layout="row" class="cellGridHolder" ng-click="setPed('agrPed')">
                                 <div flex class="cellGrid"> Data 1</div>
                                 <div flex class="cellGrid"> Data 2</div>
                                 <div flex class="cellGrid"> Data 3</div>
@@ -274,6 +274,35 @@
                         </div>
                     </div>
                 <form>
+            </md-content>
+        </md-sidenav>
+
+        <!-- 11) ########################################## LAYER (3)  ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed">
+            <!-- 11) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
+
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="row" layout-align="start start">
+                        <div>
+                            Contra Pedidos
+                            <div layout="column" layout-align="center center" >
+                                <!--<i class="fa fa-plus"></i>-->
+                                <?= HTML::image("images/agregar.png") ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="titulo_formulario" layout="row" layout-align="start start">
+                        <div>
+                            Kitchen Boxs
+                            <div layout="column" layout-align="center center" >
+                                <!--<i class="fa fa-plus"></i>-->
+                                <?= HTML::image("images/agregar.png") ?>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </md-content>
         </md-sidenav>
     </div>
