@@ -6,7 +6,7 @@
  * Time: 6:39 PM
  */
 
-namespace App\Models\Sistema\Purchase;
+namespace App\Models\Sistema\Order;
 
 
 
