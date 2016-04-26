@@ -1,29 +1,9 @@
 //var proveedores = angular.module('proveedores', []);
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv) {
-    /*$scope.project = {
-     description: 'Nuclear Missile Defense System',
-     rate: 500
-     };*/
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
+    $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
 
-
-    $http({
-        method: 'POST',
-        url: 'master/getProviderType'
-    }).then(function successCallback(response) {
-        $scope.states = response.data
-    }, function errorCallback(response) {
-        console.log("error=>",response)
-    });
-
-    $http({
-        method: 'POST',
-        url: 'master/getProviderTypeSend'
-    }).then(function successCallback(response) {
-        $scope.envios = response.data
-    }, function errorCallback(response) {
-        console.log("error=>",response)
-    });
+    $scope.envios = masters.query({ type:"getProviderTypeSend"});
 
     $scope.data = {
         cb1: true
@@ -31,12 +11,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv) {
 
     $scope.setProv = function(prov){
         setGetProv.setProv(prov.item);
-
-        console.log(prov.$index);
-        console.log(prov.$parent.todos);
-
-
-
         $mdSidenav("left").close().then(function(){
             $mdSidenav("left").open();
         });
@@ -51,15 +25,9 @@ MyApp.controller('TipoDirecc', function ($scope) {
     });
 });
 
-MyApp.controller('ListPaises', function ($scope,$http) {
-    $http({
-        method: 'GET',
-        url: 'master/getCountries'
-    }).then(function successCallback(response) {
-        $scope.paises = response.data;
-    }, function errorCallback(response) {
-        console.log("error=>",response)
-    });
+MyApp.controller('ListPaises', function ($scope,$http,masters) {
+    $scope.paises = masters.query({ type:"getCountries"});
+
 });
 
 
@@ -297,6 +265,18 @@ MyApp.service("setGetProv",function($http){
 
     };
 })
+
+//###########################################################################################3
+//##############################REST service (factory)#############################################3
+//###########################################################################################3
+MyApp.factory('masters', ['$resource',
+    function ($resource) {
+        return $resource('master/:type', {}, {
+            query: {method: 'GET', params: {type: ""}, isArray: true},
+        });
+    }
+]);
+
 //###########################################################################################3
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
@@ -315,7 +295,6 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$http,$mdToas
     };
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
-        console.log($scope.projectForm)
         if(nuevo[0] && !nuevo[1]) {
             $http({
                 method: 'POST',

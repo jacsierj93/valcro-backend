@@ -33,7 +33,7 @@ class ProvTiemAproTranController extends BaseController
      */
     public function getForm(Request $req)
     {
-        
+
         $datos = new TiemAproTran();
 
         if ($req->has('id')) {
@@ -52,7 +52,7 @@ class ProvTiemAproTranController extends BaseController
         $validator = Validator::make($req->all(), [
             'min_dia' => 'required',
             'max_dia' => 'required',
-            'id_pais' => 'required'
+            'pais' => 'required'
 
         ]);
 
@@ -71,9 +71,9 @@ class ProvTiemAproTranController extends BaseController
                 $result["action"]="edit";
             }
 
-            $model->min_dias = $req->min_dia;
-            $model->max_dias = $req->max_dia;
-            $model->id_pais = $req->id_pais;
+            $model->min_dia = $req->min_dia;
+            $model->max_dia = $req->max_dia;
+            $model->pais = $req->pais;
             $model->save(); ////edita/inserta aviso
 
 
