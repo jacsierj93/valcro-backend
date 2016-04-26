@@ -527,7 +527,6 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Precio</div>
                         <div flex class="headGrid"> Tiemp. Aprox. de Entrega</div>
-
                     </div>
                     <div id="gridKitBoxs">
                         <div flex>
