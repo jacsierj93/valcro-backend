@@ -23,7 +23,7 @@
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
 
-    <base href="/angular2/">
+    <base href="/valcro-backend/public/">
 </head>
 
 <body id="inicio" ng-cloak layout="column" ng-controller="AppMain" style="overflow: hidden;">

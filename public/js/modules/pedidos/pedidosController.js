@@ -73,6 +73,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
 
     /********************************************EVENTOS ********************************************/
+   //Inicializacion
     $scope.setProv= setProv;
     $scope.openLayer=openLayer;
     $scope.selecPedido=selecPedido;
