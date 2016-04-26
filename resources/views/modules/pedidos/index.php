@@ -199,8 +199,9 @@
                         <div  flex="15" class="md-block" style=" color: #999999;" >
                             Ordenes de Compra:
                         </div>
+
                         <div flex=""   class="md-block" style=" color: #999999;"  ng-click="setPed('odc')">
-                            {{pedidoSelec.ordenes}}
+                            {{pedidoSelec.ordenes_compra}}
                         </div>
                     </div>
 

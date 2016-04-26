@@ -3,14 +3,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     var historia= [15];
     var index=0;
     $scope.provSelec={
+        id:'-1',
         razon_social:'Desconocido',
         pedidos: new Array()
     }
     $scope.pedidoSelec={
         id:'-1',
-        ordenes:'100000,0000,000,',
-        nro_doc:'',
-        tipo:-1
+        ordenes_compra:new Array(),
+        tipo_pedido_id:'',
+        pais_id:'',
+        almacen_id:'',
+        moneda_id:'',
+        condicion_id:'',
+        motivo_id:'',
+        prioridad_id:'',
+        nro_pedido:'',
+        monto:'',
+        tasa:'',
+        tasa_fija:false,
+        comentario:'',
+        mt3:'',
+        peso:'',
+        aprob_gerencia:false,
+        fecha_aprob:null
 
     }
     $scope.formData={
@@ -58,12 +73,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
 
     /********************************************EVENTOS ********************************************/
-        //selecionar provedor
-    $scope.setProv= function(arg){
-        $mdSidenav("listPedido").open();
-        index++;
-        historia[index]='listPedido';
-//get de pedidos
+    $scope.setProv= setProv;
+    $scope.openLayer=openLayer;
+    $scope.selecPedido=selecPedido;
+    $scope.closeLayer=closeLayer;
+
+    //al selecionar provedor
+    function setProv(id){
+        openLayer('listPedido');
         $http({
             method: 'POST',
             url: 'Order/OrderProvOrder',
@@ -75,21 +92,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         }, function errorCallback(response) {
             console.log("errorrr");
         });
-
     }
 
-    $scope.openLayer= function(name){
-        $mdSidenav(name).open();
+    // abirti un layer
+    function openLayer(layer){
+        $mdSidenav(layer).open();
         index++;
-        historia[index]='name';
-
+        historia[index]=layer;
     }
 
-
-    $scope.selecPedido= function(arg){
-        $mdSidenav("detallePedido").open();
-        index++;
-        historia[index]='detallePedido';
+    function selecPedido(id){
+        openLayer('detallePedido');
         /*
          //get de pedidos
          $http({
@@ -104,16 +117,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
          console.log("errorrr");
          });
          */
+
     }
 
-    $scope.closeLayer= function (){
+    function closeLayer(){
         var layer=historia[index];
         index--;
         $mdSidenav(layer).close();
-
-
-
     }
+    /*******por integrar***/
     $scope.setPed= function(ped){
         $mdSidenav(ped).close().then(function(){
             $mdSidenav(ped).open();
@@ -121,12 +133,4 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         index++;
         historia[index]=ped;
     }
-
-    MyApp.factory('masters', ['$resource',
-        function ($resource) {
-            return $resource('master/:type', {}, {
-                query: {method: 'GET', params: {type: ""}, isArray: true},
-            });
-        }
-    ]);
 });
