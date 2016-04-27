@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\NombreValcro;
+use App\Models\Sistema\Contactos;
 use App\Models\Sistema\ProviderAddress as Address;
 use Session;
 use Validator;
@@ -123,6 +124,41 @@ class ProvidersController extends BaseController
         }else{
             return [];
         }
+    }
+
+    public function listContacProv($provId){
+        if($provId){
+            $valName = Provider::find($provId)->contacts()->get();
+            return ($valName)?$valName:[];
+        }else{
+            return [];
+        }
+    }
+
+    public function saveContact(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $valName = Contactos::find($req->id);
+            $result['action']="upd";
+        }else{
+            $valName = new Contactos();
+        }
+        if($valName->agente != 1){
+            $valName->email = $req->emailCont;
+            $valName->nombre = $req->nombreCont;
+            $valName->telefono = $req->contTelf;
+            $valName->responsabilidades = $req->responsability;
+            $valName->direccion = $req->dirOff;
+            $valName->agente = $req->isAgent;
+            $valName->pais_id = ($req->pais!="")?$req->pais!="":NULL;
+            $valName->id_lang = $req->languaje;
+            $valName->save();
+        }
+        if(!Provider::find($req->prov_id)->contacts()->find($valName->id)){
+            Provider::find($req->prov_id)->contacts()->attach($valName->id);
+        }
+        $result['id']=$valName->id;
+        return $result;
     }
 
 

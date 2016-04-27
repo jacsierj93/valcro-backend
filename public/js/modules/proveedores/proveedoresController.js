@@ -262,6 +262,9 @@ MyApp.service("setGetProv",function($http){
         },
         addToList : function(elem){
             list.unshift(elem);
+        },
+        getSel : function(){
+            return prov;
         }
 
     };
@@ -417,7 +420,20 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     })
 
     $scope.$watchGroup(['valcroName.length','prov.id'],function(nvo,old){
-            console.log(nvo,old)
+        var lastIndex = $scope.valcroName.length-1;
+        console.log("ultimoIndex",lastIndex);
+        /*lo siguiente guarda solo si es una nuevo item*/
+        if(lastIndex>=0 && $scope.valcroName[lastIndex].id == false){
+            $http({
+                method: 'POST',
+                url: "provider/saveValcroName",
+                data: $scope.valcroName[lastIndex],
+            }).then(function successCallback(response) {
+                $scope.valcroName[lastIndex].id = response.data.id;
+            }, function errorCallback(response) {
+                console.log("error=>", response)
+            });
+        }
     })
     /*la siguiente funcion transforma lo escrito a un objeto para el render y hace el insert en la Bd*/
     $scope.transformChip = function transformChip(chip) {
@@ -426,15 +442,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             return chip;
         }
         var chip = { name: chip, dep: 'adm', fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
-        $http({
-            method: 'POST',
-            url: "provider/saveValcroName",
-            data: chip,
-        }).then(function successCallback(response) {
-            $scope.valcroName[$scope.valcroName.length-1].id = response.data.id;
-        }, function errorCallback(response) {
-            console.log("error=>", response)
-        });
         // Otherwise, create a new o
         return chip;
     }
@@ -452,5 +459,34 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 })
 
 MyApp.controller('contactProv', function($scope,setGetProv,$http,providers) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
+        $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
+    })
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine'], function(nuevo) {
+        if(nuevo[0] && !nuevo[1]) {
+            $http({
+                method: 'POST',
+                url: "provider/saveContactProv",
+                data: $scope.cnt,
+            }).then(function successCallback(response) {
+                $scope.cnt.id = response.data.id;
+                $scope.provContactosForm.$setPristine();
+                $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
+
+            }, function errorCallback(response) {
+                console.log("error=>", response)
+            });
+        }
+    });
+
+    $scope.showGrid = function(elem){
+        $scope.isShow = elem;
+        if(!elem){
+            $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
+        }
+    }
 
 })

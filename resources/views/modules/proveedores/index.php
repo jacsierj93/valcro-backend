@@ -252,9 +252,9 @@
                         <md-chips  ng-disabled="enabled" class="md-block" flex ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)">
                             <md-chip-template>
                                 <span>
-                                  <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png"/>
-                                  <strong>{{$chip.name}}</strong>
-                                  <em>({{$chip.dep}})</em>
+                                  <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
+                                  <span>{{$chip.name}}</span>
+                                  <!--<em>({{$chip.dep}})</em>-->
                                 </span>
                             </md-chip-template>
                         </md-chips>
@@ -335,7 +335,7 @@
                 </form>
 
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm" ng-controller="contactProv">
+                <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Contactos Proveedor
@@ -368,8 +368,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
-                            <input name="contTelf" required md-no-asterisk ng-model="cnt.contTelf"
-                                   ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
+                            <input name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
                             <!--<div ng-messages="provContactosForm.contTelf.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
@@ -379,7 +378,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
-                            <md-select ng-model="cnt.pais">
+                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)">
                                 <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
                                     {{pais.nombre}}
                                 </md-option>
@@ -388,64 +387,11 @@
 
 
                     </div>
-
-
-
-
-                    <!--<div ng-controller="DemoCtrl3 as ctrl" layout="row">
-                        <md-autocomplete flex required
-                                         md-input-name="autocompleteField"
-                                         md-input-minlength="2"
-                                         md-input-maxlength="18"
-                                         md-no-cache="ctrl.noCache"
-                                         md-selected-item="ctrl.selectedItem"
-                                         md-search-text="ctrl.searchText"
-                                         md-items="item in ctrl.querySearch(ctrl.searchText)"
-                                         md-item-text="item.display"
-                                         md-floating-label="Cargos">
-                            <md-item-template>
-                                <span md-highlight-text="ctrl.searchText">{{item.display}}</span>
-                            </md-item-template>
-                            <div ng-messages="searchForm.autocompleteField.$error" ng-if="searchForm.autocompleteField.$touched">
-                                <div ng-message="required">Debe indicar un cargo</div>
-                                <div ng-message="minlength">Your entry is not long enough.</div>
-                                <div ng-message="maxlength">Your entry is too long.</div>
-                            </div>
-                        </md-autocomplete>
-
-
-                        <div ng-controller="DemoCtrl4 as ctrl" layout="column" ng-cloak="" class="chipsdemoCustomInputs" ng-app="MyApp">
-
-                            <md-chips
-                                ng-model="ctrl.selectedVegetables"
-                                md-autocomplete-snap=""
-                                md-transform-chip="ctrl.transformChip($chip)"
-                                md-require-match="ctrl.autocompleteDemoRequireMatch">
-                                <md-autocomplete
-                                    md-selected-item="ctrl.selectedItem"
-                                    md-search-text="ctrl.searchText"
-                                    md-items="item in ctrl.querySearch(ctrl.searchText)"
-                                    md-item-text="item.name"
-                                    md-floating-label="Cargos">
-                                    <span md-highlight-text="ctrl.searchText">{{item.name}}</span>
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <span>
-                                      {{$chip.name}}
-                                    </span>
-                                </md-chip-template>
-                            </md-chips>
-
-
-                        </div>
-
-                    </div>-->
-
                     <div layout="row">
                         <div ng-controller="idiomasController" layout="row" flex="10">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-model="cnt.idiomasSeleccionados" multiple="">
+                                <md-select ng-model="cnt.idiomasSeleccionados" multiple="" ng-disabled="(cnt.id===false)">
                                     <md-option ng-value="idioma.name" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
                                     </md-optgroup>
                                 </md-select>
@@ -454,32 +400,27 @@
 
                         <md-input-container class="md-block" flex="40">
                             <label>Responsabilidades</label>
-                            <input name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" required>
+                            <input name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)">
                         </md-input-container>
 
                         <md-input-container class="md-block" flex>
                             <label>Direccion de Oficina</label>
-                            <input name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" required>
+                            <input name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)">
                         </md-input-container>
 
                     </div>
 
 
-                    <div layout="column">
+                    <div layout="column" ng-show="isShow">
 
                         <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Nombre</div><div flex="20" class="headGrid"> Email</div><div flex class="headGrid"> Telefono</div><div flex="20" class="headGrid"> Pais</div></div>
+                            <div flex="20" class="headGrid"> Nombre</div><div flex class="headGrid"> Email</div><div flex="10" class="headGrid"> Telefono</div><div flex="20" class="headGrid"> Pais</div></div>
                         <div id="grid">
                            <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> cont.email</div><div flex="20" class="cellGrid"> cont.pais.short_name</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
+                                    <div flex="20" class="cellGrid"> {{cont.nombre}}</div><div flex class="cellGrid"> {{cont.email}}</div><div flex="10" class="cellGrid">{{cont.telefono}}</div><div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
                                 </div>
-                            </div><!--
-                            <div flex>
-                                <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> Facbrica</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
-                                </div>
-                            </div>-->
+                            </div>
 
                         </div>
 

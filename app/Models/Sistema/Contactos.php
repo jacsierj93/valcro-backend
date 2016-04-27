@@ -10,11 +10,11 @@ class Contactos extends  Model
 {
 
     use SoftDeletes;
-    protected $table = 'tbl_contactos';
+    protected $table = 'tbl_contacto';
 
     ////foreing key
     public function contacto_proveedor()
     {
-        return $this->hasMany('App\Models\Sistema\Proveedor', 'provedores_id');
+        return $this->belongsToMany('App\Models\Sistema\Provider', 'tbl_prov_cont', 'cont_id', 'prov_id');
     }
 }

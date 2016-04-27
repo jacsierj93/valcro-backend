@@ -118,8 +118,10 @@ $app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obten
 $app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir'); ///obtener datos especificos de un prov
 $app->post("provider/saveValcroName",'Providers\ProvidersController@saveValcroName'); ///obtener listado de direcciones
 $app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName');
+$app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact');
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
+$app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
 
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
