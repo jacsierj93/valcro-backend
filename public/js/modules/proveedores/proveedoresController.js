@@ -262,6 +262,9 @@ MyApp.service("setGetProv",function($http){
         },
         addToList : function(elem){
             list.unshift(elem);
+        },
+        getSel : function(){
+            return prov;
         }
 
     };
@@ -302,9 +305,8 @@ MyApp.factory('providers', ['$resource',
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
 MyApp.controller('DataProvController', function ($scope,setGetProv,$http,$mdToast) {
+    $scope.enabled = false;
     $scope.showSimpleToast = function() {
-        //var pinTo = $scope.getToastPosition();
-
         $mdToast.show(/*{
             template: "<md-toast style='width:100%'>prueba</md-toast>",
             hideDelay: 6000,
@@ -347,6 +349,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
     $scope.$watch('prov.id',function(nvo){
         $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
         $scope.address = providers.query({type:"dirList",id_prov: $scope.prov.id||0});
+        $scope.isShow = false;
     })
 
     $scope.toEdit = function(addrs){
@@ -382,6 +385,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
         }
     });
 
+    $scope.showGrid = function(elem){
+      $scope.isShow = elem;
+        if(!elem){
+            $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
+        }
+    }
+
 
 });
 
@@ -402,3 +412,81 @@ MyApp.controller('idiomasController', function($scope) {
     $scope.idiomasSeleccionados = [];
 
 });
+MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers) {
+    $scope.enabled=true;
+    $scope.prov = setGetProv.getSel(); //obtiene en local los datos del proveedor actual
+    $scope.$watch('prov.id',function(nvo){
+        $scope.valcroName = providers.query({type:"provNomValList",id_prov: $scope.prov.id||0});
+    })
+
+    $scope.$watchGroup(['valcroName.length','prov.id'],function(nvo,old){
+        var lastIndex = $scope.valcroName.length-1;
+        console.log("ultimoIndex",lastIndex);
+        /*lo siguiente guarda solo si es una nuevo item*/
+        if(lastIndex>=0 && $scope.valcroName[lastIndex].id == false){
+            $http({
+                method: 'POST',
+                url: "provider/saveValcroName",
+                data: $scope.valcroName[lastIndex],
+            }).then(function successCallback(response) {
+                $scope.valcroName[lastIndex].id = response.data.id;
+            }, function errorCallback(response) {
+                console.log("error=>", response)
+            });
+        }
+    })
+    /*la siguiente funcion transforma lo escrito a un objeto para el render y hace el insert en la Bd*/
+    $scope.transformChip = function transformChip(chip) {
+        // If it is an object, it's already a known chip
+        if (angular.isObject(chip)) {
+            return chip;
+        }
+        var chip = { name: chip, dep: 'adm', fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
+        // Otherwise, create a new o
+        return chip;
+    }
+    $scope.rmChip = function(fiel,chip){
+        $http({
+            method: 'POST',
+            url: "provider/delValcroName",
+            data: chip,
+        }).then(function successCallback(response) {
+            console.log(response);
+        }, function errorCallback(response) {
+            console.log("error=>", response)
+        });
+    }
+})
+
+MyApp.controller('contactProv', function($scope,setGetProv,$http,providers) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
+        $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
+    })
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine'], function(nuevo) {
+        if(nuevo[0] && !nuevo[1]) {
+            $http({
+                method: 'POST',
+                url: "provider/saveContactProv",
+                data: $scope.cnt,
+            }).then(function successCallback(response) {
+                $scope.cnt.id = response.data.id;
+                $scope.provContactosForm.$setPristine();
+                $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
+
+            }, function errorCallback(response) {
+                console.log("error=>", response)
+            });
+        }
+    });
+
+    $scope.showGrid = function(elem){
+        $scope.isShow = elem;
+        if(!elem){
+            $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
+        }
+    }
+
+})

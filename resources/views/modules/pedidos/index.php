@@ -16,7 +16,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center" ng-click="openLayer('agrPed')">
+            <div layout="column" layout-align="center center" ng-click="setPed('agrPed')">
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
@@ -33,7 +33,7 @@
 
         <div  layout layout-align="start center" flex>
 
-            <div layout="column" layout-align="center center" flex="30" >
+            <div layout="column" layout-align="center center" flex="25" >
                 <md-input-container class="md-block" >
                     <label>Proveedor</label>
                     <md-select ng-model="id" name ="prov_id">
@@ -130,7 +130,7 @@
         </md-content>
 
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
             <?= HTML::image("images/btn_prevArrow.png") ?>
         </div>
@@ -164,7 +164,7 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="selecPedido(pedido)">
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
@@ -214,7 +214,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="nro_doc"
+                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
                                    ng-model="pedidoSelec.nro_doc">
                         </md-input-container>
                     </div>
@@ -227,9 +227,7 @@
                                     {{prov.razon_social}}
                                 </md-option>
                             </md-select>
-
                         </md-input-container>
-
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
@@ -368,13 +366,12 @@
                             </div>-->
                         </md-input-container>
                     </div>
-                </form>
 
-                <div class="titulo_formulario" layout="Column" layout-align="start start">
-                    <div>
-                        Aprobación de Gerente
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Aprovacion de Gerente
+                        </div>
                     </div>
-                </div>
 
                 <div layout="row" >
 
@@ -423,7 +420,7 @@
                     </div>
                     <div layout="row" flex="" >
 
-                        <md-input-container class="md-block" flex="80">
+                        <md-input-container class="md-block" flex="30">
                             <label>Imagen Adjunto</label>
                             <input maxlength="6"  name="img_pago" >
                             <!--<div ng-messages="projectForm.siglas.$error">
@@ -450,11 +447,11 @@
                             </div>-->
                         </md-input-container>
                     </div>
-                </form>
 
-                <div class="titulo_formulario" layout="Column" layout-align="start start">
-                    <div>
-                        Compromiso
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Compromiso
+                        </div>
                     </div>
                 </div>
                 <form name="compromiso">

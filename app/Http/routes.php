@@ -116,7 +116,12 @@ $app->post("provider/provList",'Providers\ProvidersController@getList'); ///obte
 $app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///obtener lista general de proveedores
 $app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obtener datos especificos de un prov
 $app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir'); ///obtener datos especificos de un prov
+$app->post("provider/saveValcroName",'Providers\ProvidersController@saveValcroName'); ///obtener listado de direcciones
+$app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName');
+$app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact');
+$app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
+$app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
 
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
@@ -162,12 +167,9 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 
 ///Proveedores
 
-$app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
-$app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
+$app->get("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
+$app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
 
-//MASTERS
-$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
 $app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
