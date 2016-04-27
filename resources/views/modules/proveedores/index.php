@@ -166,7 +166,7 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" ng-controller="DataProvController">
+                <form name="projectForm" ng-controller="DataProvController"  ng-disabled="true">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -177,7 +177,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
-                            <md-select ng-model="dtaPrv.type" name ="state">
+                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.nombre}}
                                 </md-option>
@@ -193,7 +193,7 @@
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
                             <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
-                                   ng-model="dtaPrv.description">
+                                   ng-model="dtaPrv.description" ng-disabled="enabled">
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
@@ -202,7 +202,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Siglas</label>
-                            <input maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" >
+                            <input maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="enabled" >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -211,7 +211,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
-                            <md-select ng-model="dtaPrv.envio">
+                            <md-select ng-model="dtaPrv.envio" ng-disabled="enabled">
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                     {{envio.nombre}}
                                 </md-option>
@@ -222,7 +222,7 @@
                         </md-input-container>
 
                         <md-input-container class="md-block">
-                            <md-switch class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos">
+                            <md-switch class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos"  ng-disabled="enabled">
                                 Contrapedidos?
                             </md-switch>
                         </md-input-container>
@@ -240,26 +240,30 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm">
+                <form name="nomvalcroForm" ng-controller="valcroNameController">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Nombres Valcro
                         </div>
                     </div>
 
-                    <md-input-container class="md-block" flex>
-                        <label>Nombre Valcro</label>
-                        <input maxlength="60" ng-minlength="3" required md-no-asterisk name="nomValcro" ng-model="project.nomValcro">
-                        <!--<div ng-messages="nomvalcroForm.nomValcro.$error">
-                            <div ng-message="required">Campo Obligatorio.</div>
-                            <div ng-message="md-maxlength">Este nombre debe tener maximo 60 caracteres.</div>
-                        </div>-->
-                    </md-input-container>
+                    <!--<md-input-container class="md-block" flex>
+                        <label>Nombre Valcro</label>-->
+                        <md-chips  ng-disabled="enabled" class="md-block" flex ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)">
+                            <md-chip-template>
+                                <span>
+                                  <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png"/>
+                                  <strong>{{$chip.name}}</strong>
+                                  <em>({{$chip.dep}})</em>
+                                </span>
+                            </md-chip-template>
+                        </md-chips>
+                            <!--</md-input-container>-->
                 </form>
 
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm" ng-controller="provAddrsController">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click="showGrid()">
+                <form name="direccionesForm" ng-controller="provAddrsController"  ng-click="showGrid(true)" click-out="showGrid(false)">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Direcciones
                         </div>
@@ -315,28 +319,23 @@
 
                     </div>
 
-                    <div layout="column">
+                    <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
                             <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
                         </div>
-                        <div id="grid" style="overflow-y: auto">
+                        <div id="grid" style="overflow-y: auto; height: 120px">
                             <div flex ng-repeat="add in address" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
                                     <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
                                 </div>
                             </div>
-<!--                            <div flex>
-                                <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> Facbrica</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
-                                </div>
-                            </div>-->
                         </div>
                     </div>
 
                 </form>
 
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm">
+                <form name="provContactosForm" ng-controller="contactProv">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Contactos Proveedor
@@ -347,7 +346,7 @@
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
                             <input name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk
-                                   ng-model="project.nombreCont">
+                                   ng-model="cnt.nombreCont">
                             <!--<div ng-messages="provContactosForm.nombreCont.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">Debe tener maximo 55 caracteres.</div>
@@ -356,7 +355,7 @@
 
                         <md-input-container class="md-block" flex="35">
                             <label>Email</label>
-                            <input name="emailCont" minlength="10" maxlength="100" required ng-model="project.emailCont"
+                            <input name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont"
                                    ng-pattern="/^.+@.+\..+$/"/>
                             <!--<div ng-messages="provContactosForm.emailCont.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
@@ -369,7 +368,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
-                            <input name="contTelf" required md-no-asterisk ng-model="project.contTelf"
+                            <input name="contTelf" required md-no-asterisk ng-model="cnt.contTelf"
                                    ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
                             <!--<div ng-messages="provContactosForm.contTelf.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
@@ -378,9 +377,9 @@
                         </md-input-container>
 
 
-                        <md-input-container class="md-block" flex="15" ng-controller="ListPaises">
+                        <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
-                            <md-select ng-model="user.pais">
+                            <md-select ng-model="cnt.pais">
                                 <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
                                     {{pais.nombre}}
                                 </md-option>
@@ -446,7 +445,7 @@
                         <div ng-controller="idiomasController" layout="row" flex="10">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-model="idiomasSeleccionados" multiple="">
+                                <md-select ng-model="cnt.idiomasSeleccionados" multiple="">
                                     <md-option ng-value="idioma.name" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
                                     </md-optgroup>
                                 </md-select>
@@ -455,12 +454,12 @@
 
                         <md-input-container class="md-block" flex="40">
                             <label>Responsabilidades</label>
-                            <input name="cntcRespon" maxlength="100" ng-minlength="3" required>
+                            <input name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" required>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex>
                             <label>Direccion de Oficina</label>
-                            <input name="cntcDirOfc" maxlength="200" ng-minlength="3" required>
+                            <input name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" required>
                         </md-input-container>
 
                     </div>
@@ -469,19 +468,18 @@
                     <div layout="column">
 
                         <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Nombre</div><div flex="20" class="headGrid"> Email</div><div flex class="headGrid"> Telefono</div><div flex="20" class="headGrid"> Pais</div>
-                        </div>
+                            <div flex="10" class="headGrid"> Nombre</div><div flex="20" class="headGrid"> Email</div><div flex class="headGrid"> Telefono</div><div flex="20" class="headGrid"> Pais</div></div>
                         <div id="grid">
-                            <div flex>
+                           <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> Email</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
+                                    <div flex="10" class="cellGrid"> cont.email</div><div flex="20" class="cellGrid"> cont.pais.short_name</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
                                 </div>
-                            </div>
+                            </div><!--
                             <div flex>
                                 <div layout="row" layout-wrap class="cellGridHolder">
                                     <div flex="10" class="cellGrid"> Facbrica</div><div flex="20" class="cellGrid"> United Arab Emirates</div><div flex class="cellGrid"> Morbi sit amet ultricies turpis, id rhoncus est. Nulla facilisi. Sed luctus tristique convallis.</div><div flex="20" class="cellGrid">+582411233232</div>
                                 </div>
-                            </div>
+                            </div>-->
 
                         </div>
 

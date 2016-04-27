@@ -38,12 +38,7 @@ class ProvidersController extends BaseController
 
     public function getProv(request $prv)
     {
-
-        //$prov = new Proveedor();
         $data = Provider::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
-        /*   foreach($data as $k => $v){
-            $v['nombreValcro']=$v->nombres_valcro()->get();
-        }*/
         $data->contraped = ($data->contraped == 1);
         return $data;
     }
@@ -101,6 +96,33 @@ class ProvidersController extends BaseController
             return [];
         }
 
+    }
+
+    public function saveValcroName(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        $valName = new NombreValcro();
+        $valName->prov_id = $req->prov_id;
+        $valName->nombre = $req->name;
+        $valName->fav = $req->fav;
+        $valName->save();
+
+        $result['id']=$valName->id;
+        return $result;
+    }
+
+    public function delValcroName(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "del","id"=>"$req->id");
+        NombreValcro::destroy($req->id);
+        return $result;
+    }
+
+    public function listValcroName($provId){
+        if($provId){
+            $valName = Provider::find($provId)->nombres_valcro()->select("id","nombre as name","fav")->get();
+            return $valName;
+        }else{
+            return [];
+        }
     }
 
 
