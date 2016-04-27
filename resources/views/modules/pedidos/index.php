@@ -16,7 +16,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center" ng-click="setPed('agrPed')">
+            <div layout="column" layout-align="center center" ng-click="openLayer('agrPed')">
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
@@ -33,12 +33,12 @@
 
         <div  layout layout-align="start center" flex>
 
-            <div layout="column" layout-align="center center" flex="25" >
+            <div layout="column" layout-align="center center" flex="30" >
                 <md-input-container class="md-block" >
                     <label>Proveedor</label>
-                    <md-select ng-model="dtaPrv.type" name ="state">
-                        <md-option ng-repeat="state in states" value="{{state.id}}">
-                            {{state.nombre}}
+                    <md-select ng-model="id" name ="prov_id">
+                        <md-option ng-repeat="prov in todos" value="{{prov.id}}">
+                            {{prov.razon_social}}
                         </md-option>
                     </md-select>
 
@@ -47,9 +47,9 @@
             <div layout="column" layout-align="center center" flex="25">
                 <md-input-container class="md-block" >
                     <label>Moneda</label>
-                    <md-select ng-model="dtaPrv.type" name ="state">
-                        <md-option ng-repeat="state in states" value="{{state.id}}">
-                            {{state.nombre}}
+                    <md-select ng-model="id_moneda" name ="id_moneda">
+                        <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}">
+                            {{moneda.nombre}}
                         </md-option>
                     </md-select>
 
@@ -85,44 +85,42 @@
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
             <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item.id)">
 
-                <div class="boxList" layout="column" flex >
+                <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
-
-                    <div layout="row" style="height: 40px;">
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
-                                85
-                            </div>
+                <div layout="row" style="height: 40px;">
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
+                            85
                         </div>
                     </div>
-                    <div style="height:40px;" layout="row" layout-align="start end">
-                        <div flex="">$1000</div>
-                        <div flex="">860</div>
-                        <div flex="" layout="row">
-                            <div style="margin: 4px;">860</div>
-                            <img  style="float: left;" src="images/contra_pedido.png"/>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
+                            85
                         </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
+                            85
+                        </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
+                            85
+                        </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
+                            85
+                        </div>
+                    </div>
+                </div>
+                <div style="height:40px;" layout="row" layout-align="start end">
+                    <div flex="">$1000</div>
+                    <div flex="">860</div>
+                    <div flex="" layout="row">
+                        <div style="margin: 4px;">860</div>
+                        <img  style="float: left;" src="images/contra_pedido.png"/>
+                    </div>
 
 
                 </div>
@@ -130,8 +128,9 @@
             </div>
 
         </md-content>
+
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
             <?= HTML::image("images/btn_prevArrow.png") ?>
         </div>
@@ -144,7 +143,7 @@
             Selecciones un Proveedor
         </div>
 
-        <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
+        <!-- 10) ########################################## LAYER (1) lista de pedidos########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -165,7 +164,7 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div id="grid" ng-repeat="pedido in provSelec.pedidos">
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="selecPedido(pedido)">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
@@ -198,44 +197,45 @@
                         <div  flex="15" class="md-block" style=" color: #999999;" >
                             Ordenes de Compra:
                         </div>
-
                         <div flex=""   class="md-block" style=" color: #999999;"  ng-click="setPed('odc')">
-                            {{pedidoSelec.ordenes_compra}}
+                            {{pedidoSelec.ordenes}}
                         </div>
                     </div>
 
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block" flex="30">
                             <label>Tipo de Pedido</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="state" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="pedidoSelec.tipo_pedido_id" name ="tipo_pedido_id" ng-value="{{pedidoSelec.tipo_pedido_id}}">
+                                <md-option ng-repeat="tipo in formData.tipo" ng-value="{{tipo.id}}">
+                                    {{tipo.tipo}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
+                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="nro_doc"
                                    ng-model="pedidoSelec.nro_doc">
                         </md-input-container>
                     </div>
 
                     <div layout="row"  class=rowInput>
-                        <md-input-container class="md-block" flex="40">
+                        <md-input-container class="md-block" >
                             <label>Proveedor</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="proveedor" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="id" name ="prov_id">
+                                <md-option ng-repeat="prov in todos" value="{{prov.id}}">
+                                    {{prov.razon_social}}
                                 </md-option>
                             </md-select>
+
                         </md-input-container>
+
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="pais" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="pedidoSelec.pais_id" name ="pais_id" >
+                                <md-option ng-repeat="pais in formData.paises" value="{{pais.id}}">
+                                    {{pais.short_name}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -244,9 +244,9 @@
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block"  flex>
                             <label>Direccion</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="direccion" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="pedidoSelec.pais_id" name ="direccion_almacen_id">
+                                <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
+                                    {{dir.direccion}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -255,7 +255,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="20">
                             <label>Monto</label>
-                            <input maxlength="6"  name="monto" ng-minlength="3"  >
+                            <input maxlength="6" ng-model="pedidoSelec.monto" name="monto" ng-minlength="3"  >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -264,16 +264,16 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Moneda</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="moneda" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="pedidoSelec.prov_moneda_id" name ="prov_moneda_id">
+                                <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}">
+                                    {{moneda.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Tasa</label>
-                            <input maxlength="6"  name ="tasa"  ng-minlength="3"  >
+                            <input maxlength="6" ng-model="pedidoSelec.tasa" name ="tasa"  ng-minlength="3"  >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -291,9 +291,7 @@
                             </md-input-container>
 
                             <div flex=""  style="height: 30px;margin-top: 9px;  color: #999999;">
-                                <md-switch  class="md-primary"
-                                            ng-model="dtaPrv.fijaT"
-                                            name="fijaT" aria-label="fijaT">
+                                <md-switch  class="md-primary"      ng-model="pedidoSelec.tasa_fija" >
 
                                 </md-switch>
                             </div>
@@ -306,9 +304,9 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="condiPago" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="pedidoSelec.condicion_pago_id" name ="condicion_pago_id">
+                                <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
+                                    {{conPago.titulo}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -317,25 +315,25 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Motivo Pedido </label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="motivo_ped" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select ng-model="pedidoSelec.motivo_pedido_id" name ="motivo_pedido_id">
+                                <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
+                                    {{motivoPed.motivo}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Prioridad Pedido </label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="prioridad" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <md-select  ng-model="pedidoSelec.prioridad_id" name ="prioridad_id" >
+                                <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
+                                    {{prioPed.descripcion}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
-                            <label>Condicion Pedido </label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="condicion" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
+                            <label>Condiciones Pedido </label>
+                            <md-select ng-model="pedidoSelec.condicion_pedido_id" name ="condicion_pedido_id">
+                                <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
+                                    {{condPed.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -343,7 +341,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex >
                             <label>Comentario</label>
-                            <input maxlength="6"  name="comentario" ng-minlength="3"  >
+                            <input ng-model="pedidoSelec.comentario" maxlength="6"  name="comentario" ng-minlength="3"  >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -354,7 +352,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="20">
                             <label>Mt3</label>
-                            <input maxlength="6"  name="mt3" ng-minlength="3"  >
+                            <input ng-model="pedidoSelec.mt3" maxlength="6"  name="mt3" ng-minlength="3"  >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -363,37 +361,40 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Peso</label>
-                            <input maxlength="6"  name="peso" ng-minlength="3"  >
+                            <input ng-model="pedidoSelec.peso" maxlength="6"  name="peso" ng-minlength="3"  >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
                             </div>-->
                         </md-input-container>
                     </div>
+                </form>
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Aprovacion de Gerente
-                        </div>
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Aprobación de Gerente
                     </div>
+                </div>
 
-                    <div layout="row" >
+                <div layout="row" >
 
-                        <md-input-container class="md-block" flex="">
-                            <label>Estatus</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="aprv_gerente" value="{{pedidoSelec.tipo}}">
-                                <md-option ng-repeat="tipo in formData.pedidos">
-                                    {{tipo.id}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                    <md-input-container class="md-block" flex="">
+                        <label>Estatus</label>
+                        <md-select ng-model="aprobacionGerente" name ="aprob_gerencia" >
+                            <md-option ng-repeat="aprobGerente in formData.aprob_gerencia" value="{{aprobGerente.aprob_gerencia}}">
+                                {{aprobGerente.aprob_gerencia}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Aprobación
                     </div>
+                </div>
+                <form name="aprovacion">
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Aprovacion
-                        </div>
-                    </div>
                     <div layout="row" >
                         <div flex="15" style="height: 30px;margin-top: 9px;  color: #999999;" >
                             Fecha de Aprobación
@@ -422,7 +423,7 @@
                     </div>
                     <div layout="row" flex="" >
 
-                        <md-input-container class="md-block" flex="30">
+                        <md-input-container class="md-block" flex="80">
                             <label>Imagen Adjunto</label>
                             <input maxlength="6"  name="img_pago" >
                             <!--<div ng-messages="projectForm.siglas.$error">
@@ -431,38 +432,32 @@
                             </div>-->
                         </md-input-container>
                     </div>
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Cancelacion
-                        </div>
+                </form>
+
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Cancelacion
                     </div>
+                </div>
+                <form name="cancelacion">
                     <div layout="row"  >
                         <md-input-container class="md-block" flex >
-                            <label>Imagen Abono</label>
-                            <input maxlength="6"  name="cancelacion" >
+                            <label>Motivo de cancelacion </label>
+                            <input  name="cancelacion"  >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
                             </div>-->
                         </md-input-container>
                     </div>
+                </form>
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Compromiso
-                        </div>
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Compromiso
                     </div>
-                    <div layout="row"  >
-                        <md-input-container class="md-block" flex>
-                            <label>Imagen Adjunto</label>
-                            <input maxlength="6"  name="cancelacion" >
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
-                        </md-input-container>
-                    </div>
-
+                </div>
+                <form name="compromiso">
 
                     <div layout="row"  flex="" >
                         <div flex="25" style="height: 30px;margin-top: 9px;  color: #999999;" >
@@ -639,38 +634,38 @@
             <md-content  layout="row" style="'margin-top:0px;'" layout-padding flex>
 
                 <!--<div class="titulo_formulario" layout="row" flex>-->
-                        <div layout="column" flex>
-                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
-                                <div>
-                                    Contrapedidos
-                                </div>
-                                <div ng-click="setPed('agrContPed')">
-                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
-                                </div>
-                            </div>
+                <div layout="column" flex>
+                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                        <div>
+                            Contrapedidos
+                        </div>
+                        <div ng-click="setPed('agrContPed')">
+                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+                        </div>
+                    </div>
 
+                </div>
+                <div layout="Column" flex>
+                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                        <div>
+                            Kitchen Boxs
                         </div>
-                        <div layout="Column" flex>
-                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
-                                <div>
-                                   Kitchen Boxs
-                                </div>
-                                <div ng-click="setPed('agrKitBoxs')">
-                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
-                                </div>
-                            </div>
+                        <div ng-click="setPed('agrKitBoxs')">
+                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                        </div>
+                    </div>
 
+                </div>
+                <div layout="Column" flex>
+                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                        <div>
+                            Pedidos a Sustituir
                         </div>
-                        <div layout="Column" flex>
-                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
-                                <div>
-                                   Pedidos a Sustituir
-                                </div>
-                                <div>
-                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
-                                </div>
-                            </div>
+                        <div>
+                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
+                    </div>
+                </div>
                 <!--</div>-->
             </md-content>
         </md-sidenav>
