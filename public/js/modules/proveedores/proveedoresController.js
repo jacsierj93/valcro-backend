@@ -249,6 +249,7 @@ MyApp.service("setGetProv",function($http){
                 });
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
+                itemsel = {};
             }
         },
         updateItem: function(upd){
@@ -258,10 +259,11 @@ MyApp.service("setGetProv",function($http){
         },
         setList : function(val){
             list = val;
-            itemsel.list[0];
+            //itemsel.list[0];
         },
         addToList : function(elem){
             list.unshift(elem);
+            this.setProv(list[0]);
         },
         getSel : function(){
             return prov;
@@ -421,7 +423,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     $scope.$watchGroup(['valcroName.length','prov.id'],function(nvo,old){
         var lastIndex = $scope.valcroName.length-1;
-        console.log("ultimoIndex",lastIndex);
         /*lo siguiente guarda solo si es una nuevo item*/
         if(lastIndex>=0 && $scope.valcroName[lastIndex].id == false){
             $http({
@@ -458,12 +459,13 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     }
 })
 
-MyApp.controller('contactProv', function($scope,setGetProv,$http,providers) {
+MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSidenav) {
     $scope.prov = setGetProv.getSel();
     $scope.$watch('prov.id',function(nvo){
         $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
         $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
     })
+    $scope.allContact =  providers.query({type:"allContacts"});
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
@@ -484,9 +486,30 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers) {
 
     $scope.showGrid = function(elem){
         $scope.isShow = elem;
-        if(!elem){
+        /*if(!elem){
             $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
-        }
+        }*/
+    }
+
+    $scope.book=function(){
+        $mdSidenav("contactBook").open();
+    }
+
+
+
+    $scope.toEdit = function(element){
+
+        contact = element.cont;
+        $scope.cnt.id = contact.id;
+        $scope.cnt.id_prov = $scope.prov.id;
+        $scope.cnt.nombreCont = contact.nombre;
+        $scope.cnt.emailCont = contact.email;
+        $scope.cnt.contTelf = contact.telefono;
+        $scope.cnt.pais = contact.pais_id;
+        $scope.cnt.languaje = contact.id_lang;
+        $scope.cnt.responsability = contact.responsabilidades;
+        $scope.cnt.dirOff = contact.direccion;
+        console.log(element);
     }
 
 })
