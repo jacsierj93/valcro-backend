@@ -5,3 +5,10 @@
     color: #ffffff;
 }
 
+.headTitleGrid{
+     border-bottom: solid 1px rgb(84, 180, 234);
+
+}
+.image{
+    float: right;
+}

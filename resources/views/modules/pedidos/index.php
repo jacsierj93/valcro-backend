@@ -16,7 +16,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center" >
+            <div layout="column" layout-align="center center" ng-click="setPed('agrPed')">
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
@@ -78,6 +78,7 @@
     </div><!---fin menu-->
 
     <div class="contentHolder" layout="row" flex>
+
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
         <md-content class="barraLateral" >
 
@@ -124,13 +125,11 @@
                         </div>
 
 
-                    </div>
-
                 </div>
+
             </div>
 
         </md-content>
-
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
         <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
@@ -185,9 +184,568 @@
             </md-content>
         </md-sidenav>
 
+        <!-- 11) ########################################## LAYER (2) FORMULARIO INFORMACION DEL pedido ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+                <form name="detallePedido">
 
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Datos del Pedido
+                        </div>
+                    </div>
+                    <div layout="row"  >
+                        <div  flex="15" class="md-block" style=" color: #999999;" >
+                            Ordenes de Compra:
+                        </div>
+
+                        <div flex=""   class="md-block" style=" color: #999999;"  ng-click="setPed('odc')">
+                            {{pedidoSelec.ordenes_compra}}
+                        </div>
+                    </div>
+
+                    <div layout="row"  class=rowInput>
+                        <md-input-container class="md-block" flex="30">
+                            <label>Tipo de Pedido</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="state" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="30">
+                            <label>N° de Pedido</label>
+                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
+                                   ng-model="pedidoSelec.nro_doc">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row"  class=rowInput>
+                        <md-input-container class="md-block" flex="40">
+                            <label>Proveedor</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="proveedor" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Pais</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="pais" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </div>
+                    <div layout="row"  class=rowInput>
+                        <md-input-container class="md-block"  flex>
+                            <label>Direccion</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="direccion" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </div>
+                    <div layout="row" >
+                        <md-input-container class="md-block" flex="20">
+                            <label>Monto</label>
+                            <input maxlength="6"  name="monto" ng-minlength="3"  >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Moneda</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="moneda" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Tasa</label>
+                            <input maxlength="6"  name ="tasa"  ng-minlength="3"  >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+
+                        <div layout="row" flex="" >
+                            <md-input-container class="md-block" flex="20">
+                                <label>Fijar tasa</label>
+                                <input maxlength="6"  name="tasa" ng-minlength="3"  >
+                                <!--<div ng-messages="projectForm.siglas.$error">
+                                    <div ng-message="required">Obligatorio.</div>
+                                    <div ng-message="md-maxlength">maximo 4</div>
+                                </div>-->
+                            </md-input-container>
+
+                            <div flex=""  style="height: 30px;margin-top: 9px;  color: #999999;">
+                                <md-switch  class="md-primary"
+                                            ng-model="dtaPrv.fijaT"
+                                            name="fijaT" aria-label="fijaT">
+
+                                </md-switch>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    <div layout="row" >
+                        <md-input-container class="md-block" flex="">
+                            <label>Condicion de pago</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="condiPago" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" >
+                        <md-input-container class="md-block" flex="">
+                            <label>Motivo Pedido </label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="motivo_ped" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="">
+                            <label>Prioridad Pedido </label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="prioridad" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="">
+                            <label>Condicion Pedido </label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="condicion" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div layout="row" >
+                        <md-input-container class="md-block" flex >
+                            <label>Comentario</label>
+                            <input maxlength="6"  name="comentario" ng-minlength="3"  >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row" >
+                        <md-input-container class="md-block" flex="20">
+                            <label>Mt3</label>
+                            <input maxlength="6"  name="mt3" ng-minlength="3"  >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Peso</label>
+                            <input maxlength="6"  name="peso" ng-minlength="3"  >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+                    </div>
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Aprovacion de Gerente
+                        </div>
+                    </div>
+
+                    <div layout="row" >
+
+                        <md-input-container class="md-block" flex="">
+                            <label>Estatus</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="aprv_gerente" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Aprovacion
+                        </div>
+                    </div>
+                    <div layout="row" >
+                        <div flex="15" style="height: 30px;margin-top: 9px;  color: #999999;" >
+                            Fecha de Aprobación
+                        </div>
+
+                        <md-datepicker  flex="25" name="fecha_aprob" ng-model="myDate"
+                                        required md-min-date="minDate" md-max-date="maxDate"
+                                        md-date-filter="onlyWeekendsPredicate">
+                        </md-datepicker>
+
+                        <md-input-container class="md-block" flex="25">
+                            <label>Tipo de pago</label>
+                            <md-select ng-model="pedidoSelec.tipo" name ="tipo_pago" value="{{pedidoSelec.tipo}}">
+                                <md-option ng-repeat="tipo in formData.pedidos">
+                                    {{tipo.id}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="30">
+                            <label>N° Documento</label>
+                            <input maxlength="6"  name="nro_doc_pay" ng-minlength="3"  >
+
+                        </md-input-container>
+
+                    </div>
+                    <div layout="row" flex="" >
+
+                        <md-input-container class="md-block" flex="30">
+                            <label>Imagen Adjunto</label>
+                            <input maxlength="6"  name="img_pago" >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+                    </div>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Cancelacion
+                        </div>
+                    </div>
+                    <div layout="row"  >
+                        <md-input-container class="md-block" flex >
+                            <label>Imagen Abono</label>
+                            <input maxlength="6"  name="cancelacion" >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+                    </div>
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Compromiso
+                        </div>
+                    </div>
+                    <div layout="row"  >
+                        <md-input-container class="md-block" flex>
+                            <label>Imagen Adjunto</label>
+                            <input maxlength="6"  name="cancelacion" >
+                            <!--<div ng-messages="projectForm.siglas.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">maximo 4</div>
+                            </div>-->
+                        </md-input-container>
+                    </div>
+
+
+                    <div layout="row"  flex="" >
+                        <div flex="25" style="height: 30px;margin-top: 9px;  color: #999999;" >
+                            Fecha estimada de Compromiso
+                        </div>
+
+                        <md-datepicker flex="25" name="fecha_est_compro" ng-model="myDate"
+                                       required md-min-date="minDate" md-max-date="maxDate"
+                                       md-date-filter="onlyWeekendsPredicate">
+                        </md-datepicker>
+                        <div flex="20" style="height: 30px;margin-top: 9px;  color: #999999;" >
+                            Fecha limite de credito
+                        </div>
+                        <div flex="15"  style="height: 30px;margin-top: 9px;  color: #999999;">
+                            <md-switch  class="md-primary"
+                                        ng-model="dtaPrv.fijaT"
+                                        name="fijaT" aria-label="fijaT">
+
+                            </md-switch>
+                        </div>
+
+                    </div>
+
+
+                </form>
+
+            </md-content>
+        </md-sidenav>
+
+        <!-- 12) ########################################## LAYER (3)ORDENES DE COMPRAS ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="odc">
+            <!--) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Ordenes de Compra
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid"> a</div>
+                        <div flex class="headGrid"> Nº de ODC</div>
+                        <div flex class="headGrid"> Proveedor</div>
+                        <div flex class="headGrid"> Cant.</div>
+                        <div flex class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Status</div>
+                        <div flex class="headGrid"> Comentarios</div>
+                    </div>
+                    <div id="gridOdc">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder" ng-click="setPed('resumenodc')">
+                                <div class="cellGrid">
+                                    <md-switch class="md-primary" ng-model="dtaPrv.cb1"></md-switch>
+                                </div>
+                                <div flex class="cellGrid"> Data 2</div>
+                                <div flex class="cellGrid"> Data 3</div>
+                                <div flex class="cellGrid"> Data 4</div>
+                                <div flex class="cellGrid"> Data 5</div>
+                                <div flex class="cellGrid"> Data 6</div>
+                                <div flex class="cellGrid"> Data 7</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
+        <!-- 13) ########################################## LAYER (4) RESUMEN ODC ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 360px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenodc">
+            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Resumen de Orden de Compra
+                        </div>
+                    </div>
+                    <div layout="row">
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Nº ODC:</label>
+                            <md-select ng-model="dtaPed.odc" name ="odc">
+                                <md-option ng-repeat="states in states" value="{{index}}">
+                                    {{states.abbrev}}
+                                </md-option>
+                            </md-select>
+
+                            <div ng-messages="projectForm.odc.$error">
+                                <div ng-message="required">Campo Obligatorio.</div>
+                                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+                            </div>
+                        </md-input-container>
+
+
+                        <md-input-container class="md-block" flex>
+                            <label>Fecha:</label>
+                            <input md-maxlength="4" required md-no-asterisk name="fecha"
+                                   ng-model="dtaPed.fecha">
+                            <div ng-messages="projectForm.fecha.$error">
+                                <div ng-message="required">Campo Obligatorio.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Fabrica:</label>
+                            <input md-maxlength="80" required name="fabrica" ng-model="dtaPed.fabrica" >
+                            <div ng-messages="projectForm.fabrica.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                                <div ng-message="md-maxlength">La fabrica no debe tener mas de 80 caracteres.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex>
+                            <label>Pais:</label>
+                            <input md-maxlength="40" required name="pais" ng-model="dtaPed.pais" >
+                            <div ng-messages="projectForm.pais.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>Status:</label>
+                            <input md-maxlength="10" required name="status" ng-model="dtaPed.status" >
+                            <div ng-messages="projectForm.status.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Comentario:</label>
+                            <input md-maxlength="100" required name="coment" ng-model="dtaPed.coment" >
+                            <div ng-messages="projectForm.coment.$error">
+                                <div ng-message="required">Obligatorio.</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <div class="titulo_formulario"  style='margin-top: 20px;' layout="column" layout-align="start start">
+                        <div>
+                            Productos a Solicitar
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid"> Tipo</div>
+                        <div flex class="headGrid"> Cod. Producto</div>
+                        <div flex class="headGrid"> Cod. Profit</div>
+                        <div flex class="headGrid"> Descripción.</div>
+                        <div flex class="headGrid"> Cantidad</div>
+                        <div flex class="headGrid"> Comentarios</div>
+                        <div flex class="headGrid"> Adjuntos</div>
+                    </div>
+                    <div id="gridResOdc">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex class="cellGrid"> Data 1</div>
+                                <div flex class="cellGrid"> Data 2</div>
+                                <div flex class="cellGrid"> Data 3</div>
+                                <div flex class="cellGrid"> Data 4</div>
+                                <div flex class="cellGrid"> Data 5</div>
+                                <div flex class="cellGrid"> Data 6</div>
+                                <div flex class="cellGrid"> Data 7</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
+
+        <!-- 14) ########################################## LAYER (5) Agregar Pedidos ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed">
+            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
+            <md-content  layout="row" style="'margin-top:0px;'" layout-padding flex>
+
+                <!--<div class="titulo_formulario" layout="row" flex>-->
+                        <div layout="column" flex>
+                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                                <div>
+                                    Contrapedidos
+                                </div>
+                                <div ng-click="setPed('agrContPed')">
+                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div layout="Column" flex>
+                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                                <div>
+                                   Kitchen Boxs
+                                </div>
+                                <div ng-click="setPed('agrKitBoxs')">
+                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div layout="Column" flex>
+                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                                <div>
+                                   Pedidos a Sustituir
+                                </div>
+                                <div>
+                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                                </div>
+                            </div>
+                        </div>
+                <!--</div>-->
+            </md-content>
+        </md-sidenav>
+
+        <!-- 15) ########################################## LAYER (6) Agregar Contrapedidos ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrContPed">
+            <!-- ) ########################################## CONTENDOR Agregar Contrapedidos ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Agregar Contrapedidos
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid"> Nº de Contrapedido</div>
+                        <div flex class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Comentarios</div>
+                        <div flex class="headGrid"> Fecha Aprox</div>
+                        <div flex class="headGrid"> Monto</div>
+
+                    </div>
+                    <div id="gridContPed">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex class="cellGrid"> Data 1</div>
+                                <div flex class="cellGrid"> Data 2</div>
+                                <div flex class="cellGrid"> Data 3</div>
+                                <div flex class="cellGrid"> Data 4</div>
+                                <div flex class="cellGrid"> Data 5</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
+        <!-- 16) ########################################## LAYER (7) Agregar KITCHEN BOXS ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrKitBoxs">
+            <!-- ) ########################################## CONTENDOR Agregar KITCHEN BOXS ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <form name="projectForm" ng-controller="PedidosCtrll">
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Agregar Kitchen Boxs
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex class="headGrid">ID</div>
+                        <div flex class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Nº de Proforma</div>
+                        <div flex class="headGrid"> IMG Proforma</div>
+                        <div flex class="headGrid"> Monto</div>
+                        <div flex class="headGrid"> Precio</div>
+                        <div flex class="headGrid"> Tiemp. Aprox. de Entrega</div>
+
+                    </div>
+                    <div id="gridKitBoxs">
+                        <div flex>
+                            <div layout="row" class="cellGridHolder">
+                                <div flex class="cellGrid"> Data 1</div>
+                                <div flex class="cellGrid"> Data 2</div>
+                                <div flex class="cellGrid"> Data 3</div>
+                                <div flex class="cellGrid"> Data 4</div>
+                                <div flex class="cellGrid"> Data 5</div>
+                                <div flex class="cellGrid"> Data 6</div>
+                                <div flex class="cellGrid"> Data 7</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
     </div>
-
 
 
 </div>

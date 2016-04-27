@@ -111,6 +111,7 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 
 
 ///Providers
+
 $app->post("provider/provList",'Providers\ProvidersController@getList'); ///obtener lista general de proveedores
 $app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///obtener lista general de proveedores
 $app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obtener datos especificos de un prov

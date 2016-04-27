@@ -6,7 +6,7 @@
  * Time: 6:39 PM
  */
 
-namespace App\Models\Sistema\Purchase;
+namespace App\Models\Sistema\Order;
 
 
 
@@ -26,12 +26,12 @@ class Order_PurchaseOrder extends Model
 
     public function getOrder()
     {
-        return $this->belongsTo('App\Models\Sistema\Purchase\Order', 'prov_id');
+        return $this->belongsTo('App\Models\Sistema\Order\Order', 'prov_id');
     }
 
     public function getPurchaseOrder()
     {
-        return $this->belongsToMany('App\Models\Sistema\Purchase\PurchaseOrder', 'orden_compra_id');
+        return $this->belongsToMany('App\Models\Sistema\Order\PurchaseOrder', 'orden_compra_id');
     }
 
 }

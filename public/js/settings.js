@@ -2,18 +2,7 @@
  * Created by delimce on 14/3/2016.
  */
 /////variable global de la ruta de la aplicacion
-console.log("algo");
-var puerto = window.location.port;
-
-//console.log("puerto",puerto);
-if(puerto != 80 || puerto != ""){
-    prt = ":"+puerto;
-}else{
-    prt = "";
-}
-//
-//var PATHAPP = "http://"+window.location.hostname+prt+"/valcro-backend/public/";
-var PATHAPP = "http://localhost/valcro-backend/public/";
+var PATHAPP = "http://valcrolindes01/angular2/";
 
 /////////token para los request ajax
 $.ajaxSetup({
