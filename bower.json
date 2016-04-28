@@ -24,7 +24,8 @@
     "font-awesome": "fontawesome#^4.5.0",
     "jquery": "1.11.0",
     "angular-route": "^1.5.3",
-    "angular-resource": "^1.5.3"
+    "angular-resource": "^1.5.3",
+    "angular-clickout": "^1.0.2"
   },
   "resolutions": {
     "jquery": "1.11.0"

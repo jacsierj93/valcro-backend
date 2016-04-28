@@ -214,7 +214,7 @@ $app->post("catalogs/ProviderPaymentCondition",'Purchases\OrderController@getPro
 
 //anexar a Orden
 $app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'); ///getProductos de provedor
-//
+
 
 // pedidos
 $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
@@ -232,4 +232,3 @@ $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido
 $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
 
-//getProviderOrder

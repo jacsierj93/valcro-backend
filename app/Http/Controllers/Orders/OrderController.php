@@ -92,6 +92,7 @@ class OrderController extends BaseController
 
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);
+            $ped['ordenes']= $ped->getOrders()->get();
             $data['pedido']=$ped;
             $model=  ProviderAddress::where('prov_id',$ped->prov_id)->get();
             $pais= Array();
@@ -207,9 +208,9 @@ class OrderController extends BaseController
             'tipo_pedido_id' => 'required',
             'prov_id' => 'required',
             'pais_id' => 'required',
-            'items' => 'required'
-            //    'nro_doc' =>'required|min 20'
+            'nro_doc' =>'required'
         ]);
+
 
         if ($validator->fails()) { ///ups... erorres
 
@@ -264,22 +265,22 @@ class OrderController extends BaseController
                 $model->tasa_fija=0;
                 $model->tasa=  Monedas::findOrFail($req->prov_moneda_id)->precio_usd;
             }
-            $model->save();
+             $model->save();
 
-            for($i=0;$i<sizeof($req->items);$i++){
+            /* for($i=0;$i<sizeof($req->items);$i++){
 
-                $item= PurchaseOrder::findOrFail(trim($req->items[$i]['id']));
-                $item->pedido_id=$model->id;
-                $item->save();
-            }
+                 $item= PurchaseOrder::findOrFail(trim($req->items[$i]['id']));
+                 $item->pedido_id=$model->id;
+                 $item->save();
+             }
 
-            if ($req->has("del")) {
-                $result['data']="iset";
-                for($i=0;$i<sizeof($req->del);$i++){
-                    $item= new ProviderCondPayItem();
-                    // $item->destroy(trim($req->del[$i]));
-                }
-            }
+             if ($req->has("del")) {
+                 $result['data']="iset";
+                 for($i=0;$i<sizeof($req->del);$i++){
+                     $item= new ProviderCondPayItem();
+                     // $item->destroy(trim($req->del[$i]));
+                 }
+             }*/
 
         }
 
