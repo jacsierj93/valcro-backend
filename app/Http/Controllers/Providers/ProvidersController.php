@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\NombreValcro;
+use App\Models\Sistema\Contactos;
 use App\Models\Sistema\ProviderAddress as Address;
 use Session;
 use Validator;
@@ -38,12 +39,7 @@ class ProvidersController extends BaseController
 
     public function getProv(request $prv)
     {
-
-        //$prov = new Proveedor();
         $data = Provider::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
-        /*   foreach($data as $k => $v){
-            $v['nombreValcro']=$v->nombres_valcro()->get();
-        }*/
         $data->contraped = ($data->contraped == 1);
         return $data;
     }
@@ -101,6 +97,76 @@ class ProvidersController extends BaseController
             return [];
         }
 
+    }
+
+    public function saveValcroName(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        $valName = new NombreValcro();
+        $valName->prov_id = $req->prov_id;
+        $valName->nombre = $req->name;
+        $valName->fav = $req->fav;
+        $valName->save();
+
+        $result['id']=$valName->id;
+        return $result;
+    }
+
+    public function delValcroName(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "del","id"=>"$req->id");
+        NombreValcro::destroy($req->id);
+        return $result;
+    }
+
+    public function listValcroName($provId){
+        if($provId){
+            $valName = Provider::find($provId)->nombres_valcro()->select("id","nombre as name","fav")->get();
+            return $valName;
+        }else{
+            return [];
+        }
+    }
+
+    public function listContacProv($provId){
+        if($provId){
+            $valName = Provider::find($provId)->contacts()->get();
+            return ($valName)?$valName:[];
+        }else{
+            return [];
+        }
+    }
+
+    public function allContacts(){
+        $contacts = Contactos::get();
+        foreach($contacts as $contact){
+            $contact['provs']=$contact->contacto_proveedor()->select("siglas as prov")->get();
+        }
+        return ($contacts)?$contacts:[];
+    }
+
+    public function saveContact(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $valName = Contactos::find($req->id);
+            $result['action']="upd";
+        }else{
+            $valName = new Contactos();
+        }
+        if($valName->agente != 1){
+            $valName->email = $req->emailCont;
+            $valName->nombre = $req->nombreCont;
+            $valName->telefono = $req->contTelf;
+            $valName->responsabilidades = $req->responsability;
+            $valName->direccion = $req->dirOff;
+            $valName->agente = $req->isAgent;
+            $valName->pais_id = ($req->pais!="")?$req->pais!="":NULL;
+            $valName->id_lang = $req->languaje;
+            $valName->save();
+        }
+        if(!Provider::find($req->prov_id)->contacts()->find($valName->id)){
+            Provider::find($req->prov_id)->contacts()->attach($valName->id);
+        }
+        $result['id']=$valName->id;
+        return $result;
     }
 
 

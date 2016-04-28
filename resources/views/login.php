@@ -20,8 +20,9 @@
     <?= HTML::script("components/angular-aria/angular-aria.js") ?>
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
+    <?= HTML::script("components/angular-clickout/angular-clickout.min.js") ?>
 
-    <base href="/angular/">
+    <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>
 
 <body id="login" ng-app="MyApp" ng-cloak layout="column">

@@ -23,6 +23,11 @@ class Provider extends  Model
         return $this->hasMany('App\Models\Sistema\ProviderAddress', 'prov_id');
     }
 
+    public function contacts()
+    {
+        return $this->belongsToMany('App\Models\Sistema\Contactos', 'tbl_prov_cont', 'prov_id', 'cont_id');
+    }
+
     public function proveedor_product()
     {
         return $this->hasMany('App\Models\Sistema\Product', 'prov_id');

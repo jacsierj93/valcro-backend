@@ -1,10 +1,19 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     var historia= [15];
     var index=0;
     $scope.provSelec={
+        razon_social:'Desconocido',
+        pedidos: new Array()
+    }
+    $scope.pedidoSelec={
         id:'-1',
-        razon_social:'',
+        ordenes:'100000,0000,000,',
+        nro_doc:'',
+        tipo:-1
+
+    }
+    $scope.formData={
         pedidos: new Array()
     }
     $scope.todos = new Array();
@@ -46,16 +55,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         //carga los giltros
         $http({
             method: 'POST',
-            url: 'Order/OrderFilterData'
-        }).then(function successCallback(response) {
-            $scope.filterData.monedas=response.data.monedas;
-            $scope.filterData.tipoEnv=response.data.tipoEnvio;
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-// obtiene la lista de proveedores
-        $http({
-            method: 'POST',
             url: 'Order/OrderProvList'
         }).then(function successCallback(response) {
             $scope.todos = response.data;
@@ -73,6 +72,25 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     };
 
 
+    $scope.provSelec={
+        razon_social:''
+    }
+
+
+    function init(){
+        $http({
+            method: 'POST',
+            url: 'Order/OrderProvList'
+        }).then(function successCallback(response) {
+            $scope.todos = response.data;
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+
+
     /********************************************EVENTOS ********************************************/
     $scope.setProv= setProv;
     $scope.openLayer=openLayer;
@@ -86,7 +104,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         $http({
             method: 'POST',
             url: 'Order/OrderProvOrder',
-            data:{ id:id}
+            data:{ id:arg}
         }).then(function successCallback(response) {
             $scope.provSelec.pedidos=response.data.pedidos;
             $scope.provSelec.razon_social=response.data.proveedor.razon_social;
@@ -115,6 +133,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     function selecPedido(pedido){
         openLayer('detallePedido');
 
+
         $http({
             method: 'POST',
             url: 'Order/OrderDataForm',
@@ -133,19 +152,34 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
             console.log('monedas',response.data.monedas);
 
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-
+         }, function errorCallback(response) {
+         console.log("errorrr");
+         });
+         */
     }
 
-    function closeLayer(){
+    $scope.closeLayer= function (){
         var layer=historia[index];
         index--;
         $mdSidenav(layer).close();
+
+
+
     }
     /*******por integrar***/
     $scope.setPed= function(ped){
-        openLayer(ped);
+        $mdSidenav(ped).close().then(function(){
+            $mdSidenav(ped).open();
+        });
+        index++;
+        historia[index]=ped;
     }
+
+    MyApp.factory('masters', ['$resource',
+        function ($resource) {
+            return $resource('master/:type', {}, {
+                query: {method: 'GET', params: {type: ""}, isArray: true},
+            });
+        }
+    ]);
 });
