@@ -188,7 +188,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex >
 
-                <form name="detallePedido">
+                <form name="FormdetallePedido">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -219,20 +219,20 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
-                            <input required md-no-asterisk name="nro_doc"
+                            <input required  name="nro_doc"
                                    ng-model="pedidoSelec.nro_doc" ng-disabled="pedidoSelec.nro_doc">
                         </md-input-container>
                     </div>
 
                     <div layout="row"  class=rowInput>
-                        <md-input-container class="md-block" >
+                        <!--<md-input-container class="md-block" >
                             <label>Proveedor</label>
                             <md-select ng-model="id" name ="prov_id" ng-disabled="status == 2">
                                 <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                     {{prov.razon_social}}
                                 </md-option>
                             </md-select>
-                        </md-input-container>
+                        </md-input-container>-->
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>

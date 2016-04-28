@@ -19,11 +19,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     $scope.paisProv= new Array();
     $scope.aprobacionGerente = $scope.provSelec.aprob_gerencia;
 
-
-    $scope.pedidoSelec={
-        estado:0   // no se le a asignado valor
-    }
-
+    /*
+     $scope.pedidoSelec={
+     }
+     */
 
     $scope.filterData={
         monedas: new Array(),
@@ -89,16 +88,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
     // abirti un layer
     function openLayer(layer){
-        var base =288;
         index++;
-        /*
-         var newsize =288+(24*index);
-         console.log('new size',newsize);
-         var layer=$("#"+layer);
-         // layer.css('width',"'"+newsize+"'");*/
         $mdSidenav(layer).open();
         historia[index]=layer;
-
     }
 
     function selecPedido(pedido){
@@ -110,9 +102,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
             data:{ id:pedido.id}
         }).then(function successCallback(response) {
             $scope.pedidoSelec=response.data.pedido;
-            $scope.detallePedido.$setPristine();
-            $scope.pedidoSelec.estado=1; // cargado
-
             $scope.formData.tipo=response.data.tipoPedido;
             $scope.formData.monedas=response.data.monedas;
             $scope.formData.motivoPedido=response.data.motivoPedido;
@@ -121,8 +110,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
             $scope.formData.condicionPedido=response.data.condicionPedido;
             $scope.formData.paises= response.data.paises;
             $scope.formData.aprob_gerencia= response.data.aprob_gerencia;
-
-            console.log('monedas',response.data.monedas);
 
         }, function errorCallback(response) {
             console.log("errorrr");
@@ -141,38 +128,35 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         openLayer(ped);
 
     }
-
-    //detalle de pedido
-    $scope.$watch('pedidoSelec.estado', function(newVal, oldVal) {
-        console.log(' se mode', newVal);
-            if(newVal  == 1){
-
-            }
-        pedidoSelec.estado=2;
-        }
-    );
+    var i=0;
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
-    $scope.$watchGroup(['detallePedido.$valid','detallePedido.$pristine'], function(nuevo) {
-        console.log('form',nuevo);
+    $scope.$watchGroup(['FormdetallePedido.$valid','FormdetallePedido.$pristine'], function(nuevo) {
+        //alert(nuevo);
+        i++;
+        console.log('estado',nuevo);
         if(nuevo[0] && !nuevo[1]) {
-           save();
+            console.log('peddio',$scope.pedidoSelec);
+            saveDetaillPedido();
         }
+        console.log('i', i);
     });
 
     /*************************Guardado*************************************************/
-    $scope.saveDetaillPedido=saveDetaillPedido;
+    //$scope.saveDetaillPedido=saveDetaillPedido;
     function saveDetaillPedido (){
 
-        //carga los giltros
-        $http({
-            method: 'POST',
-            url: 'Order/Save',
-            data:$scope.pedidoSelec
-        }).then(function successCallback(response) {
+        if($scope.pedidoSelec.id){
+            console.log('send pedido ',$scope.pedidoSelec);
+            $http({
+                method: 'POST',
+                url: 'Order/Save',
+                data:$scope.pedidoSelec
+            }).then(function successCallback(response) {
+                $scope.FormdetallePedido.$setPristine();
 
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
+            }, function errorCallback(response) {
+                console.log("errorrr");
+            });}
     }
 });

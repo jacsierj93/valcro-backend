@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Models\Sistema\Provider;
+use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Monedas;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Order\OrderType;
@@ -16,6 +17,7 @@ use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
+//PaymentType
 
 class OrderController extends BaseController
 {
@@ -89,6 +91,7 @@ class OrderController extends BaseController
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
+        $data['tipoDepago'] = PaymentType::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         //
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);
