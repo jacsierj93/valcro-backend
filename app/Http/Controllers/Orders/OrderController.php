@@ -52,17 +52,6 @@ class OrderController extends BaseController
         return $data;
     }
 
-    /***/
-    public function getFilterData()
-    {
-
-        $data= Array();
-        $data['monedas']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
-        $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
-
-        return $data;
-    }
-
     /**
      * regresa la lista de pedidos segun id del provedor
      */
