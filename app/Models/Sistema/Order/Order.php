@@ -26,7 +26,7 @@ class Order extends Model
     /**
      */
     public function getOrders(){
-        return $this->hasMany('App\Models\Sistema\Order\PurchaseOrder', 'pedido_id');
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrder', 'pedido_id');
     }
 
     /**
@@ -34,10 +34,10 @@ class Order extends Model
     public function getTypeOrder(){
         return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
     }
-
+/*
     public function getEmisionAttribute($value)
     {
         return date("d/m/Y", strtotime($value));;
-    }
+    }*/
 
 }

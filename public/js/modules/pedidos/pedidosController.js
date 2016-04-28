@@ -3,17 +3,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     var historia= [15];
     var index=0;
     $scope.provSelec={
-        razon_social:'Desconocido',
-        pedidos: new Array()
-    }
-    $scope.pedidoSelec={
         id:'-1',
-        ordenes:'100000,0000,000,',
-        nro_doc:'',
-        tipo:-1
-
-    }
-    $scope.formData={
+        razon_social:'',
         pedidos: new Array()
     }
     $scope.todos = new Array();
@@ -26,7 +17,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.prioridadPed = new Array();
     $scope.condicionPed= new Array();
     $scope.paisProv= new Array();
-    //$scope.aprobacionGerente = $scope.pedidoSelec.aprob_gerencia;
+    $scope.aprobacionGerente = $scope.provSelec.aprob_gerencia;
 
     $scope.status = 0;
     $scope.selec = function(status) {
@@ -55,29 +46,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         //carga los giltros
         $http({
             method: 'POST',
-            url: 'Order/OrderProvList'
+            url: 'Order/OrderFilterData'
         }).then(function successCallback(response) {
-            $scope.todos = response.data;
-
+            $scope.filterData.monedas=response.data.monedas;
+            $scope.filterData.tipoEnv=response.data.tipoEnvio;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
-    }
-    $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
-
-    $scope.envios = masters.query({ type:"getProviderTypeSend"});
-
-    $scope.data = {
-        cb1: true
-    };
-
-
-    $scope.provSelec={
-        razon_social:''
-    }
-
-
-    function init(){
+// obtiene la lista de proveedores
         $http({
             method: 'POST',
             url: 'Order/OrderProvList'
@@ -88,8 +64,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             console.log("errorrr");
         });
     }
-
-
 
     /********************************************EVENTOS ********************************************/
     $scope.setProv= setProv;
@@ -133,7 +107,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     function selecPedido(pedido){
         openLayer('detallePedido');
 
-
         $http({
             method: 'POST',
             url: 'Order/OrderDataForm',
@@ -148,38 +121,59 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             $scope.formData.condicionPedido=response.data.condicionPedido;
             $scope.formData.paises= response.data.paises;
             $scope.formData.tipoDepago= response.data.tipoDepago;
+            $scope.formData.aprob_gerencia= response.data.aprob_gerencia;
 
 
-            console.log('monedas',response.data.monedas);
 
-         }, function errorCallback(response) {
-         console.log("errorrr");
-         });
-         */
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+
     }
 
-    $scope.closeLayer= function (){
+    function closeLayer(){
         var layer=historia[index];
         index--;
         $mdSidenav(layer).close();
-
-
-
+    }
+    $scope.setPed= function(ped){
+        openLayer(ped);
     }
     /*******por integrar***/
     $scope.setPed= function(ped){
-        $mdSidenav(ped).close().then(function(){
-            $mdSidenav(ped).open();
-        });
-        index++;
-        historia[index]=ped;
-    }
 
-    MyApp.factory('masters', ['$resource',
-        function ($resource) {
-            return $resource('master/:type', {}, {
-                query: {method: 'GET', params: {type: ""}, isArray: true},
-            });
+        openLayer(ped);
+
+    }
+    var i=0;
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['FormdetallePedido.$valid','FormdetallePedido.$pristine'], function(nuevo) {
+        //alert(nuevo);
+        i++;
+        console.log('estado',nuevo);
+        if(nuevo[0] && !nuevo[1]) {
+            console.log('peddio',$scope.pedidoSelec);
+            saveDetaillPedido();
         }
-    ]);
+        console.log('i', i);
+    });
+
+    /*************************Guardado*************************************************/
+    //$scope.saveDetaillPedido=saveDetaillPedido;
+    function saveDetaillPedido (){
+
+        if($scope.pedidoSelec.id){
+            console.log('send pedido ',$scope.pedidoSelec);
+            $http({
+                method: 'POST',
+                url: 'Order/Save',
+                data:$scope.pedidoSelec
+            }).then(function successCallback(response) {
+                $scope.FormdetallePedido.$setPristine();
+
+            }, function errorCallback(response) {
+                console.log("errorrr");
+            });}
+
 });

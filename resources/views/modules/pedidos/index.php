@@ -36,22 +36,22 @@
             <div layout="column" layout-align="center center" flex="25" >
                 <md-input-container class="md-block" >
                     <label>Proveedor</label>
-                    <md-select ng-model="dtaPrv.type" name ="state">
-                        <md-option ng-repeat="state in states" value="{{state.id}}">
-                            {{state.nombre}}
+                    <md-select ng-model="id" name ="prov_id">
+                        <md-option ng-repeat="prov in todos" value="{{prov.id}}">
+                            {{prov.razon_social}}
                         </md-option>
                     </md-select>
 
-                </md-input-container>
-            </div>
-            <div layout="column" layout-align="center center" flex="25">
-                <md-input-container class="md-block" >
-                    <label>Moneda</label>
-                    <md-select ng-model="dtaPrv.type" name ="state">
-                        <md-option ng-repeat="state in states" value="{{state.id}}">
-                            {{state.nombre}}
-                        </md-option>
-                    </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="column" layout-align="center center" flex="25">
+                    <md-input-container class="md-block" >
+                        <label>Moneda</label>
+                        <md-select ng-model="pedidoSelec.prov_moneda_id" >
+                            <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
+                                {{moneda.nombre}}
+                            </md-option>
+                        </md-select>
 
                 </md-input-container>
             </div>
@@ -59,8 +59,8 @@
                 <md-input-container class="md-block" >
                     <label>Tipo envio</label>
                     <md-select ng-model="dtaPrv.type" name ="state">
-                        <md-option ng-repeat="state in states" value="{{state.id}}">
-                            {{state.nombre}}
+                        <md-option ng-repeat="env in filterData.tipoEnv" value="{{env.id}}">
+                            {{env.nombre}}
                         </md-option>
                     </md-select>
 
@@ -76,6 +76,7 @@
             </div>
         </div>
     </div><!---fin menu-->
+    </form>
 
     <div class="contentHolder" layout="row" flex>
 
@@ -85,44 +86,42 @@
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
             <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item.id)">
 
-                <div class="boxList" layout="column" flex >
+                <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
-
-                    <div layout="row" style="height: 40px;">
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
-                                85
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
-                                85
-                            </div>
+                <div layout="row" style="height: 40px;">
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
+                            85
                         </div>
                     </div>
-                    <div style="height:40px;" layout="row" layout-align="start end">
-                        <div flex="">$1000</div>
-                        <div flex="">860</div>
-                        <div flex="" layout="row">
-                            <div style="margin: 4px;">860</div>
-                            <img  style="float: left;" src="images/contra_pedido.png"/>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
+                            85
                         </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
+                            85
+                        </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
+                            85
+                        </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
+                            85
+                        </div>
+                    </div>
+                </div>
+                <div style="height:40px;" layout="row" layout-align="start end">
+                    <div flex="">$1000</div>
+                    <div flex="">860</div>
+                    <div flex="" layout="row">
+                        <div style="margin: 4px;">860</div>
+                        <img  style="float: left;" src="images/contra_pedido.png"/>
+                    </div>
 
 
                 </div>
@@ -130,8 +129,9 @@
             </div>
 
         </md-content>
+
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
             <?= HTML::image("images/btn_prevArrow.png") ?>
         </div>
@@ -144,7 +144,7 @@
             Selecciones un Proveedor
         </div>
 
-        <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
+        <!-- 10) ########################################## LAYER (1) lista de pedidos########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -165,7 +165,7 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div id="grid" ng-repeat="pedido in provSelec.pedidos">
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="selecPedido(pedido)">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
@@ -187,7 +187,8 @@
         <!-- 11) ########################################## LAYER (2) FORMULARIO INFORMACION DEL pedido ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex >
-                <form name="detallePedido">
+
+                <form name="FormdetallePedido">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -198,8 +199,11 @@
                         <div  flex="15" class="md-block" style=" color: #999999;" >
                             Ordenes de Compra:
                         </div>
-                        <div flex=""   class="md-block" style=" color: #999999;"  ng-click="setPed('odc')">
-                            {{pedidoSelec.ordenes}}
+                        <div flex=""   class="md-block"  style="overflow: hidden;" ng-click="setPed('odc')">
+                            <div ng-repeat="orden in pedidoSelec.ordenes" ng-disabled="status == 2">
+                                {{orden.nro_orden}}
+                            </div>
+
                         </div>
                     </div>
 
@@ -207,7 +211,7 @@
                         <md-input-container class="md-block" flex="30">
                             <label>Tipo de Pedido</label>
                             <md-select ng-model="pedidoSelec.tipo_pedido_id" name ="tipo_pedido_id" ng-value="{{pedidoSelec.tipo_pedido_id}}">
-                                <md-option ng-repeat="tipo in formData.tipo" ng-value="{{tipo.id}}" ng-disabled="status == 2">
+                                <md-option ng-repeat="tipo in formData.tipo" ng-value="{{tipo.id}}">
                                     {{tipo.tipo}}
                                 </md-option>
                             </md-select>
@@ -215,15 +219,15 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
-                                   ng-model="pedidoSelec.nro_doc">
+                            <input required  name="nro_doc"
+                                   ng-model="pedidoSelec.nro_doc" ng-disabled="pedidoSelec.nro_doc">
                         </md-input-container>
                     </div>
 
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block" flex="40">
                             <label>Proveedor</label>
-                            <md-select ng-model="id" name ="prov_id" ng-disabled="status == 2">
+                            <md-select ng-model="id" name ="prov_id">
                                 <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                     {{prov.razon_social}}
                                 </md-option>
@@ -254,7 +258,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="20">
                             <label>Monto</label>
-                            <input maxlength="6" ng-model="pedidoSelec.monto" name="monto" ng-minlength="3" ng-disabled="status == 2">
+                            <input  ng-model="pedidoSelec.monto" name="monto"  ng-disabled="status == 2">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -272,7 +276,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Tasa</label>
-                            <input maxlength="6" ng-model="pedidoSelec.tasa" name ="tasa"  ng-minlength="3" ng-disabled="status == 2">
+                            <input  ng-model="pedidoSelec.tasa" name ="tasa" ng-disabled="status == 2">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -282,7 +286,7 @@
                         <div layout="row" flex="" >
                             <md-input-container class="md-block" flex="20">
                                 <label>Fijar tasa</label>
-                                <input maxlength="6"  name="tasa" ng-minlength="3"  >
+                                <input   name="tasa"  ng-disabled="status == 2" >
                                 <!--<div ng-messages="projectForm.siglas.$error">
                                     <div ng-message="required">Obligatorio.</div>
                                     <div ng-message="md-maxlength">maximo 4</div>
@@ -351,7 +355,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="20">
                             <label>Mt3</label>
-                            <input ng-model="pedidoSelec.mt3" maxlength="6"  name="mt3" ng-minlength="3" ng-disabled="status == 2">
+                            <input ng-model="pedidoSelec.mt3"  name="mt3"  ng-disabled="status == 2">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -360,7 +364,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Peso</label>
-                            <input ng-model="pedidoSelec.peso" maxlength="6"  name="peso" ng-minlength="3" ng-disabled="status == 2">
+                            <input ng-model="pedidoSelec.peso" name="peso" ng-disabled="status == 2">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -374,7 +378,7 @@
                         </div>
                     </div>
 
-                    <div layout="row" >
+                <div layout="row" >
 
                     <md-input-container class="md-block" flex="">
                         <label>Estatus</label>
@@ -420,7 +424,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° Documento</label>
-                            <input maxlength="6"  name="nro_doc_pay" ng-minlength="3"  >
+                            <input maxlength="6"  name="nro_doc_pay" ng-minlength="3"  nng-disabled="status == 2">
 
                         </md-input-container>
 
@@ -455,6 +459,7 @@
                             </div>-->
                         </md-input-container>
                     </div>
+                    </form>
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -639,26 +644,26 @@
             <md-content  layout="row" style="'margin-top:0px;'" layout-padding flex>
 
                 <!--<div class="titulo_formulario" layout="row" flex>-->
-                        <div layout="column" flex>
-                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
-                                <div>
-                                    Contrapedidos
-                                </div>
-                                <div ng-click="setPed('agrContPed')">
-                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
-                                </div>
-                            </div>
-
+                <div layout="column" flex>
+                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                        <div>
+                            Contrapedidos
                         </div>
-                        <div layout="Column" flex>
-                            <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
-                                <div>
-                                   Kitchen Boxs
-                                </div>
-                                <div ng-click="setPed('agrKitBoxs')">
-                                    <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
-                                </div>
-                            </div>
+                        <div ng-click="setPed('agrContPed')">
+                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+                        </div>
+                    </div>
+
+                </div>
+                <div layout="Column" flex>
+                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                        <div>
+                            Kitchen Boxs
+                        </div>
+                        <div ng-click="setPed('agrKitBoxs')">
+                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                        </div>
+                    </div>
 
                 </div>
                 <div layout="Column" flex>

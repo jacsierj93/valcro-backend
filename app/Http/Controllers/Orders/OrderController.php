@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Models\Sistema\Provider;
+use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Monedas;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Order\OrderType;
@@ -16,6 +17,7 @@ use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
+//PaymentType
 
 class OrderController extends BaseController
 {
@@ -89,9 +91,11 @@ class OrderController extends BaseController
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
-
+        $data['tipoDepago'] = PaymentType::select('descripcion', 'id')->where("deleted_at",NULL)->get();
+        //
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);
+            $ped['ordenes']= $ped->getOrders()->get();
             $data['pedido']=$ped;
             $model=  ProviderAddress::where('prov_id',$ped->prov_id)->get();
             $pais= Array();
@@ -207,8 +211,7 @@ class OrderController extends BaseController
             'tipo_pedido_id' => 'required',
             'prov_id' => 'required',
             'pais_id' => 'required',
-            'items' => 'required'
-            //    'nro_doc' =>'required|min 20'
+            'nro_doc' =>'required'
         ]);
 
         if ($validator->fails()) { ///ups... erorres
@@ -264,22 +267,22 @@ class OrderController extends BaseController
                 $model->tasa_fija=0;
                 $model->tasa=  Monedas::findOrFail($req->prov_moneda_id)->precio_usd;
             }
-            $model->save();
+             $model->save();
 
-            for($i=0;$i<sizeof($req->items);$i++){
+            /* for($i=0;$i<sizeof($req->items);$i++){
 
-                $item= PurchaseOrder::findOrFail(trim($req->items[$i]['id']));
-                $item->pedido_id=$model->id;
-                $item->save();
-            }
+                 $item= PurchaseOrder::findOrFail(trim($req->items[$i]['id']));
+                 $item->pedido_id=$model->id;
+                 $item->save();
+             }
 
-            if ($req->has("del")) {
-                $result['data']="iset";
-                for($i=0;$i<sizeof($req->del);$i++){
-                    $item= new ProviderCondPayItem();
-                    // $item->destroy(trim($req->del[$i]));
-                }
-            }
+             if ($req->has("del")) {
+                 $result['data']="iset";
+                 for($i=0;$i<sizeof($req->del);$i++){
+                     $item= new ProviderCondPayItem();
+                     // $item->destroy(trim($req->del[$i]));
+                 }
+             }*/
 
         }
 

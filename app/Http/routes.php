@@ -222,7 +222,7 @@ $app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'
 
 // pedidos
 $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
-$app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///trae la data de los filtros
+$app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///lista de todos los proveedores
 $app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
 $app->post("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
@@ -235,5 +235,3 @@ $app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el ped
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido
 $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
-
-//getProviderOrder

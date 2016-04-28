@@ -1,5 +1,9 @@
+/.gitignore
 /.idea
 /vendor
 /config/database.php
 /public/components
-/public/.htaccces
+/public/.htaccess
+/resources/views/home.php
+/resources/views/index.php
+/resources/views/login.php
