@@ -47,8 +47,8 @@
             <div layout="column" layout-align="center center" flex="25">
                 <md-input-container class="md-block" >
                     <label>Moneda</label>
-                    <md-select ng-model="id_moneda" name ="id_moneda">
-                        <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}">
+                    <md-select ng-model="pedidoSelec.prov_moneda_id" >
+                        <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
                             {{moneda.nombre}}
                         </md-option>
                     </md-select>
@@ -59,8 +59,8 @@
                 <md-input-container class="md-block" >
                     <label>Tipo envio</label>
                     <md-select ng-model="dtaPrv.type" name ="state">
-                        <md-option ng-repeat="state in states" value="{{state.id}}">
-                            {{state.nombre}}
+                        <md-option ng-repeat="env in filterData.tipoEnv" value="{{env.id}}">
+                            {{env.nombre}}
                         </md-option>
                     </md-select>
 
@@ -130,7 +130,7 @@
         </md-content>
 
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
             <?= HTML::image("images/btn_prevArrow.png") ?>
         </div>

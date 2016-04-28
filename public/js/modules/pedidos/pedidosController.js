@@ -23,12 +23,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     $scope.pedidoSelec={
     }
 
-    /*
+
     $scope.filterData={
         monedas: new Array(),
         tipoEnv: new Array()
     }
-*/
+
     $scope.formData={
         pedidos: new Array(),
         tipo: new Array(),
@@ -43,10 +43,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
             method: 'POST',
             url: 'Order/OrderFilterData'
         }).then(function successCallback(response) {
-           /* $scope.filterData.monedas=response.data.monedas;
-            $scope.filterData.tipoEnv=response.data.tipoEnvio;*/
-
-            console.log('filtros', response)
+            $scope.filterData.monedas=response.data.monedas;
+            $scope.filterData.tipoEnv=response.data.tipoEnvio;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -111,15 +109,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
     function selecPedido(pedido){
         openLayer('detallePedido');
-        /* $scope.id_moneda=pedido.prov_moneda_id;
-         $scope.direccion= pedido.direccion_almacen_id;
-         $scope.motPed= pedido.motivo_pedido_id;
-         $scope.condPago= pedido.condicion_pago_id;
-         $scope.prioridadPed= pedido.prioridad_id;
-         //$scope.condicionPed= pedido.condicion_pedido_id;
-         $scope.paisProv= pedido.pais_id;
-         $scope.aprobacionGerente = pedido.aprob_gerencia;*/
-        //get de pedidos
+
         $http({
             method: 'POST',
             url: 'Order/OrderDataForm',
