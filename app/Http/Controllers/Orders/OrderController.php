@@ -92,6 +92,7 @@ class OrderController extends BaseController
         //
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);
+            $ped['ordenes']= $ped->getOrders()->get();
             $data['pedido']=$ped;
             $model=  ProviderAddress::where('prov_id',$ped->prov_id)->get();
             $pais= Array();
