@@ -52,6 +52,17 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /***/
+    public function getFilterData()
+    {
+
+        $data= Array();
+        $data['monedas']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
+        $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
+
+        return $data;
+    }
+
     /**
      * regresa la lista de pedidos segun id del provedor
      */
@@ -89,10 +100,9 @@ class OrderController extends BaseController
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
-
+        //
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);
-            $ped['ordenes']= $ped->getOrders()->get();
             $data['pedido']=$ped;
             $model=  ProviderAddress::where('prov_id',$ped->prov_id)->get();
             $pais= Array();
@@ -210,7 +220,6 @@ class OrderController extends BaseController
             'pais_id' => 'required',
             'nro_doc' =>'required'
         ]);
-
 
         if ($validator->fails()) { ///ups... erorres
 
