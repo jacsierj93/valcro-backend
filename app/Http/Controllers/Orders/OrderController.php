@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Orders;
 
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\Monedas;
+use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Order\OrderType;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Order\Order;
@@ -15,7 +16,6 @@ use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
-
 
 class OrderController extends BaseController
 {
@@ -41,11 +41,26 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /***/
+    public function getFilterData()
+    {
+
+        $data= Array();
+        $data['proveedor']= Provider::select('razon_social', 'id')->where("deleted_at",NULL)->get();
+        $data['proveedor']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
+        $data['proveedor']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
+
+        return $data;
+    }
+
     /**
      * regresa la lista de pedidos segun id del provedor
      */
     public function getProviderListOrder(Request $req)
     {
+        $data=Array();
+
+        $prov=Provider::findOrFail($req->id);
         $orders= Provider::findOrFail($req->id)->getOrders()
             //   ->select('id','nro_doc','nro_proforma', 'emision', 'nro_factura', 'monto', 'tipo_pedido_id')
             ->get();
@@ -54,7 +69,10 @@ class OrderController extends BaseController
             $orders[$i]['tipo']=OrderType::findOrFail($orders[$i]->tipo_pedido_id)->first()->tipo;
             $i++;
         }
-        return $orders;
+        $data['pedidos']=$orders;
+        $data['proveedor']=$prov;
+
+        return $data;
 
     }
 
@@ -72,10 +90,36 @@ class OrderController extends BaseController
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
-        //
-        if ($req->has('id')) {
 
-            $data['pedido'] = Order::findOrFail($req->id);
+
+
+        if ($req->has('id')) {
+            $ped = Order::findOrFail($req->id);
+            $data['pedido']=$ped;
+            $model=  ProviderAddress::where('prov_id',$ped->prov_id)->get();
+            $pais= Array();
+            foreach( $model as $aux){
+                $pais[]= $aux->country()->first();
+
+            }
+            $data['paises']= $pais;
+            $data['monedas'] = Provider::findOrFail($ped->prov_id)->first()->getProviderCoin()->get();
+            $auxCond=Provider::findOrFail($ped->prov_id)->first()->getPaymentCondition()->get();
+            $cond= Array();
+            $i=0;
+            $text='';
+            foreach( $auxCond as $aux){
+                $cond[$i]['id']= $aux->id;
+                foreach( $aux->getItems()->get() as $aux2){
+                    $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+                }
+                $cond[$i]['titulo']= $text;
+                $text='';
+                $i++;
+            }
+
+            $data['condicionPago']=$cond;
+
         }
 
 
