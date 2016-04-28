@@ -219,7 +219,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
-                            <input required  name="nro_doc"
+                            <input  name="nro_doc"
                                    ng-model="pedidoSelec.nro_doc" ng-disabled="pedidoSelec.nro_doc">
                         </md-input-container>
                     </div>
@@ -300,14 +300,12 @@
                             </div>
                         </div>
 
-
-
                     </div>
 
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
-                            <md-select ng-model="pedidoSelec.condicion_pago_id" name ="condicion_pago_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2">
                                 <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
                                     {{conPago.titulo}}
                                 </md-option>
@@ -318,7 +316,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Motivo Pedido </label>
-                            <md-select ng-model="pedidoSelec.motivo_pedido_id" name ="motivo_pedido_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.motivo_pedido_id"  ng-disabled="status == 2">
                                 <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
                                     {{motivoPed.motivo}}
                                 </md-option>
@@ -326,7 +324,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Prioridad Pedido </label>
-                            <md-select  ng-model="pedidoSelec.prioridad_id" name ="prioridad_id" ng-disabled="status == 2">
+                            <md-select  ng-model="pedidoSelec.prioridad_id"  ng-disabled="status == 2">
                                 <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
                                     {{prioPed.descripcion}}
                                 </md-option>
@@ -334,7 +332,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Condiciones Pedido </label>
-                            <md-select ng-model="pedidoSelec.condicion_pedido_id" name ="condicion_pedido_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.condicion_pedido_id" ng-disabled="status == 2">
                                 <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
                                     {{condPed.nombre}}
                                 </md-option>
@@ -344,7 +342,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex >
                             <label>Comentario</label>
-                            <input ng-model="pedidoSelec.comentario" maxlength="6"  name="comentario" ng-disabled="status == 2">
+                            <input ng-model="pedidoSelec.comentario"  ng-disabled="status == 2">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -371,6 +369,8 @@
                             </div>-->
                         </md-input-container>
                     </div>
+
+                    </form>
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -541,7 +541,7 @@
             <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
-                <form name="projectForm" >
+                <form name="resumenOdc" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -684,7 +684,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrContPed">
             <!-- ) ########################################## CONTENDOR Agregar Contrapedidos ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <form name="projectForm" ng-controller="PedidosCtrll">
+                <form name="addContraPedidos" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -755,7 +755,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPedPend">
             <!-- ) ########################################## CONTENDOR  Pedidos Pendientes # ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <form name="projectForm" >
+                <form name="gridPagosPendientes" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
