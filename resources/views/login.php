@@ -22,7 +22,7 @@
     <?= HTML::script("components/angular-material/angular-material.js") ?>
     <?= HTML::script("components/angular-clickout/angular-clickout.min.js") ?>
 
-    <base href="/angular/">
+    <base href="/valcro-backend/public/">
 </head>
 
 <body id="login" ng-app="MyApp" ng-cloak layout="column">

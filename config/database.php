@@ -33,7 +33,7 @@ return array(
         # base de datos viejo sistema valcro
         'valcro2' => array(
             'driver'    => 'mysql',
-            'host'      => 'localhost',
+            'host'      => '10.16.2.106',
             'database'  => 'valcro_db2',
             'username'  => 'userVal',
             'password'  => 'ntmJX2zn92CQFc6P',
