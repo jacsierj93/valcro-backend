@@ -433,7 +433,7 @@
         </md-sidenav>
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="contactProv">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                     <div>
                         Contactos Existentes
