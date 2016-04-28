@@ -502,7 +502,7 @@
             <!--) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
-                <form name="projectForm" ng-controller="PedidosCtrll">
+                <form name="gridPedidos">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -541,7 +541,7 @@
             <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
-                <form name="projectForm" ng-controller="PedidosCtrll">
+                <form name="projectForm" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -713,11 +713,12 @@
                 </form>
             </md-content>
         </md-sidenav>
+
         <!-- 16) ########################################## LAYER (7) Agregar KITCHEN BOXS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrKitBoxs">
             <!-- ) ########################################## CONTENDOR Agregar KITCHEN BOXS ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <form name="projectForm" ng-controller="PedidosCtrll">
+                <form name="KitchenBoxs" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -754,7 +755,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPedPend">
             <!-- ) ########################################## CONTENDOR  Pedidos Pendientes # ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <form name="projectForm" ng-controller="PedidosCtrll">
+                <form name="projectForm" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>

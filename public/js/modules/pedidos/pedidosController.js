@@ -78,7 +78,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         $http({
             method: 'POST',
             url: 'Order/OrderProvOrder',
-            data:{ id:arg}
+            data:{ id:id}
         }).then(function successCallback(response) {
             $scope.provSelec.pedidos=response.data.pedidos;
             $scope.provSelec.razon_social=response.data.proveedor.razon_social;
@@ -174,6 +174,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
             }, function errorCallback(response) {
                 console.log("errorrr");
-            });}
+            });
+        }
+    }
 
 });
