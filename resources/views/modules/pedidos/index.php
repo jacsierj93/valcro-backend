@@ -164,7 +164,7 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div id="grid" ng-repeat="pedido in provSelec.pedidos">
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="selecPedido(pedido)">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
@@ -453,7 +453,7 @@
                             Compromiso
                         </div>
                     </div>
-                </div>
+
                 <form name="compromiso">
 
                     <div layout="row"  flex="" >

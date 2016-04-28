@@ -8,8 +8,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         pedidos: new Array()
     }
     $scope.todos = new Array();
-    $scope.monedas = new Array();// nop controler
-    $scope.tipoEnv = new Array();//no controller
     $scope.todos = new Array();
     $scope.id= $scope.provSelec.id;
     $scope.id_moneda='-1';
@@ -23,29 +21,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
 
 
     $scope.pedidoSelec={
-        id:'-1',
-        ordenes_compra:new Array(),
-        tipo_pedido_id:'',
-        pais_id:'',
-        almacen_id:'',
-        prov_moneda_id:'',
-        direccion_almacen_id:'',
-        condicion_pago_id:'',
-        motivo_pedido_id:'',
-        motivo_id:'',
-        prioridad_id:'',
-        nro_doc:'',
-        prov_id:'',
-        monto:'',
-        tasa:'',
-        tasa_fija:false,
-        comentario:'',
-        mt3:'',
-        peso:'',
-        aprob_gerencia:false,
-        fecha_aprob:null
-
     }
+
+    /*
+    $scope.filterData={
+        monedas: new Array(),
+        tipoEnv: new Array()
+    }
+*/
     $scope.formData={
         pedidos: new Array(),
         tipo: new Array(),
@@ -55,6 +38,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     init();
 
     function init(){
+        //carga los giltros
+        $http({
+            method: 'POST',
+            url: 'Order/OrderFilterData'
+        }).then(function successCallback(response) {
+           /* $scope.filterData.monedas=response.data.monedas;
+            $scope.filterData.tipoEnv=response.data.tipoEnvio;*/
+
+            console.log('filtros', response)
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+// obtiene la lista de proveedores
         $http({
             method: 'POST',
             url: 'Order/OrderProvList'
@@ -72,19 +68,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     $scope.data = {
         cb1: true
     };
-
-    function init(){
-        $http({
-            method: 'POST',
-            url: 'Order/OrderProvList'
-        }).then(function successCallback(response) {
-            $scope.todos = response.data;
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-
 
 
     /********************************************EVENTOS ********************************************/
@@ -105,7 +88,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
             $scope.provSelec.pedidos=response.data.pedidos;
             $scope.provSelec.razon_social=response.data.proveedor.razon_social;
 
-            console.log(response);
+            // console.log(response);
 
         }, function errorCallback(response) {
             console.log("errorrr");
@@ -118,45 +101,45 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         var base =288;
         index++;
         /*
-        var newsize =288+(24*index);
-        console.log('new size',newsize);
-        var layer=$("#"+layer);
-       // layer.css('width',"'"+newsize+"'");*/
+         var newsize =288+(24*index);
+         console.log('new size',newsize);
+         var layer=$("#"+layer);
+         // layer.css('width',"'"+newsize+"'");*/
         $mdSidenav(layer).open();
         historia[index]=layer;
     }
 
     function selecPedido(pedido){
         openLayer('detallePedido');
-       /* $scope.id_moneda=pedido.prov_moneda_id;
-        $scope.direccion= pedido.direccion_almacen_id;
-        $scope.motPed= pedido.motivo_pedido_id;
-        $scope.condPago= pedido.condicion_pago_id;
-        $scope.prioridadPed= pedido.prioridad_id;
-        //$scope.condicionPed= pedido.condicion_pedido_id;
-        $scope.paisProv= pedido.pais_id;
-        $scope.aprobacionGerente = pedido.aprob_gerencia;*/
+        /* $scope.id_moneda=pedido.prov_moneda_id;
+         $scope.direccion= pedido.direccion_almacen_id;
+         $scope.motPed= pedido.motivo_pedido_id;
+         $scope.condPago= pedido.condicion_pago_id;
+         $scope.prioridadPed= pedido.prioridad_id;
+         //$scope.condicionPed= pedido.condicion_pedido_id;
+         $scope.paisProv= pedido.pais_id;
+         $scope.aprobacionGerente = pedido.aprob_gerencia;*/
         //get de pedidos
-         $http({
-         method: 'POST',
-         url: 'Order/OrderDataForm',
-         data:{ id:pedido.id}
-         }).then(function successCallback(response) {
+        $http({
+            method: 'POST',
+            url: 'Order/OrderDataForm',
+            data:{ id:pedido.id}
+        }).then(function successCallback(response) {
             $scope.pedidoSelec=response.data.pedido;
-             $scope.formData.tipo=response.data.tipoPedido;
-             $scope.formData.monedas=response.data.monedas;
-             $scope.formData.motivoPedido=response.data.motivoPedido;
-             $scope.formData.condicionPago=response.data.condicionPago;
-             $scope.formData.prioridadPedido=response.data.prioridadPedido;
-             $scope.formData.condicionPedido=response.data.condicionPedido;
-             $scope.formData.paises= response.data.paises;
-             $scope.formData.aprob_gerencia= response.data.aprob_gerencia;
+            $scope.formData.tipo=response.data.tipoPedido;
+            $scope.formData.monedas=response.data.monedas;
+            $scope.formData.motivoPedido=response.data.motivoPedido;
+            $scope.formData.condicionPago=response.data.condicionPago;
+            $scope.formData.prioridadPedido=response.data.prioridadPedido;
+            $scope.formData.condicionPedido=response.data.condicionPedido;
+            $scope.formData.paises= response.data.paises;
+            $scope.formData.aprob_gerencia= response.data.aprob_gerencia;
 
             console.log('monedas',response.data.monedas);
 
-         }, function errorCallback(response) {
-         console.log("errorrr");
-         });
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
 
     }
 

@@ -46,9 +46,8 @@ class OrderController extends BaseController
     {
 
         $data= Array();
-        $data['proveedor']= Provider::select('razon_social', 'id')->where("deleted_at",NULL)->get();
-        $data['proveedor']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
-        $data['proveedor']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
+        $data['monedas']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
+        $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
 
         return $data;
     }
@@ -90,8 +89,6 @@ class OrderController extends BaseController
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
-
-
 
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);

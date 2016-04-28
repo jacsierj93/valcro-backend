@@ -218,6 +218,7 @@ $app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'
 
 // pedidos
 $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
+$app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///trae la data de los filtros
 $app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
 $app->post("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
