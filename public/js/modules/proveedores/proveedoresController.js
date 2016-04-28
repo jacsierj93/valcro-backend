@@ -52,167 +52,10 @@ MyApp.controller('ListHerramientas', function ($scope) {
  $route.reload();
  }]);*/
 
-MyApp.controller('ListProv', function ($scope,$http,setGetProv) {
-    $http({
-        method: 'POST',
-        url: 'provider/provList'
-    }).then(function successCallback(response) {
-        $scope.todos = response.data;
-        setGetProv.setList($scope.todos);
-    }, function errorCallback(response) {
-        console.log("errorrr");
-    });
+MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
+    setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
 
 });
-
-
-
-
-function DemoCtrl1 ($timeout, $q, $log) {
-    var self = this;
-    self.simulateQuery = false;
-    self.isDisabled    = false;
-    // list of `state` value/display objects
-    self.states        = loadAll();
-    self.querySearch   = querySearch;
-    self.selectedItemChange = selectedItemChange;
-    self.searchTextChange   = searchTextChange;
-    self.newState = newState;
-    function newState(state) {
-        alert("Sorry! You'll need to create a Constituion for " + state + " first!");
-    }
-    // ******************************
-    // Internal methods
-    // ******************************
-    /**
-     * Search for states... use $timeout to simulate
-     * remote dataservice call.
-     */
-    function querySearch (query) {
-        var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
-            deferred;
-        if (self.simulateQuery) {
-            deferred = $q.defer();
-            $timeout(function () { deferred.resolve( results ); }, Math.random() * 1000, false);
-            return deferred.promise;
-        } else {
-            return results;
-        }
-    }
-    function searchTextChange(text) {
-        $log.info('Text changed to ' + text);
-    }
-    function selectedItemChange(item) {
-        $log.info('Item changed to ' + JSON.stringify(item));
-    }
-    /**
-     * Build `states` list of key/value pairs
-     */
-    function loadAll() {
-        var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
-              Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana,\
-              Maine, Maryland, Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,\
-              Nebraska, Nevada, New Hampshire, New Jersey, New Mexico, New York, North Carolina,\
-              North Dakota, Ohio, Oklahoma, Oregon, Pennsylvania, Rhode Island, South Carolina,\
-              South Dakota, Tennessee, Texas, Utah, Vermont, Virginia, Washington, West Virginia,\
-              Wisconsin, Wyoming';
-        return allStates.split(/, +/g).map( function (state) {
-            return {
-                value: state.toLowerCase(),
-                display: state
-            };
-        });
-    }
-    /**
-     * Create filter function for a query string
-     */
-    function createFilterFor(query) {
-        var lowercaseQuery = angular.lowercase(query);
-        return function filterFn(state) {
-            return (state.value.indexOf(lowercaseQuery) === 0);
-        };
-    }
-}
-
-
-MyApp.controller('DemoCtrl', DemoCtrl1);
-
-
-
-function DemoCtrl2 ($timeout, $q) {
-    var self = this;
-    self.readonly = false;
-    self.selectedItem = null;
-    self.searchText = null;
-    self.querySearch = querySearch;
-    self.vegetables = loadVegetables();
-    self.selectedVegetables = [];
-    self.numberChips = [];
-    self.numberChips2 = [];
-    self.numberBuffer = '';
-    self.autocompleteDemoRequireMatch = true;
-    self.transformChip = transformChip;
-    /**
-     * Return the proper object when the append is called.
-     */
-    function transformChip(chip) {
-        // If it is an object, it's already a known chip
-        if (angular.isObject(chip)) {
-            return chip;
-        }
-        // Otherwise, create a new one
-        return { name: chip, type: 'new' }
-    }
-    /**
-     * Search for vegetables.
-     */
-    function querySearch (query) {
-        var results = query ? self.vegetables.filter(createFilterFor(query)) : [];
-        return results;
-    }
-    /**
-     * Create filter function for a query string
-     */
-    function createFilterFor(query) {
-        var lowercaseQuery = angular.lowercase(query);
-        return function filterFn(vegetable) {
-            return (vegetable._lowername.indexOf(lowercaseQuery) === 0) ||
-                (vegetable._lowertype.indexOf(lowercaseQuery) === 0);
-        };
-    }
-    function loadVegetables() {
-        var veggies = [
-            {
-                'name': 'Ingles',
-                'type': 'Brassica'
-            },
-            {
-                'name': 'Español',
-                'type': 'Brassica'
-            },
-            {
-                'name': 'Italiano',
-                'type': 'Umbelliferous'
-            },
-            {
-                'name': 'Chino',
-                'type': 'Composite'
-            },
-            {
-                'name': 'Aleman',
-                'type': 'Goosefoot'
-            }
-        ];
-        return veggies.map(function (veg) {
-            veg._lowername = veg.name.toLowerCase();
-            veg._lowertype = veg.type.toLowerCase();
-            return veg;
-        });
-    }
-}
-
-
-MyApp.controller('CustomInputDemoCtrl', DemoCtrl2);
 
 //###########################################################################################3
 //###################Service Providers (comunication betwen controllers)###################3
@@ -249,6 +92,7 @@ MyApp.service("setGetProv",function($http){
                 });
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
+                itemsel = {};
             }
         },
         updateItem: function(upd){
@@ -258,10 +102,11 @@ MyApp.service("setGetProv",function($http){
         },
         setList : function(val){
             list = val;
-            itemsel.list[0];
+            //itemsel.list[0];
         },
         addToList : function(elem){
             list.unshift(elem);
+            this.setProv(list[0]);
         },
         getSel : function(){
             return prov;
@@ -269,17 +114,6 @@ MyApp.service("setGetProv",function($http){
 
     };
 })
-
-//###########################################################################################3
-//##############################REST service (factory)#############################################3
-//###########################################################################################3
-MyApp.factory('masters', ['$resource',
-    function ($resource) {
-        return $resource('master/:type', {}, {
-            query: {method: 'GET', params: {type: ""}, isArray: true},
-        });
-    }
-]);
 
 
 //###########################################################################################3
@@ -377,7 +211,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
                 dirSel.pais_id = $scope.dir.pais;
                 dirSel.telefono = $scope.dir.provTelf;
                 if(response.data.action=="new"){
-
+                    $scope.address.unshift({
+                        direccion:$scope.dir.direccProv,
+                        tipo_dir:$scope.dir.tipo,
+                        pais_id:$scope.dir.pais,
+                        telefono:$scope.dir.provTelf
+                    });
+                    $scope.toEdit($scope.address[0])
                 }
             }, function errorCallback(response) {
                 console.log("error=>", response)
@@ -389,6 +229,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
       $scope.isShow = elem;
         if(!elem){
             $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
+            $scope.address = providers.query({type:"dirList",id_prov: $scope.prov.id||0});
         }
     }
 
@@ -421,7 +262,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     $scope.$watchGroup(['valcroName.length','prov.id'],function(nvo,old){
         var lastIndex = $scope.valcroName.length-1;
-        console.log("ultimoIndex",lastIndex);
         /*lo siguiente guarda solo si es una nuevo item*/
         if(lastIndex>=0 && $scope.valcroName[lastIndex].id == false){
             $http({
@@ -458,10 +298,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     }
 })
 
-MyApp.controller('contactProv', function($scope,setGetProv,$http,providers) {
+MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSidenav,setGetContac) {
     $scope.prov = setGetProv.getSel();
+    $scope.cnt = setGetContac.getContact();
     $scope.$watch('prov.id',function(nvo){
-        $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
         $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
     })
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -484,9 +324,48 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers) {
 
     $scope.showGrid = function(elem){
         $scope.isShow = elem;
-        if(!elem){
+        /*if(!elem){
             $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
-        }
+        }*/
     }
 
+    $scope.book=function(){
+        $mdSidenav("contactBook").open();
+    }
+
+    $scope.toEdit = function(element){
+        contact = element.cont;
+        setGetContac.setContact(contact);
+
+    }
+
+})
+
+MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac) {
+    $scope.allContact =  providers.query({type:"allContacts"});
+    $scope.toEdit = function(element){
+        contact = element.cont;
+        setGetContac.setContact(contact);
+        $mdSidenav("contactBook").close();
+    }
+
+})
+
+MyApp.service("setGetContac",function(){
+    var contact = {id:false,nombreCont:"dasd",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:0, isAgent:0};
+    return {
+        setContact : function(cont){
+            contact.id=cont.id;
+            contact.nombreCont=cont.nombre;
+            contact.emailCont=cont.email;
+            contact.contTelf=cont.telefono;
+            contact.pais=cont.id_lang;
+            contact.responsability=cont.responsabilidades;
+            contact.dirOff=cont.direccion;
+            contact.isAgent=0;
+        },
+        getContact : function(){
+            return contact;
+        }
+    }
 })

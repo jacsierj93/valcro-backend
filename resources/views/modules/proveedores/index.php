@@ -297,7 +297,7 @@
                         <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
                             <label>Pais</label>
                             <md-select ng-model="dir.pais">
-                                <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
+                                <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                     {{pais.nombre}}
                                 </md-option>
                             </md-select>
@@ -335,7 +335,7 @@
                 </form>
 
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true)">
+                <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Contactos Proveedor
@@ -345,8 +345,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
-                            <input name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk
-                                   ng-model="cnt.nombreCont">
+                            <input name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-click="book()">
                             <!--<div ng-messages="provContactosForm.nombreCont.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">Debe tener maximo 55 caracteres.</div>
@@ -379,7 +378,7 @@
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
                             <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)">
-                                <md-option ng-repeat="pais in paises" value="{{pais.nombre}}">
+                                <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                     {{pais.nombre}}
                                 </md-option>
                             </md-select>
@@ -391,8 +390,8 @@
                         <div ng-controller="idiomasController" layout="row" flex="10">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-model="cnt.idiomasSeleccionados" multiple="" ng-disabled="(cnt.id===false)">
-                                    <md-option ng-value="idioma.name" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
+                                <md-select ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)">
+                                    <md-option ng-value="idioma.id" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
                                     </md-optgroup>
                                 </md-select>
                             </md-input-container>
@@ -433,12 +432,32 @@
 
         </md-sidenav>
 
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Contactos Existentes
+                    </div>
+                </div>
+                <div style="height: 100%; overflow:scroll">
+                    <div flex ng-repeat="cont in allContact" flex="column" ng-click="toEdit(this)">
+                        <div layout="column" layout-wrap class="cellGridHolder cellGrid" style="height: 72px" >
+                            <div flex style="height: 24px">{{cont.nombre}} </div>
+                            <div flex style="height: 24px"> {{cont.email}}</div>
+                            <div flex style="height: 24px"><span ng-repeat="prov in cont.provs">{{prov.prov}}, </span></div>
+                        </div>
 
+                    </div>
 
+                </div>
+            </md-content>
+        </md-sidenav>
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="otro">
             TRES
         </md-sidenav>
+
+
 
     </div>
 

@@ -135,6 +135,14 @@ class ProvidersController extends BaseController
         }
     }
 
+    public function allContacts(){
+        $contacts = Contactos::get();
+        foreach($contacts as $contact){
+            $contact['provs']=$contact->contacto_proveedor()->select("siglas as prov")->get();
+        }
+        return ($contacts)?$contacts:[];
+    }
+
     public function saveContact(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
