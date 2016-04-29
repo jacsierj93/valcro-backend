@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     var historia= [15];
     var index=0;
@@ -19,8 +19,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
     $scope.paisProv= new Array();
     $scope.aprobacionGerente = $scope.provSelec.aprob_gerencia;
 
-
-    $scope.pedidoSelec={
+    $scope.status = 0;
+    $scope.selec = function(status) {
+        if (status ==1 || status ==3) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -59,14 +64,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
             console.log("errorrr");
         });
     }
-    $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
-
-    $scope.envios = masters.query({ type:"getProviderTypeSend"});
-
-    $scope.data = {
-        cb1: true
-    };
-
 
     /********************************************EVENTOS ********************************************/
     $scope.setProv= setProv;
@@ -123,9 +120,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
             $scope.formData.prioridadPedido=response.data.prioridadPedido;
             $scope.formData.condicionPedido=response.data.condicionPedido;
             $scope.formData.paises= response.data.paises;
+            $scope.formData.tipoDepago= response.data.tipoDepago;
             $scope.formData.aprob_gerencia= response.data.aprob_gerencia;
 
-            console.log('monedas',response.data.monedas);
+
 
         }, function errorCallback(response) {
             console.log("errorrr");
@@ -138,8 +136,46 @@ MyApp.controller('PedidosCtrll', function ($scope,$http, $mdSidenav, masters) {
         index--;
         $mdSidenav(layer).close();
     }
-    /*******por integrar***/
     $scope.setPed= function(ped){
         openLayer(ped);
     }
+    /*******por integrar***/
+    $scope.setPed= function(ped){
+
+        openLayer(ped);
+
+    }
+    var i=0;
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['FormdetallePedido.$valid','FormdetallePedido.$pristine'], function(nuevo) {
+        //alert(nuevo);
+        i++;
+        console.log('estado',nuevo);
+        if(nuevo[0] && !nuevo[1]) {
+            console.log('peddio',$scope.pedidoSelec);
+            saveDetaillPedido();
+        }
+        console.log('i', i);
+    });
+
+    /*************************Guardado*************************************************/
+    //$scope.saveDetaillPedido=saveDetaillPedido;
+    function saveDetaillPedido (){
+
+        if($scope.pedidoSelec.id){
+            console.log('send pedido ',$scope.pedidoSelec);
+            $http({
+                method: 'POST',
+                url: 'Order/Save',
+                data:$scope.pedidoSelec
+            }).then(function successCallback(response) {
+                $scope.FormdetallePedido.$setPristine();
+
+            }, function errorCallback(response) {
+                console.log("errorrr");
+            });
+        }
+    }
+
 });

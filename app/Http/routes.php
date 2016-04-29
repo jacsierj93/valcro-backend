@@ -170,9 +170,12 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 
 ///Proveedores
 
-$app->get("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->get("proveedores/getToken",'Proveedores\ProveedorController@gettoken'); ///obtener lista general de proveedores
+$app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
+$app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
+$app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
 
+//MASTERS
+$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
 $app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
@@ -221,7 +224,7 @@ $app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'
 
 // pedidos
 $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
-$app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///trae la data de los filtros
+$app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///lista de todos los proveedores
 $app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
 $app->post("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
@@ -234,5 +237,3 @@ $app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el ped
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido
 $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
-
-//getProviderOrder
