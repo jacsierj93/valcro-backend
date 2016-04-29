@@ -17,9 +17,10 @@ use App\Quotation;
 
 class Country extends Model
 {
-
     protected $table = "tbl_pais";
 
-
+    public function states(){
+        return $this->hasMany('App\Models\Sistema\State', 'in_location');
+    }
 
 }

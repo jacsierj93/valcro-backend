@@ -170,6 +170,10 @@ md-select:not([disable]):focus .md-select-value {
     transform: scaleY(1) scaleX(1) !important;
 }
 
+md-input-container > md-select{
+    margin-bottom: 10px !important;
+}
+
 /*==================================================*/
 /*=================== SWITCH =====================*/
 md-switch {
@@ -261,6 +265,15 @@ md-chips .md-chips.md-focused{
     height: 20px !important;
     line-height: 20px !important;
 }
+
+
+/*==================================================*/
+/*===================== TABS =======================*/
+md-tabs .md-tab.md-active{
+
+}
+
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 body[ng-cloak] {
