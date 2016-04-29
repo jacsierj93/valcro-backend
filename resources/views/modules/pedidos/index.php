@@ -16,7 +16,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center" ng-click="setPed('agrPed')">
+            <div layout="column" layout-align="center center" ng-click="addPedido()">
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
