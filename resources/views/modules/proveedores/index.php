@@ -4,11 +4,11 @@
     <!-- 2) ########################################## AREA DEL MENU ########################################## -->
     <div layout="row" flex="none" class="menuBarHolder">
         <!-- 3) ########################################## MENU ########################################## -->
-        <div layout="row" layout-align="start center" class="menu">
-            <div flex layout-align="center center">
+        <div layout="row" layout-align="start center" class="menu" >
+            <div flex layout-align="center center" ng-click="showAlert()">
             Menu
             </div>
-            <div layout="column" style="width: 48px; height: 48px;" layout-align="center center">
+            <div layout="column" style="width: 48px; height: 48px;" layout-align="center center" >
                 <?= HTML::image("images/btn_nextArrow.png") ?>
             </div>
         </div>
@@ -168,7 +168,7 @@
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
                 <form name="projectForm" ng-controller="DataProvController"  ng-disabled="true">
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" >
                         <div>
                             Datos Proveedor
                         </div>
@@ -424,9 +424,8 @@
                         </div>
 
                     </div>
-
-
                 </form>
+
 
             </md-content>
 
@@ -453,18 +452,286 @@
             </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER (3) INFORMACION FINANCIERA ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="otro">
-            TRES
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
+                <form name="provMoneda">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex>
+                        <div>
+                           Moneda
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20" ng-controller="provCoins">
+                            <label>Moneda</label>
+                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                    {{coin.nombre}}
+                                </md-option>
+                            </md-select>
+
+                            <!--<div ng-messages="projectForm.type.$error">
+                                <div ng-message="required">Campo Obligatorio.</div>
+                                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+                            </div>-->
+                        </md-input-container>
+                    </div>
+                </form>
+                <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
+                <form ng-controller="bankInfoController">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Informacion Bancaria
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="30">
+                            <label>Banco</label>
+                            <input name="bnk.bankName"/>
+
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="30">
+                            <label>Nombre Beneficiario</label>
+                            <input name="bnk.bankBenef"/>
+
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="40">
+                            <label>Direccion</label>
+                            <input name="bnk.bankAddr"/>
+
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>Pais</label>
+                            <md-select ng-model="bnk.pais" name ="state" ng-disabled="enabled" ng-change="setState(this)">
+                                <md-option ng-repeat="country in countries" value="{{country.id}}">
+                                    {{country.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Estado</label>
+                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="state in states" value="{{state.id}}">
+                                    {{state.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Ciudad</label>
+                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="state in states" value="{{state.id}}">
+                                    {{state.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>SWIF</label>
+                            <input name="bnk.bankAddr"/>
+
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>IBAN</label>
+                            <input name="bnk.bankAddr"/>
+
+                        </md-input-container>
+                    </div>
+
+                </form>
+                <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
+                <form name="provCred">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Credito
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="30">
+                            <label>Limite de Credito</label>
+                            <input ng-model="cred.mount">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20" ng-controller="provCoins">
+                            <label>Moneda</label>
+                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                    {{coin.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>
+                <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
+                <form name="provCred">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Factor de Conversión
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>% Flete</label>
+                            <input ng-model="conv.flete">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>% Gastos</label>
+                            <input ng-model="conv.gasto">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>% Ganancia</label>
+                            <input ng-model="conv.gan">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>% Descuento</label>
+                            <input ng-model="conv.desc">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20" ng-controller="provCoins">
+                            <label>Moneda</label>
+                            <md-select ng-model="conv.coin" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                    {{coin.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>
+                <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
+                <form name="provPoint">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Puntos
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="30">
+                            <label>Costo del punto</label>
+                            <input ng-model="pnt.cost">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20" ng-controller="provCoins">
+                            <label>Moneda</label>
+                            <md-select ng-model="pnt.coin" name ="coin" ng-disabled="enabled">
+                                <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                    {{coin.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>
+
+            </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER (4) TIEMPOS (PRODUCCION/TRANSITO) ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer4">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
+                <form name="provPoint">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Tiempo Aproximado de Producción
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>De (Dias)</label>
+                            <input ng-model="tp.from">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>A (Dias)</label>
+                            <input ng-model="tp.to">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Linea</label>
+                            <md-select ng-model="tp.coin" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="state in states" value="{{state.id}}">
+                                    {{state.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>
+                <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
+                <form name="provPoint">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Tiempo Aproximado de Transito
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>De (Dias)</label>
+                            <input ng-model="tp.from">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>A (Dias)</label>
+                            <input ng-model="tp.to">
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Linea</label>
+                            <md-select ng-model="tp.coin" name ="state" ng-disabled="enabled">
+                                <md-option ng-repeat="state in states" value="{{state.id}}">
+                                    {{state.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>
+
+                <form name="provPrecList">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Listas de Precios
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="40">
+                            <label>Referencia</label>
+                            <input ng-model="lp.ref">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>Archivo</label>
+                            <input ng-model="lp.file">
+                        </md-input-container>
+                    </div>
+
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="70" class="headGrid"> Referencias</div><div flex="30" class="headGrid"> Archivo</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in [{ref:'dasdnl',file:'img.jpg'},{ref:'dasdnl',file:'img.jpg'},{ref:'dasdnl',file:'img.jpg'}]" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="70" class="cellGrid"> {{add.ref}}</div><div flex="30" class="headGrid"> {{add.file}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
+
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:48px" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="NEXT">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+                    <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
+                    <?= HTML::image("images/btn_prevArrow.png") ?>
+                </div>
+            </md-content>
+        </md-sidenav>
+        <!-- 8) ########################################## BOTON Next ########################################## -->
 
 
     </div>
 
-
-
-
-
-
 </div>
+
 

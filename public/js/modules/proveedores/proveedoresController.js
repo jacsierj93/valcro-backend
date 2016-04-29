@@ -1,5 +1,27 @@
 //var proveedores = angular.module('proveedores', []);
 
+
+//###########################################################################################3
+//##############################REST service (factory)#############################################3
+//###########################################################################################3
+MyApp.factory('masters', ['$resource',
+    function ($resource) {
+        return $resource('master/:type', {}, {
+            query: {method: 'GET', params: {type: ""}, isArray: true}
+        });
+    }
+]);
+
+MyApp.factory('providers', ['$resource',
+    function ($resource) {
+        return $resource('provider/:type/:id_prov', {}, {
+            query: {method: 'GET', params: {type: "",id_prov:""}, isArray: true},
+            get:   {method: 'POST', params: {type: ""}, isArray: false},
+            put:   {method: 'POST', params: {type: ""}, isArray: false}
+        });
+    }
+]);
+
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
     $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
 
@@ -14,6 +36,15 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         $mdSidenav("left").close().then(function(){
             $mdSidenav("left").open();
         });
+    };
+
+    $scope.showAlert = function(){
+        console.log("asdasd");
+        $mdSidenav("alert").open();
+    };
+
+    $scope.showNext = function(action){
+
     }
 });
 
@@ -25,10 +56,16 @@ MyApp.controller('TipoDirecc', function ($scope) {
     });
 });
 
+MyApp.controller('provCoins', function ($scope,masters) {
+    $scope.coins =  masters.query({ type:"getCoins"});
+})
+
 MyApp.controller('ListPaises', function ($scope,$http,masters) {
     $scope.paises = masters.query({ type:"getCountries"});
 
 });
+
+
 
 
 MyApp.controller('ListHerramientas', function ($scope) {
@@ -60,11 +97,10 @@ MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
 //###########################################################################################3
 //###################Service Providers (comunication betwen controllers)###################3
 //###########################################################################################3
-MyApp.service("setGetProv",function($http){
+MyApp.service("setGetProv",function($http,providers){
     var prov = {id:false,type:"",description:"",siglas:"",envio:"",contraped:true,limCred:0};
     var itemsel = {};
     var list = {};
-    var addrs = {id:false,pais:{short_name:""},telefono:"",direccion:""};
     return {
         getProv: function () {
             return prov;
@@ -73,22 +109,14 @@ MyApp.service("setGetProv",function($http){
             if (index){
                 itemsel = index;
                 id = itemsel.id;
-                $http({
-                    method: 'POST',
-                    url: "provider/getProv",
-                    data: {
-                        id: id
-                    }
-                }).then(function successCallback(response) {
-                    data = response.data;
+
+                providers.get({type:"getProv"},{id:id},function(data){
                     prov.id = data.id;
                     prov.description = data.description;
                     prov.siglas = data.siglas;
                     prov.type = data.type;
                     prov.envio = data.envio;
                     prov.contraped = data.contraped;
-                }, function errorCallback(response) {
-                    console.log("error=>", response)
                 });
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
@@ -106,39 +134,22 @@ MyApp.service("setGetProv",function($http){
         },
         addToList : function(elem){
             list.unshift(elem);
-            this.setProv(list[0]);
+            itemsel = list[0];
+            //this.setProv(elem);
         },
         getSel : function(){
             return prov;
         }
 
     };
-})
+});
 
 
-//###########################################################################################3
-//##############################REST service (factory)#############################################3
-//###########################################################################################3
-MyApp.factory('masters', ['$resource',
-    function ($resource) {
-        return $resource('master/:type', {}, {
-            query: {method: 'GET', params: {type: ""}, isArray: true},
-        });
-    }
-]);
-
-MyApp.factory('providers', ['$resource',
-    function ($resource) {
-        return $resource('provider/:type/:id_prov', {}, {
-            query: {method: 'GET', params: {type: "",id_prov:""}, isArray: true},
-        });
-    }
-]);
 
 //###########################################################################################3
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
-MyApp.controller('DataProvController', function ($scope,setGetProv,$http,$mdToast) {
+MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers) {
     $scope.enabled = false;
     $scope.showSimpleToast = function() {
         $mdToast.show(/*{
@@ -153,21 +164,16 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$http,$mdToas
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
-            $http({
-                method: 'POST',
-                url: "provider/saveProv",
-                data: $scope.dtaPrv,
-            }).then(function successCallback(response) {
-                $scope.dtaPrv.id = response.data.id;
+
+            providers.put({type:"saveProv"},$scope.dtaPrv,function(data){
+                $scope.dtaPrv.id = data.id;
                 $scope.projectForm.$setPristine();
                 setGetProv.updateItem($scope.dtaPrv);
-                if(response.data.action=="new"){
+                if(data.action=="new"){
                     var newProv = angular.copy($scope.dtaPrv);
                     setGetProv.addToList(newProv);
                     $scope.showSimpleToast();
                 }
-            }, function errorCallback(response) {
-                console.log("error=>", response)
             });
         }
     });
@@ -184,7 +190,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
         $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
         $scope.address = providers.query({type:"dirList",id_prov: $scope.prov.id||0});
         $scope.isShow = false;
-    })
+    });
 
     $scope.toEdit = function(addrs){
         dirSel = addrs.add;
@@ -194,7 +200,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
         $scope.dir.tipo = dirSel.tipo_dir;
         $scope.dir.pais = dirSel.pais_id;
         $scope.dir.provTelf = dirSel.telefono;
-    }
+    };
 
     /*escuah el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['direccionesForm.$valid','direccionesForm.$pristine'], function(nuevo) {
@@ -202,7 +208,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
             $http({
                 method: 'POST',
                 url: "provider/saveProvAddr",
-                data: $scope.dir,
+                data: $scope.dir
             }).then(function successCallback(response) {
                 $scope.dir.id = response.data.id;
                 $scope.direccionesForm.$setPristine();
@@ -256,25 +262,25 @@ MyApp.controller('idiomasController', function($scope) {
 MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers) {
     $scope.enabled=true;
     $scope.prov = setGetProv.getSel(); //obtiene en local los datos del proveedor actual
-    $scope.$watch('prov.id',function(nvo){
+    $scope.$watch('prov.id',function(){
         $scope.valcroName = providers.query({type:"provNomValList",id_prov: $scope.prov.id||0});
-    })
+    });
 
-    $scope.$watchGroup(['valcroName.length','prov.id'],function(nvo,old){
+    $scope.$watchGroup(['valcroName.length','prov.id'],function(){
         var lastIndex = $scope.valcroName.length-1;
         /*lo siguiente guarda solo si es una nuevo item*/
         if(lastIndex>=0 && $scope.valcroName[lastIndex].id == false){
             $http({
                 method: 'POST',
                 url: "provider/saveValcroName",
-                data: $scope.valcroName[lastIndex],
+                data: $scope.valcroName[lastIndex]
             }).then(function successCallback(response) {
                 $scope.valcroName[lastIndex].id = response.data.id;
             }, function errorCallback(response) {
                 console.log("error=>", response)
             });
         }
-    })
+    });
     /*la siguiente funcion transforma lo escrito a un objeto para el render y hace el insert en la Bd*/
     $scope.transformChip = function transformChip(chip) {
         // If it is an object, it's already a known chip
@@ -284,33 +290,33 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         var chip = { name: chip, dep: 'adm', fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
         // Otherwise, create a new o
         return chip;
-    }
+    };
     $scope.rmChip = function(fiel,chip){
         $http({
             method: 'POST',
             url: "provider/delValcroName",
-            data: chip,
+            data: chip
         }).then(function successCallback(response) {
             console.log(response);
         }, function errorCallback(response) {
             console.log("error=>", response)
         });
-    }
-})
+    };
+});
 
 MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSidenav,setGetContac) {
     $scope.prov = setGetProv.getSel();
     $scope.cnt = setGetContac.getContact();
     $scope.$watch('prov.id',function(nvo){
         $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
-    })
+    });
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
             $http({
                 method: 'POST',
                 url: "provider/saveContactProv",
-                data: $scope.cnt,
+                data: $scope.cnt
             }).then(function successCallback(response) {
                 $scope.cnt.id = response.data.id;
                 $scope.provContactosForm.$setPristine();
@@ -327,19 +333,19 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
         /*if(!elem){
             $scope.cnt = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:$scope.prov.id||0, isAgent:0};
         }*/
-    }
+    };
 
     $scope.book=function(){
         $mdSidenav("contactBook").open();
-    }
+    };
 
     $scope.toEdit = function(element){
         contact = element.cont;
         setGetContac.setContact(contact);
 
-    }
+    };
 
-})
+});
 
 MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac) {
     $scope.allContact =  providers.query({type:"allContacts"});
@@ -349,8 +355,17 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
         $mdSidenav("contactBook").close();
     }
 
-})
+});
 
+MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac) {
+    $scope.allContact =  providers.query({type:"allContacts"});
+    $scope.toEdit = function(element){
+        contact = element.cont;
+        setGetContac.setContact(contact);
+        $mdSidenav("contactBook").close();
+    }
+
+});
 MyApp.service("setGetContac",function(){
     var contact = {id:false,nombreCont:"dasd",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:0, isAgent:0};
     return {
@@ -368,4 +383,14 @@ MyApp.service("setGetContac",function(){
             return contact;
         }
     }
-})
+});
+
+
+MyApp.controller('bankInfoController', function ($scope,$http,masters) {
+    $scope.countries = masters.query({ type:"getCountries"});
+   /* $scope.bnk = {pais:[]};
+    $scope.countries = masters.query({ type:"fullCountries"});
+    $scope.setState = function(a,b){
+        console.log($scope.bnk.pais);
+    }*/
+});
