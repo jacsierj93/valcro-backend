@@ -431,8 +431,8 @@
 
             </md-content>
 
-            <div flex="5" ng-mouseover="showNext(true)" >
-                a
+            <div style="width: 16px;" ng-mouseover="showNext(true)" >
+
             </div>
 
         </md-sidenav>
@@ -725,13 +725,8 @@
             </md-content>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:60px" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
-            <md-content class="cntLayerHolder" layout="row" layout-padding flex="1">
-                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
-                    <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png") ?>
-                </div>
-            </md-content>
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
+            <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
         <!-- 8) ########################################## BOTON Next ########################################## -->
 
