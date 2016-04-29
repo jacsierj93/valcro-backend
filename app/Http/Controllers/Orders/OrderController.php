@@ -135,7 +135,7 @@ class OrderController extends BaseController
      */
 
     public function getOrdenPurchaseOrder(Request $req){
-         return $ped = Order::findOrFail($req->id)->getOrders()->get();
+        return $ped = Order::findOrFail($req->id)->getOrders()->get();
     }
 
     /**
@@ -152,8 +152,8 @@ class OrderController extends BaseController
      ***/
     public function getProviderOrder(Request $req){
         $model = new PurchaseOrder();
-        $data = $model->where('prov_id',$req->id)->
-        where('pedido_id',null)
+        $data = $model->where('prov_id',$req->id)
+            //->where(pedido_id,null)
             ->get();
         $i=0;
         foreach( $data as $aux){
@@ -161,6 +161,18 @@ class OrderController extends BaseController
             $i++;
         }
         return $data;
+    }
+
+    public function addPurchaseOrder(Request $req){
+        $model= PurchaseOrder::findOrFail($req->id);
+        $model->pedido_id=$req->id;
+        $model->save();
+    }
+
+    public function RemovePurchaseOrder(Request $req){
+        $model= PurchaseOrder::findOrFail($req->id);
+        $model->pedido_id=null;
+        $model->save();
     }
     /**
      * Obtiene la orden de compra

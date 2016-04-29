@@ -47,7 +47,7 @@
                 <div layout="column" layout-align="center center" flex="25">
                     <md-input-container class="md-block" >
                         <label>Moneda</label>
-                        <md-select ng-model="pedidoSelec.prov_moneda_id" >
+                        <md-select ng-model="pedidoSelec.prov_moneda_id"  required>
                             <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
                                 {{moneda.nombre}}
                             </md-option>
@@ -84,7 +84,7 @@
         <md-content class="barraLateral" >
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item.id)">
+            <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item)">
 
                 <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
 
@@ -220,14 +220,14 @@
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
                             <input  name="nro_doc"
-                                   ng-model="pedidoSelec.nro_doc" ng-disabled="pedidoSelec.nro_doc">
+                                   ng-model="pedidoSelec.id" ng-disabled="true">
                         </md-input-container>
                     </div>
 
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block" flex="40">
                             <label>Proveedor</label>
-                            <md-select ng-model="id" name ="prov_id">
+                            <md-select ng-model="id" name ="prov_id" ng-disabled="true">
                                 <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                     {{prov.razon_social}}
                                 </md-option>
@@ -247,7 +247,7 @@
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block"  flex>
                             <label>Direccion</label>
-                            <md-select ng-model="pedidoSelec.pais_id" name ="direccion_almacen_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.direccion_almacen_id" name ="direccion_almacen_id" ng-disabled="status == 2">
                                 <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
                                     {{dir.direccion}}
                                 </md-option>
@@ -258,7 +258,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="20">
                             <label>Monto</label>
-                            <input  ng-model="pedidoSelec.monto" name="monto"  ng-disabled="status == 2">
+                            <input  ng-model="pedidoSelec.monto" name="monto" required  ng-disabled="status == 2">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -305,7 +305,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
-                            <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2" required>
                                 <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
                                     {{conPago.titulo}}
                                 </md-option>
@@ -316,7 +316,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Motivo Pedido </label>
-                            <md-select ng-model="pedidoSelec.motivo_pedido_id"  ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.motivo_pedido_id"  ng-disabled="status == 2" required>
                                 <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
                                     {{motivoPed.motivo}}
                                 </md-option>
@@ -324,7 +324,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Prioridad Pedido </label>
-                            <md-select  ng-model="pedidoSelec.prioridad_id"  ng-disabled="status == 2">
+                            <md-select  ng-model="pedidoSelec.prioridad_id"  ng-disabled="status == 2" required>
                                 <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
                                     {{prioPed.descripcion}}
                                 </md-option>
@@ -510,26 +510,26 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
-                        <div flex class="headGrid"> a</div>
-                        <div flex class="headGrid"> Nº de ODC</div>
-                        <div flex class="headGrid"> Proveedor</div>
-                        <div flex class="headGrid"> Cant.</div>
-                        <div flex class="headGrid"> Fecha</div>
-                        <div flex class="headGrid"> Status</div>
+                        <div flex="5" class="headGrid"> % </div>
+                        <div flex="10" class="headGrid"> Nº de ODC</div>
+                        <div flex="20" class="headGrid"> Proveedor</div>
+                        <div flex="5" class="headGrid"> Cant.</div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex="20" class="headGrid"> Status</div>
                         <div flex class="headGrid"> Comentarios</div>
                     </div>
                     <div id="gridOdc">
                         <div flex>
-                            <div layout="row" class="cellGridHolder" ng-click="setPed('resumenodc')">
-                                <div class="cellGrid">
-                                    <md-switch class="md-primary" ng-model="dtaPrv.cb1"></md-switch>
+                            <div layout="row" class="cellGridHolder"  ng-repeat="odc in formData.odc">
+                                <div class="cellGrid" flex="5">
+                                    <md-switch class="md-primary" ng-model="odc.asig" ng-change="change(odc)" ></md-switch>
                                 </div>
-                                <div flex class="cellGrid"> Data 2</div>
-                                <div flex class="cellGrid"> Data 3</div>
-                                <div flex class="cellGrid"> Data 4</div>
-                                <div flex class="cellGrid"> Data 5</div>
-                                <div flex class="cellGrid"> Data 6</div>
-                                <div flex class="cellGrid"> Data 7</div>
+                                <div flex="10" class="cellGrid" ng-click="setPed('resumenodc')"> {{odc.nro_orden}}</div>
+                                <div flex="20" class="cellGrid" ng-click="setPed('resumenodc')"> {{provSelec.razon_social}}</div>
+                                <div flex="5" class="cellGrid" ng-click="setPed('resumenodc')"> {{odc.size}}</div>
+                                <div flex="10" class="cellGrid" ng-click="setPed('resumenodc')">{{odc.created_at}}</div>
+                                <div flex="20" class="cellGrid" ng-click="setPed('resumenodc')"> {{odcEstatus(odc)}}</div>
+                                <div flex class="cellGrid"ng-click="setPed('resumenodc')" > {{odc.comentario}}</div>
                             </div>
                         </div>
                     </div>
