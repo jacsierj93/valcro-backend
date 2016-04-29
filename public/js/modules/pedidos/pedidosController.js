@@ -70,7 +70,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     //al selecionar provedor
     function setProv(id){
         $scope.id=id;
-
         $http({
             method: 'POST',
             url: 'Order/OrderProvOrder',
@@ -96,7 +95,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             l.css('width','calc(100% - '+w+'px)');
             $mdSidenav(layer).open();
             historia[index]=layer;
+            return true;
         }
+        return false;
     }
 
     function loadDataFor(){
@@ -115,16 +116,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         });
     }
     function addPedido(){
-        openLayer('detallePedido');
-        loadDataFor();
-        loadCoinProvider($scope.id);
-        loadCountryProvider($scope.id);
-        loadPaymentCondProvider($scope.id);
-        $scope.pedidoSelec={
-            pais_id:'',
-            id:''
+        if(openLayer('detallePedido')){
+            loadDataFor();
+            loadCoinProvider($scope.id);
+            loadCountryProvider($scope.id);
+            loadPaymentCondProvider($scope.id);
+            $scope.pedidoSelec={
+                pais_id:'',
+                id:''
+            }
+            $scope.FormdetallePedido.$setPristine();
         }
-        $scope.FormdetallePedido.$setPristine();
+
 
 
     }
@@ -198,6 +201,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     function closeLayer(){
         var layer=historia[index];
+        historia[index]=null;
         index--;
         $mdSidenav(layer).close();
     }
