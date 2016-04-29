@@ -86,10 +86,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     // abirti un layer
     function openLayer(layer){
-        var base =288;
-        index++;
-        $mdSidenav(layer).open();
-        historia[index]=layer;
+        if(historia.indexOf(layer)==-1){
+            var l=angular.element(document).find("#"+layer);
+            console.log('layer ',l);
+            var base =264;
+            index++;
+            var w= base+(24*index);
+            console.log(' width', w);
+            l.css('width','calc(100% - '+w+'px)');
+            $mdSidenav(layer).open();
+            historia[index]=layer;
+        }
     }
 
     function loadDataFor(){
@@ -208,7 +215,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     $scope.$watch('pedidoSelec.pais_id',function(newVal){
         if(newVal != '-1'){
-             loadDirProvider(newVal);
+            loadDirProvider(newVal);
         }
     });
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -228,7 +235,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     function saveDetaillPedido (){
 
         if($scope.pedidoSelec.id == ''){
-                delete $scope.pedidoSelec.id;
+            delete $scope.pedidoSelec.id;
         }
         $scope.pedidoSelec.prov_id=$scope.id;
         console.log('send pedido ',$scope.pedidoSelec);
