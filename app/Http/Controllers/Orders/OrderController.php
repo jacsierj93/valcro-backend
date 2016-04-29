@@ -81,18 +81,19 @@ class OrderController extends BaseController
      * carga formulario
      * @param Request $req
      */
-    public function getForm(Request $req)
+    public function getForm()
     {
 
         $data= Array();
-        $data['proveedor']= Provider::select('razon_social', 'id')->where("deleted_at",NULL)->get();
+        /**maestros*/
+        //$data['proveedor']= Provider::select('razon_social', 'id')->where("deleted_at",NULL)->get();
         $data['tipoPedido'] = OrderType::select('tipo', 'id')->where("deleted_at",NULL)->get();
         $data['motivoPedido']= OrderReason::select('motivo', 'id')->where("deleted_at",NULL)->get();
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
         $data['tipoDepago'] = PaymentType::select('descripcion', 'id')->where("deleted_at",NULL)->get();
-        //
+        /*
         if ($req->has('id')) {
             $ped = Order::findOrFail($req->id);
             $ped['ordenes']= $ped->getOrders()->get();
@@ -121,13 +122,31 @@ class OrderController extends BaseController
 
             $data['condicionPago']=$cond;
 
-        }
+        }*/
 
 
         return $data;
 
     }
 
+
+    /**
+     * obtiene las ordenes de compra de un pedido
+     */
+
+    public function getOrdenPurchaseOrder(Request $req){
+         return $ped = Order::findOrFail($req->id)->getOrders()->get();
+    }
+
+    /**
+     * obtiene las ordenes de compra de un pedido
+     */
+
+    public function getOrden(Request $req){
+        $data=Order::findOrFail($req->id);
+        $data['ordenes']= $data->getOrders()->get();
+        return $data;
+    }
     /**
      * Obtiene las ordenes de compra de un provedor
      ***/
@@ -144,7 +163,7 @@ class OrderController extends BaseController
         return $data;
     }
     /**
-     * Obtiene las ordenes de compra de un provedor
+     * Obtiene la orden de compra
      ***/
     public function getPurchaseOrder(Request $req){
         return PurchaseOrder::where('id',$req->id)->first();
@@ -156,15 +175,21 @@ class OrderController extends BaseController
      **/
     public function getProviderCountry(Request $req){
         $model=  ProviderAddress::where('prov_id',$req->id)->get();
-        $data= Array();
-        $i=0;
+        $pais= Array();
         foreach( $model as $aux){
-            $data[$i]['id']= $aux->getPais()->first()->id;
-            $data[$i]['pais']= $aux->getPais()->first()->short_name;
-            $i++;
-        }
+            $pais[]= $aux->country()->first();
 
-        return $data;
+        }
+        return $pais;
+    }
+
+    /**
+     * obtiene los direcciones de almacen
+     * donde un proveeed
+     * almacen
+     **/
+    public function getAddressCountry(Request $req){
+        return ProviderAddress::where('pais_id',$req->id)->get();
     }
 
     /**
@@ -172,30 +197,29 @@ class OrderController extends BaseController
      * @see
      **/
     public function getProviderCoins(Request $req){
-        $model=  Proveedor::findOrFail($req->id);
+        $model=  Provider::findOrFail($req->id);
         return $model->getProviderCoin()->get();
     }
     /**
      * Condiciones de pago de un proveedor
      **/
     public function getProviderPaymentCondition(Request $req){
-        $model=  Proveedor::findOrFail($req->id);
-        return $model->getPaymentCondition()->get();
-    }
-
-    /**
-     * obtiene las direcioness de almacen del proveedor
-     **/
-    public function getProviderAdressStore(Request $req){
-        $data = Proveedor::findOrFail($req->id)->getAddress();
-
-        if ($req->has('pais_id')) {
-            $data->where('pais_id', $req->pais_id);
+        $auxCond=Provider::findOrFail($req->id)->first()->getPaymentCondition()->get();
+        $cond= Array();
+        $i=0;
+        $text='';
+        foreach( $auxCond as $aux){
+            $cond[$i]['id']= $aux->id;
+            foreach( $aux->getItems()->get() as $aux2){
+                $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+            }
+            $cond[$i]['titulo']= $text;
+            $text='';
+            $i++;
         }
-
-        return $data->get();
-
+        return $cond;
     }
+
 
     /***
      * Guarda un registro en la base de datos
@@ -211,7 +235,11 @@ class OrderController extends BaseController
             'tipo_pedido_id' => 'required',
             'prov_id' => 'required',
             'pais_id' => 'required',
-            'nro_doc' =>'required'
+            'monto' => 'required',
+            'prov_moneda_id' => 'required',
+            'motivo_pedido_id' => 'required',
+            'prioridad_id' => 'required',
+            'condicion_pago_id' => 'required',
         ]);
 
         if ($validator->fails()) { ///ups... erorres
@@ -230,21 +258,43 @@ class OrderController extends BaseController
             }
 
             $model->tipo_pedido_id = $req->tipo_pedido_id;
-            $model->nro_proforma = $req->nro_proforma;
-            $model->nro_factura = $req->nro_factura;
-            $model->monto = $req->monto;
-            $model->comentario = $req->comentario;
+            $model->prioridad_id = $req->prioridad_id;
             $model->prov_id = $req->prov_id;
             $model->pais_id = $req->pais_id;
-            $model->prioridad_id = $req->prioridad_id;
-            $model->pedido_estado_id = $req->pedido_estado_id;
+            $model->monto = $req->monto;
+            $model->condicion_pago_id = $req->condicion_pago_id;
             $model->prov_moneda_id = $req->prov_moneda_id;
-            $model->direccion_almacen_id = $req->direccion_almacen_id;
-            $model->condicion_pedido_id = $req->condicion_pedido_id;
             $model->motivo_pedido_id = $req->motivo_pedido_id;
-            $model->mt3 = $req->mt3;
-            $model->peso = $req->peso;
-            $model->nro_doc = $req->nro_doc;
+            $model->prioridad_id = $req->prioridad_id;
+
+            if($req->has('nro_proforma')){
+                $model->nro_proforma = $req->nro_proforma;
+            }
+            if($req->has('nro_factura')){
+                $model->nro_factura = $req->nro_factura;
+            }
+            if($req->has('comentario')){
+                $model->comentario = $req->comentario;
+            }
+            if($req->has('pedido_estado_id')){
+                $model->pedido_estado_id = $req->pedido_estado_id;
+            }
+            if($req->has('direccion_almacen_id')){
+                $model->direccion_almacen_id = $req->direccion_almacen_id;
+            }
+            if($req->has('condicion_pedido_id')){
+                $model->condicion_pedido_id = $req->condicion_pedido_id;
+            }
+            if($req->has('mt3')){
+                $model->mt3 = $req->mt3;
+            }
+            if($req->has('peso')){
+                $model->peso = $req->peso;
+            }
+            if($req->has('nro_doc')){
+                $model->nro_doc = $req->nro_doc;
+            }
+
 
 
             if($req->has('comentario_cancelacion','cancelacion')){
@@ -267,8 +317,8 @@ class OrderController extends BaseController
                 $model->tasa_fija=0;
                 $model->tasa=  Monedas::findOrFail($req->prov_moneda_id)->precio_usd;
             }
-             $model->save();
-
+            $model->save();
+            $result['pedido']=$model;
             /* for($i=0;$i<sizeof($req->items);$i++){
 
                  $item= PurchaseOrder::findOrFail(trim($req->items[$i]['id']));
