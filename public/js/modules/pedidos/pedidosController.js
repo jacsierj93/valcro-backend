@@ -8,17 +8,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         pedidos: new Array()
     }
     $scope.todos = new Array();
-    $scope.todos = new Array();
     $scope.id= $scope.provSelec.id;
-    $scope.id_moneda='-1';
-    $scope.direccion= new Array();
-    $scope.condPago= new Array();
-    $scope.motPed=  new Array();
-    $scope.prioridadPed = new Array();
-    $scope.condicionPed= new Array();
-    $scope.paisProv= new Array();
-    $scope.aprobacionGerente = $scope.provSelec.aprob_gerencia;
-
+    $scope.pedidoSelec={
+        pais_id:'-1',
+        id:''
+    }
     $scope.status = 0;
     $scope.selec = function(status) {
         if (status ==1 || status ==3) {
@@ -41,6 +35,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         direcciones:new Array()
     }
     init();
+
 
     function init(){
         //carga los giltros
@@ -70,6 +65,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.openLayer=openLayer;
     $scope.selecPedido=selecPedido;
     $scope.closeLayer=closeLayer;
+    $scope.addPedido=addPedido;
 
     //al selecionar provedor
     function setProv(id){
@@ -81,9 +77,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             data:{ id:id}
         }).then(function successCallback(response) {
             $scope.provSelec.pedidos=response.data.pedidos;
-            $scope.provSelec.razon_social=response.data.proveedor.razon_social;
-
-            // console.log(response);
 
         }, function errorCallback(response) {
             console.log("errorrr");
@@ -95,36 +88,101 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     function openLayer(layer){
         var base =288;
         index++;
-        /*
-         var newsize =288+(24*index);
-         console.log('new size',newsize);
-         var layer=$("#"+layer);
-         // layer.css('width',"'"+newsize+"'");*/
         $mdSidenav(layer).open();
         historia[index]=layer;
     }
 
-    function selecPedido(pedido){
-        openLayer('detallePedido');
-
+    function loadDataFor(){
         $http({
             method: 'POST',
-            url: 'Order/OrderDataForm',
-            data:{ id:pedido.id}
+            url: 'Order/OrderDataForm'
         }).then(function successCallback(response) {
-            $scope.pedidoSelec=response.data.pedido;
             $scope.formData.tipo=response.data.tipoPedido;
-            $scope.formData.monedas=response.data.monedas;
             $scope.formData.motivoPedido=response.data.motivoPedido;
-            $scope.formData.condicionPago=response.data.condicionPago;
             $scope.formData.prioridadPedido=response.data.prioridadPedido;
             $scope.formData.condicionPedido=response.data.condicionPedido;
-            $scope.formData.paises= response.data.paises;
+            $scope.formData.estadoPedido=response.data.estadoPedido;
             $scope.formData.tipoDepago= response.data.tipoDepago;
-            $scope.formData.aprob_gerencia= response.data.aprob_gerencia;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+    function addPedido(){
+        openLayer('detallePedido');
+        loadDataFor();
+        loadCoinProvider($scope.id);
+        loadCountryProvider($scope.id);
+        loadPaymentCondProvider($scope.id);
+        $scope.pedidoSelec={
+            pais_id:'',
+            id:''
+        }
+        $scope.FormdetallePedido.$setPristine();
 
 
+    }
 
+    function loadDirProvider(id){
+        $http({
+            method: 'POST',
+            url: 'Order/Address',
+            data:{id:id}
+        }).then(function successCallback(response) {
+            $scope.formData.direcciones=response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function loadCoinProvider(id){
+        $http({
+            method: 'POST',
+            url: 'Order/ProviderCoins',
+            data:{id:id}
+        }).then(function successCallback(response) {
+            $scope.formData.monedas=response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function loadPaymentCondProvider(id){
+        $http({
+            method: 'POST',
+            url: 'Order/ProviderPaymentCondition',
+            data:{id:id}
+        }).then(function successCallback(response) {
+            $scope.formData.condicionPago=response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function loadCountryProvider(id){
+        $http({
+            method: 'POST',
+            url: 'Order/ProviderCountry',
+            data:{id:id}
+        }).then(function successCallback(response) {
+            $scope.formData.paises= response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function selecPedido(pedido){
+        openLayer('detallePedido');
+        loadDataFor();
+        $http({
+            method: 'POST',
+            url: 'Order/Order',
+            data:{ id:pedido.id}
+        }).then(function successCallback(response) {
+            $scope.pedidoSelec=response.data;
+            loadCoinProvider(pedido.prov_id);
+            loadCountryProvider(pedido.prov_id);
+            loadPaymentCondProvider(pedido.prov_id);
+            loadDirProvider($scope.pedidoSelec.pais_id);
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -146,7 +204,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     }
     var i=0;
+    /****** **************************listener ***************************************/
 
+    $scope.$watch('pedidoSelec.pais_id',function(newVal){
+        if(newVal != '-1'){
+             loadDirProvider(newVal);
+        }
+    });
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['FormdetallePedido.$valid','FormdetallePedido.$pristine'], function(nuevo) {
         //alert(nuevo);
@@ -163,19 +227,27 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     //$scope.saveDetaillPedido=saveDetaillPedido;
     function saveDetaillPedido (){
 
-        if($scope.pedidoSelec.id){
-            console.log('send pedido ',$scope.pedidoSelec);
-            $http({
-                method: 'POST',
-                url: 'Order/Save',
-                data:$scope.pedidoSelec
-            }).then(function successCallback(response) {
-                $scope.FormdetallePedido.$setPristine();
-
-            }, function errorCallback(response) {
-                console.log("errorrr");
-            });
+        if($scope.pedidoSelec.id == ''){
+                delete $scope.pedidoSelec.id;
         }
+        $scope.pedidoSelec.prov_id=$scope.id;
+        console.log('send pedido ',$scope.pedidoSelec);
+        $http({
+            method: 'POST',
+            url: 'Order/Save',
+            data:$scope.pedidoSelec
+        }).then(function successCallback(response) {
+            $scope.FormdetallePedido.$setPristine();
+            if(!response.data.error){
+                $scope.pedidoSelec.id=response.data.pedido.id;
+            }
+            console.log(response);
+
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+
     }
 
 });
