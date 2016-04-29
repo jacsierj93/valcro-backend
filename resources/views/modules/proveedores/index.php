@@ -156,11 +156,13 @@
                     </div>
                 </div>
             </md-content>
+
+
         </md-sidenav>
 
 
         <!-- 15) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PROVEEDOR ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="left">
 
             <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
@@ -428,6 +430,10 @@
 
 
             </md-content>
+
+            <div flex="5" ng-mouseover="showNext(true)" >
+                a
+            </div>
 
         </md-sidenav>
 
@@ -719,8 +725,8 @@
             </md-content>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:48px" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="NEXT">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:60px" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
+            <md-content class="cntLayerHolder" layout="row" layout-padding flex="1">
                 <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
                     <?= HTML::image("images/btn_prevArrow.png") ?>

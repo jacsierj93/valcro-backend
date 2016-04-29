@@ -43,8 +43,12 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         $mdSidenav("alert").open();
     };
 
-    $scope.showNext = function(action){
-
+    $scope.showNext = function(status){
+        if(status){
+            $mdSidenav("NEXT").open()
+        }else{
+            $mdSidenav("NEXT").close()
+        }
     }
 });
 
