@@ -1,14 +1,16 @@
 MyApp.controller('pagosCtrll', function ($scope,$mdSidenav) {
 
-    var historial= [20];
+    /*var historial= [20];
     $scope.toggleLeft = function() {
         $mdSidenav("left").close().then(function () {
             $mdSidenav("left").open();
         })
-    }
+    }*/
 
     $scope.lyrOpenClose = function(navID) {
-        $mdSidenav(navID).toggle();
+        //console.log(navID);
+        $mdSidenav(navID).open();
+
     }
 
 
@@ -18,6 +20,9 @@ MyApp.controller('pagosCtrll', function ($scope,$mdSidenav) {
 
 
 });
+
+
+
 /*
 MyApp.controller('ListProvPag', function ($scope,$http) {
     $http({
