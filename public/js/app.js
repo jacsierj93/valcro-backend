@@ -43,7 +43,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
         }).then(function successCallback(response) {
             if (response.data.success) {
 
-                location.replace('angular/#home');
+                location.replace(PATHAPP +'#home');
 
                 /*$("#holderLogin").animate({
                     opacity: 0
@@ -55,8 +55,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
             console.log(response);
         });
 
-
-    }
+    };
 
 }]);
 
