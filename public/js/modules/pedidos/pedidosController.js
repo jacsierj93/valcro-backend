@@ -32,7 +32,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         pedidos: new Array(),
         tipo: new Array(),
         monedas: new Array(),
-        direcciones:new Array()
+        direcciones:new Array(),
+        odc: new Array()
     }
     init();
 
@@ -67,13 +68,51 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.closeLayer=closeLayer;
     $scope.addPedido=addPedido;
 
+    $scope.odcEstatus= function(odc){
+        if(odc.aprobada){
+            return 'Asignada';
+        }else {
+            return 'No asignada';
+        }
+    }
+
+    $scope.change= function(odc){
+
+
+        if(odc.asig){
+            $http({
+                method: 'POST',
+                url: 'Order/AddPurchaseOrder',
+                data:{ id:odc.id, pedido_id:$scope.pedidoSelec.id}
+            }).then(function successCallback(response) {
+                $scope.provSelec.pedidos=response.data.pedidos;
+
+            }, function errorCallback(response) {
+                console.log("errorrr");
+            });
+        }else{
+            $http({
+                method: 'POST',
+                url: 'Order/RemovePurchaseOrder',
+                data:{ id:odc.id}
+            }).then(function successCallback(response) {
+                $scope.provSelec.pedidos=response.data.pedidos;
+
+            }, function errorCallback(response) {
+                console.log("errorrr");
+            });
+        }
+
+    }
+
     //al selecionar provedor
-    function setProv(id){
-        $scope.id=id;
+    function setProv(prov){
+        $scope.id=prov.id;
+        $scope.provSelec=prov;
         $http({
             method: 'POST',
             url: 'Order/OrderProvOrder',
-            data:{ id:id}
+            data:{ id:prov.id}
         }).then(function successCallback(response) {
             $scope.provSelec.pedidos=response.data.pedidos;
 
@@ -81,6 +120,27 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             console.log("errorrr");
         });
         openLayer('listPedido');
+
+        $http({
+            method: 'POST',
+            url: 'Order/ProviderOrder',
+            data:{ id:prov.id}
+        }).then(function successCallback(response) {
+            var odcs= new Array();
+            for(var i=0;i<response.data.length;i++){
+                var odc=response.data[i];
+                odc.asig=false;
+                if(odc.pedido_id != null){
+                    odc.asig=true;
+                }
+                odcs.push(odc);
+            }
+            $scope.formData.odc=odcs;
+
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
     }
 
     // abirti un layer
@@ -115,6 +175,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             console.log("errorrr");
         });
     }
+
     function addPedido(){
         if(openLayer('detallePedido')){
             loadDataFor();
@@ -249,7 +310,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             data:$scope.pedidoSelec
         }).then(function successCallback(response) {
             $scope.FormdetallePedido.$setPristine();
-            if(!response.data.error){
+            if(response.data.success){
                 $scope.pedidoSelec.id=response.data.pedido.id;
             }
             console.log(response);
