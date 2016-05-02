@@ -22,7 +22,46 @@ MyApp.factory('providers', ['$resource',
     }
 ]);
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
+MyApp.service("lyerMngr",function(){
+    var layer = false;
+    return {
+        getLayer:function(){
+            return layer;
+        },
+        setLayer : function(lyr){
+            layer = lyr;
+        }
+    }
+});
+
+
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,lyerMngr) {
+    var historia= [15];
+    var index=0;
+    var base =264;
+    $scope.nextLayer = lyerMngr.getLayer();
+    function openLayer(layer,callback){
+        if(historia.indexOf(layer)==-1){
+            var l=$document.find("#"+layer);
+            index++;
+            var w= base+(24*index);
+            l.css('width','calc(100% - '+w+'px)');
+            $mdSidenav(layer).open().then(callback);
+            historia[index]=layer;
+            return true;
+        }
+        return false;
+    }
+
+    function closeLayer(){
+        var layer=historia[index];
+        historia[index]=null;
+        index--;
+        $mdSidenav(layer).close().then(callback);;
+    }
+    $scope.openLayer = openLayer;
+    $scope.closeLayer = closeLayer;
+
     $scope.states = masters.query({ type:"getProviderType"}); //typeProv.query()
 
     $scope.envios = masters.query({ type:"getProviderTypeSend"});
@@ -33,8 +72,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     $scope.setProv = function(prov){
         setGetProv.setProv(prov.item);
-        $mdSidenav("left").close().then(function(){
-            $mdSidenav("left").open();
+        $mdSidenav("layer1").close().then(function(){
+            console.log(angular.element(document).find("#layer1"));
+            $mdSidenav("layer1").open();
         });
     };
 
@@ -50,6 +90,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             $mdSidenav("NEXT").close()
         }
     }
+
+
 });
 
 
@@ -168,7 +210,6 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
-
             providers.put({type:"saveProv"},$scope.dtaPrv,function(data){
                 $scope.dtaPrv.id = data.id;
                 $scope.projectForm.$setPristine();
