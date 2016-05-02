@@ -1,19 +1,34 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
 
     var historia= [15];
     var index=0;
+
+    $scope.todos = new Array();
+
+    /* proveedor selecionado*/
     $scope.provSelec={
         id:'-1',
         razon_social:'',
         pedidos: new Array()
     }
-    $scope.todos = new Array();
     $scope.id= $scope.provSelec.id;
+
+    /**pedido selecionado*/
     $scope.pedidoSelec={
         pais_id:'-1',
         id:''
     }
+
     $scope.status = 0;
+
+    /** orden de compra selecionada */
+    $scope.odcSelec={
+        id:'-1',
+        status: function(){
+            return 'hola';
+        }
+    }
+
     $scope.selec = function(status) {
         if (status ==1 || status ==3) {
             return true;
@@ -68,14 +83,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.closeLayer=closeLayer;
     $scope.addPedido=addPedido;
 
-    $scope.odcEstatus= function(odc){
-        if(odc.aprobada){
-            return 'Asignada';
-        }else {
-            return 'No asignada';
+    $scope.selecOdc= function(odc){
+        openLayer("resumenodc");
+        $http({
+            method: 'POST',
+            url: 'Order/PurchaseOrder',
+            data:{id:odc.id}
+        }).then(function successCallback(response) {
+            $scope.odcSelec= response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+
+
+    $scope.next = function (){
+        var  curren= historia[index];
+        switch (curren){
+            case 'detallePedido':
+                openLayer('agrPed')
+                break;
         }
     }
-/***************** Pro arreglar*/
+    /***************** Pro arreglar*/
+
     $scope.showNext = function(status){
         if(status){
             $mdSidenav("NEXT").open()
@@ -83,6 +115,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             $mdSidenav("NEXT").close()
         }
     }
+
+
     $scope.change= function(odc){
 
 
@@ -92,7 +126,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
                 url: 'Order/AddPurchaseOrder',
                 data:{ id:odc.id, pedido_id:$scope.pedidoSelec.id}
             }).then(function successCallback(response) {
-                $scope.provSelec.pedidos=response.data.pedidos;
+                // $scope.provSelec.pedidos=response.data.pedidos;
 
             }, function errorCallback(response) {
                 console.log("errorrr");
@@ -103,7 +137,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
                 url: 'Order/RemovePurchaseOrder',
                 data:{ id:odc.id}
             }).then(function successCallback(response) {
-                $scope.provSelec.pedidos=response.data.pedidos;
+                //$scope.provSelec.pedidos=response.data.pedidos;
 
             }, function errorCallback(response) {
                 console.log("errorrr");
@@ -274,7 +308,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         $mdSidenav(layer).close();
         switch (layer){
             case 'odc':
-                selecPedido($scope.pedidoSelec);
+                $http({
+                    method: 'POST',
+                    url: 'Order/Order',
+                    data:{ id:$scope.pedidoSelec.id}
+                }).then(function successCallback(response) {
+                    $scope.pedidoSelec=response.data;
+                }, function errorCallback(response) {
+                    console.log("errorrr");
+                });
                 break;
 
         }
@@ -335,4 +377,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     }
 
+    /**************************** Conversiones ****************/
+    $scope.odcEstatus= function(odc){
+        if(odc.pedido_id!=null){
+            return 'Asignada';
+        }else {
+            return 'No asignada';
+        }
+    }
+
+    $scope.dateParse= function (data){
+        var newData= Date.parse(data);
+        return newData;
+    }
+
+    /**********  peticiones ************/
+
 });
+
+//###########################################################################################3
+//##############################REST service (factory)#############################################3
+//###########################################################################################3
+MyApp.factory('Order', ['$resource',
+    function ($resource) {
+        return $resource('Order/:type', {}, {
+            query: {method: 'POST', params: {type: ""}}
+        });
+    }
+]);

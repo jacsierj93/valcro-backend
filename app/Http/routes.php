@@ -218,10 +218,6 @@ $app->post("catalogs/ProviderAdressStore",'Purchases\OrderController@getProvider
 $app->post("catalogs/ProviderPaymentCondition",'Purchases\OrderController@getProviderPaymentCondition'); ///getProductos de provedor
 
 
-//anexar a Orden
-$app->post("catalogs/PurchaseOrder",'Purchases\OrderController@getPurchaseOrder'); ///getProductos de provedor
-//
-
 // pedidos
 $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
 $app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///llenado de filtros a proveedores

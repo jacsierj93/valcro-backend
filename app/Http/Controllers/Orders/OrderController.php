@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Orders;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Monedas;
+use App\Models\Sistema\Product;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Order\OrderType;
 use App\Models\Sistema\Purchase\PurchaseOrder;
@@ -178,7 +179,22 @@ class OrderController extends BaseController
      * Obtiene la orden de compra
      ***/
     public function getPurchaseOrder(Request $req){
-        return PurchaseOrder::where('id',$req->id)->first();
+        $model =PurchaseOrder::findOrFail($req->id);
+        $products=Array();
+
+        $i=0;
+        foreach( $model->getItems()->get() as $aux){
+            $products[$i]['id']= $aux->id;
+            $auxPro=Product::findOrFail($aux->producto_id);
+            $products[$i]['profit_id']=$auxPro->codigo_profit;
+            $products[$i]['tipo']='desconocido';
+            $products[$i]['descripcion']=$auxPro->descripcion_profit;
+            $products[$i]['cantidad']=$aux->cantidad;
+            $products[$i]['comentario']="  ";// no comentario
+            $products[$i]['adjunto']="";// no adjuntos
+        }
+        $model['productos']= $products;
+        return $model;
     }
 
     /**

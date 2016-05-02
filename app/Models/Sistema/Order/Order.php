@@ -34,10 +34,10 @@ class Order extends Model
     public function getTypeOrder(){
         return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
     }
-/*
+
     public function getEmisionAttribute($value)
     {
-        return date("d/m/Y", strtotime($value));;
-    }*/
+        return date("Y-m-d", strtotime($value));;
+    }
 
 }

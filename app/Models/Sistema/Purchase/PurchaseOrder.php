@@ -33,4 +33,9 @@ class PurchaseOrder extends Model
     }
 
 
+    public function getemisionAttribute($value)
+    {
+        return date("d-m-Y", strtotime($value));;
+    }
+
 }

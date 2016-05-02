@@ -17,7 +17,7 @@ class PurchaseOrderItem extends Model
     use SoftDeletes;
     protected $table = "tbl_compra_orden_item";
 
-    public  function getProductoProfit(){
+    public  function producto(){
         return $this->belongsTo('App\Models\Sistema\Product', 'producto_id', 'id');
 
     }
