@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Orders;
 
+use App\Models\Sistema\KitchenBoxs\KitchenBox;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Monedas;
 use App\Models\Sistema\Product;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Order\OrderType;
+use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Order\Order;
 use App\Models\Sistema\Order\OrderStatus;
@@ -18,7 +20,7 @@ use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
-//PaymentType
+//CustomOrder
 
 class OrderController extends BaseController
 {
@@ -94,51 +96,34 @@ class OrderController extends BaseController
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
         $data['tipoDepago'] = PaymentType::select('descripcion', 'id')->where("deleted_at",NULL)->get();
-        /*
-        if ($req->has('id')) {
-            $ped = Order::findOrFail($req->id);
-            $ped['ordenes']= $ped->getOrders()->get();
-            $data['pedido']=$ped;
-            $model=  ProviderAddress::where('prov_id',$ped->prov_id)->get();
-            $pais= Array();
-            foreach( $model as $aux){
-                $pais[]= $aux->country()->first();
-
-            }
-            $data['paises']= $pais;
-            $data['monedas'] = Provider::findOrFail($ped->prov_id)->first()->getProviderCoin()->get();
-            $auxCond=Provider::findOrFail($ped->prov_id)->first()->getPaymentCondition()->get();
-            $cond= Array();
-            $i=0;
-            $text='';
-            foreach( $auxCond as $aux){
-                $cond[$i]['id']= $aux->id;
-                foreach( $aux->getItems()->get() as $aux2){
-                    $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
-                }
-                $cond[$i]['titulo']= $text;
-                $text='';
-                $i++;
-            }
-
-            $data['condicionPago']=$cond;
-
-        }*/
-
-
         return $data;
 
     }
 
-
     /**
      * obtiene las ordenes de compra de un pedido
      */
-
     public function getOrdenPurchaseOrder(Request $req){
         return $ped = Order::findOrFail($req->id)->getOrders()->get();
     }
 
+    /**
+     * obtiene los contra pedidos de un proveedor
+     */
+    public function getCustomOrders(Request $req){
+        $model =CustomOrder::where('prov_id',$req->prov_id);
+
+        return $model->get();
+    }
+
+    /**
+     * obtiene los kitchen box de un proveedor
+     */
+    public function getKitchenBoxs(Request $req){
+        $model =KitchenBox::where('prov_id',$req->prov_id);
+
+        return $model->get();
+    }
     /**
      * obtiene las ordenes de compra de un pedido
      */

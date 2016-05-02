@@ -645,7 +645,7 @@
                         <div>
                             Contrapedidos
                         </div>
-                        <div ng-click="setPed('agrContPed')">
+                        <div ng-click="addContraPedido()">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
                         </div>
                     </div>
@@ -656,7 +656,7 @@
                         <div>
                             Kitchen Boxs
                         </div>
-                        <div ng-click="setPed('agrKitBoxs')">
+                        <div ng-click="addkitChenBox()">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
                     </div>
@@ -688,6 +688,7 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
+                        <div flex="5" class="headGrid"> % </div>
                         <div flex class="headGrid"> Nº de Contrapedido</div>
                         <div flex class="headGrid"> Fecha</div>
                         <div flex class="headGrid"> Comentarios</div>
@@ -697,7 +698,10 @@
                     </div>
                     <div id="gridContPed">
                         <div flex>
-                            <div layout="row" class="cellGridHolder">
+                            <div layout="row" class="cellGridHolder" ng-repeat="contraP in formData.contraPedido">
+                                <div class="cellGrid" flex="5">
+                                    <md-switch class="md-primary"></md-switch>
+                                </div>
                                 <div flex class="cellGrid"> Data 1</div>
                                 <div flex class="cellGrid"> Data 2</div>
                                 <div flex class="cellGrid"> Data 3</div>
@@ -733,7 +737,7 @@
                     </div>
                     <div id="gridKitBoxs">
                         <div flex>
-                            <div layout="row" class="cellGridHolder">
+                            <div layout="row" class="cellGridHolder" ng-repeat="kitchenBox in formData.kitchenBox">
                                 <div flex class="cellGrid"> Data 1</div>
                                 <div flex class="cellGrid"> Data 2</div>
                                 <div flex class="cellGrid"> Data 3</div>

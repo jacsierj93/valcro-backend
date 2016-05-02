@@ -29,14 +29,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
         }
     }
 
-    $scope.selec = function(status) {
+    /*$scope.selec = function(status) {
         if (status ==1 || status ==3) {
             return true;
         } else {
             return false;
         }
     }
-
+*/
 
     $scope.filterData={
         monedas: new Array(),
@@ -48,7 +48,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
         tipo: new Array(),
         monedas: new Array(),
         direcciones:new Array(),
-        odc: new Array()
+        odc: new Array(),
+        contraPedido: new Array(),
+        kitchenBox: new Array()
     }
     init();
 
@@ -82,6 +84,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     $scope.selecPedido=selecPedido;
     $scope.closeLayer=closeLayer;
     $scope.addPedido=addPedido;
+    $scope.addContraPedido =addContraPedido;
+    $scope.addkitChenBox =addkitChenBox;
 
     $scope.selecOdc= function(odc){
         openLayer("resumenodc");
@@ -96,8 +100,35 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
         });
     }
 
+    function addContraPedido(){
+        openLayer("agrContPed");
+      //  contraPedido
+        $http({
+            method: 'POST',
+            url: 'Order/CustomOrders',
+            data:{prov_id:$scope.provSelec.id}
+        }).then(function successCallback(response) {
+             $scope.formData.contraPedido= response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function addkitChenBox(){
+        openLayer("agrKitBoxs");
+       $http({
+            method: 'POST',
+            url: 'Order/KitchenBoxs',
+            data:{prov_id:$scope.provSelec.id}
+        }).then(function successCallback(response) {
+           $scope.formData.kitchenBox= response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
 
 
+    /** al pulsar la flecha siguiente**/
     $scope.next = function (){
         var  curren= historia[index];
         switch (curren){
@@ -106,7 +137,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
                 break;
         }
     }
-    /***************** Pro arreglar*/
 
     $scope.showNext = function(status){
         if(status){
@@ -150,6 +180,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     function setProv(prov){
         $scope.id=prov.id;
         $scope.provSelec=prov;
+
         $http({
             method: 'POST',
             url: 'Order/OrderProvOrder',
@@ -396,7 +427,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
 });
 
 //###########################################################################################3
-//##############################REST service (factory)#############################################3
+//##############################REST service (factory) no funciona#############################################3
 //###########################################################################################3
 MyApp.factory('Order', ['$resource',
     function ($resource) {
