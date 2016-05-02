@@ -75,7 +75,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             return 'No asignada';
         }
     }
-
+/***************** Pro arreglar*/
+    $scope.showNext = function(status){
+        if(status){
+            $mdSidenav("NEXT").open()
+        }else{
+            $mdSidenav("NEXT").close()
+        }
+    }
     $scope.change= function(odc){
 
 
@@ -265,6 +272,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         historia[index]=null;
         index--;
         $mdSidenav(layer).close();
+        switch (layer){
+            case 'odc':
+                selecPedido($scope.pedidoSelec);
+                break;
+
+        }
     }
     $scope.setPed= function(ped){
         openLayer(ped);

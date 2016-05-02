@@ -165,7 +165,7 @@ class OrderController extends BaseController
 
     public function addPurchaseOrder(Request $req){
         $model= PurchaseOrder::findOrFail($req->id);
-        $model->pedido_id=$req->id;
+        $model->pedido_id=$req->pedido_id;
         $model->save();
     }
 

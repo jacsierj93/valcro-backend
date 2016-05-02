@@ -42,16 +42,16 @@
                         </md-option>
                     </md-select>
 
-                    </md-input-container>
-                </div>
-                <div layout="column" layout-align="center center" flex="25">
-                    <md-input-container class="md-block" >
-                        <label>Moneda</label>
-                        <md-select ng-model="pedidoSelec.prov_moneda_id"  required>
-                            <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
-                                {{moneda.nombre}}
-                            </md-option>
-                        </md-select>
+                </md-input-container>
+            </div>
+            <div layout="column" layout-align="center center" flex="25">
+                <md-input-container class="md-block" >
+                    <label>Moneda</label>
+                    <md-select ng-model="pedidoSelec.prov_moneda_id"  required>
+                        <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
+                            {{moneda.nombre}}
+                        </md-option>
+                    </md-select>
 
                 </md-input-container>
             </div>
@@ -169,7 +169,7 @@
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
-                                <div flex="15" class="cellGrid"> {{pedido.nro_doc}}</div>
+                                <div flex="15" class="cellGrid"> {{pedido.id}}</div>
                                 <div flex="15" class="cellGrid"> {{pedido.nro_proforma}}</div>
                                 <div flex="10" class="cellGrid"> {{pedido.emision  }}</div>
                                 <div flex="15" class="cellGrid"> {{pedido.nro_factura}}</div>
@@ -220,7 +220,7 @@
                         <md-input-container class="md-block" flex="30">
                             <label>N° de Pedido</label>
                             <input  name="nro_doc"
-                                   ng-model="pedidoSelec.id" ng-disabled="true">
+                                    ng-model="pedidoSelec.id" ng-disabled="true">
                         </md-input-container>
                     </div>
 
@@ -370,13 +370,13 @@
                         </md-input-container>
                     </div>
 
-                    </form>
+                </form>
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Aprovacion de Gerente
-                        </div>
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Aprovacion de Gerente
                     </div>
+                </div>
 
                 <div layout="row" >
 
@@ -384,13 +384,13 @@
                         <label>Estatus</label>
                         <md-select ng-model="status" name ="estado" >
                             <md-option  value="1" >
-                               Pendiente
+                                Pendiente
                             </md-option>
                             <md-option  value="2">
-                               Aprobado
+                                Aprobado
                             </md-option>
                             <md-option  value="3">
-                              Cancelado
+                                Cancelado
                             </md-option>
                         </md-select>
                     </md-input-container>
@@ -459,13 +459,13 @@
                             </div>-->
                         </md-input-container>
                     </div>
-                    </form>
+                </form>
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Compromiso
-                        </div>
+                <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div>
+                        Compromiso
                     </div>
+                </div>
 
                 <form name="compromiso">
 
@@ -793,6 +793,10 @@
                     </div>
                 </form>
             </md-content>
+        </md-sidenav>
+        <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
+            <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
     </div>
 
