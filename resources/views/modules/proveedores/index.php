@@ -17,7 +17,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center" ng-click="toggleLeft()">
+            <div layout="column" layout-align="center center" ng-click="addProv()">
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
@@ -56,7 +56,7 @@
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
         <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-            <?= HTML::image("images/btn_prevArrow.png") ?>
+            <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"closeLayer()","ng-show"=>"(index>0)")) ?>
         </div>
 
         <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
@@ -162,7 +162,7 @@
 
 
         <!-- 15) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PROVEEDOR ########################################## -->
-        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1">
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="layer1">
 
             <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
@@ -256,7 +256,6 @@
                                 <span>
                                   <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
                                   <span>{{$chip.name}}</span>
-                                  <!--<em>({{$chip.dep}})</em>-->
                                 </span>
                             </md-chip-template>
                         </md-chips>
@@ -431,7 +430,7 @@
 
             </md-content>
 
-            <div style="width: 16px;" ng-mouseover="showNext(true)" >
+            <div style="width: 16px;" ng-mouseover="showNext(true,'layer2')" >
 
             </div>
 
@@ -459,7 +458,7 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER (3) INFORMACION FINANCIERA ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
                 <form name="provMoneda">
@@ -485,7 +484,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
-                <form ng-controller="bankInfoController">
+                <form ng-controller="bankInfoController" name="bankInfoForm">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Informacion Bancaria
@@ -494,17 +493,17 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Banco</label>
-                            <input name="bnk.bankName"/>
+                            <input ng-model="bnk.bankName" required/>
 
                         </md-input-container>
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre Beneficiario</label>
-                            <input name="bnk.bankBenef"/>
+                            <input ng-model="bnk.bankBenef" required/>
 
                         </md-input-container>
                         <md-input-container class="md-block" flex="40">
                             <label>Direccion</label>
-                            <input name="bnk.bankAddr"/>
+                            <input ng-model="bnk.bankAddr"/>
 
                         </md-input-container>
                     </div>
@@ -519,33 +518,33 @@
                             </md-select>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="20" >
                             <label>Estado</label>
-                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="bnk.est" name ="state" ng-disabled="enabled || (bnk.pais==false)">
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
-                                    {{state.nombre}}
+                                    {{state.local_name}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Ciudad</label>
-                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
-                                <md-option ng-repeat="state in states" value="{{state.id}}">
-                                    {{state.nombre}}
+                            <md-select ng-model="bnk.ciudad" name ="state" ng-disabled="enabled || (bnk.est==false)" required>
+                                <md-option ng-repeat="city in cities" value="{{city.id}}">
+                                    {{city.local_name}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>SWIF</label>
-                            <input name="bnk.bankAddr"/>
+                            <input ng-model="bnk.bankSwift" required/>
 
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>IBAN</label>
-                            <input name="bnk.bankAddr"/>
+                            <input ng-model="bnk.bankIban" required/>
 
                         </md-input-container>
                     </div>
@@ -632,10 +631,13 @@
                 </form>
 
             </md-content>
+            <div style="width: 16px;" ng-mouseover="showNext(true,'layer3')" >
+
+            </div>
         </md-sidenav>
 
         <!-- ########################################## LAYER (4) TIEMPOS (PRODUCCION/TRANSITO) ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
                 <form name="provPoint">
@@ -723,10 +725,13 @@
                     </div>
                 </form>
             </md-content>
+            <div style="width: 16px;" ng-mouseover="showNext(true,'END')" >
+
+            </div>
         </md-sidenav>
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
-            <?= HTML::image("images/btn_nextArrow.png") ?>
+            <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"openLayer()")) ?>
         </md-sidenav>
         <!-- 8) ########################################## BOTON Next ########################################## -->
 

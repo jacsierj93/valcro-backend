@@ -16,6 +16,7 @@ use App\Models\Sistema\Provider;
 use App\Models\Sistema\NombreValcro;
 use App\Models\Sistema\Contactos;
 use App\Models\Sistema\ProviderAddress as Address;
+use App\Models\Sistema\BankAccount as Bank;
 use Session;
 use Validator;
 
@@ -166,6 +167,34 @@ class ProvidersController extends BaseController
             Provider::find($req->prov_id)->contacts()->attach($valName->id);
         }
         $result['id']=$valName->id;
+        return $result;
+    }
+
+    public function getBank($id){
+        $accounts = Provider::find($id)->bankAccount()->get();
+        return ($accounts)?$accounts:[];
+    }
+
+    public function saveInfoBank(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $bank = Bank::find($req->id);
+            $result['action']="upd";
+        }else{
+            $bank = new Bank();
+        }
+
+        $bank->banco = $req->bankName;
+        $bank->cuenta = $req->bankIban;
+        $bank->swift = $req->bankSwift;
+        $bank->beneficiario = $req->bankBenef;
+        $bank->dir_banco = $req->bankAddr;
+        $bank->dir_beneficiario = $req->dirBenef;
+        $bank->ciudad_id = $req->ciudad;
+        $bank->prov_id = $req->idProv;
+
+        $bank->save();
+        $result['id']=$bank->id;
         return $result;
     }
 

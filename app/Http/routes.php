@@ -119,17 +119,21 @@ $app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir');
 $app->post("provider/saveValcroName",'Providers\ProvidersController@saveValcroName'); ///obtener listado de direcciones
 $app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName');
 $app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact');
+$app->post("provider/saveBank",'Providers\ProvidersController@saveInfoBank');//guarda la informacion bancaria de un proveedor
+
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
 $app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
 $app->get("provider/allContacts",'Providers\ProvidersController@allContacts');
+$app->get("provider/getBankAccount/{id}",'Providers\ProvidersController@getBank');//obtener datos apra grid de cuentas bancarias
 
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
 $app->get("master/getProviderType",'Masters\MasterController@getProviderType'); ///obtener listado de tipos de proveedores
 $app->get("master/getProviderTypeSend",'Masters\MasterController@getProviderTypeSend'); ///obtener listado de tipos de envio de proveedores
 $app->get("master/getCoins",'Masters\MasterController@getCoins'); ///obtener listado de monedas
-$app->get("master/fullCountries",'Masters\MasterController@getFullCountry'); ///obtener listado de paises->estados->ciudades
+$app->get("master/getStates/{id}",'Masters\MasterController@getStates'); ///obtener listado de paises->estados
+$app->get("master/getCities/{id}",'Masters\MasterController@getCities'); ///obtener listado de estados->ciudad
 
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos

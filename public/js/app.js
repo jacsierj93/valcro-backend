@@ -109,12 +109,6 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
     //###########################################################################################3
     //$scope.toggleLeft = buildToggler('left');
 
-    $scope.toggleLeft = function() {
-        setGetProv.setProv(false)
-        $mdSidenav("left").close().then(function () {
-            $mdSidenav("left").open();
-        })
-    }
     $scope.toggleRight = buildToggler('right');
     $scope.toggleOtro = buildToggler('otro');
     function buildToggler(navID) {
