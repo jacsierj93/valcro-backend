@@ -110,9 +110,22 @@ MyApp.controller('TipoDirecc', function ($scope) {
     });
 });
 
-MyApp.controller('provCoins', function ($scope,masters) {
-    $scope.coins =  masters.query({ type:"getCoins"});
-})
+MyApp.controller('allCoinsController', function ($scope,masters,listCoins,setGetProv) {
+    $scope.coins = masters.query({ type:"getCoins"});
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo) {
+        $scope.filt = listCoins.getIdCoins();
+    });
+});
+
+MyApp.controller('provCoins', function ($scope,listCoins,setGetProv) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.coins = listCoins.getCoins();
+    })
+
+
+});
 
 MyApp.controller('ListPaises', function ($scope,$http,masters) {
     $scope.paises = masters.query({ type:"getCountries"});
@@ -438,11 +451,39 @@ MyApp.service("setGetContac",function(){
     }
 });
 
-MyApp.controller('coinController', function ($scope,masters,providers,setGetProv) {
-    $scope.prov = setGetProv.getSel();
+MyApp.service("listCoins",function(providers) {
+    var selCoins =[];
+    var coinIds = [];
 
-    $scope.coinAssign = providers.query({type:"",id_prov:$scope.prov.id});
+    return {
+        setProv:function(id_prov){
+            selCoins = providers.query({type:"provCoins",id_prov:id_prov||0});
+            coinIds = providers.query({type:"listCoin",id_prov:id_prov||0});
+        },
+        getCoins:function(){
+            return selCoins;
+        },
+        getIdCoins: function(){
+            return coinIds;
+        }
+    }
 })
+
+MyApp.controller('coinController', function ($scope,masters,providers,setGetProv,listCoins) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        listCoins.setProv(nvo);
+        $scope.coinAssign = listCoins.getCoins();
+
+    })
+    $scope.cn = {coin:""};
+    $scope.$watchGroup(['provMoneda.$valid','provMoneda.$pristine'], function(nuevo) {
+        providers.put({type:"saveCoin"},$scope.cn,function(data){
+            $scope.bankInfoForm.$setPristine();
+        })
+    })
+
+});
 
 
 MyApp.controller('bankInfoController', function ($scope,masters,providers,setGetProv) {
@@ -476,11 +517,21 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
     });
 
     $scope.showGrid = function(elem){
-        console.log("asad")
         $scope.isShow = elem;
         if(!elem){
             $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
          }
     };
+
+});
+
+
+MyApp.controller('creditCtrl', function ($scope,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
+    $scope.limits =  providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
+    $scope.$watch('prov.id',function(nvo){
+
+    })
+
 
 });

@@ -272,7 +272,7 @@
 
                     <md-input-container class="md-block" flex>
                         <label>Direccion</label>
-                        <input maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                        <input maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv" >
                         <!--<div ng-messages="nomvalcroForm.direccProv.$error">
                             <div ng-message="required">Campo Obligatorio.</div>
                             <div ng-message="md-maxlength">La direccion debe tener maximo 250 caracteres.</div>
@@ -298,7 +298,7 @@
                         <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
                             <label>Pais</label>
                             <md-select ng-model="dir.pais">
-                                <md-option ng-repeat="pais in paises" value="{{pais.id}}">
+                                <md-option ng-repeat="pais in paises" value="{{pais.id}}" >
                                     {{pais.nombre}}
                                 </md-option>
                             </md-select>
@@ -461,17 +461,17 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda">
+                <form name="provMoneda" ng-controller="coinController">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" flex>
                         <div>
                            Moneda
                         </div>
                     </div>
                     <div layout="row">
-                        <md-input-container class="md-block" flex="20" ng-controller="provCoins">
+                        <md-input-container class="md-block" flex="20" ng-controller="allCoinsController">
                             <label>Moneda</label>
                             <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled">
-                                <md-option ng-repeat="coin in coins" ng-if="" value="{{coin.id}}">
+                                <md-option ng-repeat="coin in coins | filter{filt.indexOf(coin.id) == -1}" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
@@ -481,6 +481,9 @@
                                 <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
                             </div>-->
                         </md-input-container>
+                        <div layout="row" ng-repeat="coinSel in coinAssign">
+                            <div layout="10">{{coinSel.nombre}} ({{coinSel.simbolo}})</div>
+                        </div>
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
@@ -571,7 +574,7 @@
 
                 </form>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="provCred">
+                <form name="provCred" ng-controller="creditCtrl">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Credito
@@ -583,14 +586,34 @@
                             <input ng-model="cred.mount">
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="20" ng-controller="provCoins">
+                        <md-input-container class="md-block" flex="20">
                             <label>Moneda</label>
-                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled" ng-controller="provCoins">
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
+                    <div layout="column" ng-show="isShow">
+
+                        <div layout="row" class="headGridHolder">
+                            <!--<div flex="20" class="headGrid"> Fecha</div>-->
+                            <div flex="20" class="headGrid"> Limite</div>
+                            <div flex="30" class="headGrid"> Moneda</div>
+                        </div>
+                        <div id="grid">
+                            <div flex ng-repeat="lim in limits" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <!--<div flex="20" class="cellGrid"> {{lim.fecha}}</div>-->
+                                    <div flex="20" class="cellGrid"> {{lim.limite}}</div>
+                                    <div flex="30" class="cellGrid">{{lim.moneda.nombre}}</div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
@@ -641,7 +664,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-model="pnt.coin" name ="coin" ng-disabled="enabled">
+                            <md-select ng-model="pnt.coin" ng-disabled="enabled">
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
