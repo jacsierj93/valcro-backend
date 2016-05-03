@@ -208,7 +208,7 @@
                     </div>
 
                     <div layout="row"  class=rowInput>
-                        <md-input-container class="md-block" flex="30">
+                        <md-input-container class="md-block" flex="15">
                             <label>Tipo de Pedido</label>
                             <md-select ng-model="pedidoSelec.tipo_pedido_id" name ="tipo_pedido_id" ng-value="{{pedidoSelec.tipo_pedido_id}}">
                                 <md-option ng-repeat="tipo in formData.tipo" ng-value="{{tipo.id}}">
@@ -217,15 +217,13 @@
                             </md-select>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="30">
+                        <md-input-container class="md-block" flex="15">
                             <label>N° de Pedido</label>
                             <input  name="nro_doc"
                                     ng-model="pedidoSelec.id" ng-disabled="true">
                         </md-input-container>
-                    </div>
 
-                    <div layout="row"  class=rowInput>
-                        <md-input-container class="md-block" flex="40">
+                        <md-input-container class="md-block" flex >
                             <label>Proveedor</label>
                             <md-select ng-model="id" name ="prov_id" ng-disabled="true">
                                 <md-option ng-repeat="prov in todos" value="{{prov.id}}">
@@ -233,8 +231,12 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
 
-                        <md-input-container class="md-block" flex="20">
+                    <div layout="row"  class=rowInput>
+
+
+                        <md-input-container class="md-block" flex="30">
                             <label>Pais</label>
                             <md-select ng-model="pedidoSelec.pais_id" name ="pais_id" ng-disabled="status == 2">
                                 <md-option ng-repeat="pais in formData.paises" value="{{pais.id}}">
@@ -243,8 +245,6 @@
                             </md-select>
                         </md-input-container>
 
-                    </div>
-                    <div layout="row"  class=rowInput>
                         <md-input-container class="md-block"  flex>
                             <label>Direccion</label>
                             <md-select ng-model="pedidoSelec.direccion_almacen_id" name ="direccion_almacen_id" ng-disabled="status == 2">
@@ -255,17 +255,14 @@
                         </md-input-container>
 
                     </div>
+
                     <div layout="row" >
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input  ng-model="pedidoSelec.monto" name="monto" required  ng-disabled="status == 2">
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
+                            <input  ng-model="pedidoSelec.monto" numbersOnly name="monto" type="number" required  ng-disabled="status == 2">
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
                             <md-select ng-model="pedidoSelec.prov_moneda_id" name ="prov_moneda_id" ng-disabled="status == 2">
                                 <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}">
@@ -274,35 +271,17 @@
                             </md-select>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="10">
                             <label>Tasa</label>
                             <input  ng-model="pedidoSelec.tasa" name ="tasa" ng-disabled="status == 2">
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
                         </md-input-container>
 
-                        <div layout="row" flex="" >
-                            <md-input-container class="md-block" flex="20">
-                                <label>Fijar tasa</label>
-                                <input   name="tasa"  ng-disabled="status == 2" >
-                                <!--<div ng-messages="projectForm.siglas.$error">
-                                    <div ng-message="required">Obligatorio.</div>
-                                    <div ng-message="md-maxlength">maximo 4</div>
-                                </div>-->
-                            </md-input-container>
+                        <div flex="10">
+                            <md-switch class="md-primary"  ng-model="pedidoSelec.tasa_fija">
 
-                            <div flex=""  style="height: 30px;margin-top: 9px;  color: #999999;">
-                                <md-switch  class="md-primary"  ng-model="pedidoSelec.tasa_fija" ng-disabled="status == 2">
-
-                                </md-switch>
-                            </div>
+                            </md-switch>
                         </div>
 
-                    </div>
-
-                    <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
                             <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2" required>
@@ -311,6 +290,7 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+
                     </div>
 
                     <div layout="row" >
