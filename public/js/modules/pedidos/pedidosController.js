@@ -13,6 +13,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     $scope.openOdcs =openOdcs;
     $scope.selecOdc=selecOdc;
     $scope.removeLisContraP=removeLisContraP;
+    $scope.removeLisKitchenBox=removeLisKitchenBox;
 
 
     /*******incializacion de $scope*****/
@@ -52,6 +53,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
 
     function removeLisContraP(aux){
         removeContraPedido(aux.id,$scope.pedidoSelec.id);
+        loadPedido($scope.pedidoSelec.id);
+    }
+
+    function removeLisKitchenBox(aux){
+        removekitchenBox(aux.id,$scope.pedidoSelec.id);
         loadPedido($scope.pedidoSelec.id);
     }
     function selecOdc (odc){
