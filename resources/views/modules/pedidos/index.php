@@ -84,7 +84,7 @@
         <md-content class="barraLateral" >
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProv(item)">
+            <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProvedor(item)">
 
                 <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
 
@@ -199,7 +199,7 @@
                         <div  flex="15" class="md-block" style=" color: #999999;" >
                             Ordenes de Compra:
                         </div>
-                        <div flex=""   class="md-block" layout="row" style="overflow: hidden;" ng-click="setPed('odc')">
+                        <div flex=""   class="md-block" layout="row" style="overflow: hidden;" ng-click="openOdcs()">
                             <div style="margin-right: 4px; margin-left:4px;" ng-repeat="orden in pedidoSelec.ordenes" ng-disabled="status == 2">
                                 {{orden.nro_orden}}
                             </div>
@@ -591,7 +591,7 @@
                                     Aprobada
                                 </md-option>
                                 <md-option value="0">
-                                   No Aprobada
+                                    No Aprobada
                                 </md-option>
                             </md-select>
 
@@ -689,11 +689,11 @@
                     </div>
                     <div layout="row" class="headGridHolder">
                         <div flex="5" class="headGrid"> % </div>
-                        <div flex class="headGrid"> Nº de Contrapedido</div>
-                        <div flex class="headGrid"> Fecha</div>
-                        <div flex class="headGrid"> Comentarios</div>
-                        <div flex class="headGrid"> Fecha Aprox</div>
-                        <div flex class="headGrid"> Monto</div>
+                        <div flex="5" class="headGrid"> Id </div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Comentario</div>
+                        <div flex="10" class="headGrid"> Fecha Aprox</div>
+                        <div flex="15" class="headGrid"> Monto</div>
 
                     </div>
                     <div id="gridContPed">
@@ -702,11 +702,11 @@
                                 <div class="cellGrid" flex="5">
                                     <md-switch class="md-primary"></md-switch>
                                 </div>
-                                <div flex class="cellGrid"> Data 1</div>
-                                <div flex class="cellGrid"> Data 2</div>
-                                <div flex class="cellGrid"> Data 3</div>
-                                <div flex class="cellGrid"> Data 4</div>
-                                <div flex class="cellGrid"> Data 5</div>
+                                <div flex="5" class="cellGrid"> {{contraP.id}}</div>
+                                <div flex="10" class="cellGrid"> {{contraP.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid"> {{contraP.comentario}}</div>
+                                <div flex="10" class="cellGrid"> {{contraP.fecha_aprox_entrega | date:'dd/MM/yyyy' }}</div>
+                                <div flex="15" class="cellGrid"> {{contraP.monto}}</div>
                             </div>
                         </div>
                     </div>
@@ -726,28 +726,32 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
-                        <div flex class="headGrid">ID</div>
-                        <div flex class="headGrid"> Fecha</div>
-                        <div flex class="headGrid"> Nº de Proforma</div>
-                        <div flex class="headGrid"> IMG Proforma</div>
-                        <div flex class="headGrid"> Monto</div>
-                        <div flex class="headGrid"> Precio</div>
+                        <div flex="5" class="headGrid"> % </div>
+                        <div flex="5" class="headGrid">ID</div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex="15" class="headGrid"> Nº de Proforma</div>
+                        <div flex="10" class="headGrid"> IMG Proforma</div>
+                        <div flex="15" class="headGrid"> Monto</div>
+                        <div flex="15" class="headGrid"> Precio</div>
                         <div flex class="headGrid"> Tiemp. Aprox. de Entrega</div>
 
                     </div>
                     <div id="gridKitBoxs">
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="kitchenBox in formData.kitchenBox">
-                                <div flex class="cellGrid"> Data 1</div>
-                                <div flex class="cellGrid"> Data 2</div>
-                                <div flex class="cellGrid"> Data 3</div>
-                                <div flex class="cellGrid"> Data 4</div>
-                                <div flex class="cellGrid"> Data 5</div>
-                                <div flex class="cellGrid"> Data 6</div>
-                                <div flex class="cellGrid"> Data 7</div>
+                                <div class="cellGrid" flex="5">
+                                    <md-switch class="md-primary"></md-switch>
+                                </div>
+                                <div flex="5" class="cellGrid"> {{kitchenBox.id}}</div>
+                                <div flex="10" class="cellGrid"> {{kitchenBox.fecha | date:'dd/MM/yyyy'}}</div>
+                                <div flex="15" class="cellGrid"> {{kitchenBox.num_proforma}}</div>
+                                <div flex="10" class="cellGrid"> {{kitchenBox.img_proforma}}</div>
+                                <div flex="15" class="cellGrid"> {{kitchenBox.monto}}</div>
+                                <div flex="15" class="cellGrid"> {{kitchenBox.precio}}</div>
+                                <div flex class="cellGrid"> {{kitchenBox.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
                             </div>
                         </div>
-                    </div>
+                     </div>
                 </form>
             </md-content>
         </md-sidenav>

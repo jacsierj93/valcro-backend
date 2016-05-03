@@ -18,4 +18,9 @@ class CustomOrder extends Model
     protected $table = "tbl_contra_pedido";
 
 
+    public function getfechaAttribute($value)
+    {
+        return date("Y-m-d", strtotime($value));;
+    }
+
 }
