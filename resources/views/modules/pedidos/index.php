@@ -645,13 +645,25 @@
                         <div>
                             Contrapedidos
                         </div>
-                        <div ng-click="addContraPedido()">
+                        <div ng-click="openContraPedido()">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
                         </div>
                     </div>
 
+                    <div >
+                        <div layout="column" flex="" style="margin-left: 8px;">
+                            <div layout="row" class="cellGridHolder" ng-repeat="contraP in pedidoSelec.contraPedido">
+
+                                <div flex class="cellGrid"> {{contraP.id}}</div>
+                                <div flex class="cellGrid"> {{contraP.titulo}}</div>
+                                <div flex class="cellGrid"> {{contraP.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" ng-click="removeLisContraP(contraP)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-                <div layout="Column" flex>
+                <div layout="column" flex>
                     <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
                         <div>
                             Kitchen Boxs
@@ -660,6 +672,8 @@
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
                     </div>
+
+
 
                 </div>
                 <div layout="Column" flex>
@@ -691,6 +705,7 @@
                         <div flex="5" class="headGrid"> % </div>
                         <div flex="5" class="headGrid"> Id </div>
                         <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Titulo</div>
                         <div flex class="headGrid"> Comentario</div>
                         <div flex="10" class="headGrid"> Fecha Aprox</div>
                         <div flex="15" class="headGrid"> Monto</div>
@@ -700,10 +715,11 @@
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="contraP in formData.contraPedido">
                                 <div class="cellGrid" flex="5">
-                                    <md-switch class="md-primary"></md-switch>
+                                    <md-switch class="md-primary" ng-model="contraP.asig" ng-change="changeContraP(contraP)"></md-switch>
                                 </div>
                                 <div flex="5" class="cellGrid"> {{contraP.id}}</div>
                                 <div flex="10" class="cellGrid"> {{contraP.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid"> {{contraP.titulo}}</div>
                                 <div flex class="cellGrid"> {{contraP.comentario}}</div>
                                 <div flex="10" class="cellGrid"> {{contraP.fecha_aprox_entrega | date:'dd/MM/yyyy' }}</div>
                                 <div flex="15" class="cellGrid"> {{contraP.monto}}</div>
@@ -751,7 +767,7 @@
                                 <div flex class="cellGrid"> {{kitchenBox.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
                             </div>
                         </div>
-                     </div>
+                    </div>
                 </form>
             </md-content>
         </md-sidenav>

@@ -242,4 +242,5 @@ $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrd
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
 $app->post("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->post("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
-
+$app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el pedido
+$app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///elimina el pedido

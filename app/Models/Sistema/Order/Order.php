@@ -35,6 +35,12 @@ class Order extends Model
         return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
     }
 
+    /**
+     */
+    public function customOrder(){
+        return $this->belongsToMany('App\Models\Sistema\CustomOrders\CustomOrder', 'tbl_pedido_contrapedido', 'pedido_id','contra_pedido_id');
+    }
+
     public function getEmisionAttribute($value)
     {
         return date("Y-m-d", strtotime($value));;
