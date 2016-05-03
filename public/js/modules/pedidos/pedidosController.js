@@ -8,10 +8,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     $scope.selecPedido=selecPedido;
     $scope.closeLayer=closeLayer;
     $scope.addPedido=addPedido;
-    $scope.addContraPedido =addContraPedido;
+    $scope.openContraPedido =openContraPedido;
     $scope.addkitChenBox =addkitChenBox;
     $scope.openOdcs =openOdcs;
     $scope.selecOdc=selecOdc;
+    $scope.removeLisContraP=removeLisContraP;
+
 
     /*******incializacion de $scope*****/
     $scope.todos = new Array();
@@ -23,9 +25,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     $scope.formData={  pedidos: new Array(), tipo: new Array(),  monedas: new Array(),
         direcciones:new Array(), odc: new Array(), contraPedido: new Array(), kitchenBox: new Array()
     }
-    //  carga la primera data del sistema filtros proveedores
+    //  carga la primera data del sistema filtros  y proveedores
     init();
-
     function init(){
         $http({
             method: 'POST',
@@ -49,6 +50,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
 
     /********************************************EVENTOS ********************************************/
 
+    function removeLisContraP(aux){
+        removeContraPedido(aux.id,$scope.pedidoSelec.id);
+        loadPedido($scope.pedidoSelec.id);
+    }
     function selecOdc (odc){
         loadOdc(odc.id);
         openLayer("resumenodc");
@@ -59,7 +64,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
         openLayer('odc');
     }
 
-    function addContraPedido(){
+    function openContraPedido(){
         openLayer("agrContPed");
         loadContraPedidosProveedor($scope.provSelec.id);
     }
@@ -92,13 +97,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     $scope.change= function(odc){
         if(odc.asig){
             addOrdenCompra(odc.id,$scope.pedidoSelec.id);
-            odc.asig=true;
         }else{
             removeOrdenCompra(odc.id);
-            odc.asig=false;
         }
         loadPedido($scope.pedidoSelec.id);
+    }
 
+
+
+    $scope.changeContraP= function(contraP){
+        if(contraP.asig){
+
+            addContraPedido(contraP.id,$scope.pedidoSelec.id);
+        }else{
+            removeContraPedido(contraP.id, $scope.pedidoSelec.id);
+        }
+         loadPedido($scope.pedidoSelec.id);
     }
 
     //al selecionar provedor
@@ -366,6 +380,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
             url: 'Order/CustomOrders',
             data:{prov_id:id}
         }).then(function successCallback(response) {
+            var contraPs = new Array();
+            for(var i=0;i<response.data.length;i++){
+                var aux=response.data[i];
+                aux.asig=false;
+                if(aux.pedido_id != null){
+                    aux.asig=true;
+                }
+                contraPs.push(aux);
+            }
             $scope.formData.contraPedido= response.data;
         }, function errorCallback(response) {
             console.log("errorrr");
@@ -399,6 +422,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
             method: 'POST',
             url: 'Order/RemovePurchaseOrder',
             data:{ id:id}
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function addContraPedido(id, pedido_id){
+        $http({
+            method: 'POST',
+            url: 'Order/AddCustomOrder',
+            data:{ id:id, pedido_id:pedido_id}
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+    function removeContraPedido(id, pedido_id){
+        $http({
+            method: 'POST',
+            url: 'Order/RemoveCustomOrder',
+            data:{ id:id, pedido_id:pedido_id}
         }).then(function successCallback(response) {
 
         }, function errorCallback(response) {

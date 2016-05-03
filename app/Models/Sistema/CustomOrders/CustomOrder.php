@@ -23,4 +23,9 @@ class CustomOrder extends Model
         return date("Y-m-d", strtotime($value));;
     }
 
+    /**
+     */
+    public function order(){
+        return $this->belongsToMany('App\Models\Sistema\Order\Order', 'tbl_pedido_contrapedido', 'contra_pedido_id','pedido_id');
+    }
 }

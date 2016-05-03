@@ -126,7 +126,6 @@ $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr');
 $app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
 $app->get("provider/allContacts",'Providers\ProvidersController@allContacts');
 $app->get("provider/getBankAccount/{id}",'Providers\ProvidersController@getBank');//obtener datos apra grid de cuentas bancarias
-$app->get("provider/getAssignCoins",'Providers\ProvidersController@getCoins');//obtener datos apra grid de cuentas bancarias
 
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
@@ -235,7 +234,6 @@ $app->post("Order/Order",'Orders\OrderController@getOrden'); ///llenado de filtr
 $app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
 $app->post("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
-//$app->post("Order/OrdenPurchaseOrder",'Orders\OrderController@getOrdenPurchaseOrder'); ///Obtiene todas las ordenes de compra de un pedido segun su id
 $app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
 $app->post("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->post("Order/ProviderCoins",'Orders\OrderController@getProviderCoins'); ///obtine las monedas de un proveedor
@@ -246,4 +244,6 @@ $app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el ped
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido
 $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
+$app->post("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
+$app->post("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
 

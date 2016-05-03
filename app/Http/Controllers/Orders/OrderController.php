@@ -111,8 +111,17 @@ class OrderController extends BaseController
      * obtiene los contra pedidos de un proveedor
      */
     public function getCustomOrders(Request $req){
-        $model =CustomOrder::where('prov_id',$req->prov_id);
 
+        $model =CustomOrder::
+        select('tbl_contra_pedido.id',
+            'tbl_contra_pedido.fecha',
+            'tbl_contra_pedido.comentario',
+            'tbl_contra_pedido.monto',
+            'tbl_pedido_contrapedido.pedido_id',
+            'tbl_contra_pedido.fecha_aprox_entrega')->
+        where('prov_id',$req->prov_id);
+        $model->leftJoin('tbl_pedido_contrapedido', 'tbl_contra_pedido.id', '=', 'tbl_pedido_contrapedido.contra_pedido_id');
+        //$model->where('tbl_pedido_contrapedido.pedido_id',null);
         return $model->get();
     }
 
@@ -131,6 +140,7 @@ class OrderController extends BaseController
     public function getOrden(Request $req){
         $data=Order::findOrFail($req->id);
         $data['ordenes']= $data->getOrders()->get();
+        $data['contraPedido']= $data->customOrder()->get();
         return $data;
     }
     /**
@@ -149,16 +159,39 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /**
+     * asigna la orden de compra a un pedido
+     **/
     public function addPurchaseOrder(Request $req){
         $model= PurchaseOrder::findOrFail($req->id);
         $model->pedido_id=$req->pedido_id;
         $model->save();
     }
 
+    /**
+     * elimina la orden de compra de un pedido
+     **/
     public function RemovePurchaseOrder(Request $req){
         $model= PurchaseOrder::findOrFail($req->id);
         $model->pedido_id=null;
         $model->save();
+    }
+
+    /**
+     * asigna la orden de compra a un pedido
+     **/
+    public function addCustomOrder(Request $req){
+
+        CustomOrder::findOrFail($req->id)
+        ->order()->attach($req->pedido_id);
+    }
+
+    /**
+     * elimina la orden de compra de un pedido
+     **/
+    public function RemoveCustomOrder(Request $req){
+        CustomOrder::findOrFail($req->id)
+            ->order()->detach([$req->pedido_id]);
     }
     /**
      * Obtiene la orden de compra
