@@ -555,3 +555,29 @@ body {
     font-size: 15px;
     font-weight: 400;
 }
+
+/* */
+
+md-tabs md-ink-bar{
+    height: 1px !important;
+    color: rgb(84, 180, 234) !important;
+    background-color: rgb(84, 180, 234) !important;
+}
+.md-tab{
+    line-height: 20px !important;
+    padding: 10px 24px 0 24px !important;
+    text-transform: initial !important;
+    font-weight: 300 !important;
+    font-size: 16px !important;
+    text-align: left;
+}
+md-tabs .md-tab.md-active{
+    color: rgb(84, 180, 234);
+}
+md-tabs-canvas{
+    height: 30px !important;
+}
+
+md-pagination-wrapper {
+    height: 30px !important;
+}
