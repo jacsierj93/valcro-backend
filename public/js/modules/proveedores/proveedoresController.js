@@ -438,20 +438,26 @@ MyApp.service("setGetContac",function(){
     }
 });
 
+MyApp.controller('coinController', function ($scope,masters,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
 
-MyApp.controller('bankInfoController', function ($scope,$http,masters,providers,setGetProv) {
+    $scope.coinAssign = providers.query({type:"",id_prov:$scope.prov.id});
+})
+
+
+MyApp.controller('bankInfoController', function ($scope,masters,providers,setGetProv) {
     $scope.prov = setGetProv.getSel();
     $scope.countries = masters.query({ type:"getCountries"});
     $scope.$watch('prov.id',function(nvo){
-        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0}
-        $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id});
-    })
+        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
+        $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
+    });
     $scope.$watch('bnk.pais', function(nuevo) {
         $scope.states = masters.query({ type:"getStates",id:$scope.bnk.pais});
     });
     $scope.$watch('bnk.est', function(nuevo) {
         $scope.cities = masters.query({ type:"getCities",id:$scope.bnk.est});
-    })
+    });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['bankInfoForm.$valid','bankInfoForm.$pristine'], function(nuevo) {
@@ -460,18 +466,21 @@ MyApp.controller('bankInfoController', function ($scope,$http,masters,providers,
             providers.put({type:"saveBank"},$scope.bnk,function(data){
                 $scope.bnk.id = data.id;
                 $scope.bankInfoForm.$setPristine();
-            })
+                if(data.action=="new"){
+                    var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
+                    $scope.accounts.unshift(newElem);
+                }
+            });
 
         }
     });
 
     $scope.showGrid = function(elem){
+        console.log("asad")
         $scope.isShow = elem;
         if(!elem){
-            $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id});
+            $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
          }
     };
-
-
 
 });
