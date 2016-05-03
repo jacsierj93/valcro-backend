@@ -6,8 +6,8 @@
 //###########################################################################################3
 MyApp.factory('masters', ['$resource',
     function ($resource) {
-        return $resource('master/:type', {}, {
-            query: {method: 'GET', params: {type: ""}, isArray: true}
+        return $resource('master/:type/:id', {}, {
+            query: {method: 'GET', params: {type: "",id:""}, isArray: true}
         });
     }
 ]);
@@ -22,42 +22,46 @@ MyApp.factory('providers', ['$resource',
     }
 ]);
 
-MyApp.service("lyerMngr",function(){
-    var layer = false;
-    return {
-        getLayer:function(){
-            return layer;
-        },
-        setLayer : function(lyr){
-            layer = lyr;
-        }
-    }
-});
 
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,lyerMngr) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
+
     var historia= [15];
-    var index=0;
+    $scope.index = index=0;
     var base =264;
-    $scope.nextLayer = lyerMngr.getLayer();
-    function openLayer(layer,callback){
-        if(historia.indexOf(layer)==-1){
-            var l=$document.find("#"+layer);
-            index++;
-            var w= base+(24*index);
+
+    function openLayer(layr){
+        $scope.showNext(false);
+        layer = layr||$scope.nextLyr;
+        if(historia.indexOf(layer)==-1 && layer!="END"){
+            var l=angular.element("#"+layer);
+            $scope.index++;
+            var w= base+(24*$scope.index);
             l.css('width','calc(100% - '+w+'px)');
-            $mdSidenav(layer).open().then(callback);
-            historia[index]=layer;
+            $mdSidenav(layer).open();
+            historia[$scope.index]=layer;
             return true;
+        }else if(historia.indexOf(layer)==-1 && layer=="END"){
+            closeLayer(true)
         }
-        return false;
+
     }
 
-    function closeLayer(){
-        var layer=historia[index];
-        historia[index]=null;
-        index--;
-        $mdSidenav(layer).close().then(callback);;
+    function closeLayer(all){
+        if(all){
+            while($scope.index!=0){
+                var layer=historia[$scope.index];
+                historia[$scope.index]=null;
+                $scope.index--;
+                $mdSidenav(layer).close();
+            }
+        }else{
+            var layer=historia[$scope.index];
+            historia[$scope.index]=null;
+            $scope.index--;
+            $mdSidenav(layer).close();
+        }
+
     }
     $scope.openLayer = openLayer;
     $scope.closeLayer = closeLayer;
@@ -72,19 +76,23 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     $scope.setProv = function(prov){
         setGetProv.setProv(prov.item);
-        $mdSidenav("layer1").close().then(function(){
-            console.log(angular.element(document).find("#layer1"));
-            $mdSidenav("layer1").open();
-        });
+        closeLayer(true)
+        openLayer("layer1");
     };
 
     $scope.showAlert = function(){
-        console.log("asdasd");
         $mdSidenav("alert").open();
     };
 
-    $scope.showNext = function(status){
+    $scope.addProv = function(){
+        setGetProv.setProv(false)
+        $scope.openLayer("layer1");
+    }
+
+    $scope.showNext = function(status,to){
         if(status){
+            $scope.nextLyr = to;
+            console.log($scope.nextLyr)
             $mdSidenav("NEXT").open()
         }else{
             $mdSidenav("NEXT").close()
@@ -402,7 +410,7 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
 
 });
 
-MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac) {
+/*MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac) {
     $scope.allContact =  providers.query({type:"allContacts"});
     $scope.toEdit = function(element){
         contact = element.cont;
@@ -410,7 +418,7 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
         $mdSidenav("contactBook").close();
     }
 
-});
+});*/
 MyApp.service("setGetContac",function(){
     var contact = {id:false,nombreCont:"dasd",emailCont:"",contTelf:"",pais:"",languaje:"",responsability:"",dirOff:"",prov_id:0, isAgent:0};
     return {
@@ -431,11 +439,39 @@ MyApp.service("setGetContac",function(){
 });
 
 
-MyApp.controller('bankInfoController', function ($scope,$http,masters) {
+MyApp.controller('bankInfoController', function ($scope,$http,masters,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
     $scope.countries = masters.query({ type:"getCountries"});
-   /* $scope.bnk = {pais:[]};
-    $scope.countries = masters.query({ type:"fullCountries"});
-    $scope.setState = function(a,b){
-        console.log($scope.bnk.pais);
-    }*/
+    $scope.$watch('prov.id',function(nvo){
+        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0}
+        $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id});
+    })
+    $scope.$watch('bnk.pais', function(nuevo) {
+        $scope.states = masters.query({ type:"getStates",id:$scope.bnk.pais});
+    });
+    $scope.$watch('bnk.est', function(nuevo) {
+        $scope.cities = masters.query({ type:"getCities",id:$scope.bnk.est});
+    })
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['bankInfoForm.$valid','bankInfoForm.$pristine'], function(nuevo) {
+
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveBank"},$scope.bnk,function(data){
+                $scope.bnk.id = data.id;
+                $scope.bankInfoForm.$setPristine();
+            })
+
+        }
+    });
+
+    $scope.showGrid = function(elem){
+        $scope.isShow = elem;
+        if(!elem){
+            $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id});
+         }
+    };
+
+
+
 });

@@ -18,8 +18,11 @@ class BankAccount extends Model
     protected $table = "tbl_cuenta_bancaria";
 
     public  function getAdvancePaymentProvider(){
-
         return $this->belongsTo('App\Models\Sistema\AdvancePaymentProvider', 'cuenta_id');
+    }
+
+    public function provider(){
+        return $this->belongsTo('App\Models\Sistema\Provider', 'cuenta_id');
     }
 
 

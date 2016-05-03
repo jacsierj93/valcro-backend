@@ -47,6 +47,13 @@ class Provider extends  Model
     }
 
     /**
+     * obtiene las cuentas bancarias del proveedor
+     */
+    public function bankAccount(){
+        return $this->hasMany('App\Models\Sistema\BankAccount','prov_id');
+    }
+
+    /**
      * obtiene las condiciones de pago asignadas al proveedor
      */
     public function getPaymentCondition(){

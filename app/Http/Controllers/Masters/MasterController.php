@@ -44,16 +44,24 @@ class MasterController extends BaseController
 		return Monedas::select("id","nombre","simbolo","codigo")->get();
 	}
 
-	public function getFullCountry(){
-		$countries = Country::get();
-		foreach ($countries as $country){
-			$country["states"]=$country->states()->get();
-			foreach ($country["states"] as $state){
-				$state['cities'] = $state->cities()->get();
-			}
+
+	public function getStates($id){
+		if($id){
+			$states = Country::find($id)->states()->get();
+			return ($states)?$states:[];
+		}else{
+			return [];
 		}
 
-		//dd($countries);
-		return $countries;
+	}
+
+	public function getCities($id){
+		if($id){
+			$cities = State::find($id)->cities()->get();
+			return ($cities)?$cities:[];
+		}else{
+			return [];
+		}
+
 	}
 }
