@@ -112,9 +112,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
         }else{
             removeContraPedido(contraP.id, $scope.pedidoSelec.id);
         }
-         loadPedido($scope.pedidoSelec.id);
+        loadPedido($scope.pedidoSelec.id);
     }
 
+    $scope.changeKitchenBox= function(contraP){
+        if(contraP.asig){
+
+            addkitchenBox(contraP.id,$scope.pedidoSelec.id);
+        }else{
+            removekitchenBox(contraP.id, $scope.pedidoSelec.id);
+        }
+        loadPedido($scope.pedidoSelec.id);
+    }
     //al selecionar provedor
     function setProvedor(prov){
         $scope.id=prov.id;
@@ -401,7 +410,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
             url: 'Order/KitchenBoxs',
             data:{prov_id:id}
         }).then(function successCallback(response) {
-            $scope.formData.kitchenBox= response.data;
+            var auxs = new Array();
+            for(var i=0;i<response.data.length;i++){
+                var aux=response.data[i];
+                aux.asig=false;
+                if(aux.pedido_id != null){
+                    aux.asig=true;
+                }
+                auxs.push(aux);
+            }
+            $scope.formData.kitchenBox= auxs;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -429,6 +447,28 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
         });
     }
 
+    function addkitchenBox(id, pedido_id){
+        $http({
+            method: 'POST',
+            url: 'Order/AddkitchenBox',
+            data:{ id:id, pedido_id:pedido_id}
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+    function removekitchenBox(id, pedido_id){
+        $http({
+            method: 'POST',
+            url: 'Order/RemovekitchenBox',
+            data:{ id:id, pedido_id:pedido_id}
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
     function addContraPedido(id, pedido_id){
         $http({
             method: 'POST',

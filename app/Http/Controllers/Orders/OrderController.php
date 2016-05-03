@@ -117,6 +117,7 @@ class OrderController extends BaseController
             'tbl_contra_pedido.fecha',
             'tbl_contra_pedido.comentario',
             'tbl_contra_pedido.monto',
+            'tbl_contra_pedido.titulo',
             'tbl_pedido_contrapedido.pedido_id',
             'tbl_contra_pedido.fecha_aprox_entrega')->
         where('prov_id',$req->prov_id);
@@ -129,7 +130,20 @@ class OrderController extends BaseController
      * obtiene los kitchen box de un proveedor
      */
     public function getKitchenBoxs(Request $req){
-        $model =KitchenBox::where('prov_id',$req->prov_id);
+        $model =KitchenBox::
+            select('tbl_kitchen_box.id',
+            'tbl_kitchen_box.fecha',
+            'tbl_kitchen_box.nro_proforma',
+            'tbl_kitchen_box.img_proforma',
+            'tbl_kitchen_box.precio_bs',
+            'tbl_kitchen_box.fecha_aprox_entrega',
+            'tbl_kitchen_box.titulo',
+            'tbl_pedido_kitchenbox.pedido_id'
+
+        )->
+        where('prov_id',$req->prov_id)->
+        leftJoin('tbl_pedido_kitchenbox', 'tbl_kitchen_box.id','=','tbl_pedido_kitchenbox.kitchen_box_id');
+        //$model->where('tbl_pedido_kitchenbox.pedido_id',null);
 
         return $model->get();
     }
@@ -141,6 +155,7 @@ class OrderController extends BaseController
         $data=Order::findOrFail($req->id);
         $data['ordenes']= $data->getOrders()->get();
         $data['contraPedido']= $data->customOrder()->get();
+        $data['kitchenBox']= $data->kitchenBox()->get();
         return $data;
     }
     /**
@@ -177,13 +192,30 @@ class OrderController extends BaseController
         $model->save();
     }
 
+
+    /**
+     * asigna un kitchenbox a un pedido
+     **/
+    public function addkitchenBox(Request $req){
+        kitchenBox::findOrFail($req->id)
+            ->order()->attach($req->pedido_id);
+    }
+
+    /**
+     * elimina el kitchenbox de un pedido
+     **/
+    public function removekitchenBox(Request $req){
+        kitchenBox::findOrFail($req->id)
+            ->order()->detach([$req->pedido_id]);
+    }
+
     /**
      * asigna la orden de compra a un pedido
      **/
     public function addCustomOrder(Request $req){
 
         CustomOrder::findOrFail($req->id)
-        ->order()->attach($req->pedido_id);
+            ->order()->attach($req->pedido_id);
     }
 
     /**

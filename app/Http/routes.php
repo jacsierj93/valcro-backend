@@ -244,3 +244,5 @@ $app->post("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// o
 $app->post("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el pedido
 $app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///elimina el pedido
+$app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); ///elimina el pedido
+$app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); ///elimina el pedido

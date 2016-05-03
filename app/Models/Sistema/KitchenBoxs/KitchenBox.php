@@ -18,9 +18,17 @@ class KitchenBox extends Model
     protected $table = "tbl_kitchen_box";
 
 
+
     public function getfechaAttribute($value)
     {
         return date("Y-m-d", strtotime($value));;
     }
+
+    /**
+     */
+    public function order(){
+        return $this->belongsToMany('App\Models\Sistema\Order\Order', 'tbl_pedido_kitchenbox', 'kitchen_box_id','pedido_id');
+    }
+
 
 }

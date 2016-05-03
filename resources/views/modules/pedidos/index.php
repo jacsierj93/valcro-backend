@@ -768,7 +768,7 @@
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="kitchenBox in formData.kitchenBox">
                                 <div class="cellGrid" flex="5">
-                                    <md-switch class="md-primary"></md-switch>
+                                    <md-switch class="md-primary" ng-model="kitchenBox.asig" ng-change="changeKitchenBox(kitchenBox)"></md-switch>
                                 </div>
                                 <div flex="5" class="cellGrid"> {{kitchenBox.id}}</div>
                                 <div flex="10" class="cellGrid"> {{kitchenBox.fecha | date:'dd/MM/yyyy'}}</div>

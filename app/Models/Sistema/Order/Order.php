@@ -36,9 +36,17 @@ class Order extends Model
     }
 
     /**
+     *  contien lo sontra pedidos
      */
     public function customOrder(){
         return $this->belongsToMany('App\Models\Sistema\CustomOrders\CustomOrder', 'tbl_pedido_contrapedido', 'pedido_id','contra_pedido_id');
+    }
+
+    /**
+     *  contien lo sontra pedidos
+     */
+    public function kitchenBox(){
+        return $this->belongsToMany('App\Models\Sistema\KitchenBoxs\KitchenBox', 'tbl_pedido_kitchenbox', 'pedido_id','kitchen_box_id');
     }
 
     public function getEmisionAttribute($value)
