@@ -673,6 +673,18 @@
                         </div>
                     </div>
 
+                    <div >
+                        <div layout="column" flex="" style="margin-left: 8px;">
+                            <div layout="row" class="cellGridHolder" ng-repeat="contraP in pedidoSelec.kitchenBox">
+
+                                <div flex class="cellGrid"> {{contraP.id}}</div>
+                                <div flex class="cellGrid"> {{contraP.titulo}}</div>
+                                <div flex class="cellGrid"> {{contraP.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" ng-click="removeLisContraP(contraP)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                            </div>
+                        </div>
+                    </div>
+
 
 
                 </div>
