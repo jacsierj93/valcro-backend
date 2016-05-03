@@ -471,7 +471,7 @@
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
                             <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled">
-                                <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                <md-option ng-repeat="coin in coins" ng-if="" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
@@ -484,7 +484,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
-                <form ng-controller="bankInfoController" name="bankInfoForm">
+                <form ng-controller="bankInfoController" name="bankInfoForm" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Informacion Bancaria
@@ -548,6 +548,26 @@
 
                         </md-input-container>
                     </div>
+                 <div layout="column" ng-show="isShow">
+
+                  <div layout="row" class="headGridHolder">
+                   <div flex="20" class="headGrid"> Banco</div>
+                   <div flex class="headGrid"> Beneficiario</div>
+                   <div flex="30" class="headGrid"> Cuenta</div>
+                  </div>
+                  <div id="grid">
+                   <div flex ng-repeat="account in accounts" ng-click="toEdit(this)">
+                    <div layout="row" layout-wrap class="cellGridHolder">
+                     <div flex="20" class="cellGrid"> {{account.banco}}</div>
+                     <div flex class="cellGrid"> {{account.beneficiario}}</div>
+                     <div flex="30" class="cellGrid">{{account.cuenta}}</div>
+
+                    </div>
+                   </div>
+
+                  </div>
+
+                 </div>
 
                 </form>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->

@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Monedas extends  Model
 {
 
-    use SoftDeletes;
-    protected $table = 'tbl_moneda';
+	use SoftDeletes;
+	protected $table = 'tbl_moneda';
 
-    ////foreing key
-    public function moneda_proveedor()
-    {
-        return $this->hasMany('App\Models\Sistema\ProvMoneda', 'moneda_id');
-    }
+	////foreing key
+	public function moneda_proveedor()
+	{
+		return $this->belongsToMany('App\Models\Sistema\Provider', 'tbl_prov_moneda', 'moneda_id','prov_id');
+	}
 }
