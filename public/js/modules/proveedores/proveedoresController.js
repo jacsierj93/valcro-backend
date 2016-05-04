@@ -528,9 +528,9 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
 
 MyApp.controller('creditCtrl', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getSel();
-    $scope.limits =  providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
-    $scope.$watch('prov.id',function(nvo){
 
+    $scope.$watch('prov.id',function(nvo){
+        $scope.limits =  providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
     })
 
 
