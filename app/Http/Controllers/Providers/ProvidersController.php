@@ -22,7 +22,7 @@ class ProvidersController extends BaseController
     public function getList()
     {
         $provs = new Provider();
-        $data = $provs->select("id","razon_social as description","contrapedido as contraped","limite_credito  as limCred", "siglas")->where("deleted_at",NULL)->get();
+        $data = $provs->get();
         /*   foreach($data as $k => $v){
             $v['nombreValcro']=$v->nombres_valcro()->get();
         }*/
