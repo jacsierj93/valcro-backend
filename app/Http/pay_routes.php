@@ -12,3 +12,5 @@
 
 $app->get('payments/provList', 'Payments\PaymentController@getProvidersList'); ///lista de proveedores
 $app->get('payments/typeList', 'Payments\PaymentController@getPaymentTypes'); ///tipos de pagos
+$app->get('payments/typeDocsList', 'Payments\PaymentController@getDocumentTypes'); ///tipos de documentos
+$app->post('payments/paymentsByProvId', 'Payments\PaymentController@getPaymentsByProvId'); ///pagos por proveedor

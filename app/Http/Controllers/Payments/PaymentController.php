@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Payments;
 
+use App\Models\Sistema\Payments\DocumentCPType;
+use App\Models\Sistema\Payments\Payment;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Provider;
 use Illuminate\Http\Request;
@@ -60,13 +62,13 @@ class PaymentController extends BaseController
 
         } else {  ///ok
 
-            $result = array("success" => "Registro guardado con éxito","action"=>"new");
+            $result = array("success" => "Registro guardado con éxito", "action" => "new");
 
             $model = new Departament();
             //////////condicion para editar
             if ($req->has('id')) {
                 $model = $model->findOrFail($req->id);
-                $result["action"]="edit";
+                $result["action"] = "edit";
             }
 
             $model->nombre = $req->nombre;
@@ -94,18 +96,61 @@ class PaymentController extends BaseController
 
 
     /////lista de proveedores
-    
-    public function getProvidersList(){
+
+    /**lista de proveedores
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getProvidersList()
+    {
         $provs = Provider::all();
         return $provs;
     }
 
 
-    public function getPaymentTypes(){
+    /**tipos de pago
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getPaymentTypes()
+    {
         $types = PaymentType::all();
         return $types;
 
     }
-    
+
+    /**tipos de documentos
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getDocumentTypes()
+    {
+
+        $dtype = DocumentCPType::all();
+        return $dtype;
+    }
+
+
+    /**trae los pagos de un proveedor
+     * @param Request $req
+     */
+    public function getPaymentsByProvId(Request $req)
+    {
+
+        $prov = $req->prov_id;
+        $pagos = Payment::where("prov_id", $prov)->get();
+
+        $result = array();
+        foreach ($pagos as $pago) {
+
+            $temp["id"] = $pago->id;
+            $temp["monto"] = $pago->monto;
+            $temp["fecha"] = $pago->fecha_pago;
+            $temp["tasa"] = $pago->tasa;
+            $temp["moneda"] = $pago->moneda->nombre;
+
+            $result[] = $temp;
+        }
+
+        return response()->json($result); /// json
+    }
+
 
 }
