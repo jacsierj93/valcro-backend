@@ -376,14 +376,14 @@
                             Fecha de Aprobación
                         </div>
 
-                        <md-datepicker  flex="25" name="fecha_aprob" ng-model="myDate"
+                        <md-datepicker  flex="25" name="fecha_aprob" ng-model="date"
                                         required md-min-date="minDate" md-max-date="maxDate"
-                                        md-date-filter="onlyWeekendsPredicate">
+                                        md-date-filter="onlyWeekendsPredicate" ng-disabled="pedidoSelec.estado_id!=2">
                         </md-datepicker>
 
                         <md-input-container class="md-block" flex="25">
                             <label>Tipo de pago</label>
-                            <md-select ng-model="pedidoSelec.tipo" name ="tipo_pago" value="{{pedidoSelec.tipo}}">
+                            <md-select ng-model="pedidoSelec.tipo" name ="tipo_pago" value="{{pedidoSelec.tipo}} ng-disabled="pedidoSelec.estado_id!=2"">
                                 <md-option ng-repeat="tipo in formData.pedidos">
                                     {{tipo.id}}
                                 </md-option>
@@ -392,7 +392,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>N° Documento</label>
-                            <input maxlength="6"  name="nro_doc_pay" ng-minlength="3"  nng-disabled="status == 2">
+                            <input ng-model="pedidoSelec.nro_doc"  ng-disabled="pedidoSelec.estado_id!=2">
 
                         </md-input-container>
 
@@ -401,13 +401,9 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Imagen Adjunto</label>
-                            <input flex maxlength="180" type="file" style="display: none;" id="img" name="img_abono"  ng-disabled="status == 3">
-                            <?= HTML::image("images/adjunto.png",'null', array('id' => 'adjunto', 'class' => 'image')) ?>
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
+                            <input flex maxlength="180" type="file" style="display: none;" id="imgAprov" name="img_abono" ng-disabled="pedidoSelec.estado_id!=2" >
                         </md-input-container>
+                        <?= HTML::image("images/adjunto.png",'null', array('id' => 'adjAprob', 'class' => 'image')) ?>
                     </div>
                 </form>
 
@@ -420,11 +416,7 @@
                     <div layout="row"  >
                         <md-input-container class="md-block" flex >
                             <label>Motivo de cancelacion </label>
-                            <input  ng-model="pedidoSelec.comentario_cancelacion" name="comentario_cancelacion" ng-disabled="status == 2 || status == 3" >
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
+                            <input  ng-model="pedidoSelec.comentario_cancelacion"  ng-disabled="pedidoSelec.estado_id!=3" >
                         </md-input-container>
                     </div>
                 </form>
@@ -444,7 +436,7 @@
 
                         <md-datepicker flex="25" name="fecha_est_compro" ng-model="myDate"
                                        required md-min-date="minDate" md-max-date="maxDate"
-                                       md-date-filter="onlyWeekendsPredicate">
+                                       md-date-filter="onlyWeekendsPredicate" ng-disabled="pedidoSelec.estado_id!=3">
                         </md-datepicker>
                         <div flex="20" style="height: 30px;margin-top: 9px;  color: #999999;" >
                             Fecha limite de credito
@@ -452,7 +444,7 @@
                         <div flex="15"  style="height: 30px;margin-top: 9px;  color: #999999;">
                             <md-switch  class="md-primary"
                                         ng-model="dtaPrv.fijaT"
-                                        name="fijaT" aria-label="fijaT">
+                                        name="fijaT" aria-label="fijaT" ng-disabled="pedidoSelec.estado_id!=3">
 
                             </md-switch>
                         </div>
@@ -463,6 +455,7 @@
                 </form>
 
             </md-content>
+            <!-----flecha siguiente -->
             <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
         </md-sidenav>
 
