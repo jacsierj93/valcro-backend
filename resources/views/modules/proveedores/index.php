@@ -617,7 +617,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
-                <form name="provCred">
+                <form name="provCred" >
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Factor de Conversión

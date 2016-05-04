@@ -25,7 +25,9 @@
     "jquery": "1.11.0",
     "angular-route": "^1.5.3",
     "angular-resource": "^1.5.3",
-    "angular-clickout": "^1.0.2"
+    "angular-clickout": "^1.0.2",
+    "angular-ui-mask": "^1.8.3",
+    "angular-input-masks": "^2.3.0"
   },
   "resolutions": {
     "jquery": "1.11.0"
