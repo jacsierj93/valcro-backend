@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     var historia= [15];
     var index=0;
@@ -494,49 +494,5 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
 
 });
 
-//###########################################################################################3
-//##############################REST service (factory) no funciona#############################################3
-//###########################################################################################3
-MyApp.factory('Order', ['$resource',
-    function ($resource) {
-        return $resource('Order/:type', {}, {
-            query: {method: 'POST', params: {type: ""}}
-        });
-    }
-]);
-
-MyApp.directive('amount', function () {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function (scope, element, attrs, ctrl) {
-            element.bind("keydown keypress", function (e) {
-                var key = window.Event ? e.which : e.keyCode;
-                console.log(key);
-                // si marca una letra
-                if(key >= 65 && key <= 90){
-                    e.preventDefault();
-                }
-                //llave cochetes etc
-                if(key >= 171 && key <= 175){
-                    e.preventDefault();
-                }
-                //numpar +-*/
-                if(key == 106 | key == 111 | key ==  107 | key ==  109){
-                    e.preventDefault();
-                }
-                //signos de interrogacion
-                if(key == 0 | key == 222 ){
-                    e.preventDefault();
-                }
-                //<>
-                if(key == 60){
-                    e.preventDefault();
-                }
 
 
-            });
-
-        }
-    };
-});

@@ -259,7 +259,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input  ng-model="pedidoSelec.monto" numbersOnly name="monto" type="number" required  ng-disabled="status == 2">
+                            <input  ng-model="pedidoSelec.monto" ng-model="number" ui-number-mask type="text" required >
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="10">
@@ -273,14 +273,8 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Tasa</label>
-                            <input  ng-model="pedidoSelec.tasa" name ="tasa" ng-disabled="status == 2">
+                            <input  ng-model="pedidoSelec.tasa"  ng-model="number" ui-number-mask name ="tasa" disabled>
                         </md-input-container>
-
-                        <div flex="10">
-                            <md-switch class="md-primary"  ng-model="pedidoSelec.tasa_fija">
-
-                            </md-switch>
-                        </div>
 
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
