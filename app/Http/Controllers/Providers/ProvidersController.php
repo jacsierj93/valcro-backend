@@ -211,5 +211,11 @@ class ProvidersController extends BaseController
         return ($coins)?$coins:[];
     }
 
+    public function getCreditLimits($id){
+        $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
+        return ($coins)?$coins:[];
+    }
+
+
 
 }
