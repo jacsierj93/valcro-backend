@@ -16,10 +16,10 @@ class MasterController extends BaseController
 {
 
 	public function __construct()
-    {
+	{
 
-        $this->middleware('auth');
-    }
+		$this->middleware('auth');
+	}
 
 	public function getCountries()
 	{
@@ -63,5 +63,12 @@ class MasterController extends BaseController
 			return [];
 		}
 
+	}
+
+	/**
+	 * obtiene la moneda segun id
+	 **/
+	public function getCoin($id){
+		return Monedas::findOrFail($id);
 	}
 }

@@ -199,8 +199,8 @@
                         <div  flex="15" class="md-block" style=" color: #999999;" >
                             Ordenes de Compra:
                         </div>
-                        <div flex=""   class="md-block" layout="row" style="overflow: hidden;" ng-click="openOdcs()">
-                            <div style="margin-right: 4px; margin-left:4px;" ng-repeat="orden in pedidoSelec.ordenes" ng-disabled="status == 2">
+                        <div flex=""   class="md-block" layout="row" style="overflow: hidden;" ng-click="openOdcs()" ng-disabled="pedidoSelec.estado_id!=1">
+                            <div style="margin-right: 4px; margin-left:4px;" ng-repeat="orden in pedidoSelec.ordenes" >
                                 {{orden.nro_orden}}
                             </div>
 
@@ -210,7 +210,7 @@
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Pedido</label>
-                            <md-select ng-model="pedidoSelec.tipo_pedido_id" name ="tipo_pedido_id" ng-value="{{pedidoSelec.tipo_pedido_id}}">
+                            <md-select ng-model="pedidoSelec.tipo_pedido_id" name ="tipo_pedido_id" ng-value="{{pedidoSelec.tipo_pedido_id}}" ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="tipo in formData.tipo" ng-value="{{tipo.id}}">
                                     {{tipo.tipo}}
                                 </md-option>
@@ -225,7 +225,7 @@
 
                         <md-input-container class="md-block" flex >
                             <label>Proveedor</label>
-                            <md-select ng-model="id" name ="prov_id" ng-disabled="true">
+                            <md-select ng-model="id" name ="prov_id" ng-disabled="true" md-no-ink  ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                     {{prov.razon_social}}
                                 </md-option>
@@ -238,7 +238,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Pais</label>
-                            <md-select ng-model="pedidoSelec.pais_id" name ="pais_id" ng-disabled="status == 2" md-no-ink>
+                            <md-select ng-model="pedidoSelec.pais_id" name ="pais_id" md-no-ink  ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="pais in formData.paises" value="{{pais.id}}">
                                     {{pais.short_name}}
                                 </md-option>
@@ -247,7 +247,7 @@
 
                         <md-input-container class="md-block"  flex>
                             <label>Direccion</label>
-                            <md-select ng-model="pedidoSelec.direccion_almacen_id" name ="direccion_almacen_id" ng-disabled="status == 2" md-no-ink>
+                            <md-select ng-model="pedidoSelec.direccion_almacen_id" name ="direccion_almacen_id" md-no-ink ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
                                     {{dir.direccion}}
                                 </md-option>
@@ -259,26 +259,27 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input  ng-model="pedidoSelec.monto" ng-model="number" ui-number-mask type="text" required >
+                            <input  ng-model="pedidoSelec.monto" ng-model="number" ui-number-mask type="text" required ng-disabled="pedidoSelec.estado_id!=1" >
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="pedidoSelec.prov_moneda_id" name ="prov_moneda_id" ng-disabled="status == 2" md-no-ink>
+                            <md-select ng-model="pedidoSelec.prov_moneda_id" name ="prov_moneda_id"  md-no-ink ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="10">
+                        <md-input-container class="md-block" flex="10" ng-dblclick=" pedidoSelec.tasa_fija = 1 " >
                             <label>Tasa</label>
-                            <input  ng-model="pedidoSelec.tasa"  ng-model="number" ui-number-mask name ="tasa" disabled>
+                            <input  ng-model="pedidoSelec.tasa"  ng-model="number" ui-number-mask
+                                    ng-readonly="pedidoSelec.tasa_fija == 0 " ng-disabled="pedidoSelec.estado_id!=1">
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
-                            <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2" required md-no-ink>
+                            <md-select ng-model="pedidoSelec.condicion_pago_id"  required md-no-ink>
                                 <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
                                     {{conPago.titulo}}
                                 </md-option>
@@ -290,7 +291,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Motivo Pedido </label>
-                            <md-select ng-model="pedidoSelec.motivo_pedido_id"  ng-disabled="status == 2" required md-no-ink>
+                            <md-select ng-model="pedidoSelec.motivo_pedido_id" required md-no-ink ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
                                     {{motivoPed.motivo}}
                                 </md-option>
@@ -298,7 +299,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Prioridad Pedido </label>
-                            <md-select  ng-model="pedidoSelec.prioridad_id"  ng-disabled="status == 2" required md-no-ink>
+                            <md-select  ng-model="pedidoSelec.prioridad_id"  required md-no-ink ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
                                     {{prioPed.descripcion}}
                                 </md-option>
@@ -306,7 +307,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Condiciones Pedido </label>
-                            <md-select ng-model="pedidoSelec.condicion_pedido_id" ng-disabled="status == 2" md-no-ink>
+                            <md-select ng-model="pedidoSelec.condicion_pedido_id" md-no-ink ng-disabled="pedidoSelec.estado_id!=1">
                                 <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
                                     {{condPed.nombre}}
                                 </md-option>
@@ -316,7 +317,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex >
                             <label>Comentario</label>
-                            <input ng-model="pedidoSelec.comentario"  ng-disabled="status == 2">
+                            <input ng-model="pedidoSelec.comentario"  ng-disabled="pedidoSelec.tasa_fija" ng-disabled="pedidoSelec.estado_id!=1">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -327,20 +328,13 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="20">
                             <label>Mt3</label>
-                            <input ng-model="pedidoSelec.mt3"  name="mt3"  ng-disabled="status == 2">
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
+                            <input ng-model="pedidoSelec.mt3"  name="mt3"  ng-model="number" ui-number-mask ng-disabled="pedidoSelec.estado_id!=1" >
+
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Peso</label>
-                            <input ng-model="pedidoSelec.peso" name="peso" ng-disabled="status == 2">
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
+                            <input ng-model="pedidoSelec.peso" name="peso"  ng-model="number" ui-number-mask ng-disabled="pedidoSelec.estado_id!=1">
                         </md-input-container>
                     </div>
 
@@ -397,13 +391,15 @@
                         </md-input-container>
 
                     </div>
-                    <div layout="row" flex="" >
+                    <div layout="row" flex="30" >
+                        <div flex="">
+                                Imagen Adjunto
+                        </div>
 
-                        <md-input-container class="md-block" flex="30">
-                            <label>Imagen Adjunto</label>
-                            <input flex maxlength="180" type="file" style="display: none;" id="imgAprov" name="img_abono" ng-disabled="pedidoSelec.estado_id!=2" >
-                        </md-input-container>
-                        <?= HTML::image("images/adjunto.png",'null', array('id' => 'adjAprob', 'class' => 'image')) ?>
+                        <div flex="10" style="rgb(153, 153, 153)" ng-click="simulateClick('#imgAprob')">
+                            <input type="file" id="imgAprob" style="display: none;" />
+                            <?= HTML::image("images/adjunto.png",'null', array('id' => 'adjAprob', 'class' => 'image')) ?>
+                        </div>
                     </div>
                 </form>
 
@@ -515,7 +511,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Nº ODC:</label>
-                            <input  ng-model="odcSelec.id" name="monto" required  ng-disabled="true">
+                            <input  ng-model="odcSelec.id"  required  ng-disabled="true">
 
                         </md-input-container>
 
@@ -744,6 +740,7 @@
                 </form>
             </md-content>
         </md-sidenav>
+
         <!-- 17) ########################################## LAYER (8) Pedidos Pendientes########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPedPend" id="agrPedPend">
             <!-- ) ########################################## CONTENDOR  Pedidos Pendientes # ########################################## -->
@@ -756,7 +753,6 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
-                        <div flex class="headGrid">-</div>
                         <div flex class="headGrid">-</div>
                         <div flex class="headGrid"> Nº de Pedido</div>
                         <div flex class="headGrid"> Nombre Proveedor</div>
@@ -771,7 +767,7 @@
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div class="cellGrid">
-                                    <md-switch class="md-primary" ng-model="dtaPrv.cb1"></md-switch>
+                                    <md-switch class="md-primary"></md-switch>
                                 </div>
                                 <div flex class="cellGrid"> Data 2</div>
                                 <div flex class="cellGrid"> Data 3</div>
