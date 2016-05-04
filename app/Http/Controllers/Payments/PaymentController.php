@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Payments;
 
+use App\Models\Sistema\Payments\PaymentType;
+use App\Models\Sistema\Provider;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
@@ -89,5 +91,21 @@ class PaymentController extends BaseController
 
     }
 
+
+
+    /////lista de proveedores
+    
+    public function getProvidersList(){
+        $provs = Provider::all();
+        return $provs;
+    }
+
+
+    public function getPaymentTypes(){
+        $types = PaymentType::all();
+        return $types;
+
+    }
+    
 
 }

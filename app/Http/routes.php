@@ -35,10 +35,14 @@ $app->get('/api/info', 'Api\UserController@info');
 $app->get('test', 'Admin\AccountController@main');
 
 
-/**
- * rutas de la administración
- * con AdminLTE
- */
+
+/************************RUTAS DE LOS SERVICIOS***********************/
+
+//////enrutador para servicios de pagos
+if (Request::is('payments/*'))
+{
+    require __DIR__.'/pay_routes.php';
+}
 
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
 
@@ -84,7 +88,7 @@ $app->post("catalogs/sucursalSave",'Catalogs\SucursalController@saveOrUpdate'); 
 $app->post("catalogs/sucursalDel",'Catalogs\SucursalController@delete'); ///borrar
 
 
-////tipo de provedores
+////tipo de proveedores
 $app->get('catalogs/providerTypesList', 'Catalogs\ProviderTypesController@getList'); ///lista de tipo de prov
 $app->get('catalogs/providerTypesForm', 'Catalogs\ProviderTypesController@getForm'); ///nuevo tipo prov
 $app->post("catalogs/providerTypesSave",'Catalogs\ProviderTypesController@saveOrUpdate'); ///guardar tipo prov
