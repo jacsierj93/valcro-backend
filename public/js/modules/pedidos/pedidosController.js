@@ -13,18 +13,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.openOdcs =openOdcs;
     $scope.selecOdc=selecOdc;
     $scope.removeLisContraP=removeLisContraP;
+    $scope.removeLisKitchenBox=removeLisKitchenBox;
+
 
 
     /*******incializacion de $scope*****/
     $scope.todos = new Array();
-    $scope.provSelec={id:'-1',razon_social:'', pedidos: new Array() }
+    $scope.provSelec={id:'-1',razon_social:'', pedidos: new Array() };
     $scope.id= $scope.provSelec.id;
-    $scope.pedidoSelec={ pais_id:'-1', id:''}
-    $scope.odcSelec={ id:'-1'}
-    $scope.filterData={ monedas: new Array(), tipoEnv: new Array() }
+    $scope.pedidoSelec={ pais_id:'-1', id:'',estado_id:'1'};
+    $scope.odcSelec={ id:'-1'};
+    $scope.filterData={ monedas: new Array(), tipoEnv: new Array() };
     $scope.formData={  pedidos: new Array(), tipo: new Array(),  monedas: new Array(),
-        direcciones:new Array(), odc: new Array(), contraPedido: new Array(), kitchenBox: new Array()
-    }
+        direcciones:new Array(), odc: new Array(), contraPedido: new Array(), kitchenBox: new Array(),
+        estadoPedido:new Array()
+    };
+
     //  carga la primera data del sistema filtros  y proveedores
     init();
     function init(){
@@ -52,6 +56,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     function removeLisContraP(aux){
         removeContraPedido(aux.id,$scope.pedidoSelec.id);
+        loadPedido($scope.pedidoSelec.id);
+    }
+
+    function removeLisKitchenBox(aux){
+        removekitchenBox(aux.id,$scope.pedidoSelec.id);
         loadPedido($scope.pedidoSelec.id);
     }
     function selecOdc (odc){
@@ -124,7 +133,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         }
         loadPedido($scope.pedidoSelec.id);
     }
-    //al selecionar provedor
+
     function setProvedor(prov){
         $scope.id=prov.id;
         $scope.provSelec=prov;
@@ -149,8 +158,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         return false;
     }
 
-
-
     function addPedido(){
         if(openLayer('detallePedido')){
             loadDataFor();
@@ -163,9 +170,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             }
             $scope.FormdetallePedido.$setPristine();
         }
-
-
-
     }
 
     function selecPedido(pedido){
@@ -194,13 +198,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.setPed= function(ped){
         openLayer(ped);
     }
-    /*******por integrar***/
-    $scope.setPed= function(ped){
 
-        openLayer(ped);
-
-    }
-    var i=0;
     /****** **************************listener ***************************************/
 
     $scope.$watch('pedidoSelec.pais_id',function(newVal){
@@ -220,8 +218,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         console.log('i', i);
     });
 
-    /*************************Guardado*************************************************/
-    //$scope.saveDetaillPedido=saveDetaillPedido;
+    /*************************Guardados*************************************************/
+
     function saveDetaillPedido (){
 
         if($scope.pedidoSelec.id == ''){
@@ -239,8 +237,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
                 $scope.pedidoSelec.id=response.data.pedido.id;
             }
             console.log(response);
-
-
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -257,7 +253,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     }
 
 
-    /*********************************  peticiones $http ********************* ************/
+    /*********************************  peticiones  carga $http ********************* ************/
 
     function loadPedido(id){
         $http({
@@ -424,6 +420,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             console.log("errorrr");
         });
     }
+
+    /*********************************  peticiones  guardado $http ********************* ************/
+
     function addOrdenCompra(id, pedido_id){
         $http({
             method: 'POST',

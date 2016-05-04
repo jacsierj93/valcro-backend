@@ -356,15 +356,9 @@
 
                     <md-input-container class="md-block" flex="">
                         <label>Estatus</label>
-                        <md-select ng-model="status" name ="estado" >
-                            <md-option  value="1" >
-                                Pendiente
-                            </md-option>
-                            <md-option  value="2">
-                                Aprobado
-                            </md-option>
-                            <md-option  value="3">
-                                Cancelado
+                        <md-select ng-model="pedidoSelec.estado_id" v >
+                            <md-option ng-repeat="item in formData.estadoPedido" value="{{item.id}}">
+                                {{item.estado}}
                             </md-option>
                         </md-select>
                     </md-input-container>
@@ -667,7 +661,7 @@
                         <div>
                             Pedidos a Sustituir
                         </div>
-                        <div ng-click="setPed('agrPedPend')">
+                        <div ng-click="openLayer('agrPedPend')">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
                     </div>
