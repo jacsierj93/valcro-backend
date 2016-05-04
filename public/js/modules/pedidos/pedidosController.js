@@ -13,7 +13,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
     $scope.openOdcs =openOdcs;
     $scope.selecOdc=selecOdc;
     $scope.removeLisContraP=removeLisContraP;
-    $scope.removeLisKitchenBox=removeLisKitchenBox;
 
 
     /*******incializacion de $scope*****/
@@ -53,11 +52,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, Order) {
 
     function removeLisContraP(aux){
         removeContraPedido(aux.id,$scope.pedidoSelec.id);
-        loadPedido($scope.pedidoSelec.id);
-    }
-
-    function removeLisKitchenBox(aux){
-        removekitchenBox(aux.id,$scope.pedidoSelec.id);
         loadPedido($scope.pedidoSelec.id);
     }
     function selecOdc (odc){
@@ -510,3 +504,39 @@ MyApp.factory('Order', ['$resource',
         });
     }
 ]);
+
+MyApp.directive('amount', function () {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, element, attrs, ctrl) {
+            element.bind("keydown keypress", function (e) {
+                var key = window.Event ? e.which : e.keyCode;
+                console.log(key);
+                // si marca una letra
+                if(key >= 65 && key <= 90){
+                    e.preventDefault();
+                }
+                //llave cochetes etc
+                if(key >= 171 && key <= 175){
+                    e.preventDefault();
+                }
+                //numpar +-*/
+                if(key == 106 | key == 111 | key ==  107 | key ==  109){
+                    e.preventDefault();
+                }
+                //signos de interrogacion
+                if(key == 0 | key == 222 ){
+                    e.preventDefault();
+                }
+                //<>
+                if(key == 60){
+                    e.preventDefault();
+                }
+
+
+            });
+
+        }
+    };
+});
