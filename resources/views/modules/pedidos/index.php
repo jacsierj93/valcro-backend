@@ -238,7 +238,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Pais</label>
-                            <md-select ng-model="pedidoSelec.pais_id" name ="pais_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.pais_id" name ="pais_id" ng-disabled="status == 2" md-no-ink>
                                 <md-option ng-repeat="pais in formData.paises" value="{{pais.id}}">
                                     {{pais.short_name}}
                                 </md-option>
@@ -247,7 +247,7 @@
 
                         <md-input-container class="md-block"  flex>
                             <label>Direccion</label>
-                            <md-select ng-model="pedidoSelec.direccion_almacen_id" name ="direccion_almacen_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.direccion_almacen_id" name ="direccion_almacen_id" ng-disabled="status == 2" md-no-ink>
                                 <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
                                     {{dir.direccion}}
                                 </md-option>
@@ -264,7 +264,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="pedidoSelec.prov_moneda_id" name ="prov_moneda_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.prov_moneda_id" name ="prov_moneda_id" ng-disabled="status == 2" md-no-ink>
                                 <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
@@ -284,7 +284,7 @@
 
                         <md-input-container class="md-block" flex="">
                             <label>Condicion de pago</label>
-                            <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2" required>
+                            <md-select ng-model="pedidoSelec.condicion_pago_id"  ng-disabled="status == 2" required md-no-ink>
                                 <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
                                     {{conPago.titulo}}
                                 </md-option>
@@ -296,7 +296,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex="">
                             <label>Motivo Pedido </label>
-                            <md-select ng-model="pedidoSelec.motivo_pedido_id"  ng-disabled="status == 2" required>
+                            <md-select ng-model="pedidoSelec.motivo_pedido_id"  ng-disabled="status == 2" required md-no-ink>
                                 <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
                                     {{motivoPed.motivo}}
                                 </md-option>
@@ -304,7 +304,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Prioridad Pedido </label>
-                            <md-select  ng-model="pedidoSelec.prioridad_id"  ng-disabled="status == 2" required>
+                            <md-select  ng-model="pedidoSelec.prioridad_id"  ng-disabled="status == 2" required md-no-ink>
                                 <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
                                     {{prioPed.descripcion}}
                                 </md-option>
@@ -312,7 +312,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="">
                             <label>Condiciones Pedido </label>
-                            <md-select ng-model="pedidoSelec.condicion_pedido_id" ng-disabled="status == 2">
+                            <md-select ng-model="pedidoSelec.condicion_pedido_id" ng-disabled="status == 2" md-no-ink>
                                 <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
                                     {{condPed.nombre}}
                                 </md-option>
@@ -354,7 +354,7 @@
 
                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                     <div>
-                        Aprovacion de Gerente
+                        Aprobacion de Gerente
                     </div>
                 </div>
 

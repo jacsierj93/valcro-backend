@@ -65,8 +65,13 @@ md-input-container {
 
 /*==================================================*/
 /*==================== INPUT =======================*/
+md-input-container .md-input{
+    /*border-color: #ffffff !important;*/
+}
+
 md-input-container:not(.md-input-invalid).md-input-focused .md-input {
     border-color: rgb(84, 180, 234) !important;
+    /*border-color: #ffffff !important;*/
 }
 
 md-input-container:not(.md-input-invalid).md-input-focused label {
@@ -145,6 +150,10 @@ md-input-container .md-input {
     min-height: 19px !important;
     padding: 0 !important;
 }
+
+/*md-select .md-select-value{
+    border-bottom-color: #ffffff;
+}*/
 
 md-select:not([disable]):focus .md-select-value {
     border-bottom-width: 1px;
