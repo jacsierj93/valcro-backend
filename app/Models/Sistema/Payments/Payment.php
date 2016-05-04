@@ -36,5 +36,11 @@ class Payment extends Model
         return $this->belongsTo('App\Models\Sistema\BankAccountProvider', 'prov_cuenta_id');
     }
 
+    ////foreing key
+    public function moneda()
+    {
+        return $this->hasOne('App\Models\Monedas', 'moneda_id');
+    }
+
 
 }

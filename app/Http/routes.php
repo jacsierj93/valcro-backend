@@ -35,10 +35,14 @@ $app->get('/api/info', 'Api\UserController@info');
 $app->get('test', 'Admin\AccountController@main');
 
 
-/**
- * rutas de la administración
- * con AdminLTE
- */
+
+/************************RUTAS DE LOS SERVICIOS***********************/
+
+//////enrutador para servicios de pagos
+if (Request::is('payments/*'))
+{
+    require __DIR__.'/pay_routes.php';
+}
 
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
 
@@ -84,7 +88,7 @@ $app->post("catalogs/sucursalSave",'Catalogs\SucursalController@saveOrUpdate'); 
 $app->post("catalogs/sucursalDel",'Catalogs\SucursalController@delete'); ///borrar
 
 
-////tipo de provedores
+////tipo de proveedores
 $app->get('catalogs/providerTypesList', 'Catalogs\ProviderTypesController@getList'); ///lista de tipo de prov
 $app->get('catalogs/providerTypesForm', 'Catalogs\ProviderTypesController@getForm'); ///nuevo tipo prov
 $app->post("catalogs/providerTypesSave",'Catalogs\ProviderTypesController@saveOrUpdate'); ///guardar tipo prov
@@ -113,19 +117,23 @@ $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delet
 ///Providers
 
 $app->get("provider/provList",'Providers\ProvidersController@getList'); ///obtener lista general de proveedores
-$app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///obtener lista general de proveedores
+$app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///guarda datos basicos de un prov
 $app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obtener datos especificos de un prov
-$app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir'); ///obtener datos especificos de un prov
+$app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir'); ///guardar direccion de proveedor
 $app->post("provider/saveValcroName",'Providers\ProvidersController@saveValcroName'); ///obtener listado de direcciones
-$app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName');
-$app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact');
+$app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName'); //elimina un nombre Valcro
+$app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact'); //guarda informacion de contacto
 $app->post("provider/saveBank",'Providers\ProvidersController@saveInfoBank');//guarda la informacion bancaria de un proveedor
+$app->post("provider/saveCoin",'Providers\ProvidersController@saveCoin');//guarda relacion con una moneda
+$app->post("provider/delCoin",'Providers\ProvidersController@delCoin');//elimina la relacion con una moneda
 
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
 $app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
 $app->get("provider/allContacts",'Providers\ProvidersController@allContacts');
 $app->get("provider/getBankAccount/{id}",'Providers\ProvidersController@getBank');//obtener datos apra grid de cuentas bancarias
+$app->get("provider/provCoins/{id}",'Providers\ProvidersController@getCoins');
+$app->get("provider/listCoin/{id}",'Providers\ProvidersController@assignCoin');
 
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises

@@ -1,14 +1,5 @@
-﻿<?php
-
-/**
- * Created by PhpStorm.
- * User: laptoHPWhite
- * Date: 08/04/2016
- * Time: 16:08
- */
-
+<?php
 namespace App\Http\Controllers\Providers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -196,6 +187,28 @@ class ProvidersController extends BaseController
         $bank->save();
         $result['id']=$bank->id;
         return $result;
+    }
+
+    public function getCoins($id){
+        $coins = Provider::find($id)->getProviderCoin()->get();
+        return ($coins)?$coins:[];
+    }
+
+    public function saveCoin(request $req){
+        if(!Provider::find($req->prov_id)->contacts()->find($req->id)){
+            Provider::find($req->prov_id)->contacts()->attach($req->id);
+        }
+    }
+
+    public function delCoin(request $req){
+        if(!Provider::find($req->prov_id)->contacts()->find($req->id)){
+            Provider::find($req->prov_id)->contacts()->dettach($req->id);
+        }
+    }
+
+    public function assignCoin($id){
+        $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
+        return ($coins)?$coins:[];
     }
 
 
