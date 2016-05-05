@@ -41,11 +41,11 @@
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
             <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)">
-                <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.description }}</div>
-                <div style="height:40px; font-size:31px;">{{item.limCred}}00000</div>
+                <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
+                <div style="height:40px; font-size:31px;">{{item.limite_credito}}00000</div>
                 <div style="height:40px;">
                     <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
-                    <img ng-show="(item.contraped==1)" src="images/contra_pedido.png"/>
+                    <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png"/>
                     <img src="images/aereo.png"/>
                     <img src="images/maritimo.png"/>
                 </div>

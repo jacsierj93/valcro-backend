@@ -35,10 +35,10 @@
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
-        <md-content class="barraLateral">
+        <md-content class="barraLateral" data-ng-init="getProvs()">
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex ng-click="openLayer('lyr1pag')">
-                <div flex>Nombre del proveedor</div>
+            <div data-ng-repeat="prov in provs"   class="boxList" layout="column" flex ng-click="setProv(prov)">
+                <div flex>{{prov.razon_social}}</div>
                 <div layout="row" style="height: 24px;">
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
