@@ -24,7 +24,7 @@ class MasterController extends BaseController
 	public function getCountries()
 	{
 		$country = new Country();
-		$paises = $country->select("id","short_name as nombre")->get();
+		$paises = $country->get();
 		return $paises;
 	}
 

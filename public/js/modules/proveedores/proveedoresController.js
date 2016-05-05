@@ -528,10 +528,128 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
 
 MyApp.controller('creditCtrl', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getSel();
-
     $scope.$watch('prov.id',function(nvo){
-        $scope.limits =  providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
-    })
+        $scope.cred = {id:false,coin:"",amount:"",id_prov: $scope.prov.id||0};
+        $scope.limits =  providers.query({type:"provLimits",id_prov:$scope.prov.id||0});
+    });
 
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['provCred.$valid','provCred.$pristine'], function(nuevo) {
 
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveLim"},$scope.cred,function(data){
+                $scope.cred.id = data.id;
+                $scope.provCred.$setPristine();
+                if(data.action=="new"){
+                    //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
+                    alert("save");
+                    // $scope.accounts.unshift(newElem);
+                }
+            });
+
+        }
+    });
+});
+
+MyApp.controller('convController', function ($scope,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",id_prov: $scope.prov.id||0};
+        $scope.factors =  providers.query({type:"provFactors",id_prov:$scope.prov.id||0});
+    });
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['provConv.$valid','provConv.$pristine'], function(nuevo) {
+        var sum = $scope.conv;
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveConv"},$scope.conv,function(data){
+                $scope.conv.id = data.id;
+                $scope.provConv.$setPristine();
+                if(data.action=="new"){
+                    //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
+                    alert("save");
+                    // $scope.accounts.unshift(newElem);
+                }
+            });
+
+        }
+    });
+});
+
+/*
+MyApp.controller('provPointController', function ($scope,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.pnt = {id:false,cost:"",coin:"",id_prov: $scope.prov.id||0};
+        $scope.points =  providers.query({type:"provPoints",id_prov:$scope.prov.id||0});
+    });
+
+    /!*escuha el estatus del formulario y guarda cuando este valido*!/
+    $scope.$watchGroup(['provPoint.$valid','v.$pristine'], function(nuevo) {
+        var sum = $scope.conv;
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveConv"},$scope.conv,function(data){
+                $scope.conv.id = data.id;
+                $scope.provPoint.$setPristine();
+                if(data.action=="new"){
+                    //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
+                    alert("save");
+                    // $scope.accounts.unshift(newElem);
+                }
+            });
+
+        }
+    });
+});*/
+
+MyApp.controller('prodTimeController', function ($scope,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.tp = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
+        //$scope.provCountries = providers.query({type:"provCountries",id_prov:$scope.prov.id||0});
+        $scope.timesP =  providers.query({type:"prodTimes",id_prov:$scope.prov.id||0});
+    });
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['timeProd.$valid','timeProd.$pristine'], function(nuevo) {
+        var sum = $scope.conv;
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveProdTime"},$scope.tp,function(data){
+                $scope.tp.id = data.id;
+                $scope.timeProd.$setPristine();
+                if(data.action=="new"){
+                    //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
+                    alert("save");
+                    // $scope.accounts.unshift(newElem);
+                }
+            });
+
+        }
+    });
+});
+
+MyApp.controller('prodTimeController', function ($scope,providers,setGetProv) {
+    $scope.prov = setGetProv.getSel();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
+        $scope.provCountries = providers.query({type:"provCountries",id_prov:$scope.prov.id||0});
+        $scope.timesT =  providers.query({type:"transTimes",id_prov:$scope.prov.id||0});
+    });
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['timeTrans.$valid','timeTrans.$pristine'], function(nuevo) {
+        var sum = $scope.conv;
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveTransTime"},$scope.ttr,function(data){
+                $scope.ttr.id = data.id;
+                $scope.timeTrans.$setPristine();
+                if(data.action=="new"){
+                    //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
+                    alert("save");
+                    // $scope.accounts.unshift(newElem);
+                }
+            });
+
+        }
+    });
 });

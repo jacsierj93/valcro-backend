@@ -17,7 +17,4 @@ class ProviderFactor extends Model
     use SoftDeletes;
     protected $table = "tbl_prov_factor";
 
-
-
-
 }

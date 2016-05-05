@@ -26,7 +26,7 @@ class TiemAproTran extends Model
 
     protected $fillabled = ['id', 'min_dia', 'max_dia', 'id_pais'];
 
-    public function getPaisName(){
+    public function country(){
         return $this->hasOne('App\Models\Sistema\Country', 'id', 'id_pais');
     }
 }

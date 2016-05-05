@@ -17,8 +17,11 @@ class ProviderCreditLimit extends Model
     use SoftDeletes;
     protected $table = "tbl_prov_lim_credito";
 
+    public function provider(){
+        $this->belongsTo('App\Models\Sistema\Provider',"prov_id");
+    }
 
-
-
-
+    public function coins(){
+        $this->hasOne('App\Models\Sistema\Monedas',"monedas_id");
+    }
 }

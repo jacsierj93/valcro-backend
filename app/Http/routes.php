@@ -44,6 +44,12 @@ if (Request::is('payments/*'))
     require __DIR__.'/pay_routes.php';
 }
 
+//////enrutador para servicios de Proveedores
+if (Request::is('provider/*'))
+{
+    require __DIR__.'/prov_routes.php';
+}
+
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
 
 
@@ -113,28 +119,6 @@ $app->get('catalogs/tiemAproTranForm', 'Catalogs\ProvTiemAproTranController@getF
 $app->post("catalogs/tiemAproTranSave",'Catalogs\ProvTiemAproTranController@saveOrUpdate'); ///guardar tiempo apro. transito
 $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delete'); ///borrar tiempo aprox. trans.
 
-
-///Providers
-
-$app->get("provider/provList",'Providers\ProvidersController@getList'); ///obtener lista general de proveedores
-$app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///guarda datos basicos de un prov
-$app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obtener datos especificos de un prov
-$app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir'); ///guardar direccion de proveedor
-$app->post("provider/saveValcroName",'Providers\ProvidersController@saveValcroName'); ///obtener listado de direcciones
-$app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName'); //elimina un nombre Valcro
-$app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact'); //guarda informacion de contacto
-$app->post("provider/saveBank",'Providers\ProvidersController@saveInfoBank');//guarda la informacion bancaria de un proveedor
-$app->post("provider/saveCoin",'Providers\ProvidersController@saveCoin');//guarda relacion con una moneda
-$app->post("provider/delCoin",'Providers\ProvidersController@delCoin');//elimina la relacion con una moneda
-
-$app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
-$app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
-$app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
-$app->get("provider/allContacts",'Providers\ProvidersController@allContacts');
-$app->get("provider/getBankAccount/{id}",'Providers\ProvidersController@getBank');//obtener datos apra grid de cuentas bancarias
-$app->get("provider/provCoins/{id}",'Providers\ProvidersController@getCoins');
-$app->get("provider/listCoin/{id}",'Providers\ProvidersController@assignCoin');
-
 //MASTERS
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
 $app->get("master/getProviderType",'Masters\MasterController@getProviderType'); ///obtener listado de tipos de proveedores
@@ -178,13 +162,6 @@ $app->get('catalogs/tiemAproTranList', 'Catalogs\ProvTiemAproTranController@getL
 $app->get('catalogs/tiemAproTranForm', 'Catalogs\ProvTiemAproTranController@getForm'); ///nuevo tiempo aproximado d transito
 $app->post("catalogs/tiemAproTranSave",'Catalogs\ProvTiemAproTranController@saveOrUpdate'); ///guardar tiempo apro. transito
 $app->post("catalogs/tiemAproTranDel",'Catalogs\ProvTiemAproTranController@delete'); ///borrar tiempo aprox. trans.
-
-
-///Proveedores
-
-$app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); ///obtener lista general de proveedores
-$app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
-$app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
 
 //MASTERS
 $app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
