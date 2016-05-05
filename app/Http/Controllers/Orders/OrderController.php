@@ -139,9 +139,7 @@ class OrderController extends BaseController
             'tbl_kitchen_box.precio_bs',
             'tbl_kitchen_box.fecha_aprox_entrega',
             'tbl_kitchen_box.titulo',
-            'tbl_pedido_kitchenbox.pedido_id',
-            'tbl_pedido_kitchenbox.prov_id'
-
+            'tbl_pedido_kitchenbox.pedido_id'
         )->
         where('prov_id',$req->prov_id)->
         leftJoin('tbl_pedido_kitchenbox', 'tbl_kitchen_box.id','=','tbl_pedido_kitchenbox.kitchen_box_id');
