@@ -23,6 +23,10 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         }
     }
 
+
+
+
+
     function closeLayer(all) {
         if (all) {
             while ($scope.index != 0) {
@@ -92,6 +96,18 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         });
     };
 
+    
+    ////setear proveedor
+    $scope.setProv = function(prov){
+
+        $http.get('payments/getProv/'+prov.id).success(function(response){
+           // $scope.provs = response;
+            console.log("trayendo proveedor con id:"+prov.id);
+        });
+
+        closeLayer(true);
+        openLayer('lyr1pag');
+    };
 
 
 

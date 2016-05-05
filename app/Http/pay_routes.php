@@ -14,3 +14,7 @@ $app->get('payments/provList', 'Payments\PaymentController@getProvidersList'); /
 $app->get('payments/typeList', 'Payments\PaymentController@getPaymentTypes'); ///tipos de pagos
 $app->get('payments/typeDocsList', 'Payments\PaymentController@getDocumentTypes'); ///tipos de documentos
 $app->post('payments/paymentsByProvId', 'Payments\PaymentController@getPaymentsByProvId'); ///pagos por proveedor
+
+$app->get('payments/getProv/{id}','Payments\PaymentController@getProvById');
+$app->get('payments/debtsList', 'Payments\PaymentController@getDebtsList'); ///lista de deudas
+$app->get('payments/payList', 'Payments\PaymentController@getPayList'); ///lista de pagos
