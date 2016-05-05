@@ -113,10 +113,18 @@ class OrderController extends BaseController
      */
     public function getCustomOrders(Request $req){
 
-        $data= DB::table('getCustomOrders');
+        $model =CustomOrder::
+        select('tbl_contra_pedido.id',
+            'tbl_contra_pedido.fecha',
+            'tbl_contra_pedido.comentario',
+            'tbl_contra_pedido.monto',
+            'tbl_contra_pedido.titulo',
+            'tbl_pedido_contrapedido.pedido_id',
+            'tbl_contra_pedido.fecha_aprox_entrega')->
+        where('prov_id',$req->prov_id);
+        $model->leftJoin('tbl_pedido_contrapedido', 'tbl_contra_pedido.id', '=', 'tbl_pedido_contrapedido.contra_pedido_id');
         //$model->where('tbl_pedido_contrapedido.pedido_id',null);
-       $data->where('prov_id',$req->prov_id);
-        return $data->get();
+        return $model->get();
     }
 
     /**
