@@ -1,4 +1,6 @@
-MyApp.controller('pagosCtrll', function ($scope, $mdSidenav) {
+
+
+MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $routeParams, $resource) {
 
     var historia = [15];
     $scope.index = index = 0;
@@ -80,8 +82,22 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav) {
         id : 3,
         nombre: "Efectivo"
     }];
+    
+    
+    ////lista de proveedores
+    $scope.getProvs = function() {
+        $http.get('payments/provList').success(function(response){
+            $scope.provs = response;
+            console.log("trayendo lista de proveedores");
+        });
+    };
+
+
+
+
 
 });
+
 
 
 /*
