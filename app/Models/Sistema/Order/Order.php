@@ -16,6 +16,8 @@ class Order extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_pedido";
+    protected $dates = ['deleted_at'];
+
 
     /**
      */

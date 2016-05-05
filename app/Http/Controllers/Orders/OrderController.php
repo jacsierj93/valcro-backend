@@ -20,6 +20,7 @@ use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
+use DB;
 //CustomOrder
 
 class OrderController extends BaseController
@@ -112,18 +113,10 @@ class OrderController extends BaseController
      */
     public function getCustomOrders(Request $req){
 
-        $model =CustomOrder::
-        select('tbl_contra_pedido.id',
-            'tbl_contra_pedido.fecha',
-            'tbl_contra_pedido.comentario',
-            'tbl_contra_pedido.monto',
-            'tbl_contra_pedido.titulo',
-            'tbl_pedido_contrapedido.pedido_id',
-            'tbl_contra_pedido.fecha_aprox_entrega')->
-        where('prov_id',$req->prov_id);
-        $model->leftJoin('tbl_pedido_contrapedido', 'tbl_contra_pedido.id', '=', 'tbl_pedido_contrapedido.contra_pedido_id');
+        $data= DB::table('getCustomOrders');
         //$model->where('tbl_pedido_contrapedido.pedido_id',null);
-        return $model->get();
+       $data->where('prov_id',$req->prov_id);
+        return $data->get();
     }
 
     /**
@@ -138,7 +131,8 @@ class OrderController extends BaseController
             'tbl_kitchen_box.precio_bs',
             'tbl_kitchen_box.fecha_aprox_entrega',
             'tbl_kitchen_box.titulo',
-            'tbl_pedido_kitchenbox.pedido_id'
+            'tbl_pedido_kitchenbox.pedido_id',
+            'tbl_pedido_kitchenbox.prov_id'
 
         )->
         where('prov_id',$req->prov_id)->
