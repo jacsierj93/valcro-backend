@@ -753,30 +753,29 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
-                        <div flex class="headGrid">-</div>
-                        <div flex class="headGrid"> Nº de Pedido</div>
-                        <div flex class="headGrid"> Nombre Proveedor</div>
-                        <div flex class="headGrid"> Nº de Proforma</div>
-                        <div flex class="headGrid"> Fecha</div>
-                        <div flex class="headGrid"> Nº de Factura</div>
-                        <div flex class="headGrid"> Monto</div>
+                        <div flex="5" class="headGrid">-</div>
+                        <div flex="10" class="headGrid"> Pedido</div>
+                        <div flex="" class="headGrid"> Nombre Proveedor</div>
+                        <div flex="10" class="headGrid"> Proforma</div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex="15" class="headGrid"> Nº de Factura</div>
+                        <div flex="10" class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
 
                     </div>
                     <div id="gridPedPend">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
-                                <div class="cellGrid">
+                                <div flex="5" class="cellGrid">
                                     <md-switch class="md-primary"></md-switch>
                                 </div>
-                                <div flex class="cellGrid"> Data 2</div>
-                                <div flex class="cellGrid"> Data 3</div>
-                                <div flex class="cellGrid"> Data 4</div>
-                                <div flex class="cellGrid"> Data 5</div>
-                                <div flex class="cellGrid"> Data 6</div>
-                                <div flex class="cellGrid"> Data 7</div>
+                                <div flex="10" class="cellGrid"> Data 2</div>
+                                <div flex="" class="cellGrid"> Data 3</div>
+                                <div flex="10" class="cellGrid"> Data 4</div>
+                                <div flex="10" class="cellGrid"> Data 5</div>
+                                <div flex="15" class="cellGrid"> Data 6</div>
+                                <div flex="10" class="cellGrid"> Data 7</div>
                                 <div flex class="cellGrid"> Data 8</div>
-                                <div flex class="cellGrid"> Data 9</div>
                             </div>
                         </div>
                     </div>
