@@ -90,27 +90,32 @@
 
                 <div layout="row" style="height: 40px;">
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006837;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00862c;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00a421;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
+                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00c316;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00CCA2;">
+                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00e10b;">
+                            85
+                        </div>
+                    </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00ff00;">
                             85
                         </div>
                     </div>
