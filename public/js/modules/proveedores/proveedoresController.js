@@ -384,12 +384,18 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     };
 });
 
-MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSidenav,setGetContac) {
+MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSidenav,setGetContac,masters,$filter) {
     $scope.prov = setGetProv.getProv();
     $scope.cnt = setGetContac.getContact();
+    $scope.paises = masters.query({ type:"getCountries"});
     $scope.$watch('prov.id',function(nvo){
         $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
     });
+    $scope.$watch('isShow',function(nvo,old){
+        if(nvo!=old && nvo){
+            $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
+        }
+    })
     contact = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave"], function(nuevo) {
@@ -405,7 +411,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
                 contact.nombre = $scope.cnt.nombreCont;
                 contact.email = $scope.cnt.emailCont;
                 contact.telefono = $scope.cnt.contTelf;
-
+                var paisel =$filter("filterSearch")($scope.paises,[$scope.cnt.pais]);
+                contact.pais = paisel[0];
             }, function errorCallback(response) {
                 console.log("error=>", response)
             });
@@ -414,9 +421,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
 
     $scope.showGrid = function(elem){
         $scope.isShow = elem;
-        if(elem){
-            $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
-        }
     };
 
     $scope.book=function(){
@@ -425,6 +429,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
 
     $scope.toEdit = function(element){
         contact = element.cont;
+        contact.prov_id = $scope.prov.id;
         setGetContac.setContact(contact);
 
     };

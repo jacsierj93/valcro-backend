@@ -179,7 +179,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
-                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled" md-no-ink>
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.nombre}}
                                 </md-option>
@@ -213,7 +213,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
-                            <md-select ng-model="dtaPrv.envio" ng-disabled="enabled">
+                            <md-select ng-model="dtaPrv.envio" ng-disabled="enabled" md-no-ink>
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                     {{envio.nombre}}
                                 </md-option>
@@ -284,7 +284,7 @@
 
                         <md-input-container class="md-block" flex="20" ng-controller="TipoDirecc">
                             <label>Tipo de Direccion</label>
-                            <md-select ng-model="dir.tipo">
+                            <md-select ng-model="dir.tipo" md-no-ink>
                                 <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
                                     {{tipo.descripcion}}
                                 </md-option>
@@ -297,7 +297,7 @@
 
                         <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
                             <label>Pais</label>
-                            <md-select ng-model="dir.pais">
+                            <md-select ng-model="dir.pais" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}" >
                                     {{pais.short_name}}
                                 </md-option>
@@ -378,7 +378,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
-                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)">
+                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                     {{pais.short_name}}
                                 </md-option>
@@ -391,7 +391,7 @@
                         <div ng-controller="idiomasController" layout="row" flex="10">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)">
+                                <md-select ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)" md-no-ink>
                                     <md-option ng-value="idioma.id" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
                                     </md-optgroup>
                                 </md-select>
@@ -470,7 +470,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20" ng-controller="allCoinsController">
                             <label>Moneda</label>
-                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled" required>
+                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -514,7 +514,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-model="bnk.pais" name ="state" ng-disabled="enabled" ng-change="setState(this)">
+                            <md-select ng-model="bnk.pais" name ="state" ng-disabled="enabled" ng-change="setState(this)" md-no-ink>
                                 <md-option ng-repeat="country in countries" value="{{country.id}}">
                                     {{country.short_name}}
                                 </md-option>
@@ -523,7 +523,7 @@
 
                         <md-input-container class="md-block" flex="20" >
                             <label>Estado</label>
-                            <md-select ng-model="bnk.est" name ="state" ng-disabled="enabled || (bnk.pais==false)">
+                            <md-select ng-model="bnk.est" name ="state" ng-disabled="enabled || (bnk.pais==false)" md-no-ink>
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.local_name}}
                                 </md-option>
@@ -532,7 +532,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Ciudad</label>
-                            <md-select ng-model="bnk.ciudad" name ="state" ng-disabled="enabled || (bnk.est==false)" required>
+                            <md-select ng-model="bnk.ciudad" name ="state" ng-disabled="enabled || (bnk.est==false)" required md-no-ink>
                                 <md-option ng-repeat="city in cities" value="{{city.id}}">
                                     {{city.local_name}}
                                 </md-option>
@@ -588,7 +588,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Moneda</label>
-                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled" ng-controller="provCoins" required>
+                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled" ng-controller="provCoins" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -642,7 +642,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-model="conv.coin" name ="state" ng-disabled="enabled" required>
+                            <md-select ng-model="conv.coin" name ="state" ng-disabled="enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -664,7 +664,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-model="pnt.coin" ng-disabled="enabled" required>
+                            <md-select ng-model="pnt.coin" ng-disabled="enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -701,7 +701,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-model="tp.country" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="tp.country" name ="state" ng-disabled="enabled" md-no-ink>
                                 <!--<md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
                                     {{country.pais.short_name}}
                                 </md-option>-->
@@ -728,7 +728,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-model="ttr.country" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="ttr.country" name ="state" ng-disabled="enabled" md-no-ink>
                                 <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
                                     {{country.pais.short_name}}
                                 </md-option>
