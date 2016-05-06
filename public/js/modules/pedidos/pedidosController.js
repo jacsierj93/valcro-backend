@@ -21,7 +21,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.todos = new Array();
     $scope.provSelec={id:'-1',razon_social:'', pedidos: new Array() };
     $scope.id= $scope.provSelec.id;
-    $scope.pedidoSelec={ pais_id:'-1', id:'',estado_id:'1'};
+    $scope.pedidoSelec={ pais_id:'-1', id:'',estado_id:'1',prov_moneda_id:'-1', tasa:'0'};
     $scope.odcSelec={ id:'-1'};
     $scope.filterData={ monedas: new Array(), tipoEnv: new Array() };
     $scope.formData={  pedidos: new Array(), tipo: new Array(),  monedas: new Array(),
@@ -54,6 +54,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     /********************************************EVENTOS ********************************************/
 
+    $scope.test= function(){
+        alert('');
+    }
+    $scope.simulateClick= function(id){
+       var a= angular.element(document).find(id);
+        console.log('click ', a);
+        a.click();
+    }
     function removeLisContraP(aux){
         removeContraPedido(aux.id,$scope.pedidoSelec.id);
         loadPedido($scope.pedidoSelec.id);
@@ -83,6 +91,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         loadkitchenBoxProveedor($scope.provSelec.id);
 
     }
+
 
     /** al pulsar la flecha siguiente**/
     $scope.next = function (){
@@ -207,6 +216,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         }
     });
 
+    $scope.$watch('pedidoSelec.prov_moneda_id',function(newVal){
+        if(newVal != '-1'){
+            loadTasa(newVal);
+        }
+    });
+
     $scope.$watchGroup(['FormdetallePedido.$valid','FormdetallePedido.$pristine'], function(nuevo) {
         //alert(nuevo);
         i++;
@@ -291,6 +306,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             data:{id:id}
         }).then(function successCallback(response) {
             $scope.formData.direcciones=response.data;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function loadTasa(id){
+        $http({
+            method: 'GET',
+            url: 'master/getCoin/'+id,
+        }).then(function successCallback(response) {
+            console.log('tasa',response);
+            $scope.pedidoSelec.tasa=response.data.precio_usd;
         }, function errorCallback(response) {
             console.log("errorrr");
         });

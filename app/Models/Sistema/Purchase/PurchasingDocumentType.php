@@ -16,6 +16,7 @@ class PurchasingDocumentType extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_docum_cp_tipo";
+    protected $dates = ['deleted_at'];
 
 
 }

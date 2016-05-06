@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers\Payments;
 
+use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\DocumentCPType;
 use App\Models\Sistema\Payments\Payment;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Provider;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
+use Session;
 use Validator;
 
 
 class PaymentController extends BaseController
 {
+
+
+    private $payIds = array(1, 2, 3);
+    private $debtsIds = array(4, 5);
 
     public function __construct()
     {
@@ -150,6 +156,41 @@ class PaymentController extends BaseController
         }
 
         return response()->json($result); /// json
+    }
+
+
+
+    public function getProvById($provId){
+
+        Session::put("PROVID",$provId); ///setea sesion del proveedor actual
+
+        $proveedor = Provider::findOrFail($provId); ///trayendo datos del proveedor
+
+    }
+
+
+
+    /**lista de pagos hechas al proveedor
+     * @return mixed
+     */
+    public function getPayList()
+    {
+        $provId = Session::get("PROVID");
+        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
+        $result = $pagos;
+        return $result;
+    }
+
+
+    /**deudas del proveedor
+     * @return mixed
+     */
+    public function getDebtsList()
+    {
+        $provId = Session::get("PROVID");
+        $deudas = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->debtsIds)->get();
+        $result = $deudas;
+        return $result;
     }
 
 

@@ -4,6 +4,4 @@
 /config/database.php
 /public/components
 /public/.htaccess
-/resources/views/home.php
 /resources/views/index.php
-/resources/views/login.php

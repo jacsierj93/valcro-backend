@@ -1,4 +1,6 @@
-MyApp.controller('pagosCtrll', function ($scope, $mdSidenav) {
+
+
+MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $routeParams, $resource) {
 
     var historia = [15];
     $scope.index = index = 0;
@@ -20,6 +22,10 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav) {
             closeLayer(true);
         }
     }
+
+
+
+
 
     function closeLayer(all) {
         if (all) {
@@ -80,8 +86,34 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav) {
         id : 3,
         nombre: "Efectivo"
     }];
+    
+    
+    ////lista de proveedores
+    $scope.getProvs = function() {
+        $http.get('payments/provList').success(function(response){
+            $scope.provs = response;
+            console.log("trayendo lista de proveedores");
+        });
+    };
+
+    
+    ////setear proveedor
+    $scope.setProv = function(prov){
+
+        $http.get('payments/getProv/'+prov.id).success(function(response){
+           // $scope.provs = response;
+            console.log("trayendo proveedor con id:"+prov.id);
+        });
+
+        closeLayer(true);
+        openLayer('lyr1pag');
+    };
+
+
+
 
 });
+
 
 
 /*

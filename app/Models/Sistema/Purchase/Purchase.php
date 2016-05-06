@@ -16,6 +16,8 @@ class Purchase extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_compra";
+    protected $dates = ['deleted_at'];
+
 
     public function getItems(){
         return $this->hasMany('App\Models\Sistema\Purchaseitem', 'compra_id', 'id');

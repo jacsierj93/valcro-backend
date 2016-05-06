@@ -16,6 +16,7 @@ class PurchaseOrder extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_compra_orden";
+    protected $dates = ['deleted_at'];
 
 
     /**@return Proveedor de pago*/

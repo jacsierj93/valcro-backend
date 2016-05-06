@@ -16,6 +16,7 @@ class PurchaseItem extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_compra_item";
+    protected $dates = ['deleted_at'];
 
 
     public  function getAdvancePaymentProvider(){

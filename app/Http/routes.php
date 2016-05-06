@@ -44,6 +44,11 @@ if (Request::is('payments/*'))
     require __DIR__.'/pay_routes.php';
 }
 
+//////enrutador para servicios de pedidos
+if (Request::is('Order/*'))
+{
+    require __DIR__.'/order_routes.php';
+}
 //////enrutador para servicios de Proveedores
 if (Request::is('provider/*'))
 {
@@ -133,6 +138,7 @@ $app->get("master/getProviderTypeSend",'Masters\MasterController@getProviderType
 $app->get("master/getCoins",'Masters\MasterController@getCoins'); ///obtener listado de monedas
 $app->get("master/getStates/{id}",'Masters\MasterController@getStates'); ///obtener listado de paises->estados
 $app->get("master/getCities/{id}",'Masters\MasterController@getCities'); ///obtener listado de estados->ciudad
+$app->get("master/getCoin/{id}",'Masters\MasterController@getCoin'); ///obtener una maneda
 
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
@@ -213,28 +219,3 @@ $app->post("catalogs/ProviderProduct",'Purchases\PurchasingOrderController@getPr
 $app->post("catalogs/ProviderAdressStore",'Purchases\OrderController@getProviderAdressStore'); ///getProductos de provedor
 $app->post("catalogs/ProviderPaymentCondition",'Purchases\OrderController@getProviderPaymentCondition'); ///getProductos de provedor
 
-
-// pedidos
-$app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
-$app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///llenado de filtros a proveedores
-$app->post("Order/Order",'Orders\OrderController@getOrden'); ///llenado de filtros a proveedores
-
-$app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
-$app->post("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
-$app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
-$app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
-$app->post("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
-$app->post("Order/ProviderCoins",'Orders\OrderController@getProviderCoins'); ///obtine las monedas de un proveedor
-$app->post("Order/ProviderPaymentCondition",'Orders\OrderController@getProviderPaymentCondition'); ///obtiene las condiciones de pago a proveedor
-$app->post("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressStore'); ///obtiene las direcciones de almacen de un proveedor
-$app->post("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtiene las direcciones de almacen de un proveedor en un pais
-$app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el pedido
-$app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido
-$app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
-$app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
-$app->post("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
-$app->post("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
-$app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el pedido
-$app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///elimina el pedido
-$app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); ///elimina el pedido
-$app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); ///elimina el pedido
