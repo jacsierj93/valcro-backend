@@ -285,8 +285,8 @@
                         <md-input-container class="md-block" flex="20" ng-controller="TipoDirecc">
                             <label>Tipo de Direccion</label>
                             <md-select ng-model="dir.tipo">
-                                <md-option ng-repeat="tipo in tipos" value="{{tipo.nombre}}">
-                                    {{tipo.nombre}}
+                                <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
+                                    {{tipo.descripcion}}
                                 </md-option>
                             </md-select>
                             <!--<div ng-messages="user.tipo.$error">

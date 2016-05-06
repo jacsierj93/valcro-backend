@@ -10,14 +10,13 @@ use App\Models\Sistema\Monedas;
 use App\Models\Sistema\ProviderType;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\State;
-use App\Models\Sistema\City;
+use App\Models\Sistema\TypeAddress;
 
 class MasterController extends BaseController
 {
 
 	public function __construct()
 	{
-
 		$this->middleware('auth');
 	}
 
@@ -45,6 +44,11 @@ class MasterController extends BaseController
 		return Monedas::all();
 	}
 
+	public function getAddressType(){
+		return TypeAddress::get();
+	}
+
+
 
 	public function getStates($id){
 		if($id){
@@ -65,6 +69,7 @@ class MasterController extends BaseController
 		}
 
 	}
+
 
 	/**
 	 * obtiene la moneda segun id

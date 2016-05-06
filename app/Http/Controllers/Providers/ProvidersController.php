@@ -38,7 +38,7 @@ class ProvidersController extends BaseController
 
     public function getProv(request $prv)
     {
-        $data = Provider::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
+        $data = Provider::find($prv->id);
         $data->contraped = ($data->contraped == 1);
         return $data;
     }
