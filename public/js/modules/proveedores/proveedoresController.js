@@ -15,12 +15,27 @@ MyApp.factory('masters', ['$resource',
 MyApp.factory('providers', ['$resource',
     function ($resource) {
         return $resource('provider/:type/:id_prov', {}, {
-            query: {method: 'GET', interceptor : {responseError : function(err){return [];}}, params: {type: "",id_prov:""}, isArray: true},
+            query: {method: 'GET', cancellable:true, params: {type: "",id_prov:""}, isArray: true},
             get:   {method: 'POST', params: {type: ""}, isArray: false},
             put:   {method: 'POST', params: {type: ""}, isArray: false}
         });
     }
 ]);
+
+MyApp.service("masterLists",function(masters) {
+    var coins =[];
+    var countries = [];
+    var languaje = [];
+
+    return {
+        setMain:function(){
+            countries = masters.query({ type:"getCountries"});
+        },
+        getCountries:function(){
+            return countries;
+        }
+    }
+})
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -41,7 +56,7 @@ MyApp.filter('filterSearch', function() {
 
 
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists) {
     $scope.prov=setGetProv.getProv()
     var historia= [15];
     $scope.index = index=0;
@@ -116,6 +131,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         }
     }
 
+    masterLists.setMain();
+
 
 });
 
@@ -141,8 +158,8 @@ MyApp.controller('provCoins', function ($scope,listCoins,setGetProv) {
 
 });
 
-MyApp.controller('ListPaises', function ($scope,$http,masters) {
-    $scope.paises = masters.query({ type:"getCountries"});
+MyApp.controller('ListPaises', function ($scope,masterLists) {
+    $scope.paises = masterLists.getCountries();
 
 });
 
@@ -173,6 +190,7 @@ MyApp.controller('ListHerramientas', function ($scope) {
 
 MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
     setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
+    $scope.prov = setGetProv.getProv();
 });
 
 //###########################################################################################3
@@ -197,7 +215,7 @@ MyApp.service("setGetProv",function($http,providers){
                     prov.siglas = data.siglas;
                     prov.type = data.tipo_id;
                     prov.envio = data.tipo_envio_id;
-                    prov.contraped = data.contrapedido;
+                    prov.contraped = (data.contrapedido==1)?true:false;
                 });
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
@@ -208,6 +226,7 @@ MyApp.service("setGetProv",function($http,providers){
             itemsel.razon_social = upd.description;
             itemsel.limite_credito = upd.limCred;
             itemsel.contrapedido = upd.contraped;
+            itemsel.tipo_envio_id= upd.envio;
         },
         setList : function(val){
             list = val;
@@ -229,6 +248,10 @@ MyApp.service("setGetProv",function($http,providers){
 //###########################################################################################3
 MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers) {
     $scope.enabled = false;
+    $scope.toCheck = false;
+    $scope.inputSta = function(inp){
+        $scope.toCheck = true;
+    };
     $scope.showSimpleToast = function() {
         $mdToast.show(/*{
             template: "<md-toast style='width:100%'>prueba</md-toast>",
@@ -250,6 +273,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                     setGetProv.addToList({
                         razon_social: $scope.dtaPrv.description,
                         contrapedido: $scope.dtaPrv.contraped,
+                        tipo_envio_id: $scope.dtaPrv.envio,
                         id: $scope.dtaPrv.id,
                     });
                     $scope.showSimpleToast();
@@ -267,9 +291,11 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,$mdToast,pro
     var dirSel = {};
     /*escucha cambios en el proveedor seleccionado y carga las direcciones correspondiente*/
     $scope.$watch('prov.id',function(nvo){
-        $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
-        $scope.address = providers.query({type:"dirList",id_prov: $scope.prov.id||0});
+
+        $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
+        $scope.address = (nvo)?providers.query({type: "dirList", id_prov: $scope.prov.id || 0}):[];
         $scope.isShow = false;
+
     });
 
     $scope.toEdit = function(addrs){
@@ -342,8 +368,9 @@ MyApp.controller('idiomasController', function($scope) {
 MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers) {
     $scope.enabled=true;
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
-    $scope.$watch('prov.id',function(){
-        $scope.valcroName = providers.query({type:"provNomValList",id_prov: $scope.prov.id||0});
+    $scope.$watch('prov.id',function(nvo){
+        $scope.valcroName = (nvo)?providers.query({type: "provNomValList", id_prov: $scope.prov.id || 0}):[];
+
     });
 
     $scope.$watchGroup(['valcroName.length','prov.id'],function(){
@@ -389,7 +416,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
     $scope.cnt = setGetContac.getContact();
     $scope.paises = masters.query({ type:"getCountries"});
     $scope.$watch('prov.id',function(nvo){
-        $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
+        $scope.contacts = (nvo)?providers.query({type: "contactProv", id_prov: $scope.prov.id || 0}):[];
+
     });
     $scope.$watch('isShow',function(nvo,old){
         if(nvo!=old && nvo){
@@ -475,8 +503,11 @@ MyApp.service("listCoins",function(providers) {
 
     return {
         setProv:function(id_prov){
-            selCoins = providers.query({type:"provCoins",id_prov:id_prov||0});
-            coinIds = providers.query({type:"listCoin",id_prov:id_prov||0});
+            if(id_prov){
+                selCoins = providers.query({type:"provCoins",id_prov:id_prov||0});
+                coinIds = providers.query({type:"listCoin",id_prov:id_prov||0});
+            }
+
         },
         getCoins:function(){
             return selCoins;
@@ -490,6 +521,7 @@ MyApp.service("listCoins",function(providers) {
 MyApp.controller('coinController', function ($scope,masters,providers,setGetProv,listCoins) {
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
+
         listCoins.setProv(nvo);
         $scope.coinAssign = listCoins.getCoins();
         $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
@@ -512,7 +544,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
     $scope.countries = masters.query({ type:"getCountries"});
     $scope.$watch('prov.id',function(nvo){
         $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
-        $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
+        $scope.accounts = (nvo)?providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0}):[];
     });
     $scope.$watch('bnk.pais', function(nuevo) {
         $scope.states = masters.query({ type:"getStates",id:$scope.bnk.pais||0});
@@ -551,7 +583,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
         $scope.cred = {id:false,coin:"",amount:"",id_prov: $scope.prov.id||0};
-        $scope.limits =  providers.query({type:"provLimits",id_prov:$scope.prov.id||0});
+        $scope.limits =  (nvo)?providers.query({type:"provLimits",id_prov:$scope.prov.id||0}):0;
     });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -576,7 +608,7 @@ MyApp.controller('convController', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
         $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",id_prov: $scope.prov.id||0};
-        $scope.factors =  providers.query({type:"provFactors",id_prov:$scope.prov.id||0});
+        $scope.factors = (nvo)? providers.query({type:"provFactors",id_prov:$scope.prov.id||0}):[];
     });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -610,13 +642,6 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv) {
             providers.put({type:"savePoint"},$scope.pnt,function(data){
 
                 $scope.provPoint.$setPristine();
-/*                $scope.conv.id = data.id;
-
-                if(data.action=="new"){
-                    //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
-                    alert("save");
-                    // $scope.accounts.unshift(newElem);
-                }*/
             });
 
         }
@@ -628,7 +653,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv) {
     $scope.$watch('prov.id',function(nvo){
         $scope.tp = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
         //$scope.provCountries = providers.query({type:"provCountries",id_prov:$scope.prov.id||0});
-        $scope.timesP =  providers.query({type:"prodTimes",id_prov:$scope.prov.id||0});
+        $scope.timesP =  (nvo)?providers.query({type:"prodTimes",id_prov:$scope.prov.id||0}):[];
     });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -653,8 +678,8 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
         $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
-        $scope.provCountries = providers.query({type:"provCountries",id_prov:$scope.prov.id||0});
-        $scope.timesT =  providers.query({type:"transTimes",id_prov:$scope.prov.id||0});
+        $scope.provCountries = (nvo)?providers.query({type:"provCountries",id_prov:$scope.prov.id||0}):[];
+        $scope.timesT =  (nvo)?providers.query({type:"transTimes",id_prov:$scope.prov.id||0}):[];
     });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/

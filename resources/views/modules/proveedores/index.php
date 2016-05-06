@@ -40,14 +40,14 @@
         <md-content class="barraLateral" ng-controller="ListProv">
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)">
+            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id)}">
                 <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                 <div style="height:40px; font-size:31px;">{{item.limite_credito}}00000</div>
                 <div style="height:40px;">
                     <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
                     <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png"/>
-                    <img src="images/aereo.png"/>
-                    <img src="images/maritimo.png"/>
+                    <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)"src="images/aereo.png"/>
+                    <img ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)"src="images/maritimo.png"/>
                 </div>
             </div>
 
@@ -194,15 +194,14 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
-                                   ng-model="dtaPrv.description" ng-disabled="enabled">
+                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description" ng-disabled="(enabled || (toCheck && projectForm.description.$valid))"> <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
                             </div>-->
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="10">
+                        <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
                             <input maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="enabled" >
                             <!--<div ng-messages="projectForm.siglas.$error">
@@ -649,6 +648,18 @@
                             </md-select>
                         </md-input-container>
                     </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
                 <form name="provPoint" ng-controller="provPointController">
@@ -670,6 +681,18 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
 
@@ -734,6 +757,18 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
 

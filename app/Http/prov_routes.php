@@ -35,4 +35,4 @@ $app->get("provider/provLimits/{id}",'Providers\ProvidersController@getCreditLim
 $app->get("provider/provFactors/{id}",'Providers\ProvidersController@getFactorConvers');//obtener factores de conversion asignados al proveedor
 $app->get("provider/provCountries/{id}",'Providers\ProvidersController@provCountries');//obtener factores de conversion asignados al proveedor
 $app->get("provider/prodTimes/{id}",'Providers\ProvidersController@getProdTime');//obtener factores de conversion asignados al proveedor
-$app->get("provider/transTimes/{id}",'Providers\ProvidersController@getProdTrans');//obtener factores de conversion asignados al proveedor
+$app->get("provider/transTimes/{id}",'Providers\ProvidersController@getTimeTrans');//obtener factores de conversion asignados al proveedor

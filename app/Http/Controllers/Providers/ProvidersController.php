@@ -332,7 +332,7 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function getProdTrans($id){
+    public function getTimeTrans($id){
         if((bool)$id) {
             $times = Provider::find($id)->transTime()->get();
             foreach ($times as $time) {
