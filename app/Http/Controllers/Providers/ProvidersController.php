@@ -20,11 +20,11 @@ use Validator;
 
 class ProvidersController extends BaseController
 {
-        public function __construct()
-        {
+    public function __construct()
+    {
 
-            $this->middleware('auth');
-        }
+        $this->middleware('auth');
+    }
 
     public function getList()
     {
@@ -116,21 +116,17 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function listValcroName($provId){
-        if($provId){
-            $valName = Provider::find($provId)->nombres_valcro()->select("id","nombre as name","fav")->get();
+    public function listValcroName($id){
+        if((bool)$id){
+            $valName = Provider::find($id)->nombres_valcro()->select("id","nombre as name","fav")->get();
             return $valName;
-        }else{
-            return [];
         }
     }
 
-    public function listContacProv($provId){
-        if($provId){
-            $valName = Provider::find($provId)->contacts()->get();
+    public function listContacProv($id){
+        if((bool)$id){
+            $valName = Provider::find($id)->contacts()->get();
             return ($valName)?$valName:[];
-        }else{
-            return [];
         }
     }
 
@@ -169,11 +165,9 @@ class ProvidersController extends BaseController
     }
 
     public function getBank($id){
-        if($id!=0){
+        if((bool)$id){
             $accounts = Provider::find($id)->bankAccount()->get();
             return ($accounts)?$accounts:[];
-        }else{
-            return [];
         }
 
     }
@@ -202,34 +196,39 @@ class ProvidersController extends BaseController
     }
 
     public function getCoins($id){
-        $coins = Provider::find($id)->getProviderCoin()->get();
-        return ($coins)?$coins:[];
+        if((bool)$id) {
+            $coins = Provider::find($id)->getProviderCoin()->get();
+            return ($coins) ? $coins : [];
+        }
     }
 
     public function saveCoin(request $req){
-        if(!Provider::find($req->prov_id)->contacts()->find($req->id)){
-            Provider::find($req->prov_id)->contacts()->attach($req->id);
+        if(!Provider::find($req->prov_id)->getProviderCoin()->find($req->coin)){
+            Provider::find($req->prov_id)->getProviderCoin()->attach($req->coin);
         }
     }
 
     public function delCoin(request $req){
-        if(!Provider::find($req->prov_id)->contacts()->find($req->id)){
-            Provider::find($req->prov_id)->contacts()->dettach($req->id);
+        if(!Provider::find($req->prov_id)->getProviderCoin()->find($req->id)){
+            Provider::find($req->prov_id)->getProviderCoin()->dettach($req->id);
         }
     }
 
     public function assignCoin($id){
-        $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
-        return ($coins)?$coins:[];
+        if((bool)$id) {
+            $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
+            return ($coins) ? $coins : [];
+        }
     }
 
     public function getCreditLimits($id){
-        $limits = Provider::find($id)->limitCredit()->get();
-        foreach($limits as $lim){
-            $lim['moneda']=Monedas::find($lim->moneda_id);
+        if((bool)$id) {
+            $limits = Provider::find($id)->limitCredit()->get();
+            foreach ($limits as $lim) {
+                $lim['moneda'] = Monedas::find($lim->moneda_id);
+            }
+            return ($limits) ? $limits : [];
         }
-
-        return ($limits)?$limits:[];
     }
 
     public function saveLimCred(request $req){
@@ -251,12 +250,13 @@ class ProvidersController extends BaseController
     }
 
     public function getFactorConvers($id){
-        $factors = Provider::find($id)->convertFact()->get();
-        foreach($factors as $factor){
-            $factor['moneda']=Monedas::find($factor->moneda_id);
+        if($id) {
+            $factors = Provider::find($id)->convertFact()->get();
+            foreach ($factors as $factor) {
+                $factor['moneda'] = Monedas::find($factor->moneda_id);
+            }
+            return ($factors) ? $factors : [];
         }
-
-        return ($factors)?$factors:[];
     }
 
 
@@ -281,23 +281,52 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function savePoint(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+       /* if($req->id){
+            $fact = FactConv::find($req->id);
+            $result['action']="upd";
+        }else{
+            $lim = new FactConv();
+        }*/
+
+        $point = Provider::find($req->id_prov)->getProviderCoin()->updateExistingPivot($req->coin,["punto"=>$req->cost]);
+
+/*        $lim->prov_id = $req->id_prov;
+        $lim->moneda_id = $req->coin;
+        $lim->flete = $req->freight;
+        $lim->gastos = $req->expens;
+        $lim->ganancia = $req->gain;
+        $lim->descuento = $req->disc;
+
+        $lim->save();
+        $result['id']=$lim->id;*/
+        return $result;
+    }
+
     public function provCountries($id){
-        $countries = Provider::find($id)->address()->groupBy("pais_id")->get();
-       foreach($countries as $country){
-           $country['pais']=$country->country()->get()->first();
+        if((bool)$id) {
+            $countries = Provider::find($id)->address()->groupBy("pais_id")->get();
+            foreach ($countries as $country) {
+                $country['pais'] = $country->country()->get()->first();
+            }
+            // dd($country);
+            return ($countries) ? $countries : [];
         }
-       // dd($country);
-        return ($countries)?$countries:[];
     }
 
 
     public function getProdTime($id){
-        $times = Provider::find($id)->prodTime()->get();
-        foreach($times as $time){
-           $time->country;
-        }
+        if((bool)$id) {
+            $times = Provider::find($id)->prodTime()->get();
+            foreach ($times as $time) {
+                $time->country;
+            }
 
-        return ($times)?$times:[];
+            return ($times) ? $times : [];
+        }/*else{
+            return [];
+        }*/
     }
 
 
@@ -321,12 +350,14 @@ class ProvidersController extends BaseController
     }
 
     public function getProdTrans($id){
-        $times = Provider::find($id)->transTime()->get();
-        foreach($times as $time){
-            $time->country;
-        }
+        if((bool)$id) {
+            $times = Provider::find($id)->transTime()->get();
+            foreach ($times as $time) {
+                $time->country;
+            }
 
-        return ($times)?$times:[];
+            return ($times) ? $times : [];
+        }
     }
 
     public function saveProdTrans(request $req){

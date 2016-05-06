@@ -15,17 +15,25 @@ MyApp.factory('masters', ['$resource',
 MyApp.factory('providers', ['$resource',
     function ($resource) {
         return $resource('provider/:type/:id_prov', {}, {
-            query: {method: 'GET', params: {type: "",id_prov:""}, isArray: true},
+            query: {method: 'GET', interceptor : {responseError : function(err){return [];}}, params: {type: "",id_prov:""}, isArray: true},
             get:   {method: 'POST', params: {type: ""}, isArray: false},
             put:   {method: 'POST', params: {type: ""}, isArray: false}
         });
     }
 ]);
+/*filtro para filtrar los option de los selects basandose en un array */
+MyApp.filter('filterSelect', function() {
+    return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return arr1.filter(function(val) {
+            return arr2.indexOf(val.id) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+        });
+    }
+});
 
 
 
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
-
+    $scope.prov=setGetProv.getProv()
     var historia= [15];
     $scope.index = index=0;
     var base =264;
@@ -92,8 +100,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     $scope.showNext = function(status,to){
         if(status){
             $scope.nextLyr = to;
-            console.log($scope.nextLyr)
-            $mdSidenav("NEXT").open()
+            if($scope.prov.id)
+                $mdSidenav("NEXT").open()
         }else{
             $mdSidenav("NEXT").close()
         }
@@ -474,13 +482,16 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     $scope.$watch('prov.id',function(nvo){
         listCoins.setProv(nvo);
         $scope.coinAssign = listCoins.getCoins();
-
+        $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
     })
-    $scope.cn = {coin:""};
+
     $scope.$watchGroup(['provMoneda.$valid','provMoneda.$pristine'], function(nuevo) {
-        providers.put({type:"saveCoin"},$scope.cn,function(data){
-            $scope.bankInfoForm.$setPristine();
-        })
+        if(nuevo[0] && !nuevo[1]) {
+            providers.put({type: "saveCoin"}, $scope.cn, function (data) {
+                $scope.provMoneda.$setPristine();
+                listCoins.setProv($scope.prov.id)
+            })
+        }
     })
 
 });
@@ -494,10 +505,10 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         $scope.accounts = providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0});
     });
     $scope.$watch('bnk.pais', function(nuevo) {
-        $scope.states = masters.query({ type:"getStates",id:$scope.bnk.pais});
+        $scope.states = masters.query({ type:"getStates",id:$scope.bnk.pais||0});
     });
     $scope.$watch('bnk.est', function(nuevo) {
-        $scope.cities = masters.query({ type:"getCities",id:$scope.bnk.est});
+        $scope.cities = masters.query({ type:"getCities",id:$scope.bnk.est||0});
     });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -576,7 +587,6 @@ MyApp.controller('convController', function ($scope,providers,setGetProv) {
     });
 });
 
-/*
 MyApp.controller('provPointController', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getSel();
     $scope.$watch('prov.id',function(nvo){
@@ -584,23 +594,24 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv) {
         $scope.points =  providers.query({type:"provPoints",id_prov:$scope.prov.id||0});
     });
 
-    /!*escuha el estatus del formulario y guarda cuando este valido*!/
-    $scope.$watchGroup(['provPoint.$valid','v.$pristine'], function(nuevo) {
-        var sum = $scope.conv;
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+    $scope.$watchGroup(['provPoint.$valid','provPoint.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
-            providers.put({type:"saveConv"},$scope.conv,function(data){
-                $scope.conv.id = data.id;
+            providers.put({type:"savePoint"},$scope.pnt,function(data){
+
                 $scope.provPoint.$setPristine();
+/*                $scope.conv.id = data.id;
+
                 if(data.action=="new"){
                     //var newElem = {banco:$scope.bnk.bankName,beneficiario:$scope.bnk.bankBenef,cuenta:$scope.bnk.bankIban};
                     alert("save");
                     // $scope.accounts.unshift(newElem);
-                }
+                }*/
             });
 
         }
     });
-});*/
+});
 
 MyApp.controller('prodTimeController', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getSel();
@@ -628,7 +639,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv) {
     });
 });
 
-MyApp.controller('prodTimeController', function ($scope,providers,setGetProv) {
+MyApp.controller('transTimeController', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getSel();
     $scope.$watch('prov.id',function(nvo){
         $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};

@@ -30,18 +30,19 @@ class MasterController extends BaseController
 
 	public function getProviderType()
 	{
-		$paises = ProviderType::select("id","nombre")->where("deleted_at",NULL)->get();
+		$paises = ProviderType::select("id","nombre")->get();
 		return $paises;
 	}
 
 	public function getProviderTypeSend()
 	{
-		$paises = ProvTipoEnvio::select("id","nombre")->where("deleted_at",NULL)->get();
+		$paises = ProvTipoEnvio::select("id","nombre")->get();
 		return $paises;
 	}
 	public function getCoins()
 	{
-		return Monedas::select("id","nombre","simbolo","codigo")->get();
+		//return Monedas::select("id","nombre","simbolo","codigo")->get();
+		return Monedas::all();
 	}
 
 

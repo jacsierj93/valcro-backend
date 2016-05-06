@@ -471,7 +471,7 @@
                         <md-input-container class="md-block" flex="20" ng-controller="allCoinsController">
                             <label>Moneda</label>
                             <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled" required>
-                                <md-option ng-repeat="coin in coins">
+                                <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
@@ -651,7 +651,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
-                <form name="provPoint" <!--ng-controller="provPointController"-->>
+                <form name="provPoint" ng-controller="provPointController">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Puntos
@@ -660,11 +660,11 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Costo del punto</label>
-                            <input ng-model="pnt.cost">
+                            <input ng-model="pnt.cost" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-model="pnt.coin" ng-disabled="enabled">
+                            <md-select ng-model="pnt.coin" ng-disabled="enabled" required>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -710,7 +710,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="timeTrans" ng-controller="prodTransController">
+                <form name="timeTrans" ng-controller="transTimeController">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Tiempo Aproximado de Transito

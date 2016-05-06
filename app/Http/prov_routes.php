@@ -22,6 +22,7 @@ $app->post("provider/saveLim",'Providers\ProvidersController@saveLimCred');//gua
 $app->post("provider/saveConv",'Providers\ProvidersController@saveFactorConvert');//guarda o actualiza un factor de conversion
 $app->post("provider/saveProdTime",'Providers\ProvidersController@saveProdTime');//guarda o actualiza un tiempo de porduccion
 $app->post("provider/saveTransTime",'Providers\ProvidersController@saveProdTrans');//guarda o actualiza un tiempo de transporte
+$app->post("provider/savePoint",'Providers\ProvidersController@savePoint');//guarda el valor para un punto en proveedor
 
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones

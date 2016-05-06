@@ -50,6 +50,13 @@ if (Request::is('provider/*'))
     require __DIR__.'/prov_routes.php';
 }
 
+//////enrutador para servicios de embarques
+if (Request::is('embarques/*'))
+{
+    require __DIR__.'/embarques_routes.php';
+}
+
+
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
 
 
