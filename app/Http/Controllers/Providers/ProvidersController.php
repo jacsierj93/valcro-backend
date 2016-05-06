@@ -283,24 +283,7 @@ class ProvidersController extends BaseController
 
     public function savePoint(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
-       /* if($req->id){
-            $fact = FactConv::find($req->id);
-            $result['action']="upd";
-        }else{
-            $lim = new FactConv();
-        }*/
-
         $point = Provider::find($req->id_prov)->getProviderCoin()->updateExistingPivot($req->coin,["punto"=>$req->cost]);
-
-/*        $lim->prov_id = $req->id_prov;
-        $lim->moneda_id = $req->coin;
-        $lim->flete = $req->freight;
-        $lim->gastos = $req->expens;
-        $lim->ganancia = $req->gain;
-        $lim->descuento = $req->disc;
-
-        $lim->save();
-        $result['id']=$lim->id;*/
         return $result;
     }
 

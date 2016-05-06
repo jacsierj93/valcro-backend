@@ -31,6 +31,15 @@ MyApp.filter('filterSelect', function() {
 });
 
 
+MyApp.filter('filterSearch', function() {
+    return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return arr1.filter(function(val) {
+            return arr2.indexOf(val.id) !== -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+        });
+    }
+});
+
+
 
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters) {
     $scope.prov=setGetProv.getProv()
@@ -381,6 +390,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
     $scope.$watch('prov.id',function(nvo){
         $scope.contacts = providers.query({type:"contactProv",id_prov: $scope.prov.id||0});
     });
+    contact = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave"], function(nuevo) {
         console.log(nuevo[2]);
@@ -392,6 +402,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
             }).then(function successCallback(response) {
                 $scope.cnt.id = response.data.id;
                 $scope.provContactosForm.$setPristine();
+                contact.nombre = $scope.cnt.nombreCont;
+                contact.email = $scope.cnt.emailCont;
+                contact.telefono = $scope.cnt.contTelf;
 
             }, function errorCallback(response) {
                 console.log("error=>", response)
@@ -415,19 +428,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,$http,providers,$mdSi
         setGetContac.setContact(contact);
 
     };
-
-/*
-    $scope.toEdit = function(addrs){
-        dirSel = addrs.add;
-        $scope.dir.id = dirSel.id;
-        $scope.dir.id_prov = dirSel.prov_id;
-        $scope.dir.direccProv = dirSel.direccion;
-        $scope.dir.tipo = dirSel.tipo_dir;
-        $scope.dir.pais = dirSel.pais_id;
-        $scope.dir.provTelf = dirSel.telefono;
-    };
-*/
-
 });
 
 MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac,setGetProv) {
@@ -596,7 +596,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv) {
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
         $scope.pnt = {id:false,cost:"",coin:"",id_prov: $scope.prov.id||0};
-        $scope.points =  providers.query({type:"provPoints",id_prov:$scope.prov.id||0});
+        //$scope.points =  providers.query({type:"provPoints",id_prov:$scope.prov.id||0});
     });
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
