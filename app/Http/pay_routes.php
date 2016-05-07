@@ -18,3 +18,5 @@ $app->post('payments/paymentsByProvId', 'Payments\PaymentController@getPaymentsB
 $app->get('payments/getProv/{id}','Payments\PaymentController@getProvById');
 $app->get('payments/debtsList', 'Payments\PaymentController@getDebtsList'); ///lista de deudas
 $app->get('payments/payList', 'Payments\PaymentController@getPayList'); ///lista de pagos
+
+

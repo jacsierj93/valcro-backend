@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Payments;
 
+use App\Http\Controllers\Masters\MasterFinancialController;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\DocumentCPType;
 use App\Models\Sistema\Payments\Payment;
@@ -26,14 +27,6 @@ class PaymentController extends BaseController
         $this->middleware('auth');
     }
 
-
-    public function getList()
-    {
-
-        $data = Departament::all();
-
-        return view('modules.catalogs.dep-list', ['data' => $data]);
-    }
 
     /**carga formulario
      * @param Request $req
@@ -109,7 +102,73 @@ class PaymentController extends BaseController
     public function getProvidersList()
     {
         $provs = Provider::all();
-        return $provs;
+        $abonos = array(1, 2, 3); ///id de los abonos AD,NDC,RBY
+        $deudas = array(4); ///id de deudas
+        $currenDate = date("Y-m-d");
+        // echo MasterFinancialController::getCostByCoin(50000,2,3);
+
+
+        $total_abonos = 0;
+        $total_deuda = 0;
+        $nvencido = 0; ///vencidos
+        $nv7 = 0; ///vence 7
+        $nv30 = 0; ///vence30
+        $nv60 = 0; ///vence60
+        $nv90 = 0; ///vence90
+
+
+        $result = array();
+        foreach ($provs as $prv) {
+
+            $temp["id"] = $prv->id;
+            $temp["razon_social"] = $prv->razon_social;
+            $docs = $prv->getDocuments();
+
+            foreach ($docs as $doc) {
+
+                ////////totalizando abonos
+                if (in_array($doc->tipo_id, $abonos)) {
+                    $total_abonos += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
+                }
+
+                ////total deudas
+                if (in_array($doc->tipo_id, $deudas)) {
+                    $total_deuda += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
+                }
+
+
+                ////nfact vence
+                $vence = $this->dateDiff($doc->fecha_vence, $currenDate);
+
+                if ($vence <= 0) {
+                    $nvencido++;
+                } else if ($vence <= 7) {
+                    $nv7++;
+                } else if ($vence > 7 && $vence <= 30) {
+                    $nv30++;
+                } else if ($vence > 30 && $vence <= 60) {
+                    $nv60++;
+                } else if ($vence > 60 && $vence <= 90) {
+                    $nv90++;
+                }
+
+
+            }
+
+            $temp["tabono"] = $total_abonos;
+            $temp["tdeuda"] = $total_deuda;
+            $temp["vencido"] = $nvencido;
+            $temp["vence7"] = $nv7;
+            $temp["vence30"] = $nv30;
+            $temp["vence60"] = $nv60;
+            $temp["vence90"] = $nv90;
+
+            $result[] = $temp;
+
+        }
+
+
+        return $result;
     }
 
 
@@ -159,15 +218,15 @@ class PaymentController extends BaseController
     }
 
 
+    public function getProvById($provId)
+    {
 
-    public function getProvById($provId){
-
-        Session::put("PROVID",$provId); ///setea sesion del proveedor actual
+        Session::put("PROVID", $provId); ///setea sesion del proveedor actual
 
         $proveedor = Provider::findOrFail($provId); ///trayendo datos del proveedor
 
-    }
 
+    }
 
 
     /**lista de pagos hechas al proveedor
@@ -191,6 +250,20 @@ class PaymentController extends BaseController
         $deudas = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->debtsIds)->get();
         $result = $deudas;
         return $result;
+    }
+
+
+    /**funcion que trae la diferencia de fechas en dias
+     * @param $dateIni
+     * @param $dateEnd
+     * @return mixed
+     */
+    private function dateDiff($dateIni, $dateEnd)
+    {
+        $from = date_create($dateIni);
+        $to = date_create($dateEnd);
+        $diff = date_diff($to, $from);
+        return (int)$diff->format('%R%d');
     }
 
 
