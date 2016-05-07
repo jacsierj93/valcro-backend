@@ -61,6 +61,12 @@ if (Request::is('embarques/*'))
     require __DIR__.'/embarques_routes.php';
 }
 
+//////enrutador para servicios master
+if (Request::is('master/*'))
+{
+    require __DIR__.'/master_routes.php';
+}
+
 
 $app->get('/', 'Account\AccountController@main'); ///pagina principal
 
@@ -153,15 +159,6 @@ $app->get("provider/getBankAccount/{id}",'Providers\ProvidersController@getBank'
 $app->get("provider/provCoins/{id}",'Providers\ProvidersController@getCoins');
 $app->get("provider/listCoin/{id}",'Providers\ProvidersController@assignCoin');
 
-//MASTERS
-$app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
-$app->get("master/getProviderType",'Masters\MasterController@getProviderType'); ///obtener listado de tipos de proveedores
-$app->get("master/getProviderTypeSend",'Masters\MasterController@getProviderTypeSend'); ///obtener listado de tipos de envio de proveedores
-$app->get("master/getCoins",'Masters\MasterController@getCoins'); ///obtener listado de monedas
-$app->get("master/getStates/{id}",'Masters\MasterController@getStates'); ///obtener listado de paises->estados
-$app->get("master/getCities/{id}",'Masters\MasterController@getCities'); ///obtener listado de estados->ciudad
-$app->get("master/getCoin/{id}",'Masters\MasterController@getCoin'); ///obtener una maneda
-$app->get("master/addressType",'Masters\MasterController@getAddressType'); ///obtener una maneda
 
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
@@ -206,8 +203,7 @@ $app->post("proveedores/provList",'Proveedores\ProveedorController@getList'); //
 $app->post("proveedores/provNomValList",'Proveedores\ProveedorController@provNombreval'); ///obtener lista general de proveedores
 $app->post("proveedores/getProv",'Proveedores\ProveedorController@getProv'); ///obtener datos especificos de un prov
 
-//MASTERS
-$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
+
 ///contactos-proveedores
 $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos'); ///obtener lista general de contactos
 $app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
