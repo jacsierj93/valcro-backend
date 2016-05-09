@@ -20,10 +20,16 @@ class CustomOrder extends Model
 
     public function getfechaAttribute($value)
     {
-        return date("Y-m-d", strtotime($value));;
+        return date("Y-m-d", strtotime($value));
     }
 
     /**
+    */
+    public function CustomOrderItem(){
+        return $this->hasMany('App\Models\Sistema\CustomOrders\CustomOrderItem', 'contra_pedido_id', 'id');
+    }
+    /**
+     * @deprecated
      */
     public function order(){
         return $this->belongsToMany('App\Models\Sistema\Order\Order', 'tbl_pedido_contrapedido', 'contra_pedido_id','pedido_id');

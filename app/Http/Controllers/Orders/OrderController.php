@@ -8,7 +8,8 @@ use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Monedas;
 use App\Models\Sistema\Product;
 use App\Models\Sistema\ProvTipoEnvio;
-use App\Models\Sistema\Order\OrderType;
+use App\Models\Sistema\Order\OrderType;//OrderItem
+use App\Models\Sistema\Order\OrderItem;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Order\Order;
@@ -96,16 +97,35 @@ class OrderController extends BaseController
         $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
-        $data['tipoDepago'] = PaymentType::select('descripcion', 'id')->where("deleted_at",NULL)->get();
+        $data['tipoDepago'] = PaymentType::select('nombre', 'id')->where("deleted_at",NULL)->get();
         return $data;
 
     }
 
     /**
+     * obtiene todos los pedido que son sustituibles
+     **/
+
+    public function getOrderSubstituteOrder(Request $req){
+
+
+        $model =Order::
+        select(DB::raw("id , nro_proforma, emision , nro_factura, monto, comentario, "
+            ." (select count(*) from tbl_pedido_item where deleted_at is null and pedido_id= "
+            .$req->pedido_id
+            ." and pedido_tipo_origen_id = 3 and origen_id = id "
+            .") as asignado "
+        ));
+        $model->where('prov_id',$req->prov_id);
+        $model->where('id','<>',$req->pedido_id);
+
+        return $model->get();
+    }
+    /**
      * obtiene las ordenes de compra de un pedido
      */
     public function getOrdenPurchaseOrder(Request $req){
-        return $ped = Order::findOrFail($req->id)->getOrders()->get();
+        return Order::findOrFail($req->id)->item()->where('pedido_tipo_origen_id',1);
     }
 
     /**
@@ -114,16 +134,13 @@ class OrderController extends BaseController
     public function getCustomOrders(Request $req){
 
         $model =CustomOrder::
-        select('tbl_contra_pedido.id',
-            'tbl_contra_pedido.fecha',
-            'tbl_contra_pedido.comentario',
-            'tbl_contra_pedido.monto',
-            'tbl_contra_pedido.titulo',
-            'tbl_pedido_contrapedido.pedido_id',
-            'tbl_contra_pedido.fecha_aprox_entrega')->
-        where('prov_id',$req->prov_id);
-        $model->leftJoin('tbl_pedido_contrapedido', 'tbl_contra_pedido.id', '=', 'tbl_pedido_contrapedido.contra_pedido_id');
-        //$model->where('tbl_pedido_contrapedido.pedido_id',null);
+        select(DB::raw("id , fecha, comentario , monto, monto, titulo, fecha_aprox_entrega, "
+            ." (select count(*) from tbl_pedido_item where deleted_at is null and pedido_id= "
+            .$req->pedido_id
+            ." and pedido_tipo_origen_id = 4 and origen_id= tbl_contra_pedido.id"
+            .") as asignado"
+        ));
+        $model->where('prov_id',$req->prov_id);
         return $model->get();
     }
 
@@ -132,64 +149,97 @@ class OrderController extends BaseController
      */
     public function getKitchenBoxs(Request $req){
         $model =KitchenBox::
-            select('tbl_kitchen_box.id',
-            'tbl_kitchen_box.fecha',
-            'tbl_kitchen_box.nro_proforma',
-            'tbl_kitchen_box.img_proforma',
-            'tbl_kitchen_box.precio_bs',
-            'tbl_kitchen_box.fecha_aprox_entrega',
-            'tbl_kitchen_box.titulo',
-            'tbl_pedido_kitchenbox.pedido_id'
-        )->
-        where('prov_id',$req->prov_id)->
-        leftJoin('tbl_pedido_kitchenbox', 'tbl_kitchen_box.id','=','tbl_pedido_kitchenbox.kitchen_box_id');
-        //$model->where('tbl_pedido_kitchenbox.pedido_id',null);
-
+        select(DB::raw("id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega, "
+            ." (select count(*) from tbl_pedido_item where deleted_at is null and pedido_id= "
+            .$req->pedido_id
+            ." and pedido_tipo_origen_id = 2 and origen_id= tbl_kitchen_box.id"
+            .") as asignado"
+        ));
+        $model->where('prov_id',$req->prov_id);
         return $model->get();
     }
     /**
-     * obtiene las ordenes de compra de un pedido
+     * obtiene toda la data de un pedido
      */
 
     public function getOrden(Request $req){
         $data=Order::findOrFail($req->id);
-        $data['ordenes']= $data->getOrders()->get();
-        $data['contraPedido']= $data->customOrder()->get();
-        $data['kitchenBox']= $data->kitchenBox()->get();
+        $items=$data->OrderItem()->groupBy('origen_id')->get();//
+        $o= Array();
+        $c=Array();
+        $k=Array();
+        $p= Array();
+
+        foreach( $items as $aux){
+            switch($aux->pedido_tipo_origen_id){
+                case '1';
+                    $o[]=PurchaseOrder::find($aux->origen_id);
+                    break;
+                case '2';
+                    $k[]=KitchenBox::find($aux->origen_id);
+                    ;break;
+                case '3';
+                    $p[]=Order::find($aux->origen_id);
+                    ;break;
+                case '4';
+                    $c[]=CustomOrder::find($aux->origen_id)
+                    ;break;
+            }
+        }
+        $data['ordenes']=$o;
+        $data['contraPedido']=$c;
+        $data['pedidosSusti']=$p;
+        $data['kitchenBox']=$k;
         return $data;
+
     }
     /**
      * Obtiene las ordenes de compra de un provedor
      ***/
     public function getProviderOrder(Request $req){
-        $model = new PurchaseOrder();
-        $data = $model->where('prov_id',$req->id)
-            //->where(pedido_id,null)
-            ->get();
+
+        $model =PurchaseOrder::
+        select(DB::raw("id , nro_orden, emision , aprobada, comentario , "
+            ." (select count(*) from tbl_pedido_item where deleted_at is null and pedido_id= "
+            .$req->pedido_id
+            ." and pedido_tipo_origen_id = 1 and origen_id= tbl_compra_orden.id"
+            .") as asignado"
+        ))
+            ->where('prov_id',$req->prov_id)->get();
         $i=0;
-        foreach( $data as $aux){
-            $data[$i]['size']= $aux->getItems()->count();
+        foreach( $model as $aux){
+            $model[$i]['size']= $aux->PurchaseOrderItem()->count();
             $i++;
         }
-        return $data;
+        return $model;
     }
 
     /**
      * asigna la orden de compra a un pedido
      **/
     public function addPurchaseOrder(Request $req){
-        $model= PurchaseOrder::findOrFail($req->id);
-        $model->pedido_id=$req->pedido_id;
-        $model->save();
+
+        $odc= PurchaseOrder::findOrFail($req->id);
+
+        foreach(  $odc->PurchaseOrderItem()->get() as $aux){
+            $item = new OrderItem();
+            $item->pedido_id=$req->pedido_id;
+            $item->producto_id=$aux->id;
+            $item->pedido_tipo_origen_id='1';
+            $item->origen_id=$req->id;
+            $item->save();
+        }
+
     }
 
     /**
      * elimina la orden de compra de un pedido
      **/
     public function RemovePurchaseOrder(Request $req){
-        $model= PurchaseOrder::findOrFail($req->id);
-        $model->pedido_id=null;
-        $model->save();
+        $model = OrderItem::where('origen_id', $req->id)->get();
+        foreach(  $model as $aux){
+            $aux->destroy($aux->id);
+        }
     }
 
 
@@ -197,33 +247,97 @@ class OrderController extends BaseController
      * asigna un kitchenbox a un pedido
      **/
     public function addkitchenBox(Request $req){
-        kitchenBox::findOrFail($req->id)
-            ->order()->attach($req->pedido_id);
+
+
+        $k= kitchenBox::findOrFail($req->id);
+        $item = new OrderItem();
+        $item->pedido_id=$req->pedido_id;
+        $item->producto_id=$k->id;/// reemplazr cuando se sepa la logica
+        $item->pedido_tipo_origen_id='2';
+        $item->origen_id=$req->id;
+        $item->save();
     }
 
     /**
      * elimina el kitchenbox de un pedido
      **/
     public function removekitchenBox(Request $req){
-        kitchenBox::findOrFail($req->id)
-            ->order()->detach([$req->pedido_id]);
+
+        $model = OrderItem::where('origen_id', $req->id)->first();
+
+        return OrderItem::destroy($model->id);
+        /* foreach(  $model as $aux){
+             $aux->destroy($aux->id);
+         }*/
+        /* ::findOrFail($req->id)
+             ->order()->detach([$req->pedido_id]);*/
+    }
+
+
+    /***************** Pedidos a sustituir ***************************/
+
+
+    /**
+     * asigna un pedido a un nuevo pedido
+     **/
+    public function addOrderSubstitute(Request $req){
+        $model = Order::findOrFail($req->id);
+
+        foreach(  $model->OrderItem() as $aux){
+            $item = new OrderItem();
+            $item->pedido_id=$req->pedido_id;
+            $item->producto_id=$aux->producto_id;// id enla tabla original
+            $item->pedido_tipo_origen_id='3';
+            $item->origen_id=$req->id;
+            $item->save();
+        }
+
     }
 
     /**
+     * elimina un pedido a un nuevo pedido
+     **/
+    public function removeOrderSubstitute(Request $req){
+
+        /* $model = OrderItem::where('origen_id', $req->id)->first();
+
+         return OrderItem::destroy($model->id);
+         /* foreach(  $model as $aux){
+              $aux->destroy($aux->id);
+          }*/
+        /* ::findOrFail($req->id)
+             ->order()->detach([$req->pedido_id]);*/
+    }
+
+    /******************************************************
+    /**
      * asigna la orden de compra a un pedido
+     *
      **/
     public function addCustomOrder(Request $req){
 
-        CustomOrder::findOrFail($req->id)
-            ->order()->attach($req->pedido_id);
+        $model= CustomOrder::findOrFail($req->id);
+
+        $model->CustomOrderItem()->get();
+        foreach(  $model->CustomOrderItem()->get() as $aux){
+            $item = new OrderItem();
+            $item->pedido_id=$req->pedido_id;
+            $item->producto_id=$aux->id;
+            $item->pedido_tipo_origen_id='4';// 4 es contra pedido
+            $item->origen_id=$req->id;
+            $item->save();
+        }
     }
 
     /**
-     * elimina la orden de compra de un pedido
+     * elimina los renglones de un contra pedido
      **/
     public function RemoveCustomOrder(Request $req){
-        CustomOrder::findOrFail($req->id)
-            ->order()->detach([$req->pedido_id]);
+        $model = OrderItem::where('origen_id', $req->id)->get();
+        foreach(  $model as $aux){
+            $aux->destroy($aux->id);
+        }
+
     }
     /**
      * Obtiene la orden de compra

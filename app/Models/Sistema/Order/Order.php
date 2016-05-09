@@ -20,13 +20,27 @@ class Order extends Model
 
 
     /**
-     */
-    public function PurchaseOrder(){
-        return $this->belongsToMany('App\Models\Sistema\Purchase\Purchase', 'tbl_compra_orden', 'pedido_id','orden_compra_id');
+     * Get all of the tags for the post.
+*/
+    public function PurchaseOrder()
+    {
+//        $this->morphMany('Photo', 'imageable')->where('type', '=', 'Photo');;
+        return $this->morphToMany('App\Models\Sistema\Purchase\Purchase', 'tbl_pedido_items')->
+        where('pedido_tipo_origen_id','=','1');
     }
-
     /**
      */
+    public function OrderItem(){
+        return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'pedido_id');
+    }
+
+
+     /**si es mal uso
+    public function PurchaseOrder(){
+  /*      return $this->belongsToMany('App\Models\Sistema\Purchase\Purchase', 'tbl_pedido_items','pedido_id', 'origen_idd');
+    }
+
+    /*     */
     public function getOrders(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrder', 'pedido_id');
     }

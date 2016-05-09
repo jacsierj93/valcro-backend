@@ -36,7 +36,7 @@
             <div layout="column" layout-align="center center" flex="25" >
                 <md-input-container class="md-block" >
                     <label>Proveedor</label>
-                    <md-select ng-model="id" name ="prov_id">
+                    <md-select ng-model="filterOption.prov_id" >
                         <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                             {{prov.razon_social}}
                         </md-option>
@@ -47,7 +47,7 @@
             <div layout="column" layout-align="center center" flex="25">
                 <md-input-container class="md-block" >
                     <label>Moneda</label>
-                    <md-select ng-model="pedidoSelec.prov_moneda_id"  required>
+                    <md-select ng-model="filterOption.moneda_id" >
                         <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
                             {{moneda.nombre}}
                         </md-option>
@@ -58,7 +58,7 @@
             <div layout="column" layout-align="center center" flex="25" >
                 <md-input-container class="md-block" >
                     <label>Tipo envio</label>
-                    <md-select ng-model="dtaPrv.type" name ="state">
+                    <md-select ng-model="filterOption.tipo_env_id" >
                         <md-option ng-repeat="env in filterData.tipoEnv" value="{{env.id}}">
                             {{env.nombre}}
                         </md-option>
@@ -136,7 +136,7 @@
         </md-content>
 
         <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
+        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()" ng-show="index>0">
             <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
             <?= HTML::image("images/btn_prevArrow.png") ?>
         </div>
@@ -322,7 +322,7 @@
                     <div layout="row" >
                         <md-input-container class="md-block" flex >
                             <label>Comentario</label>
-                            <input ng-model="pedidoSelec.comentario"  ng-disabled="pedidoSelec.tasa_fija" ng-disabled="pedidoSelec.estado_id!=1">
+                            <input ng-model="pedidoSelec.comentario"  ng-disabled="pedidoSelec.estado_id!=1">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -475,7 +475,6 @@
                     <div layout="row" class="headGridHolder">
                         <div flex="5" class="headGrid"> % </div>
                         <div flex="10" class="headGrid"> Nº de ODC</div>
-                        <div flex="20" class="headGrid"> Proveedor</div>
                         <div flex="5" class="headGrid"> Cant.</div>
                         <div flex="10" class="headGrid"> Fecha</div>
                         <div flex="20" class="headGrid"> Status</div>
@@ -488,7 +487,6 @@
                                     <md-switch class="md-primary" ng-model="odc.asig" ng-change="change(odc)" ></md-switch>
                                 </div>
                                 <div flex="10" class="cellGrid" ng-click="selecOdc(odc)"> {{odc.nro_orden}}</div>
-                                <div flex="20" class="cellGrid" ng-click="selecOdc(odc)"> {{provSelec.razon_social}}</div>
                                 <div flex="5" class="cellGrid" ng-click="selecOdc('odc')"> {{odc.size}}</div>
                                 <div flex="10" class="cellGrid" ng-click="selecOdc(odc)">{{odc.emision | date:'dd-MM-yyyy'}}</div>
                                 <div flex="20" class="cellGrid" ng-click="selecOdc(odc)"> {{odcEstatus(odc)}}</div>
@@ -655,7 +653,7 @@
                         <div>
                             Pedidos a Sustituir
                         </div>
-                        <div ng-click="openLayer('agrPedPend')">
+                        <div ng-click="openPedsust()">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
                     </div>
@@ -751,7 +749,6 @@
             <!-- ) ########################################## CONTENDOR  Pedidos Pendientes # ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <form name="gridPagosPendientes" >
-
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Pedidos Pendientes
@@ -760,7 +757,6 @@
                     <div layout="row" class="headGridHolder">
                         <div flex="5" class="headGrid">-</div>
                         <div flex="10" class="headGrid"> Pedido</div>
-                        <div flex="" class="headGrid"> Nombre Proveedor</div>
                         <div flex="10" class="headGrid"> Proforma</div>
                         <div flex="10" class="headGrid"> Fecha</div>
                         <div flex="15" class="headGrid"> Nº de Factura</div>
@@ -770,17 +766,17 @@
                     </div>
                     <div id="gridPedPend">
                         <div flex>
-                            <div layout="row" class="cellGridHolder">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in formData.pedidoSust">
                                 <div flex="5" class="cellGrid">
-                                    <md-switch class="md-primary"></md-switch>
+                                    <md-switch class="md-primary" ng-model="item.asig"
+                                               ng-change="changePedidoSustituto(item)" ></md-switch>
                                 </div>
-                                <div flex="10" class="cellGrid"> Data 2</div>
-                                <div flex="" class="cellGrid"> Data 3</div>
-                                <div flex="10" class="cellGrid"> Data 4</div>
-                                <div flex="10" class="cellGrid"> Data 5</div>
-                                <div flex="15" class="cellGrid"> Data 6</div>
-                                <div flex="10" class="cellGrid"> Data 7</div>
-                                <div flex class="cellGrid"> Data 8</div>
+                                <div flex="10" class="cellGrid"> {{item.id}}</div>
+                                <div flex="10" class="cellGrid">{{item.nro_proforma}}</div>
+                                <div flex="10" class="cellGrid">{{item.emision | date:'dd/MM/yyyy'}}</div>
+                                <div flex="10" class="cellGrid">{{item.nro_factura}}</div>
+                                <div flex="15" class="cellGrid"> {{item.monto}}</div>
+                                <div flex class="cellGrid">{{item.comentario}}</div>
                             </div>
                         </div>
                     </div>
@@ -788,7 +784,7 @@
             </md-content>
         </md-sidenav>
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
-        <md-sidenav
+        <md-sidenav ng-show="pedidoSelec.id > 0";
             style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');"
             layout="column" layout-align="center center" class="md-sidenav-right"
             md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"

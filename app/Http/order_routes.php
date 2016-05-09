@@ -16,6 +16,7 @@ $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///l
 $app->post("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///llenado de filtros a proveedores
 $app->post("Order/Order",'Orders\OrderController@getOrden'); ///llenado de filtros a proveedores
 $app->post("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
+$app->post("Order/OrderSubstituteOrder",'Orders\OrderController@getOrderSubstituteOrder'); ///lista de todos los pedidos que se úeden sustituir
 $app->post("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
 $app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
@@ -30,7 +31,8 @@ $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrd
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
 $app->post("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->post("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
-$app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el pedido
-$app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///elimina el pedido
-$app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); ///elimina el pedido
-$app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); ///elimina el pedido
+$app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido
+$app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///agrega el  contrapedido
+
+$app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina el pedido sustituto
+$app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega el pedido sustituto
