@@ -30,5 +30,10 @@ class KitchenBox extends Model
         return $this->belongsToMany('App\Models\Sistema\Order\Order', 'tbl_pedido_kitchenbox', 'kitchen_box_id','pedido_id');
     }
 
+    public function item()
+    {
+        return $this->morphMany('App\Models\Sistema\OrderItem', 'items');
+    }
+
 
 }

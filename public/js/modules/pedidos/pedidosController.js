@@ -1,7 +1,25 @@
 MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     var historia= [15];
-    var index=0;
+    $scope.index=0;
+
+    var config=[
+        {
+            id:'listPedido',
+            update:'',
+            open:'',
+            close:'',
+            confirmClose:''
+        }
+    ];
+    $scope.layers={
+        listPedido:{
+            open:setProvedor
+        }
+
+    };
+
+
     /******************* declaracion defunciones de eventos */
     $scope.setProvedor= setProvedor;
     $scope.openLayer=openLayer;
@@ -9,13 +27,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.closeLayer=closeLayer;
     $scope.addPedido=addPedido;
     $scope.openContraPedido =openContraPedido;
+    $scope.openPedsust =openPedsust;
     $scope.addkitChenBox =addkitChenBox;
     $scope.openOdcs =openOdcs;
     $scope.selecOdc=selecOdc;
     $scope.removeLisContraP=removeLisContraP;
     $scope.removeLisKitchenBox=removeLisKitchenBox;
-
-
 
     /*******incializacion de $scope*****/
     $scope.todos = new Array();
@@ -26,11 +43,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     $scope.filterData={ monedas: new Array(), tipoEnv: new Array() };
     $scope.formData={  pedidos: new Array(), tipo: new Array(),  monedas: new Array(),
         direcciones:new Array(), odc: new Array(), contraPedido: new Array(), kitchenBox: new Array(),
-        estadoPedido:new Array()
+        estadoPedido:new Array(), pedidoSust: new Array()
     };
+
+    $scope.filterOption={
+        prov_id:'',
+        moneda_id:'',
+        tipo_env_id:''
+    }
 
     //  carga la primera data del sistema filtros  y proveedores
     init();
+
+    //loadPedidosASustituir('1')
     function init(){
         $http({
             method: 'POST',
@@ -58,7 +83,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         alert('');
     }
     $scope.simulateClick= function(id){
-       var a= angular.element(document).find(id);
+        var a= angular.element(document).find(id);
         console.log('click ', a);
         a.click();
     }
@@ -86,6 +111,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         loadContraPedidosProveedor($scope.provSelec.id);
     }
 
+    function openPedsust(){
+        openLayer("agrPedPend");
+        loadPedidosASustituir($scope.provSelec.id);
+    }
+
     function addkitChenBox(){
         openLayer("agrKitBoxs");
         loadkitchenBoxProveedor($scope.provSelec.id);
@@ -95,7 +125,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 
     /** al pulsar la flecha siguiente**/
     $scope.next = function (){
-        var  curren= historia[index];
+        var  curren= historia[$scope.index];
         switch (curren){
             case 'detallePedido':
                 openLayer('agrPed')
@@ -143,11 +173,21 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         loadPedido($scope.pedidoSelec.id);
     }
 
+    $scope.changePedidoSustituto= function(item){
+        if(item.asig){
+
+           addPedidoSustituto(item.id,$scope.pedidoSelec.id);
+        }else{
+            removeaddPedidoSustituto(item.id, $scope.pedidoSelec.id);
+        }
+        loadPedido($scope.pedidoSelec.id);
+    }
+
     function setProvedor(prov){
         $scope.id=prov.id;
         $scope.provSelec=prov;
         loadPedidosProvedor(prov.id);
-        loadOrdenesDeCompraProveedor(prov.id);
+        //loadOrdenesDeCompraProveedor(prov.id);
         openLayer('listPedido');
     }
 
@@ -156,12 +196,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             var l=angular.element(document).find("#"+layer);
             console.log('layer ',l);
             var base =264;
-            index++;
-            var w= base+(24*index);
+            $scope.index++;
+            var w= base+(24*$scope.index);
             console.log(' width', w);
             l.css('width','calc(100% - '+w+'px)');
             $mdSidenav(layer).open();
-            historia[index]=layer;
+            historia[$scope.index]=layer;
             return true;
         }
         return false;
@@ -173,10 +213,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             loadCoinProvider($scope.id);
             loadCountryProvider($scope.id);
             loadPaymentCondProvider($scope.id);
-            $scope.pedidoSelec={
-                pais_id:'',
-                id:''
-            }
+            $scope.pedidoSelec={ pais_id:'-1', id:'',estado_id:'1',prov_moneda_id:'-1', tasa:'0'};
             $scope.FormdetallePedido.$setPristine();
         }
     }
@@ -192,9 +229,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     }
 
     function closeLayer(){
-        var layer=historia[index];
-        historia[index]=null;
-        index--;
+        var layer=historia[$scope.index];
+        historia[$scope.index]=null;
+        $scope.index--;
         $mdSidenav(layer).close();
         switch (layer){
             case 'odc':
@@ -211,20 +248,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     /****** **************************listener ***************************************/
 
     $scope.$watch('pedidoSelec.pais_id',function(newVal){
-        if(newVal != '-1'){
+        if(newVal != '-1' && newVal!= 'undefined'){
             loadDirProvider(newVal);
         }
     });
 
     $scope.$watch('pedidoSelec.prov_moneda_id',function(newVal){
-        if(newVal != '-1'){
+        if(newVal != '-1' && newVal!= 'undefined'){
             loadTasa(newVal);
         }
     });
 
     $scope.$watchGroup(['FormdetallePedido.$valid','FormdetallePedido.$pristine'], function(nuevo) {
-        //alert(nuevo);
-        i++;
         console.log('estado',nuevo);
         if(nuevo[0] && !nuevo[1]) {
             console.log('peddio',$scope.pedidoSelec);
@@ -324,6 +359,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     }
 
     function loadCoinProvider(id){
+
         $http({
             method: 'POST',
             url: 'Order/ProviderCoins',
@@ -377,13 +413,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         $http({
             method: 'POST',
             url: 'Order/ProviderOrder',
-            data:{ id:id}
+            data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
             var odcs= new Array();
             for(var i=0;i<response.data.length;i++){
                 var odc=response.data[i];
                 odc.asig=false;
-                if(odc.pedido_id != null){
+                if(odc.asignado != 0){
                     odc.asig=true;
                 }
                 odcs.push(odc);
@@ -410,13 +446,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         $http({
             method: 'POST',
             url: 'Order/CustomOrders',
-            data:{prov_id:id}
+            data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
             var contraPs = new Array();
             for(var i=0;i<response.data.length;i++){
                 var aux=response.data[i];
                 aux.asig=false;
-                if(aux.pedido_id != null){
+                if(aux.asignado != 0){
                     aux.asig=true;
                 }
                 contraPs.push(aux);
@@ -431,18 +467,39 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         $http({
             method: 'POST',
             url: 'Order/KitchenBoxs',
-            data:{prov_id:id}
+            data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
             var auxs = new Array();
             for(var i=0;i<response.data.length;i++){
                 var aux=response.data[i];
                 aux.asig=false;
-                if(aux.pedido_id != null){
+                if(aux.asignado != 0){
                     aux.asig=true;
                 }
                 auxs.push(aux);
             }
             $scope.formData.kitchenBox= auxs;
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+
+    function loadPedidosASustituir(id){
+        $http({
+            method: 'POST',
+            url: 'Order/OrderSubstituteOrder',
+            data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
+        }).then(function successCallback(response) {
+            var auxs = new Array();
+            for(var i=0;i<response.data.length;i++){
+                var aux=response.data[i];
+                aux.asig=false;
+                if(aux.asignado != 0){
+                    aux.asig=true;
+                }
+                auxs.push(aux);
+            }
+            $scope.formData.pedidoSust= auxs;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -495,6 +552,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             console.log("errorrr");
         });
     }
+
     function addContraPedido(id, pedido_id){
         $http({
             method: 'POST',
@@ -518,7 +576,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         });
     }
 
+    /*****/
+    function addPedidoSustituto(id, pedido_id){
+        $http({
+            method: 'POST',
+            url: 'Order/AddOrderSubstitute',
+            data:{ id:id, pedido_id:pedido_id}
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
+    function removeaddPedidoSustituto(id, pedido_id){
+        $http({
+            method: 'POST',
+            url: 'Order/RemoveOrderSubstitute',
+            data:{ id:id, pedido_id:pedido_id}
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            console.log("errorrr");
+        });
+    }
 });
+
 
 
 

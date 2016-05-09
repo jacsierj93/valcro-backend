@@ -29,7 +29,7 @@ class PurchaseOrder extends Model
         return $this->hasOne('App\Models\Sistema\Purchase\OrderReason', 'id', 'motivo_id');
     }
 
-    public function getItems(){
+    public function PurchaseOrderItem(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrderItem', 'compra_orden_id');
     }
 
