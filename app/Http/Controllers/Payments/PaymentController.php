@@ -19,7 +19,7 @@ class PaymentController extends BaseController
 
 
     private $payIds = array(1, 2, 3);
-    private $debtsIds = array(4, 5);
+    private $debtsIds = array(4);
 
     public function __construct()
     {
@@ -102,19 +102,10 @@ class PaymentController extends BaseController
     public function getProvidersList()
     {
         $provs = Provider::all();
-        $abonos = array(1, 2, 3); ///id de los abonos AD,NDC,RBY
-        $deudas = array(4); ///id de deudas
+        $abonos = $this->payIds; ///id de los abonos AD,NDC,RBY
+        $deudas = $this->debtsIds; ///id de deudas
         $currenDate = date("Y-m-d");
         // echo MasterFinancialController::getCostByCoin(50000,2,3);
-
-
-        $total_abonos = 0;
-        $total_deuda = 0;
-        $nvencido = 0; ///vencidos
-        $nv7 = 0; ///vence 7
-        $nv30 = 0; ///vence30
-        $nv60 = 0; ///vence60
-        $nv90 = 0; ///vence90
 
 
         $result = array();
@@ -122,7 +113,16 @@ class PaymentController extends BaseController
 
             $temp["id"] = $prv->id;
             $temp["razon_social"] = $prv->razon_social;
-            $docs = $prv->getDocuments();
+            $docs = $prv->getDocuments()->get();
+
+            $total_abonos = 0;
+            $total_deuda = 0;
+            $nvencido = 0; ///vencidos
+            $nv7 = 0; ///vence 7
+            $nv30 = 0; ///vence30
+            $nv60 = 0; ///vence60
+            $nv90 = 0; ///vence90
+
 
             foreach ($docs as $doc) {
 
@@ -225,6 +225,12 @@ class PaymentController extends BaseController
 
         $proveedor = Provider::findOrFail($provId); ///trayendo datos del proveedor
 
+        $data["razon_social"] = $proveedor->razon_social;
+        $data["pagos"] = $this->getPayList($provId);
+        $data["deudas"] = $this->getDebtsList($provId);
+
+        return $data;
+
 
     }
 
@@ -232,11 +238,21 @@ class PaymentController extends BaseController
     /**lista de pagos hechas al proveedor
      * @return mixed
      */
-    public function getPayList()
+    public function getPayList($provId)
     {
-        $provId = Session::get("PROVID");
         $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
-        $result = $pagos;
+
+        $result = array();
+        foreach ($pagos as $pago) {
+
+            $temp["nro_factura"] = $pago->nro_factura;
+            $temp["fecha"] = $pago->fecha;
+            $temp["tipo"] = $pago->tipo->descripcion;
+
+            $result[] = $temp;
+        }
+
+
         return $result;
     }
 
@@ -244,11 +260,20 @@ class PaymentController extends BaseController
     /**deudas del proveedor
      * @return mixed
      */
-    public function getDebtsList()
+    public function getDebtsList($provId)
     {
-        $provId = Session::get("PROVID");
         $deudas = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->debtsIds)->get();
-        $result = $deudas;
+        $result = array();
+        foreach ($deudas as $deuda) {
+
+            $temp["nro_factura"] = $deuda->nro_factura;
+            $temp["fecha"] = $deuda->fecha;
+            $temp["vence"] = $deuda->fecha_vence;
+            $temp["tipo"] = $deuda->tipo->descripcion;
+
+            $result[] = $temp;
+        }
+
         return $result;
     }
 

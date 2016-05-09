@@ -1,10 +1,9 @@
-
-
 MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $routeParams, $resource) {
 
     var historia = [15];
     $scope.index = index = 0;
     var base = 264;
+    $scope.provData = {"nombre": '', "pagos": {}, "deudas": {}};
 
     function openLayer(layr) {
         console.log(layr);
@@ -22,9 +21,6 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             closeLayer(true);
         }
     }
-
-
-
 
 
     function closeLayer(all) {
@@ -65,8 +61,8 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.monedaSel = "";
 
     /////lista monedas
-    $scope.getCoins = function() {
-        $http.get('master/getCoins').success(function(response){
+    $scope.getCoins = function () {
+        $http.get('master/getCoins').success(function (response) {
             $scope.monedas = response;
             console.log("lista de monedas");
         });
@@ -74,41 +70,48 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
 
     $scope.tipoPagoSel = "";
-    
+
     /////lista de formas de pago
-    $scope.getPayTypes = function() {
-        $http.get('payments/typeList').success(function(response){
+    $scope.getPayTypes = function () {
+        $http.get('payments/typeList').success(function (response) {
             $scope.tipoPagos = response;
             console.log("tipos de pago");
         });
     };
 
-    
+
     ////lista de proveedores
-    $scope.getProvs = function() {
-        $http.get('payments/provList').success(function(response){
+    $scope.getProvs = function () {
+        $http.get('payments/provList').success(function (response) {
             $scope.provs = response;
             console.log("lista de proveedores");
         });
     };
 
-    
-    ////setear proveedor
-    $scope.setProv = function(prov){
 
-        $http.get('payments/getProv/'+prov.id).success(function(response){
-           // $scope.provs = response;
-            console.log("trayendo proveedor con id:"+prov.id);
+    ////setear proveedor
+    $scope.setProv = function (prov) {
+
+        $http.get('payments/getProv/' + prov.id).success(function (response) {
+
+            ///setiando datos del proveedor
+            $scope.provData.nombre = response.razon_social;
+            $scope.provData.pagos = response.pagos;
+            $scope.provData.deudas = response.deudas;
+
+            console.log("trayendo proveedor con id:" + prov.id);
         });
 
-        closeLayer(true);
+        //  closeLayer(true);
         openLayer('lyr1pag');
+
+        //  $scope.getCoins();
+        //  $scope.getPayTypes();
+
     };
 
 
-
 });
-
 
 
 /*

@@ -41,15 +41,7 @@ class DocumentCP extends Model
         return $this->belongsTo('App\Models\Sistema\Payments\DocumentCPType', 'tipo_id');
     }
 
-
-    public function prueba()
-    {
-
-        $this->whereRaw("DATEDIFF(day,NOW(),fecha) <= 7 ")->count();
-
-    }
-
-
+    
     ////foreing key
     public function moneda()
     {

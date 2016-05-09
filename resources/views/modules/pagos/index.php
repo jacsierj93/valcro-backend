@@ -38,7 +38,7 @@
         <md-content class="barraLateral" data-ng-init="getProvs()">
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
             <div data-ng-repeat="prov in provs"   class="boxList" layout="column" flex ng-click="setProv(prov)">
-                <div flex>{{prov.razon_social}}</div>
+                <div  style="overflow: hidden; text-overflow: ellipsis" flex>{{prov.razon_social}}</div>
                 <div layout="row" style="height: 24px;">
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
@@ -101,7 +101,7 @@
 
                                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                                     <div>
-                                        Pagos Pendientes a: <spam style="color: #000;">NOMBRE DEL PROVEEDOR</spam>
+                                        Pagos Pendientes a: <spam style="color: #000;">{{provData.nombre}}</spam>
                                     </div>
                                 </div>
                                 <div layout="row" class="headGridHolder">
@@ -115,7 +115,21 @@
                                     <div flex class="headGrid"> Saldo</div>
                                 </div>
                                 <div id="grid">
-                                    <div flex>
+                                    <div ng-repeat="deuda in provData.deudas" flex>
+                                        <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr2pag')">
+                                            <div flex="10" class="cellGrid"> {{deuda.nro_factura}}</div>
+                                            <div flex="10" class="cellGrid">{{deuda.fecha}}</div>
+                                            <div flex="10" class="cellGrid">{{deuda.vence}}</div>
+                                            <div flex="5" class="cellGrid" style="text-align: right;"> <div style="width: 16px; height: 16px; border-radius: 50%; background-color: #ff6f4c;"></div></div>
+                                            <div flex class="cellGrid"> 4 </div>
+                                            <div flex class="cellGrid"> 4.212$ </div>
+                                            <div flex class="cellGrid"> 2.230$ </div>
+                                            <div flex class="cellGrid"> 1.982$ </div>
+                                        </div>
+                                    </div>
+
+
+                          <!--          <div flex>
                                         <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr2pag')">
                                             <div flex="10" class="cellGrid"> TET56276-2015</div>
                                             <div flex="10" class="cellGrid"> 26/02/2016</div>
@@ -126,7 +140,9 @@
                                             <div flex class="cellGrid"> 2.230$ </div>
                                             <div flex class="cellGrid"> 1.982$ </div>
                                         </div>
-                                    </div>
+                                    </div>-->
+
+
                                 </div>
 
                             </form>
@@ -135,7 +151,6 @@
                     </md-tab>
                     <md-tab label="Pagos">
                         <md-content  style="padding-top: 10px;">
-                            <form>
 
                                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                                     <div>
@@ -151,7 +166,21 @@
                                     <div flex class="headGrid"> 000000</div>
                                 </div>
                                 <div id="grid">
-                                    <div flex>
+                                    <div ng-repeat="pago in provData.pagos" flex>
+                                        <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr3pag')">
+                                            <div flex="20" class="cellGrid">{{pago.nro_factura}}</div>
+                                            <div flex="10" class="cellGrid">{{pago.fecha}}</div>
+                                            <div flex class="cellGrid">{{pago.tipo}}</div>
+                                            <div flex class="cellGrid"> Data 4</div>
+                                            <div flex class="cellGrid"> Data 5</div>
+                                            <div flex class="cellGrid"> Data 6</div>
+                                        </div>
+                                    </div>
+
+
+
+
+                            <!--        <div flex>
                                         <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr3pag')">
                                             <div flex="20" class="cellGrid"> TET56276-2015</div>
                                             <div flex="10" class="cellGrid"> 26/02/2016</div>
@@ -160,10 +189,11 @@
                                             <div flex class="cellGrid"> Data 5</div>
                                             <div flex class="cellGrid"> Data 6</div>
                                         </div>
-                                    </div>
+                                    </div>-->
+
+
                                 </div>
 
-                            </form>
                         </md-content>
                     </md-tab>
                 </md-tabs>
@@ -249,7 +279,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select data-ng-init="getCoins()" ng-model="monedaSel" required md-no-ink>
+                            <md-select ng-model="monedaSel" required md-no-ink>
                                 <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
@@ -264,7 +294,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Tipo Pago</label>
-                            <md-select data-ng-init="getPayTypes()" ng-model="tipoPagoSel" required md-no-ink>
+                            <md-select  ng-model="tipoPagoSel" required md-no-ink>
                                 <md-option ng-repeat="tipoPago in tipoPagos" value="{{tipoPago.id}}">
                                     {{tipoPago.nombre}}
                                 </md-option>
