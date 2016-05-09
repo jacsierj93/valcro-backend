@@ -40,14 +40,14 @@
         <md-content class="barraLateral" ng-controller="ListProv">
 
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)">
+            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id)}">
                 <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                 <div style="height:40px; font-size:31px;">{{item.limite_credito}}00000</div>
                 <div style="height:40px;">
                     <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
                     <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png"/>
-                    <img src="images/aereo.png"/>
-                    <img src="images/maritimo.png"/>
+                    <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)"src="images/aereo.png"/>
+                    <img ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)"src="images/maritimo.png"/>
                 </div>
             </div>
 
@@ -179,7 +179,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
-                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled" md-no-ink>
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.nombre}}
                                 </md-option>
@@ -194,15 +194,14 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description"
-                                   ng-model="dtaPrv.description" ng-disabled="enabled">
+                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description" ng-disabled="(enabled || (toCheck && projectForm.description.$valid))"> <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
                             </div>-->
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="10">
+                        <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
                             <input maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="enabled" >
                             <!--<div ng-messages="projectForm.siglas.$error">
@@ -213,7 +212,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
-                            <md-select ng-model="dtaPrv.envio" ng-disabled="enabled">
+                            <md-select ng-model="dtaPrv.envio" ng-disabled="enabled" md-no-ink>
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                     {{envio.nombre}}
                                 </md-option>
@@ -284,9 +283,9 @@
 
                         <md-input-container class="md-block" flex="20" ng-controller="TipoDirecc">
                             <label>Tipo de Direccion</label>
-                            <md-select ng-model="dir.tipo">
-                                <md-option ng-repeat="tipo in tipos" value="{{tipo.nombre}}">
-                                    {{tipo.nombre}}
+                            <md-select ng-model="dir.tipo" md-no-ink>
+                                <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
+                                    {{tipo.descripcion}}
                                 </md-option>
                             </md-select>
                             <!--<div ng-messages="user.tipo.$error">
@@ -297,9 +296,9 @@
 
                         <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
                             <label>Pais</label>
-                            <md-select ng-model="dir.pais">
+                            <md-select ng-model="dir.pais" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}" >
-                                    {{pais.nombre}}
+                                    {{pais.short_name}}
                                 </md-option>
                             </md-select>
                             <!--<div ng-messages="user.pais.$error">
@@ -378,9 +377,9 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
-                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)">
+                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}">
-                                    {{pais.nombre}}
+                                    {{pais.short_name}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -391,7 +390,7 @@
                         <div ng-controller="idiomasController" layout="row" flex="10">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)">
+                                <md-select ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)" md-no-ink>
                                     <md-option ng-value="idioma.id" ng-repeat="idioma in idiomas">{{idioma.name}}</md-option>
                                     </md-optgroup>
                                 </md-select>
@@ -470,8 +469,8 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20" ng-controller="allCoinsController">
                             <label>Moneda</label>
-                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled">
-                                <md-option ng-repeat="coin in coins | filter{filt.indexOf(coin.id) == -1}" value="{{coin.id}}">
+                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled" required md-no-ink>
+                                <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
@@ -514,16 +513,16 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-model="bnk.pais" name ="state" ng-disabled="enabled" ng-change="setState(this)">
+                            <md-select ng-model="bnk.pais" name ="state" ng-disabled="enabled" ng-change="setState(this)" md-no-ink>
                                 <md-option ng-repeat="country in countries" value="{{country.id}}">
-                                    {{country.nombre}}
+                                    {{country.short_name}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20" >
                             <label>Estado</label>
-                            <md-select ng-model="bnk.est" name ="state" ng-disabled="enabled || (bnk.pais==false)">
+                            <md-select ng-model="bnk.est" name ="state" ng-disabled="enabled || (bnk.pais==false)" md-no-ink>
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.local_name}}
                                 </md-option>
@@ -532,7 +531,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Ciudad</label>
-                            <md-select ng-model="bnk.ciudad" name ="state" ng-disabled="enabled || (bnk.est==false)" required>
+                            <md-select ng-model="bnk.ciudad" name ="state" ng-disabled="enabled || (bnk.est==false)" required md-no-ink>
                                 <md-option ng-repeat="city in cities" value="{{city.id}}">
                                     {{city.local_name}}
                                 </md-option>
@@ -583,12 +582,12 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Limite de Credito</label>
-                            <input ng-model="cred.mount">
+                            <input ng-model="cred.amount" required >
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Moneda</label>
-                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled" ng-controller="provCoins">
+                            <md-select ng-model="cred.coin" name ="state" ng-disabled="enabled" ng-controller="provCoins" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -617,7 +616,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
-                <form name="provCred" >
+                <form name="provConv" ng-controller="convController">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Factor de Conversión
@@ -626,32 +625,44 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>% Flete</label>
-                            <input ng-model="conv.flete">
+                            <input ng-model="conv.freight">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Gastos</label>
-                            <input ng-model="conv.gasto">
+                            <input ng-model="conv.expens">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Ganancia</label>
-                            <input ng-model="conv.gan">
+                            <input ng-model="conv.gain">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Descuento</label>
-                            <input ng-model="conv.desc">
+                            <input ng-model="conv.disc">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-model="conv.coin" name ="state" ng-disabled="enabled">
+                            <md-select ng-model="conv.coin" name ="state" ng-disabled="enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
                     </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
-                <form name="provPoint">
+                <form name="provPoint" ng-controller="provPointController">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Puntos
@@ -660,16 +671,28 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Costo del punto</label>
-                            <input ng-model="pnt.cost">
+                            <input ng-model="pnt.cost" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-model="pnt.coin" ng-disabled="enabled">
+                            <md-select ng-model="pnt.coin" ng-disabled="enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
 
@@ -683,7 +706,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-                <form name="provPoint">
+                <form name="timeProd" ng-controller="prodTimeController">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Tiempo Aproximado de Producción
@@ -692,25 +715,25 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>De (Dias)</label>
-                            <input ng-model="tp.from">
+                            <input ng-model="tp.from" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>A (Dias)</label>
-                            <input ng-model="tp.to">
+                            <input ng-model="tp.to" required>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
-                            <label>Linea</label>
-                            <md-select ng-model="tp.coin" name ="state" ng-disabled="enabled">
-                                <md-option ng-repeat="state in states" value="{{state.id}}">
-                                    {{state.nombre}}
-                                </md-option>
+                            <label>Pais</label>
+                            <md-select ng-model="tp.country" name ="state" ng-disabled="enabled" md-no-ink>
+                                <!--<md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
+                                    {{country.pais.short_name}}
+                                </md-option>-->
                             </md-select>
                         </md-input-container>
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="provPoint">
+                <form name="timeTrans" ng-controller="transTimeController">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Tiempo Aproximado de Transito
@@ -719,21 +742,33 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>De (Dias)</label>
-                            <input ng-model="tp.from">
+                            <input ng-model="ttr.from">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>A (Dias)</label>
-                            <input ng-model="tp.to">
+                            <input ng-model="ttr.to">
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
-                            <label>Linea</label>
-                            <md-select ng-model="tp.coin" name ="state" ng-disabled="enabled">
-                                <md-option ng-repeat="state in states" value="{{state.id}}">
-                                    {{state.nombre}}
+                            <label>Pais</label>
+                            <md-select ng-model="ttr.country" name ="state" ng-disabled="enabled" md-no-ink>
+                                <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
+                                    {{country.pais.short_name}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
 

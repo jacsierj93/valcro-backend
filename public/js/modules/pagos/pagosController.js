@@ -63,36 +63,32 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
      };*/
 
     $scope.monedaSel = "";
-    $scope.monedas = [{
-        id : 1,
-        nombre: "dolar"
-    },{
-        id : 2,
-        nombre: "Euro"
-    },{
-        id : 3,
-        nombre: "Yen"
-    }];
+
+    /////lista monedas
+    $scope.getCoins = function() {
+        $http.get('master/getCoins').success(function(response){
+            $scope.monedas = response;
+            console.log("lista de monedas");
+        });
+    };
 
 
     $scope.tipoPagoSel = "";
-    $scope.tipoPagos = [{
-        id : 1,
-        nombre: "Tranferencia"
-    },{
-        id : 2,
-        nombre: "Cheque"
-    },{
-        id : 3,
-        nombre: "Efectivo"
-    }];
     
+    /////lista de formas de pago
+    $scope.getPayTypes = function() {
+        $http.get('payments/typeList').success(function(response){
+            $scope.tipoPagos = response;
+            console.log("tipos de pago");
+        });
+    };
+
     
     ////lista de proveedores
     $scope.getProvs = function() {
         $http.get('payments/provList').success(function(response){
             $scope.provs = response;
-            console.log("trayendo lista de proveedores");
+            console.log("lista de proveedores");
         });
     };
 
@@ -108,7 +104,6 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         closeLayer(true);
         openLayer('lyr1pag');
     };
-
 
 
 

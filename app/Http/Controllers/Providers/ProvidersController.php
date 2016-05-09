@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Providers;
+use App\Models\Sistema\ProviderCreditLimit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -8,16 +9,22 @@ use App\Models\Sistema\NombreValcro;
 use App\Models\Sistema\Contactos;
 use App\Models\Sistema\ProviderAddress as Address;
 use App\Models\Sistema\BankAccount as Bank;
+use App\Models\Sistema\ProviderCreditLimit as limCred;
+use App\Models\Sistema\ProviderFactor as FactConv;
+use App\Models\Sistema\Monedas;
+use App\Models\Sistema\ProdTime;
+use App\Models\Sistema\TiemAproTran;
+
 use Session;
 use Validator;
 
 class ProvidersController extends BaseController
 {
-    /*    public function __construct()
-        {
+    public function __construct()
+    {
 
-            $this->middleware('auth');
-        }*/
+        $this->middleware('auth');
+    }
 
     public function getList()
     {
@@ -31,7 +38,7 @@ class ProvidersController extends BaseController
 
     public function getProv(request $prv)
     {
-        $data = Provider::select("id","razon_social as description","contrapedido as contraped","limite_credito as limCred", "siglas","tipo_id as type","tipo_envio_id as envio")->where("id",$prv->id)->get()->first();
+        $data = Provider::find($prv->id);
         $data->contraped = ($data->contraped == 1);
         return $data;
     }
@@ -82,7 +89,7 @@ class ProvidersController extends BaseController
         if($id){
             $addrs = Provider::find($id)->address()->get();
             foreach($addrs as $v){
-                $v['pais'] = $v->country()->select("short_name")->first();
+                $v['pais'] = $v->country()->first();
             }
             return $addrs;
         }else{
@@ -109,21 +116,17 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function listValcroName($provId){
-        if($provId){
-            $valName = Provider::find($provId)->nombres_valcro()->select("id","nombre as name","fav")->get();
+    public function listValcroName($id){
+        if((bool)$id){
+            $valName = Provider::find($id)->nombres_valcro()->select("id","nombre as name","fav")->get();
             return $valName;
-        }else{
-            return [];
         }
     }
 
-    public function listContacProv($provId){
-        if($provId){
-            $valName = Provider::find($provId)->contacts()->get();
+    public function listContacProv($id){
+        if((bool)$id){
+            $valName = Provider::find($id)->contacts()->get();
             return ($valName)?$valName:[];
-        }else{
-            return [];
         }
     }
 
@@ -162,8 +165,11 @@ class ProvidersController extends BaseController
     }
 
     public function getBank($id){
-        $accounts = Provider::find($id)->bankAccount()->get();
-        return ($accounts)?$accounts:[];
+        if((bool)$id){
+            $accounts = Provider::find($id)->bankAccount()->get();
+            return ($accounts)?$accounts:[];
+        }
+
     }
 
     public function saveInfoBank(request $req){
@@ -190,32 +196,170 @@ class ProvidersController extends BaseController
     }
 
     public function getCoins($id){
-        $coins = Provider::find($id)->getProviderCoin()->get();
-        return ($coins)?$coins:[];
+        if((bool)$id) {
+            $coins = Provider::find($id)->getProviderCoin()->get();
+            return ($coins) ? $coins : [];
+        }
     }
 
     public function saveCoin(request $req){
-        if(!Provider::find($req->prov_id)->contacts()->find($req->id)){
-            Provider::find($req->prov_id)->contacts()->attach($req->id);
+        if(!Provider::find($req->prov_id)->getProviderCoin()->find($req->coin)){
+            Provider::find($req->prov_id)->getProviderCoin()->attach($req->coin);
         }
     }
 
     public function delCoin(request $req){
-        if(!Provider::find($req->prov_id)->contacts()->find($req->id)){
-            Provider::find($req->prov_id)->contacts()->dettach($req->id);
+        if(!Provider::find($req->prov_id)->getProviderCoin()->find($req->id)){
+            Provider::find($req->prov_id)->getProviderCoin()->dettach($req->id);
         }
     }
 
     public function assignCoin($id){
-        $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
-        return ($coins)?$coins:[];
+        if((bool)$id) {
+            $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
+            return ($coins) ? $coins : [];
+        }
     }
 
     public function getCreditLimits($id){
-        $coins = Provider::find($id)->getProviderCoin()->lists("tbl_moneda.id");
-        return ($coins)?$coins:[];
+        if((bool)$id) {
+            $limits = Provider::find($id)->limitCredit()->get();
+            foreach ($limits as $lim) {
+                $lim['moneda'] = Monedas::find($lim->moneda_id);
+            }
+            return ($limits) ? $limits : [];
+        }
+    }
+
+    public function saveLimCred(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $lim = limCred::find($req->id);
+            $result['action']="upd";
+        }else{
+            $lim = new limCred();
+        }
+
+        $lim->prov_id = $req->id_prov;
+        $lim->moneda_id = $req->coin;
+        $lim->limite = $req->amount;
+
+        $lim->save();
+        $result['id']=$lim->id;
+        return $result;
+    }
+
+    public function getFactorConvers($id){
+        if($id) {
+            $factors = Provider::find($id)->convertFact()->get();
+            foreach ($factors as $factor) {
+                $factor['moneda'] = Monedas::find($factor->moneda_id);
+            }
+            return ($factors) ? $factors : [];
+        }
     }
 
 
+    public function saveFactorConvert(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $fact = FactConv::find($req->id);
+            $result['action']="upd";
+        }else{
+            $lim = new FactConv();
+        }
+
+        $lim->prov_id = $req->id_prov;
+        $lim->moneda_id = $req->coin;
+        $lim->flete = $req->freight;
+        $lim->gastos = $req->expens;
+        $lim->ganancia = $req->gain;
+        $lim->descuento = $req->disc;
+
+        $lim->save();
+        $result['id']=$lim->id;
+        return $result;
+    }
+
+    public function savePoint(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        $point = Provider::find($req->id_prov)->getProviderCoin()->updateExistingPivot($req->coin,["punto"=>$req->cost]);
+        return $result;
+    }
+
+    public function provCountries($id){
+        if((bool)$id) {
+            $countries = Provider::find($id)->address()->groupBy("pais_id")->get();
+            foreach ($countries as $country) {
+                $country['pais'] = $country->country()->get()->first();
+            }
+            // dd($country);
+            return ($countries) ? $countries : [];
+        }
+    }
+
+
+    public function getProdTime($id){
+        if((bool)$id) {
+            $times = Provider::find($id)->prodTime()->get();
+            foreach ($times as $time) {
+                $time->country;
+            }
+
+            return ($times) ? $times : [];
+        }/*else{
+            return [];
+        }*/
+    }
+
+
+    public function saveProdTime(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $time = ProdTime::find($req->id);
+            $result['action']="upd";
+        }else{
+            $time = new ProdTime();
+        }
+
+        $time->prov_id = $req->id_prov;
+        $time->min_dias = $req->from;
+        $time->max_dias = $req->to;
+        $time->id_pais = $req->country;
+
+        $time->save();
+        $result['id']=$time->id;
+        return $result;
+    }
+
+    public function getTimeTrans($id){
+        if((bool)$id) {
+            $times = Provider::find($id)->transTime()->get();
+            foreach ($times as $time) {
+                $time->country;
+            }
+
+            return ($times) ? $times : [];
+        }
+    }
+
+    public function saveProdTrans(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $time = TiemAproTran::find($req->id);
+            $result['action']="upd";
+        }else{
+            $time = new TiemAproTran();
+        }
+
+        $time->prov_id = $req->id_prov;
+        $time->min_dias = $req->from;
+        $time->max_dias = $req->to;
+        $time->id_pais = $req->country;
+
+        $time->save();
+        $result['id']=$time->id;
+        return $result;
+    }
 
 }

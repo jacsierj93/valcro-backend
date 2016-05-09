@@ -42,39 +42,37 @@
                 <div layout="row" style="height: 24px;">
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
-                            85
+                            {{prov.vencido}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
-                            85
+                            {{prov.vence7}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
-                            85
+                            {{prov.vence30}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
-                            85
+                            {{prov.vence60}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CCA2;">
-                            85
+                            {{prov.vence90}}
                         </div>
                     </div>
                 </div>
                 <div style="height: 32px; text-align: right;">
-                    999.999.999
+                    Deudas {{prov.tdeuda}}
                 </div>
                 <div style="height: 32px; text-align: right;">
-                    ND/C. 999.999.999
+                    Abonos {{prov.tabono}}
                 </div>
-                <div style="height: 32px; text-align: right;">
-                    RBY. 999.999.999
-                </div>
+
             </div>
         </md-content>
 
@@ -251,7 +249,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="monedaSel" required md-no-ink>
+                            <md-select data-ng-init="getCoins()" ng-model="monedaSel" required md-no-ink>
                                 <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
@@ -266,7 +264,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Tipo Pago</label>
-                            <md-select ng-model="tipoPagoSel" required md-no-ink>
+                            <md-select data-ng-init="getPayTypes()" ng-model="tipoPagoSel" required md-no-ink>
                                 <md-option ng-repeat="tipoPago in tipoPagos" value="{{tipoPago.id}}">
                                     {{tipoPago.nombre}}
                                 </md-option>

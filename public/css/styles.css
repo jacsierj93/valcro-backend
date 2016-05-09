@@ -590,3 +590,14 @@ md-tabs-canvas{
 md-pagination-wrapper {
     height: 30px !important;
 }
+
+/**********************EDITADO POR JACSIEL 06/05/2016****************************
+*********************************************************************************
+****CLASES QUE MARCA ELEMENTO SELECCIONADO EN EL GRID Y LISTADO DE PROVEEDORES***
+********************************************************************************/
+.listSel {
+    background-color: #f1f1f1;
+}
+.gridSel {
+    background-color: #f1f1f1;
+}
