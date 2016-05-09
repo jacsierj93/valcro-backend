@@ -90,6 +90,7 @@ class ProvidersController extends BaseController
             $addrs = Provider::find($id)->address()->get();
             foreach($addrs as $v){
                 $v['pais'] = $v->country()->first();
+                $v->tipo;
             }
             return $addrs;
         }else{
@@ -153,7 +154,7 @@ class ProvidersController extends BaseController
             $valName->responsabilidades = $req->responsability;
             $valName->direccion = $req->dirOff;
             $valName->agente = $req->isAgent;
-            $valName->pais_id = ($req->pais!="")?$req->pais!="":NULL;
+            $valName->pais_id = ($req->pais!="")?$req->pais:NULL;
             $valName->id_lang = $req->languaje;
             $valName->save();
         }
@@ -263,7 +264,7 @@ class ProvidersController extends BaseController
     public function saveFactorConvert(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
-            $fact = FactConv::find($req->id);
+            $lim = FactConv::find($req->id);
             $result['action']="upd";
         }else{
             $lim = new FactConv();
@@ -303,7 +304,7 @@ class ProvidersController extends BaseController
         if((bool)$id) {
             $times = Provider::find($id)->prodTime()->get();
             foreach ($times as $time) {
-                $time->country;
+                $time->lines;
             }
 
             return ($times) ? $times : [];
@@ -325,7 +326,7 @@ class ProvidersController extends BaseController
         $time->prov_id = $req->id_prov;
         $time->min_dias = $req->from;
         $time->max_dias = $req->to;
-        $time->id_pais = $req->country;
+        $time->linea_id = $req->line;
 
         $time->save();
         $result['id']=$time->id;

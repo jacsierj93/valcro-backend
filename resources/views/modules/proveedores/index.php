@@ -180,8 +180,8 @@
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
                             <md-select ng-model="dtaPrv.type" name ="state" ng-disabled="enabled" md-no-ink>
-                                <md-option ng-repeat="state in states" value="{{state.id}}">
-                                    {{state.nombre}}
+                                <md-option ng-repeat="type in types" value="{{type.id}}">
+                                    {{type.nombre}}
                                 </md-option>
                             </md-select>
 
@@ -281,7 +281,7 @@
 
                     <div layout="row">
 
-                        <md-input-container class="md-block" flex="20" ng-controller="TipoDirecc">
+                        <md-input-container class="md-block" flex="20">
                             <label>Tipo de Direccion</label>
                             <md-select ng-model="dir.tipo" md-no-ink>
                                 <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
@@ -294,7 +294,7 @@
                             </div>-->
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="50" ng-controller="ListPaises">
+                        <md-input-container class="md-block" flex="50">
                             <label>Pais</label>
                             <md-select ng-model="dir.pais" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}" >
@@ -326,7 +326,7 @@
                         <div id="grid" style="overflow-y: auto; height: 120px">
                             <div flex ng-repeat="add in address" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                    <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
                                 </div>
                             </div>
                         </div>
@@ -345,7 +345,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
-                            <input name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-click="book()">
+                            <input name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick  ="book()">
                             <!--<div ng-messages="provContactosForm.nombreCont.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">Debe tener maximo 55 caracteres.</div>
@@ -437,10 +437,11 @@
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
-                <div class="titulo_formulario" layout="Column" layout-align="start start">
-                    <div>
+                <div class="titulo_formulario" layout="column" layout-align="start start">
+                    <div ng-click="closeContackBook()">
                         Contactos Existentes
                     </div>
+
                 </div>
                 <div style="height: 100%; overflow:scroll">
                     <div flex ng-repeat="cont in allContact" flex="column" ng-click="toEdit(this)">
@@ -467,9 +468,9 @@
                         </div>
                     </div>
                     <div layout="row">
-                        <md-input-container class="md-block" flex="20" ng-controller="allCoinsController">
-                            <label>Moneda</label>
-                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled" required md-no-ink>
+                        <md-input-container class="md-block" flex="20">
+                            <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
+                            <md-select ng-model="cn.coin" name ="state" ng-disabled="enabled || (coins.length == filt.length)" required md-no-ink>
                                 <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -573,7 +574,7 @@
 
                 </form>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="provCred" ng-controller="creditCtrl">
+                <form name="provCred" ng-controller="creditCtrl" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Credito
@@ -616,7 +617,7 @@
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
-                <form name="provConv" ng-controller="convController">
+                <form name="provConv" ng-controller="convController" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Factor de Conversión
@@ -650,19 +651,19 @@
                     </div>
                     <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                            <div flex="20" class="headGrid"> Flete</div><div flex="20" class="headGrid"> Gastos</div><div flex="20" class="headGrid"> Ganancia </div><div flex="20" class="headGrid"> Descuento</div><div flex="20" class="headGrid"> Moneda</div>
                         </div>
                         <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                            <div flex ng-repeat="factor in factors" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                    <div flex="20" class="cellGrid"> {{factor.flete}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{factor.gastos}}</div><div flex="20" class="cellGrid">{{factor.ganancia}}</div><div flex="20" class="cellGrid">{{factor.descuento}}</div><div flex="20" class="cellGrid">{{factor.moneda.nombre}}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
-                <form name="provPoint" ng-controller="provPointController">
+                <form name="provPoint" ng-controller="provPointController" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Puntos
@@ -676,7 +677,7 @@
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
                             <md-select ng-model="pnt.coin" ng-disabled="enabled" required md-no-ink>
-                                <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                <md-option ng-repeat="coin in coins" ng-hide="(coin.pivot.punto)" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
                             </md-select>
@@ -684,12 +685,12 @@
                     </div>
                     <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                            <div flex="30" class="headGrid"> punto</div><div flex="20" class="headGrid"> Pais</div>
                         </div>
                         <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                            <div flex ng-repeat="point in coins" ng-click="toEdit(this)" ng-show="point.pivot.punto">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                    <div flex="30" class="cellGrid"> {{point.pivot.punto}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{point.nombre}}</div>
                                 </div>
                             </div>
                         </div>
@@ -706,7 +707,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-                <form name="timeProd" ng-controller="prodTimeController">
+                <form name="timeProd" ng-controller="prodTimeController" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Tiempo Aproximado de Producción
@@ -723,17 +724,29 @@
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
-                            <label>Pais</label>
-                            <md-select ng-model="tp.country" name ="state" ng-disabled="enabled" md-no-ink>
-                                <!--<md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
-                                    {{country.pais.short_name}}
-                                </md-option>-->
+                            <label>Linea</label>
+                            <md-select ng-model="tp.line" name ="state" ng-disabled="enabled" md-no-ink>
+                                <md-option ng-repeat="line in lines" value="{{line.id}}">
+                                    {{line.linea}}
+                                </md-option>
                             </md-select>
                         </md-input-container>
                     </div>
+                    <div layout="column" ng-show="isShow">
+                        <div layout="row" class="headGridHolder">
+                            <div flex="20" class="headGrid"> minimo dias</div><div flex="20" class="headGrid">Maximo Dias</div><div flex class="headGrid">Linea</div>
+                        </div>
+                        <div id="grid" style="overflow-y: auto; height: 120px">
+                            <div flex ng-repeat="time in timesP" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder">
+                                    <div flex="20" class="cellGrid"> {{time.min_dias}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div><div flex class="cellGrid">{{time.lines.linea}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="timeTrans" ng-controller="transTimeController">
+                <form name="timeTrans" ng-controller="transTimeController" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
                             Tiempo Aproximado de Transito
@@ -751,7 +764,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-model="ttr.country" name ="state" ng-disabled="enabled" md-no-ink>
+                            <md-select ng-model="ttr.country" name ="state" ng-disabled="enabled" md-no-ink required>
                                 <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
                                     {{country.pais.short_name}}
                                 </md-option>
@@ -760,12 +773,12 @@
                     </div>
                     <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Tipo</div><div flex="20" class="headGrid"> Pais</div><div flex class="headGrid"> Direccion</div><div flex="20" class="headGrid"> Telefono</div>
+                            <div flex="20" class="headGrid"> minimo dias</div><div flex="20" class="headGrid">Maximo Dias</div><div flex class="headGrid">Pais</div>
                         </div>
                         <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                            <div flex ng-repeat="time in timesT" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="10" class="cellGrid"> {{add.tipo_dir}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div><div flex class="cellGrid">{{add.direccion}}</div><div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                    <div flex="20" class="cellGrid"> {{time.min_dias}}</div><div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div><div flex class="cellGrid">{{time.country.short_name}}</div>
                                 </div>
                             </div>
                         </div>

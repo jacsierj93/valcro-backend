@@ -27,4 +27,9 @@ class ProviderAddress extends Model
     {
         return $this->hasOne('App\Models\Sistema\Country', 'id', 'pais_id');
     }
+
+    public function tipo()
+    {
+        return $this->hasOne('App\Models\Sistema\TypeAddress', 'id', 'tipo_dir');
+    }
 }

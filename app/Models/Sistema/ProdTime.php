@@ -26,7 +26,7 @@ class ProdTime extends Model
         return $this->belongsTo('App\Models\Sistema\Provider',"prov_id");
     }
 
-    public function country(){
-        return $this->hasOne('App\Models\Sistema\Country',"id");
+    public function lines(){
+        return $this->hasOne('App\Models\Sistema\Line',"id","linea_id");
     }
 }
