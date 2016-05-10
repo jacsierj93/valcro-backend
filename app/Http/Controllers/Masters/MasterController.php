@@ -11,8 +11,6 @@ use App\Models\Sistema\ProviderType;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\State;
 use App\Models\Sistema\TypeAddress;
-use Laravel\Lumen\Routing\Controller as BaseController;
-use Validator;
 use App\Models\Sistema\Line;
 
 class MasterController extends BaseController
