@@ -3,9 +3,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     var historia = [15];
     $scope.index = index = 0;
     var base = 264;
-    $scope.provData = {"nombre": '', "pagos": {}, "deudas": {}};
-    $scope.debData = {"provname": '', "provid": '', "factura": '', "cuotas":''};
-    $scope.payData = {"provname": '', "provid": '', "factura": ''};
+    $scope.provData = {"id":'',"nombre": '', "pagos": {}, "deudas": {}};
+    $scope.debData = {"id":'',"provname": '', "provid": '', "factura": '', "cuotas":''};
+    $scope.payData = {"id":'',"provname": '', "provid": '', "factura": ''};
 
     function openLayer(layr) {
         console.log(layr);
@@ -97,6 +97,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         $http.get('payments/getProv/' + prov.id).success(function (response) {
 
             ///setiando datos del proveedor
+            $scope.provData.id = response.id;
             $scope.provData.nombre = response.razon_social;
             $scope.provData.pagos = response.pagos;
             $scope.provData.deudas = response.deudas;
@@ -104,8 +105,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             console.log("trayendo proveedor con id:" + prov.id);
         });
 
-        //  closeLayer(true);
-        openLayer('lyr1pag');
+
+        closeLayer(true)
+        openLayer("lyr1pag");
 
     };
 

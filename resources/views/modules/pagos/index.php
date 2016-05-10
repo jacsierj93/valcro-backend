@@ -37,7 +37,7 @@
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
         <md-content class="barraLateral" data-ng-init="getProvs()">
             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div data-ng-repeat="prov in provs"   class="boxList" layout="column" flex ng-click="setProv(prov)">
+            <div data-ng-repeat="prov in provs"   class="boxList" layout="column" flex ng-click="setProv(prov)" ng-class="{'listSel' : (prov.id ==provData.id)}">
                 <div  style="overflow: hidden; text-overflow: ellipsis" flex>{{prov.razon_social}}</div>
                 <div layout="row" style="height: 24px;">
                     <div flex layout layout-align="center center">

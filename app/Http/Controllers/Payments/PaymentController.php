@@ -232,6 +232,7 @@ class PaymentController extends BaseController
         Session::put("PROVNAME", $proveedor->razon_social); ///nombre provedor
         Session::put("PROVID", $provId); ///setea sesion del proveedor actual
 
+        $data["id"] = $proveedor->id;
         $data["razon_social"] = $proveedor->razon_social;
         $data["pagos"] = $this->getPayList($provId);
         $data["deudas"] = $this->getDebtsList($provId);
