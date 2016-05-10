@@ -96,7 +96,7 @@ class PaymentController extends BaseController
 
     /////lista de proveedores
 
-    /**lista de proveedores
+    /**lista de proveedores con sus atributos de pagos y facturas
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function getProvidersList()
@@ -104,7 +104,6 @@ class PaymentController extends BaseController
         $provs = Provider::all();
         $abonos = $this->payIds; ///id de los abonos AD,NDC,RBY
         $deudas = $this->debtsIds; ///id de deudas
-        $currenDate = date("Y-m-d");
         // echo MasterFinancialController::getCostByCoin(50000,2,3);
 
 
@@ -122,6 +121,7 @@ class PaymentController extends BaseController
             $nv30 = 0; ///vence30
             $nv60 = 0; ///vence60
             $nv90 = 0; ///vence90
+            $nv100 = 0; ///vence +90
 
 
             foreach ($docs as $doc) {
@@ -138,18 +138,21 @@ class PaymentController extends BaseController
 
 
                 ////nfact vence
-                $vence = $this->dateDiff($doc->fecha_vence, $currenDate);
+                //  $vence = $this->dateDiff($doc->fecha_vence, $currenDate);
+                $vence = $this->getVencimiento($doc->fecha_vence);
 
-                if ($vence <= 0) {
+                if ($vence == 0) {
                     $nvencido++;
-                } else if ($vence <= 7) {
+                } else if ($vence == 7) {
                     $nv7++;
-                } else if ($vence > 7 && $vence <= 30) {
+                } else if ($vence == 30) {
                     $nv30++;
-                } else if ($vence > 30 && $vence <= 60) {
+                } else if ($vence == 60) {
                     $nv60++;
-                } else if ($vence > 60 && $vence <= 90) {
+                } else if ($vence == 90) {
                     $nv90++;
+                } else {
+                    $nv100++;
                 }
 
 
@@ -218,12 +221,16 @@ class PaymentController extends BaseController
     }
 
 
+    /**trae nombre del proveedor, deudas y pagos
+     * @param $provId
+     * @return mixed
+     */
     public function getProvById($provId)
     {
 
-        Session::put("PROVID", $provId); ///setea sesion del proveedor actual
-
         $proveedor = Provider::findOrFail($provId); ///trayendo datos del proveedor
+        Session::put("PROVNAME", $proveedor->razon_social); ///nombre provedor
+        Session::put("PROVID", $provId); ///setea sesion del proveedor actual
 
         $data["razon_social"] = $proveedor->razon_social;
         $data["pagos"] = $this->getPayList($provId);
@@ -231,6 +238,45 @@ class PaymentController extends BaseController
 
         return $data;
 
+    }
+
+
+    /** para seleccionar el detalle del documento
+     * @param $id
+     * @return mixed
+     */
+    public function getDocById($id)
+    {
+
+        $doc = DocumentCP::findOrFail($id);
+
+        $data["prov_nombre"] = Session::get("PROVNAME");
+        $data["prov_id"] = Session::get("PROVID");
+        $data["doc_id"] = $doc->id;
+        $data["doc_tipo"] = $doc->tipo_id;
+        $data["doc_factura"] = $doc->nro_factura;
+        $data["doc_vence"] = $doc->fecha_vence;
+        $data["doc_vencimiento"] = 'v' . $this->getVencimiento($doc->fecha_vence); ///color del punto
+        $data["doc_descripcion"] = $doc->descripcion;
+        if (in_array($doc->tipo_id, $this->debtsIds)) { ////en caso de ser una deuda
+
+            $cuotas = $doc->cuotas();
+            $cdata = array();
+            foreach ($cuotas as $cc){
+
+                $temp["fecha_vence"] = $cc->fecha_vence;
+                $temp["nro_factura"] = $cc->nro_factura;
+                $temp["descripcion"] = $cc->descripcion;
+                $temp["vencimiento"] = 'v'.$cc->vencimiento();
+                $cdata[] = $temp;
+            }
+
+            $data["doc_cuotas"] = $cdata;
+
+        }
+
+
+        return $data;
 
     }
 
@@ -245,9 +291,13 @@ class PaymentController extends BaseController
         $result = array();
         foreach ($pagos as $pago) {
 
+            $temp["id"] = $pago->id;
             $temp["nro_factura"] = $pago->nro_factura;
             $temp["fecha"] = $pago->fecha;
             $temp["tipo"] = $pago->tipo->descripcion;
+            $temp["saldo"] = $pago->saldo;
+            $temp["pagado"] = $pago->monto - $pago->saldo;
+
 
             $result[] = $temp;
         }
@@ -266,10 +316,16 @@ class PaymentController extends BaseController
         $result = array();
         foreach ($deudas as $deuda) {
 
+            $temp["id"] = $deuda->id;
             $temp["nro_factura"] = $deuda->nro_factura;
             $temp["fecha"] = $deuda->fecha;
             $temp["vence"] = $deuda->fecha_vence;
+            $temp["vencido"] = 'v' . $this->getVencimiento($deuda->fecha_vence); ///color del punto
             $temp["tipo"] = $deuda->tipo->descripcion;
+            $temp["saldo"] = $deuda->saldo;
+            $temp["monto"] = $deuda->monto;
+            $temp["cuotas"] = $deuda->ncuotas();
+            $temp["pagado"] = $deuda->monto - $deuda->saldo;
 
             $result[] = $temp;
         }
@@ -289,6 +345,35 @@ class PaymentController extends BaseController
         $to = date_create($dateEnd);
         $diff = date_diff($to, $from);
         return (int)$diff->format('%R%d');
+    }
+
+    /**calcula el rango de vencimiento segun la fecha dada
+     * @param $fecha
+     * @return int
+     */
+    private function getVencimiento($fecha)
+    {
+
+        $currenDate = date("Y-m-d"); ///fecha actual
+        $dias = $this->dateDiff($fecha, $currenDate); ///calculo de dias para el vencimiento
+
+        if ($dias <= 0) {
+            $estatus = 0; ///vencido
+        } else if ($dias <= 7) {
+            $estatus = 7; ///vence en 7 dias o menos ...
+        } else if ($dias > 7 && $dias <= 30) {
+            $estatus = 30;
+        } else if ($dias > 30 && $dias <= 60) {
+            $estatus = 60;
+        } else if ($dias > 60 && $dias <= 90) {
+            $estatus = 90;
+        } else {
+            $estatus = 100; ///mas de 90
+        }
+
+        return $estatus;
+
+
     }
 
 

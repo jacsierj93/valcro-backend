@@ -4,4 +4,26 @@
     border-radius: 50%;
     color: #ffffff;
 }
+/*tipos de vencimiento*/
+.v0{
+    background-color: #003000;
+}
+.v7{
+    background-color: #006600;
+}
+.v30{
+    background-color: #009A00;
+}
+.v60{
+    background-color: #00CD00;
+}
+.v90{
+    background-color: #00CCA2;
+}
+.v100{
+    background-color: #ffff00;
+}
+
+
+
 

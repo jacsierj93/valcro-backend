@@ -41,27 +41,27 @@
                 <div  style="overflow: hidden; text-overflow: ellipsis" flex>{{prov.razon_social}}</div>
                 <div layout="row" style="height: 24px;">
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #003000;">
+                        <div layout layout-align="center center" class="cantFactDeb v0">
                             {{prov.vencido}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006600;">
+                        <div layout layout-align="center center" class="cantFactDeb v7">
                             {{prov.vence7}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #009A00;">
+                        <div layout layout-align="center center" class="cantFactDeb v30">
                             {{prov.vence30}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CD00;">
+                        <div layout layout-align="center center" class="cantFactDeb v60">
                             {{prov.vence60}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00CCA2;">
+                        <div layout layout-align="center center" class="cantFactDeb v90">
                             {{prov.vence90}}
                         </div>
                     </div>
@@ -116,32 +116,17 @@
                                 </div>
                                 <div id="grid">
                                     <div ng-repeat="deuda in provData.deudas" flex>
-                                        <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr2pag')">
+                                        <div layout="row" class="cellGridHolder" ng-click="setDeduda(deuda)">
                                             <div flex="10" class="cellGrid"> {{deuda.nro_factura}}</div>
                                             <div flex="10" class="cellGrid">{{deuda.fecha}}</div>
                                             <div flex="10" class="cellGrid">{{deuda.vence}}</div>
-                                            <div flex="5" class="cellGrid" style="text-align: right;"> <div style="width: 16px; height: 16px; border-radius: 50%; background-color: #ff6f4c;"></div></div>
-                                            <div flex class="cellGrid"> 4 </div>
-                                            <div flex class="cellGrid"> 4.212$ </div>
-                                            <div flex class="cellGrid"> 2.230$ </div>
-                                            <div flex class="cellGrid"> 1.982$ </div>
+                                            <div flex="5" class="cellGrid" style="text-align: right;"> <div style="width: 16px; height: 16px; border-radius: 50%" class="{{deuda.vencido}}"></div></div>
+                                            <div flex class="cellGrid"> {{deuda.cuotas}} </div>
+                                            <div flex class="cellGrid"> {{deuda.monto}}$ </div>
+                                            <div flex class="cellGrid"> {{deuda.pagado}}$ </div>
+                                            <div flex class="cellGrid"> {{deuda.saldo}}$ </div>
                                         </div>
                                     </div>
-
-
-                          <!--          <div flex>
-                                        <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr2pag')">
-                                            <div flex="10" class="cellGrid"> TET56276-2015</div>
-                                            <div flex="10" class="cellGrid"> 26/02/2016</div>
-                                            <div flex="10" class="cellGrid"> 26/05/2016 </div>
-                                            <div flex="5" class="cellGrid" style="text-align: right;"> <div style="width: 16px; height: 16px; border-radius: 50%; background-color: #ff6f4c;"></div></div>
-                                            <div flex class="cellGrid"> 4 </div>
-                                            <div flex class="cellGrid"> 4.212$ </div>
-                                            <div flex class="cellGrid"> 2.230$ </div>
-                                            <div flex class="cellGrid"> 1.982$ </div>
-                                        </div>
-                                    </div>-->
-
 
                                 </div>
 
@@ -167,30 +152,15 @@
                                 </div>
                                 <div id="grid">
                                     <div ng-repeat="pago in provData.pagos" flex>
-                                        <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr3pag')">
+                                        <div layout="row" class="cellGridHolder" ng-click="setPago(pago)">
                                             <div flex="20" class="cellGrid">{{pago.nro_factura}}</div>
                                             <div flex="10" class="cellGrid">{{pago.fecha}}</div>
                                             <div flex class="cellGrid">{{pago.tipo}}</div>
-                                            <div flex class="cellGrid"> Data 4</div>
+                                            <div flex class="cellGrid">{{pago.pagado}}</div>
                                             <div flex class="cellGrid"> Data 5</div>
                                             <div flex class="cellGrid"> Data 6</div>
                                         </div>
                                     </div>
-
-
-
-
-                            <!--        <div flex>
-                                        <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr3pag')">
-                                            <div flex="20" class="cellGrid"> TET56276-2015</div>
-                                            <div flex="10" class="cellGrid"> 26/02/2016</div>
-                                            <div flex class="cellGrid"> Data 3</div>
-                                            <div flex class="cellGrid"> Data 4</div>
-                                            <div flex class="cellGrid"> Data 5</div>
-                                            <div flex class="cellGrid"> Data 6</div>
-                                        </div>
-                                    </div>-->
-
 
                                 </div>
 
@@ -216,7 +186,7 @@
 
                 <div class="titulo_formulario" layout="Column" layout-align="start start" >
                     <div>
-                        Listado de cuotas: <spam style="color: #000;">Factura Nro. NUMERO DE FACTURA, Proveedor: NOMBRE DEL PROVEEDOR</spam>
+                        Listado de cuotas: <spam style="color: #000;">Factura Nro. {{debData.factura}}, Proveedor: {{debData.provname}}</spam>
                     </div>
                 </div>
 
@@ -228,13 +198,13 @@
                     <div flex="10" class="headGrid"> Estatus</div>
                 </div>
                 <div id="grid" flex style="overflow-y: auto;">
-                    <div flex>
+                    <div ng-repeat="cuota in debData.cuotas" flex>
                         <div layout="row" class="cellGridHolder" ng-click="openLayer('lyr3pag')">
-                            <div flex="10" class="cellGrid"> 1</div>
-                            <div flex="10" class="cellGrid"> 26/02/2016</div>
-                            <div flex class="cellGrid"> Esta es una cuota de prueba</div>
-                            <div flex class="cellGrid"> 10% Contra BL</div>
-                            <div flex="10" class="cellGrid"> <div style="width: 16px; height: 16px; border-radius: 50%; background-color: #ff6f4c;"></div></div>
+                            <div flex="10" class="cellGrid">{{$index+1}}</div>
+                            <div flex="10" class="cellGrid">{{cuota.fecha_vence}}</div>
+                            <div flex class="cellGrid">{{cuota.nro_factura}}</div>
+                            <div flex class="cellGrid">{{cuota.descripcion}}</div>
+                            <div flex="10" class="cellGrid"> <div style="width: 16px; height: 16px; border-radius: 50%" class="{{cuota.vencimiento}}"></div></div>
                         </div>
                     </div>
                 </div>
@@ -256,7 +226,7 @@
                 <form>
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
-                            Pago cuota: <span style="color: #000;">Nro. NUMERO DE LA CUOTA, Factura Nro. NUMERO DE FACTURA, Proveedor: NOMBRE DEL PROVEEDOR</span>
+                            Pago cuota: <span style="color: #000;">Nro. NUMERO DE LA CUOTA, Factura Nro. {{payData.factura}}, Proveedor: {{payData.provname}}</span>
                         </div>
                     </div>
                     <div layout="row">

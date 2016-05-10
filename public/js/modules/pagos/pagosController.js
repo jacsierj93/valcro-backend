@@ -4,6 +4,8 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.index = index = 0;
     var base = 264;
     $scope.provData = {"nombre": '', "pagos": {}, "deudas": {}};
+    $scope.debData = {"provname": '', "provid": '', "factura": '', "cuotas":''};
+    $scope.payData = {"provname": '', "provid": '', "factura": ''};
 
     function openLayer(layr) {
         console.log(layr);
@@ -105,10 +107,52 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         //  closeLayer(true);
         openLayer('lyr1pag');
 
-        //  $scope.getCoins();
-        //  $scope.getPayTypes();
+    };
+
+
+    ////setear documento deuda
+    $scope.setDeduda = function (doc) {
+
+        openLayer('lyr2pag');
+
+        $http.get('payments/getDocById/' + doc.id).success(function (response) {
+
+            ///setiando datos de la deuda
+            $scope.debData.provname = response.prov_nombre;
+            $scope.debData.provid = response.prov_id;
+            $scope.debData.factura = response.doc_factura;
+            $scope.debData.cuotas = response.doc_cuotas;
+
+            console.log("trayendo datos deuda:" + doc.id);
+        });
 
     };
+
+    
+
+
+    $scope.setPago = function (doc) {
+
+        openLayer('lyr3pag');
+
+        $http.get('payments/getDocById/' + doc.id).success(function (response) {
+
+            ///setiando datos de la deuda
+            $scope.payData.provname = response.prov_nombre;
+            $scope.payData.provid = response.prov_id;
+            $scope.payData.factura = response.doc_factura;
+
+            console.log("trayendo datos pago:" + doc.id);
+        });
+        
+
+        $scope.getCoins();
+        $scope.getPayTypes();
+
+    }
+
+
+
 
 
 });
