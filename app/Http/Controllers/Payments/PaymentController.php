@@ -265,6 +265,7 @@ class PaymentController extends BaseController
             $cdata = array();
             foreach ($cuotas as $cc){
 
+                $temp["id"] = $cc->id;
                 $temp["fecha_vence"] = $cc->fecha_vence;
                 $temp["nro_factura"] = $cc->nro_factura;
                 $temp["descripcion"] = $cc->descripcion;

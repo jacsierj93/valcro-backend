@@ -3,9 +3,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     var historia = [15];
     $scope.index = index = 0;
     var base = 264;
-    $scope.provData = {"id":'',"nombre": '', "pagos": {}, "deudas": {}};
-    $scope.debData = {"id":'',"provname": '', "provid": '', "factura": '', "cuotas":''};
-    $scope.payData = {"id":'',"provname": '', "provid": '', "factura": ''};
+    $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}};
+    $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
+    $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
 
     function openLayer(layr) {
         console.log(layr);
@@ -120,6 +120,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         $http.get('payments/getDocById/' + doc.id).success(function (response) {
 
             ///setiando datos de la deuda
+            $scope.debData.id = response.doc_id; ///id de la deuda
             $scope.debData.provname = response.prov_nombre;
             $scope.debData.provid = response.prov_id;
             $scope.debData.factura = response.doc_factura;
@@ -130,7 +131,26 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     };
 
-    
+
+    $scope.setPagoCuota = function (doc, cuota) {
+
+        openLayer('lyr3pag')
+
+        $http.get('payments/getDocById/' + doc.id).success(function (response) {
+
+            ///setiando datos de la deuda (factura)
+            $scope.payData.id = response.doc_id; ///id de la factura
+            $scope.payData.provname = response.prov_nombre;
+            $scope.payData.provid = response.prov_id;
+            $scope.payData.factura = response.doc_factura;
+
+            console.log("trayendo datos del pago de la cuota:" + cuota.id);
+        });
+
+        $scope.getCoins();
+        $scope.getPayTypes();
+
+    }
 
 
     $scope.setPago = function (doc) {
@@ -143,18 +163,16 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             $scope.payData.provname = response.prov_nombre;
             $scope.payData.provid = response.prov_id;
             $scope.payData.factura = response.doc_factura;
+            $scope.payData.id = response.doc_id; ///id de la deuda
 
             console.log("trayendo datos pago:" + doc.id);
         });
-        
+
 
         $scope.getCoins();
         $scope.getPayTypes();
 
     }
-
-
-
 
 
 });
