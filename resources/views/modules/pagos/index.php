@@ -18,13 +18,13 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center">
+            <div ng-show="true" layout="column" layout-align="center center">
                 <?= HTML::image("images/agregar.png") ?>
             </div>
-            <div layout="column" layout-align="center center">
+            <div ng-show="false" layout="column" layout-align="center center">
                 <?= HTML::image("images/actualizar.png") ?>
             </div>
-            <div layout="column" layout-align="center center">
+            <div ng-show="false" layout="column" layout-align="center center">
                 <?= HTML::image("images/filtro.png") ?>
             </div>
         </div>
@@ -73,10 +73,10 @@
                     
                 </div>
                 <div style="height: 32px; text-align: right;">
-                    Deudas {{prov.tdeuda}}
+                    Deudas {{prov.tdeuda | currency : $ : 2}}
                 </div>
                 <div style="height: 32px; text-align: right;">
-                    Abonos {{prov.tabono}}
+                    Abonos {{prov.tabono | currency : $ : 2}}
                 </div>
 
             </div>
