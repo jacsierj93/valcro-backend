@@ -165,6 +165,7 @@ class PaymentController extends BaseController
             $temp["vence30"] = $nv30;
             $temp["vence60"] = $nv60;
             $temp["vence90"] = $nv90;
+            $temp["vence100"] = $nv100;
 
             $result[] = $temp;
 

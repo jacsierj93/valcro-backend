@@ -65,6 +65,12 @@
                             {{prov.vence90}}
                         </div>
                     </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb v90">
+                            {{prov.vence100}}
+                        </div>
+                    </div>
+                    
                 </div>
                 <div style="height: 32px; text-align: right;">
                     Deudas {{prov.tdeuda}}
