@@ -13,6 +13,7 @@ use App\Models\Sistema\State;
 use App\Models\Sistema\TypeAddress;
 use App\Models\Sistema\Line;
 use App\Models\Sistema\Language;
+use App\Models\Sistema\CargoContact;
 
 class MasterController extends BaseController
 {
@@ -91,5 +92,9 @@ class MasterController extends BaseController
 	 **/
 	public function getLanguajes(){
 		return Language::all();
+	}
+
+	public function getCargos(){
+		return CargoContact::all();
 	}
 }

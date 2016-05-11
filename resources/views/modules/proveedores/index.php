@@ -105,27 +105,6 @@
                                 </div>
                             </div>
                         </md-grid-tile>
-                        <!--<md-grid-tile>
-                            <div class="textResm" flex layout="Column" layout-align="start start">
-                                <div style="overflow: hidden; text-overflow: ellipsis;">
-                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
-                                </div>
-                            </div>
-                        </md-grid-tile>
-                        <md-grid-tile>
-                            <div class="textResm" flex layout="Column" layout-align="start start">
-                                <div style="overflow: hidden; text-overflow: ellipsis;">
-                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
-                                </div>
-                            </div>
-                        </md-grid-tile>
-                        <md-grid-tile>
-                            <div class="textResm" flex layout="Column" layout-align="start start">
-                                <div style="overflow: hidden; text-overflow: ellipsis;">
-                                    CECRISA REVESTIMIENTO CERAMICOS, S.A
-                                </div>
-                            </div>
-                        </md-grid-tile>-->
                     </md-grid-list>
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
@@ -134,15 +113,50 @@
                     </div>
                     <div layout="row">
                         <div flex>
+                            <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)"src="images/aereo.png"/>
+                            <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)"src="images/maritimo.png"/>
+                        </div>
+                    </div>
+
+                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div>
+                            Tiempos Estimados
+                        </div>
+                    </div>
+                    <div layout="column">
+                        <div flex>
+                            Produccion:
+                        </div>
+                        <div flex ng-repeat="tiempo in prov.tiemposP">
+                            <div flex >de: {{tiempo.min_dias}} a {{tiempo.max_dias }} para {{tiempo.lines.linea}}</div>
+                        </div>
+                    </div>
+                    <div layout="column">
+                        <div flex>
+                            Transito:
+                        </div>
+                        <div flex ng-repeat="tiempo in prov.tiemposT">
+                            <div flex >de: {{tiempo.min_dias}} a {{tiempo.max_dias }} desde {{tiempo.country.short_name}}</div>
                         </div>
                     </div>
 
                 </div>
+
+
                 <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
                 <div layout="column" flex>
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
-                            Datos Proveedor
+                           Direcciones
+                        </div>
+                    </div>
+                    <div ng-repeat="dir in prov.direcciones" layout="column">
+                        <div layout="row">
+                            <div flex="50">{{dir.tipo.descripcion}}</div>
+                            <div flex="50">{{dir.country.short_name}}</div>
+                        </div>
+                        <div flex>
+                            {{dir.direccion}}
                         </div>
                     </div>
                 </div>
@@ -363,20 +377,16 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
-                            <input ng-disabled="enabled" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" ng-pattern="/^[0-9]{4}-[0-9]{3}-[0-9]{4}$/"/>
+                            <input ng-disabled="enabled" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" />
                             <!--<div ng-messages="provContactosForm.contTelf.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
                             </div>-->
                         </md-input-container>
 
-
-
-
-
                     </div>
                     <div layout="row">
-                        <div layout="row" flex="10">
+                        <div layout="row" flex="30">
                             <md-input-container flex>
                                 <label>Idiomas</label>
                                 <md-select ng-disabled="enabled" ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)" md-no-ink>
@@ -386,16 +396,26 @@
                             </md-input-container>
                         </div>
 
+                        <div layout="row" flex="30">
+                            <md-input-container flex>
+                                <label>cargos</label>
+                                <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || enabled" md-no-ink>
+                                    <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+
                         <md-input-container class="md-block" flex="40">
                             <label>Responsabilidades</label>
                             <input ng-disabled="enabled" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)">
                         </md-input-container>
 
+                    </div>
+                    <div layout="row" flex>
                         <md-input-container class="md-block" flex>
                             <label>Direccion de Oficina</label>
                             <input ng-disabled="enabled" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)">
                         </md-input-container>
-
                     </div>
 
 
@@ -403,7 +423,7 @@
 
                         <div layout="row" class="headGridHolder">
                             <div flex="20" class="headGrid"> Nombre</div><div flex class="headGrid"> Email</div><div flex="10" class="headGrid"> Telefono</div><div flex="20" class="headGrid"> Pais</div></div>
-                        <div id="grid">
+                        <div id="grid" style="overflow-y: auto; height: 120px">
                            <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
                                     <div flex="20" class="cellGrid"> {{cont.nombre}}</div><div flex class="cellGrid"> {{cont.email}}</div><div flex="10" class="cellGrid">{{cont.telefono}}</div><div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
@@ -451,11 +471,6 @@
                     </div>
                     <div style="height: 100%; overflow:scroll">
                         <div flex ng-repeat="cont in allContact" flex="column" ng-click="toEdit(this)">
-                           <!-- <div layout="column" layout-wrap class="cellGridHolder cellGrid" style="height: 72px" >
-                                <div flex style="height: 24px">{{cont.nombre}} </div>
-                                <div flex style="height: 24px"> {{cont.email}}</div>
-                                <div flex style="height: 24px"><span ng-repeat="prov in cont.provs">{{prov.prov}}, </span></div>
-                            </div>-->
 
                         </div>
 
@@ -657,23 +672,23 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>% Flete</label>
-                            <input ng-disabled="enabled" ng-model="conv.flete">
+                            <input ng-disabled="enabled" ng-model="conv.freight">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Gastos</label>
-                            <input ng-disabled="enabled" ng-model="conv.gastos">
+                            <input ng-disabled="enabled" ng-model="conv.expens">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Ganancia</label>
-                            <input ng-disabled="enabled" ng-model="conv.ganancia">
+                            <input ng-disabled="enabled" ng-model="conv.gain">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Descuento</label>
-                            <input ng-disabled="enabled" ng-model="conv.descuento">
+                            <input ng-disabled="enabled" ng-model="conv.disc">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-disabled="enabled" ng-model="conv.moneda_id" name ="state" ng-disabled="enabled" required md-no-ink>
+                            <md-select ng-disabled="enabled" ng-model="conv.coin" name ="state" ng-disabled="enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -840,6 +855,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Archivo</label>
+                            <input id="upListPrice" type="file" name="files[]" data-url="" multiple>
                             <input ng-disabled="enabled" ng-model="lp.file">
                         </md-input-container>
                     </div>

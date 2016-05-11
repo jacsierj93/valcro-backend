@@ -41,6 +41,19 @@ class ProvidersController extends BaseController
         $data->contraped = ($data->contraped == 1);
         $data->limCred =$data->limitCredit()->max("limite");
         $data->nomValc = $data->nombres_valcro()->get();
+        $data->tiemposP = $data->prodTime()->get();
+        foreach ($data->tiemposP as $time){
+            $time->lines;
+        }
+        $data->tiemposT = $data->transTime()->get();
+        foreach ($data->tiemposT as $time){
+            $time->country;
+        }
+        $data->direcciones=$data->address()->get();
+        foreach ($data->direcciones as $dir){
+            $dir->country;
+            $dir->tipo;
+        }
         return $data;
     }
 
@@ -127,8 +140,12 @@ class ProvidersController extends BaseController
 
     public function listContacProv($id){
         if((bool)$id){
-            $valName = Provider::find($id)->contacts()->get();
-            return ($valName)?$valName:[];
+            $contacts = Provider::find($id)->contacts()->get();
+            foreach($contacts as $contact){
+                $contact->languages=$contact->idiomas()->lists("languaje_id");
+                $contact->cargos=$contact->cargos()->lists("cargo_id");
+            }
+            return ($contacts)?$contacts:[];
         }
     }
 
@@ -136,6 +153,8 @@ class ProvidersController extends BaseController
         $contacts = Contactos::get();
         foreach($contacts as $contact){
             $contact['provs']=$contact->contacto_proveedor()->select("siglas as prov")->get();
+            $contact->languages=$contact->idiomas()->lists("languaje_id");
+            $contact->cargos=$contact->cargos()->lists("cargo_id");
         }
         return ($contacts)?$contacts:[];
     }
@@ -155,9 +174,13 @@ class ProvidersController extends BaseController
             $valName->responsabilidades = $req->responsability;
             $valName->direccion = $req->dirOff;
             $valName->agente = $req->isAgent;
-            $valName->pais_id = ($req->pais!="")?$req->pais:NULL;
-            $valName->id_lang = $req->languaje;
+            $valName->pais_id = ($req->pais)?$req->pais:NULL;
             $valName->save();
+            //echo $req->languaje;
+            //if(count($req->languaje) > 0){
+            $valName->idiomas()->sync($req->languaje);
+            //}
+            $valName->cargos()->sync($req->cargo);
         }
         if(!Provider::find($req->prov_id)->contacts()->find($valName->id)){
             Provider::find($req->prov_id)->contacts()->attach($valName->id);
@@ -251,13 +274,11 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function getFactorConvers($id){
-        if($id) {
-            $factors = Provider::find($id)->convertFact()->get();
-            foreach ($factors as $factor) {
-                $factor['moneda'] = Monedas::find($factor->moneda_id);
-            }
-            return ($factors) ? $factors : [];
+    public function getFactorConvers(request $req){
+        if($req->id) {
+            $factor = Provider::find($req->id)->convertFact()->first();
+            $factor['moneda'] = Monedas::find($factor->moneda_id);
+            return ($factor)?$factor:false;
         }
     }
 
