@@ -49,7 +49,12 @@ form {
     max-width: 100% !important;
 }*/
 md-backdrop {
-    display: none !important;
+    background-color: transparent !important;
+}
+
+.md-sidenav-backdrop{
+    background-color: transparent !important;
+    display: none;
 }
 
 md-sidenav {
@@ -182,6 +187,18 @@ md-select:not([disable]):focus .md-select-value {
 md-input-container > md-select{
     margin-bottom: 10px !important;
 }
+
+/*==================================================*/
+/*================ SELECTOR MULTIPLE ===============*/
+md-select-value>span{
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+md-select-value>span>div{
+    float: left !important;
+    margin-left: 12px !important;
+}
+
 
 /*==================================================*/
 /*=================== SWITCH =====================*/
@@ -495,7 +512,7 @@ body {
 }
 
 .boxList:hover {
-    background-color: #f1f1f1;
+    background-color: rgba(221, 221, 221, 0.2);
 }
 
 .titulo_formulario {
@@ -551,6 +568,7 @@ body {
 
 .cellGridHolder:hover {
     background-color: #f1f1f1;
+    color: #999999;
 }
 
 .cellGrid {

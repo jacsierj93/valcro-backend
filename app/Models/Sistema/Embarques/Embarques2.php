@@ -15,4 +15,8 @@ class Embarques2 extends Model
         return $this->hasMany('App\Models\Sistema\NombreValcro', 'prov_id');
     }
 
+    public function direcciones()
+    {
+        return $this->hasMany('App\Models\Sistema\ProviderAddress', 'prov_id');
+    }
 }

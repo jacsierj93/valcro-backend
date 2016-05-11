@@ -18,15 +18,19 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div layout="column" layout-align="center center">
+            <div ng-show="true" layout="column" layout-align="center center">
                 <?= HTML::image("images/agregar.png") ?>
             </div>
-            <div layout="column" layout-align="center center">
+            <div ng-show="false" layout="column" layout-align="center center">
                 <?= HTML::image("images/actualizar.png") ?>
             </div>
-            <div layout="column" layout-align="center center">
+            <div ng-show="false" layout="column" layout-align="center center">
                 <?= HTML::image("images/filtro.png") ?>
             </div>
+            <div ng-show="true" layout="column" layout-align="center center" ng-click="openLayer('lyr4pag')" style="width: 144px;">
+                Docuementos Pago
+            </div>
+
         </div>
 
 
@@ -65,12 +69,18 @@
                             {{prov.vence90}}
                         </div>
                     </div>
+                    <div flex layout layout-align="center center">
+                        <div layout layout-align="center center" class="cantFactDeb v90">
+                            {{prov.vence100}}
+                        </div>
+                    </div>
+                    
                 </div>
                 <div style="height: 32px; text-align: right;">
-                    Deudas {{prov.tdeuda}}
+                    Deudas {{prov.tdeuda | currency : $ : 2}}
                 </div>
                 <div style="height: 32px; text-align: right;">
-                    Abonos {{prov.tabono}}
+                    Abonos {{prov.tabono | currency : $ : 2}}
                 </div>
 
             </div>
@@ -179,6 +189,7 @@
 
             </div>
         </md-sidenav>
+
 
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr2pag" id="lyr2pag">
             <!-- ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
@@ -351,7 +362,48 @@
             </md-sidenav>
 
 
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr4pag" id="lyr4pag">
+            <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
+                <div class="titulo_formulario" layout="column" layout-align="start start">
+                    <div>
+                        Listado de documentos a favor
+                    </div>
+                </div>
 
+                <div layout="row" class="headGridHolder">
+                    <div flex="10" class="headGrid" contenteditable> N° Docu.</div>
+                    <div flex="10" class="headGrid" contenteditable> Tipo</div>
+                    <div flex class="headGrid" contenteditable> Origen</div>
+                    <div flex="10" class="headGrid"> Fecha</div>
+                    <div flex="10" class="headGrid"> Monto</div>
+                    <div flex="5" class="headGrid" contenteditable> Mnd.</div>
+                    <div flex="5" class="headGrid"> Tasa</div>
+                    <div flex="10" class="headGrid"> Saldo</div>
+                </div>
+
+                <div id="grid" flex style="overflow-y: auto;" >
+                    <div flex>
+                        <div layout="row" class="cellGridHolder" ng-repeat="item in [{tipo:'ND/C',org:'6527-AL2015'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'RBAY',org:'6527-AL2015'},{tipo:'ND/C',org:'6527-AL2015'},{tipo:'ND/C',org:'6527-AL2015'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'RBAY',org:'6527-AL2015'},{tipo:'ND/C',org:'6527-AL2015'}]">
+                            <div flex="10" class="cellGrid"> 17622</div>
+                            <div flex="10" class="cellGrid"> {{item.tipo}}</div>
+                            <div flex class="cellGrid"> {{item.org}}</div>
+                            <div flex="10" class="cellGrid"> 21/11/2015</div>
+                            <div flex="10" class="cellGrid"> $2.000</div>
+                            <div flex="5" class="cellGrid"> EUR</div>
+                            <div flex="5" class="cellGrid"> 1.2</div>
+                            <div flex="10" class="cellGrid"> $1.000</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </md-content>
+
+            <div style="width: 16px;" >
+
+            </div>
+        </md-sidenav>
 
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
