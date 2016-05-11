@@ -49,7 +49,12 @@ form {
     max-width: 100% !important;
 }*/
 md-backdrop {
-    display: none !important;
+    background-color: transparent !important;
+}
+
+.md-sidenav-backdrop{
+    background-color: transparent !important;
+    display: none;
 }
 
 md-sidenav {
