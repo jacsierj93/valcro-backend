@@ -8,5 +8,5 @@ $app->get("master/getStates/{id}",'Masters\MasterController@getStates'); ///obte
 $app->get("master/getCities/{id}",'Masters\MasterController@getCities'); ///obtener listado de estados->ciudad
 $app->get("master/getCoin/{id}",'Masters\MasterController@getCoin'); ///obtener una maneda
 $app->get("master/addressType",'Masters\MasterController@getAddressType'); ///obtener una maneda
-$app->post("master/getCountries",'Masters\MasterController@getCountries'); ///obtener lista general de proveedores
 $app->get("master/prodLines",'Masters\MasterController@getLines'); ///obtener una maneda
+$app->get("master/languajes",'Masters\MasterController@getLanguajes'); ///obtener una maneda

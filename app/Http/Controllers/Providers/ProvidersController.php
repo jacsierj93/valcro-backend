@@ -28,11 +28,10 @@ class ProvidersController extends BaseController
 
     public function getList()
     {
-        $provs = new Provider();
-        $data = $provs->get();
-        /*   foreach($data as $k => $v){
-            $v['nombreValcro']=$v->nombres_valcro()->get();
-        }*/
+        $data = Provider::all();
+        foreach($data as $prov){
+            $prov['limCred']=$prov->limitCredit()->max("limite");
+        }
         return $data;
     }
 
@@ -40,6 +39,8 @@ class ProvidersController extends BaseController
     {
         $data = Provider::find($prv->id);
         $data->contraped = ($data->contraped == 1);
+        $data->limCred =$data->limitCredit()->max("limite");
+        $data->nomValc = $data->nombres_valcro()->get();
         return $data;
     }
 

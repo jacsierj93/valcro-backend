@@ -596,7 +596,7 @@ md-pagination-wrapper {
 ****CLASES QUE MARCA ELEMENTO SELECCIONADO EN EL GRID Y LISTADO DE PROVEEDORES***
 ********************************************************************************/
 .listSel {
-    background-color: #f1f1f1;
+   border-left:2px solid rgb(84, 180, 234);
 }
 .gridSel {
     background-color: #f1f1f1;

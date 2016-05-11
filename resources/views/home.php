@@ -36,7 +36,16 @@
     <div layout layout-align="start center" style="width: 132px; height: 48px;">
         <?= HTML::image("images/logo_inicio.png") ?>
     </div>
-    <div flex></div>
+    <div flex>
+        <md-input-container class="md-block" flex="15" >
+            <label>Tipo</label>
+            <md-select ng-model="dtaPrv.type" ng-disabled="enabled" md-no-ink>
+                <md-option ng-repeat="type in [1,2,3,4]" value="{{$index}}">
+                    {{type}}
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </div>
     <div layout layout-align="start center" style="width: 132px; height: 48px;">
         <a ng-href="logout">
             Salir

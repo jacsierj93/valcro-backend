@@ -12,6 +12,7 @@ use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\State;
 use App\Models\Sistema\TypeAddress;
 use App\Models\Sistema\Line;
+use App\Models\Sistema\Language;
 
 class MasterController extends BaseController
 {
@@ -23,8 +24,10 @@ class MasterController extends BaseController
 
 	public function getCountries()
 	{
-		$country = new Country();
-		$paises = $country->get();
+		$paises = Country::all();
+		foreach($paises as $pais){
+			$pais->areaCode;
+		}
 		return $paises;
 	}
 
@@ -81,5 +84,12 @@ class MasterController extends BaseController
 	 **/
 	public function getCoin($id){
 		return Monedas::findOrFail($id);
+	}
+
+	/**
+	 * obtiene la moneda segun id
+	 **/
+	public function getLanguajes(){
+		return Language::all();
 	}
 }
