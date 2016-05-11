@@ -3,9 +3,11 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     var historia = [15];
     $scope.index = index = 0;
     var base = 264;
+    $scope.toolBar = {"add":'true',"edit":'false',"filter":'false'} ///botonera
     $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}};
     $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
+
 
     function openLayer(layr) {
         console.log(layr);
@@ -43,6 +45,20 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     $scope.openLayer = openLayer;
     $scope.closeLayer = closeLayer;
+
+
+
+    /////modificando botonera
+    $scope.setTool = function(add,edit,filter){
+        $scope.toolBar = {"add":add,"edit":edit,"filter":filter} ///botonera
+
+    }
+    /////retornando el valor del boton
+    $scope.getToolValue = function(key){
+       return $scope.toolBar[key];
+    }
+
+
 
     $scope.showNext = function (status, to) {
         if (status) {

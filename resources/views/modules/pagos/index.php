@@ -18,13 +18,13 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div ng-show="true" layout="column" layout-align="center center">
+            <div ng-show="{{getToolValue('add')}}" layout="column" layout-align="center center">
                 <?= HTML::image("images/agregar.png") ?>
             </div>
-            <div ng-show="false" layout="column" layout-align="center center">
+            <div ng-show="{{getToolValue('edit')}}" layout="column" layout-align="center center">
                 <?= HTML::image("images/actualizar.png") ?>
             </div>
-            <div ng-show="false" layout="column" layout-align="center center">
+            <div ng-show="{{getToolValue('filter')}}" layout="column" layout-align="center center">
                 <?= HTML::image("images/filtro.png") ?>
             </div>
         </div>
