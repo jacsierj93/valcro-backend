@@ -6,6 +6,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}};
     $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
+    $scope.abonos = {};
 
     function openLayer(layr) {
         console.log(layr);
@@ -90,10 +91,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         });
     };
 
-    
+
     //////trayendo lista de pagos sin cuota asociada
-    
-    
+
 
     ////setear proveedor
     $scope.setProv = function (prov) {
@@ -175,6 +175,22 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
         $scope.getCoins();
         $scope.getPayTypes();
+
+    }
+
+
+    /////pagos que no tienene facturas directamente
+    $scope.getAbonos = function () {
+
+        openLayer('lyr4pag');
+
+        $http.get('payments/getPayList').success(function (response) {
+
+            $scope.abonos = response;
+
+            console.log("trayendo pagos sin cuotas");
+        });
+
 
     }
 

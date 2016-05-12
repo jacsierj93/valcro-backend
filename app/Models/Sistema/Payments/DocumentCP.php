@@ -58,16 +58,13 @@ class DocumentCP extends Model
         return DocumentCP::where("nro_orig",$this->nro_factura)->where("tipo_id",5)->get();
     }
 
-    
+
     ////foreing key
     public function moneda()
     {
-        return $this->hasOne('App\Models\Monedas', 'moneda_id');
+        return $this->belongsTo('App\Models\Sistema\Monedas', 'moneda_id');
     }
-
-
-
-
+    
 
     /**funcion que trae la diferencia de fechas en dias
      * @param $dateIni

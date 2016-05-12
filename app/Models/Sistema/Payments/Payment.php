@@ -32,7 +32,7 @@ class Payment extends Model
     ////foreing key
     public function moneda()
     {
-        return $this->hasOne('App\Models\Monedas', 'moneda_id');
+        return $this->belongsTo('App\Models\Sistema\Monedas', 'moneda_id');
     }
 
 

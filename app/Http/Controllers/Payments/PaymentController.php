@@ -308,11 +308,35 @@ class PaymentController extends BaseController
 
         return $result;
     }
-    
-    
+
+
+    /**pagos hechos sin factura
+     * @return array
+     */
     public function getPayList(){
 
-        
+
+        $provId = Session::get("PROVID");
+        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
+
+        $result = array();
+        foreach ($pagos as $pago) {
+
+            $temp["id"] = $pago->id;
+            $temp["nro_factura"] = $pago->nro_factura;
+            $temp["origen"] = $pago->org_factura;
+            $temp["fecha"] = $pago->fecha;
+            $temp["monto"] = $pago->monto;
+            $temp["moneda"] = $pago->moneda->codigo;
+            $temp["tasa"] = $pago->tasa;
+            $temp["tipo"] = $pago->tipo->descripcion;
+            $temp["saldo"] = $pago->saldo;
+            $temp["pagado"] = $pago->monto - $pago->saldo;
+
+            $result[] = $temp;
+        }
+
+        return $result;
         
     }
     

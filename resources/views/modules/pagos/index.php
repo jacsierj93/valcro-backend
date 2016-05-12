@@ -27,7 +27,7 @@
             <div ng-show="false" layout="column" layout-align="center center">
                 <?= HTML::image("images/filtro.png") ?>
             </div>
-            <div ng-show="true" layout="column" layout-align="center center" ng-click="openLayer('lyr4pag')" style="width: 144px;">
+            <div ng-show="true" layout="column" layout-align="center center" ng-click="getAbonos()" style="width: 144px;">
                 Documentos de Pago
             </div>
 
@@ -383,15 +383,15 @@
 
                 <div id="grid" flex style="overflow-y: auto;" >
                     <div flex>
-                        <div layout="row" class="cellGridHolder" ng-repeat="item in [{tipo:'ND/C',org:'6527-AL2015'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'RBAY',org:'6527-AL2015'},{tipo:'ND/C',org:'6527-AL2015'},{tipo:'ND/C',org:'6527-AL2015'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'ADEL',org:'N/A'},{tipo:'RBAY',org:'6527-AL2015'},{tipo:'ND/C',org:'6527-AL2015'}]">
-                            <div flex="10" class="cellGrid"> 17622</div>
-                            <div flex="10" class="cellGrid"> {{item.tipo}}</div>
-                            <div flex class="cellGrid"> {{item.org}}</div>
-                            <div flex="10" class="cellGrid"> 21/11/2015</div>
-                            <div flex="10" class="cellGrid"> $2.000</div>
-                            <div flex="5" class="cellGrid"> EUR</div>
-                            <div flex="5" class="cellGrid"> 1.2</div>
-                            <div flex="10" class="cellGrid"> $1.000</div>
+                        <div layout="row" class="cellGridHolder" ng-repeat="pay in abonos">
+                            <div flex="10" class="cellGrid"> {{pay.nro_factura}}</div>
+                            <div flex="10" class="cellGrid"> {{pay.tipo}}</div>
+                            <div flex class="cellGrid"> {{pay.origen}}</div>
+                            <div flex="10" class="cellGrid"> {{pay.fecha}}</div>
+                            <div flex="10" class="cellGrid"> {{pay.monto | currency : $ : 2 }}</div>
+                            <div flex="5" class="cellGrid"> {{pay.moneda}}</div>
+                            <div flex="5" class="cellGrid">{{pay.tasa}}</div>
+                            <div flex="10" class="cellGrid"> {{pay.saldo | currency : $ : 2 }}</div>
                         </div>
                     </div>
                 </div>

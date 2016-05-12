@@ -17,6 +17,7 @@ $app->post('payments/paymentsByProvId', 'Payments\PaymentController@getPaymentsB
 
 $app->get('payments/getProv/{id}','Payments\PaymentController@getProvById'); ///selecciona un proveedor
 $app->get('payments/getDocById/{id}','Payments\PaymentController@getDocById'); ///selecciona un documento
+$app->get('payments/getPayList','Payments\PaymentController@getPayList'); ///trae los pagos a favor
 
 
 
