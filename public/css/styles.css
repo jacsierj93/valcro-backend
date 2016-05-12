@@ -625,3 +625,17 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.title_error{
+    color:rgb(221,44,0) !important;
+}
+.title_error>div{
+    border-color:rgb(221,44,0) !important;
+}
+
+.onlyread{
+    color:#999 !important;
+}
+.onlyread>div{
+    border-color:#999 !important;
+}

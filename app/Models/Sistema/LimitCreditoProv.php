@@ -13,8 +13,9 @@ class LimitCreditoProv extends  Model
     protected $table = 'tbl_prov_lim_credito';
 
     ////foreing key
-    public function limite_credito()
+    public function provider()
     {
-        return $this->hasMany('App\Models\Sistema\Proveedor', 'prov_id');
+        return $this->belongsTo('App\Models\Sistema\Proveedor', 'prov_id');
     }
+
 }

@@ -58,6 +58,12 @@ class ProvidersController extends BaseController
         foreach ($data->contacts as $cont){
             $cont->cargos = $cont->cargos()->get();
         }
+        $data->monedas = $data->getProviderCoin()->get();
+        $data->limCred = $data->limitCredit()->get();
+        foreach ($data->limCred as $lim){
+            $lim->moneda = Monedas::find($lim->moneda_id);
+        }
+        $data->banks = $data->bankAccount()->get();
         return $data;
     }
 
