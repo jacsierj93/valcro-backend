@@ -137,8 +137,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             $mdSidenav("NEXT").close()
         }
     }
-
-
     $scope.change= function(odc){
         if(odc.asig){
             addOrdenCompra(odc.id,$scope.pedidoSelec.id);
