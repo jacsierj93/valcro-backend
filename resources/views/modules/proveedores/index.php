@@ -71,9 +71,9 @@
         <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex>
+            <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
                 <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
-                <div layout="column" flex ng-controller="resumenProv">
+                <div layout="column" flex >
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Proveedor
@@ -144,28 +144,65 @@
 
 
                 <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
-                <div layout="column" flex>
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                           Direcciones
+                <div layout="column" flex >
+                    <div flex="50" layout="column">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Direcciones
+                            </div>
+                        </div>
+                        <div flex layout="column">
+                            <div ng-repeat="direccion in prov.direcciones" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                                <div layout="row">
+                                    <div flex="50">{{direccion.tipo.descripcion}}</div>
+                                    <div flex="50" style="overflow-x: hidden; text-overflow: ellipsis;">
+                                        {{direccion.country.short_name}}
+                                    </div>
+                                </div>
+                                <div flex>
+                                    {{direccion.direccion}}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div ng-repeat="dir in prov.direcciones" layout="column">
-                        <div layout="row">
-                            <div flex="50">{{dir.tipo.descripcion}}</div>
-                            <div flex="50">{{dir.country.short_name}}</div>
+                    <div flex="50" layout="column">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Contactos
+                            </div>
                         </div>
-                        <div flex>
-                            {{dir.direccion}}
+                        <div flex ng-repeat="contact in prov.contacts" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                            <div layout="row">
+                                <div flex="50">{{contact.nombre}}</div>
+                                <div flex="50"  >
+                                    <span ng-repeat="cargo in contact.cargos">{{cargo.cargo}}, </span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
                 <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
                 <div layout="column" flex>
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Datos Proveedor
+                    <div flex="10">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Monedas
+                            </div>
                         </div>
+<!--                        <div flex layout="column">
+                            <div ng-repeat="direccion in prov.direcciones" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                                <div layout="row">
+                                    <div flex="50">{{direccion.tipo.descripcion}}</div>
+                                    <div flex="50" style="overflow-x: hidden; text-overflow: ellipsis;">
+                                        {{direccion.country.short_name}}
+                                    </div>
+                                </div>
+                                <div flex>
+                                    {{direccion.direccion}}
+                                </div>
+                            </div>
+                        </div>-->
                     </div>
                 </div>
             </md-content>
@@ -313,7 +350,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="40">
                             <label>Telefono</label>
-                            <input name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="enabled" />
+                            <input name="provTelf" type="number" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="enabled" />
                         </md-input-container>
 
                     </div>
