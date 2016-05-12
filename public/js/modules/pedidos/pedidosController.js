@@ -251,13 +251,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     /****** **************************listener ***************************************/
 
     $scope.$watch('pedidoSelec.pais_id',function(newVal){
-        if(newVal != '-1' && newVal!= 'undefined'){
+        if(newVal != '' && typeof(newVal) !== 'undefined' ){
             loadDirProvider(newVal);
         }
     });
 
     $scope.$watch('provSelec.id',function(newVal){
-        if(newVal != '-1' && newVal != 'undefined'){
+        if(newVal != '' && typeof(newVal) !== 'undefined'){
             loadCoinProvider(newVal);
             loadCountryProvider(newVal);
             loadPaymentCondProvider(newVal);
@@ -265,7 +265,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     });
 
     $scope.$watch('pedidoSelec.prov_moneda_id',function(newVal){
-        if(newVal != '-1' && newVal!= 'undefined'){
+        if(newVal != '' && typeof(newVal) !== 'undefined'){
             loadTasa(newVal);
         }
     });
@@ -317,7 +317,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     /*********************************  peticiones  carga $http ********************* ************/
 
     function loadPedido(id){
-        $http({
+        $scope.pedidoSelec= ORDER.get({type:'Order'},{id:id});
+       /* $http({
             method: 'POST',
             url: 'Order/Order',
             data:{ id:id}
@@ -325,7 +326,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             $scope.pedidoSelec=response.data;
         }, function errorCallback(response) {
             console.log("errorrr");
-        })
+        })*/
     }
 
     function loadDataFor(){
@@ -628,17 +629,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     function  restore(key){
         switch (key){
             case 'provSelec':
-                $scope.provSelec={id:'-1',razon_social:'',save:false, pedidos: new Array() };
+                $scope.provSelec={id:'',razon_social:'',save:false, pedidos: new Array() };
                 break;
             case 'pedidoSelec':
-                $scope.pedidoSelec={ pais_id:'-1', id:'',estado_id:'1',
-                    prov_moneda_id:'-1', tasa:'0', emision:new Date()};
+                $scope.pedidoSelec={ pais_id:'', id:'',estado_id:'1',
+                    prov_moneda_id:'', tasa:'0', emision:new Date()};
                 break;
             case 'odcSelec':
-                $scope.odcSelec={ id:'-1'};
+                $scope.odcSelec={ id:''};
                 break;
             case 'contraPedSelec':
-                $scope.contraPedSelec={ id:'-1'};
+                $scope.contraPedSelec={ id:''};
                 break;
             case 'FormData':
                 $scope.formData={  pedidos: new Array(), tipo: new Array(),  monedas: new Array(),
@@ -674,6 +675,7 @@ MyApp.factory('ORDER', ['$resource',
     function ($resource) {
         return $resource('Order/:type/:id', {}, {
             query: {method: 'GET',params: {type: "",id:""}, isArray: true},
+            get: {method: 'POST',params: {type:" "}, isArray: false},
 
         });
     }
