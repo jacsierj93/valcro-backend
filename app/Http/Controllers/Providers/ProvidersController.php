@@ -54,6 +54,10 @@ class ProvidersController extends BaseController
             $dir->country;
             $dir->tipo;
         }
+        $data->contacts = $data->contacts()->get();
+        foreach ($data->contacts as $cont){
+            $cont->cargos = $cont->cargos()->get();
+        }
         return $data;
     }
 

@@ -206,9 +206,10 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
 MyApp.controller('resumenProv', function ($scope,setGetProv,providers) {
     $scope.provider = setGetProv.getProv();
-    $scope.prov = {tiemposP:[],tiemposT:[]};
+    $scope.prov = {tiemposP:[],tiemposT:[],direcciones:[]};
     $scope.$watch('provider.id',function(nvo){
         $scope.prov = setGetProv.getFullProv();
+        console.log($scope.prov);
     })
 });
 
