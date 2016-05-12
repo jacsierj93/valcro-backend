@@ -18,7 +18,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div ng-show="true" layout="column" layout-align="center center">
+            <div ng-show="true" layout="column" layout-align="center center" ng-click="openLayer('lyr5pag')">
                 <?= HTML::image("images/agregar.png") ?>
             </div>
             <div ng-show="false" layout="column" layout-align="center center">
@@ -397,6 +397,94 @@
                 </div>
 
 
+
+            </md-content>
+
+            <div style="width: 16px;" >
+
+            </div>
+        </md-sidenav>
+
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr5pag" id="lyr5pag">
+            <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
+                <div class="titulo_formulario" layout="column" layout-align="start start">
+                    <div>
+                        Carga de Pagos
+                    </div>
+                </div>
+                <div layout="row">
+
+                    <md-input-container class="md-block" flex="20">
+                        <label>Tipo Pago</label>
+                        <md-select ng-model="tiposPago" required md-no-ink>
+                            <md-option ng-repeat="tipoPago in [{id:1,nombre:'Adelanto'},{id:2,nombre:'Nota de Credito'},{id:3,nombre:'Rebay'}]" value="{{tipoPago.id}}">
+                                {{tipoPago.nombre}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex>
+                        <label>Nro. Documento</label>
+                        <input required/>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="20">
+                        <label>Fecha</label>
+                        <input required/>
+                    </md-input-container>
+
+
+
+                </div>
+
+                <div  layout="row">
+
+                    <md-input-container class="md-block" flex>
+                        <label>Metodo de Pago</label>
+                        <md-select ng-model="metodoPago" required md-no-ink>
+                            <md-option ng-repeat="metodoPago in [{id:1,nombre:'Transferencia'},{id:2,nombre:'Efectivo'},{id:3,nombre:'Cheque'}]" value="{{metodoPago.id}}">
+                                {{metodoPago.nombre}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="30">
+                        <label>Monto</label>
+                        <input />
+
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="15">
+                        <label>Moneda</label>
+                        <md-select ng-model="monedas" required md-no-ink>
+                            <md-option ng-repeat="moneda in [{id:1,nombre:'USD'},{id:2,nombre:'EUR'},{id:3,nombre:'YEN'},{id:4,nombre:'VEF'}]" value="{{moneda.id}}">
+                                {{moneda.nombre}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="10">
+                        <label>Tasa</label>
+                        <input />
+
+                    </md-input-container>
+
+
+
+
+
+                </div>
+
+                <div  layout="row">
+                <md-input-container class="md-block" flex>
+                    <label>Cpmentarios</label>
+                    <input />
+
+                </md-input-container>
+
+                <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>
+
+                </div>
 
             </md-content>
 
