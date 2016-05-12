@@ -13,6 +13,11 @@
 /*** opcionales a maestro*/
 $app->post("Order/Order",'Orders\OrderController@getOrden'); ///trae tod el detalle de pedido
 $app->post("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
+$app->post("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
+$app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae tod el detalle de contraPedido
+$app->get("Order/CustomOrderPriority",'Orders\OrderController@getCustomOrderPriority'); ///trae tod el detalle de contraPedido
+
+
 
 // pedidos
 $app->post("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores

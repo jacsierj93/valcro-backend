@@ -1,7 +1,8 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     var historia= [15];
     $scope.index=0;
+
 
     /******************* declaracion defunciones de eventos */
     /*******incializacion de $scope*****/
@@ -12,7 +13,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     restore('contraPedSelec');// inializa contra pedido selecionado
     restore('FormData');//// la data del formulario
     restore('filterData');/// la data de filtros
-
+    restore('FormDataContraP');
     restore('todos');// lista de proveedores
     restore('filterOption');//selecion de los filtros
 
@@ -88,6 +89,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
     }
     function selecContraP (item){
         restore('contraPedSelec');
+        $scope.formDataContraP.contraPedidoMotivo = ORDER.query({type:'CustomOrderReason'});
+        $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type:'CustomOrderPriority'});
         loadContraP(item.id);
         openLayer("resumenContraPedido");
     }
@@ -141,7 +144,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
         if(odc.asig){
             addOrdenCompra(odc.id,$scope.pedidoSelec.id);
         }else{
-            removeOrdenCompra(odc.id);
+            removeOrdenCompra(odc.id,$scope.pedidoSelec.id);
         }
         loadPedido($scope.pedidoSelec.id);
     }
@@ -540,11 +543,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             console.log("errorrr");
         });
     }
-    function removeOrdenCompra(id){
+    function removeOrdenCompra(id,pedido_id){
         $http({
             method: 'POST',
             url: 'Order/RemovePurchaseOrder',
-            data:{ id:id}
+            data:{ id:id, pedido_id:pedido_id}
         }).then(function successCallback(response) {
             alert('des Asignado');
         }, function errorCallback(response) {
@@ -640,7 +643,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
             case 'FormData':
                 $scope.formData={  pedidos: new Array(), tipo: new Array(),  monedas: new Array(),
                     direcciones:new Array(), odc: new Array(), contraPedido: new Array(), kitchenBox: new Array(),
-                    estadoPedido:new Array(), pedidoSust: new Array()
+                    estadoPedido:new Array(), pedidoSust: new Array(),
+                };
+                break;
+            case 'FormDataContraP':
+                $scope.formDataContraP={
+                    contraPedidoMotivo: new Array(),contraPedidoPrioridad: new Array()
                 };
                 break;
             case 'filterData':
@@ -662,5 +670,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav) {
 });
 
 
+MyApp.factory('ORDER', ['$resource',
+    function ($resource) {
+        return $resource('Order/:type/:id', {}, {
+            query: {method: 'GET',params: {type: "",id:""}, isArray: true},
 
+        });
+    }
+]);
 

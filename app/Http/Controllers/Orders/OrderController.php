@@ -11,6 +11,8 @@ use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Order\OrderType;//OrderItem
 use App\Models\Sistema\Order\OrderItem;
 use App\Models\Sistema\CustomOrders\CustomOrder;
+use App\Models\Sistema\CustomOrders\CustomOrderReason;
+use App\Models\Sistema\CustomOrders\CustomOrderPriority;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Order\Order;
 use App\Models\Sistema\Order\OrderStatus;
@@ -22,7 +24,7 @@ use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
 use DB;
-//CustomOrder
+
 
 class OrderController extends BaseController
 {
@@ -51,17 +53,34 @@ class OrderController extends BaseController
         return $data;
     }
 
-    /***/
+    /**
+     * llena los camppos de los filtros
+     */
     public function getFilterData()
     {
 
         $data= Array();
         $data['monedas']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
-
         return $data;
     }
 
+
+    /**
+     *  obtiene los motivo de contra pedido
+     */
+    public function getCustomOrderResons()
+    {
+        return CustomOrderReason:: get();
+    }
+
+    /**
+     *  obtiene las prioridad de contra pedido
+     */
+    public function getCustomOrderPriority()
+    {
+        return CustomOrderPriority:: get();
+    }
     /**
      * regresa la lista de pedidos segun id del provedor
      */
@@ -105,13 +124,12 @@ class OrderController extends BaseController
 
     }
 
+/*********************************** PEDIDOS A SUSTITUIR ***********************************/
     /**
      * obtiene todos los pedido que son sustituibles
      **/
 
     public function getOrderSubstituteOrder(Request $req){
-
-
         $model =Order::
         select(DB::raw("id , nro_proforma, emision , nro_factura, monto, comentario, "
             ." (select count(*) from tbl_pedido_item where deleted_at is null and pedido_id= "
@@ -131,11 +149,17 @@ class OrderController extends BaseController
         return Order::findOrFail($req->id)->item()->where('pedido_tipo_origen_id',1);
     }
 
-                /******************** Contra pedidos ***********************/
+
+    /***********************************Contra pedidos ***********************************/
 
 
+    /**
+     * obtiene un contra pedido con sus pedidos
+     */
     public function getCustomOrder(Request $req){
-        return CustomOrder:: findOrFail($req->id);
+        $model=CustomOrder:: findOrFail($req->id);
+        $model['productos']=$model->CustomOrderItem()->get();
+        return $model;
     }
 
     /**
@@ -156,7 +180,7 @@ class OrderController extends BaseController
             ->Where(function($query) use ($req)
             {
                 $query->where('tbl_pedido_item.pedido_id',null)
-                   ->Orwhere('tbl_pedido_item.pedido_id',$req->pedido_id)
+                    ->Orwhere('tbl_pedido_item.pedido_id',$req->pedido_id)
                 ;
 
             })
@@ -187,11 +211,12 @@ class OrderController extends BaseController
      * elimina los renglones de un contra pedido
      **/
     public function RemoveCustomOrder(Request $req){
-        $model = OrderItem::findOrFail('origen_id', $req->id)->get();
-
-        /*foreach(  $model as $aux){
+        $model = OrderItem::where('origen_id', $req->id)
+            ->where('pedido_id',$req->pedido_id)
+            ->get();
+        foreach(  $model as $aux){
             $aux->destroy($aux->id);
-        }*/
+        }
 
     }
 
@@ -268,19 +293,18 @@ class OrderController extends BaseController
             pedido_tipo_origen_id = 1 and origen_id= tbl_compra_orden.id"
             .") as asignado"
         ))
-            //
             ->leftJoin('tbl_pedido_item','tbl_compra_orden.id','=','tbl_pedido_item.origen_id')
             ->where('aprobada','1')
             //  ->where('tbl_pedido_item.pedido_id',$req->pedido_id)
             ->where('prov_id',$req->prov_id)
             ->Where(function($query) use ($req)
             {
-                global $ped;
                 $query->where('tbl_pedido_item.pedido_id',null)
                     ->Orwhere('tbl_pedido_item.pedido_id',$req->pedido_id)
                 ;
 
             })
+            ->groupby('tbl_compra_orden.id')
             ->get();
         $i=0;
         foreach( $model as $aux){
@@ -312,7 +336,9 @@ class OrderController extends BaseController
      * elimina la orden de compra de un pedido
      **/
     public function RemovePurchaseOrder(Request $req){
-        $model = OrderItem::where('origen_id', $req->id)->get();
+        $model = OrderItem::where('origen_id', $req->id)
+            ->where('pedido_id',$req->pedido_id)
+            ->get();
         foreach(  $model as $aux){
             $aux->destroy($aux->id);
         }

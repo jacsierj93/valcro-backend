@@ -607,7 +607,7 @@
 
                 <!--<div class="titulo_formulario" layout="row" flex>-->
                 <div layout="column" flex>
-                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                    <div class="titulo_formulario md-block" layout-padding layout="row"  >
                         <div>
                             Contrapedidos
                         </div>
@@ -617,20 +617,21 @@
                     </div>
 
                     <div >
-                        <div layout="column" flex="" style="margin-left: 8px;">
-                            <div layout="row" class="cellGridHolder" ng-repeat="contraP in pedidoSelec.contraPedido">
+                        <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.contraPedido">
 
-                                <div flex class="cellGrid"> {{contraP.id}}</div>
-                                <div flex class="cellGrid"> {{contraP.titulo}}</div>
-                                <div flex class="cellGrid"> {{contraP.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid"> {{item.id}}</div>
+                                <div flex class="cellGrid"> {{item.titulo}}</div>
+                                <div flex class="cellGrid"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" ng-click="removeLisContraP(contraP)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
                     </div>
 
                 </div>
+
                 <div layout="column" flex>
-                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                    <div class="titulo_formulario md-block" layout-padding  layout="row" >
                         <div>
                             Kitchen Boxs
                         </div>
@@ -640,7 +641,7 @@
                     </div>
 
                     <div >
-                        <div layout="column" flex="" style="margin-left: 8px;">
+                        <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
                             <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.kitchenBox">
 
                                 <div flex class="cellGrid"> {{item.id}}</div>
@@ -655,7 +656,7 @@
 
                 </div>
                 <div layout="column" flex>
-                    <div class="titulo_formulario md-block" layout-padding layout="row" layout-align="end start" flex>
+                    <div class="titulo_formulario md-block" layout-padding  layout="row" >
                         <div>
                             Pedidos a Sustituir
                         </div>
@@ -664,7 +665,7 @@
                         </div>
                     </div>
 
-                    <div layout="column" flex="" style="margin-left: 8px;">
+                    <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
                         <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.pedidoSusti">
 
                             <div flex class="cellGrid"> {{item.id}}</div>
@@ -856,7 +857,8 @@
                         <md-input-container class="md-block" flex="20">
                             <label>Motivo:</label>
                             <md-select ng-model="contraPedSelec.motivo_contrapedido_id" ng-disabled="true">
-                                <md-option >
+                                <md-option ng-repeat="item in formDataContraP.contraPedidoMotivo" value="{{item.id}}">
+                                    {{item.motivo}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -864,7 +866,8 @@
                         <md-input-container class="md-block" flex="20">
                             <label>Tipo Envio:</label>
                             <md-select ng-model="contraPedSelec.tipo_envio_id" ng-disabled="true">
-                                <md-option >
+                                <md-option ng-repeat="item in filterData.tipoEnv" value="{{item.id}}">
+                                    {{item.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -872,7 +875,8 @@
                         <md-input-container class="md-block"flex="20" >
                             <label>Prioridad:</label>
                             <md-select ng-model="contraPedSelec.prioridad_id" ng-disabled="true">
-                                <md-option >
+                                <md-option ng-repeat="item in formDataContraP.contraPedidoPrioridad" value="{{item.id}}">
+                                    {{item.descripcion}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -902,8 +906,8 @@
                         <md-input-container class="md-block" flex="20" >
                             <label>Moneda</label>
                             <md-select ng-model="contraPedSelec.moneda_id" ng-disabled="true">
-                                <md-option ng-repeat="moneda in filterData.monedas" value="{{moneda.id}}">
-                                    {{moneda.nombre}}
+                                <md-option ng-repeat="item in filterData.monedas" value="{{item.id}}">
+                                    {{item.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -923,7 +927,6 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
-                        <div flex="10" class="headGrid"> Tipo</div>
                         <div flex="15" class="headGrid"> Cod. Producto</div>
                         <div flex class="headGrid"> Cod. Profit</div>
                         <div flex class="headGrid"> Descripción.</div>
@@ -934,7 +937,6 @@
                     <div id="gridResOdc">
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="product in contraPedSelec.productos">
-                                <div flex="10" class="cellGrid"> {{product.tipo}}</div>
                                 <div flex="15" class="cellGrid">  {{product.id}}</div>
                                 <div flex class="cellGrid"> {{product.profit_id}}</div>
                                 <div flex class="cellGrid">  {{product.descripcion}}</div>
