@@ -79,7 +79,6 @@ class MasterController extends BaseController
 
 	}
 
-
 	/**
 	 * obtiene la moneda segun id
 	 **/
