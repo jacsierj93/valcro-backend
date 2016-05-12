@@ -9,10 +9,6 @@
 namespace App\Models\Sistema\Payments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Sistema\Proveedor;
-use App\Models\Sistema\BankAccount;
-use App\Models\Sistema\BankAccountProvidert;
-
 
 
 class Payment extends Model
@@ -22,17 +18,14 @@ class Payment extends Model
 
 
     /**@return Proveedor de pago*/
-    public function getProveedor(){
-        return $this->belongsTo('App\Models\Sistema\Proveedor', 'prov_id');
+    public function proveedor(){
+        return $this->belongsTo('App\Models\Sistema\Provider', 'prov_id');
     }
 
-    /**@return BankAccount bancaria**/
-    public function getBankAccount(){
-        return $this->belongsTo('App\Models\Sistema\BankAccount', 'cuenta_id');
-    }
+    
 
     /**@return BankAccountProvidert  de provedor**/
-    public function getBankAccountProvider(){
+    public function cuentaBancariaProveedor(){
         return $this->belongsTo('App\Models\Sistema\BankAccountProvider', 'prov_cuenta_id');
     }
 

@@ -235,7 +235,7 @@ class PaymentController extends BaseController
 
         $data["id"] = $proveedor->id;
         $data["razon_social"] = $proveedor->razon_social;
-        $data["pagos"] = $this->getPayList($provId);
+        $data["pagos"] = $this->getPayListFact($provId);
         $data["deudas"] = $this->getDebtsList($provId);
 
         return $data;
@@ -284,10 +284,10 @@ class PaymentController extends BaseController
     }
 
 
-    /**lista de pagos hechas al proveedor
+    /**lista de pagos hechas al proveedor CON FACTURA
      * @return mixed
      */
-    public function getPayList($provId)
+    public function getPayListFact($provId)
     {
         $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
 
@@ -308,6 +308,15 @@ class PaymentController extends BaseController
 
         return $result;
     }
+    
+    
+    public function getPayList(){
+
+        
+        
+    }
+    
+    
 
 
     /**deudas del proveedor

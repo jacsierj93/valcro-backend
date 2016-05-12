@@ -90,6 +90,10 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         });
     };
 
+    
+    //////trayendo lista de pagos sin cuota asociada
+    
+    
 
     ////setear proveedor
     $scope.setProv = function (prov) {

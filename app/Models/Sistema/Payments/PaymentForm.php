@@ -8,10 +8,10 @@
 
 namespace App\Models\Sistema\Payments;
 
+use App\Quotation;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DB;
-use App\Quotation;
 
 class PaymentForm extends Model
 {
@@ -20,6 +20,16 @@ class PaymentForm extends Model
     protected $table = "tbl_pago_forma_pago";
 
     protected $dates = ['deleted_at'];
+
+    public function tipo()
+    {
+        return $this->belongsTo('App\Models\Sistema\Payments\PaymentType', 'tipo_id');
+    }
+
+    public function pago()
+    {
+        return $this->belongsTo('App\Models\Sistema\Payments\Payment', 'pago_id');
+    }
 
 
 }

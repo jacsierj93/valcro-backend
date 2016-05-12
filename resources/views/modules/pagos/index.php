@@ -28,7 +28,7 @@
                 <?= HTML::image("images/filtro.png") ?>
             </div>
             <div ng-show="true" layout="column" layout-align="center center" ng-click="openLayer('lyr4pag')" style="width: 144px;">
-                Docuementos Pago
+                Documentos de Pago
             </div>
 
         </div>
