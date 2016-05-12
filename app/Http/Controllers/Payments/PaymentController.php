@@ -235,7 +235,7 @@ class PaymentController extends BaseController
 
         $data["id"] = $proveedor->id;
         $data["razon_social"] = $proveedor->razon_social;
-        $data["pagos"] = $this->getPayList($provId);
+        $data["pagos"] = $this->getPayListFact($provId);
         $data["deudas"] = $this->getDebtsList($provId);
 
         return $data;
@@ -284,10 +284,10 @@ class PaymentController extends BaseController
     }
 
 
-    /**lista de pagos hechas al proveedor
+    /**lista de pagos hechas al proveedor CON FACTURA
      * @return mixed
      */
-    public function getPayList($provId)
+    public function getPayListFact($provId)
     {
         $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
 
@@ -308,6 +308,39 @@ class PaymentController extends BaseController
 
         return $result;
     }
+
+
+    /**pagos hechos sin factura
+     * @return array
+     */
+    public function getPayList(){
+
+
+        $provId = Session::get("PROVID");
+        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
+
+        $result = array();
+        foreach ($pagos as $pago) {
+
+            $temp["id"] = $pago->id;
+            $temp["nro_factura"] = $pago->nro_factura;
+            $temp["origen"] = $pago->org_factura;
+            $temp["fecha"] = $pago->fecha;
+            $temp["monto"] = $pago->monto;
+            $temp["moneda"] = $pago->moneda->codigo;
+            $temp["tasa"] = $pago->tasa;
+            $temp["tipo"] = $pago->tipo->descripcion;
+            $temp["saldo"] = $pago->saldo;
+            $temp["pagado"] = $pago->monto - $pago->saldo;
+
+            $result[] = $temp;
+        }
+
+        return $result;
+        
+    }
+    
+    
 
 
     /**deudas del proveedor

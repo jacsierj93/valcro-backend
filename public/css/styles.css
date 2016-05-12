@@ -189,6 +189,18 @@ md-input-container > md-select{
 }
 
 /*==================================================*/
+/*================ SELECTOR MULTIPLE ===============*/
+md-select-value>span{
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+md-select-value>span>div{
+    float: left !important;
+    margin-left: 12px !important;
+}
+
+
+/*==================================================*/
 /*=================== SWITCH =====================*/
 md-switch {
     margin: 0 !important;
@@ -500,7 +512,7 @@ body {
 }
 
 .boxList:hover {
-    background-color: #f1f1f1;
+    background-color: rgba(221, 221, 221, 0.2);
 }
 
 .titulo_formulario {
@@ -556,6 +568,7 @@ body {
 
 .cellGridHolder:hover {
     background-color: #f1f1f1;
+    color: #999999;
 }
 
 .cellGrid {
@@ -605,4 +618,10 @@ md-pagination-wrapper {
 }
 .gridSel {
     background-color: #f1f1f1;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
