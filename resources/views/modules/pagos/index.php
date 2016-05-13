@@ -431,6 +431,37 @@
                             Carga de Pagos
                         </div>
                     </div>
+
+                    <div layout="row">
+
+
+
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- Este campo debe cargar las cuentas acrgadas desde el provedor y asignarle una al pago en cuestion --->
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+
+                        <md-input-container class="md-block" flex>
+                            <label>Cuenta destino provedor</label>
+                            <md-select ng-model="cuentas" required md-no-ink>
+                                <md-option ng-repeat="cuenta in [{id:1,banco: 'Fulano', direcion:'Direccion de pruebaaaaaaaaa'}]" value="{{cuenta.id}}">
+                                    {{cuenta.banco}} ,  {{cuenta.direcion}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+
+
+
+                    </div>
+
+
                     <div layout="row">
 
                         <md-input-container class="md-block" flex="20">
@@ -465,13 +496,13 @@
                             </md-select>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="30">
+                        <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
                             <input ng-model="abono.monto" required/>
 
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="15">
+                        <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
                             <md-select ng-model="abono.moneda_id" required md-no-ink>
                                 <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
@@ -480,11 +511,37 @@
                             </md-select>
                         </md-input-container>
 
+
+
                         <md-input-container class="md-block" flex="10">
                             <label>Tasa</label>
                             <input ng-model="abono.tasa" required/>
 
                         </md-input-container>
+
+
+
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- ################################### Estos dos campos son calculados del monto ingresado ################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- Estos varian dependiendo del procentaje o el monto solocados en uno de los 3 campos (Monto, Monto recargo y porventaje recargo) -->
+
+                        <md-input-container class="md-block" flex="15">
+                            <label>Monto Recargo</label>
+                            <input required/>
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="15">
+                            <label>% Recargo</label>
+                            <input required/>
+                        </md-input-container>
+
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+                        <!-- ################################################################################################ -->
+
 
                     </div>
 
