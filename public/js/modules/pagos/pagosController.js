@@ -83,6 +83,15 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     };
 
 
+    /////lista de tipos de documento de pago
+    $scope.getPayDocTypes = function () {
+        $http.get('payments/payDocsList').success(function (response) {
+            $scope.tipoDocsPago = response;
+            console.log("tipos de documentos de pago");
+        });
+    };
+
+
     ////lista de proveedores
     $scope.getProvs = function () {
         $http.get('payments/provList').success(function (response) {
@@ -184,29 +193,51 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
         openLayer('lyr4pag');
 
-        $http.get('payments/getPayList').success(function (response) {
+        $http.get('payments/getAbonos').success(function (response) {
 
             $scope.abonos = response;
+          //  $scope.abono = {};
 
-            console.log("trayendo pagos sin cuotas");
+            console.log("trayendo Abonos");
         });
 
 
     }
 
 
+    ////formulario de registro de adelanto
+    $scope.setFormAdelanto = function () {
+
+        openLayer('lyr5pag');
+
+        $scope.getPayDocTypes(); //tipos de documento de pago
+        $scope.getPayTypes(); ///tipos de pago
+        $scope.getCoins(); //monedas
+    }
+
+
+    $scope.saveFormAbono = function () {
+
+
+        $http.post('payments/saveAbono', $scope.abono)
+            .success(function (data, status, headers, config) {
+                console.log(data)
+                closeLayer('lyr5pag');
+                $scope.getAbonos(); ///yendo a la lista de abonos
+
+            })
+            .error(function (data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+                console.log("Error:enviando datos del abono...")
+            });
+
+
+
+
+    }
+
+
 });
-
-
-/*
- MyApp.controller('ListProvPag', function ($scope,$http) {
- $http({
- method: 'POST',
- url: 'provider/provList'
- }).then(function successCallback(response) {
- $scope.todos = response.data;
- }, function errorCallback(response) {
- console.log("errorrr");
- });
-
- });*/
