@@ -223,6 +223,10 @@ class OrderController extends BaseController
     /*********************************** kitchen box (cocinas)*********************************************/
 
 
+    public function getKitchenBox($id){
+        $model=KitchenBox:: findOrFail($id);
+        return $model;
+    }
     /**
      * falta incluir a algortimo que determina si esta aprobado o no
      * obtiene los kitchen box de un proveedor
@@ -230,22 +234,36 @@ class OrderController extends BaseController
     public function getKitchenBoxs(Request $req){
 
         $model =KitchenBox::
-        select(DB::raw("tbl_kitchen_box.id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega, "
+        select(DB::raw("tbl_kitchen_box.id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega,tbl_pedido_item.pedido_id as pedidoIdentifi, "
             ." (select count(*) from tbl_pedido_item where deleted_at is null
         and pedido_tipo_origen_id = 2 and tbl_pedido_item.origen_id= tbl_kitchen_box.id"
             .") as asignado"
         ))
             ->distinct()
             ->leftJoin('tbl_pedido_item','tbl_kitchen_box.id','=','tbl_pedido_item.origen_id')
-           // ->where('aprobada','1')
+            // ->where('aprobada','1')
             ->where('prov_id',$req->prov_id)
             ->Where(function($query) use ($req)
             {
                 $query->where('tbl_pedido_item.pedido_id',null)
-                    ->Orwhere('tbl_pedido_item.pedido_id',$req->pedido_id)
+                    ->WhereNotNull('tbl_pedido_item.deleted_at')
+
+                    /*
+                    ->OrWhere(function($query) use ($req){
+                        $query
+                            ->Orwhere('tbl_pedido_item.pedido_idd','<>',$req->pedido_id);
+
+                    });*/
+
                 ;
 
+            })->OrWhere(function($query) use ($req){
+                $query
+                    ->where('tbl_pedido_item.pedido_id',$req->pedido_id)
+                    ->whereNull('tbl_pedido_item.deleted_at');
             })
+
+
             ->get();
         return $model;
     }
@@ -288,7 +306,10 @@ class OrderController extends BaseController
 
     public function getOrden(Request $req){
         $data=Order::findOrFail($req->id);
-        $items=$data->OrderItem()->where('pedido_tipo_origen_id','<>','1')->get();//
+        $items=$data->OrderItem()
+            // ->where('pedido_tipo_origen_id','<>','1')
+            ->get()
+        ;//
         $o= Array();
         $c=Array();
         $k=Array();
@@ -312,15 +333,14 @@ class OrderController extends BaseController
                     ;break;
             }
         }
-        $odcs =$data->OrderItem()->where('pedido_tipo_origen_id','1')
+        /*$odcs =$data->OrderItem()->where('pedido_tipo_origen_id','1')
             ->groupBy('origen_id')
             ->get();
         foreach( $odcs as $aux){
             $o[]=PurchaseOrder::find($aux->origen_id);
-        }
+        }*/
         $data['data']=$items;
-        $data['ordenes']=$o
-        ;
+        $data['ordenes']=$o ;
         $data['contraPedido']=$c;
         $data['pedidoSusti']=$p;
         $data['kitchenBox']=$k;

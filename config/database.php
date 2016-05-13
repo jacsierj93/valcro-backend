@@ -2,7 +2,7 @@
 
 return array(
 
-    'default' => 'valcrosis',
+    'default' => 'valcro2',
 
     'connections' => array(
 
@@ -33,7 +33,7 @@ return array(
         # base de datos viejo sistema valcro
         'valcro2' => array(
             'driver'    => 'mysql',
-            'host'      => '10.16.2.106',
+            'host'      => 'localhost',
             'database'  => 'valcro_db2',
             'username'  => 'userVal',
             'password'  => 'ntmJX2zn92CQFc6P',

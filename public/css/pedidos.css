@@ -16,3 +16,11 @@
 #adjunto{
 
 }
+/*********** para los campos tipo fecha */
+.dateRow {
+    height: 30px; margin-top: 6px;
+}
+
+.dateRowTitle {
+    margin-right: 8px; margin-top:8px;
+}
