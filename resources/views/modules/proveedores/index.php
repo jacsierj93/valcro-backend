@@ -151,7 +151,9 @@
                                 Direcciones
                             </div>
                         </div>
+
                         <div flex layout="column">
+
                             <div ng-repeat="direccion in prov.direcciones" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
                                 <div layout="row">
                                     <div flex="50">{{direccion.tipo.descripcion}}</div>

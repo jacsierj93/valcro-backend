@@ -55,13 +55,10 @@
 
 
 <div layout="row" flex class="middle">
-
     <div class="barraHerramientas" layout="column" layout-align="center center" ng-controller="ListHerramientas">
-
         <div layout="column" layout-align="center center" ng-repeat="item in tools">
             <div class="btnDot" title="{{item.tool}}"></div>
         </div>
-
     </div>
 
     <!-- ######################### CONTENIDO #############################-->
@@ -87,5 +84,6 @@
 <?= HTML::script('js/modules/proveedores/proveedoresController.js') ?>
 <?= HTML::script('js/modules/pagos/pagosController.js') ?>
 <?= HTML::script('js/modules/pedidos/pedidosController.js') ?>
+<?= HTML::script('js/modules/embarques/embarquesController.js') ?>
 </body>
 </html>
