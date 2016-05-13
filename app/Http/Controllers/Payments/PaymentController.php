@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payments;
 
 use App\Http\Controllers\Masters\MasterFinancialController;
+use App\Libs\Api\RestApi;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\DocumentCPType;
 use App\Models\Sistema\Payments\Payment;
@@ -383,6 +384,8 @@ class PaymentController extends BaseController
     {
 
 
+        $rest = new RestApi();
+
         //////////validation
         $validator = Validator::make($req->all(), [
 
@@ -393,10 +396,9 @@ class PaymentController extends BaseController
 
         if ($validator->fails()) { ///ups... erorres
 
-            $result = array("error" => "errores en campos de formulario");
+            $rest->setError("por favor, verifique los datos de entrada");
 
         } else {  ///ok
-
 
             $model = new DocumentCP();
             //////////condicion para editar
@@ -413,11 +415,11 @@ class PaymentController extends BaseController
             $model->descripcion = $req->descripcion;
             $model->save(); ////edita/inserta
 
-            $result = array("success" => "Registro guardado con éxito", "action" => "new");
+            $rest->setContent("registro guardado con éxito");
 
         }
 
-        return response()->json($result); /// respuesta json
+        return $rest->responseJson();
 
 
     }
