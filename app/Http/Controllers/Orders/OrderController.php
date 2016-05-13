@@ -234,8 +234,10 @@ class OrderController extends BaseController
     public function getKitchenBoxs(Request $req){
 
         $model =KitchenBox::
-        select(DB::raw("tbl_kitchen_box.id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega,tbl_pedido_item.pedido_id as pedidoIdentifi, "
-            ." (select count(*) from tbl_pedido_item where deleted_at is null
+        select(DB::raw("tbl_kitchen_box.id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega,
+        tbl_pedido_item.pedido_id as pedidoIdentifi,
+        tbl_pedido_item.origen_id, tbl_pedido_item.pedido_id ,"
+            ." ( select count(*) from tbl_pedido_item where deleted_at is null
         and pedido_tipo_origen_id = 2 and tbl_pedido_item.origen_id= tbl_kitchen_box.id"
             .") as asignado"
         ))
@@ -243,29 +245,16 @@ class OrderController extends BaseController
             ->leftJoin('tbl_pedido_item','tbl_kitchen_box.id','=','tbl_pedido_item.origen_id')
             // ->where('aprobada','1')
             ->where('prov_id',$req->prov_id)
-            ->Where(function($query) use ($req)
-            {
-                $query->where('tbl_pedido_item.pedido_id',null)
-                    ->WhereNotNull('tbl_pedido_item.deleted_at')
-
-                    /*
-                    ->OrWhere(function($query) use ($req){
-                        $query
-                            ->Orwhere('tbl_pedido_item.pedido_idd','<>',$req->pedido_id);
-
-                    });*/
-
-                ;
-
-            })->OrWhere(function($query) use ($req){
-                $query
-                    ->where('tbl_pedido_item.pedido_id',$req->pedido_id)
-                    ->whereNull('tbl_pedido_item.deleted_at');
-            })
-
-
             ->get();
-        return $model;
+        $data = $model->filter(function ($item) use ($req){
+                if($item->asignado > 0){
+                    if($item->pedido_id != $req->pedido_id){
+                        return false;
+                    }
+                }
+            return true;
+        });
+        return array_values($data->toArray());
     }
 
 

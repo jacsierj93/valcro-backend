@@ -512,13 +512,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
     }
 
     function loadkitchenBoxProveedor(id){
+
+        ORDER.post({type:'KitchenBoxs'},{prov_id:id, pedido_id: $scope.pedidoSelec.id}, function(data){
+            //  $scope.formData.kitchenBox=data;
+            //  $scope.formData.kitchenBox=data;
+            alert('finite');
+            console.log('order data', data);
+        });
+
         $http({
             method: 'POST',
             url: 'Order/KitchenBoxs',
             data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
+            console.log('response ',response);
             var auxs = new Array();
-            for(var i=0;i<response.data.length;i++){
+            for(var i=0;i < response.data.length;i++){
                 var aux=response.data[i];
                 aux.asig=false;
                 if(aux.asignado != 0){
@@ -526,7 +535,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
                 }
                 auxs.push(aux);
             }
-            $scope.formData.kitchenBox= auxs;
+            console.log(' kit response ',response);
+             $scope.formData.kitchenBox= auxs;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -708,6 +718,7 @@ MyApp.factory('ORDER', ['$resource',
             query: {method: 'GET',params: {type: "",id:""}, isArray: true},
             get: {method: 'GET',params: {type:" "}, isArray: false},
             post: {method: 'POST',params: {type:" "}, isArray: false},
+            postAll: {method: 'POST',params: {type:" "}, isArray: false}
 
         });
     }
