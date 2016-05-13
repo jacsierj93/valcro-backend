@@ -639,3 +639,10 @@ input[type=number]::-webkit-outer-spin-button {
 .onlyread>div{
     border-color:#999 !important;
 }
+
+
+
+/*========================== DATE PICKERS ===============================*/
+.md-datepicker-button{
+    display:none;
+}
