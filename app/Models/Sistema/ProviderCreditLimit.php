@@ -7,9 +7,10 @@
  */
 
 namespace App\Models\Sistema;
+use App\Quotation;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 
 
 class ProviderCreditLimit extends Model
@@ -21,7 +22,7 @@ class ProviderCreditLimit extends Model
         $this->belongsTo('App\Models\Sistema\Provider',"prov_id");
     }
 
-    public function coins(){
-        $this->hasOne('App\Models\Sistema\Monedas',"monedas_id");
+    public function moneda(){
+        $this->hasOne('App\Models\Sistema\Monedas','id','moneda_id');
     }
 }

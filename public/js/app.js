@@ -76,15 +76,14 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
             url: 'modules/proveedores/index',
             selct: 'btnDot'
         }, {
-            secc: 'Productos',
-            url: 'modules/home/logedout',
+            secc: 'Embarques',
+            url: 'modules/embarques/index',
             selct: 'btnDot'
         }, {
             secc: 'Pagos',
             url: 'modules/pagos/index',
             selct: 'btnDot'
-        }
-        , {
+        }, {
             secc: 'Pedidos',
             url: 'modules/pedidos/index',
             selct: 'btnDot'
