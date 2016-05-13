@@ -21,7 +21,7 @@
                 <!--<i class="fa fa-plus"></i>-->
                 <?= HTML::image("images/agregar.png") ?>
             </div>
-            <div layout="column" layout-align="center center" ng-click="toggleRight()" ng-show="prov.id">
+            <div layout="column" layout-align="center center" ng-click="editProv()" ng-show="prov.id">
                 <!--<i class="fa fa-filter"></i>-->
                 <?= HTML::image("images/actualizar.png") ?>
             </div>
@@ -151,7 +151,9 @@
                                 Direcciones
                             </div>
                         </div>
+
                         <div flex layout="column">
+
                             <div ng-repeat="direccion in prov.direcciones" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
                                 <div layout="row">
                                     <div flex="50">{{direccion.tipo.descripcion}}</div>
@@ -190,21 +192,48 @@
                                 Monedas
                             </div>
                         </div>
-<!--                        <div flex layout="column">
-                            <div ng-repeat="direccion in prov.direcciones" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                                <div layout="row">
-                                    <div flex="50">{{direccion.tipo.descripcion}}</div>
-                                    <div flex="50" style="overflow-x: hidden; text-overflow: ellipsis;">
-                                        {{direccion.country.short_name}}
-                                    </div>
-                                </div>
-                                <div flex>
-                                    {{direccion.direccion}}
-                                </div>
+                        <div flex layout="column">
+                            <div ng-repeat="moneda in prov.monedas" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                                {{moneda.nombre}} ({{moneda.simbolo}})
                             </div>
-                        </div>-->
+                        </div>
+                    </div>
+                    <div flex="20">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Puntos
+                            </div>
+                        </div>
+                        <div ng-repeat="point in prov.monedas" ng-show="point.pivot.punto" layout="row" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                            <div flex="30">{{point.nombre}}</div>
+                            <div flex="70">{{point.pivot.punto}} {{point.simbolo}}</div>
+                        </div>
+                    </div>
+
+                    <div flex="20">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'title_error' : (prov.limCred.length < 1)}">
+                            <div>
+                                Limites de Credito
+                            </div>
+                        </div>
+                        <div ng-repeat="lim in prov.limCred" layout="row" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                            <div flex="30">{{lim.moneda.nombre}}</div>
+                            <div flex="70">{{lim.limite}} {{lim.moneda.simbolo}}</div>
+                        </div>
+                    </div>
+                    <div flex="50">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Cuentas Bancarias
+                            </div>
+                        </div>
+                        <div ng-repeat="bank in prov.banks" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                            <div flex>{{bank.banco}}</div>
+                            <div flex>{{bank.cuenta}}</div>
+                        </div>
                     </div>
                 </div>
+
             </md-content>
             <div style="width: 16px;" ng-mouseover="showNext(true,'layer1')" >
 
@@ -222,7 +251,7 @@
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
                 <form name="projectForm" ng-controller="DataProvController"  ng-disabled="true">
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" >
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
                         <div>
                             Datos Proveedor
                         </div>
@@ -231,7 +260,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
-                            <md-select ng-model="dtaPrv.type" ng-disabled="enabled" md-no-ink>
+                            <md-select ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                 <md-option ng-repeat="type in types" value="{{type.id}}">
                                     {{type.nombre}}
                                 </md-option>
@@ -246,7 +275,7 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description" ><!--ng-disabled="(enabled || (toCheck && projectForm.description.$valid))"-->  <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
+                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description" ><!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->  <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
@@ -255,7 +284,7 @@
 
                         <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
-                            <input maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="enabled" >
+                            <input maxlength="6" ng-minlength="3"  required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id" >
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -264,7 +293,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
-                            <md-select ng-model="dtaPrv.envio" ng-disabled="enabled" md-no-ink>
+                            <md-select ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                     {{envio.nombre}}
                                 </md-option>
@@ -275,7 +304,7 @@
                         </md-input-container>
 
                         <md-input-container class="md-block">
-                            <md-switch class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos"  ng-disabled="enabled">
+                            <md-switch class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos"  ng-disabled="$parent.enabled && prov.id">
                                 Contrapedidos?
                             </md-switch>
                         </md-input-container>
@@ -294,7 +323,7 @@
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
                 <form name="nomvalcroForm" ng-controller="valcroNameController">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Nombres Valcro
                         </div>
@@ -302,7 +331,7 @@
 
                     <!--<md-input-container class="md-block" flex>
                         <label>Nombre Valcro</label>-->
-                        <md-chips  ng-disabled="enabled" class="md-block" flex ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)" md-on-select="selChip($chip)">
+                        <md-chips  ng-disabled="$parent.enabled" class="md-block" flex ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)" md-on-select="selChip($chip)">
                             <md-chip-template>
                                 <span>
                                   <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
@@ -315,7 +344,7 @@
 
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
                 <form name="direccionesForm" ng-controller="provAddrsController"  ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Direcciones
                         </div>
@@ -325,7 +354,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Tipo de Direccion</label>
-                            <md-select ng-model="dir.tipo" md-no-ink ng-disabled="enabled">
+                            <md-select ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
                                 <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
                                     {{tipo.descripcion}}
                                 </md-option>
@@ -338,7 +367,7 @@
 
                         <md-input-container class="md-block" flex="50">
                             <label>Pais</label>
-                            <md-select ng-model="dir.pais" md-no-ink ng-disabled="enabled">
+                            <md-select ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}" >
                                     {{pais.short_name}}
                                 </md-option>
@@ -350,13 +379,13 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="40">
                             <label>Telefono</label>
-                            <input name="provTelf" type="number" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="enabled" />
+                            <input name="provTelf" type="number" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                         </md-input-container>
 
                     </div>
                     <md-input-container class="md-block" flex>
                         <label>Direccion</label>
-                        <input ng-disabled="enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv" >
+                        <input ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv" >
                     </md-input-container>
                     <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
@@ -375,7 +404,7 @@
 
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
                 <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Contactos Proveedor
                         </div>
@@ -384,7 +413,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
-                            <input ng-disabled="enabled" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick  ="book()">
+                            <input ng-disabled="$parent.enabled" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick  ="book()">
                             <!--<div ng-messages="provContactosForm.nombreCont.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="md-maxlength">Debe tener maximo 55 caracteres.</div>
@@ -393,7 +422,7 @@
 
                         <md-input-container class="md-block" flex="35">
                             <label>Email</label>
-                            <input ng-disabled="enabled" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont"
+                            <input ng-disabled="$parent.enabled" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont"
                                    ng-pattern="/^.+@.+\..+$/"/>
                             <!--<div ng-messages="provContactosForm.emailCont.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
@@ -405,7 +434,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
-                            <md-select ng-disabled="enabled" ng-model="cnt.pais" ng-disabled="(cnt.id===false)" md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="cnt.pais" ng-disabled="(cnt.id===false)" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                     {{pais.short_name}}
                                 </md-option>
@@ -414,7 +443,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
-                            <input ng-disabled="enabled" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" />
+                            <input ng-disabled="$parent.enabled" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" />
                             <!--<div ng-messages="provContactosForm.contTelf.$error">
                                 <div ng-message="required">Campo Obligatorio.</div>
                                 <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
@@ -426,7 +455,7 @@
                         <div layout="row" flex="30">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-disabled="enabled" ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)" md-no-ink>
+                                <md-select ng-disabled="$parent.enabled" ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)" md-no-ink>
                                     <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
 
                                 </md-select>
@@ -436,7 +465,7 @@
                         <div layout="row" flex="30">
                             <md-input-container flex>
                                 <label>cargos</label>
-                                <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || enabled" md-no-ink>
+                                <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled" md-no-ink>
                                     <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
                                 </md-select>
                             </md-input-container>
@@ -444,14 +473,14 @@
 
                         <md-input-container class="md-block" flex="40">
                             <label>Responsabilidades</label>
-                            <input ng-disabled="enabled" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)">
+                            <input ng-disabled="$parent.enabled" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)">
                         </md-input-container>
 
                     </div>
                     <div layout="row" flex>
                         <md-input-container class="md-block" flex>
                             <label>Direccion de Oficina</label>
-                            <input ng-disabled="enabled" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)">
+                            <input ng-disabled="$parent.enabled" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)">
                         </md-input-container>
                     </div>
 
@@ -544,7 +573,7 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
                 <form name="provMoneda" ng-controller="coinController">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex>
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                            Moneda
                         </div>
@@ -552,7 +581,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
-                            <md-select ng-disabled="enabled" ng-model="cn.coin" name ="state" ng-disabled="enabled || (coins.length == filt.length)" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="cn.coin" name ="state" ng-disabled="$parent.enabled || (coins.length == filt.length)" required md-no-ink>
                                 <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -570,7 +599,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
                 <form ng-controller="bankInfoController" name="bankInfoForm" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Informacion Bancaria
                         </div>
@@ -596,7 +625,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-disabled="enabled" ng-model="bnk.pais" name ="state" ng-disabled="enabled" ng-change="setState(this)" md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="bnk.pais" name ="state" ng-disabled="$parent.enabled" ng-change="setState(this)" md-no-ink>
                                 <md-option ng-repeat="country in countries" value="{{country.id}}">
                                     {{country.short_name}}
                                 </md-option>
@@ -605,7 +634,7 @@
 
                         <md-input-container class="md-block" flex="20" >
                             <label>Estado</label>
-                            <md-select ng-disabled="enabled" ng-model="bnk.est" name ="state" ng-disabled="enabled || (bnk.pais==false)" md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="bnk.est" name ="state" ng-disabled="$parent.enabled || (bnk.pais==false)" md-no-ink>
                                 <md-option ng-repeat="state in states" value="{{state.id}}">
                                     {{state.local_name}}
                                 </md-option>
@@ -614,7 +643,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Ciudad</label>
-                            <md-select ng-disabled="enabled" ng-model="bnk.ciudad" name ="state" ng-disabled="enabled || (bnk.est==false)" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="bnk.ciudad" name ="state" ng-disabled="$parent.enabled || (bnk.est==false)" required md-no-ink>
                                 <md-option ng-repeat="city in cities" value="{{city.id}}">
                                     {{city.local_name}}
                                 </md-option>
@@ -623,13 +652,13 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>SWIF</label>
-                            <input ng-disabled="enabled" ng-model="bnk.bankSwift" required/>
+                            <input ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
 
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>IBAN</label>
-                            <input ng-disabled="enabled" ng-model="bnk.bankIban" required/>
+                            <input ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
 
                         </md-input-container>
                     </div>
@@ -657,7 +686,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
                 <form name="provCred" ng-controller="creditCtrl" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}" >
                         <div>
                             Credito
                         </div>
@@ -665,12 +694,12 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Limite de Credito</label>
-                            <input ng-disabled="enabled" ng-model="cred.amount" required >
+                            <input ng-disabled="$parent.enabled" ng-model="cred.amount" required >
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Moneda</label>
-                            <md-select ng-disabled="enabled" ng-model="cred.coin" name ="state" ng-disabled="enabled" ng-controller="provCoins" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="cred.coin" name ="state" ng-disabled="$parent.enabled" ng-controller="provCoins" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -701,7 +730,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
                 <form name="provConv" ng-controller="convController" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Factor de Conversión
                         </div>
@@ -709,23 +738,23 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>% Flete</label>
-                            <input ng-disabled="enabled" ng-model="conv.freight">
+                            <input ng-disabled="$parent.enabled" ng-model="conv.freight">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Gastos</label>
-                            <input ng-disabled="enabled" ng-model="conv.expens">
+                            <input ng-disabled="$parent.enabled" ng-model="conv.expens">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Ganancia</label>
-                            <input ng-disabled="enabled" ng-model="conv.gain">
+                            <input ng-disabled="$parent.enabled" ng-model="conv.gain">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Descuento</label>
-                            <input ng-disabled="enabled" ng-model="conv.disc">
+                            <input ng-disabled="$parent.enabled" ng-model="conv.disc">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-disabled="enabled" ng-model="conv.coin" name ="state" ng-disabled="enabled" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="conv.coin" name ="state" ng-disabled="$parent.enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -747,7 +776,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
                 <form name="provPoint" ng-controller="provPointController" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Puntos
                         </div>
@@ -755,11 +784,11 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Costo del punto</label>
-                            <input ng-disabled="enabled" ng-model="pnt.cost" required>
+                            <input ng-disabled="$parent.enabled" ng-model="pnt.cost" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-disabled="enabled" ng-model="pnt.coin" ng-disabled="enabled" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="pnt.coin" ng-disabled="$parent.enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" ng-hide="(coin.pivot.punto)" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -802,7 +831,7 @@
 -->
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
                 <form name="timeProd" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Tiempo Aproximado de Producción
                         </div>
@@ -810,16 +839,16 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>De (Dias)</label>
-                            <input ng-disabled="enabled" ng-model="tp.from" required>
+                            <input ng-disabled="$parent.enabled" ng-model="tp.from" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>A (Dias)</label>
-                            <input ng-disabled="enabled" ng-model="tp.to" required>
+                            <input ng-disabled="$parent.enabled" ng-model="tp.to" required>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Linea</label>
-                            <md-select ng-disabled="enabled" ng-model="tp.line" name ="state" ng-disabled="enabled" md-no-ink>
+                            <md-select ng-disabled="$parent.enabled" ng-model="tp.line" name ="state" ng-disabled="$parent.enabled" md-no-ink>
                                 <md-option ng-repeat="line in lines" value="{{line.id}}">
                                     {{line.linea}}
                                 </md-option>
@@ -841,7 +870,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
                 <form name="timeTrans" ng-controller="transTimeController" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Tiempo Aproximado de Transito
                         </div>
@@ -849,16 +878,16 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>De (Dias)</label>
-                            <input ng-disabled="enabled" ng-model="ttr.from">
+                            <input ng-disabled="$parent.enabled" ng-model="ttr.from">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>A (Dias)</label>
-                            <input ng-disabled="enabled" ng-model="ttr.to">
+                            <input ng-disabled="$parent.enabled" ng-model="ttr.to">
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Pais</label>
-                            <md-select ng-disabled="enabled" ng-model="ttr.country" name ="state" ng-disabled="enabled" md-no-ink required>
+                            <md-select ng-disabled="$parent.enabled" ng-model="ttr.country" name ="state" ng-disabled="$parent.enabled" md-no-ink required>
                                 <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
                                     {{country.pais.short_name}}
                                 </md-option>
@@ -880,7 +909,7 @@
                 </form>
 
                 <form name="provPrecList">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Listas de Precios
                         </div>
@@ -888,12 +917,12 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="40">
                             <label>Referencia</label>
-                            <input ng-disabled="enabled" ng-model="lp.ref">
+                            <input ng-disabled="$parent.enabled" ng-model="lp.ref">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Archivo</label>
                             <input id="upListPrice" type="file" name="files[]" data-url="" multiple>
-                            <input ng-disabled="enabled" ng-model="lp.file">
+                            <input ng-disabled="$parent.enabled" ng-model="lp.file">
                         </md-input-container>
                     </div>
 

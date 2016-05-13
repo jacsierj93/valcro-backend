@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payments;
 
 use App\Http\Controllers\Masters\MasterFinancialController;
+use App\Libs\Api\RestApi;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\DocumentCPType;
 use App\Models\Sistema\Payments\Payment;
@@ -138,8 +139,7 @@ class PaymentController extends BaseController
 
 
                 ////nfact vence
-                //  $vence = $this->dateDiff($doc->fecha_vence, $currenDate);
-                $vence = $this->getVencimiento($doc->fecha_vence);
+                $vence = $doc->vencimiento();
 
                 if ($vence == 0) {
                     $nvencido++;
@@ -193,6 +193,12 @@ class PaymentController extends BaseController
     {
 
         $dtype = DocumentCPType::all();
+        return $dtype;
+    }
+
+    public function getDocumentPayTypes()
+    {
+        $dtype = DocumentCPType::find($this->payIds);
         return $dtype;
     }
 
@@ -258,19 +264,19 @@ class PaymentController extends BaseController
         $data["doc_tipo"] = $doc->tipo_id;
         $data["doc_factura"] = $doc->nro_factura;
         $data["doc_vence"] = $doc->fecha_vence;
-        $data["doc_vencimiento"] = 'v' . $this->getVencimiento($doc->fecha_vence); ///color del punto
+        $data["doc_vencimiento"] = 'v' . $doc->vencimiento(); ///color del punto
         $data["doc_descripcion"] = $doc->descripcion;
         if (in_array($doc->tipo_id, $this->debtsIds)) { ////en caso de ser una deuda
 
             $cuotas = $doc->cuotas();
             $cdata = array();
-            foreach ($cuotas as $cc){
+            foreach ($cuotas as $cc) {
 
                 $temp["id"] = $cc->id;
                 $temp["fecha_vence"] = $cc->fecha_vence;
                 $temp["nro_factura"] = $cc->nro_factura;
                 $temp["descripcion"] = $cc->descripcion;
-                $temp["vencimiento"] = 'v'.$cc->vencimiento();
+                $temp["vencimiento"] = 'v' . $cc->vencimiento();
                 $cdata[] = $temp;
             }
 
@@ -313,11 +319,11 @@ class PaymentController extends BaseController
     /**pagos hechos sin factura
      * @return array
      */
-    public function getPayList(){
-
+    public function getAbonoList()
+    {
 
         $provId = Session::get("PROVID");
-        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
+        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->orderBy('id','desc')->get();
 
         $result = array();
         foreach ($pagos as $pago) {
@@ -337,10 +343,8 @@ class PaymentController extends BaseController
         }
 
         return $result;
-        
+
     }
-    
-    
 
 
     /**deudas del proveedor
@@ -356,7 +360,7 @@ class PaymentController extends BaseController
             $temp["nro_factura"] = $deuda->nro_factura;
             $temp["fecha"] = $deuda->fecha;
             $temp["vence"] = $deuda->fecha_vence;
-            $temp["vencido"] = 'v' . $this->getVencimiento($deuda->fecha_vence); ///color del punto
+            $temp["vencido"] = 'v' . $deuda->vencimiento(); ///color del punto
             $temp["tipo"] = $deuda->tipo->descripcion;
             $temp["saldo"] = $deuda->saldo;
             $temp["monto"] = $deuda->monto;
@@ -370,44 +374,52 @@ class PaymentController extends BaseController
     }
 
 
-    /**funcion que trae la diferencia de fechas en dias
-     * @param $dateIni
-     * @param $dateEnd
-     * @return mixed
-     */
-    private function dateDiff($dateIni, $dateEnd)
-    {
-        $from = date_create($dateIni);
-        $to = date_create($dateEnd);
-        $diff = date_diff($to, $from);
-        return (int)$diff->format('%R%d');
-    }
+    /********************************************************************************
+     * ******************************OPERACIONES CRUD*****************************************
+     *********************************************************************************/
 
-    /**calcula el rango de vencimiento segun la fecha dada
-     * @param $fecha
-     * @return int
-     */
-    private function getVencimiento($fecha)
+
+    public function abonoSaveOrUpdate(Request $req)
     {
 
-        $currenDate = date("Y-m-d"); ///fecha actual
-        $dias = $this->dateDiff($fecha, $currenDate); ///calculo de dias para el vencimiento
+        $rest = new RestApi();
 
-        if ($dias <= 0) {
-            $estatus = 0; ///vencido
-        } else if ($dias <= 7) {
-            $estatus = 7; ///vence en 7 dias o menos ...
-        } else if ($dias > 7 && $dias <= 30) {
-            $estatus = 30;
-        } else if ($dias > 30 && $dias <= 60) {
-            $estatus = 60;
-        } else if ($dias > 60 && $dias <= 90) {
-            $estatus = 90;
-        } else {
-            $estatus = 100; ///mas de 90
+        //////////validation
+        $validator = Validator::make($req->all(), [
+
+            'nro_doc' => 'required'
+
+        ]);
+
+
+        if ($validator->fails()) { ///ups... erorres
+
+            $rest->setError("por favor, verifique los datos de entrada");
+
+        } else {  ///ok
+
+            $model = new DocumentCP();
+            //////////condicion para editar
+            if ($req->has('id')) {
+                $model = $model->findOrFail($req->id);
+            }
+
+            $model->tipo_id = $req->tipo_id;
+            $model->prov_id = Session::get("PROVID");
+            $model->nro_factura = $req->nro_doc;
+            $model->moneda_id = $req->moneda_id;
+            $model->fecha = $req->fecha;
+            $model->monto = $req->monto;
+            $model->saldo = $req->monto;
+            $model->tasa = $req->tasa;
+            $model->descripcion = $req->descripcion;
+            $model->save(); ////edita/inserta
+
+            $rest->setContent("registro guardado con éxito");
+
         }
 
-        return $estatus;
+        return $rest->responseJson();
 
 
     }
