@@ -322,9 +322,8 @@ class PaymentController extends BaseController
     public function getAbonoList()
     {
 
-
         $provId = Session::get("PROVID");
-        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->get();
+        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->orderBy('id','desc')->get();
 
         $result = array();
         foreach ($pagos as $pago) {
@@ -383,7 +382,6 @@ class PaymentController extends BaseController
     public function abonoSaveOrUpdate(Request $req)
     {
 
-
         $rest = new RestApi();
 
         //////////validation
@@ -410,7 +408,9 @@ class PaymentController extends BaseController
             $model->prov_id = Session::get("PROVID");
             $model->nro_factura = $req->nro_doc;
             $model->moneda_id = $req->moneda_id;
+            $model->fecha = $req->fecha;
             $model->monto = $req->monto;
+            $model->saldo = $req->monto;
             $model->tasa = $req->tasa;
             $model->descripcion = $req->descripcion;
             $model->save(); ////edita/inserta

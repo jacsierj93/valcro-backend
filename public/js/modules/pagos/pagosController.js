@@ -3,7 +3,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     var historia = [15];
     $scope.index = index = 0;
     var base = 264;
-    $scope.toolBar = {"add":'true',"edit":'false',"filter":'false'} ///botonera
+    $scope.toolBar = {"add":true,"edit":false,"filter":false} ///botonera
     $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}};
     $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
@@ -26,6 +26,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             closeLayer(true);
         }
     }
+
 
 
     function closeLayer(all) {
@@ -145,6 +146,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.setDeduda = function (doc) {
 
         openLayer('lyr2pag');
+     //   $scope.setTool(true,"false",true); ///colocando funcion de filtro
 
         $http.get('payments/getDocById/' + doc.id).success(function (response) {
 
@@ -234,19 +236,18 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     $scope.saveFormAbono = function () {
 
-
         $http.post('payments/saveAbono', $scope.abono)
             .success(function (data, status, headers, config) {
-                console.log(data)
-                closeLayer('lyr5pag');
-                $scope.getAbonos(); ///yendo a la lista de abonos
+                if(data.success){ ///guarda el registro
+                    closeLayer('lyr5pag');
+                    $scope.getAbonos(); ///yendo a la lista de abonos
+                }else{ ///errores insertando
+                    alert("falla guardando documento");
+                }
+
 
             })
             .error(function (data, status, header, config) {
-                $scope.ResponseDetails = "Data: " + data +
-                    "<hr />status: " + status +
-                    "<hr />headers: " + header +
-                    "<hr />config: " + config;
                 console.log("Error:enviando datos del abono...")
             });
 

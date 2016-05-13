@@ -259,10 +259,10 @@
                             <input required/>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="10">
+
                             <label>Fecha</label>
-                            <input required/>
-                        </md-input-container>
+                            <md-datepicker ng-model="abono.fecha" md-placeholder="Enter date"></md-datepicker>
+
 
                         <md-input-container class="md-block" flex="20">
                             <label>Monto</label>
@@ -478,10 +478,9 @@
                             <input ng-model="abono.nro_doc" required/>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
-                            <label>Fecha</label>
-                            <input ng-model="abono.fecha" required/>
-                        </md-input-container>
+                        <div layout="column" flex>
+                                <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+                        </div>
 
                     </div>
 
