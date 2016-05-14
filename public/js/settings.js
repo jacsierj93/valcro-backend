@@ -12,7 +12,7 @@ if(puerto != 80 || puerto != ""){
     prt = "";
 }
 
-var PATHAPP = "http://"+window.location.hostname+prt+"/valcro-backend/public/";
+var PATHAPP = "http://"+window.location.hostname+prt+"/angular2/";
 
 /////////token para los request ajax
 $.ajaxSetup({

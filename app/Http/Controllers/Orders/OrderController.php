@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Orders;
 
+use App\Models\Sistema\CustomOrders\CustomOrderItem;
 use App\Models\Sistema\KitchenBoxs\KitchenBox;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\Payments\PaymentType;
@@ -65,22 +66,6 @@ class OrderController extends BaseController
         return $data;
     }
 
-
-    /**
-     *  obtiene los motivo de contra pedido
-     */
-    public function getCustomOrderResons()
-    {
-        return CustomOrderReason:: get();
-    }
-
-    /**
-     *  obtiene las prioridad de contra pedido
-     */
-    public function getCustomOrderPriority()
-    {
-        return CustomOrderPriority:: get();
-    }
     /**
      * regresa la lista de pedidos segun id del provedor
      */
@@ -152,16 +137,86 @@ class OrderController extends BaseController
 
     /***********************************Contra pedidos ***********************************/
 
+    /**
+     *  obtiene los motivo de contra pedido
+     */
+    public function getCustomOrderResons()
+    {
+        return CustomOrderReason:: get();
+    }
 
     /**
-     * obtiene un contra pedido con sus pedidos
+     *  obtiene las prioridad de contra pedido
+     */
+    public function getCustomOrderPriority()
+    {
+        return CustomOrderPriority:: get();
+    }
+
+    /**
+     * obtiene un contra pedido con sus productos
      */
     public function getCustomOrder(Request $req){
+
         $model=CustomOrder:: findOrFail($req->id);
-        $model['productos']=$model->CustomOrderItem()->get();
+        $prods= Array();
+        $items =$model->CustomOrderItem()->get();
+
+        foreach( $items as $aux){
+            $it['contraPItem'] = $aux;
+            $reng=OrderItem::where('producto_id', $aux->id)
+                ->where('tipo_origen_id', '2')
+                ->where('origen_id', $aux->contra_pedido_id)->first();
+            $it['pedidoItem']= $reng;
+            $it['disponible']=$aux->cantidad;
+
+            if($reng != null){
+
+                $it['disponible']= $aux->cantidad - $reng->cantidad;
+            }
+
+            $prods[]=$it;
+        }
+
+        $model['productos']=$prods;
+
         return $model;
     }
 
+    /**
+     * obtiene un contra pedido con sus productos
+     */
+    public function getCustomOrderItem(Request $req){
+
+        $model=CustomOrder:: findOrFail($req->id);
+        $prods= Array();
+        $items =$model->CustomOrderItem()->get();
+
+        foreach( $items as $aux){
+            $it['contraPItem'] = $aux;
+            $reng=OrderItem::where('producto_id', $aux->id)
+                ->where('tipo_origen_id', '2')
+                ->where('origen_id', $aux->contra_pedido_id)->first();
+            $it['pedidoItem']= $reng;
+            $it['monto']=$aux->cantidad;
+
+            if($reng != null){
+
+                $it['monto']= $aux->cantidad - $reng->cantidad;
+            }
+
+            $prods[]=$it;
+        }
+
+        $model['productos']=$prods;
+
+        return $model;
+    }
+
+    public  function addCustomOrderItem(Request $req){
+
+        return $req;
+    }
     /**
      * obtiene los contra pedidos de un proveedor
      */
@@ -171,7 +226,7 @@ class OrderController extends BaseController
         select(DB::raw("tbl_contra_pedido.id ,
         fecha, comentario , monto, titulo, fecha_aprox_entrega, tbl_contra_pedido.aprobada , "
             ." (select count(*) from tbl_pedido_item where deleted_at is null
-            and pedido_tipo_origen_id = 4 and origen_id= tbl_contra_pedido.id"
+            and tipo_origen_id = 2 and origen_id= tbl_contra_pedido.id"
             .") as asignado"
         ))
             ->leftJoin('tbl_pedido_item','tbl_contra_pedido.id','=','tbl_pedido_item.origen_id')
@@ -185,7 +240,16 @@ class OrderController extends BaseController
 
             })
             ->get();
-        return $model;
+
+        $data = $model->filter(function ($item) use ($req){
+            if($item->asignado > 0){
+                if($item->pedido_id != $req->pedido_id){
+                    return false;
+                }
+            }
+            return true;
+        });
+        return array_values($data->toArray());
     }
 
     /**
@@ -238,7 +302,7 @@ class OrderController extends BaseController
         tbl_pedido_item.pedido_id as pedidoIdentifi,
         tbl_pedido_item.origen_id, tbl_pedido_item.pedido_id ,"
             ." ( select count(*) from tbl_pedido_item where deleted_at is null
-        and pedido_tipo_origen_id = 2 and tbl_pedido_item.origen_id= tbl_kitchen_box.id"
+        and pedido_tipo_origen_id = 3 and tbl_pedido_item.origen_id= tbl_kitchen_box.id"
             .") as asignado"
         ))
             ->distinct()
@@ -247,11 +311,11 @@ class OrderController extends BaseController
             ->where('prov_id',$req->prov_id)
             ->get();
         $data = $model->filter(function ($item) use ($req){
-                if($item->asignado > 0){
-                    if($item->pedido_id != $req->pedido_id){
-                        return false;
-                    }
+            if($item->asignado > 0){
+                if($item->pedido_id != $req->pedido_id){
+                    return false;
                 }
+            }
             return true;
         });
         return array_values($data->toArray());
@@ -295,44 +359,7 @@ class OrderController extends BaseController
 
     public function getOrden(Request $req){
         $data=Order::findOrFail($req->id);
-        $items=$data->OrderItem()
-            // ->where('pedido_tipo_origen_id','<>','1')
-            ->get()
-        ;//
-        $o= Array();
-        $c=Array();
-        $k=Array();
-        $p= Array();
-
-        foreach( $items as $aux){
-            switch($aux->pedido_tipo_origen_id){
-                /*        case '1';
-                            $o[]=PurchaseOrder::find($aux->origen_id);
-                            break;*/
-                case '2';
-                    $k[]=KitchenBox::find($aux->origen_id);
-                    ;break;
-                case '3';
-                    $ren=Order::find($aux->origen_id);
-                    $ren['oldId']=$aux->producto_id;
-                    $p[]=$ren;
-                    ;break;
-                case '4';
-                    $c[]=CustomOrder::find($aux->origen_id)
-                    ;break;
-            }
-        }
-        /*$odcs =$data->OrderItem()->where('pedido_tipo_origen_id','1')
-            ->groupBy('origen_id')
-            ->get();
-        foreach( $odcs as $aux){
-            $o[]=PurchaseOrder::find($aux->origen_id);
-        }*/
-        $data['data']=$items;
-        $data['ordenes']=$o ;
-        $data['contraPedido']=$c;
-        $data['pedidoSusti']=$p;
-        $data['kitchenBox']=$k;
+        $data['contraPedido'] = $data->getCustomOrder();
         return $data;
 
     }
@@ -519,7 +546,9 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getAddressCountry(Request $req){
-        return ProviderAddress::where('pais_id',$req->id)->get();
+        if($req->has('id')){
+            return ProviderAddress::where('pais_id',$req->id)->get();
+        }
     }
 
     /**

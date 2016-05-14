@@ -42,8 +42,12 @@ $app->post("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// o
 $app->post("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
 $app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); /// obtiene las kitchen box de proveedor
 $app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); /// obtiene las kitchen box de proveedor
+
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido
 $app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///agrega el  contrapedido
+$app->post("Order/AddCustomOrderItem",'Orders\OrderController@addCustomOrderItem'); ///agrega un item
 
 $app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina el pedido sustituto
 $app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega el pedido sustituto
+
+

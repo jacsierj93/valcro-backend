@@ -20,6 +20,25 @@ class Order extends Model
 
 
     /**
+     * obtiene los item de pedidos
+     */
+    public function OrderItem(){
+        return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'pedido_id');
+    }
+
+    public function getCustomOrder(){
+        $data  = $this->OrderItem()
+            ->get();
+        return $data;
+    }
+
+
+
+
+
+    /**************************** descontinuado**********************
+
+    /**
      * Get all of the tags for the post.
 */
     public function PurchaseOrder()
@@ -28,11 +47,7 @@ class Order extends Model
         return $this->morphToMany('App\Models\Sistema\Purchase\Purchase', 'tbl_pedido_items')->
         where('pedido_tipo_origen_id','=','1');
     }
-    /**
-     */
-    public function OrderItem(){
-        return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'pedido_id');
-    }
+
 
 
      /**si es mal uso

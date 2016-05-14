@@ -170,7 +170,7 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="selecPedido(pedido)">
+                    <div id="grid" ng-repeat="pedido in provSelec.pedidos" ng-click="DtPedido(pedido)">
                         <div flex>
                             <div layout="row" class="cellGridHolder">
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
@@ -359,7 +359,7 @@
                     </div>
 
                 </form>
-
+                <!--
                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                     <div>
                         Aprobacion de Gerente
@@ -436,6 +436,7 @@
                         </md-input-container>
                     </div>
                 </form>
+                -->
                 <!--
                                 <div class="titulo_formulario" layout="Column" layout-align="start start">
                                     <div>
@@ -936,7 +937,7 @@
                     <div layout="row" class="headGridHolder">
 
                         <div flex="5" class="cellGrid">
-                            <md-switch class="md-primary" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+
                         </div>
                         <div flex="15" class="headGrid"> Cod. Producto</div>
                         <div flex class="headGrid"> Cod. Profit</div>
@@ -947,21 +948,29 @@
                     </div>
                     <div id="gridResOdc">
                         <div flex>
-                            <div layout="row" class="cellGridHolder" ng-repeat="product in contraPedSelec.productos">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in contraPedSelec.productos">
                                 <div flex="5" class="cellGrid">
-                                    <md-switch class="md-primary" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+                                    <md-switch class="md-primary"
+                                               ng-model="item.asig"
+                                               ng-change="changeContraPItem(item)"
+                                               ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
                                 </div>
-                                <div flex="15" class="cellGrid">  {{product.id}}</div>
-                                <div flex class="cellGrid"> {{product.profit_id}}</div>
-                                <div flex class="cellGrid">  {{product.descripcion}}</div>
-                                <div flex="10" class="cellGrid">  {{product.cantidad}}</div>
-                                <div flex class="cellGrid">  {{product.comentario}}</div>
-                                <div flex class="cellGrid">  {{product.adjunto}}</div>
+                                <div flex="15" class="cellGrid">  {{item.contraPItem.id}}</div>
+                                <div flex class="cellGrid"> {{item.contraPItemcod_profit}}</div>
+                                <div flex class="cellGrid">  {{item.contraPItem.descripcion}}</div>
+                                <md-input-container class="md-block" flex="10" >
+                                    <input  ng-model="item.monto"
+                                            min="0.01" ui-number-mask type="text"
+                                            max="{{item.monto}}"
+                                            ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asig )"
+                                    />
+                                </md-input-container>
+                                <div flex class="cellGrid">  {{item.comentario}}</div>
+                                <div flex class="cellGrid">  {{item.adjunto}}</div>
                             </div>
                         </div>
                     </div>
 
-                    <!--                                                -->
                 </form>
 
             </md-content>

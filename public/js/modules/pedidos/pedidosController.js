@@ -1,6 +1,10 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
+
+    var historia= [15];
 
     $scope.formBlock=true;
+    $scope.index=0;
+    $scope.layer='';
 
     /******************* declaracion defunciones de eventos */
     /*******incializacion de $scope*****/
@@ -18,9 +22,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
     restore('FormDataKitchenBox'); // formulario de ckitchen box
 
     $scope.setProvedor= setProvedor;
-    // $scope.openLayer=openLayer;
-    $scope.selecPedido=selecPedido;
-    //$scope.closeLayer=closeLayer;
+    $scope.openLayer=openLayer;
+    // $scope.selecPedido=selecPedido;
+    $scope.closeLayer=closeLayer;
     $scope.DtPedido=DtPedido;
     $scope.openContraPedido =openContraPedido;
     $scope.openPedsust =openPedsust;
@@ -34,11 +38,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
     $scope.removeLisKitchenBox=removeLisKitchenBox;
     $scope.removeLisPedidoSus=removeLisPedidoSus;
 
-    Navi.built($scope);
     $scope.updateForm= function(){
         $scope.formBlock=false;
 
     }
+
 
     //  carga la primera data del sistema filtros  y proveedores
     init();
@@ -93,7 +97,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
     function selecOdc (odc){
         restore('odcSelec');
         loadOdc(odc.id);
-        Navi.openLayer("resumenodc");
+        openLayer("resumenodc");
 
     }
     function selecContraP (item){
@@ -101,38 +105,34 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
         $scope.formDataContraP.contraPedidoMotivo = ORDER.query({type:'CustomOrderReason'});
         $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type:'CustomOrderPriority'});
         loadContraP(item.id);
-        Navi.openLayer("resumenContraPedido");
+        openLayer("resumenContraPedido");
     }
 
     function selecKitchenBox(item){
         restore('FormDataKitchenBox');
         console.log('item id', item);
         $scope.kitchenBoxSelec = ORDER.get({type:'KitchenBox',id:item.id});
-
-        /* $scope.formDataKitchenBox.contraPedidoMotivo = ORDER.query({type:'resumenKitchenbox'});
-         $scope.formDataKitchenBox.contraPedidoPrioridad = ORDER.query({type:'CustomOrderPriority'});
-         loadContraP(item.id);*/
-        Navi.openLayer("resumenKitchenbox");
+        openLayer("resumenKitchenbox");
     }
 
 
     function openOdcs(){
         loadOrdenesDeCompraProveedor($scope.provSelec.id);
-        Navi.openLayer('odc');
+        openLayer('odc');
     }
 
     function openContraPedido(){
-        Navi.openLayer("agrContPed");
+        openLayer("agrContPed");
         loadContraPedidosProveedor($scope.provSelec.id);
     }
 
     function openPedsust(){
-        Navi.openLayer("agrPedPend");
+        openLayer("agrPedPend");
         loadPedidosASustituir($scope.provSelec.id);
     }
 
     function addkitChenBox(){
-        Navi.openLayer("agrKitBoxs");
+        openLayer("agrKitBoxs");
         loadkitchenBoxProveedor($scope.provSelec.id);
 
     }
@@ -141,12 +141,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
     /** al pulsar la flecha siguiente**/
     $scope.next = function (){
         var  curren= $scope.layer;
-        console.log('navi', Navi);
         console.log('current', curren);
 
         switch (curren){
             case 'detallePedido':
-                Navi.openLayer('agrPed');
+                openLayer('agrPed');
                 break;
         }
     }
@@ -184,6 +183,35 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
         loadPedido($scope.pedidoSelec.id);
     }
 
+
+    $scope.changeContraPItem= function(item){
+        /**
+         ORDER.post({type:'KitchenBoxs'},{prov_id:id, pedido_id: $scope.pedidoSelec.id}, function(data){
+            //  $scope.formData.kitchenBox=data;
+            //  $scope.formData.kitchenBox=data;
+           // alert('finite');
+            console.log('order data', data);
+        });
+         */
+        if(item.asig){
+            ORDER.post({type:'AddCustomOrderItem'}, item);
+        }else{
+            // removeContraPedido(contraP.id, $scope.pedidoSelec.id);
+        }
+        // loadPedido($scope.pedidoSelec.id);
+    }
+
+
+    $scope.changeContraP= function(contraP){
+        if(contraP.asig){
+
+            addContraPedido(contraP.id,$scope.pedidoSelec.id);
+        }else{
+            removeContraPedido(contraP.id, $scope.pedidoSelec.id);
+        }
+        loadPedido($scope.pedidoSelec.id);
+    }
+
     $scope.changeKitchenBox= function(contraP){
         if(contraP.asig){
 
@@ -209,45 +237,63 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
         console.log('prov id='+prov.id+"  scop prov ="+ $scope.provSelec.id)
         loadPedidosProvedor(prov.id);
         //loadOrdenesDeCompraProveedor(prov.id);
-        Navi.openLayer('listPedido');
+        openLayer('listPedido');
     }
-    /*
-     function openLayer(layer){
-     if(historia.indexOf(layer)==-1){
-     var l=angular.element(document).find("#"+layer);
-     console.log('layer ',l);
-     var base =264;
-     $scope.index++;
-     var w= base+(24*$scope.index);
-     console.log(' width', w);
-     l.css('width','calc(100% - '+w+'px)');
-     $mdSidenav(layer).open();
-     historia[$scope.index]=layer;
-     $scope.layer=layer;
 
-     return true;
-     }
-     return false;
-     }*/
+    function openLayer(layer){
+        console.log('index of ', historia.indexOf(layer));
+        if(historia.indexOf(layer) == -1){
+
+            var l=angular.element(document).find("#"+layer);
+            console.log('layer ',l);
+            var base =264;
+            $scope.index++;
+            var w= base+(24*$scope.index);
+            console.log(' width', w);
+            l.css('width','calc(100% - '+w+'px)');
+            $mdSidenav(layer).open();
+            historia[$scope.index]=layer;
+            $scope.layer=layer;
+            return true;
+        }
+        return false;
+    }
 
     function DtPedido(pedido){
 
-        if(Navi.openLayer('detallePedido')){
+        if(pedido == 'null'){
 
-            if(pedido == 'null'){
-                restore('pedidoSelec');
-
+            if(segurity('newPedido')){
+                if( openLayer('detallePedido')){
+                    $scope.formBlock=false;
+                    restore('pedidoSelec');
+                    if($scope.index <= 1){
+                        restore('provSelec');
+                    }
+                }
+            }else {
+                alert('No tiene suficientes permiso para ejecutar esta accion');
             }
-            if($scope.index <= 1){
-                restore('provSelec');
+        }else {
+            if(segurity('EditPedido')){
+                if(openLayer('detallePedido')){
+                    loadPedido(pedido.id);
+                    // loadCoinProvider(pedido.prov_id);
+                    // loadCountryProvider(pedido.prov_id);
+                    // loadPaymentCondProvider(pedido.prov_id);
+                    loadDirProvider($scope.pedidoSelec.pais_id);
+                }
             }
-
-            $scope.FormdetallePedido.$setPristine();
+            else {
+                alert('No tiene suficientes permiso para ejecutar esta accion');
+            }
         }
+        $scope.FormdetallePedido.$setPristine();
+
     }
 
     function selecPedido(pedido){
-        Navi.openLayer('detallePedido');
+
 
         loadPedido(pedido.id);
         loadCoinProvider(pedido.prov_id);
@@ -265,7 +311,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
     }
 
     $scope.setPed= function(ped){
-        Navi.openLayer(ped);
+        openLayer(ped);
     }
 
     /****** **************************listener ***************************************/
@@ -278,14 +324,26 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
 
     $scope.$watch('layer',function(newVal){
         if(newVal != '' && typeof(newVal) !== 'undefined' ){
-            console.log(' select layer ', newVal);
+            console.log('current layer', newVal);
             switch (newVal){
-                case 'odc' | 'asdf':
-                    loadPedido($scope.pedidoSelec.id);
+                case 'listPedido':
+                    if($scope.provSelec.id != ''){
+                        loadPedidosProvedor($scope.provSelec.id);
+                    }
                     break;
+                default :
+
+            }
+
+            console.log(' scop index', $scope.index)
+            switch ($scope.index){
+                case 1:
+                    $scope.formBlock=true;
+                    ;break;
             }
         }
     });
+
 
     $scope.$watch('provSelec.id',function(newVal){
         if(newVal != '' && typeof(newVal) !== 'undefined'){
@@ -480,9 +538,21 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
         $http({
             method: 'POST',
             url: 'Order/CustomOrder',
-            data:{id:id}
+            data:{id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
             $scope.contraPedSelec= response.data;
+            var items= new Array();
+            for(var i=0;i<response.data.productos.length;i++){
+                var item=response.data.productos[i];
+
+                item.asig=false;
+                if(item.pedidoItem != null){
+                    item.asig=true;
+                }
+                items.push(item);
+            }
+            $scope.contraPedSelec.productos=items;
+            console.log( $scope.contraPedSelec);
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -516,7 +586,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
         ORDER.post({type:'KitchenBoxs'},{prov_id:id, pedido_id: $scope.pedidoSelec.id}, function(data){
             //  $scope.formData.kitchenBox=data;
             //  $scope.formData.kitchenBox=data;
-            alert('finite');
+           // alert('finite');
             console.log('order data', data);
         });
 
@@ -536,7 +606,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
                 auxs.push(aux);
             }
             console.log(' kit response ',response);
-             $scope.formData.kitchenBox= auxs;
+            $scope.formData.kitchenBox= auxs;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -658,6 +728,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, Navi)
         });
     }
 
+    function segurity(key){
+        return true;
+    }
     function  restore(key){
         switch (key){
             case 'provSelec':
@@ -723,71 +796,4 @@ MyApp.factory('ORDER', ['$resource',
         });
     }
 ]);
-
-MyApp.service("Navi",function($mdSidenav) {
-    var historia= [15];
-    var sp;
-
-    function openLayer(layer){
-
-        if(historia.indexOf(layer)==-1){
-            var l=angular.element(document).find("#"+layer);
-            var base =264;
-            sp.index++;
-            var w= base+(24*sp.index);
-            l.css('width','calc(100% - '+w+'px)');
-            $mdSidenav(layer).open();
-            historia[sp.index]=layer;
-            sp.layer=layer;
-            return true;
-        }
-        return false;
-    }
-
-    function closeLayer(data){
-        var numclose=1;
-        console.log(' tipo', typeof(data));
-
-        if (typeof(data) === 'number'){
-            numclose=data;
-        }else  if (typeof(data) === 'string') {
-            if(data=='END'){
-                numclose= historia.length;
-            }else {
-                var index= historia.indexOf(data);
-                if(index==-1){
-                    numclose=0;
-                    console.log('no se ha abierto el layer');
-                }
-                else {
-                    numclose =  historia.length - (index +1);
-                }
-            }
-        }
-
-        for(var i=0; i<numclose ;i++){
-            var layer=historia[sp.index];
-            $mdSidenav(layer).close();
-            historia[sp.index]=null;
-            sp.index--;
-            sp.layer = historia[sp.index];
-        }
-
-
-
-
-    }
-
-    return {
-        built: function(scope){
-            sp=scope;
-            sp.index = 0;
-            sp.layer = '';
-            sp.openLayer = openLayer;
-            sp.closeLayer = closeLayer;
-        },
-        openLayer:openLayer,
-        closeLayer:closeLayer
-    }
-});
 
