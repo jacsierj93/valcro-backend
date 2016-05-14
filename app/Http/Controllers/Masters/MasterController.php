@@ -96,4 +96,6 @@ class MasterController extends BaseController
 	public function getCargos(){
 		return CargoContact::all();
 	}
+
+
 }

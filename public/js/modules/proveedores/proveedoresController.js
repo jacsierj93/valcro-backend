@@ -120,11 +120,16 @@ MyApp.filter('customFind', function() {
 
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac) {
     $scope.prov=setGetProv.getProv();
-    $scope.cantProvs = setGetProv.seeNew();
-    $scope.isNew = function(){
-        $scope.enabled = false;
-        $scope.edit = true;
-    };
+    $scope.$watch('prov.id',function(nvo) {
+        if(nvo && $scope.prov.new){
+            $scope.prov.new = false;
+            $scope.enabled = false;
+            $scope.edit = true;
+        }
+    });
+/*    $scope.isNew = function(){
+
+    };*/
 
     var historia= [15];
     $scope.index = index=0;
@@ -178,16 +183,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.setProv = function(prov){
-        setGetProv.setProv(prov.item);
         closeLayer(true)
         $scope.edit = false;
         $scope.enabled = true;
+        setGetProv.setProv(prov.item);
         openLayer("layer0");//modificado para mostrar resumen proveedor
     };
 
     $scope.showAlert = function(){
         $mdSidenav("alert").open();
     };
+
 
     $scope.addProv = function(){
         setGetProv.setProv(false);
@@ -280,16 +286,15 @@ MyApp.service("setGetProv",function($http,providers){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var editMode = false;
     return {
         getProv: function () {
             return prov;
         },
         setProv: function(index) {
+            console.log("index",index);
             if (index){
                 itemsel = index;
                 id = itemsel.id;
-
                 providers.get({type:"getProv"},{id:id},function(data){
                     fullProv = data;
                     prov.id = data.id;
@@ -298,8 +303,9 @@ MyApp.service("setGetProv",function($http,providers){
                     prov.type = data.tipo_id;
                     prov.envio = data.tipo_envio_id;
                     prov.contraped = (data.contrapedido==1)?true:false;
-                    prov.limCred = data.limCred;
+                    ///prov.limCred = data.limCred;
                 });
+
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
                 itemsel = {};
@@ -310,6 +316,7 @@ MyApp.service("setGetProv",function($http,providers){
             itemsel.limCred = upd.limCred;
             itemsel.contrapedido = upd.contraped;
             itemsel.tipo_envio_id= upd.envio;
+            //console.log(upd,itemsel)
         },
         setList : function(val){
             list = val;
@@ -358,13 +365,13 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     };
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
-        console.log($scope.$parent);
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveProv"},$scope.dtaPrv,function(data){
                 $scope.dtaPrv.id = data.id;
                 $scope.projectForm.$setPristine();
                 setGetProv.updateItem($scope.dtaPrv);
                 if(data.action=="new"){
+                    $scope.dtaPrv.new = true;
                     setGetProv.addToList({
                         razon_social: $scope.dtaPrv.description,
                         contrapedido: $scope.dtaPrv.contraped,
@@ -372,7 +379,6 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                         id: $scope.dtaPrv.id,
                     });
                     $scope.showSimpleToast();
-                    $scope.$parent.isNew();
                 }
             });
         }
@@ -619,7 +625,10 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     $scope.prov = setGetProv.getProv();
     $scope.coins =masterLists.getAllCoins();
     $scope.$watch('prov.id',function(nvo){
-        listCoins.setProv(nvo);
+        if(nvo){
+            listCoins.setProv(nvo);
+        }
+
         $scope.coinAssign = listCoins.getCoins();
         $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
         $scope.filt = listCoins.getIdCoins();
@@ -746,6 +755,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         $scope.cred.id_prov = credit.prov_id;
         $scope.cred.coin = credit.moneda_id;
         $scope.cred.amount = credit.limite;
+        console.log($scope.cred);
     };
 
     $scope.showGrid = function(elem){
@@ -972,4 +982,94 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
             $scope.timeTrans.$setUntouched();
         }
     }
+});
+
+MyApp.service("setgetCondition",function(){
+    var title = {id_cond:"",title:"",line:""};
+
+    return {
+        getTitle:function(){
+            return title;
+        },
+        setTitle:function(cond){
+            title.id = cond.id;
+            title.title = cond.titulo;
+            title.line = cond.line.linea;
+            title.items = cond.items;
+        }
+    }
+})
+
+MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetProv,providers,$filter,setgetCondition) {
+    $scope.lines = masterLists.getLines();
+    $scope.prov = setGetProv.getProv();
+    $scope.$watch('prov.id',function(nvo) {
+        $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+        $scope.conditions = (nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
+    });
+    $scope.openFormCond = function(){
+        setgetCondition.setTitle(cond);
+        $mdSidenav("payCond").open();
+    };
+    var cond = {};
+    $scope.$watchGroup(['condHeadFrm.$valid','condHeadFrm.$pristine'], function(nuevo) {
+        var sum = $scope.conv;
+        if (nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveHeadCond"},$scope.condHead,function(data){
+                $scope.condHead.id = data.id;
+                $scope.condHeadFrm.$setPristine();
+                cond.titulo = $scope.condHead.title;
+                cond.linea_id = $scope.condHead.line;
+                cond.line =  $filter("filterSearch")($scope.lines,[$scope.condHead.line])[0];
+                if(data.action=="new"){
+                    cond.id = $scope.condHead.id;
+                    $scope.conditions.unshift(cond);
+                }
+            });
+        }
+    });
+
+    $scope.toEdit = function(element){
+        cond = element.condition;
+        $scope.condHead.id = cond.id;
+        $scope.condHead.id_prov = cond.prov_id;
+        $scope.condHead.title = cond.titulo;
+        $scope.condHead.line = cond.linea_id;
+    };
+
+    $scope.showGrid = function(elem){
+        $scope.isShow = elem;
+        if(!elem){
+            $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+            cond = {};
+            $scope.condHeadFrm.$setUntouched();
+        }
+    }
+});
+MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition) {
+    $scope.closeCondition = function(){
+        $mdSidenav("payCond").close();
+    };
+    $scope.head = setgetCondition.getTitle();
+    $scope.$watch('head.id',function(nvo) {
+        $scope.condItem = {id:false,days:"",percent:"",condit:"",id_head:$scope.head.id||0};
+        $scope.conditions = $scope.head.items;
+    });
+
+    var item = {};
+    $scope.$watchGroup(['itemCondForm.$valid','itemCondForm.$pristine'], function(nuevo) {
+        if (nuevo[0] && !nuevo[1]) {
+            providers.put({type:"saveItemCond"},$scope.condItem,function(data){
+                $scope.condItem.id = data.id;
+                $scope.itemCondForm.$setPristine();
+                item.porcentaje = $scope.condItem.percent;
+                item.dias = $scope.condItem.days;
+                item.descripcion =  $scope.condItem.condit;
+                if(data.action=="new"){
+                    item.id = $scope.condItem.id;
+                    $scope.conditions.unshift(item);
+                }
+            });
+        }
+    });
 });

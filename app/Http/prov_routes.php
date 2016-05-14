@@ -23,6 +23,8 @@ $app->post("provider/saveConv",'Providers\ProvidersController@saveFactorConvert'
 $app->post("provider/saveProdTime",'Providers\ProvidersController@saveProdTime');//guarda o actualiza un tiempo de porduccion
 $app->post("provider/saveTransTime",'Providers\ProvidersController@saveProdTrans');//guarda o actualiza un tiempo de transporte
 $app->post("provider/savePoint",'Providers\ProvidersController@savePoint');//guarda el valor para un punto en proveedor
+$app->post("provider/saveHeadCond",'Providers\ProvidersController@saveHeadCond');//guarda el encabezado d euna condicion de pago
+$app->post("provider/saveItemCond",'Providers\ProvidersController@saveItemCond');//guarda el items de una condicion de pago
 
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
@@ -33,6 +35,7 @@ $app->get("provider/provCoins/{id}",'Providers\ProvidersController@getCoins');//
 $app->get("provider/listCoin/{id}",'Providers\ProvidersController@assignCoin');//obtener Monedas asignadas al proveedor(solo id)
 $app->get("provider/provLimits/{id}",'Providers\ProvidersController@getCreditLimits');//obtener limites de creditos asignados al proveedor
 $app->post("provider/provFactors",'Providers\ProvidersController@getFactorConvers');//obtener factores de conversion asignados al proveedor
-$app->get("provider/provCountries/{id}",'Providers\ProvidersController@provCountries');//obtener factores de conversion asignados al proveedor
-$app->get("provider/prodTimes/{id}",'Providers\ProvidersController@getProdTime');//obtener factores de conversion asignados al proveedor
-$app->get("provider/transTimes/{id}",'Providers\ProvidersController@getTimeTrans');//obtener factores de conversion asignados al proveedor
+$app->get("provider/provCountries/{id}",'Providers\ProvidersController@provCountries');//obtener paises asignados al proveedor en direcciones
+$app->get("provider/prodTimes/{id}",'Providers\ProvidersController@getProdTime');//obtener tiempos de produccion
+$app->get("provider/transTimes/{id}",'Providers\ProvidersController@getTimeTrans');//obtener tiempos de transito
+$app->get("provider/payConditions/{id}",'Providers\ProvidersController@getConditions');//obtener tiempos de transito

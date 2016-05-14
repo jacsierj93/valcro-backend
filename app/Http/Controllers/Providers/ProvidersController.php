@@ -14,6 +14,8 @@ use App\Models\Sistema\ProviderFactor as FactConv;
 use App\Models\Sistema\Monedas;
 use App\Models\Sistema\ProdTime;
 use App\Models\Sistema\TiemAproTran;
+use App\Models\Sistema\ProviderCondPay;
+use App\Models\Sistema\ProviderCondPayItem;
 
 use Session;
 use Validator;
@@ -59,8 +61,8 @@ class ProvidersController extends BaseController
             $cont->cargos = $cont->cargos()->get();
         }
         $data->monedas = $data->getProviderCoin()->get();
-        $data->limCred = $data->limitCredit()->get();
-        foreach ($data->limCred as $lim){
+        $data->limites = $data->limitCredit()->get();
+        foreach ($data->limites as $lim){
             $lim->moneda = Monedas::find($lim->moneda_id);
         }
         $data->banks = $data->bankAccount()->get();
@@ -281,6 +283,52 @@ class ProvidersController extends BaseController
 
         $lim->save();
         $result['id']=$lim->id;
+        return $result;
+    }
+
+    public function getConditions($id){
+        if((bool)$id) {
+            $conditions = Provider::find($id)->getPaymentCondition()->get();
+            foreach ($conditions as $cond) {
+                $cond['items'] = $cond->getItems()->get();
+                $cond->line;
+            }
+            return ($conditions) ? $conditions : [];
+        }
+    }
+
+    public function saveHeadCond(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $cond = ProviderCondPay::find($req->id);
+            $result['action']="upd";
+        }else{
+            $cond = new ProviderCondPay();
+        }
+        $cond->titulo = $req->title;
+        $cond->linea_id = $req->line;
+        $cond->prov_id = $req->id_prov;
+
+        $cond->save();
+        $result['id']=$cond->id;
+        return $result;
+    }
+
+    public function saveItemCond(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $item = ProviderCondPayItem::find($req->id);
+            $result['action']="upd";
+        }else{
+            $item = new ProviderCondPayItem();
+        }
+        $item->porcentaje = $req->percent;
+        $item->dias = $req->days;
+        $item->descripcion = $req->condit;
+        $item->id_condicion = $req->id_head;
+
+        $item->save();
+        $result['id']=$item->id;
         return $result;
     }
 

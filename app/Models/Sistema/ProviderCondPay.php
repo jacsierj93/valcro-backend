@@ -21,5 +21,9 @@ class ProviderCondPay extends Model
         return $this->hasMany('App\Models\Sistema\ProviderCondPayItem', 'id_condicion', 'id');
     }
 
+    public function line(){
+        return $this->hasOne('App\Models\Sistema\Line','id','linea_id');
+    }
+
 
 }

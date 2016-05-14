@@ -216,7 +216,7 @@
                                 Limites de Credito
                             </div>
                         </div>
-                        <div ng-repeat="lim in prov.limCred" layout="row" style="border-bottom: 1px solid rgb(84, 180, 234)">
+                        <div ng-repeat="lim in prov.limites" layout="row" style="border-bottom: 1px solid rgb(84, 180, 234)">
                             <div flex="30">{{lim.moneda.nombre}}</div>
                             <div flex="70">{{lim.limite}} {{lim.moneda.simbolo}}</div>
                         </div>
@@ -322,24 +322,21 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" ng-controller="valcroNameController">
+                <form name="nomvalcroForm" ng-controller="valcroNameController" layout="Column" >
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Nombres Valcro
                         </div>
                     </div>
+                    <md-chips  ng-disabled="$parent.enabled" class="md-block" flex="80" ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)" md-on-select="selChip($chip)">
+                        <md-chip-template>
+                            <span>
+                              <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
+                              <span>{{$chip.name}}</span>
+                            </span>
+                        </md-chip-template>
+                    </md-chips>
 
-                    <!--<md-input-container class="md-block" flex>
-                        <label>Nombre Valcro</label>-->
-                        <md-chips  ng-disabled="$parent.enabled" class="md-block" flex ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)" md-on-select="selChip($chip)">
-                            <md-chip-template>
-                                <span>
-                                  <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
-                                  <span>{{$chip.name}}</span>
-                                </span>
-                            </md-chip-template>
-                        </md-chips>
-                            <!--</md-input-container>-->
                 </form>
 
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
@@ -365,7 +362,7 @@
                             </div>-->
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="50">
+                        <md-input-container class="md-block" flex="30">
                             <label>Pais</label>
                             <md-select ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}" >
@@ -377,7 +374,12 @@
 
                             </div>-->
                         </md-input-container>
-                        <md-input-container class="md-block" flex="40">
+                        <md-input-container class="md-block" flex="20">
+                            <label>Codigo Postal</label>
+                            <input md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                        </md-input-container>
+
+                        <md-input-container class="md-block" flex="30">
                             <label>Telefono</label>
                             <input name="provTelf" type="number" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                         </md-input-container>
@@ -414,23 +416,12 @@
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
                             <input ng-disabled="$parent.enabled" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick  ="book()">
-                            <!--<div ng-messages="provContactosForm.nombreCont.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="md-maxlength">Debe tener maximo 55 caracteres.</div>
-                            </div>-->
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="35">
                             <label>Email</label>
                             <input ng-disabled="$parent.enabled" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont"
                                    ng-pattern="/^.+@.+\..+$/"/>
-                            <!--<div ng-messages="provContactosForm.emailCont.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="pattern">Inserte un email valido.</div>
-                                <div ng-message-exp="['minlength', 'maxlength']">
-                                    El debe tener entre 10 y 100 caracteres.
-                                </div>
-                            </div>-->
                         </md-input-container>
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
@@ -444,10 +435,6 @@
                         <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
                             <input ng-disabled="$parent.enabled" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" />
-                            <!--<div ng-messages="provContactosForm.contTelf.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="pattern">0241-123-1234, ingrese un numero valido.</div>
-                            </div>-->
                         </md-input-container>
 
                     </div>
@@ -571,32 +558,7 @@
         <!-- ########################################## LAYER (3) INFORMACION FINANCIERA ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda" ng-controller="coinController">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                           Moneda
-                        </div>
-                    </div>
-                    <div layout="row">
-                        <md-input-container class="md-block" flex="20">
-                            <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="cn.coin" name ="state" ng-disabled="$parent.enabled || (coins.length == filt.length)" required md-no-ink>
-                                <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
-                                    {{coin.nombre}}
-                                </md-option>
-                            </md-select>
 
-                            <!--<div ng-messages="projectForm.type.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
-                            </div>-->
-                        </md-input-container>
-                        <div layout="row" ng-repeat="coinSel in coinAssign">
-                            <div layout="10">{{coinSel.nombre}} ({{coinSel.simbolo}})</div>
-                        </div>
-                    </div>
-                </form>
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
                 <form ng-controller="bankInfoController" name="bankInfoForm" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
@@ -684,6 +646,28 @@
                  </div>
 
                 </form>
+
+                <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
+                <form name="provMoneda" ng-controller="coinController">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                        <div>
+                            Moneda
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
+                            <md-select ng-disabled="$parent.enabled" ng-model="cn.coin" name ="state" ng-disabled="$parent.enabled || (coins.length == filt.length)" required md-no-ink>
+                                <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
+                                    {{coin.nombre}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <div layout="row" ng-repeat="coinSel in coinAssign">
+                            <div layout="10">{{coinSel.nombre}} ({{coinSel.simbolo}})</div>
+                        </div>
+                    </div>
+                </form>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
                 <form name="provCred" ng-controller="creditCtrl" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}" >
@@ -721,6 +705,58 @@
                                     <div flex="20" class="cellGrid"> {{lim.limite}}</div>
                                     <div flex="30" class="cellGrid">{{lim.moneda.nombre}}</div>
                                     <div flex class="cellGrid"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </form>
+
+                <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
+                <form name="condHeadFrm" ng-controller="condPayList" ng-click="showGrid(true)" click-out="showGrid(false)">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}" >
+                        <div flex>
+                           Condiciones de pago
+                        </div>
+
+                    </div>
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="60">
+                            <label>Titulo</label>
+                            <input ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Linea</label>
+                            <md-select ng-disabled="$parent.enabled" ng-model="condHead.line" ng-disabled="$parent.enabled" required md-no-ink>
+                                <md-option ng-repeat="line in lines" value="{{line.id}}">
+                                    {{line.linea}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <div style="width:24px;">
+                            <?= HTML::image("images/menu.png","",array("ng-click"=>"openFormCond()","ng-show"=>"(condHead.id)")) ?>
+                        </div>
+                    </div>
+                    <div layout="column" ng-show="isShow">
+
+                        <div layout="row" class="headGridHolder">
+                            <!--<div flex="20" class="headGrid"> Fecha</div>-->
+                            <div flex="20" class="headGrid"> Titulo</div>
+                            <div flex="30" class="headGrid"> Linea</div>
+                            <div flex class="headGrid"></div>
+                        </div>
+                        <div id="grid">
+                            <div flex ng-repeat="condition in conditions" ng-click="toEdit(this)">
+                                <div layout="row" layout-wrap class="cellGridHolder" style="height: 50px">
+<!--                                    <div flex layout="row">-->
+                                        <div flex="30" class="cellGrid"> {{condition.titulo}}</div>
+                                        <div flex="30" class="cellGrid">{{condition.line.linea}}</div>
+                                        <div flex class="cellGrid"><span ng-repeat="item in condition.items">{{item.porcentaje}}% {{item.dias}} dias, {{item.descripcion}} | </span></div>
+<!--                                    </div>-->
+<!--                                    <div flex layout="row">-->
+<!--                                        <span ng-repeat="item in condition.items">{{item.porcentaje}} {{item.dias}} {{item.descripcion}}</span>-->
+<!--                                    </div>-->
                                 </div>
                             </div>
 
@@ -815,20 +851,54 @@
             </div>
         </md-sidenav>
 
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController" >
+                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click="closeCondition()">
+                    <div>
+                       {{head.title}} <i>({{head.line}})</i>
+                    </div>
+                </div>
+                <!--<form name="headCond">
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="60">
+                            <label>Titulo</label>
+                            <input ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Linea</label>
+                            <md-select ng-disabled="$parent.enabled" ng-model="condHead.line" ng-disabled="$parent.enabled" required md-no-ink>
+                                <md-option ng-repeat="line in lines" value="{{line.id}}">
+                                    {{line.linea}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>-->
+                <form name="itemCondForm">
+                    <div layout="row">
+                        <md-input-container class="md-block" flex="20">
+                            <label>%</label>
+                            <input ng-disabled="$parent.enabled" ng-model="condItem.percent" required>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="20">
+                            <label>Dias</label>
+                            <input ng-disabled="$parent.enabled" ng-model="condItem.days" required>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Condicion</label>
+                            <md-select ng-disabled="$parent.enabled" ng-model="condItem.condit" ng-disabled="$parent.enabled" required md-no-ink>
+                                <md-option ng-repeat="cond in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},]" value="{{cond.name}}">
+                                    {{cond.name}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </form>
+            </md-content>
+        </md-sidenav>
         <!-- ########################################## LAYER (4) TIEMPOS (PRODUCCION/TRANSITO) ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-<!--                <form name="timeProd" ng-controller="prodTimeController" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
-                        <div>
-                            Tiempo Aproximado de Producción
-                        </div>
-                    </div>
-
-
-                </form>
--->
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
                 <form name="timeProd" ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
