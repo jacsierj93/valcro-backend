@@ -1,21 +1,9 @@
-.cantPediLlegar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    color: #ffffff;
-}
 
-.headTitleGrid{
-     border-bottom: solid 1px rgb(84, 180, 234);
-
-}
 .image{
     float: right;
 }
 
-#adjunto{
 
-}
 /*********** para los campos tipo fecha */
 .dateRow {
     height: 30px; margin-top: 6px;

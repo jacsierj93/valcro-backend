@@ -90,32 +90,32 @@
 
                 <div layout="row" style="height: 40px;">
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #006837;">
+                        <div layout layout-align="center center" class="dop-item" style="background-color: #006837;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00862c;">
+                        <div layout layout-align="center center" class="dop-item" style="background-color: #00862c;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00a421;">
+                        <div layout layout-align="center center" class="dop-item" style="background-color: #00a421;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb" style="background-color: #00c316;">
+                        <div layout layout-align="center center" class="dop-item" style="background-color: #00c316;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00e10b;">
+                        <div layout layout-align="center center" class="dop-item" style="background-color: #00e10b;">
                             85
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantPediLlegar" style="background-color: #00ff00;">
+                        <div layout layout-align="center center" class="dop-item" style="background-color: #00ff00;">
                             85
                         </div>
                     </div>
@@ -200,6 +200,7 @@
                             Datos del Pedido
                         </div>
                     </div>
+                    <!--
                     <div layout="row" style="height: 25px;" >
                         <div  flex="15" class="md-block" style=" color: #999999;" >
                             Ordenes de Compra
@@ -213,6 +214,7 @@
 
                         </div>
                     </div>
+                    -->
 
                     <div layout="row"  class=rowInput>
                         <md-input-container class="md-block" flex="15">
@@ -626,9 +628,9 @@
                         <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
                             <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.contraPedido">
 
-                                <div flex class="cellGrid"> {{item.id}}</div>
-                                <div flex class="cellGrid"> {{item.titulo}}</div>
-                                <div flex class="cellGrid"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
+                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
+                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" ng-click="removeLisContraP(contraP)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
@@ -650,15 +652,13 @@
                         <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
                             <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.kitchenBox">
 
-                                <div flex class="cellGrid"> {{item.id}}</div>
-                                <div flex class="cellGrid"> {{item.titulo}}</div>
-                                <div flex class="cellGrid"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
+                                <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
+                                <div flex class="cellGrid"ng-click="selecKitchenBox(item)" > {{item.fecha | date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" ng-click="removeLisKitchenBox(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
                     </div>
-
-
 
                 </div>
                 <div layout="column" flex>
@@ -812,7 +812,7 @@
 
         <!-- 14) ########################################## LAYER (5) RESUMEN CONTRA PEDIDO ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenContraPedido" id="resumenContraPedido" >
-            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
+            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE CONTRA PEDIDO ########################################## -->
 
 
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -934,6 +934,10 @@
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
+
+                        <div flex="5" class="cellGrid">
+                            <md-switch class="md-primary" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+                        </div>
                         <div flex="15" class="headGrid"> Cod. Producto</div>
                         <div flex class="headGrid"> Cod. Profit</div>
                         <div flex class="headGrid"> Descripción.</div>
@@ -944,6 +948,9 @@
                     <div id="gridResOdc">
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="product in contraPedSelec.productos">
+                                <div flex="5" class="cellGrid">
+                                    <md-switch class="md-primary" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+                                </div>
                                 <div flex="15" class="cellGrid">  {{product.id}}</div>
                                 <div flex class="cellGrid"> {{product.profit_id}}</div>
                                 <div flex class="cellGrid">  {{product.descripcion}}</div>
@@ -1059,41 +1066,21 @@
                         </div>
                     </div>
 
-                    <md-grid-list md-cols="4" style = "margin-right: 16px;" md-row-height="100px" >
-                        <md-grid-tile style="background-color: #0a6ebd">
-                            <md-grid-tile> Imagen Proforma</md-grid-tile>
-                        </md-grid-tile>
-                        <md-grid-tile style="background-color: #ffffff">
-                            <md-grid-tile> Imagen Abono</md-grid-tile>
-                        </md-grid-tile>
-                        <md-grid-tile style="background-color: #43bd4c">
-                            <md-grid-tile> Imagen Ada</md-grid-tile>
+                </form>
 
-                        </md-grid-tile>
-                        <md-grid-tile style="background-color: #af6bbd">
-                            <md-grid-tile> Imagen Confirmacion de fabrica</md-grid-tile>
+            </md-content>
 
-                        </md-grid-tile>
-                        <md-grid-tile style="background-color: #333ebd"></md-grid-tile>
-                        <md-grid-tile style="background-color: #bd1620"></md-grid-tile>
-                        <md-grid-tile style="background-color: #b9bd39"></md-grid-tile>
-                    </md-grid-list>
+        </md-sidenav>
+
+
+        <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
+        <md-sidenav ng-show="pedidoSelec.id > 0";
+                    style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');"
+                    layout="column" layout-align="center center" class="md-sidenav-right"
+                    md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
+                    ng-mouseleave="showNext(false)" ng-click="next()">
+            <?= HTML::image("images/btn_nextArrow.png") ?>
+        </md-sidenav>
     </div>
-    </form>
-
-    </md-content>
-
-    </md-sidenav>
-
-
-    <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
-    <md-sidenav ng-show="pedidoSelec.id > 0";
-                style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');"
-                layout="column" layout-align="center center" class="md-sidenav-right"
-                md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
-                ng-mouseleave="showNext(false)" ng-click="next()">
-        <?= HTML::image("images/btn_nextArrow.png") ?>
-    </md-sidenav>
-</div>
 </div>
 

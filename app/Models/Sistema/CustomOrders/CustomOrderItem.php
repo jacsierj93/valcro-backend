@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CustomOrderItem extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_producto_contrapedido";
+    protected $table = "tbl_contra_pedido_item";
     protected $dates = ['deleted_at'];
 
 
