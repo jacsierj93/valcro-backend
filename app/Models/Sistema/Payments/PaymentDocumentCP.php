@@ -22,4 +22,20 @@ class PaymentDocumentCP extends Model
     protected $dates = ['deleted_at'];
 
 
+
+    ////foreing key
+    public function pago()
+    {
+        return $this->belongsTo('App\Models\Sistema\Payments\Payment', 'pago_id');
+    }
+
+
+    ////foreing key
+    public function documento()
+    {
+        return $this->belongsTo('App\Models\Sistema\Payments\DocumentCP', 'documento_cp_id');
+    }
+
+
+
 }
