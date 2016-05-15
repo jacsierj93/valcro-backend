@@ -444,9 +444,9 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Cuenta destino provedor</label>
-                            <md-select ng-model="cuentas" required md-no-ink>
-                                <md-option ng-repeat="cuenta in [{id:1,banco: 'Fulano', direcion:'Direccion de pruebaaaaaaaaa'}]" value="{{cuenta.id}}">
-                                    {{cuenta.banco}} ,  {{cuenta.direcion}}
+                            <md-select ng-model="abono.prov_cuenta_id" md-no-ink>
+                                <md-option ng-repeat="cuenta in cuentasBancarias" value="{{cuenta.id}}">
+                                    {{cuenta.banco}} ,  {{cuenta.cuenta}} , {{cuenta.beneficiario}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
@@ -524,7 +524,7 @@
                         <!-- ################################################################################################ -->
                         <!-- ################################### Estos dos campos son calculados del monto ingresado ################################ -->
                         <!-- ################################################################################################ -->
-                        <!-- Estos varian dependiendo del procentaje o el monto solocados en uno de los 3 campos (Monto, Monto recargo y porventaje recargo) -->
+                        <!-- Estos varian dependiendo del procentaje o el monto solocados en uno de los 3 campos (Monto, Monto recargo y porcentaje recargo) -->
 
                         <md-input-container class="md-block" flex="15">
                             <label>Monto Recargo</label>

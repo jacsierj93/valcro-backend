@@ -15,6 +15,7 @@ class Payment extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_pago";
+    protected $dates = ['deleted_at'];
 
 
     /**@return Proveedor de pago*/

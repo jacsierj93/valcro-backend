@@ -107,6 +107,15 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             console.log("tipos de documentos de pago");
         });
     };
+    
+    ////lista de cuentas bancarias
+    $scope.getProvBankAccounts = function () {
+        $http.get('payments/provider/getBankAccounts').success(function (response) {
+            $scope.cuentasBancarias = response;
+            console.log("trayendo cuentas bancarias del proveedor");
+        });
+        
+    }
 
 
     ////lista de proveedores
@@ -231,6 +240,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         $scope.getPayDocTypes(); //tipos de documento de pago
         $scope.getPayTypes(); ///tipos de pago
         $scope.getCoins(); //monedas
+        $scope.getProvBankAccounts() ///cuentas bancarias
     }
 
 
