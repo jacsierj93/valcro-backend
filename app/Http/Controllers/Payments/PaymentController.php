@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Payments;
 
 use App\Http\Controllers\Masters\MasterFinancialController;
-use App\Libs\Api\RestApi;
+use App\Models\Sistema\BankAccountProvider;
 use App\Models\Sistema\Payments\DocumentCP;
-use App\Models\Sistema\Payments\DocumentCPType;
 use App\Models\Sistema\Payments\Payment;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Provider;
@@ -29,58 +28,6 @@ class PaymentController extends BaseController
     }
 
 
-    /**carga formulario
-     * @param Request $req
-     */
-    public function getForm(Request $req)
-    {
-
-        $datos = new Departament();
-
-        if ($req->has('id')) {
-            $datos = Departament::findOrFail($req->id);
-        }
-
-
-        return view('modules.catalogs.dep-form', ["data" => $datos]);
-
-    }
-
-    public function saveOrUpdate(Request $req)
-    {
-
-        //////////validation
-        $validator = Validator::make($req->all(), [
-            'nombre' => 'required',
-            'descripcion' => 'required'
-
-        ]);
-
-        if ($validator->fails()) { ///ups... erorres
-
-            $result = array("error" => "errores en campos de formulario");
-
-        } else {  ///ok
-
-            $result = array("success" => "Registro guardado con éxito", "action" => "new");
-
-            $model = new Departament();
-            //////////condicion para editar
-            if ($req->has('id')) {
-                $model = $model->findOrFail($req->id);
-                $result["action"] = "edit";
-            }
-
-            $model->nombre = $req->nombre;
-            $model->descripcion = $req->descripcion;
-            $model->save(); ////edita/inserta aviso
-
-
-        }
-
-        return response()->json($result); /// respuesta json
-
-    }
 
     public function delete(Request $req)
     {
@@ -186,21 +133,8 @@ class PaymentController extends BaseController
 
     }
 
-    /**tipos de documentos
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
-     */
-    public function getDocumentTypes()
-    {
+  
 
-        $dtype = DocumentCPType::all();
-        return $dtype;
-    }
-
-    public function getDocumentPayTypes()
-    {
-        $dtype = DocumentCPType::find($this->payIds);
-        return $dtype;
-    }
 
 
     /**trae los pagos de un proveedor
@@ -249,46 +183,20 @@ class PaymentController extends BaseController
     }
 
 
-    /** para seleccionar el detalle del documento
-     * @param $id
+    /**cuentas bancarias del proveedor
      * @return mixed
      */
-    public function getDocById($id)
+    public function getProvBankAccounts()
     {
 
-        $doc = DocumentCP::findOrFail($id);
-
-        $data["prov_nombre"] = Session::get("PROVNAME");
-        $data["prov_id"] = Session::get("PROVID");
-        $data["doc_id"] = $doc->id;
-        $data["doc_tipo"] = $doc->tipo_id;
-        $data["doc_factura"] = $doc->nro_factura;
-        $data["doc_vence"] = $doc->fecha_vence;
-        $data["doc_vencimiento"] = 'v' . $doc->vencimiento(); ///color del punto
-        $data["doc_descripcion"] = $doc->descripcion;
-        if (in_array($doc->tipo_id, $this->debtsIds)) { ////en caso de ser una deuda
-
-            $cuotas = $doc->cuotas();
-            $cdata = array();
-            foreach ($cuotas as $cc) {
-
-                $temp["id"] = $cc->id;
-                $temp["fecha_vence"] = $cc->fecha_vence;
-                $temp["nro_factura"] = $cc->nro_factura;
-                $temp["descripcion"] = $cc->descripcion;
-                $temp["vencimiento"] = 'v' . $cc->vencimiento();
-                $cdata[] = $temp;
-            }
-
-            $data["doc_cuotas"] = $cdata;
-
-        }
-
-
+        $provid = Session::get("PROVID"); ///setea sesion del proveedor actual
+        $data = BankAccountProvider::where("prov_id", $provid)->get();
         return $data;
 
     }
 
+
+  
 
     /**lista de pagos hechas al proveedor CON FACTURA
      * @return mixed
@@ -316,37 +224,7 @@ class PaymentController extends BaseController
     }
 
 
-    /**pagos hechos sin factura
-     * @return array
-     */
-    public function getAbonoList()
-    {
-
-        $provId = Session::get("PROVID");
-        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->orderBy('id','desc')->get();
-
-        $result = array();
-        foreach ($pagos as $pago) {
-
-            $temp["id"] = $pago->id;
-            $temp["nro_factura"] = $pago->nro_factura;
-            $temp["origen"] = $pago->org_factura;
-            $temp["fecha"] = $pago->fecha;
-            $temp["monto"] = $pago->monto;
-            $temp["moneda"] = $pago->moneda->codigo;
-            $temp["tasa"] = $pago->tasa;
-            $temp["tipo"] = $pago->tipo->descripcion;
-            $temp["saldo"] = $pago->saldo;
-            $temp["pagado"] = $pago->monto - $pago->saldo;
-
-            $result[] = $temp;
-        }
-
-        return $result;
-
-    }
-
-
+  
     /**deudas del proveedor
      * @return mixed
      */
@@ -374,55 +252,19 @@ class PaymentController extends BaseController
     }
 
 
+
+
     /********************************************************************************
      * ******************************OPERACIONES CRUD*****************************************
      *********************************************************************************/
 
 
-    public function abonoSaveOrUpdate(Request $req)
-    {
+    public function paySaveOrUpdate(Request $req){
 
-        $rest = new RestApi();
-
-        //////////validation
-        $validator = Validator::make($req->all(), [
-
-            'nro_doc' => 'required'
-
-        ]);
-
-
-        if ($validator->fails()) { ///ups... erorres
-
-            $rest->setError("por favor, verifique los datos de entrada");
-
-        } else {  ///ok
-
-            $model = new DocumentCP();
-            //////////condicion para editar
-            if ($req->has('id')) {
-                $model = $model->findOrFail($req->id);
-            }
-
-            $model->tipo_id = $req->tipo_id;
-            $model->prov_id = Session::get("PROVID");
-            $model->nro_factura = $req->nro_doc;
-            $model->moneda_id = $req->moneda_id;
-            $model->fecha = $req->fecha;
-            $model->monto = $req->monto;
-            $model->saldo = $req->monto;
-            $model->tasa = $req->tasa;
-            $model->descripcion = $req->descripcion;
-            $model->save(); ////edita/inserta
-
-            $rest->setContent("registro guardado con éxito");
-
-        }
-
-        return $rest->responseJson();
-
+        dd($req->all());
 
     }
+
 
 
 }

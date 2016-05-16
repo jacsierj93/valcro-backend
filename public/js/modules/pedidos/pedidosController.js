@@ -185,19 +185,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
 
     $scope.changeContraPItem= function(item){
-        /**
-         ORDER.post({type:'KitchenBoxs'},{prov_id:id, pedido_id: $scope.pedidoSelec.id}, function(data){
-            //  $scope.formData.kitchenBox=data;
-            //  $scope.formData.kitchenBox=data;
-           // alert('finite');
-            console.log('order data', data);
-        });
-         */
-        if(item.asig){
-            ORDER.post({type:'AddCustomOrderItem'}, item);
-        }else{
-            // removeContraPedido(contraP.id, $scope.pedidoSelec.id);
+
+
+        item.pedido_id=$scope.pedidoSelec.id;
+        console.log(' value item',item.monto);
+        if($scope.FormResumenContra.$valid){
+            loadContraP($scope.contraPedSelec.id);
+            if(item.asignado ){
+                ORDER.post({type:'AddCustomOrderItem'}, item);
+            }else{
+                ORDER.post({type:'RemoveCustomOrderItem'},{id:item.renglon_id});
+
+            }
         }
+
+
+
         // loadPedido($scope.pedidoSelec.id);
     }
 
@@ -329,6 +332,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
                 case 'listPedido':
                     if($scope.provSelec.id != ''){
                         loadPedidosProvedor($scope.provSelec.id);
+
                     }
                     break;
                 default :
@@ -541,18 +545,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             data:{id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
             $scope.contraPedSelec= response.data;
-            var items= new Array();
-            for(var i=0;i<response.data.productos.length;i++){
-                var item=response.data.productos[i];
-
-                item.asig=false;
-                if(item.pedidoItem != null){
-                    item.asig=true;
-                }
-                items.push(item);
-            }
-            $scope.contraPedSelec.productos=items;
-            console.log( $scope.contraPedSelec);
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -566,16 +558,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             url: 'Order/CustomOrders',
             data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
-            var contraPs = new Array();
-            for(var i=0;i<response.data.length;i++){
-                var aux=response.data[i];
-                aux.asig=false;
-                if(aux.asignado != 0){
-                    aux.asig=true;
-                }
-                contraPs.push(aux);
-            }
             $scope.formData.contraPedido= response.data;
+            /*
+             var contraPs = new Array();
+             for(var i=0;i<response.data.length;i++){
+             var aux=response.data[i];
+             aux.asig=false;
+             if(aux.asignado != 0){
+             aux.asig=true;
+             }
+             contraPs.push(aux);
+             }*/
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -586,7 +579,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         ORDER.post({type:'KitchenBoxs'},{prov_id:id, pedido_id: $scope.pedidoSelec.id}, function(data){
             //  $scope.formData.kitchenBox=data;
             //  $scope.formData.kitchenBox=data;
-           // alert('finite');
+            // alert('finite');
             console.log('order data', data);
         });
 
