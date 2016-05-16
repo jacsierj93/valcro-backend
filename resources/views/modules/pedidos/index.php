@@ -712,7 +712,7 @@
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="item in formData.contraPedido">
                                 <div class="cellGrid" flex="5">
-                                    <md-switch class="md-primary" ng-model="item.asig" ng-change="changeContraP(item)" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
                                 </div>
                                 <div flex="5" class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
                                 <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
@@ -817,7 +817,6 @@
 
 
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-                <form name="resumenContraPed" >
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
                         <div>
                             Resumen de Contra Pedido
@@ -929,7 +928,9 @@
                         </md-input-container>
                     </div>
 
-                    <div class="titulo_formulario"  style='margin-top: 20px;' layout="column" layout-align="start start">
+                <form name="FormResumenContra" >
+
+                <div class="titulo_formulario"  style='margin-top: 20px;' layout="column" layout-align="start start">
                         <div>
                             Productos a Solicitar
                         </div>
@@ -951,18 +952,19 @@
                             <div layout="row" class="cellGridHolder" ng-repeat="item in contraPedSelec.productos">
                                 <div flex="5" class="cellGrid">
                                     <md-switch class="md-primary"
-                                               ng-model="item.asig"
+                                               ng-model="item.asignado"
                                                ng-change="changeContraPItem(item)"
                                                ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
                                 </div>
-                                <div flex="15" class="cellGrid">  {{item.contraPItem.id}}</div>
-                                <div flex class="cellGrid"> {{item.contraPItemcod_profit}}</div>
-                                <div flex class="cellGrid">  {{item.contraPItem.descripcion}}</div>
+                                <div flex="15" class="cellGrid">  {{item.id}}</div>
+                                <div flex class="cellGrid"> {{item.cod_profit}}</div>
+                                <div flex class="cellGrid">  {{item.descripcion}}</div>
                                 <md-input-container class="md-block" flex="10" >
                                     <input  ng-model="item.monto"
-                                            min="0.01" ui-number-mask type="text"
-                                            max="{{item.monto}}"
-                                            ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asig )"
+                                            ng-change="changeContraPItem(item)"
+                                            ui-number-mask type="text"
+                                            max="{{item.disponible}}"
+                                            ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado )"
                                     />
                                 </md-input-container>
                                 <div flex class="cellGrid">  {{item.comentario}}</div>

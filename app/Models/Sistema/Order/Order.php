@@ -26,16 +26,6 @@ class Order extends Model
         return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'pedido_id');
     }
 
-    public function getCustomOrder(){
-        $data  = $this->OrderItem()
-            ->get();
-        return $data;
-    }
-
-
-
-
-
     /**************************** descontinuado**********************
 
     /**
