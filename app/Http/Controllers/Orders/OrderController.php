@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers\Orders;
 
-use App\Models\Sistema\CustomOrders\CustomOrderItem;
-use App\Models\Sistema\KitchenBoxs\KitchenBox;
-use App\Models\Sistema\Provider;
-use App\Models\Sistema\Payments\PaymentType;
-use App\Models\Sistema\Monedas;
-use App\Models\Sistema\Product;
-use App\Models\Sistema\ProvTipoEnvio;
-use App\Models\Sistema\Order\OrderType;//OrderItem
-use App\Models\Sistema\Order\OrderItem;
 use App\Models\Sistema\CustomOrders\CustomOrder;
-use App\Models\Sistema\CustomOrders\CustomOrderReason;
+use App\Models\Sistema\CustomOrders\CustomOrderItem;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
-use App\Models\Sistema\Purchase\PurchaseOrder;
+use App\Models\Sistema\CustomOrders\CustomOrderReason;
+use App\Models\Sistema\KitchenBoxs\KitchenBox;
+use App\Models\Sistema\Monedas;
 use App\Models\Sistema\Order\Order;
-use App\Models\Sistema\Order\OrderStatus;
 use App\Models\Sistema\Order\OrderCondition;
-use App\Models\Sistema\Order\OrderReason;
+use App\Models\Sistema\Order\OrderItem;
 use App\Models\Sistema\Order\OrderPriority;
+use App\Models\Sistema\Order\OrderReason;
+use App\Models\Sistema\Order\OrderStatus;
+use App\Models\Sistema\Order\OrderType;
+use App\Models\Sistema\Payments\PaymentType;
+use App\Models\Sistema\Product;
+use App\Models\Sistema\Provider;
 use App\Models\Sistema\ProviderAddress;
+use App\Models\Sistema\ProvTipoEnvio;
+use App\Models\Sistema\Purchase\PurchaseOrder;
+use DB;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
-use DB;
+
+//OrderItem
 
 
 class OrderController extends BaseController
@@ -162,49 +164,37 @@ class OrderController extends BaseController
         $prods= Array();
         $items =$model->CustomOrderItem()->get();
 
-        foreach( $items as $aux){
-            $it['contraPItem'] = $aux;
-            $reng=OrderItem::where('producto_id', $aux->id)
-                ->where('tipo_origen_id', '2')
-                ->where('origen_id', $aux->contra_pedido_id)->first();
-            $it['pedidoItem']= $reng;
-            $it['disponible']=$aux->cantidad;
+        foreach( $items as $aux ){
+            $it=$aux;
+            $pediItem = OrderItem::where('pedido_id', $req->pedido_id)
+                ->where('tipo_origen_id','2')
+                ->where('origen_item_id' , $aux->id)
+                ->first();
+            $OtherpediItem= OrderItem::where('pedido_id','<>', $req->pedido_id)
+                ->where('tipo_origen_id','2')
+                ->where('origen_item_id' , $aux->id)
+                ->get();
 
-            if($reng != null){
+            $it['renglon_id'] = null;
+            $it['asignado'] = false;
+            $auxMonto =(float)$aux->cantidad;
+            $auxDisp =(float)$aux->cantidad;
 
-                $it['disponible']= $aux->cantidad - $reng->cantidad;
+            foreach( $OtherpediItem as $other){
+
+                $auxMonto -= (float)$other->cantidad;
+                $auxDisp  -=(float)$other->cantidad;
             }
 
-            $prods[]=$it;
-        }
+            if( $pediItem !== null){
+                $auxMonto = (float) $pediItem->cantidad;
+               // $auxDisp =    $aux->cantidad - (float) $pediItem->cantidad;
+                $it['renglon_id']=$pediItem->id;
+                $it['asignado'] = true;
 
-        $model['productos']=$prods;
-
-        return $model;
-    }
-
-    /**
-     * obtiene un contra pedido con sus productos
-     */
-    public function getCustomOrderItem(Request $req){
-
-        $model=CustomOrder:: findOrFail($req->id);
-        $prods= Array();
-        $items =$model->CustomOrderItem()->get();
-
-        foreach( $items as $aux){
-            $it['contraPItem'] = $aux;
-            $reng=OrderItem::where('producto_id', $aux->id)
-                ->where('tipo_origen_id', '2')
-                ->where('origen_id', $aux->contra_pedido_id)->first();
-            $it['pedidoItem']= $reng;
-            $it['monto']=$aux->cantidad;
-
-            if($reng != null){
-
-                $it['monto']= $aux->cantidad - $reng->cantidad;
             }
-
+            $it['disponible']=  $auxDisp;
+            $it['monto']=  $auxMonto ;
             $prods[]=$it;
         }
 
@@ -215,41 +205,74 @@ class OrderController extends BaseController
 
     public  function addCustomOrderItem(Request $req){
 
-        return $req;
+        $item = new OrderItem();
+        if($req->renglon_id != null){
+            $item = OrderItem:: findOrFail($req->renglon_id);
+        }
+        $item->tipo_origen_id = 2;
+        $item->pedido_id =  $req->pedido_id;
+        $item->doc_origen_id =  $req->doc_origen_id;
+        $item->origen_item_id = $req->id;
+        $item->descripcion = $req->descripcion;
+        $item->cantidad = $req->monto;
+        $item->save();
+
+    }
+
+    public  function removeCustomOrderItem(Request $req){
+         $item = OrderItem:: findOrFail($req->id);
+         $item->destroy($item->id);
+
     }
     /**
      * obtiene los contra pedidos de un proveedor
      */
     public function getCustomOrders(Request $req){
 
-        $model =CustomOrder::
-        select(DB::raw("tbl_contra_pedido.id ,
-        fecha, comentario , monto, titulo, fecha_aprox_entrega, tbl_contra_pedido.aprobada , "
-            ." (select count(*) from tbl_pedido_item where deleted_at is null
-            and tipo_origen_id = 2 and origen_id= tbl_contra_pedido.id"
-            .") as asignado"
-        ))
-            ->leftJoin('tbl_pedido_item','tbl_contra_pedido.id','=','tbl_pedido_item.origen_id')
-            ->where('aprobada','1')
+        $data = Array();
+        $items = CustomOrder::
+        where('aprobada','1')
             ->where('prov_id',$req->prov_id)
-            ->Where(function($query) use ($req)
-            {
-                $query->where('tbl_pedido_item.pedido_id',null)
-                    ->Orwhere('tbl_pedido_item.pedido_id',$req->pedido_id)
-                ;
-
-            })
             ->get();
 
-        $data = $model->filter(function ($item) use ($req){
-            if($item->asignado > 0){
-                if($item->pedido_id != $req->pedido_id){
-                    return false;
+        foreach( $items as $aux ){
+            $item=$aux;
+            $CItems= $aux->CustomOrderItem()->get();
+
+            foreach( $CItems as $aux2 ){
+
+                $reng =null;
+                $reng = OrderItem::
+                where('tipo_origen_id',2)
+                    ->where('origen_item_id',$aux2->id)->get();
+
+                if( sizeof($reng) <= 0){
+                    $data[]= $item;
+                }
+                else {
+                    $item['asignado']=false;
+                    $item['renglen_id']=null;
+                    $sum=0.0;
+                    foreach( $reng as $aux3 )
+                    {
+                        if($aux3->pedido_id == $req->pedido_id){
+                            $item['asignado']=true;
+                            $item['renglen_id']= $aux3->id;
+                            $data[]= $item;
+                            break 2;
+                        }else{
+                            $sum+=$aux3->cantidad;
+                        }
+                    }
+                    if($sum <$aux2->cantidad){
+                        $data[]= $item;
+                    }
+
                 }
             }
-            return true;
-        });
-        return array_values($data->toArray());
+
+        }
+        return $data;
     }
 
     /**
@@ -358,11 +381,25 @@ class OrderController extends BaseController
      */
 
     public function getOrden(Request $req){
-        $data=Order::findOrFail($req->id);
-        $data['contraPedido'] = $data->getCustomOrder();
+
+        $order=Order::findOrFail($req->id);
+        $data= $order;
+        $items= $order->OrderItem()->get();
+
+        $contra=Array();
+        foreach($items->where('tipo_origen_id', '2') as $aux){
+
+            $contra[]= CustomOrder::find($aux->doc_origen_id);
+            // $data['contraPedido'][] =
+        }
+
+
+
+        $data['contraPedido'] = $contra;
         return $data;
 
     }
+
     /**
      * Obtiene las ordenes de compra de un provedor
      ***/
