@@ -27,6 +27,7 @@ $app->post("provider/saveHeadCond",'Providers\ProvidersController@saveHeadCond')
 $app->post("provider/saveItemCond",'Providers\ProvidersController@saveItemCond');//guarda el items de una condicion de pago
 
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
+$app->get("provider/allValcroName",'Providers\ProvidersController@listAllValcroName');//obtener tiempos de transito
 $app->get("provider/dirList/{id}",'Providers\ProvidersController@listProvAddr'); ///obtener listado de direcciones
 $app->get("provider/contactProv/{provId}",'Providers\ProvidersController@listContacProv'); ///obtener listado contactos Proveedores
 $app->get("provider/allContacts",'Providers\ProvidersController@allContacts');

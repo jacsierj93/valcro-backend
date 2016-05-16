@@ -132,6 +132,7 @@ class ProvidersController extends BaseController
         $valName->nombre = $req->name;
         $valName->fav = $req->fav;
         $valName->save();
+        $valName->departamento()->sync($req->departments);
 
         $result['id']=$valName->id;
         return $result;
@@ -146,8 +147,19 @@ class ProvidersController extends BaseController
     public function listValcroName($id){
         if((bool)$id){
             $valName = Provider::find($id)->nombres_valcro()->select("id","nombre as name","fav")->get();
+            foreach($valName as $nom){
+                $nom->departments = $nom->departamento()->lists("depa_id");
+            }
             return $valName;
         }
+    }
+
+    public function listAllValcroName(){
+        $valName = NombreValcro::all();
+        foreach($valName as $nom){
+            $nom->departments = $nom->departamento()->get();
+        }
+        return $valName;
     }
 
     public function listContacProv($id){

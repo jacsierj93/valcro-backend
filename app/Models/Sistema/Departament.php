@@ -24,5 +24,9 @@ class Departament extends Model
 
     protected $dates = ['deleted_at'];
 
-
+    ///foreing key
+    public function nomVal()
+    {
+        return $this->belongsToMany('App\Models\Sistema\NombreValcro','tbl_nom_valcro_departameno','depa_id','nomVal_id');
+    }
 }

@@ -322,21 +322,33 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" ng-controller="valcroNameController" layout="Column" >
+                <form name="nomvalcroForm" ng-controller="valcroNameController">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Nombres Valcro
                         </div>
                     </div>
-                    <md-chips  ng-disabled="$parent.enabled" class="md-block" flex="80" ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" placeholder="Nombre Valcro" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)" md-on-select="selChip($chip)">
-                        <md-chip-template>
-                            <span>
-                              <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
-                              <span>{{$chip.name}}</span>
-                            </span>
-                        </md-chip-template>
-                    </md-chips>
-
+                    <div layout="row" flex>
+                        <md-chips ng-disabled="$parent.enabled" class="md-block" flex ng-model="valcroName" md-autocomplete-snap=""  md-require-match="false" md-on-add="addChip(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmChip(this,$chip)" md-on-select="selChip($chip)">
+                            <md-autocomplete md-search-text="ctl.currentName" md-items="item in []" placeholder="Nombre Valcro" >
+                            </md-autocomplete>
+                            <md-chip-template>
+                                <span>
+                                  <img ng-show="($chip.fav=='1')" src="images/contra_pedido.png" height="16" width="16"/>
+                                  <span>{{$chip.name}}</span>
+                                </span>
+                            </md-chip-template>
+                        </md-chips>
+                        <div>
+                            <span>{{ctl.search(ctl.currentName)}}</span>
+                            <?= HTML::image("images/1administrator.png","",array("ng-click"=>"setDepa('adm')","ng-show"=>"(dep.indexOf(deps.adm.id)===-1) && ctl.currentName")) ?>
+                            <?= HTML::image("images/2administrator.png","",array("ng-click"=>"unSetDepa('adm')","ng-show"=>"(dep.indexOf(deps.adm.id)!==-1) || ((dep.indexOf(deps.adm.id)!==-1) && !(ctl.currentName))")) ?>
+                            <?= HTML::image("images/1delivery_food.png","",array("ng-click"=>"setDepa('store')","ng-show"=>"(dep.indexOf(deps.store.id)===-1) && ctl.currentName")) ?>
+                            <?= HTML::image("images/2delivery_food.png","",array("ng-click"=>"unSetDepa('store')","ng-show"=>"((dep.indexOf(deps.store.id)!==-1) && !(ctl.currentName))")) ?>
+                            <?= HTML::image("images/1shoping_cart.png","",array("ng-click"=>"setDepa('purch')","ng-show"=>"(dep.indexOf(deps.purch.id)===-1) && ctl.currentName")) ?>
+                            <?= HTML::image("images/2shoping_cart.png","",array("ng-click"=>"unSetDepa('purch')","ng-show"=>"((dep.indexOf(deps.purch.id)!==-1) && !(ctl.currentName))")) ?>
+                        </div>
+                    </div>
                 </form>
 
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
@@ -506,9 +518,9 @@
                         </div>
                     </div>
                     <div style="height: 100%; overflow:scroll">
-                        <div flex ng-repeat="line in lines" flex="column" ng-click="toEdit(this)">
+                        <div flex ng-repeat="line in lines.list" flex="column" ng-click="toEdit(this)">
                             <div layout="column" layout-wrap class="cellGridHolder cellGrid" style="height: 24px" >
-                                <div flex style="height: 24px">{{line.linea}} </div>
+                                <div flex style="height: 24px">{{line.nombre}} </div>
                             </div>
 
                         </div>
@@ -892,6 +904,17 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                    </div>
+                    <div id="grid">
+                        <div flex ng-repeat="condition in conditions" ng-click="toEdit(this)">
+                            <div layout="row" layout-wrap class="cellGridHolder">
+                                <!--                                    <div flex layout="row">-->
+                                <div flex="30" class="cellGrid"> {{condition.porcentaje}}</div>
+                                <div flex="30" class="cellGrid">{{condition.dias}}</div>
+                                <div flex class="cellGrid">{{condition.descripcion}}</div>
+                            </div>
+                        </div>
+
                     </div>
                 </form>
             </md-content>

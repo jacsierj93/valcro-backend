@@ -18,10 +18,9 @@ class NombreValcro extends Model
     use SoftDeletes;
     protected $table = "tbl_prov_nomb_valcro";
 
-    ///foreing key
-/*    public function proveedor()
+    public function departamento()
     {
-        return $this->belongsTo('App\Models\Sistema\Proveedor', 'cargo_id');
-    }*/
+        return $this->belongsToMany('App\Models\Sistema\Departament','tbl_nom_valcro_departameno','nomVal_id','depa_id');
+    }
 
 }

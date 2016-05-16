@@ -451,8 +451,11 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
 
 
-MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers,$mdSidenav) {
+MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers,$mdSidenav,$filter,valcroNameDetail) {
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
+    $scope.allName = providers.query({type:"allValcroName"});
+    $scope.deps = {"store":{id:1},"adm":{id:2},"purch":{id:3}};
+    $scope.dep = [];
     $scope.$watch('prov.id',function(nvo){
         $scope.valcroName = (nvo)?providers.query({type: "provNomValList", id_prov: $scope.prov.id || 0}):[];
     });
@@ -469,6 +472,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                 data: $scope.valcroName[lastIndex]
             }).then(function successCallback(response) {
                 $scope.valcroName[lastIndex].id = response.data.id;
+                $scope.dep = [];
             }, function errorCallback(response) {
                 console.log("error=>", response)
             });
@@ -480,12 +484,12 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         if (angular.isObject(chip)) {
             return chip;
         }
-        var chip = { name: chip, dep: 'adm', fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
+        var chip = { name: chip, departments: $scope.dep, fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
         // Otherwise, create a new o
         return chip;
     };
     $scope.rmChip = function(fiel,chip){
-        console.log(fiel)
+        //console.log(fiel)
         $http({
             method: 'POST',
             url: "provider/delValcroName",
@@ -497,16 +501,51 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         });
     };
 
+    $scope.chipSel = {};
     $scope.selChip = function(chip){
-        $mdSidenav("nomValLyr").open();
-    }
+        $scope.dep = chip.departments;
+        //$mdSidenav("nomValLyr").open();
+    };
 
-    /*$mdSidenav*/
+    $scope.setDepa = function(dep){
+        $scope.dep.push($scope.deps[dep].id)
+
+    };
+
+    $scope.unSetDepa = function(dep){
+        var k = $scope.dep.indexOf($scope.deps[dep].id);
+        //console.log($scope.dep);
+        delete $scope.dep[k];
+    };
+
+    $scope.ctl = {currentName:""};
+    $scope.ctl.search = function(val){
+        if(val){
+            list = $filter("customFind")($scope.allName,val,function(current,compare){return current.nombre.indexOf(compare)!==-1});
+            valcroNameDetail.setList(list);
+            return list.length
+        }
+    };
 });
 
-MyApp.controller('nomValAssign', function ($scope,setGetProv,providers,masterLists) {
+MyApp.service("valcroNameDetail",function(){
+    var valcroNames = {list:[],last:null};
+
+    return {
+        setList : function(list){
+            var d = new Date();
+            valcroNames.list = list;
+            valcroNames.last = d.getDate();
+        },
+        getList : function(){
+            return valcroNames;
+        }
+    }
+});
+
+MyApp.controller('nomValAssign', function ($scope,setGetProv,valcroNameDetail) {
     $scope.prov = setGetProv.getProv();
-    $scope.lines = masterLists.getLines();
+    $scope.lines = valcroNameDetail.getList();
 });
 MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter) {
     $scope.prov = setGetProv.getProv();
@@ -1052,7 +1091,7 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
     };
     $scope.head = setgetCondition.getTitle();
     $scope.$watch('head.id',function(nvo) {
-        $scope.condItem = {id:false,days:"",percent:"",condit:"",id_head:$scope.head.id||0};
+        $scope.condItem = {id:false,days:"",percent:0.00,condit:"",id_head:$scope.head.id||0};
         $scope.conditions = $scope.head.items;
     });
 
