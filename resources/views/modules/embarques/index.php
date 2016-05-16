@@ -1,14 +1,64 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="embarquesCtrll">
-    <span ng-click="openLayer('lyr1pag')"> ABRIRRRR </span>
+    <span ng-click="openLayer('lyrAlert')"> ABRIRRRR </span>
 
-
-
-    <md-sidenav layout="row" style="margin-top:200px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyr1pag" id="lyr1pag">
-        ALGO
-
-        <div style="width: 16px;" >
-
+    <md-sidenav layout="row" style="top: calc(100% - 128px); height: 80px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
+        <div flex style="background-color: yellow;">
+            <md-tabs>
+                <md-tab label="one">
+                    <md-content class="md-padding">
+                        Lorem ipsum dolor sit amet.
+                    </md-content>
+                </md-tab>
+                <md-tab label="two">
+                    <md-content class="md-padding">
+                        Lorem ipsum dolor sit amet.
+                    </md-content>
+                </md-tab>
+                <md-tab label="three">
+                    <md-content class="md-padding">
+                        Integer turpis erat, porttitor.
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </div>
+        <div flex style="background-color: #ac2925;">
+            <md-tabs>
+                <md-tab label="one">
+                    <md-content class="md-padding">
+                        Lorem ipsum dolor sit amet.
+                    </md-content>
+                </md-tab>
+                <md-tab label="two">
+                    <md-content class="md-padding">
+                        Lorem ipsum dolor sit amet.
+                    </md-content>
+                </md-tab>
+                <md-tab label="three">
+                    <md-content class="md-padding">
+                        Integer turpis erat, porttitor.
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </div>
+        <div flex>
+            <md-tabs>
+                <md-tab label="one">
+                    <md-content class="md-padding">
+                        Lorem ipsum dolor sit amet.
+                    </md-content>
+                </md-tab>
+                <md-tab label="two">
+                    <md-content class="md-padding">
+                        Lorem ipsum dolor sit amet.
+                    </md-content>
+                </md-tab>
+                <md-tab label="three">
+                    <md-content class="md-padding">
+                        Integer turpis erat, porttitor.
+                    </md-content>
+                </md-tab>
+            </md-tabs>
         </div>
     </md-sidenav>
 
