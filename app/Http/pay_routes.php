@@ -15,13 +15,13 @@ $app->get('payments/typeDocsList', 'Payments\DocumentController@getDocumentTypes
 $app->get('payments/payDocsList', 'Payments\DocumentController@getDocumentPayTypes'); ///tipos de documentos de pago
 $app->get('payments/getDocById/{id}','Payments\DocumentController@getDocById'); ///selecciona un documento
 $app->post('payments/saveAbono', 'Payments\DocumentController@abonoSaveOrUpdate'); ///guarda un documento de abono
-$app->get('payments/getAbonos','Payments\DocumentController@getAbonoList'); ///trae los abonos a favor
+$app->get('payments/getAbonos/{type}','Payments\DocumentController@getAbonoList'); ///trae los abonos a favor segun estatus
 
 $app->get('payments/provList', 'Payments\PaymentController@getProvidersList'); ///lista de proveedores
 $app->get('payments/typeList', 'Payments\PaymentController@getPaymentTypes'); ///tipos de pagos
 $app->get('payments/getProv/{id}','Payments\PaymentController@getProvById'); ///selecciona un proveedor
 $app->get('payments/provider/getBankAccounts','Payments\PaymentController@getProvBankAccounts'); ///lista de cuentas bancarias del proveedor
-
+$app->post('payments/savePay', 'Payments\PaymentController@paySaveOrUpdate'); ///guarda un documento de abono
 
 
 

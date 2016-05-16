@@ -225,7 +225,6 @@ class PaymentController extends BaseController
 
 
   
-
     /**deudas del proveedor
      * @return mixed
      */
@@ -252,6 +251,20 @@ class PaymentController extends BaseController
         return $result;
     }
 
-    
+
+
+
+    /********************************************************************************
+     * ******************************OPERACIONES CRUD*****************************************
+     *********************************************************************************/
+
+
+    public function paySaveOrUpdate(Request $req){
+
+        dd($req->all());
+
+    }
+
+
 
 }

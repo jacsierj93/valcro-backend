@@ -19,8 +19,9 @@ use Validator;
 class DocumentController extends BaseController
 {
 
-    private $payIds = array(1, 2, 3);
-    private $debtsIds = array(4);
+    private $payIds = array(1, 2, 3); ///tipos de abono ADE,NDC,RBAY
+    private $debtsIds = array(4); ///facturas
+    private $documentState = array(1, 2, 3); ///estatus de documentos nuevo,procesado,cancelado
 
     public function __construct()
     {
@@ -83,16 +84,24 @@ class DocumentController extends BaseController
 
 
     /**pagos hechos sin factura
-     * @return array
+     * @return array todo: chequear si son todos? o si son los que no se han procesado (segun vista)
      */
-    public function getAbonoList()
+    public function getAbonoList($type)
     {
 
         $provId = Session::get("PROVID");
-        $pagos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->orderBy('id', 'desc')->get();
+        $abonos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->orderBy('id', 'desc');
+
+        if ($type == "new") {
+            $abonos = $abonos->where("estatus", 1);
+        }
+
+
+        $lista = $abonos->get();
+
 
         $result = array();
-        foreach ($pagos as $pago) {
+        foreach ($lista as $pago) {
 
             $temp["id"] = $pago->id;
             $temp["nro_factura"] = $pago->nro_factura;
@@ -101,7 +110,12 @@ class DocumentController extends BaseController
             $temp["monto"] = $pago->monto;
             $temp["moneda"] = $pago->moneda->codigo;
             $temp["tasa"] = $pago->tasa;
-            $temp["tipo"] = $pago->tipo->descripcion;
+            try {
+                $temp["tipo"] = $pago->tipo->descripcion;
+            } catch (\Exception $e) {
+                $temp["tipo"] = "N/A";
+            }
+
             $temp["saldo"] = $pago->saldo;
             $temp["pagado"] = $pago->monto - $pago->saldo;
 
@@ -113,6 +127,9 @@ class DocumentController extends BaseController
     }
 
 
+    /***trae todos los abonos realizados
+     * @return mixed
+     */
     public function getDocumentPayTypes()
     {
         $dtype = DocumentCPType::find($this->payIds);

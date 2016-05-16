@@ -189,6 +189,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
         $scope.getCoins();
         $scope.getPayTypes();
+        $scope.getAbonosNew();
 
     }
 
@@ -215,12 +216,12 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     }
 
 
-    /////pagos que no tienene facturas directamente
+    /////abonos al proveedor TODOS
     $scope.getAbonos = function () {
 
         openLayer('lyr4pag');
 
-        $http.get('payments/getAbonos').success(function (response) {
+        $http.get('payments/getAbonos/all').success(function (response) {
 
             $scope.abonos = response;
           //  $scope.abono = {};
@@ -230,6 +231,19 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
 
     }
+
+    $scope.getAbonosNew=function () {
+
+        $http.get('payments/getAbonos/new').success(function (response) {
+
+            $scope.abonos2 = response;
+            //  $scope.abono = {};
+
+            console.log("trayendo Abonos sin procesar");
+        });
+
+    }
+
 
 
     ////formulario de registro de adelanto
@@ -261,10 +275,23 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
                 console.log("Error:enviando datos del abono...")
             });
 
-
-
-
     }
+
+
+    /////formulario de registro de pago
+    $scope.saveFormPago = function () {
+        $http.post('payments/savePay',$scope.pago)
+            .success(function (data, status, headers, config){
+
+                console.log(data);
+
+            }).error(function (data, status, header, config) {
+            console.log("Error:enviando datos del pago...")
+        });
+    }
+
+
+
 
 
 });
