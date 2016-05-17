@@ -25,7 +25,8 @@ class MasterOrderController extends BaseController
 
     /**
      *Obtiene la cantidad disponible para la compra de un producto
-     *
+     * @param el producto item (tbl_contra_pedido_item) que posea el campo cantidad
+     * @param el id del pedido a donde se va a assignar
      */
     public static function getQuantityAvailableProduct($producto, $pedido_id){
         $auxMonto =(float)$producto->cantidad;
@@ -61,4 +62,25 @@ class MasterOrderController extends BaseController
         return $it;
     }
 
+    /**
+     * determina si el producto ya a sido asignado al pedido(kitchenBox)
+     * @param el producto que posea el campo cantidad
+     * @param el id del pedido a donde se va a assignar
+     */
+    public static function getAvailableProduct($producto, $pedido_id){
+        $it=$producto;
+        $it['asignado'] = false;
+
+        $pediItem = OrderItem::where('pedido_id', $pedido_id)
+            ->where('tipo_origen_id',$producto->tipo_origen_id)
+            ->where('origen_item_id' , $producto->id)
+            ->first();
+        if( $pediItem !== null){
+            $it['renglon_id']=$pediItem->id;
+            $it['asignado'] = true;
+        }
+
+        return $it;
+
+    }
 }

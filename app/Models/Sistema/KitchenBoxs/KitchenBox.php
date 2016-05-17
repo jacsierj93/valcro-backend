@@ -18,11 +18,11 @@ class KitchenBox extends Model
     protected $table = "tbl_kitchen_box";
 
 
-
+/*
     public function getfechaAttribute($value)
     {
         return date("Y-m-d", strtotime($value));;
-    }
+    }*/
 
     /**
      */

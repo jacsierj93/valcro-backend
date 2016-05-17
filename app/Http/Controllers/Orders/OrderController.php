@@ -131,6 +131,7 @@ class OrderController extends BaseController
         return $model->get();
     }
     /**
+     * @deprecated
      * obtiene las ordenes de compra de un pedido
      */
     public function getOrdenPurchaseOrder(Request $req){
@@ -202,6 +203,7 @@ class OrderController extends BaseController
 
     }
     /**
+     * revisar por intergar al maestro de Order
      * obtiene los contra pedidos de un proveedor
      */
     public function getCustomOrders(Request $req){
@@ -323,28 +325,24 @@ class OrderController extends BaseController
      */
     public function getKitchenBoxs(Request $req){
 
-        $model =KitchenBox::
-        select(DB::raw("tbl_kitchen_box.id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega,
-        tbl_pedido_item.pedido_id as pedidoIdentifi,
-        tbl_pedido_item.origen_id, tbl_pedido_item.pedido_id ,"
-            ." ( select count(*) from tbl_pedido_item where deleted_at is null
-        and pedido_tipo_origen_id = 3 and tbl_pedido_item.origen_id= tbl_kitchen_box.id"
-            .") as asignado"
-        ))
-            ->distinct()
-            ->leftJoin('tbl_pedido_item','tbl_kitchen_box.id','=','tbl_pedido_item.origen_id')
-            // ->where('aprobada','1')
-            ->where('prov_id',$req->prov_id)
+        $data = Array();
+        $items = KitchenBox::
+       where('prov_id',$req->prov_id)
+            ->where('precio_bs','<>',0)
+            ->whereNotNull('img_conf_gerente')
+            ->whereNotNull('fecha_conf_gerente')
             ->get();
-        $data = $model->filter(function ($item) use ($req){
-            if($item->asignado > 0){
-                if($item->pedido_id != $req->pedido_id){
-                    return false;
-                }
+
+        foreach($items as $aux){
+            $it=$aux;
+            $it->tipo_origen='2';
+            $it= MasterOrderController::getAvailableProduct($it, $req->pedido_id);
+            $it->tipo_origen=$aux->tipo_origen;
+            if(!$it['asignado']){
+                $data[]=$it;
             }
-            return true;
-        });
-        return array_values($data->toArray());
+        }
+        return $data;
     }
 
 

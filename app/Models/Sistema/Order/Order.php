@@ -69,10 +69,10 @@ class Order extends Model
     public function kitchenBox(){
         return $this->belongsToMany('App\Models\Sistema\KitchenBoxs\KitchenBox', 'tbl_pedido_kitchenbox', 'pedido_id','kitchen_box_id');
     }
-
+/*
     public function getEmisionAttribute($value)
     {
         return date("Y-m-d", strtotime($value));;
     }
-
+*/
 }

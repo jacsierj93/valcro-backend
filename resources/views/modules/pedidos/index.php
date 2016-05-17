@@ -176,7 +176,7 @@
                                 <div flex="5" class="cellGrid"> {{pedido.tipo}}</div>
                                 <div flex="15" class="cellGrid"> {{pedido.id}}</div>
                                 <div flex="15" class="cellGrid"> {{pedido.nro_proforma}}</div>
-                                <div flex="10" class="cellGrid"> {{pedido.emision | date:'dd/MM/yyyy' }}</div>
+                                <div flex="10" class="cellGrid"> {{pedido.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
                                 <div flex="15" class="cellGrid"> {{pedido.nro_factura}}</div>
                                 <div flex class="cellGrid"> {{pedido.monto}}</div>
                                 <div flex class="cellGrid">{{pedido.comentario}}</div>
@@ -232,11 +232,11 @@
                             <input  ng-model="pedidoSelec.id" ng-disabled="true">
                         </md-input-container>
 
-                        <div layout="row"  flex="25"  class="dateRow" >
-                            <div class="dateRowTitle"> Fecha </div>
+                        <div layout="column" flex>
                             <md-datepicker ng-model="pedidoSelec.emision"
-                                           md-placeholder="{{pedidoSelec.emision | date:'dd/MM/yyyy'}}"
-                                           ng-disabled="true"></md-datepicker>
+                                           md-placeholder="Fecha"
+                                           ng-disabled="(provSelec.save || formBlock)"
+                            ></md-datepicker>
                         </div>
 
                         <md-input-container class="md-block" flex >
@@ -518,7 +518,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenodc" id="resumenodc">
             <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-
+<!--
                 <form name="resumenOdc" >
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start">
@@ -534,12 +534,12 @@
 
                         </md-input-container>
 
+                        <div layout="column" flex>
+                            <md-datepicker ng-model="odcSelec.emision" md-placeholder="Fecha"
+                                           ng-disabled="true"
+                            ></md-datepicker>
+                        </div>
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>Fecha:</label>
-                            <input md-maxlength="4"  md-no-asterisk name="fecha"
-                                   ng-model="odcSelec.emision" ng-disabled="true" >
-                        </md-input-container>
 
                         <md-input-container class="md-block" flex="40">
                             <label>Fabrica</label>
@@ -605,13 +605,14 @@
                         </div>
                     </div>
                 </form>
+                --->
             </md-content>
         </md-sidenav>
 
 
         <!-- 15) ########################################## LAYER (5) Agregar Pedidos ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed" id="agrPed">
-            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
+            <!-- ) ########################################## Agregar Pedidos ########################################## -->
             <md-content  layout="row" style="'margin-top:0px;'" layout-padding flex>
 
                 <!--<div class="titulo_formulario" layout="row" flex>-->
@@ -677,7 +678,7 @@
 
                             <div flex class="cellGrid"> {{item.id}}</div>
                             <div flex class="cellGrid"> {{item.id}}</div>
-                            <div flex class="cellGrid"> {{item.emision | date:'dd/MM/yyyy' }}</div>
+                            <div flex class="cellGrid"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
                             <div flex class="cellGrid" ng-click="removeLisPedidoSus(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                         </div>
                     </div>
@@ -762,7 +763,7 @@
                                 <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.img_proforma}}</div>
                                 <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.monto}}</div>
                                 <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.precio}}</div>
-                                <div flex class="cellGrid"> {{kitchenBox.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
+                                <div flex class="cellGrid"> {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
                             </div>
                         </div>
                     </div>
@@ -831,10 +832,10 @@
                         </md-input-container>
 
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>Fecha:</label>
-                            <input ng-model="contraPedSelec.fecha" ng-disabled="true" >
-                        </md-input-container>
+                        <div layout="column" flex="20">
+                            <md-datepicker ng-model="contraPedSelec.fecha"
+                                           md-placeholder="Fecha" ng-disabled="true"></md-datepicker>
+                        </div>
 
                         <md-input-container class="md-block" flex="40">
                             <label>Fabrica</label>
@@ -891,16 +892,18 @@
 
                     </div>
 
-                    <div layout="row">
-                        <md-input-container class="md-block" flex>
+                    <div layout="row" >
+                        <md-input-container class="md-block" flex="60">
                             <label>Titulo:</label>
                             <input ng-model="contraPedSelec.titulo" ng-disabled="true" >
                         </md-input-container>
 
-                        <div layout="row"  flex  style="height: 30px; margin-top: 6px;">
-                            <div style="margin-right: 8px;" > Entrega Aproximada: </div>
-                            <div >{{contraPedSelec.fecha_aprox_entrega | date:'dd/MM/yyyy' }}</div>
+                        <div layout="column" flex="20">
+                            <md-datepicker ng-model="contraPedSelec.fecha_aprox_entrega"
+                                           md-placeholder="Entrega" ng-disabled="true">
+                            </md-datepicker>
                         </div>
+
                     </div>
 
 
@@ -1001,9 +1004,8 @@
                             <input  ng-model="kitchenBoxSelec.id" ng-disabled="true">
                         </md-input-container>
 
-                        <div layout="row"  flex="30"  class="dateRow" >
-                            <div class="dateRowTitle"> Fecha </div>
-                            <md-datepicker ng-model="kitchenBoxSelec.fecha" md-placeholder="{{kitchenBoxSelec.fecha | date:'dd/MM/yyyy'}}"  ng-disabled="true"></md-datepicker>
+                        <div layout="column" flex>
+                            <md-datepicker ng-model="kitchenBoxSelec.fecha" md-placeholder="Fecha"></md-datepicker>
                         </div>
 
                         <md-input-container class="md-block" flex="40">
@@ -1021,9 +1023,11 @@
                             <input ng-model="kitchenBoxSelec.titulo" ng-disabled="true" >
                         </md-input-container>
 
-                        <div layout="row"  flex="40"  class="dateRow">
-                            <div style=""  class="dateRowTitle"> Entrega Aproximada: </div>
-                            <md-datepicker ng-model="kitchenBoxSelec.fecha_aprox_entrega" md-placeholder="{{kitchenBoxSelec.fecha_aprox_entrega | date:'dd/MM/yyyy'}}"  ng-disabled="true"></md-datepicker>
+                        <div layout="column" flex="20">
+                            <md-datepicker ng-model="kitchenBoxSelec.fecha_aprox_entrega"
+                                           md-placeholder="Entrega"
+                                           ng-disabled="true"
+                            ></md-datepicker>
                         </div>
 
                         <md-input-container class="md-block"flex="20" >
@@ -1044,9 +1048,8 @@
                                     ng-disabled="true" required>
                         </md-input-container>
 
-                        <div layout="row"  flex="30"  class="dateRow">
-                            <div style=""  class="dateRowTitle"> Fecha Abono </div>
-                            <md-datepicker ng-model="kitchenBoxSelec.fecha_abono" md-placeholder="{{kitchenBoxSelec.fecha_aprox_entrega | date:'dd/MM/yyyy'}}"  ng-disabled="true"></md-datepicker>
+                        <div layout="column" flex>
+                            <md-datepicker ng-model="kitchenBoxSelec.fecha_abono" md-placeholder="Fecha Abono"></md-datepicker>
                         </div>
                         <div flex="">
                             <!-- imga maqueta -->
