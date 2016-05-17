@@ -62,6 +62,23 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
 
 
+    $scope.getTasaByCoinId = function(id,tipo){
+
+        $http.get('master/getCoin/'+id).success(function (response) {
+            var tasa = response.precio_usd;
+
+            if(tipo=='abono')
+            $scope.abono.tasa = parseFloat(tasa).toFixed(1); ////abono
+            else
+            $scope.pago.tasa = parseFloat(tasa).toFixed(1); ///pago
+                
+            console.log("trae tasa de la moneda");
+        });
+
+
+    }
+
+
     $scope.showNext = function (status, to) {
         if (status) {
             $scope.nextLyr = to;
