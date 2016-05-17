@@ -755,7 +755,7 @@
                         <div flex>
                             <div layout="row" class="cellGridHolder" ng-repeat="item in formData.kitchenBox">
                                 <div class="cellGrid" flex="5">
-                                    <md-switch class="md-primary" ng-model="item.asig" ng-change="changeKitchenBox(item)" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
                                 </div>
                                 <div flex="5" class="cellGrid"  ng-click="selecKitchenBox(item)"> {{item.id}}</div>
                                 <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
@@ -1004,11 +1004,11 @@
                             <input  ng-model="kitchenBoxSelec.id" ng-disabled="true">
                         </md-input-container>
 
-                        <div layout="column" flex>
-                            <md-datepicker ng-model="kitchenBoxSelec.fecha" md-placeholder="Fecha"></md-datepicker>
+                        <div layout="column" flex="15">
+                            <md-datepicker ng-model="kitchenBoxSelec.fecha" md-placeholder="Fecha" ng-disabled="true"></md-datepicker>
                         </div>
 
-                        <md-input-container class="md-block" flex="40">
+                        <md-input-container class="md-block" flex>
                             <label>Fabrica</label>
                             <md-select ng-model="kitchenBoxSelec.prov_id"ng-disabled="true">
                                 <md-option ng-repeat="prov in todos" value="{{prov.id}}">
@@ -1059,9 +1059,9 @@
 
                         <md-input-container class="md-block" flex="40">
                             <label>Condciones de pago</label>
-                            <md-select ng-model="provSelec.id"ng-disabled="true">
-                                <md-option ng-repeat="prov in todos" value="{{prov.id}}">
-                                    {{prov.razon_social}}
+                            <md-select ng-model="kitchenBoxSelec.condicion_pago_id" ng-disabled="true">
+                                <md-option >
+
                                 </md-option>
                             </md-select>
                         </md-input-container>

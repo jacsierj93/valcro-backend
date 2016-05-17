@@ -327,7 +327,7 @@ class OrderController extends BaseController
 
         $data = Array();
         $items = KitchenBox::
-       where('prov_id',$req->prov_id)
+        where('prov_id',$req->prov_id)
             ->where('precio_bs','<>',0)
             ->whereNotNull('img_conf_gerente')
             ->whereNotNull('fecha_conf_gerente')
@@ -335,12 +335,19 @@ class OrderController extends BaseController
 
         foreach($items as $aux){
             $it=$aux;
-            $it->tipo_origen='2';
+            $it->tipo_origen_id='3';
             $it= MasterOrderController::getAvailableProduct($it, $req->pedido_id);
-            $it->tipo_origen=$aux->tipo_origen;
-            if(!$it['asignado']){
+            $it->tipo_origen_id=$aux->tipo_origen;
+            if(!$it->asignado  ){
                 $data[]=$it;
+            }else{
+                $ordI = OrderItem::findOrFail($it->renglon_id);
+                if($ordI->pedido_id == $req->pedido_id){
+                    $data[]=$it;
+                }
             }
+
+
         }
         return $data;
     }
@@ -351,13 +358,13 @@ class OrderController extends BaseController
      **/
     public function addkitchenBox(Request $req){
 
-
         $k= kitchenBox::findOrFail($req->id);
         $item = new OrderItem();
         $item->pedido_id=$req->pedido_id;
-        $item->producto_id=$k->id;/// reemplazr cuando se sepa la logica
-        $item->pedido_tipo_origen_id='2';
-        $item->origen_id=$req->id;
+        $item->origen_item_id=$k->id;/// reemplazr cuando se sepa la logica
+        $item->tipo_origen_id='3';
+        $item->doc_origen_id=$k->id;
+        $item->cantidad=1;
         $item->save();
     }
 
@@ -366,7 +373,7 @@ class OrderController extends BaseController
      **/
     public function removekitchenBox(Request $req){
 
-        $model = OrderItem::where('origen_id', $req->id)
+        $model = OrderItem::where('origen_item_id', $req->id)
             ->where('pedido_id',$req->pedido_id)
             ->get();
         foreach(  $model as $aux){
@@ -386,17 +393,20 @@ class OrderController extends BaseController
         $order=Order::findOrFail($req->id);
         $data= $order;
         $items= $order->OrderItem()->get();
-
         $contra=Array();
+        $kitchen= Array();
         foreach($items->where('tipo_origen_id', '2') as $aux){
-
             $contra[]= CustomOrder::find($aux->doc_origen_id);
-            // $data['contraPedido'][] =
+        }
+
+        foreach($items->where('tipo_origen_id', '3') as $aux){
+            $kitchen[]= KitchenBox::find($aux->origen_item_id);
         }
 
 
 
         $data['contraPedido'] = $contra;
+        $data['kitchenBox'] = $kitchen;
         return $data;
 
     }

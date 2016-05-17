@@ -71,8 +71,8 @@ class MasterOrderController extends BaseController
         $it=$producto;
         $it['asignado'] = false;
 
-        $pediItem = OrderItem::where('pedido_id', $pedido_id)
-            ->where('tipo_origen_id',$producto->tipo_origen_id)
+        $pediItem = OrderItem::
+            where('tipo_origen_id',$producto->tipo_origen_id)
             ->where('origen_item_id' , $producto->id)
             ->first();
         if( $pediItem !== null){

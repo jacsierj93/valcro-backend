@@ -77,7 +77,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function removeLisKitchenBox(aux){
         removekitchenBox(aux.id,$scope.pedidoSelec.id);
-        loadPedido($scope.pedidoSelec.id);
+     //   loadPedido($scope.pedidoSelec.id);
     }
 
     function removeLisPedidoSus(aux){
@@ -180,23 +180,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     }
 
-    $scope.changeContraP= function(contraP){
-        if(contraP.asignado){
 
-            addContraPedido(contraP.id,$scope.pedidoSelec.id);
+    $scope.changeKitchenBox= function(item){
+        if(item.asignado){
+
+            addkitchenBox(item.id,$scope.pedidoSelec.id);
         }else{
-            removeContraPedido(contraP.id, $scope.pedidoSelec.id);
-        }
-
-
-    }
-
-    $scope.changeKitchenBox= function(contraP){
-        if(contraP.asig){
-
-            addkitchenBox(contraP.id,$scope.pedidoSelec.id);
-        }else{
-            removekitchenBox(contraP.id, $scope.pedidoSelec.id);
+            removekitchenBox(item.id, $scope.pedidoSelec.id);
         }
 
     }
@@ -571,26 +561,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
                 $scope.formData.kitchenBox.fecha = Date.parse(response.fecha);
             });
 
-        /*$http({
-         method: 'POST',
-         url: 'Order/KitchenBoxs',
-         data:
-         }).then(function successCallback(response) {
-         console.log('response ',response);
-         var auxs = new Array();
-         for(var i=0;i < response.data.length;i++){
-         var aux=response.data[i];
-         aux.asig=false;
-         if(aux.asignado != 0){
-         aux.asig=true;
-         }
-         auxs.push(aux);
-         }
-         console.log(' kit response ',response);
-         $scope.formData.kitchenBox= auxs;
-         }, function errorCallback(response) {
-         console.log("errorrr");
-         });*/
     }
 
     function loadPedidosASustituir(id){
@@ -656,7 +626,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             url: 'Order/RemovekitchenBox',
             data:{ id:id, pedido_id:pedido_id}
         }).then(function successCallback(response) {
-
+            alert(' Removido ');
+            loadPedido($scope.pedidoSelec.id);
         }, function errorCallback(response) {
             console.log("errorrr");
         });
