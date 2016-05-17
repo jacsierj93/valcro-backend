@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Orders;
 
+use App\Http\Controllers\Masters\MasterOrderController;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\CustomOrders\CustomOrderItem;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
@@ -130,6 +131,7 @@ class OrderController extends BaseController
         return $model->get();
     }
     /**
+     * @deprecated
      * obtiene las ordenes de compra de un pedido
      */
     public function getOrdenPurchaseOrder(Request $req){
@@ -166,36 +168,11 @@ class OrderController extends BaseController
 
         foreach( $items as $aux ){
             $it=$aux;
-            $pediItem = OrderItem::where('pedido_id', $req->pedido_id)
-                ->where('tipo_origen_id','2')
-                ->where('origen_item_id' , $aux->id)
-                ->first();
-            $OtherpediItem= OrderItem::where('pedido_id','<>', $req->pedido_id)
-                ->where('tipo_origen_id','2')
-                ->where('origen_item_id' , $aux->id)
-                ->get();
+            $it->tipo_origen_id='2';
+            $it= MasterOrderController::getQuantityAvailableProduct($aux,$req->pedido_id);
+            $it->tipo_origen_id=$aux->tipo_origen_id;
+            $prods[] =$it;
 
-            $it['renglon_id'] = null;
-            $it['asignado'] = false;
-            $auxMonto =(float)$aux->cantidad;
-            $auxDisp =(float)$aux->cantidad;
-
-            foreach( $OtherpediItem as $other){
-
-                $auxMonto -= (float)$other->cantidad;
-                $auxDisp  -=(float)$other->cantidad;
-            }
-
-            if( $pediItem !== null){
-                $auxMonto = (float) $pediItem->cantidad;
-               // $auxDisp =    $aux->cantidad - (float) $pediItem->cantidad;
-                $it['renglon_id']=$pediItem->id;
-                $it['asignado'] = true;
-
-            }
-            $it['disponible']=  $auxDisp;
-            $it['monto']=  $auxMonto ;
-            $prods[]=$it;
         }
 
         $model['productos']=$prods;
@@ -206,7 +183,7 @@ class OrderController extends BaseController
     public  function addCustomOrderItem(Request $req){
 
         $item = new OrderItem();
-        if($req->renglon_id != null){
+        if($req->has('renglon_id')){
             $item = OrderItem:: findOrFail($req->renglon_id);
         }
         $item->tipo_origen_id = 2;
@@ -216,15 +193,17 @@ class OrderController extends BaseController
         $item->descripcion = $req->descripcion;
         $item->cantidad = $req->monto;
         $item->save();
+        return $item;
 
     }
 
     public  function removeCustomOrderItem(Request $req){
-         $item = OrderItem:: findOrFail($req->id);
-         $item->destroy($item->id);
+        $item = OrderItem:: findOrFail($req->id);
+        $item->destroy($item->id);
 
     }
     /**
+     * revisar por intergar al maestro de Order
      * obtiene los contra pedidos de un proveedor
      */
     public function getCustomOrders(Request $req){
@@ -284,6 +263,32 @@ class OrderController extends BaseController
         $model= CustomOrder::findOrFail($req->id);
 
         $model->CustomOrderItem()->get();
+        $items= Array();
+        foreach(  $model->CustomOrderItem()->get() as $aux){
+            $it=$aux;
+            $it->tipo_origen_id='2';
+            $it= MasterOrderController::getQuantityAvailableProduct($aux,$req->pedido_id);
+            $it->tipo_origen_id=$aux->tipo_origen_id;
+            $items[]=$it;
+            if($it['asignado']){
+                $orI= OrderItem::findOrFail($it['renglon_id']);
+                $orI=$it['disponible'];
+                $orI->save();
+            }else{
+                $item = new OrderItem();
+                $item->tipo_origen_id = 2;
+                $item->pedido_id =  $req->pedido_id;
+                $item->doc_origen_id =  $aux->doc_origen_id;
+                $item->origen_item_id = $aux->id;
+                $item->descripcion = $aux->descripcion;
+                $item->cantidad = $it['disponible'];
+                $item->save();
+            }
+        }
+        return $items;
+
+
+        /*
         foreach(  $model->CustomOrderItem()->get() as $aux){
             $item = new OrderItem();
             $item->pedido_id=$req->pedido_id;
@@ -291,14 +296,14 @@ class OrderController extends BaseController
             $item->pedido_tipo_origen_id='4';// 4 es contra pedido
             $item->origen_id=$req->id;
             $item->save();
-        }
+        }*/
     }
 
     /**
      * elimina los renglones de un contra pedido
      **/
     public function RemoveCustomOrder(Request $req){
-        $model = OrderItem::where('origen_id', $req->id)
+        $model = OrderItem::where('doc_origen_id', $req->id)
             ->where('pedido_id',$req->pedido_id)
             ->get();
         foreach(  $model as $aux){
@@ -320,28 +325,31 @@ class OrderController extends BaseController
      */
     public function getKitchenBoxs(Request $req){
 
-        $model =KitchenBox::
-        select(DB::raw("tbl_kitchen_box.id , fecha, nro_proforma , img_proforma, monto, precio_bs, fecha_aprox_entrega,
-        tbl_pedido_item.pedido_id as pedidoIdentifi,
-        tbl_pedido_item.origen_id, tbl_pedido_item.pedido_id ,"
-            ." ( select count(*) from tbl_pedido_item where deleted_at is null
-        and pedido_tipo_origen_id = 3 and tbl_pedido_item.origen_id= tbl_kitchen_box.id"
-            .") as asignado"
-        ))
-            ->distinct()
-            ->leftJoin('tbl_pedido_item','tbl_kitchen_box.id','=','tbl_pedido_item.origen_id')
-            // ->where('aprobada','1')
-            ->where('prov_id',$req->prov_id)
+        $data = Array();
+        $items = KitchenBox::
+        where('prov_id',$req->prov_id)
+            ->where('precio_bs','<>',0)
+            ->whereNotNull('img_conf_gerente')
+            ->whereNotNull('fecha_conf_gerente')
             ->get();
-        $data = $model->filter(function ($item) use ($req){
-            if($item->asignado > 0){
-                if($item->pedido_id != $req->pedido_id){
-                    return false;
+
+        foreach($items as $aux){
+            $it=$aux;
+            $it->tipo_origen_id='3';
+            $it= MasterOrderController::getAvailableProduct($it, $req->pedido_id);
+            $it->tipo_origen_id=$aux->tipo_origen;
+            if(!$it->asignado  ){
+                $data[]=$it;
+            }else{
+                $ordI = OrderItem::findOrFail($it->renglon_id);
+                if($ordI->pedido_id == $req->pedido_id){
+                    $data[]=$it;
                 }
             }
-            return true;
-        });
-        return array_values($data->toArray());
+
+
+        }
+        return $data;
     }
 
 
@@ -350,13 +358,13 @@ class OrderController extends BaseController
      **/
     public function addkitchenBox(Request $req){
 
-
         $k= kitchenBox::findOrFail($req->id);
         $item = new OrderItem();
         $item->pedido_id=$req->pedido_id;
-        $item->producto_id=$k->id;/// reemplazr cuando se sepa la logica
-        $item->pedido_tipo_origen_id='2';
-        $item->origen_id=$req->id;
+        $item->origen_item_id=$k->id;/// reemplazr cuando se sepa la logica
+        $item->tipo_origen_id='3';
+        $item->doc_origen_id=$k->id;
+        $item->cantidad=1;
         $item->save();
     }
 
@@ -365,7 +373,7 @@ class OrderController extends BaseController
      **/
     public function removekitchenBox(Request $req){
 
-        $model = OrderItem::where('origen_id', $req->id)
+        $model = OrderItem::where('origen_item_id', $req->id)
             ->where('pedido_id',$req->pedido_id)
             ->get();
         foreach(  $model as $aux){
@@ -385,17 +393,20 @@ class OrderController extends BaseController
         $order=Order::findOrFail($req->id);
         $data= $order;
         $items= $order->OrderItem()->get();
-
         $contra=Array();
+        $kitchen= Array();
         foreach($items->where('tipo_origen_id', '2') as $aux){
-
             $contra[]= CustomOrder::find($aux->doc_origen_id);
-            // $data['contraPedido'][] =
+        }
+
+        foreach($items->where('tipo_origen_id', '3') as $aux){
+            $kitchen[]= KitchenBox::find($aux->origen_item_id);
         }
 
 
 
         $data['contraPedido'] = $contra;
+        $data['kitchenBox'] = $kitchen;
         return $data;
 
     }
