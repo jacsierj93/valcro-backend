@@ -141,9 +141,9 @@
                                                      class="{{deuda.vencido}}"></div>
                                             </div>
                                             <div flex class="cellGrid"> {{deuda.cuotas}}</div>
-                                            <div flex class="cellGrid"> {{deuda.monto}}$</div>
-                                            <div flex class="cellGrid"> {{deuda.pagado}}$</div>
-                                            <div flex class="cellGrid"> {{deuda.saldo}}$</div>
+                                            <div flex class="cellGrid"> {{deuda.monto | currency : $ : 2}}$</div>
+                                            <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}$</div>
+                                            <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}$</div>
                                         </div>
                                     </div>
 
@@ -175,7 +175,7 @@
                                         <div flex="20" class="cellGrid">{{pago.nro_factura}}</div>
                                         <div flex="10" class="cellGrid">{{pago.fecha}}</div>
                                         <div flex class="cellGrid">{{pago.tipo}}</div>
-                                        <div flex class="cellGrid">{{pago.pagado}}</div>
+                                        <div flex class="cellGrid">{{pago.pagado | currency : $ : 2}}</div>
                                         <div flex class="cellGrid"> Data 5</div>
                                         <div flex class="cellGrid"> Data 6</div>
                                     </div>
@@ -216,6 +216,7 @@
                     <div flex class="headGrid"> Descripcion</div>
                     <div flex class="headGrid"> Condicion Cuota</div>
                     <div flex="10" class="headGrid"> Estatus</div>
+                    <div flex="10" class="headGrid"> Saldo</div>
                 </div>
                 <div id="grid" flex style="overflow-y: auto;">
                     <div ng-repeat="cuota in debData.cuotas" flex>
@@ -228,6 +229,7 @@
                                 <div style="width: 16px; height: 16px; border-radius: 50%"
                                      class="{{cuota.vencimiento}}"></div>
                             </div>
+                            <div flex="10" class="cellGrid">{{cuota.saldo | currency : $ : 2}}</div>
                         </div>
                     </div>
                 </div>
@@ -498,8 +500,8 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="abono.moneda_id" required md-no-ink>
-                                <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
+                            <md-select ng-model="abono.moneda_id" required ng-change="getTasaByCoinId(abono.moneda_id)" md-no-ink>
+                                <md-option ng-repeat="moneda in monedas"   ng-value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
                             </md-select>
@@ -508,7 +510,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Tasa</label>
-                            <input ng-model="abono.tasa" required/>
+                            <input ng-model="abono.tasa" ng-readonly="true"  required/>
 
                         </md-input-container>
 

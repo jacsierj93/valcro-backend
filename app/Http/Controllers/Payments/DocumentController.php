@@ -22,6 +22,9 @@ class DocumentController extends BaseController
     private $payIds = array(1, 2, 3); ///tipos de abono ADE,NDC,RBAY
     private $debtsIds = array(4); ///facturas
     private $documentState = array(1, 2, 3); ///estatus de documentos nuevo,procesado,cancelado
+    private $ndcId = 2;
+    private $adeId = 1;
+    private $rbayId = 3;
 
     public function __construct()
     {
@@ -69,6 +72,7 @@ class DocumentController extends BaseController
                 $temp["fecha_vence"] = $cc->fecha_vence;
                 $temp["nro_factura"] = $cc->nro_factura;
                 $temp["descripcion"] = $cc->descripcion;
+                $temp["saldo"]       = $cc->saldo;
                 $temp["vencimiento"] = 'v' . $cc->vencimiento();
                 $cdata[] = $temp;
             }
