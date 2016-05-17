@@ -20,6 +20,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     restore('todos');// lista de proveedores
     restore('filterOption');//selecion de los filtros
     restore('FormDataKitchenBox'); // formulario de ckitchen box
+    restore('pedidoSusPedSelec'); // pedido sustitu selecionado
+
 
     $scope.setProvedor= setProvedor;
     $scope.openLayer=openLayer;
@@ -27,6 +29,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     $scope.DtPedido=DtPedido;
     $scope.selecOdc=selecOdc;
     $scope.selecContraP=selecContraP;
+    $scope.selecPedidoSust=selecPedidoSust;
+
     $scope.selecKitchenBox=selecKitchenBox;
     $scope.removeLisContraP=removeLisContraP;
     $scope.removeLisKitchenBox=removeLisKitchenBox;
@@ -96,6 +100,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type:'CustomOrderPriority'});
         loadContraP(item.id);
         openLayer("resumenContraPedido");
+    }
+
+    function selecPedidoSust (item){
+        //restore('contraPedSelec');
+        //$scope.formDataContraP.contraPedidoMotivo = ORDER.query({type:'CustomOrderReason'});
+        //$scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type:'CustomOrderPriority'});
+        //loadContraP(item.id);
+        openLayer("resumenPedido");
     }
 
     function selecKitchenBox(item){
@@ -256,17 +268,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         }
         $scope.FormdetallePedido.$setPristine();
 
-    }
-
-    /**@deprecated*/
-    function selecPedido(pedido){
-
-
-        loadPedido(pedido.id);
-        loadCoinProvider(pedido.prov_id);
-        loadCountryProvider(pedido.prov_id);
-        loadPaymentCondProvider(pedido.prov_id);
-        loadDirProvider($scope.pedidoSelec.pais_id);
     }
 
     function closeLayer(){
@@ -569,16 +570,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             url: 'Order/OrderSubstituteOrder',
             data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
         }).then(function successCallback(response) {
-            var auxs = new Array();
-            for(var i=0;i<response.data.length;i++){
-                var aux=response.data[i];
-                aux.asig=false;
-                if(aux.asignado != 0){
-                    aux.asig=true;
-                }
-                auxs.push(aux);
-            }
-            $scope.formData.pedidoSust= auxs;
+            $scope.formData.pedidoSust= response.data;
         }, function errorCallback(response) {
             console.log("errorrr");
         });
@@ -696,6 +688,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
                 $scope.contraPedSelec={ id:''};
                 break;
 
+            case 'pedidoSusPedSelec':
+                $scope.pedidoSusPedSelec={ id:''};
+                break;
             case 'kitchenBoxSelec':
                 $scope.contraPedSelec={ id:'', fecha: new Date()};
                 break;
