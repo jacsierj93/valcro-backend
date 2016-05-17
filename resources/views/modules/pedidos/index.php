@@ -620,7 +620,7 @@
                         <div>
                             Contrapedidos
                         </div>
-                        <div ng-click="openContraPedido()">
+                        <div ng-click=" openLayer('agrContPed');">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
                         </div>
                     </div>
@@ -632,7 +632,7 @@
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                <div flex class="cellGrid" ng-click="removeLisContraP(contraP)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                <div flex class="cellGrid" ng-click="removeLisContraP(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
                     </div>
@@ -644,7 +644,7 @@
                         <div>
                             Kitchen Boxs
                         </div>
-                        <div ng-click="addkitChenBox()">
+                        <div ng-click="openLayer('agrKitBoxs')">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
                     </div>
@@ -667,7 +667,7 @@
                         <div>
                             Pedidos a Sustituir
                         </div>
-                        <div ng-click="openPedsust()">
+                        <div ng-click="openLayer('agrPedPend')">
                             <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
                         </div>
                     </div>
