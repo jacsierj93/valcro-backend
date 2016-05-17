@@ -279,7 +279,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="pago.moneda_id" required md-no-ink>
+                            <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')" required md-no-ink>
                                 <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
@@ -288,7 +288,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Tasa</label>
-                            <input ng-model="pago.tasa" required/>
+                            <input ng-model="pago.tasa" ng-readonly="true" required/>
 
                         </md-input-container>
 
@@ -500,7 +500,7 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="abono.moneda_id" required ng-change="getTasaByCoinId(abono.moneda_id)" md-no-ink>
+                            <md-select ng-model="abono.moneda_id" required ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
                                 <md-option ng-repeat="moneda in monedas"   ng-value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
