@@ -35,7 +35,7 @@ $app->get("provider/getBankAccount/{id}",'Providers\ProvidersController@getBank'
 $app->get("provider/provCoins/{id}",'Providers\ProvidersController@getCoins');///obtener Monedas asignadas al proveedor
 $app->get("provider/listCoin/{id}",'Providers\ProvidersController@assignCoin');//obtener Monedas asignadas al proveedor(solo id)
 $app->get("provider/provLimits/{id}",'Providers\ProvidersController@getCreditLimits');//obtener limites de creditos asignados al proveedor
-$app->post("provider/provFactors",'Providers\ProvidersController@getFactorConvers');//obtener factores de conversion asignados al proveedor
+$app->get("provider/provFactors/{id}",'Providers\ProvidersController@getFactorConvers');//obtener factores de conversion asignados al proveedor
 $app->get("provider/provCountries/{id}",'Providers\ProvidersController@provCountries');//obtener paises asignados al proveedor en direcciones
 $app->get("provider/prodTimes/{id}",'Providers\ProvidersController@getProdTime');//obtener tiempos de produccion
 $app->get("provider/transTimes/{id}",'Providers\ProvidersController@getTimeTrans');//obtener tiempos de transito

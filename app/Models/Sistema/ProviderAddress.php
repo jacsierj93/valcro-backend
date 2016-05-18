@@ -32,4 +32,9 @@ class ProviderAddress extends Model
     {
         return $this->hasOne('App\Models\Sistema\TypeAddress', 'id', 'tipo_dir');
     }
+
+    public function ports()
+    {
+        return $this->belongsToMany('App\Models\Sistema\Ports', 'tbl_direcciones_puerto', 'direccion_id','puerto_id');
+    }
 }

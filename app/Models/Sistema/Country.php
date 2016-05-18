@@ -25,4 +25,7 @@ class Country extends Model
     public function areaCode(){
         return $this->hasOne('App\Models\Sistema\AreaCode', 'pais_id');
     }
+    public function ports(){
+        return $this->hasOne('App\Models\Sistema\Ports', 'pais_id');
+    }
 }

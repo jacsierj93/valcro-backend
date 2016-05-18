@@ -17,4 +17,8 @@ class ProviderFactor extends Model
     use SoftDeletes;
     protected $table = "tbl_prov_factor";
 
+    public function linea()
+    {
+        return $this->hasOne('App\Models\Sistema\Line', 'id', 'linea_id');
+    }
 }

@@ -105,7 +105,9 @@ class ProvidersController extends BaseController
         $addr->tipo_dir = $req->tipo;
         $addr->telefono = $req->provTelf;
         $addr->save();
-
+        if($addr->tipo_dir == 2){
+            $addr->ports()->sync($req->ports);
+        }
         $result['id'] = $addr->id;
         return $result;
     }
@@ -117,6 +119,7 @@ class ProvidersController extends BaseController
             foreach($addrs as $v){
                 $v['pais'] = $v->country()->first();
                 $v->tipo;
+                $v->ports = $v->ports()->lists("puerto_id");
             }
             return $addrs;
         }else{
@@ -158,6 +161,7 @@ class ProvidersController extends BaseController
         $valName = NombreValcro::all();
         foreach($valName as $nom){
             $nom->departments = $nom->departamento()->get();
+            $nom->providers;
         }
         return $valName;
     }
@@ -344,10 +348,14 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function getFactorConvers(request $req){
-        if($req->id) {
-            $factor = Provider::find($req->id)->convertFact()->first();
-            $factor['moneda'] = Monedas::find($factor->moneda_id);
+    public function getFactorConvers($id){
+        if($id) {
+            $factor = Provider::find($id)->convertFact()->get();
+            foreach($factor as $fact){
+                //$fact['moneda'] = Monedas::find($factor->moneda_id);
+                $fact->linea;
+            }
+
             return ($factor)?$factor:false;
         }
     }
@@ -368,6 +376,7 @@ class ProvidersController extends BaseController
         $lim->gastos = $req->expens;
         $lim->ganancia = $req->gain;
         $lim->descuento = $req->disc;
+        $lim->linea_id = $req->line;
 
         $lim->save();
         $result['id']=$lim->id;

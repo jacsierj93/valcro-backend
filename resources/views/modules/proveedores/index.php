@@ -338,15 +338,17 @@
                                   <span>{{$chip.name}}</span>
                                 </span>
                             </md-chip-template>
+                            <button style="display:none" md-chip-remove="">
+
+                            </button>
                         </md-chips>
                         <div>
                             <span>{{ctl.search(ctl.currentName)}}</span>
-                            <?= HTML::image("images/1administrator.png","",array("ng-click"=>"setDepa('adm')","ng-show"=>"(dep.indexOf(deps.adm.id)===-1) && ctl.currentName")) ?>
-                            <?= HTML::image("images/2administrator.png","",array("ng-click"=>"unSetDepa('adm')","ng-show"=>"(dep.indexOf(deps.adm.id)!==-1) || ((dep.indexOf(deps.adm.id)!==-1) && !(ctl.currentName))")) ?>
-                            <?= HTML::image("images/1delivery_food.png","",array("ng-click"=>"setDepa('store')","ng-show"=>"(dep.indexOf(deps.store.id)===-1) && ctl.currentName")) ?>
-                            <?= HTML::image("images/2delivery_food.png","",array("ng-click"=>"unSetDepa('store')","ng-show"=>"((dep.indexOf(deps.store.id)!==-1) && !(ctl.currentName))")) ?>
-                            <?= HTML::image("images/1shoping_cart.png","",array("ng-click"=>"setDepa('purch')","ng-show"=>"(dep.indexOf(deps.purch.id)===-1) && ctl.currentName")) ?>
-                            <?= HTML::image("images/2shoping_cart.png","",array("ng-click"=>"unSetDepa('purch')","ng-show"=>"((dep.indexOf(deps.purch.id)!==-1) && !(ctl.currentName))")) ?>
+                            <?= HTML::image("images/lupa.png","",array("ng-click"=>"openCoinc()","ng-show"=>"ctl.search(ctl.currentName)")) ?>
+                            <?= HTML::image("images/listado.png","",array("ng-click"=>"setDepa('adm')","ng-show"=>"(dep.indexOf(deps.adm.id)===-1) && ctl.currentName")) ?>
+                            <?= HTML::image("images/carro.png","",array("ng-click"=>"setDepa('store')","ng-show"=>"(dep.indexOf(deps.store.id)===-1) && ctl.currentName")) ?>
+                            <?= HTML::image("images/regalo.png","",array("ng-click"=>"setDepa('purch')","ng-show"=>"(dep.indexOf(deps.purch.id)===-1) && ctl.currentName")) ?>
+                            <?= HTML::image("images/barco.png","",array("ng-click"=>"setDepa('imp')","ng-show"=>"(dep.indexOf(deps.imp.id)===-1) && ctl.currentName")) ?>
                         </div>
                     </div>
                 </form>
@@ -393,10 +395,18 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Telefono</label>
-                            <input name="provTelf" type="number" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                            <input name="provTelf"  required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                         </md-input-container>
 
                     </div>
+                    <md-input-container class="md-block" flex ng-show="dir.tipo==2">
+                        <label>puertos</label>
+                        <md-select ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
+                            <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}" >
+                                {{port.Main_port_name}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
                     <md-input-container class="md-block" flex>
                         <label>Direccion</label>
                         <input ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv" >
@@ -511,36 +521,21 @@
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="nomValAssign">
-                <div layout="column" flex="50" style="overflow-x: hidden;">
+                <div layout="column" flex style="overflow-x: hidden;">
                     <div class="titulo_formulario" layout="column" layout-align="start start">
-                        <div ng-click="closeContackBook()">
-                            Lineas
+                        <div ng-click="closeNomValLyr()">
+                            Existentes
                         </div>
                     </div>
                     <div style="height: 100%; overflow:scroll">
                         <div flex ng-repeat="line in lines.list" flex="column" ng-click="toEdit(this)">
-                            <div layout="column" layout-wrap class="cellGridHolder cellGrid" style="height: 24px" >
+                            <div layout="column" layout-wrap class="cellGridHolder cellGrid" style="height: 50px" >
                                 <div flex style="height: 24px">{{line.nombre}} </div>
                             </div>
 
                         </div>
 
                     </div>
-                </div>
-                <div layout="column" flex="50">
-                    <div class="titulo_formulario" layout="column" layout-align="start start">
-                        <div ng-click="closeContackBook()">
-                            Departamentos
-                        </div>
-
-                    </div>
-                    <div style="height: 100%; overflow:scroll">
-                        <div flex ng-repeat="cont in allContact" flex="column" ng-click="toEdit(this)">
-
-                        </div>
-
-                    </div>
-                </div>
                 </div>
             </md-content>
         </md-sidenav>
@@ -669,7 +664,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="cn.coin" name ="state" ng-disabled="$parent.enabled || (coins.length == filt.length)" required md-no-ink>
+                            <md-select ng-model="cn.coin" name ="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink>
                                 <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -682,7 +677,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
                 <form name="provCred" ng-controller="creditCtrl" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}" >
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length<1)}" >
                         <div>
                             Credito
                         </div>
@@ -690,12 +685,12 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Limite de Credito</label>
-                            <input ng-disabled="$parent.enabled" ng-model="cred.amount" required >
+                            <input ng-disabled="$parent.enabled || coins.length<1" ng-model="cred.amount" required >
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>Moneda</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="cred.coin" name ="state" ng-disabled="$parent.enabled" ng-controller="provCoins" required md-no-ink>
+                            <md-select ng-model="cred.coin" name ="state" ng-disabled="$parent.enabled || coins.length<1" ng-controller="provCoins" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -740,7 +735,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Linea</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="condHead.line" ng-disabled="$parent.enabled" required md-no-ink>
+                            <md-select ng-model="condHead.line" ng-disabled="$parent.enabled" required md-no-ink>
                                 <md-option ng-repeat="line in lines" value="{{line.id}}">
                                     {{line.linea}}
                                 </md-option>
@@ -778,7 +773,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
                 <form name="provConv" ng-controller="convController" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
                         <div>
                             Factor de Conversión
                         </div>
@@ -786,23 +781,23 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>% Flete</label>
-                            <input ng-disabled="$parent.enabled" ng-model="conv.freight">
+                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Gastos</label>
-                            <input ng-disabled="$parent.enabled" ng-model="conv.expens">
+                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.expens">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Ganancia</label>
-                            <input ng-disabled="$parent.enabled" ng-model="conv.gain">
+                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.gain">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>% Descuento</label>
-                            <input ng-disabled="$parent.enabled" ng-model="conv.disc">
+                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.disc">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="conv.coin" name ="state" ng-disabled="$parent.enabled" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.coin" name="state" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>
@@ -824,7 +819,7 @@
                 </form>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
                 <form name="provPoint" ng-controller="provPointController" ng-click="showGrid(true)" click-out="showGrid(false)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit)}">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex  ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
                         <div>
                             Puntos
                         </div>
@@ -832,11 +827,11 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Costo del punto</label>
-                            <input ng-disabled="$parent.enabled" ng-model="pnt.cost" required>
+                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.cost" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="pnt.coin" ng-disabled="$parent.enabled" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.coin" required md-no-ink>
                                 <md-option ng-repeat="coin in coins" ng-hide="(coin.pivot.punto)" value="{{coin.id}}">
                                     {{coin.nombre}}
                                 </md-option>

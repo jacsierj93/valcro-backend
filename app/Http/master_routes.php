@@ -11,3 +11,4 @@ $app->get("master/addressType",'Masters\MasterController@getAddressType'); ///ob
 $app->get("master/prodLines",'Masters\MasterController@getLines'); ///obtener Lineas
 $app->get("master/languajes",'Masters\MasterController@getLanguajes'); ///obtener Idiomas
 $app->get("master/cargoContact",'Masters\MasterController@getCargos'); ///obtener Cargos
+$app->get("master/getPorts",'Masters\MasterController@getPorts'); ///obtener Puertos

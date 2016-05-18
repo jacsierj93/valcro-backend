@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Masters;
 
 
+use App\Models\Sistema\Ports;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
@@ -96,6 +97,8 @@ class MasterController extends BaseController
 	public function getCargos(){
 		return CargoContact::all();
 	}
-
+	public function getPorts(){
+		return Ports::select("id","Main_port_name","pais_id")->get();
+	}
 
 }

@@ -30,6 +30,7 @@ MyApp.service("masterLists",function(masters) {
     var provType = [];
     var provTypeSend = [];
     var prodLines = [];
+    var ports = [];
     return {
         setMain:function(){
             countries = masters.query({ type:"getCountries"});
@@ -39,6 +40,7 @@ MyApp.service("masterLists",function(masters) {
             coins = masters.query({ type:"getCoins"});
             prodLines = masters.query({ type:"prodLines"});
             languaje = masters.query({type:"languajes"});
+            ports = masters.query({type:"getPorts"});
         },
         getCountries:function(){
             return countries;
@@ -60,6 +62,9 @@ MyApp.service("masterLists",function(masters) {
         },
         getLanguaje : function(){
             return languaje;
+        },
+        getPorts : function(){
+            return ports;
         }
     }
 });
@@ -183,6 +188,18 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.setProv = function(prov){
+        if($scope.edit){
+            var quit = confirm("desea cambiar de proveedor?");
+            if(quit) {
+                chngProv(prov);
+            }
+        }else{
+            chngProv(prov);
+        }
+
+    };
+
+    var chngProv = function(prov){
         closeLayer(true)
         $scope.edit = false;
         $scope.enabled = true;
@@ -196,6 +213,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
 
     $scope.addProv = function(){
+        if($scope.edit){
+            var quit = confirm("desea crear un nuevo proveedor?");
+            if(quit) {
+                newProv();
+            }
+        }else{
+            newProv();
+        }
+    };
+
+    var newProv = function(){
         setGetProv.setProv(false);
         closeLayer(true);
         $scope.edit = false;
@@ -393,9 +421,10 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     var dirSel = {};
     $scope.tipos = masterLists.getTypeDir();
     $scope.paises = masterLists.getCountries();
+    $scope.ports = masterLists.getPorts();
     /*escucha cambios en el proveedor seleccionado y carga las direcciones correspondiente*/
     $scope.$watch('prov.id',function(nvo){
-        $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",  id: false, id_prov: $scope.prov.id};
+        $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
         $scope.address = (nvo)?providers.query({type: "dirList", id_prov: $scope.prov.id || 0}):[];
         $scope.isShow = false;
     });
@@ -407,14 +436,21 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.provTelf = (nvo != 0) ? $scope.dir.provTelf.replace(prev, $filter("filterSearch")($scope.paises, [nvo])[0].area_code.phone) : $scope.dir.provTelf;
 
     });
+
+    $scope.searchPort = function(ports,pais){
+        return ports.pais_id == pais;
+    }
+
     $scope.toEdit = function(addrs){
         dirSel = addrs.add;
+        console.log(dirSel)
         $scope.dir.id = dirSel.id;
         $scope.dir.id_prov = dirSel.prov_id;
         $scope.dir.direccProv = dirSel.direccion;
         $scope.dir.tipo = dirSel.tipo_dir;
         $scope.dir.pais = dirSel.pais_id;
         $scope.dir.provTelf = dirSel.telefono;
+        $scope.dir.ports = dirSel.ports;
     };
 
     /*escuah el estatus del formulario y guarda cuando este valido*/
@@ -430,6 +466,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 dirSel.pais_id=$scope.dir.pais;
                 dirSel.pais=$filter("filterSearch")($scope.paises,[$scope.dir.pais])[0];
                 dirSel.telefono = $scope.dir.provTelf;
+                dirSel.ports = $scope.dir.ports;
                 if(data.action=="new"){
                     $scope.address.unshift(dirSel);
                 }
@@ -440,9 +477,16 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.showGrid = function(elem){
       $scope.isShow = elem;
         if(!elem){
-            $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
-            //console.log($scope.direccionesForm);
-            $scope.direccionesForm.$setUntouched();
+            if($scope.dir.id){
+                var quit=confirm("desea salir del formulario");
+                if(quit){
+                    $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
+                    $scope.direccionesForm.$setUntouched();
+                }
+            }else{
+                $scope.dir = {direccProv:"",tipo:"",pais:0,provTelf:"",id:false,id_prov: $scope.prov.id};
+                $scope.direccionesForm.$setUntouched();
+            }
         }
     }
 
@@ -454,7 +498,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers,$mdSidenav,$filter,valcroNameDetail) {
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
     $scope.allName = providers.query({type:"allValcroName"});
-    $scope.deps = {"store":{id:1},"adm":{id:2},"purch":{id:3}};
+    $scope.deps = {"store":{id:1},"adm":{id:2},"purch":{id:3},"imp":{id:4}};
     $scope.dep = [];
     $scope.$watch('prov.id',function(nvo){
         $scope.valcroName = (nvo)?providers.query({type: "provNomValList", id_prov: $scope.prov.id || 0}):[];
@@ -476,20 +520,22 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             }, function errorCallback(response) {
                 console.log("error=>", response)
             });
+        }else if($scope.valcroName[lastIndex]===false){
+            delete $scope.valcroName[lastIndex];
         }
     });
     /*la siguiente funcion transforma lo escrito a un objeto para el render y hace el insert en la Bd*/
     $scope.transformChip = function transformChip(chip) {
         // If it is an object, it's already a known chip
-        if (angular.isObject(chip)) {
+        if($filter("customFind")($scope.valcroName,chip,function(current,compare){return current.name==compare}).length<1){
+            var chip = { name: chip, departments: $scope.dep, fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
+            // Otherwise, create a new o
             return chip;
+        }else{
+            return false;
         }
-        var chip = { name: chip, departments: $scope.dep, fav:($scope.valcroName.length==0)?"1":"0", id:false, prov_id:$scope.prov.id};
-        // Otherwise, create a new o
-        return chip;
     };
     $scope.rmChip = function(fiel,chip){
-        //console.log(fiel)
         $http({
             method: 'POST',
             url: "provider/delValcroName",
@@ -504,7 +550,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     $scope.chipSel = {};
     $scope.selChip = function(chip){
         $scope.dep = chip.departments;
-        //$mdSidenav("nomValLyr").open();
+    };
+
+    $scope.openCoinc = function(){
+        $mdSidenav("nomValLyr").open();
     };
 
     $scope.setDepa = function(dep){
@@ -517,6 +566,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         //console.log($scope.dep);
         delete $scope.dep[k];
     };
+
+    $scope.closeNomValLyr = function () {
+        $mdSidenav("nomValLyr").close();
+    }
 
     $scope.ctl = {currentName:""};
     $scope.ctl.search = function(val){

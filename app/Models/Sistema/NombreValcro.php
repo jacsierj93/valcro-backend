@@ -22,5 +22,8 @@ class NombreValcro extends Model
     {
         return $this->belongsToMany('App\Models\Sistema\Departament','tbl_nom_valcro_departameno','nomVal_id','depa_id');
     }
-
+    public function providers()
+    {
+        return $this->belongsTo('App\Models\Sistema\Provider','prov_id');
+    }
 }
