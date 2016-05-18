@@ -165,24 +165,78 @@ class DocumentController extends BaseController
 
         } else {  ///ok
 
-            $model = new DocumentCP();
-            //////////condicion para editar
-            if ($req->has('id')) {
-                $model = $model->findOrFail($req->id);
+
+
+        try {
+
+            DB::beginTransaction();
+
+
+            $doc = new DocumentCP(); ///asignando datos del documento
+            $doc->tipo_id = $req->tipo_id;
+            $doc->prov_id = Session::get("PROVID");
+            $doc->nro_factura = $req->nro_doc;
+            $doc->moneda_id = $req->moneda_id;
+
+            
+            $doc->fecha = $req->fecha;
+            $doc->monto = $req->monto;
+            $doc->saldo = $req->monto;
+            $doc->tasa = $req->tasa;
+            $doc->descripcion = $req->descripcion;
+            $doc->save(); ////edita/inserta el docmento
+
+
+            //*********************en caso de un adelanto*************************
+
+            if($this->adeId==$req->tipo_id){
+
+
+            $pago = new Payment(); ///asignado datos del pago
+            $pago->prov_id = Session::get("PROVID");
+            $pago->moneda_id = $req->moneda_id;
+            $pago->tasa = $req->tasa;
+            $pago->fecha_pago = $req->fecha;
+            $pago->monto = $req->monto;
+            ///////////nro de cuenta del proveedor
+            $pago->prov_cuenta_id = $req->cuenta_id;
+            $pago->save();
+
+
+            /////creando relacion documento  pago
+
+            $payDoc = new PaymentDocumentCP();
+            $payDoc->pago_id = $pago->id;
+            $payDoc->documento_cp_id = $doc->id;
+            $payDoc->monto = $req->monto;
+            $payDoc->abono = $req->monto;
+            $payDoc->save();
+
+            //////forma de pago
+
+            $form = new PaymentForm();
+            $form->pago_id = $pago->id;
+            $form->tipo_id = $req->tipo_pago_id ////tipo de pago
+            $form->banco = $req>banco; ////banco del pago
+            $form->ref_pago = $req->ref_pago; ////referencia del pago
+            $form->monto = $req->monto;
+
+
             }
+          
 
-            $model->tipo_id = $req->tipo_id;
-            $model->prov_id = Session::get("PROVID");
-            $model->nro_factura = $req->nro_doc;
-            $model->moneda_id = $req->moneda_id;
-            $model->fecha = $req->fecha;
-            $model->monto = $req->monto;
-            $model->saldo = $req->monto;
-            $model->tasa = $req->tasa;
-            $model->descripcion = $req->descripcion;
-            $model->save(); ////edita/inserta
 
-            $rest->setContent("registro guardado con éxito");
+
+             DB::commit();
+             $rest->setContent("registro guardado con éxito");
+
+
+        } catch (Exception $e) {
+            // Woopsy
+            DB::rollback();
+            $rest->setError("error en la Transacción");
+        }
+
 
         }
 
