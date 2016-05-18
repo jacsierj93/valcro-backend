@@ -113,22 +113,98 @@ class OrderController extends BaseController
     }
 
     /*********************************** PEDIDOS A SUSTITUIR ***********************************/
+
+    /**
+     * id  siempre va a ser del articulo a
+     * asigna un pedido a un nuevo pedido
+     **/
+    public function addOrderSubstitute(Request $req){
+
+        $oldPed= Order:: findOrFail($req->id);// se destruye la orden anterior
+        $newPed= Order:: findOrFail($req->pedido_id);// se destruye la orden anterior
+
+        $orSus = new OrderItem();
+        $orSus->pedido_id=$req->pedido_id;
+        $orSus->producto_id = $req->id;
+        $orSus->pedido_tipo_origen_id = '3';
+        $orSus->origen_id = $req->pedido_id;
+        $orSus->save();
+
+        $items = OrderItem::where('pedido_id',$req->id)->get();// los item a asignar al pedidos
+
+        // se mueven los item a el nuevo pedido
+        foreach( $items as $aux){
+            $item = new OrderItem();
+            $item->pedido_id = $req->pedido_id;
+            $item->producto_id = $aux->producto_id;
+            $item->pedido_tipo_origen_id = $aux->pedido_tipo_origen_id;
+            $item->origen_id = $aux->origen_id;
+            // $item->save();
+            $aux->destroy($aux->id); // se destruyen los iten anteriores
+        }
+
+        $newPed->parent=$oldPed->id;
+        //  $newPed->save();
+        Order::destroy($oldPed->id);// se detruye el anteri
+
+        /* $model = Order::where($req->id);// buscamos el pedido a asignar
+
+
+         foreach(  $model->OrderItem()->get() as $aux){
+             $item = new OrderItem();
+             $item->pedido_id = $req->pedido_id;
+             $item->producto_id = $aux->producto_id;
+             $item->pedido_tipo_origen_id = $aux->pedido_tipo_origen_id;
+             $item->origen_id = $aux->pedido_tipo_origen_id;
+             $item->save();
+         }*/
+
+
+    }
+
+    /**
+     * elimina un pedido a un nuevo pedido
+     **/
+    public function removeOrderSubstitute(Request $req){
+
+        $res= Array();
+        $model = OrderItem::where('pedido_id',$req->pedido_id)
+            ->where('producto_id',$req->id)
+            ->where('pedido_tipo_origen_id','3')
+            ->first();
+
+        //  $parent=Order::select('parent')->where('id',$model->producto_id);// id del pedido se guarda aqui
+        $moveItem = DB::table('tbl_pedido_item')->select('id')->where('pedido_id',$req->id)->get();
+
+        foreach(  $moveItem  as $aux){
+            dd($aux);
+            $newItem = OrderItem::where('producto_id', $aux)
+
+                ->where('pedido_id', $req->pedido_id)->first();
+            $res[]=$aux;
+            //OrderItem::destroy($newItem->id);
+        }
+        //OrderItem::destroy($model->id);
+        return $res;
+    }
+
     /**
      * obtiene todos los pedido que son sustituibles
      **/
 
     public function getOrderSubstituteOrder(Request $req){
-        $model =Order::
-        select(DB::raw("id , nro_proforma, emision , nro_factura, monto, comentario, "
-            ." (select count(*) from tbl_pedido_item where deleted_at is null and pedido_id= "
-            .$req->pedido_id
-            ." and pedido_tipo_origen_id = 3 and origen_id = tbl_pedido.id "
-            .") as asignado "
-        ));
-        $model->where('prov_id',$req->prov_id);
-        $model->where('id','<>',$req->pedido_id);
+        $data= Array();
+        $items =Order::where('prov_id',$req->prov_id)
+            ->where('id','<>',$req->pedido_id)
+            ->where('aprob_gerencia',1)
+            ->get();
+        foreach($items as $aux){
+            $it= $aux;
+            $it= MasterOrderController::getAvailableProduct($aux,$req->pedido_id);
+            $data[]=$it;
 
-        return $model->get();
+        }
+        return $data;
     }
     /**
      * @deprecated
@@ -478,80 +554,7 @@ class OrderController extends BaseController
     /***************** Pedidos a sustituir ***************************/
 
 
-    /**
-     *      * id  siempre va a ser del articulo a
 
-     * asigna un pedido a un nuevo pedido
-     **/
-    public function addOrderSubstitute(Request $req){
-
-        $oldPed= Order:: findOrFail($req->id);// se destruye la orden anterior
-        $newPed= Order:: findOrFail($req->pedido_id);// se destruye la orden anterior
-
-        $orSus = new OrderItem();
-        $orSus->pedido_id=$req->pedido_id;
-        $orSus->producto_id = $req->id;
-        $orSus->pedido_tipo_origen_id = '3';
-        $orSus->origen_id = $req->pedido_id;
-        $orSus->save();
-
-        $items = OrderItem::where('pedido_id',$req->id)->get();// los item a asignar al pedidos
-
-        // se mueven los item a el nuevo pedido
-        foreach( $items as $aux){
-            $item = new OrderItem();
-            $item->pedido_id = $req->pedido_id;
-            $item->producto_id = $aux->producto_id;
-            $item->pedido_tipo_origen_id = $aux->pedido_tipo_origen_id;
-            $item->origen_id = $aux->origen_id;
-            $item->save();
-            $aux->destroy($aux->id); // se destruyen los iten anteriores
-        }
-
-        $newPed->parent=$oldPed->id;
-        $newPed->save();
-        Order::destroy($oldPed->id);// se detruye el anteri
-
-        /* $model = Order::where($req->id);// buscamos el pedido a asignar
-
-
-         foreach(  $model->OrderItem()->get() as $aux){
-             $item = new OrderItem();
-             $item->pedido_id = $req->pedido_id;
-             $item->producto_id = $aux->producto_id;
-             $item->pedido_tipo_origen_id = $aux->pedido_tipo_origen_id;
-             $item->origen_id = $aux->pedido_tipo_origen_id;
-             $item->save();
-         }*/
-
-
-    }
-
-    /**
-     * elimina un pedido a un nuevo pedido
-     **/
-    public function removeOrderSubstitute(Request $req){
-
-        $res= Array();
-        $model = OrderItem::where('pedido_id',$req->pedido_id)
-            ->where('producto_id',$req->id)
-            ->where('pedido_tipo_origen_id','3')
-            ->first();
-
-        //  $parent=Order::select('parent')->where('id',$model->producto_id);// id del pedido se guarda aqui
-        $moveItem = DB::table('tbl_pedido_item')->select('id')->where('pedido_id',$req->id)->get();
-
-        foreach(  $moveItem  as $aux){
-            dd($aux);
-            $newItem = OrderItem::where('producto_id', $aux)
-
-                ->where('pedido_id', $req->pedido_id)->first();
-            $res[]=$aux;
-            //OrderItem::destroy($newItem->id);
-        }
-        //OrderItem::destroy($model->id);
-        return $res;
-    }
     /**
      * Obtiene la orden de compra
      ***/
