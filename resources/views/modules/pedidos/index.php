@@ -964,11 +964,15 @@
                                 <div flex class="cellGrid"> {{item.cod_profit}}</div>
                                 <div flex class="cellGrid">  {{item.descripcion}}</div>
                                 <md-input-container class="md-block" flex="10" >
-                                    <input  ng-model="item.monto"
-                                            ng-change="changeContraPItem(item)"
-                                            ui-number-mask type="text"
-                                            max="{{item.disponible}}"
-                                            ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado )"
+                                    <input
+                                        style="border: 0px !important;"
+                                        ng-model="item.monto"
+                                        ui-number-mask type="text"
+                                        min="0.0"
+                                        max="{{item.disponible}}",
+                                        ng-blur="focusLostCpitm(item)"
+                                        ng-change="changeContraPItem(item)"
+                                        ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado )"
                                     />
                                 </md-input-container>
                                 <div flex class="cellGrid">  {{item.comentario}}</div>
@@ -1049,8 +1053,11 @@
                                     ng-disabled="true" required>
                         </md-input-container>
 
-                        <div layout="column" flex>
-                            <md-datepicker ng-model="kitchenBoxSelec.fecha_abono" md-placeholder="Fecha Abono"></md-datepicker>
+                        <div layout="column" flex="20">
+                            <md-datepicker ng-model="kitchenBoxSelec.fecha_abono"
+                                           md-placeholder="Fecha Abono"
+                                           ng-disabled="true"
+                            ></md-datepicker>
                         </div>
                         <div flex="">
                             <!-- imga maqueta -->
@@ -1194,7 +1201,7 @@
 
                         </div>
                         <div flex="15" class="headGrid"> Cod. Producto</div>
-                        <div flex class="headGrid"> Cod. Profit</div>
+                        <div flex class="headGrid"> Tipo</div>
                         <div flex class="headGrid"> Descripción.</div>
                         <div flex="10" class="headGrid"> Cantidad</div>
                         <div flex class="headGrid"> Comentario</div>
@@ -1202,22 +1209,20 @@
                     </div>
                     <div id="gridResOdc">
                         <div flex>
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in contraPedSelec.productos">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos">
                                 <div flex="5" class="cellGrid">
                                     <md-switch class="md-primary"
                                                ng-model="item.asignado"
-                                               ng-change="changeContraPItem(item)"
-                                               ng-disabled="(pedidoSelec.estado_id !=1 || formBlock)"></md-switch>
+                                               ng-disabled="(pedidoSelec.estado_id !=1 || formBlock )"></md-switch>
                                 </div>
                                 <div flex="15" class="cellGrid">  {{item.id}}</div>
-                                <div flex class="cellGrid"> {{item.cod_profit}}</div>
+                                <div flex class="cellGrid"> {{item.tipo}}</div>
                                 <div flex class="cellGrid">  {{item.descripcion}}</div>
                                 <md-input-container class="md-block" flex="10" >
                                     <input  ng-model="item.monto"
-                                            ng-change="changeContraPItem(item)"
                                             ui-number-mask type="text"
-                                            max="{{item.disponible}}"
-                                            ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado )"
+                                            ng-change="changePedidoSustituto(item)"
+                                            ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado || item.tipo_origen == 3 )"
                                     />
                                 </md-input-container>
                                 <div flex class="cellGrid">  {{item.comentario}}</div>
