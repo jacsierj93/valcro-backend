@@ -307,6 +307,87 @@ md-chips .md-chips.md-focused{
 }
 
 
+
+/*==================================================*/
+/*==================== ALERTS ======================*/
+/*.alertsHolder{
+    top: calc(100% - 144px) !important;
+    height: 96px !important;
+    margin-bottom:48px !important;
+    width: calc(100% - 288px) !important;
+}*/
+.alertBox md-tabs-wrapper{
+    display: none !important;
+}
+.alertBox md-tabs-canvas{
+    display: none !important;
+}
+.alertBox md-tabs-content-wrapper{
+    top: 0 !important;
+}
+.alertBox md-tabs:not(.md-no-tab-content):not(.md-dynamic-height){
+    min-height: 96px !important;
+}
+.alertBox md-tab-content{
+    height: 96px;
+}
+.alertBox md-tab-content>div{
+    height: 96px;
+}
+
+.alertPrevArrow{
+    width: 16px;
+    height: 96px;
+    cursor: pointer;
+    background-image: url("../images/alert_prev_arrow.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.alertNextArrow{
+    width: 16px;
+    height: 96px;
+    cursor: pointer;
+    background-image: url("../images/alert_next_arrow.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.alertOkColor{
+    background-color:rgba(255,239,0,0.9);
+}
+.alertAlertColor{
+    background-color: rgba(245,171,0,0.9);
+}
+.alertErrorColor{
+    background-color: rgba(255,50,0,0.9);
+}
+.alertInfoColor{
+    background-color: rgba(0,0,0,0.2);
+}
+.alertContainer{
+    background-color: transparent;
+    height: 96px;
+}
+.alertItem{
+    height: 96px;
+}
+.alertTextContent{
+    overflow-y: auto;
+    height: 72px;
+    width: 100%;
+    text-align: center;
+}
+.alertTextOpcs{
+    height: 24px;
+    width: 100%;
+    text-align: center;
+}
+.alertTextOpcs>div:hover{
+    background-color: rgba(0,0,0,0.2);
+}
+.alertTextOpcs>div:active{
+    background-color: rgba(255,255,255,0.2);
+}
+
 /*==================================================*/
 /*===================== TABS =======================*/
 md-tabs .md-tab.md-active{

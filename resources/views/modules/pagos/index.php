@@ -279,7 +279,8 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')" required md-no-ink>
+                            <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')"
+                                       required md-no-ink>
                                 <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
@@ -431,6 +432,35 @@
                         </div>
                     </div>
 
+
+                    <div layout="row">
+
+
+                        <md-input-container class="md-block" flex="20">
+                            <label>Tipo Pago</label>
+                            <md-select ng-model="abono.tipo_id" required md-no-ink>
+                                <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
+                                    {{tipoPago.descripcion}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+
+                        <!--espacio-->
+                        <span style="padding-right: 300px">&nbsp; </span>
+                        <!--espacio-->
+
+
+                        <div>Id del pago: #100</div>
+
+                        <!--espacio-->
+                        <span style="padding-right: 100px">&nbsp; </span>
+                        <!--espacio-->
+                        <div>Fecha: <?= date("d-m-Y") ?></div>
+
+                    </div>
+
+
                     <div layout="row">
 
 
@@ -440,9 +470,9 @@
                         <!-- ################################################################################################ -->
                         <!-- ################################################################################################ -->
 
-                        <md-input-container class="md-block" flex>
+                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
                             <label>Cuenta destino provedor</label>
-                            <md-select ng-model="abono.prov_cuenta_id" md-no-ink>
+                            <md-select ng-model="abono.cuenta_id" md-no-ink>
                                 <md-option ng-repeat="cuenta in cuentasBancarias" value="{{cuenta.id}}">
                                     {{cuenta.banco}} , {{cuenta.cuenta}} , {{cuenta.beneficiario}}
                                 </md-option>
@@ -456,42 +486,48 @@
                         <!-- ################################################################################################ -->
 
 
-                    </div>
-
-
-                    <div layout="row">
-
-                        <md-input-container class="md-block" flex="20">
-                            <label>Tipo Pago</label>
-                            <md-select ng-model="abono.tipo_id" required md-no-ink>
-                                <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
-                                    {{tipoPago.descripcion}}
-                                </md-option>
-                            </md-select>
+                        <md-input-container ng-hide="abono.tipo_id==1" class="md-block" flex>
+                            <label>Nro. Documento Origen</label>
+                            <input ng-model="abono.org_factura" />
                         </md-input-container>
+
 
                         <md-input-container class="md-block" flex>
                             <label>Nro. Documento</label>
                             <input ng-model="abono.nro_doc" required/>
                         </md-input-container>
 
+
                         <div layout="column" flex>
                             <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
                         </div>
 
+                        <md-input-container ng-show="abono.tipo_id==2" class="md-block" flex>
+                            <label>Nro. Reclamo</label>
+                            <input ng-model="abono.nro_rec"/>
+                        </md-input-container>
+
+
                     </div>
+
 
                     <div layout="row">
 
-                        <md-input-container class="md-block" flex>
+                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
                             <label>Metodo de Pago</label>
-                            <md-select ng-model="abono.pago_id" required md-no-ink>
+                            <md-select ng-model="abono.pago_id" md-no-ink>
                                 <md-option ng-repeat="metodoPago in tipoPagos" value="{{metodoPago.id}}">
                                     {{metodoPago.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
+                        <md-input-container ng-hide="abono.tipo_id!=1"  class="md-block" flex="15">
+                            <label>Referencia</label>
+                            <input ng-model="abono.ref_pago" type="number"/>
+                        </md-input-container>
+                        
+                        
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
                             <input ng-model="abono.monto" required/>
@@ -500,8 +536,9 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Moneda</label>
-                            <md-select ng-model="abono.moneda_id" required ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
-                                <md-option ng-repeat="moneda in monedas"   ng-value="{{moneda.id}}">
+                            <md-select ng-model="abono.moneda_id" required
+                                       ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
+                                <md-option ng-repeat="moneda in monedas" ng-value="{{moneda.id}}">
                                     {{moneda.nombre}}
                                 </md-option>
                             </md-select>
@@ -510,9 +547,10 @@
 
                         <md-input-container class="md-block" flex="10">
                             <label>Tasa</label>
-                            <input ng-model="abono.tasa" ng-readonly="true"  required/>
+                            <input ng-model="abono.tasa" ng-readonly="true" required/>
 
                         </md-input-container>
+
 
 
                         <!-- ################################################################################################ -->
@@ -521,14 +559,24 @@
                         <!-- ################################################################################################ -->
                         <!-- Estos varian dependiendo del procentaje o el monto solocados en uno de los 3 campos (Monto, Monto recargo y porcentaje recargo) -->
 
-                        <md-input-container class="md-block" flex="15">
+                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>Monto Recargo</label>
-                            <input required/>
+                            <input ng-model="abono.monto_rec"/>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="15">
+                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>% Recargo</label>
-                            <input required/>
+                            <input ng-model="abono.monto_recp"/>
+                        </md-input-container>
+
+
+                        <md-input-container ng-show="abono.tipo_id>1" class="md-block" flex="35">
+
+
+                                <md-switch class="md-primary" ng-disabled="enabled">
+                                </md-switch>
+                            <label>Restricción Limitante</label>
+
                         </md-input-container>
 
                         <!-- ################################################################################################ -->
@@ -561,6 +609,69 @@
 
             </div>
         </md-sidenav>
+
+
+<!--    **********************************    SELECCIONAR DEUDAS A PAGAR CON EL DOCUMENTO ******************-->
+
+
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);"
+                    class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr6pag"
+                    id="lyr6pag">
+            <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
+                <div class="titulo_formulario" layout="column" layout-align="start start">
+                    <div>
+                       Uso del pago a Proveedor: {{provData.nombre}}
+                    </div>
+                </div>
+
+
+
+
+
+
+
+            </md-content>
+
+            <div style="width: 16px;">
+
+            </div>
+        </md-sidenav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         <!-- boton para registrar pago nuevo-->
