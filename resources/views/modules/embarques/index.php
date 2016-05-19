@@ -1,5 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="embarquesCtrll">
+<div layout="column" class="md-whiteframe-1dp" flex >
     <div ng-controller="test">
         <span ng-click="outside()"> ABRIRRRR </span>
     </div>

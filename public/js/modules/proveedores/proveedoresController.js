@@ -123,7 +123,7 @@ MyApp.filter('customFind', function() {
     }
 });
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif) {
     $scope.prov=setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo) {
         if(nvo && $scope.prov.new){
@@ -231,6 +231,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         $scope.openLayer("layer1");
     };
     $scope.editProv = function(){
+        console.log("Dasdas")
         $scope.edit = true;
         $scope.enabled =false;
         openLayer('layer1');
@@ -549,6 +550,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     $scope.chipSel = {};
     $scope.selChip = function(chip){
+        console.log($scope.$parent);
+        $scope.$parent.setNotif.addNotif('adv','prueba111','creara un nuevo proveedor',[{name:'pushMe',action:function(){console.log("llamdo")}},{name:'dont pushMe',action:function(){console.log('WHY?? :(')}}]);
         $scope.dep = chip.departments;
     };
 
@@ -558,12 +561,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     $scope.setDepa = function(dep){
         $scope.dep.push($scope.deps[dep].id)
-
     };
 
     $scope.unSetDepa = function(dep){
         var k = $scope.dep.indexOf($scope.deps[dep].id);
-        //console.log($scope.dep);
         delete $scope.dep[k];
     };
 
