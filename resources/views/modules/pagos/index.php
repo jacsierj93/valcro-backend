@@ -488,7 +488,7 @@
 
                         <md-input-container ng-hide="abono.tipo_id==1" class="md-block" flex>
                             <label>Nro. Documento Origen</label>
-                            <input ng-model="abono.org_factura" required/>
+                            <input ng-model="abono.org_factura" />
                         </md-input-container>
 
 
@@ -508,7 +508,6 @@
                         </md-input-container>
 
 
-
                     </div>
 
 
@@ -516,13 +515,19 @@
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
                             <label>Metodo de Pago</label>
-                            <md-select ng-model="abono.pago_id" required md-no-ink>
+                            <md-select ng-model="abono.pago_id" md-no-ink>
                                 <md-option ng-repeat="metodoPago in tipoPagos" value="{{metodoPago.id}}">
                                     {{metodoPago.nombre}}
                                 </md-option>
                             </md-select>
                         </md-input-container>
 
+                        <md-input-container ng-hide="abono.tipo_id!=1"  class="md-block" flex="15">
+                            <label>Referencia</label>
+                            <input ng-model="abono.ref_pago" type="number"/>
+                        </md-input-container>
+                        
+                        
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
                             <input ng-model="abono.monto" required/>
@@ -556,12 +561,12 @@
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>Monto Recargo</label>
-                            <input required/>
+                            <input ng-model="abono.monto_rec"/>
                         </md-input-container>
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>% Recargo</label>
-                            <input required/>
+                            <input ng-model="abono.monto_recp"/>
                         </md-input-container>
 
 
@@ -604,6 +609,69 @@
 
             </div>
         </md-sidenav>
+
+
+<!--    **********************************    SELECCIONAR DEUDAS A PAGAR CON EL DOCUMENTO ******************-->
+
+
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);"
+                    class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr6pag"
+                    id="lyr6pag">
+            <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
+                <div class="titulo_formulario" layout="column" layout-align="start start">
+                    <div>
+                       Uso del pago a Proveedor: {{provData.nombre}}
+                    </div>
+                </div>
+
+
+
+
+
+
+
+            </md-content>
+
+            <div style="width: 16px;">
+
+            </div>
+        </md-sidenav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         <!-- boton para registrar pago nuevo-->

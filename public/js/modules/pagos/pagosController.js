@@ -277,11 +277,16 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     $scope.saveFormAbono = function () {
 
+        openLayer('lyr6pag'); ////tre lo que puedo pagar con el documento
+
+     /*
+
         $http.post('payments/saveAbono', $scope.abono)
             .success(function (data, status, headers, config) {
                 if(data.success){ ///guarda el registro
-                    closeLayer('lyr5pag');
-                    $scope.getAbonos(); ///yendo a la lista de abonos
+                //    closeLayer('lyr5pag');
+                    openLayer('lyr6pag'); ////tre lo que puedo pagar con el documento
+                  //  $scope.getAbonos(); ///yendo a la lista de abonos
                 }else{ ///errores insertando
                     alert("falla guardando documento");
                 }
@@ -290,7 +295,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             })
             .error(function (data, status, header, config) {
                 console.log("Error:enviando datos del abono...")
-            });
+            });*/
+
+
 
     }
 
