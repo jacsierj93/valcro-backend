@@ -22,8 +22,13 @@ $app->post("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtie
 $app->post("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el pedido
 
+//Genericos
+$app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
+$app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
+
+
 // contra pedidos
-$app->post("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
+$app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
 $app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae tod el detalle de contraPedido
 $app->get("Order/CustomOrderPriority",'Orders\OrderController@getCustomOrderPriority'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido
@@ -40,8 +45,9 @@ $app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); 
 
 // pedido a  sustituir
 $app->post("Order/OrderSubstitutes",'Orders\OrderController@getOrderSubstituteOrder'); ///lista de todos los pedidos que se úeden sustituir
-$app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina el pedido sustituto
-$app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega el pedido sustituto
+$app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina todo el pedido sustituto
+$app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega todo el pedido sustituto
+$app->post("Order/AddOrderSubstituteItem",'Orders\OrderController@OrderSubstituteItem'); ///agrega todo el pedido sustituto
 $app->get("Order/OrderSubstitute",'Orders\OrderController@getOrderSustitute'); ///agrega el pedido sustituto
 
 // sin uso

@@ -632,9 +632,9 @@
                             <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.contraPedido">
 
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
-                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
+                                <div flex="50" class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                <div flex class="cellGrid" ng-click="removeLisContraP(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
                     </div>
@@ -658,7 +658,7 @@
                                 <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
                                 <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
                                 <div flex class="cellGrid"ng-click="selecKitchenBox(item)" > {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                <div flex class="cellGrid" ng-click="removeLisKitchenBox(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
                     </div>
@@ -678,9 +678,9 @@
                         <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.pedidoSusti">
 
                             <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
-                            <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
-                            <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.fecha.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
-                            <div flex class="cellGrid" ng-click="removeLisPedidoSus(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                           <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->
+                            <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
+                            <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                         </div>
                     </div>
                 </div>
@@ -966,10 +966,9 @@
                                 <md-input-container class="md-block" flex="10" >
                                     <input
                                         style="border: 0px !important;"
-                                        ng-model="item.monto"
+                                        ng-model="item.saldo"
                                         ui-number-mask type="text"
                                         min="0.0"
-                                        max="{{item.disponible}}",
                                         ng-blur="focusLostCpitm(item)"
                                         ng-change="changeContraPItem(item)"
                                         ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado )"
@@ -1212,6 +1211,7 @@
                             <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos">
                                 <div flex="5" class="cellGrid">
                                     <md-switch class="md-primary"
+                                               ng-change="changePedidoSustitutoItem(item)"
                                                ng-model="item.asignado"
                                                ng-disabled="(pedidoSelec.estado_id !=1 || formBlock )"></md-switch>
                                 </div>
@@ -1219,9 +1219,11 @@
                                 <div flex class="cellGrid"> {{item.tipo}}</div>
                                 <div flex class="cellGrid">  {{item.descripcion}}</div>
                                 <md-input-container class="md-block" flex="10" >
-                                    <input  ng-model="item.monto"
+                                    <input  ng-model="item.saldo"
+                                            max="item.cantidad"
                                             ui-number-mask type="text"
-                                            ng-change="changePedidoSustituto(item)"
+                                            ng-readonly="(item.cantidad == 0 && renglon_id)"
+                                            ng-change="changePedidoSustitutoItem(item)"
                                             ng-disabled="(pedidoSelec.estado_id !=1 || formBlock || !item.asignado || item.tipo_origen == 3 )"
                                     />
                                 </md-input-container>

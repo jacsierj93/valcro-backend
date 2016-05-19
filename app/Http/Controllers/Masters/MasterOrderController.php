@@ -10,7 +10,11 @@
 
 namespace app\Http\Controllers\Masters;
 
+use App\Models\Sistema\CustomOrders\CustomOrder;
+use App\Models\Sistema\CustomOrders\CustomOrderItem;
+use App\Models\Sistema\KitchenBoxs\KitchenBox;
 use App\Models\Sistema\Order\OrderItem;
+use App\Models\Sistema\Other\SourceType;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
 
@@ -51,7 +55,6 @@ class MasterOrderController extends BaseController
 
         if( $pediItem !== null){
             $auxMonto = (float) $pediItem->cantidad;
-            // $auxDisp =    $aux->cantidad - (float) $pediItem->cantidad;
             $it['renglon_id']=$pediItem->id;
             $it['asignado'] = true;
 
@@ -60,6 +63,77 @@ class MasterOrderController extends BaseController
         $it['monto']=  $auxMonto ;
 
         return $it;
+    }
+
+    /**
+     * @return el tipo de producto original
+     */
+    public static function getTypeProduct($producto){
+
+        $idType=$producto->tipo_origen_id;
+
+        if($idType == 4){
+            $i=0;
+            $aux= $producto;
+            do {
+                $aux= OrderItem::findOrFail($aux->origen_item_id);
+                $idType=$aux->tipo_origen_id;
+                $i++;
+
+            } while ($idType == 4 && $i<3);
+        }
+        return SourceType::findOrFail($idType)->descripcion;
+
+    }
+
+    /**
+     * @return el tipo de producto original
+     */
+    public static function getOriginalHead($producto){
+
+        $idType=$producto->tipo_origen_id;
+        $aux= $producto;
+        if($idType == 4){
+            $i=0;
+            do {
+                $aux= OrderItem::findOrFail($aux->origen_item_id);
+                $idType=$aux->tipo_origen_id;
+                $i++;
+
+            } while ($idType == 4 && $i<3);
+        }
+        switch($aux->tipo_origen_id){
+            case '2':
+                return  CustomOrder::find($aux->doc_origen_id);
+                break;
+            case '3':
+                return  KitchenBox::find($aux->doc_origen_id);
+                break;
+        }
+
+        return $aux;
+
+    }
+
+    /**
+     * @return el tipo de producto original
+     */
+    public static function getTypeProductId($producto){
+
+        $idType=$producto->tipo_origen_id;
+
+        if($idType == 4){
+            $i=0;
+            $aux= $producto;
+            do {
+                $aux= OrderItem::findOrFail($aux->origen_item_id);
+                $idType=$aux->tipo_origen_id;
+                $i++;
+
+            } while ($idType == 4 && $i<3);
+        }
+        return SourceType::findOrFail($idType)->id;
+
     }
 
     /**
@@ -72,7 +146,7 @@ class MasterOrderController extends BaseController
         $it['asignado'] = false;
 
         $pediItem = OrderItem::
-            where('tipo_origen_id',$producto->tipo_origen_id)
+        where('tipo_origen_id',$producto->tipo_origen_id)
             ->where('origen_item_id' , $producto->id)
             ->first();
         if( $pediItem !== null){
@@ -83,4 +157,6 @@ class MasterOrderController extends BaseController
         return $it;
 
     }
+
+
 }
