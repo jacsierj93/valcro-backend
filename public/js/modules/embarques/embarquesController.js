@@ -96,9 +96,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif', function 
 }]);
 
 MyApp.service("setNotif",function(){
-    var d = new Date();
     var list =  {
-            ok: [{title: "dada", content: "una prueba", opcs: {"ok":function(){console.log("dasd")}}}],
+            ok: [],
             alert: [],
             error: [],
             info: []
@@ -109,8 +108,17 @@ MyApp.service("setNotif",function(){
        },
        addNotif : function(obj,title, view,opcs){
            list[obj].unshift({title: title, content: view, opcs: opcs});
-
        }
    }
 
 });
+
+
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','setNotif', function ($scope, $mdSidenav,setNotif) {
+
+    $scope.callInfo = function(){
+
+        setNotif.addNotif("info","", "Esta es una prueba", [{name:"algo",action:function(){alert();}}]);
+    }
+
+}]);

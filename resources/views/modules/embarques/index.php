@@ -1,14 +1,11 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex >
-    <div ng-controller="test">
-        <span ng-click="outside()"> ABRIRRRR </span>
-    </div>
-
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="embarquesController">
 
     <span ng-click="callInfo()"> NUEVA </span>
     <span ng-click="callOk()"> NUEVA2 </span>
     <span ng-click="callErr()"> NUEVA3 </span>
     <span ng-click="callAdv()"> NUEVA4 </span>
+
     <md-sidenav layout="row" style="top: calc(100% - 144px); height: 96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
         <!-- OK   ############################################################################################## -->
         <div class="alertBox alertOkColor" flex ng-show="alerts.ok.length > 0" layout="row">
