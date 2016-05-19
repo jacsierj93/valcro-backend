@@ -85,5 +85,6 @@
 <?= HTML::script('js/modules/pagos/pagosController.js') ?>
 <?= HTML::script('js/modules/pedidos/pedidosController.js') ?>
 <?= HTML::script('js/modules/embarques/embarquesController.js') ?>
+<?= HTML::script('js/modules/main/notificacionesController.js') ?>
 </body>
 </html>
