@@ -266,7 +266,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     ////formulario de registro de adelanto
     $scope.setFormAdelanto = function () {
 
-        openLayer('lyr5pag');
+      //  openLayer('lyr5pag');
+
+        openLayer('lyr6pag');
 
         $scope.getPayDocTypes(); //tipos de documento de pago
         $scope.getPayTypes(); ///tipos de pago
