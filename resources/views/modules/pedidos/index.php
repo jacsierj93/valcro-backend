@@ -91,32 +91,32 @@
                 <div layout="row" style="height: 40px;">
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="dop-item" style="background-color: #006837;">
-                            85
+                            {{item.llega0}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="dop-item" style="background-color: #00862c;">
-                            85
+                            {{item.llega7}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="dop-item" style="background-color: #00a421;">
-                            85
+                            {{item.llega30}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="dop-item" style="background-color: #00c316;">
-                            85
+                            {{item.llega60}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="dop-item" style="background-color: #00e10b;">
-                            85
+                            {{item.llega90}}
                         </div>
                     </div>
                     <div flex layout layout-align="center center">
                         <div layout layout-align="center center" class="dop-item" style="background-color: #00ff00;">
-                            85
+                            {{item.llega100}}
                         </div>
                     </div>
                 </div>

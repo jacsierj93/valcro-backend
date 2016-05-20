@@ -52,6 +52,7 @@ $app->get("Order/OrderSubstitute",'Orders\OrderController@getOrderSustitute'); /
 
 // sin uso
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido
+$app->get("Order/test",'Orders\OrderController@test'); ///elimina el pedido
 
 //deprecated
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id

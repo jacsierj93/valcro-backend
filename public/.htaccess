@@ -4,7 +4,7 @@
     </IfModule>
 
     RewriteEngine On
-   # RewriteBase /angular2
+    RewriteBase /angular2
 
     # Redirect Trailing Slashes...
     RewriteRule ^(.*)/$ /$1 [L,R=301]
@@ -14,3 +14,4 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
