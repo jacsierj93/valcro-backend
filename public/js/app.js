@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut','ui.mask', 'ui.utils.masks'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut'/*,'ui.mask', 'ui.utils.masks'*/];
 var MyApp = angular.module('MyApp', dependency);
 
 
@@ -25,6 +25,46 @@ var MyApp = angular.module('MyApp', dependency);
     $routeProvider
         .when('/home',  {templateUrl:"modules/home"})
 }]);*/
+
+var INTEGER_REGEXP = /^\-?\d+$/;
+MyApp.directive('duplicate', function($filter,$q,$timeout) {
+
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            //var targ = attrs.integer;
+            ctrl.$asyncValidators.duplicate = function(modelValue, viewValue) {
+                var srcScope = attrs['duplicate'];
+                var fld = attrs['field'];
+                if (ctrl.$isEmpty(modelValue)) {
+                    // consider empty models to be valid
+                    return $q.when();
+                }
+
+                var def = $q.defer();
+
+                $timeout(function() {
+                    // Mock a delayed response
+                    if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].indexOf(compare) !== -1}).length<1) {
+                        // it is valid
+                        def.resolve();
+                    }else{
+                        def.reject();
+                    }
+                }, 50);
+
+                return def.promise;
+
+            };
+        }
+    };
+});
+
+MyApp.directive('2valName', function() {
+    console.log("entor en la direcytiva")
+
+});
+
 
 
 MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {

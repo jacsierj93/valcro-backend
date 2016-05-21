@@ -130,11 +130,21 @@ class ProvidersController extends BaseController
 
     public function saveValcroName(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
-        $valName = new NombreValcro();
+        if($req->id){
+            $valName = NombreValcro::find($req->id);
+            $result['action']="upd";
+        }else{
+            $valName = new NombreValcro();
+        }
         $valName->prov_id = $req->prov_id;
         $valName->nombre = $req->name;
         $valName->fav = $req->fav;
         $valName->save();
+        foreach($req->departments as $k=>$v){
+            if(!$v){
+                unset($req->departments[$k]);
+            }
+        }
         $valName->departamento()->sync($req->departments);
 
         $result['id']=$valName->id;
@@ -151,7 +161,7 @@ class ProvidersController extends BaseController
         if((bool)$id){
             $valName = Provider::find($id)->nombres_valcro()->select("id","nombre as name","fav")->get();
             foreach($valName as $nom){
-                $nom->departments = $nom->departamento()->lists("depa_id");
+                $nom->departments = $nom->departamento()->get();
             }
             return $valName;
         }

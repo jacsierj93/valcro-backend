@@ -83,6 +83,7 @@ md-input-container:not(.md-input-invalid).md-input-focused label {
     color: rgb(84, 180, 234);
 }
 
+
 input {
     font-size: 98% !important;
 }
@@ -711,8 +712,22 @@ md-pagination-wrapper {
 .listSel {
    border-left:2px solid rgb(84, 180, 234);
 }
+.listSelTemp {
+     border-left:2px solid #febd33;
+ }
+
+.iconInactive {
+    color :#d1d1d1 !important;
+}
+.iconActive {
+    color : rgb(84, 180, 234) !important;
+}
+.iconFav {
+   color: #febd33 !important;
+}
 .gridSel {
-    background-color: #f1f1f1;
+    background-color: rgb(84, 180, 234);
+    color: #fff;
 }
 
 input[type=number]::-webkit-inner-spin-button,
@@ -720,6 +735,15 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+/*
+#valcroName:not(.md-input-invalid) .md-input {
+    border-color: rgb(84, 180, 234) !important;
+    !*border-color: #ffffff !important;*!
+}
+
+#valcroName:not(.md-input-invalid) label {
+    color: rgb(84, 180, 234);
+}*/
 
 .title_error{
     color:rgb(221,44,0) !important;
@@ -733,6 +757,15 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .onlyread>div{
     border-color:#999 !important;
+}
+
+.itemName{
+    border-radius: 10px;
+    padding: 5px;
+    margin-right: 8px;
+    margin-top: 8px;
+    float: left;
+    border: 1px solid #ccc;
 }
 
 
