@@ -651,12 +651,12 @@
 
                     <md-input-container class="md-block" flex="15">
                         <label>Monto</label>
-                        <input ng-value="20000" required/>
+                        <input value="20000" required/>
                     </md-input-container>
 
                     <md-input-container class="md-block" flex="15">
                         <label>fecha</label>
-                        <input ng-value="18-05-2016" required/>
+                        <input value="18-05-2016" required/>
                     </md-input-container>
 
                     <!--espacio-->
@@ -665,12 +665,12 @@
 
                     <md-input-container class="md-block" flex="15">
                         <label>moneda</label>
-                        <input ng-value="USD" required/>
+                        <input value="USD" required/>
                     </md-input-container>
 
                     <md-input-container class="md-block" flex="15">
                         <label>Tasa</label>
-                        <input ng-value="1" required/>
+                        <input value="1" required/>
                     </md-input-container>
 
 
@@ -685,11 +685,39 @@
 
                 <div layout="row">
 
-                    <md-input-container class="md-block" flex="40">
-                       <span class="balance_plus">{{50000 | currency : $ : 2}} </span>  / <span class="balance_sub">{{50000 | currency : $ : 2}}</span>
+                    <md-input-container class="md-block" flex="35">
+                        <span class="balance_plus">{{50000 | currency : $ : 2}} </span> / <span class="balance_sub">{{50000 | currency : $ : 2}}</span>
                     </md-input-container>
 
-                    
+
+
+                    <md-input-container class="md-block" flex="20">
+                        <label>Proceder el Pago</label>
+                        <md-select ng-model="abono2.tipo" md-no-ink>
+                            <md-option ng-repeat="metodoPago in [{id:1,nombre: 'Todo por llegar'},
+                            {id:2,nombre: 'Vencidos'} ]" value="{{metodoPago.id}}">
+                                {{metodoPago.nombre}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+
+
+                    <!--espacio-->
+                    <span style="padding-right: 40px">&nbsp; </span>
+                    <!--espacio-->
+
+
+                    <md-input-container class="md-block" flex="20">
+                        <md-checkbox  ng-model="isDisabled" aria-label="Disabled">
+                            Pagar todo?
+                        </md-checkbox>
+                    </md-input-container>
+
+
+                    <md-input-container class="md-block">
+                        <label>Indique un monto</label>
+                        <input  required/>
+                    </md-input-container>
 
 
                 </div>
