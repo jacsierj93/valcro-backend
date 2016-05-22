@@ -17,16 +17,15 @@ use Validator;
 class PaymentController extends BaseController
 {
 
-
     private $payIds = array(1, 2, 3);
     private $debtsIds = array(4);
+    private $factCuoIds = array(4, 5);
 
     public function __construct()
     {
 
         $this->middleware('auth');
     }
-
 
 
     public function delete(Request $req)
@@ -133,9 +132,6 @@ class PaymentController extends BaseController
 
     }
 
-  
-
-
 
     /**trae los pagos de un proveedor
      * @param Request $req
@@ -176,7 +172,8 @@ class PaymentController extends BaseController
         $data["id"] = $proveedor->id;
         $data["razon_social"] = $proveedor->razon_social;
         $data["pagos"] = $this->getPayListFact($provId);
-        $data["deudas"] = $this->getDebtsList($provId);
+        $data["deudas"] = $this->getDebtsList($provId); ////facturas
+        $data["factCuo"] = $this->getFactCuoByProvId($provId); //cuotas y facturas sin cuotas
 
         return $data;
 
@@ -195,8 +192,6 @@ class PaymentController extends BaseController
 
     }
 
-
-  
 
     /**lista de pagos hechas al proveedor CON FACTURA
      * @return mixed
@@ -224,7 +219,6 @@ class PaymentController extends BaseController
     }
 
 
-  
     /**deudas del proveedor
      * @return mixed
      */
@@ -252,6 +246,36 @@ class PaymentController extends BaseController
     }
 
 
+    public function getFactCuoByProvId($provId)
+    {
+
+        $deudas = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->factCuoIds)->get();
+        $result = array();
+        foreach ($deudas as $deuda) {
+
+            if ($deuda->ncuotas() == 0) { ///puras cuotas y facturas sin cuotas
+
+                $temp["id"] = $deuda->id;
+                $temp["nro_factura"] = $deuda->nro_factura;
+                $temp["fecha"] = $deuda->fecha;
+                $temp["vence"] = $deuda->fecha_vence;
+                $temp["vencido"] = 'v' . $deuda->vencimiento(); ///color del punto
+                $temp["tipo"] = $deuda->tipo->descripcion;
+                $temp["saldo"] = $deuda->saldo;
+                $temp["doc_orig"] = $deuda->doc_orig;
+                $temp["nro_orig"] = $deuda->nro_orig;
+                $temp["monto"] = $deuda->monto;
+                $temp["pagado"] = $deuda->monto - $deuda->saldo;
+            }
+
+
+            $result[] = $temp;
+        }
+
+        return $result;
+
+
+    }
 
 
     /********************************************************************************
@@ -259,12 +283,12 @@ class PaymentController extends BaseController
      *********************************************************************************/
 
 
-    public function paySaveOrUpdate(Request $req){
+    public function paySaveOrUpdate(Request $req)
+    {
 
         dd($req->all());
 
     }
-
 
 
 }

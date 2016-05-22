@@ -4,10 +4,26 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.index = index = 0;
     var base = 264;
     $scope.toolBar = {"add":true,"edit":false,"filter":false} ///botonera
-    $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}};
+    $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2":{}};
     $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
     $scope.abonos = {};
+    $scope.provSelected = {};
+
+
+    /**
+     * traer proveedor actual
+     * @param id
+     * @returns {*}
+     */
+    function getProvById(id) {
+        for (var d = 0, len = $scope.provs.length; d < len; d += 1) {
+            if ($scope.provs[d].id === id) {
+                return $scope.provs[d];
+            }
+        }
+    }
+
 
 
     function openLayer(layr) {
@@ -81,6 +97,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     $scope.showNext = function (status, to) {
         if (status) {
+            
             $scope.nextLyr = to;
             //console.log($scope.nextLyr);
             $mdSidenav("NEXT").open()
@@ -157,9 +174,15 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             $scope.provData.nombre = response.razon_social;
             $scope.provData.pagos = response.pagos;
             $scope.provData.deudas = response.deudas;
+            $scope.provData.deudas2 = response.factCuo; 
+
+            $scope.provSelected = getProvById(response.id); ///proveedor seleccionado de la lista
 
             console.log("trayendo proveedor con id:" + prov.id);
+
         });
+        
+
 
 
         closeLayer(true)
