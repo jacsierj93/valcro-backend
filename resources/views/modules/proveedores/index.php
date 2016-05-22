@@ -2,77 +2,89 @@
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="AppCtrl">
 
     <!-- 2) ########################################## AREA DEL MENU ########################################## -->
-    <div layout="row" flex="none" class="menuBarHolder">
-        <!-- 3) ########################################## MENU ########################################## -->
-        <div layout="row" layout-align="start center" class="menu">
-            <div flex layout-align="center center" ng-click="showAlert()">
-                Menu
-            </div>
-            <div layout="column" style="width: 48px; height: 48px;" layout-align="center center">
-                <?= HTML::image("images/btn_nextArrow.png") ?>
-            </div>
-        </div>
-        <!-- 4) ########################################## BOTONERA ########################################## -->
-        <div class="botonera" layout layout-align="start center">
-            <div layout="column" layout-align="center center">
+    <!--<div layout="row" flex="none" class="menuBarHolder">
 
-            </div>
-            <div layout="column" layout-align="center center" ng-click="addProv()">
-                <!--<i class="fa fa-plus"></i>-->
-                <?= HTML::image("images/agregar.png") ?>
-            </div>
-            <div layout="column" layout-align="center center" ng-click="editProv()" ng-show="prov.id">
-                <!--<i class="fa fa-filter"></i>-->
-                <?= HTML::image("images/actualizar.png") ?>
-            </div>
-            <div layout="column" layout-align="center center" ng-click="toggleOtro()" ng-show="prov.id">
-                <!--<i class="fa fa-minus"></i>-->
-                <?= HTML::image("images/filtro.png") ?>
-            </div>
-        </div>
 
-    </div>
+
+    </div>-->
 
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
 
-        <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
-        <md-content class="barraLateral" ng-controller="ListProv">
+        <div class="barraLateral" layout="column" style="height:100%;">
+            <div id="menu" layout="row" flex="none" class="menuBarHolder md-whiteframe-1dp">
+                <!-- 3) ########################################## MENU ########################################## -->
+                <div layout="row" layout-align="start center" class="menu">
+                    <div flex layout-align="center center" ng-click="showAlert()">
+                        Menu
+                    </div>
+                    <div layout="column" style="width: 48px; height: 48px;" layout-align="center center" ng-click="menuExpand()">
+                        <?= HTML::image("images/btn_nextArrow.png") ?>
+                    </div>
+                </div>
+            </div>
+            <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
+            <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
+            <div flex ng-controller="ListProv" style="overflow-y:auto;">
+                <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
+                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id)}">
+                    <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
+                    <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'000000'}}</div>
+                    <div style="height:40px;">
+                        <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
+                        <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />
+                        <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/aereo.png" />
+                        <img ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)" src="images/maritimo.png" />
+                    </div>
+                </div>
+            </div>
+            <!--</md-content>-->
+        </div>
 
-            <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id)}">
-                <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
-                <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'000000'}}</div>
-                <div style="height:40px;">
-                    <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
-                    <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />
-                    <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/aereo.png" />
-                    <img ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)" src="images/maritimo.png" />
+        <div layout="column" flex class="md-whiteframe-1dp">
+            <!-- 4) ########################################## BOTONERA ########################################## -->
+            <div class="botonera" layout layout-align="start center">
+                <div layout="column" layout-align="center center">
+
+                </div>
+                <div layout="column" layout-align="center center" ng-click="addProv()">
+                    <!--<i class="fa fa-plus"></i>-->
+                    <?= HTML::image("images/agregar.png") ?>
+                </div>
+                <div layout="column" layout-align="center center" ng-click="editProv()" ng-show="prov.id">
+                    <!--<i class="fa fa-filter"></i>-->
+                    <?= HTML::image("images/actualizar.png") ?>
+                </div>
+                <div layout="column" layout-align="center center" ng-click="toggleOtro()" ng-show="prov.id">
+                    <!--<i class="fa fa-minus"></i>-->
+                    <?= HTML::image("images/filtro.png") ?>
                 </div>
             </div>
 
-        </md-content>
+            <div flex layout="row">
+                <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
+                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+                    <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"closeLayer()","ng-show"=>"(index>0)")) ?>
+                </div>
 
-        <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
-            <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-            <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"closeLayer()","ng-show"=>"(index>0)")) ?>
-        </div>
-
-        <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
-        <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
-            <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
-                P
+                <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
+                <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+                    <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                        P
+                    </div>
+                    <br> Selecciones un Proveedor
+                </div>
             </div>
-            <br> Selecciones un Proveedor
         </div>
+
 
         <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
                 <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
-                <div layout="column" flex>
+                <div layout="column" flex style="margin-right:8px;">
                     <div class="titulo_formulario" style="height:39px;">
                         <div>
                             Proveedor
@@ -88,144 +100,142 @@
                             {{prov.siglas}}
                         </div>
                     </div>
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div class="titulo_formulario" style="height:39px;" layout-align="start start">
                         <div>
                             Nombres Valcro
                         </div>
                     </div>
-                    <md-grid-list md-cols="2" md-gutter="6px" md-row-height="4:1" style="margin-right: 8px;" ng-repeat="name in prov.nomValc">
-                        <md-grid-tile>
-                            <div class="textResm" flex layout="Column" layout-align="start start">
-                                <div style="overflow: hidden; text-overflow: ellipsis;">
-                                    {{name.nombre}}
-                                </div>
-                            </div>
-                        </md-grid-tile>
-                    </md-grid-list>
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div flex style="overflow-y:auto;">
+                        <div class="itemName" ng-repeat="name in prov.nomValc">
+                            {{name.nombre}}
+                        </div>
+                    </div>
+                    <div class="titulo_formulario" style="height:39px;">
                         <div>
                             Tipo de envio
                         </div>
                     </div>
-                    <div layout="row">
+                    <div style="height:39px;">
                         <div flex>
                             <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
                             <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />
                         </div>
                     </div>
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div class="titulo_formulario" style="height:39px;">
                         <div>
                             Tiempos Estimados
                         </div>
                     </div>
-                    <div layout="column">
-                        <div flex>
-                            Produccion:
-                        </div>
-                        <div flex ng-repeat="tiempo in prov.tiemposP">
-                            <div flex>de: {{tiempo.min_dias}} a {{tiempo.max_dias }} para {{tiempo.lines.linea}}</div>
+                    <div style="height:24px;">
+                        Produccion:
+                    </div>
+                    <div flex style="overflow-y: auto;">
+                        <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposP">
+                            de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
                         </div>
                     </div>
-                    <div layout="column">
-                        <div flex>
-                            Transito:
-                        </div>
-                        <div flex ng-repeat="tiempo in prov.tiemposT">
-                            <div flex>de: {{tiempo.min_dias}} a {{tiempo.max_dias }} desde {{tiempo.country.short_name}}</div>
+                    <div style="height:24px;">
+                        Transito:
+                    </div>
+                    <div flex style="overflow-y: auto;">
+                        <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposT">
+                            de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> desde <b>{{tiempo.country.short_name}}</b>
                         </div>
                     </div>
 
                 </div>
 
-
                 <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
-                <div layout="column" flex>
-                    <div flex="50" layout="column">
-                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                <div layout="column" flex style="margin-right:8px;">
+                    <div flex>
+                        <div class="titulo_formulario" style="height: 39px;">
                             <div>
                                 Direcciones
                             </div>
                         </div>
-
-                        <div flex layout="column">
-
-                            <div ng-repeat="direccion in prov.direcciones" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                                <div layout="row">
-                                    <div flex="50">{{direccion.tipo.descripcion}}</div>
-                                    <div flex="50" style="overflow-x: hidden; text-overflow: ellipsis;">
-                                        {{direccion.country.short_name}}
-                                    </div>
+                        <div style="overflow-y: auto; height: calc(100% - 39px);">
+                            <div ng-repeat="direccion in prov.direcciones" style="height: 60px; width:100%;">
+                                <div style="width: 30%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis; font-weight:bold;">
+                                    {{direccion.tipo.descripcion}}
                                 </div>
-                                <div flex>
+                                <div style="width: 70%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis;">
+                                    {{direccion.country.short_name}}
+                                </div>
+                                <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
                                     {{direccion.direccion}}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div flex="50" layout="column">
-                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div flex>
+                        <div class="titulo_formulario" style="height: 39px;">
                             <div>
                                 Contactos
                             </div>
                         </div>
-                        <div flex ng-repeat="contact in prov.contacts" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                            <div layout="row">
-                                <div flex="50">{{contact.nombre}}</div>
-                                <div flex="50">
-                                    <span ng-repeat="cargo in contact.cargos">{{cargo.cargo}}, </span>
+                        <div style="overflow-y: auto; height: calc(100% - 39px);">
+                            <div ng-repeat="contact in prov.contacts" style="height: 39px;">
+                                <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
+                                    <span style="font-weight: bold !important; float:left;">{{contact.nombre}}: </span>
+                                    <span style="float:left;" ng-repeat="cargo in contact.cargos">{{cargo.cargo}},</span>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
                 <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
                 <div layout="column" flex>
-                    <div flex="10">
-                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div style="height:78px;">
+                        <div class="titulo_formulario" style="height: 39px;">
                             <div>
                                 Monedas
                             </div>
                         </div>
-                        <div flex layout="column">
-                            <div ng-repeat="moneda in prov.monedas" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                                {{moneda.nombre}} ({{moneda.simbolo}})
+                        <div style="overflow-y: auto; height: calc(100% - 39px);">
+                            <div ng-repeat="moneda in prov.monedas" style="float:left; height:24px;">
+                                <span style="font-weight:bold;">{{moneda.nombre}} &nbsp;</span>({{moneda.simbolo}})
                             </div>
                         </div>
                     </div>
-                    <div flex="20">
-                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div flex>
+                        <div class="titulo_formulario" style="height: 39px;">
                             <div>
                                 Puntos
                             </div>
                         </div>
-                        <div ng-repeat="point in prov.monedas" ng-show="point.pivot.punto" layout="row" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                            <div flex="30">{{point.nombre}}</div>
-                            <div flex="70">{{point.pivot.punto}} {{point.simbolo}}</div>
+                        <div style="overflow-y: auto; height: calc(100% - 39px);">
+                            <div ng-repeat="point in prov.monedas" ng-show="point.pivot.punto">
+                                <div style="width: 30%; float:left;">{{point.nombre}}</div>
+                                <div style="width: 70%; float:left;">{{point.pivot.punto}} {{point.simbolo}}</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div flex="20">
-                        <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'title_error' : (prov.limCred.length < 1)}">
+                    <div flex>
+                        <div class="titulo_formulario" style="height: 39px;" ng-class="{'title_error' : (prov.limCred.length < 1)}">
                             <div>
                                 Limites de Credito
                             </div>
                         </div>
-                        <div ng-repeat="lim in prov.limites" layout="row" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                            <div flex="30">{{lim.moneda.nombre}}</div>
-                            <div flex="70">{{lim.limite}} {{lim.moneda.simbolo}}</div>
+                        <div style="overflow-y: auto; height: calc(100% - 39px);">
+                            <div ng-repeat="lim in prov.limites" style="width: 100%;">
+                                <div style="width: 30%; float:left;">{{lim.moneda.nombre}}</div>
+                                <div style="width: 70%; float:left;">{{lim.limite}} {{lim.moneda.simbolo}}</div>
+                            </div>
                         </div>
                     </div>
-                    <div flex="50">
-                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div flex>
+                        <div class="titulo_formulario" style="height: 39px;">
                             <div>
                                 Cuentas Bancarias
                             </div>
                         </div>
-                        <div ng-repeat="bank in prov.banks" layout="column" style="border-bottom: 1px solid rgb(84, 180, 234)">
-                            <div flex>{{bank.banco}}</div>
-                            <div flex>{{bank.cuenta}}</div>
+                        <div style="overflow-y: auto; height:calc(100% - 39px); posi">
+                            <div ng-repeat="bank in prov.banks" style="width: 100%;">
+                                <div style="width: 100%; height:24px; font-weight:bold;">{{bank.banco}}</div>
+                                <div style="width: 100%; height:24px;">{{bank.cuenta}}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
