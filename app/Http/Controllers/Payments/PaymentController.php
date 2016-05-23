@@ -224,7 +224,9 @@ class PaymentController extends BaseController
      */
     public function getDebtsList($provId)
     {
-        $deudas = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->debtsIds)->get();
+
+        /////puras facturas no pagadas por completo
+        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->debtsIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
 
@@ -249,7 +251,8 @@ class PaymentController extends BaseController
     public function getFactCuoByProvId($provId)
     {
 
-        $deudas = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->factCuoIds)->get();
+        ////trayendo las facturas y cuotas que no hayan sido pagadas
+        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->factCuoIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
 
