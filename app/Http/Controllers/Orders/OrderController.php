@@ -40,12 +40,15 @@ class OrderController extends BaseController
         $this->middleware('auth');
     }
 
+    /**
+     * obtiene la lista de proveedores
+     */
     public function getProviderList()
     {
 
         $provs = Provider::
-       where('id', 1)->
-            get();
+        where('id', 1)->
+        get();
         $data = array();
 
         foreach($provs as $prv){
@@ -96,6 +99,21 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /**
+     * llena los camppos de los filtros
+     */
+    public function getFilterData()
+    {
+
+        $data= Array();
+        $data['monedas']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
+        $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
+        return $data;
+    }
+    /**
+     * prueba para metodos
+     * @deprecated
+     */
     function test(Request $req){
         $model = Provider::findOrFail(1);
         $pedidos =$model->Order()
@@ -143,18 +161,24 @@ class OrderController extends BaseController
 
         return $resul;
     }
+
+
     /**
-     * llena los camppos de los filtros
+     * edita el item de pedido y ajusta los valores del anterior
      */
-    public function getFilterData()
-    {
 
-        $data= Array();
-        $data['monedas']= Monedas::select('nombre', 'id')->where("deleted_at",NULL)->get();
-        $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
-        return $data;
+    public function EditPedido(Request $req){
+
+        $model= OrderItem::findOrfail($req->id);
+        $model->cantidad = $req->cantidad;
+        $model->saldo = $req->saldo;
+        $model->save();
+        
+        $resul['accion']= "edicion ". $req->tipo_origen_id;
+        $resul['item']= $model;
+        return $resul;
+
     }
-
     /**
      * regresa la lista de pedidos segun id del provedor
      */
@@ -383,9 +407,9 @@ class OrderController extends BaseController
         }
         foreach( $items as $aux ){
             $it=$aux;
-//            $it->tipo_origen_id='2';
-//            //$it= MasterOrderController::getQuantityAvailableProduct($aux,$pedido);
-//            $it->tipo_origen_id=$aux->tipo_origen_id;
+            $it->tipo_origen_id='2';
+            $it= MasterOrderController::getQuantityAvailableProduct($aux,$pedido);
+            $it->tipo_origen_id=$aux->tipo_origen_id;
             $prods[] =$aux;
         }
         $model['productos']=$prods;
@@ -631,15 +655,17 @@ class OrderController extends BaseController
         $contra=Collection::make(Array());
         $kitchen= Collection::make(Array());
         $pediSus= Collection::make(Array());
+        $all= Collection::make(Array());
 
+        /** contra pedido*/
         foreach($items->where('tipo_origen_id', '2') as $aux){
             $contra->push(CustomOrder::find($aux->doc_origen_id));
         }
-
+        /** kitceh box*/
         foreach($items->where('tipo_origen_id', '3') as $aux){
             $kitchen->push(KitchenBox::find($aux->origen_item_id));
         }
-
+        /** importados */
         foreach($items->where('tipo_origen_id', '4') as $aux){
 
             $id =MasterOrderController::getTypeProductId($aux);
@@ -662,11 +688,23 @@ class OrderController extends BaseController
 
         }
 
-
+        /** todos */
+        foreach($items as $aux){
+            $tem['id']= $aux->id;
+            $tem['cantidad']= $aux->cantidad;
+            $tem['saldo']= $aux->saldo;
+            $tem['descripcion']= $aux->descripcion;
+            $tem['tipo_origen_id']= $aux->tipo_origen_id;
+            $tem['asignado']= true;
+            $tem['Origen']= MasterOrderController::getTypeProduct($aux);
+            $all->push($tem);
+        }
 
         $data['contraPedido'] = $contra;
         $data['kitchenBox'] = $kitchen;
         $data['pedidoSusti'] = $pediSus;
+        $data['todos'] = $all;
+
         return $data;
 
     }

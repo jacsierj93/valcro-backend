@@ -25,6 +25,7 @@ $app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el ped
 //Genericos
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
+$app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae tod el detalle de contraPedido
 
 
 // contra pedidos

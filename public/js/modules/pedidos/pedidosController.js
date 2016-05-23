@@ -5,7 +5,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     $scope.formBlock = true;
     $scope.index = 0;
     $scope.layer = '';
-
+    $scope.showGripro=false;
     /******************* declaracion defunciones de eventos */
     /*******incializacion de $scope*****/
 
@@ -26,17 +26,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     $scope.setProvedor = setProvedor;
     $scope.openLayer = openLayer;
     $scope.closeLayer = closeLayer;
-    //$scope.closeLayeValid=closeLayeValid;
     $scope.DtPedido = DtPedido;
     $scope.selecOdc = selecOdc;
     $scope.selecContraP = selecContraP;
     $scope.selecPedidoSust = selecPedidoSust;
-
     $scope.selecKitchenBox = selecKitchenBox;
-    // $scope.removeLisContraP = removeLisContraP;
-    //$scope.removeLisKitchenBox = removeLisKitchenBox;
-    //$scope.removeLisPedidoSus = removeLisPedidoSus;
-    //  carga la primera data del sistema filtros  y proveedores
     init();
 
 
@@ -76,6 +70,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         a.click();
     }
 
+    $scope.showProduc= function () {
+        if($scope.showGripro){
+            $scope.showGripro=false;
+        }else {
+            $scope.showGripro=true;
+        }
+
+    }
+    $scope.onchangePeditem=  function (item){
+        if(item.asignado){
+            $http.post("Order/EditOrdenItem", item)
+                .success(function (response) {
+                    console.log(response);
+                });
+        }
+    }
+
     function selecOdc(odc) {
         restore('odcSelec');
         loadOdc(odc.id);
@@ -106,7 +117,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             });
         $scope.formDataContraP.contraPedidoMotivo = ORDER.query({type: 'CustomOrderReason'});
         $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type: 'CustomOrderPriority'});
-        //loadContraP(item.id);
         openLayer("resumenContraPedido");
     }
 
@@ -121,7 +131,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function selecKitchenBox(item) {
         restore('kitchenBoxSelec');
-        console.log('item id', item);
         ORDER.get({type: 'KitchenBox', id: item.id}, {}, function (response) {
             $scope.kitchenBoxSelec = response;
             if (response.fecha != null) {
@@ -139,8 +148,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
         var curren = $scope.layer;
-        console.log('current', curren);
-
         switch (curren) {
             case 'detallePedido':
                 openLayer('agrPed');
@@ -205,14 +212,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
             }
         }
-        /*
-         else
-         if(item.asignado && item.renglon_id == null){
-         alert('EL monto excede la cantidad original');
-         ORDER.post({type: 'AddCustomOrderItem'}, item, function (response) {
-         item.renglon_id = response.id;
-         });
-         }*/
+
     }
 
 
@@ -278,9 +278,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function setProvedor(prov) {
         $scope.provSelec = prov;
-        console.log('prov id=' + prov.id + "  scop prov =" + $scope.provSelec.id)
-        loadPedidosProvedor(prov.id);
-        //loadOrdenesDeCompraProveedor(prov.id);
         openLayer('listPedido');
     }
 
@@ -302,29 +299,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function DtPedido(pedido) {
 
-        if (pedido == 'null') {
-
-            if (segurity('newPedido')) {
-                if (openLayer('detallePedido')) {
-                    $scope.formBlock = false;
-                    restore('pedidoSelec');
-                    if ($scope.index <= 1) {
-                        restore('provSelec');
-                    }
-                }
-            } else {
-                alert('No tiene suficientes permiso para ejecutar esta accion');
-            }
-        } else {
+        if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                if (openLayer('detallePedido')) {
-                    loadPedido(pedido.id);
-                    loadDirProvider($scope.pedidoSelec.pais_id);
-                }
+                openLayer('detallePedido');
+                loadPedido(pedido.id);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
             }
+        }else  if(!pedido && $scope.index <2){
+            if (segurity('newPedido')) {
+                restore("pedidoSelec");
+                openLayer('detallePedido');
+                $scope.formBlock=false;
+            }
+        }else {
+
         }
         $scope.FormdetallePedido.$setPristine();
 
@@ -364,13 +354,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
             loadDirProvider(newVal);
         }
+        console.log('pais id', newVal);
     });
 
     $scope.$watch('index', function (newVal, olvValue) {
         //actualizacion segun el index layer abierto
         switch (newVal) {
             case 1:
-                $scope.formBlock = true;
+              //  $scope.formBlock = true;
                 ;
                 break;
         }
@@ -399,6 +390,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
                     loadPedido($scope.pedidoSelec.id);
                     break;
                 default :
+                    $scope.showGripro=false;
                     ;
             }
         }
@@ -482,7 +474,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             });
     }
     function loadPedido(id){
-        console.log();
         ORDER.post({type:'Order'},{id:id}, function(response){
             $scope.pedidoSelec = response;
         });
