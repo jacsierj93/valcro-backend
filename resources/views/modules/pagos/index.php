@@ -18,7 +18,7 @@
             <div layout="column" layout-align="center center">
 
             </div>
-            <div ng-show="true" layout="column" layout-align="center center" ng-click="setFormAdelanto()">
+            <div ng-show="provData.id!=''" layout="column" layout-align="center center" ng-click="setFormAdelanto()">
                 <?= HTML::image("images/agregar.png") ?>
             </div>
             <div ng-show="false" layout="column" layout-align="center center">
@@ -755,9 +755,6 @@
                             Deudas adquiridas con el proveedor
                         </div>
                     </div>
-
-
-
 
                     <div layout="row" class="headGridHolder">
                         <div>&nbsp;</div>
