@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut'/*,'ui.mask', 'ui.utils.masks'*/];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut','ui.mask', 'ui.utils.masks'];
 var MyApp = angular.module('MyApp', dependency);
 
 
