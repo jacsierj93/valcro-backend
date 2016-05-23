@@ -16,7 +16,7 @@ use App\Models\Sistema\ProdTime;
 use App\Models\Sistema\TiemAproTran;
 use App\Models\Sistema\ProviderCondPay;
 use App\Models\Sistema\ProviderCondPayItem;
-
+use App\Models\Sistema\Line;
 use Session;
 use Validator;
 
@@ -289,6 +289,7 @@ class ProvidersController extends BaseController
             $limits = Provider::find($id)->limitCredit()->get();
             foreach ($limits as $lim) {
                 $lim['moneda'] = Monedas::find($lim->moneda_id);
+                $lim->line = Line::find($lim->linea_id);
             }
             return ($limits) ? $limits : [];
         }
@@ -306,6 +307,7 @@ class ProvidersController extends BaseController
         $lim->prov_id = $req->id_prov;
         $lim->moneda_id = $req->coin;
         $lim->limite = $req->amount;
+        $lim->linea_id = ($req->line!=0)?$req->line:NULL;
 
         $lim->save();
         $result['id']=$lim->id;
@@ -362,7 +364,7 @@ class ProvidersController extends BaseController
         if($id) {
             $factor = Provider::find($id)->convertFact()->get();
             foreach($factor as $fact){
-                //$fact['moneda'] = Monedas::find($factor->moneda_id);
+                $fact->moneda;
                 $fact->linea;
             }
 

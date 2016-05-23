@@ -21,4 +21,9 @@ class ProviderFactor extends Model
     {
         return $this->hasOne('App\Models\Sistema\Line', 'id', 'linea_id');
     }
+
+    public function moneda()
+    {
+        return $this->hasOne('App\Models\Sistema\Monedas', 'id', 'moneda_id');
+    }
 }

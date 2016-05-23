@@ -11,10 +11,10 @@
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
 
-        <div class="barraLateral" layout="column" style="height:100%;">
-            <div id="menu" layout="row" flex="none" class="menuBarHolder md-whiteframe-1dp">
+        <div class="barraLateral" layout="column">
+            <div id="menu" layout="row" flex="none" class="menuBarHolder md-whiteframe-1dp" style="height: 48px">
                 <!-- 3) ########################################## MENU ########################################## -->
-                <div layout="row" layout-align="start center" class="menu">
+                <div layout="row" layout-align="start center" class="menu" style="height: 48px;">
                     <div flex layout-align="center center" ng-click="showAlert()">
                         Menu
                     </div>
@@ -27,7 +27,7 @@
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div flex ng-controller="ListProv" style="overflow-y:auto;">
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id)}">
+                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'000000'}}</div>
                     <div style="height:40px;">
@@ -281,7 +281,7 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
+                            <input ng-blur="check('description')" duplicate="list" field="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
                             <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                             <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -292,7 +292,7 @@
 
                         <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
-                            <input maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
+                            <input ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -330,7 +330,7 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" ng-controller="valcroNameController">
+                <form name="nomvalcroForm" ng-controller="valcroNameController"  ng-click="showGrid(true)" click-out="showGrid(false)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Nombres Valcro
@@ -393,7 +393,7 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Telefono</label>
-                            <input name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                            <input ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                         </md-input-container>
 
                     </div>
@@ -418,7 +418,7 @@
                         </div>
                         <div id="grid" style="overflow-y: auto; height: 120px">
                             <div flex ng-repeat="add in address" ng-click="toEdit(this)">
-                                <div layout="row" layout-wrap class="cellGridHolder">
+                                <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
                                     <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
                                     <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div>
                                     <div flex class="cellGrid">{{add.direccion}}</div>
@@ -706,6 +706,15 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+
+                        <md-input-container class="md-block" flex="30">
+                            <label>Linea</label>
+                            <md-select ng-disabled="$parent.enabled" ng-model="cred.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
+                                <md-option ng-repeat="line in lines" value="{{line.id}}">
+                                    {{line.linea}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
                     </div>
                     <div layout="column" ng-show="isShow">
 
@@ -713,6 +722,7 @@
                             <!--<div flex="20" class="headGrid"> Fecha</div>-->
                             <div flex="20" class="headGrid"> Limite</div>
                             <div flex="30" class="headGrid"> Moneda</div>
+                            <div flex="30" class="headGrid"> Linea</div>
                             <div flex class="headGrid"></div>
                         </div>
                         <div id="grid">
@@ -721,6 +731,7 @@
                                     <!--<div flex="20" class="cellGrid"> {{lim.fecha}}</div>-->
                                     <div flex="20" class="cellGrid"> {{lim.limite}}</div>
                                     <div flex="30" class="cellGrid">{{lim.moneda.nombre}}</div>
+                                    <div flex="30" class="cellGrid">{{lim.line.linea}}</div>
                                     <div flex class="cellGrid"></div>
                                 </div>
                             </div>
@@ -789,19 +800,19 @@
                         </div>
                     </div>
                     <div layout="row">
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="10">
                             <label>% Flete</label>
                             <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
                         </md-input-container>
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="10">
                             <label>% Gastos</label>
                             <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.expens">
                         </md-input-container>
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="10">
                             <label>% Ganancia</label>
                             <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.gain">
                         </md-input-container>
-                        <md-input-container class="md-block" flex="20">
+                        <md-input-container class="md-block" flex="10">
                             <label>% Descuento</label>
                             <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.disc">
                         </md-input-container>
@@ -813,23 +824,33 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Linea</label>
+                            <md-select ng-model="conv.line" ng-disabled="$parent.enabled" required md-no-ink>
+                                <md-option ng-repeat="line in lines" value="{{line.id}}">
+                                    {{line.linea}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
                     </div>
                     <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
-                            <div flex="20" class="headGrid"> Flete</div>
-                            <div flex="20" class="headGrid"> Gastos</div>
-                            <div flex="20" class="headGrid"> Ganancia </div>
-                            <div flex="20" class="headGrid"> Descuento</div>
-                            <div flex="20" class="headGrid"> Moneda</div>
+                            <div flex="10" class="headGrid"> Flete</div>
+                            <div flex="10" class="headGrid"> Gastos</div>
+                            <div flex="10" class="headGrid"> Ganancia </div>
+                            <div flex="10" class="headGrid"> Descuento</div>
+                            <div flex="30" class="headGrid"> Moneda</div>
+                            <div flex="30" class="headGrid"> Linea</div>
                         </div>
                         <div id="grid" style="overflow-y: auto; height: 120px">
                             <div flex ng-repeat="factor in factors" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="20" class="cellGrid"> {{factor.flete}}</div>
-                                    <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{factor.gastos}}</div>
-                                    <div flex="20" class="cellGrid">{{factor.ganancia}}</div>
-                                    <div flex="20" class="cellGrid">{{factor.descuento}}</div>
-                                    <div flex="20" class="cellGrid">{{factor.moneda.nombre}}</div>
+                                    <div flex="10" class="cellGrid"> {{factor.flete}}</div>
+                                    <div flex="10" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{factor.gastos}}</div>
+                                    <div flex="10" class="cellGrid">{{factor.ganancia}}</div>
+                                    <div flex="10" class="cellGrid">{{factor.descuento}}</div>
+                                    <div flex="30" class="cellGrid">{{factor.moneda.nombre}}</div>
+                                    <div flex="30" class="cellGrid">{{factor.linea.linea}}</div>
                                 </div>
                             </div>
                         </div>
@@ -1069,87 +1090,7 @@
             <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"openLayer()")) ?>
         </md-sidenav>
         <!-- 8) ########################################## BOTON Next ########################################## -->
-        <div ng-controller="notificaciones">
-            <md-sidenav layout="row" style="top: calc(100% - 144px); height: 96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
-                <!-- OK   ############################################################################################## -->
-                <div class="alertBox alertOkColor" flex ng-show="alerts.ok.length > 0" layout="row">
-                    <div class="alertPrevArrow" ng-click="alertPrev('ok')" ng-show="alerts.ok.length > 1"></div>
-                    <md-tabs class="alertContainer" layout="column" md-selected="selected.ok" flex>
-                        <md-tab label="{{tab.title}}" layout="column" class="alertItem" flex ng-repeat="tab in alerts.ok">
-                            <div class="alertTextContent" style="">
-                                {{tab.content}}
-                            </div>
-                            <div class="alertTextOpcs" layout="row">
-                                <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('ok');ok(this)">
-                                    {{opc.name}}
-                                </div>
-                            </div>
-                        </md-tab>
-                    </md-tabs>
-                    <div class="alertNextArrow" ng-click="alertNext('ok')" ng-show="alerts.ok.length > 1" style="width: 50px;">
-                        <div ng-show="alerts.ok.length>1">{{selected.ok + 1}}/{{alerts.ok.length}}</div>
-                    </div>
-                </div>
-                <!-- ALERT ############################################################################################## -->
-                <div class="alertBox alertAlertColor" flex ng-show="alerts.alert.length > 0" layout="row">
-                    <div class="alertPrevArrow" ng-click="alertPrev('alert')" ng-show="alerts.alert.length > 1"></div>
-                    <md-tabs class="alertContainer" layout="column" md-selected="selected.alert" flex>
-                        <md-tab label="{{tab.title}}" layout="column" class="alertItem" ng-repeat="tab in alerts.alert">
-                            <div class="alertTextContent" style="">
-                                {{tab.content}}
-                            </div>
-                            <div class="alertTextOpcs" layout="row">
-                                <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('alert');ok(this)">
-                                    {{opc.name}}
-                                </div>
-                            </div>
-                        </md-tab>
-                    </md-tabs>
-                    <div class="alertNextArrow" ng-click="alertNext('alert')" ng-show="alerts.alert.length > 1" style="width: 50px;">
-                        <div ng-show="alerts.alert.length>1">{{selected.alert + 1}}/{{alerts.alert.length}}</div>
-                    </div>
-                </div>
-                <!-- ERROR ############################################################################################## -->
-                <div class="alertBox alertErrorColor" flex ng-show="alerts.error.length > 0" layout="row">
-                    <div class="alertPrevArrow" ng-click="alertPrev('error')" ng-show="alerts.error.length > 1"></div>
-                    <md-tabs class="alertContainer" md-selected="selected.error" flex>
-                        <md-tab label="{{tab.title}}" class="alertItem" ng-repeat="tab in alerts.error">
-                            <div class="alertTextContent" style="">
-                                {{tab.content}}
-                            </div>
-                            <div class="alertTextOpcs" layout="row">
-                                <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('error');ok(this)">
-                                    {{opc.name}}
-                                </div>
-                            </div>
-                        </md-tab>
-                    </md-tabs>
-                    <div class="alertNextArrow" ng-click="alertNext('error')" ng-show="alerts.error.length > 1" style="width: 50px;">
-                        <div ng-show="alerts.error.length>1">{{selected.error + 1}}/{{alerts.error.length}}</div>
-                    </div>
-                </div>
-                <!-- INFO ############################################################################################## -->
-                <div class="alertBox alertInfoColor" flex ng-show="alerts.info.length > 0" layout="row">
-                    <div class="alertPrevArrow" ng-click="alertPrev('info')" ng-show="alerts.info.length > 1"></div>
-                    <md-tabs class="alertContainer" md-selected="selected.info" flex>
-                        <md-tab label="{{tab.title}}" class="alertItem" ng-repeat="tab in alerts.info">
-                            <div class="alertTextContent" style="">
-                                {{tab.content}}
-                            </div>
-                            <div class="alertTextOpcs" layout="row">
-                                <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('info');ok(this)">
-                                    {{opc.name}}
-                                </div>
-                            </div>
-
-                        </md-tab>
-                    </md-tabs>
-                    <div class="alertNextArrow" ng-click="alertNext('info')" ng-show="alerts.info.length > 1" style="width: 50px;">
-                        <div ng-show="alerts.info.length>1">{{selected.info + 1}}/{{alerts.info.length}}</div>
-                    </div>
-                </div>
-            </md-sidenav>
-        </div>
-    </div>
+        <div ng-controller="notificaciones" ng-include="template"></div>
+</div>
 
 </div>
