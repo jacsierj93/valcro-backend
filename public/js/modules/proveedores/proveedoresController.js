@@ -260,6 +260,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     masterLists.setMain();
     setGetContac.setList();
 
+
+    $scope.menuExpand = function(){
+
+        console.log($("#menu").html());
+        alert("algo");
+
+    }
+
+
+
+
 });
 
 
