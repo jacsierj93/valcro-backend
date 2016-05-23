@@ -5,7 +5,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     $scope.formBlock = true;
     $scope.index = 0;
     $scope.layer = '';
-
+    $scope.showGripro=false;
     /******************* declaracion defunciones de eventos */
     /*******incializacion de $scope*****/
 
@@ -26,39 +26,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     $scope.setProvedor = setProvedor;
     $scope.openLayer = openLayer;
     $scope.closeLayer = closeLayer;
-    //$scope.closeLayeValid=closeLayeValid;
     $scope.DtPedido = DtPedido;
     $scope.selecOdc = selecOdc;
     $scope.selecContraP = selecContraP;
     $scope.selecPedidoSust = selecPedidoSust;
-
     $scope.selecKitchenBox = selecKitchenBox;
-    // $scope.removeLisContraP = removeLisContraP;
-    //$scope.removeLisKitchenBox = removeLisKitchenBox;
-    //$scope.removeLisPedidoSus = removeLisPedidoSus;
-    //  carga la primera data del sistema filtros  y proveedores
     init();
 
 
     function init() {
-        $http({
-            method: 'POST',
-            url: 'Order/OrderFilterData'
-        }).then(function successCallback(response) {
-            $scope.filterData.monedas = response.data.monedas;
-            $scope.filterData.tipoEnv = response.data.tipoEnvio;
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-        $http({
-            method: 'POST',
-            url: 'Order/OrderProvList'
-        }).then(function successCallback(response) {
-            $scope.todos = response.data;
+        /*    $http({
+         method: 'POST',
+         url: 'Order/OrderFilterData'
+         }).then(function successCallback(response) {
+         $scope.filterData.monedas = response.data.monedas;
+         $scope.filterData.tipoEnv = response.data.tipoEnvio;
+         }, function errorCallback(response) {
+         console.log("errorrr");
+         });*/
 
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
+        $http.get("Order/OrderProvList")
+            .success(function (response) {
+                $scope.todos = response;
+            });
         loadDataFor();
     }
 
@@ -74,6 +64,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         var a = angular.element(document).find(id);
         console.log('click ', a);
         a.click();
+    }
+
+    $scope.showProduc= function () {
+        if($scope.showGripro){
+            $scope.showGripro=false;
+        }else {
+            $scope.showGripro=true;
+        }
+
+    }
+    $scope.onchangePeditem=  function (item){
+        if(item.asignado){
+            $http.post("Order/EditOrdenItem", item)
+                .success(function (response) {
+                    console.log(response);
+                });
+        }
     }
 
     function selecOdc(odc) {
@@ -106,7 +113,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             });
         $scope.formDataContraP.contraPedidoMotivo = ORDER.query({type: 'CustomOrderReason'});
         $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type: 'CustomOrderPriority'});
-        //loadContraP(item.id);
         openLayer("resumenContraPedido");
     }
 
@@ -121,7 +127,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function selecKitchenBox(item) {
         restore('kitchenBoxSelec');
-        console.log('item id', item);
         ORDER.get({type: 'KitchenBox', id: item.id}, {}, function (response) {
             $scope.kitchenBoxSelec = response;
             if (response.fecha != null) {
@@ -139,8 +144,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
         var curren = $scope.layer;
-        console.log('current', curren);
-
         switch (curren) {
             case 'detallePedido':
                 openLayer('agrPed');
@@ -205,14 +208,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
             }
         }
-        /*
-         else
-         if(item.asignado && item.renglon_id == null){
-         alert('EL monto excede la cantidad original');
-         ORDER.post({type: 'AddCustomOrderItem'}, item, function (response) {
-         item.renglon_id = response.id;
-         });
-         }*/
+
     }
 
 
@@ -278,9 +274,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function setProvedor(prov) {
         $scope.provSelec = prov;
-        console.log('prov id=' + prov.id + "  scop prov =" + $scope.provSelec.id)
-        loadPedidosProvedor(prov.id);
-        //loadOrdenesDeCompraProveedor(prov.id);
         openLayer('listPedido');
     }
 
@@ -302,29 +295,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
 
     function DtPedido(pedido) {
 
-        if (pedido == 'null') {
-
-            if (segurity('newPedido')) {
-                if (openLayer('detallePedido')) {
-                    $scope.formBlock = false;
-                    restore('pedidoSelec');
-                    if ($scope.index <= 1) {
-                        restore('provSelec');
-                    }
-                }
-            } else {
-                alert('No tiene suficientes permiso para ejecutar esta accion');
-            }
-        } else {
+        if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                if (openLayer('detallePedido')) {
-                    loadPedido(pedido.id);
-                    loadDirProvider($scope.pedidoSelec.pais_id);
-                }
+                openLayer('detallePedido');
+                loadPedido(pedido.id);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
             }
+        }else  if(!pedido && $scope.index <2){
+            if (segurity('newPedido')) {
+                restore("pedidoSelec");
+                openLayer('detallePedido');
+                $scope.formBlock=false;
+            }
+        }else {
+
         }
         $scope.FormdetallePedido.$setPristine();
 
@@ -370,7 +356,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         //actualizacion segun el index layer abierto
         switch (newVal) {
             case 1:
-                $scope.formBlock = true;
+                //  $scope.formBlock = true;
                 ;
                 break;
         }
@@ -399,6 +385,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
                     loadPedido($scope.pedidoSelec.id);
                     break;
                 default :
+                    $scope.showGripro=false;
                     ;
             }
         }
@@ -482,103 +469,61 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             });
     }
     function loadPedido(id){
-        console.log();
-        ORDER.post({type:'Order'},{id:id}, function(response){
+        $http.get("Order/Order",{params:{id:id}}).success(function (response) {
             $scope.pedidoSelec = response;
         });
     }
 
     function loadDataFor(){
-        $http({
-            method: 'POST',
-            url: 'Order/OrderDataForm'
-        }).then(function successCallback(response) {
-            $scope.formData.tipo=response.data.tipoPedido;
-            $scope.formData.motivoPedido=response.data.motivoPedido;
-            $scope.formData.prioridadPedido=response.data.prioridadPedido;
-            $scope.formData.condicionPedido=response.data.condicionPedido;
-            $scope.formData.estadoPedido=response.data.estadoPedido;
-            $scope.formData.tipoDepago= response.data.tipoDepago;
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("Order/OrderDataForm").success(function (response) {
+            $scope.formData.tipo=response.tipoPedido;
+            $scope.formData.motivoPedido=response.motivoPedido;
+            $scope.formData.prioridadPedido=response.prioridadPedido;
+            $scope.formData.condicionPedido=response.condicionPedido;
+            $scope.formData.estadoPedido=response.estadoPedido;
+            $scope.formData.tipoDepago= response.tipoDepago;
         });
     }
 
 
     function loadDirProvider(id){
-        $http({
-            method: 'POST',
-            url: 'Order/Address',
-            data:{id:id}
-        }).then(function successCallback(response) {
-            $scope.formData.direcciones=response.data;
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("Order/Address",{params:{id:id}}).success(function (response) {
+            $scope.formData.direcciones=response;
         });
     }
 
     function loadTasa(id){
-        $http({
-            method: 'GET',
-            url: 'master/getCoin/'+id,
-        }).then(function successCallback(response) {
-            console.log('tasa',response);
-            $scope.pedidoSelec.tasa=response.data.precio_usd;
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("master/getCoin/"+id).success(function (response) {
+            $scope.pedidoSelec.tasa=response.precio_usd;
         });
     }
 
     function loadCoinProvider(id){
 
-        $http({
-            method: 'GET',
-            url: 'provider/provCoins/'+id,
-        }).then(function successCallback(response) {
-            $scope.formData.monedas=response.data;
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("provider/provCoins/"+id).success(function (response) {
+            $scope.formData.monedas=response;
         });
     }
 
     function loadPaymentCondProvider(id){
-        $http({
-            method: 'POST',
-            url: 'Order/ProviderPaymentCondition',
-            data:{id:id}
-        }).then(function successCallback(response) {
-            $scope.formData.condicionPago=response.data;
-        }, function errorCallback(response) {
-            console.log("erfrorrr");
+        $http.get("Order/ProviderPaymentCondition",{params:{id:id}}).success(function (response) {
+            $scope.formData.condicionPago=response;
         });
     }
 
     function loadCountryProvider(id){
-        $http({
-            method: 'POST',
-            url: 'Order/ProviderCountry',
-            data:{id:id}
-        }).then(function successCallback(response) {
-            $scope.formData.paises= response.data;
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("Order/ProviderCountry",{params:{id:id}}).success(function (response) {
+            $scope.formData.paises= response;
         });
     }
 
     function loadPedidosProvedor(id){
-        $http({
-            method: 'POST',
-            url: 'Order/OrderProvOrder',
-            data:{ id:id}
-        }).then(function successCallback(response) {
-            $scope.provSelec.pedidos=response.data.pedidos;
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("Order/OrderProvOrder",{params:{id:id}}).success(function (response) {
+            $scope.provSelec.pedidos=response.pedidos;
         });
     }
 
+    /*@deprecated*/
     function  loadOrdenesDeCompraProveedor(id){
 
         $http({
@@ -601,7 +546,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
         })
     }
 
+    /**@deprecated*/
     function loadOdc(id){
+
         $http({
             method: 'POST',
             url: 'Order/PurchaseOrder',
@@ -612,64 +559,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
             console.log("errorrr");
         });
     }
-
-    function loadContraP(id){
-
-
-        $http({
-            method: 'POST',
-            url: 'Order/CustomOrder',
-            data:{id:id, pedido_id: $scope.pedidoSelec.id}
-        }).then(function successCallback(response) {
-            $scope.contraPedSelec= response.data;
-            console.log('contra P',response);
-
-            if(response.data.fecha_aprox_entrega != null){
-                $scope.contraPedSelec.fecha_aprox_entrega = new Date(Date.parse(response.data.fecha_aprox_entrega));
-            }
-            if(response.data.fecha != null){
-                $scope.contraPedSelec.fecha = new Date(Date.parse(response.data.fecha));
-                console.log(new Date(Date.parse(response.emision)));
-            }
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-
-
-
     function loadContraPedidosProveedor(id){
-        $http({
-            method: 'POST',
-            url: 'Order/CustomOrders',
-            data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
-        }).then(function successCallback(response) {
-            $scope.formData.contraPedido= response.data;
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("Order/CustomOrders",{params:{prov_id:id, pedido_id: $scope.pedidoSelec.id}}).success(function (response) {
+            $scope.formData.contraPedido= response;
         });
     }
 
     function loadkitchenBoxProveedor(id){
 
-        $http.post('Order/KitchenBoxs', {prov_id:id, pedido_id: $scope.pedidoSelec.id})
-            .success(function(response){
-                $scope.formData.kitchenBox= response;
-                $scope.formData.kitchenBox.fecha = Date.parse(response.fecha);
-            });
-
+        $http.get("Order/KitchenBoxs",{params:{prov_id:id, pedido_id: $scope.pedidoSelec.id}}).success(function (response) {
+            $scope.formData.kitchenBox= response;
+            $scope.formData.kitchenBox.fecha = Date.parse(response.fecha);        });
     }
 
     function loadPedidosASustituir(id){
-        $http({
-            method: 'POST',
-            url: 'Order/OrderSubstitutes',
-            data:{prov_id:id, pedido_id: $scope.pedidoSelec.id}
-        }).then(function successCallback(response) {
-            $scope.formData.pedidoSust= response.data;
-        }, function errorCallback(response) {
-            console.log("errorrr");
+        $http.get("Order/OrderSubstitutes",{params:{prov_id:id, pedido_id: $scope.pedidoSelec.id}}).success(function (response) {
+            $scope.formData.pedidoSust= response;
+
         });
     }
 

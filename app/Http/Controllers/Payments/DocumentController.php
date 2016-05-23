@@ -64,18 +64,32 @@ class DocumentController extends BaseController
         $data["doc_descripcion"] = $doc->descripcion;
         if (in_array($doc->tipo_id, $this->debtsIds)) { ////en caso de ser una deuda
 
-            $cuotas = $doc->cuotas();
             $cdata = array();
-            foreach ($cuotas as $cc) {
+            if ($doc->ncuotas() > 0) { ////factura con cuotas
+                $cuotas = $doc->cuotas();
+                foreach ($cuotas as $cc) {
 
-                $temp["id"] = $cc->id;
-                $temp["fecha_vence"] = $cc->fecha_vence;
-                $temp["nro_factura"] = $cc->nro_factura;
-                $temp["descripcion"] = $cc->descripcion;
-                $temp["saldo"] = $cc->saldo;
-                $temp["vencimiento"] = 'v' . $cc->vencimiento();
+                    $temp["id"] = $cc->id;
+                    $temp["fecha_vence"] = $cc->fecha_vence;
+                    $temp["nro_factura"] = $cc->nro_factura;
+                    $temp["descripcion"] = $cc->descripcion;
+                    $temp["saldo"] = $cc->saldo;
+                    $temp["vencimiento"] = 'v' . $cc->vencimiento();
+                    $cdata[] = $temp;
+                }
+
+            } else { ///factura sin cuotas (es la propia deuda)
+
+                $temp["id"] = $doc->id;
+                $temp["fecha_vence"] = $doc->fecha_vence;
+                $temp["nro_factura"] = $doc->nro_factura;
+                $temp["descripcion"] = $doc->descripcion;
+                $temp["saldo"] = $doc->saldo;
+                $temp["vencimiento"] = 'v' . $doc->vencimiento();
                 $cdata[] = $temp;
+
             }
+
 
             $data["doc_cuotas"] = $cdata;
 
