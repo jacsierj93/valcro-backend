@@ -25,4 +25,7 @@ class ProviderCreditLimit extends Model
     public function moneda(){
         $this->hasOne('App\Models\Sistema\Monedas','id','moneda_id');
     }
+    public function lines(){
+        $this->hasOne('App\Models\Sistema\Line','id','linea_id');
+    }
 }

@@ -36,7 +36,7 @@ MyApp.directive('duplicate', function($filter,$q,$timeout) {
             ctrl.$asyncValidators.duplicate = function(modelValue, viewValue) {
                 var srcScope = attrs['duplicate'];
                 var fld = attrs['field'];
-                if (ctrl.$isEmpty(modelValue)) {
+                if (ctrl.$isEmpty(modelValue) || ctrl.$pristine) {
                     // consider empty models to be valid
                     return $q.when();
                 }
@@ -44,8 +44,10 @@ MyApp.directive('duplicate', function($filter,$q,$timeout) {
                 var def = $q.defer();
 
                 $timeout(function() {
+
                     // Mock a delayed response
-                    if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].indexOf(compare) !== -1}).length<1) {
+
+                    if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].toUpperCase() == compare.toUpperCase() && (scope.localId !=current.id)}).length<1) {
                         // it is valid
                         def.resolve();
                     }else{
@@ -82,14 +84,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
             }
         }).then(function successCallback(response) {
             if (response.data.success) {
-
                 location.replace(PATHAPP +'#home');
-
-                /*$("#holderLogin").animate({
-                    opacity: 0
-                }, 1000, function () {
-                    location.replace('angular/#home');
-                });*/
             }
         }, function errorCallback(response) {
             console.log(response);

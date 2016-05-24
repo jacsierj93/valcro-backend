@@ -584,8 +584,8 @@ body {
 
 /**********************************************/
 .menuBarHolder {
-    height: 48px !important;
-    background-color: #ffffff;
+    height: 48px;
+    background-color: #f1f1f1;
 }
 
 .menu {
@@ -728,6 +728,12 @@ md-pagination-wrapper {
 .gridSel {
     background-color: rgb(84, 180, 234);
     color: #fff;
+}
+
+.rowSel>div{
+    border-bottom-color: rgb(84, 180, 234);
+    color: rgb(84, 180, 234);
+    font-weight: bolder !important;
 }
 
 input[type=number]::-webkit-inner-spin-button,
