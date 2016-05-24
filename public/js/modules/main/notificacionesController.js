@@ -9,9 +9,11 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     var tipos = ["ok","error","alert","info"];
     // ####################################################################################################
     $scope.alerts = setNotif.listNotif();
+
     $scope.ok = function(call){
         call.opc.action();
     };
+
     $scope.closeThis = function(target){
         $scope.alerts[target].splice($scope.selected[target],1);
     };
@@ -42,7 +44,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
     $scope.launchParam = function(tab){
         console.log("select",tab);
-    };
+    }
+
 
     $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length'], function(newValues,old) {
         open = false;
@@ -67,20 +70,16 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 }]);
 
 
-MyApp.service("setNotif",function($filter,$timeout){
-    var d = [];
-    var list = {
-            ok: [],
-            alert: [],
-            error: [],
-            info: []
+MyApp.service("setNotif",function($filter){
+    var list =  {
+        ok: [],
+        alert: [],
+        error: [],
+        info: []
     };
     return {
         listNotif : function(){
             return list;
-        },
-        getdata: function(){
-          return d;
         },
         addNotif : function(obj,mnsg,opcs,param){
             var Self = this;

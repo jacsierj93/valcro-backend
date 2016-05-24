@@ -395,6 +395,7 @@
                                 <div flex class="cellGrid">  {{item.descripcion}}</div>
                                 <md-input-container class="md-block" flex="10" >
                                     <input  ng-model="item.saldo"
+                                            ng-model="numer"
                                             ui-number-mask type="text"
                                             ng-blur="onchangePeditem(item)"
                                             ng-readonly="(item.cantidad == 0 && renglon_id)"
@@ -1162,6 +1163,10 @@
                     ng-mouseleave="showNext(false)" ng-click="next()">
             <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
+
+        <!------------------------------------------- Alertas ------------------------------------------------>
+        <div ng-controller="notificaciones" ng-include="template"></div>
+
     </div>
 </div>
 

@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNotif) {
 
     var historia = [15];
 
