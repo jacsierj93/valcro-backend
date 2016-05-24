@@ -9,11 +9,9 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     var tipos = ["ok","error","alert","info"];
     // ####################################################################################################
     $scope.alerts = setNotif.listNotif();
-
     $scope.ok = function(call){
         call.opc.action();
     };
-
     $scope.closeThis = function(target){
         $scope.alerts[target].splice($scope.selected[target],1);
     };
@@ -44,35 +42,24 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
     $scope.launchParam = function(tab){
         console.log("select",tab);
-    }
-
+    };
 
     $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length'], function(newValues,old) {
-
-        var open = false;
+        open = false;
+        prev = false;
         angular.forEach(newValues, function(v, k) {
             if(v > 0 ){
                 open = true;
                 $mdSidenav('lyrAlert').open();
                 //return false;
             }
-            if(k == newValues.length-1 && !open){
-                console.log(open);
+            if(old[k]>0){
+                prev = true;
+            }
+            if((k == newValues.length-1 && !open) && prev){
                 $mdSidenav('lyrAlert').close();
             }
 
-            /*
-            if(v!=old[k]){
-                var curr = $scope.alerts[tipos[k]][v-1];
-                if(curr.param.autohidden){
-
-                    setTimeout(function(trg,hash){
-                        console.log($scope.alerts[trg].indexOf($filter("customFind")($scope.alerts[trg],hash,function(current,compare){return current.$$hashKey == compare})[0]))
-                        $scope.alerts[trg].splice($scope.alerts[trg].indexOf($filter("customFind")($scope.alerts[trg],hash,function(current,compare){return current.$$hashKey == compare})[0]),1);
-                        console.log($scope.alerts[trg]);
-                    },1000,tipos[k],curr.$$hashKey)
-                }
-            }*/
         });
 
     });
@@ -80,28 +67,32 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 }]);
 
 
-MyApp.service("setNotif",function($filter){
-    var list =  {
-        ok: [],
-        alert: [],
-        error: [],
-        info: []
+MyApp.service("setNotif",function($filter,$timeout){
+    var d = [];
+    var list = {
+            ok: [],
+            alert: [],
+            error: [],
+            info: []
     };
     return {
         listNotif : function(){
             return list;
         },
-        addNotif : function(obj,mnsg,opcs,param){
-            list[obj].unshift({title:"", content: mnsg, opcs: opcs,param:{autohidden:2000}});
-            /*setTimeout(function(id,trg){
-                //console.log($filter("customFind")(list[obj],id,function(current,compare){return current.uid == compare}));
-                console.log(Self);
-                Self.delNotif(trg,list[trg].indexOf($filter("customFind")(list[obj],id,function(current,compare){return current.uid == compare})[0]))
-            },3000,uid,obj);*/
+        getdata: function(){
+          return d;
         },
-        delNotif:function(trg,item){
-            list[trg].splice(item,1);
-            console.log(list[trg])
+        addNotif : function(obj,mnsg,opcs,param){
+            var Self = this;
+            var uid = Math.random();
+            list[obj].unshift({title:"", content: mnsg, opcs: opcs, uid:uid, param:param});
+            if(param && "autohidden" in param){
+                $timeout(function(){
+                    list[obj].splice(list[obj].indexOf($filter("customFind")(list[obj],uid,function(current,compare){return current.uid == compare})[0]),1);
+                }, param.autohidden);
+            }
+
+
         }
     }
 });

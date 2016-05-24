@@ -445,7 +445,6 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         $scope.localId = nvo
     });
     $scope.$watch('dtaPrv.envio',function(nvo){
-        console.log("type",nvo)
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
 
@@ -460,7 +459,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
             }}]);
         }
-    }
+    };
 
 
     $scope.dtaPrv = setGetProv.getProv();
@@ -472,13 +471,8 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                 setGetProv.updateItem($scope.dtaPrv);
                 if(data.action=="new"){
                     $scope.dtaPrv.new = true;
-                   /* setGetProv.addToList({
-                        razon_social: $scope.dtaPrv.description,
-                        contrapedido: $scope.dtaPrv.contraped,
-                        tipo_envio_id: $scope.dtaPrv.envio,
-                        id: $scope.dtaPrv.id,
-                    });*/
-                    $scope.showSimpleToast();
+                    setNotif.addNotif("ok", "Proveedor agregado", [
+                    ],{autohidden:5000});
                 }
             });
         }

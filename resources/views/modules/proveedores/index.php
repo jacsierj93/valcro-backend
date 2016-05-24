@@ -336,6 +336,7 @@
                             Nombres Valcro
                         </div>
                         <div flex="20" style="height: 30px;">
+
                             <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
                             <!--<span style="font-size: 18px; margin-left: 8px" class="icon-barco"></span>
                             <span style="font-size: 18px; margin-left: 8px" class="icon-gift"></span>-->

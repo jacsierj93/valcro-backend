@@ -13,6 +13,21 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'setNotif', fun
                 console.log("Ejecuta cualquier accion o funcion que se programe aqui.");
             }
         }
+        ],{autohidden:2000});
+    }
+    $scope.callAlert = function () {
+        setNotif.addNotif("info", "Aqui vas a escribir el mensaje que monstrara el Alerta2222222", [
+        {
+            name: "Titulo del Boton 2",
+            action: function () {
+                alert("algo");
+            }
+        }, {
+            name: " Boton 2",
+            action: function () {
+                console.log("Ejecuta cualquier accion o funcion que se programe aqui.");
+            }
+        }
         ]);
     }
 
