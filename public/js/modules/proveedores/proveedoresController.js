@@ -241,7 +241,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         })
     };
     $scope.editProv = function(){
-        console.log("Dasdas")
         $scope.edit = true;
         $scope.enabled =false;
         openLayer('layer1');
@@ -455,7 +454,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     });
     $scope.check = function(elem){
         if($scope.projectForm[elem].$error.duplicate){
-            setNotif.addNotif("alert","existe un Proveedor con el mismo nombre",[{name:"deshacer",action:function(){
+            setNotif.addNotif("alert","existe un Proveedor con el mismo nombre o siglas",[{name:"deshacer",action:function(){
 
             }}]);
         }
@@ -754,7 +753,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                 {
                     name: "SI",
                     action: function () {
-                        console.log("eliminar");
                         var temp = {};
                         var i = 0;
                         angular.forEach($scope.valName.departments, function (k, v) {
@@ -811,7 +809,7 @@ MyApp.controller('nomValAssign', function ($scope,setGetProv,valcroNameDetail) {
     $scope.prov = setGetProv.getProv();
     $scope.lines = valcroNameDetail.getList();
 });
-MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter) {
+MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif) {
     $scope.prov = setGetProv.getProv();
     $scope.cnt = setGetContac.getContact();
     $scope.paises = masterLists.getCountries();
@@ -835,18 +833,30 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if((nuevo[0] && !nuevo[1]) || nuevo[2]) {
 
             if(!$scope.cnt.id && $filter("customFind")($scope.allContact,$scope.cnt.emailCont,function(val,compare){return val.email == compare;}).length>0){
+                setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
+                ],{autohidden:3000});
                 $mdSidenav("contactBook").open();
             }else {
                 providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
                     $scope.cnt.id = data.id;
                     $scope.provContactosForm.$setPristine();
+                    contact.id = $scope.cnt.id;
                     contact.nombre = $scope.cnt.nombreCont;
                     contact.email = $scope.cnt.emailCont;
                     contact.telefono = $scope.cnt.contTelf;
+                    contact.pais_id = $scope.cnt.pais;
                     contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
-                    if (data.action == "new") {
-                        contact.id = $scope.cnt.id;
+                    contact.responsabilidades =  $scope.cnt.responsability;
+                    contact.direccion = $scope.cnt.dirOff;
+                    contact.agente = $scope.cnt.isAgent;
+                    contact.prov_id = $scope.cnt.prov_id;
+                    contact.languages = $scope.cnt.languaje;
+                    contact.cargos = $scope.cnt.cargo;
+                    if (data.action == "new" || nuevo[2]) {
                         $scope.contacts.unshift(contact);
+                        setGetContac.addUpd(contact,angular.copy($scope.prov));
+                        setNotif.addNotif("ok", "contacto añadido", [
+                        ],{autohidden:3000});
                     }
                 });
             }
@@ -855,8 +865,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
 
 
-    $scope.showGrid = function(elem){
-        if(!$mdSidenav("contactBook").isOpen()){
+    $scope.showGrid = function(elem,event){
+        if((jQuery(event.toElement).parents("#contactBook").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
             $scope.isShow = elem;
             if(!elem){
                 contact = {};
@@ -864,7 +874,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 $scope.provContactosForm.$setUntouched();
             }
         }
-
     };
 
     $scope.book=function(){
@@ -873,23 +882,40 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     $scope.toEdit = function(element){
         contact = element.cont;
-        console.log("dasda")
         contact.prov_id = $scope.prov.id;
         setGetContac.setContact(contact);
     };
 });
 
-MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac,setGetProv) {
+MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac,setGetProv,$filter,setNotif) {
     $scope.prov = setGetProv.getProv();
-    $scope.allContact =  setGetContac.getList();//providers.query({type:"allContacts"});
+    $scope.allContact =  setGetContac.getList();
+    $scope.filtByprov = function(a,b){
+        return $filter("customFind")(a.provs,b,function(val,compare){return val.prov_id == compare}).length==0;
+    };
     $scope.toEdit = function(element){
-        contact = element.cont;
-        contact.autoSave =true;
-        contact.prov_id = $scope.prov.id;
-        setGetContac.setContact(contact);
-        setTimeout(function(){
-            $mdSidenav("contactBook").close();
-        },100);
+        setNotif.addNotif("alert", "añadir este contacto, lo convertira en Agente y no podra ser editado.. esta deacuerdo?", [
+            {
+                name:"si",
+                action:function(){
+                    contact = element.cont;
+                    contact.agente = 1;
+                    contact.autoSave =true;
+                    contact.prov_id = $scope.prov.id;
+                    setGetContac.setContact(contact);
+                    $mdSidenav("contactBook").close();
+                }
+            },
+            {
+                name:"no",
+                action:function(){
+
+                }
+            }
+        ]);
+
+
+
     }
 
     $scope.closeContackBook = function(){
@@ -898,7 +924,7 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
 
 });
 
-MyApp.service("setGetContac",function(providers,setGetProv){
+MyApp.service("setGetContac",function(providers,setGetProv,$filter){
     var contact = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:[],cargo:[],responsability:"",dirOff:"",prov_id:false, isAgent:0,autoSave:false};
     var listCont = [];
     return {
@@ -911,15 +937,24 @@ MyApp.service("setGetContac",function(providers,setGetProv){
                 contact.pais = cont.pais_id||"";
                 contact.responsability = cont.responsabilidades||"";
                 contact.dirOff = cont.direccion||"";
-                contact.isAgent = 0;
+                contact.isAgent = cont.agente || 0;
                 contact.autoSave = cont.autoSave || false;
                 contact.prov_id = cont.prov_id||prov.id;
                 contact.languaje = cont.languages||[];
                 contact.cargo = cont.cargos||[];
-
         },
         getContact : function(){
             return contact;
+        },
+        addUpd : function(cont,prov){
+
+            var contact = $filter("customFind")(listCont,cont.id,function(val,compare){return  val.id == compare;});
+            if(contact.length>0){
+                contact[0].provs.push({"prov_id":prov.id,"prov":prov.siglas});
+            }else{
+                cont.provs = [{"prov_id":prov.id,"prov":prov.siglas}];
+                listCont.push(cont);
+            }
         },
         setList : function(list){
             listCont = providers.query({type:"allContacts"});
@@ -1334,11 +1369,13 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     };
 
     $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
-            cond = {};
-            $scope.condHeadFrm.$setUntouched();
+        if((jQuery(event.toElement).parents("#payCond").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
+            $scope.isShow = elem;
+            if(!elem){
+                $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+                cond = {};
+                $scope.condHeadFrm.$setUntouched();
+            }
         }
     }
 });
@@ -1368,4 +1405,23 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
             });
         }
     });
+
+    $scope.toEdit = function(element){
+        item = element.condition;
+        $scope.condItem.id = item.id;
+        $scope.condItem.days = item.dias;
+        $scope.condItem.percent = item.porcentaje;
+        $scope.condItem.condit = item.descripcion;
+        $scope.condItem.id_head = $scope.head.id
+    };
+
+    $scope.showGrid = function(elem){
+        if((jQuery(event.toElement).parents("#lyrAlert").length==0)){
+            if(!elem){
+                $scope.condItem = {id:false,days:"",percent:0.00,condit:"",id_head:$scope.head.id||0};
+                item = {};
+                $scope.itemCondForm.$setUntouched();
+            }
+        }
+    }
 });

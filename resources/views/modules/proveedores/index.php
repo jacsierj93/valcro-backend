@@ -281,7 +281,7 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input ng-blur="check('description')" duplicate="list" field="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
+                            <input autocomplete="off" ng-blur="check('description')" duplicate="list" field="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
                             <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                             <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -292,7 +292,7 @@
 
                         <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
-                            <input ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
+                            <input autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -330,7 +330,7 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" ng-controller="valcroNameController"  ng-click="showGrid(true)" click-out="showGrid(false)">
+                <form name="nomvalcroForm" ng-controller="valcroNameController"  ng-click="showGrid(true)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Nombres Valcro
@@ -344,7 +344,7 @@
                     </div>
                     <md-input-container class="md-block" flex id="valcroName">
                         <label>Nombre...</label>
-                        <input duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
+                        <input autocomplete="off" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
                     </md-input-container>
 
                     <div ng-show="isShow">
@@ -389,12 +389,12 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Codigo Postal</label>
-                            <input md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                            <input autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="30">
                             <label>Telefono</label>
-                            <input ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                            <input autocomplete="off" ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                         </md-input-container>
 
                     </div>
@@ -408,7 +408,7 @@
                     </md-input-container>
                     <md-input-container class="md-block" flex>
                         <label>Direccion</label>
-                        <input ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                        <input autocomplete="off" ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                     </md-input-container>
                     <div layout="column" ng-show="isShow">
                         <div layout="row" class="headGridHolder">
@@ -432,7 +432,7 @@
                 </form>
 
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true)" click-out="showGrid(false)">
+                <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Contactos Proveedor
@@ -442,16 +442,16 @@
 
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre y Apellido</label>
-                            <input ng-disabled="$parent.enabled" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
+                            <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="35">
                             <label>Email</label>
-                            <input ng-disabled="$parent.enabled" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
+                            <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
                         </md-input-container>
                         <md-input-container class="md-block" flex="15">
                             <label>Pais de Residencia</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="cnt.pais" ng-disabled="(cnt.id===false)" md-no-ink>
+                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                 <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                     {{pais.short_name}}
                                 </md-option>
@@ -460,7 +460,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Telefono</label>
-                            <input ng-disabled="$parent.enabled" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false)" />
+                            <input autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
                         </md-input-container>
 
                     </div>
@@ -468,7 +468,7 @@
                         <div layout="row" flex="30">
                             <md-input-container flex>
                                 <label>Idiomas</label>
-                                <md-select ng-disabled="$parent.enabled" ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false)" md-no-ink>
+                                <md-select  ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
 
                                 </md-select>
@@ -478,7 +478,7 @@
                         <div layout="row" flex="30">
                             <md-input-container flex>
                                 <label>cargos</label>
-                                <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled" md-no-ink>
+                                <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
                                 </md-select>
                             </md-input-container>
@@ -486,14 +486,14 @@
 
                         <md-input-container class="md-block" flex="40">
                             <label>Responsabilidades</label>
-                            <input ng-disabled="$parent.enabled" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)">
+                            <input autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                         </md-input-container>
 
                     </div>
                     <div layout="row" flex>
                         <md-input-container class="md-block" flex>
                             <label>Direccion de Oficina</label>
-                            <input ng-disabled="$parent.enabled" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)">
+                            <input autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                         </md-input-container>
                     </div>
 
@@ -551,16 +551,15 @@
             </md-content>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
-                <div class="titulo_formulario" layout="column" layout-align="start start">
+                <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
                     <div ng-click="closeContackBook()">
                         Contactos Existentes
                     </div>
-
                 </div>
-                <div style="height: 100%; overflow:scroll">
-                    <div flex ng-repeat="cont in allContact" flex="column" ng-click="toEdit(this)">
+                <div style="height: calc(100% - 39px); overflow-y: auto">
+                    <div ng-repeat="cont in allContact | customFind : prov.id : filtByprov " layout="column" ng-click="toEdit(this)">
                         <div layout="column" layout-wrap class="cellGridHolder cellGrid" style="height: 72px">
                             <div flex style="height: 24px">{{cont.nombre}} </div>
                             <div flex style="height: 24px"> {{cont.email}}</div>
@@ -587,17 +586,17 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Banco</label>
-                            <input ng-model="bnk.bankName" required/>
+                            <input autocomplete="off" ng-model="bnk.bankName" required/>
 
                         </md-input-container>
                         <md-input-container class="md-block" flex="30">
                             <label>Nombre Beneficiario</label>
-                            <input ng-model="bnk.bankBenef" required/>
+                            <input autocomplete="off" ng-model="bnk.bankBenef" required/>
 
                         </md-input-container>
                         <md-input-container class="md-block" flex="40">
                             <label>Direccion</label>
-                            <input ng-model="bnk.bankAddr" />
+                            <input autocomplete="off" ng-model="bnk.bankAddr" />
 
                         </md-input-container>
                     </div>
@@ -632,13 +631,13 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>SWIF</label>
-                            <input ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
 
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
                             <label>IBAN</label>
-                            <input ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
 
                         </md-input-container>
                     </div>
@@ -696,7 +695,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Limite de Credito</label>
-                            <input ng-disabled="$parent.enabled || coins.length<1" ng-model="cred.amount" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled || coins.length<1" ng-model="cred.amount" required>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
@@ -743,7 +742,7 @@
                 </form>
 
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="condHeadFrm" ng-controller="condPayList" ng-click="showGrid(true)" click-out="showGrid(false)">
+                <form name="condHeadFrm" ng-controller="condPayList" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div flex>
                             Condiciones de pago
@@ -753,7 +752,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="60">
                             <label>Titulo</label>
-                            <input ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Linea</label>
@@ -803,19 +802,19 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="10">
                             <label>% Flete</label>
-                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
+                            <input autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
                         </md-input-container>
                         <md-input-container class="md-block" flex="10">
                             <label>% Gastos</label>
-                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.expens">
+                            <input autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.expens">
                         </md-input-container>
                         <md-input-container class="md-block" flex="10">
                             <label>% Ganancia</label>
-                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.gain">
+                            <input autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.gain">
                         </md-input-container>
                         <md-input-container class="md-block" flex="10">
                             <label>% Descuento</label>
-                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.disc">
+                            <input autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.disc">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
@@ -867,7 +866,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="30">
                             <label>Costo del punto</label>
-                            <input ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.cost" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.cost" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                             <label>Moneda</label>
@@ -902,7 +901,7 @@
             </div>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController">
                 <div class="titulo_formulario" layout="column" layout-align="start start" ng-click="closeCondition()">
                     <div>
@@ -913,7 +912,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="60">
                             <label>Titulo</label>
-                            <input ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Linea</label>
@@ -925,15 +924,15 @@
                         </md-input-container>
                     </div>
                 </form>-->
-                <form name="itemCondForm">
+                <form name="itemCondForm" click-out="showGrid(false)">
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>%</label>
-                            <input ng-disabled="$parent.enabled" ng-model="condItem.percent" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condItem.percent" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Dias</label>
-                            <input ng-disabled="$parent.enabled" ng-model="condItem.days" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condItem.days" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Condicion</label>
@@ -971,11 +970,11 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>De (Dias)</label>
-                            <input ng-disabled="$parent.enabled" ng-model="tp.from" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.from" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>A (Dias)</label>
-                            <input ng-disabled="$parent.enabled" ng-model="tp.to" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.to" required>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
@@ -1014,11 +1013,11 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>De (Dias)</label>
-                            <input ng-disabled="$parent.enabled" ng-model="ttr.from">
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>A (Dias)</label>
-                            <input ng-disabled="$parent.enabled" ng-model="ttr.to">
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="20">
@@ -1057,12 +1056,12 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="40">
                             <label>Referencia</label>
-                            <input ng-disabled="$parent.enabled" ng-model="lp.ref">
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Archivo</label>
-                            <input id="upListPrice" type="file" name="files[]" data-url="" multiple>
-                            <input ng-disabled="$parent.enabled" ng-model="lp.file">
+
+                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
                         </md-input-container>
                     </div>
 

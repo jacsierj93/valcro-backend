@@ -190,7 +190,7 @@ class ProvidersController extends BaseController
     public function allContacts(){
         $contacts = Contactos::get();
         foreach($contacts as $contact){
-            $contact['provs']=$contact->contacto_proveedor()->select("siglas as prov")->get();
+            $contact['provs']=$contact->contacto_proveedor()->select("prov_id","siglas as prov")->get();
             $contact->languages=$contact->idiomas()->lists("languaje_id");
             $contact->cargos=$contact->cargos()->lists("cargo_id");
         }
