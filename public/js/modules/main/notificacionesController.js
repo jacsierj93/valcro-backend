@@ -70,7 +70,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 }]);
 
 
-MyApp.service("setNotif",function($filter){
+MyApp.service("setNotif",function($filter,$timeout){
     var list =  {
         ok: [],
         alert: [],

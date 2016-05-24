@@ -472,7 +472,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                 if(data.action=="new"){
                     $scope.dtaPrv.new = true;
                     setNotif.addNotif("ok", "Proveedor agregado", [
-                    ],{autohidden:5000});
+                    ],{autohidden:3000});
                 }
             });
         }
@@ -539,6 +539,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 dirSel.ports = $scope.dir.ports;
                 if(data.action=="new"){
                     $scope.address.unshift(dirSel);
+                    setNotif.addNotif("ok", "Nueva Direccion!", [
+                    ],{autohidden:3000});
                 }
             });
         }
@@ -648,32 +650,55 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             });
             if (data.action == "new") {
                 $scope.valcroName.unshift(valcroName);
+                setNotif.addNotif("ok", "Nuevo Nombre Valcro", [
+                ],{autohidden:3000});
             }
         });
     };
 
     $scope.rmValName = function(name){
-        chip = name.name;
-        $http({
-            method: 'POST',
-            url: "provider/delValcroName",
-            data: chip
-        }).then(function successCallback(response) {
-            $scope.valcroName.splice(name.$index,1);
-            $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
-            valcroName = {};
-            $scope.nomvalcroForm.$setUntouched();
-        }, function errorCallback(response) {
-            console.log("error=>", response)
-        });
+
+        setNotif.addNotif("alert", "desea borrar este nombre valcro", [
+            {
+                name: "SI",
+                action: function () {
+                    chip = name.name;
+                    $http({
+                        method: 'POST',
+                        url: "provider/delValcroName",
+                        data: chip
+                    }).then(function successCallback(response) {
+                        $scope.valcroName.splice(name.$index,1);
+                        $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                        valcroName = {};
+                        $scope.nomvalcroForm.$setUntouched();
+                        setNotif.addNotif("ok", "Nombre valcro borrado", [
+                        ],{autohidden:3000});
+                    }, function errorCallback(response) {
+                        console.log("error=>", response)
+                    });
+                }
+            },
+            {
+                name: "no",
+                action: function () {
+                }
+            }
+        ]);
+
     };
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
+    $scope.showGrid = function(elem,a){
         if(!elem){
-            $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
-            valcroName = {};
-            $scope.nomvalcroForm.$setUntouched();
+            if(jQuery(a.toElement).parents("#lyrAlert").length==0){
+                $scope.isShow = elem;
+                $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                valcroName = {};
+                $scope.nomvalcroForm.$setUntouched();
+            }
+
+        }else{
+            $scope.isShow = elem;
         }
     };
     $scope.openCoinc = function(){
@@ -725,23 +750,41 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             return false;
         }
         if($scope.valName.departments[dep.dep.id]){
-            var temp = {};
-            var i = 0;
-            angular.forEach($scope.valName.departments,function(k,v){
-                if(parseInt(v)!=parseInt(dep.dep.id)){
-                    temp[v] = k;
+            setNotif.addNotif("alert", "desea quitar este departamento?", [
+                {
+                    name: "SI",
+                    action: function () {
+                        console.log("eliminar");
+                        var temp = {};
+                        var i = 0;
+                        angular.forEach($scope.valName.departments, function (k, v) {
+                            if (parseInt(v) != parseInt(dep.dep.id)) {
+                                temp[v] = k;
+                            }
+                            if (i == Object.keys($scope.valName.departments).length - 1) {
+                                $scope.valName.departments = temp;
+                            }
+                            i++;
+                        });
+                        saveValcroname();
+                        setNotif.addNotif("ok", "departamento desvinculado", [
+                        ],{autohidden:3000});
+                    }
+                },
+                {
+                    name: "no",
+                    action: function () {
+                    }
                 }
-                if(i==Object.keys($scope.valName.departments).length-1){
-                    $scope.valName.departments = temp;
-                }
-                i++;
-            })
-
+            ]);
         }else{
             var fav = {fav:0};
             $scope.valName.departments[dep.dep.id]=fav;
+            saveValcroname();
+            setNotif.addNotif("ok", "departamento añadido", [
+            ],{autohidden:3000});
         }
-        saveValcroname();
+
     };
 
     $scope.closeNomValLyr = function () {
