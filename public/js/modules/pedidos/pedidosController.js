@@ -14,6 +14,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
     $scope.TextLateralFilter="Mas Opciones";
+    $scope.viewMode=false;
+    $scope.selecPed=false;
+
+
 
 
 
@@ -32,7 +36,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
     restore('filterOption');//selecion de los filtros
     restore('FormDataKitchenBox'); // formulario de ckitchen box
     restore('pedidoSusPedSelec'); // pedido sustitu selecionado
-
 
     $scope.setProvedor = setProvedor;
     $scope.openLayer = openLayer;
@@ -97,13 +100,60 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
     }
 
 
-
-
     /********************************************EVENTOS ********************************************/
+
+
+    $scope.hoverpedido= function(pedido){
+
+        if(pedido && $scope.viewMode){
+            $scope.pedidoSelec=pedido;
+            if($scope.layer !='detallePedido' ){
+                openLayer("detallePedido");
+            }
+        }
+
+        if(!pedido ){
+            $scope.Preview=false;
+        }
+    }
+
+
+    $scope.$watch('viewMode', function (newVal) {
+        console.log('preview', newVal )
+        if(!newVal && !$scope.selecPed){
+            closeLayer('listPedido');
+        }
+    });
+   /* $scope.$watch('Preview', function(newVal){
+        if(!newVal && !$scope.selecPed){
+            closeLayer('listPedido');
+        }
+    })*/
+
+
+    $scope.hoverActivePreview= function(){
+        $scope.Preview=true;
+    }
 
     $scope.updateForm = function () {
         $scope.formBlock = !segurity('editPedido');
     }
+    $scope.showProduc= function () {
+        if($scope.showGripro){
+            $scope.showGripro=false;
+        }else {
+            $scope.showGripro=true;
+        }
+
+    }
+
+    $scope.closeTo = function(layer){
+        console.log('close to',layer);
+        closeLayer(layer);
+    }
+
+    /********************************************DEBUGGIN ********************************************/
+
     $scope.test = function () {
         alert('');
     }
@@ -113,14 +163,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
         a.click();
     }
 
-    $scope.showProduc= function () {
-        if($scope.showGripro){
-            $scope.showGripro=false;
-        }else {
-            $scope.showGripro=true;
-        }
-
-    }
+    /********************************************otros ********************************************/
 
 
     function selecOdc(odc) {
@@ -433,7 +476,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
 
         if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                openLayer('detallePedido');
+                openLayer('detallePedido');ue
+                $scope.selecPed=true;
                 loadPedido(pedido.id);
             }
             else {
@@ -459,12 +503,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
 
     }
 
-    function closeLayer() {
-        var layer = historia[$scope.index];
-        historia[$scope.index] = null;
-        $scope.index--;
-        $mdSidenav(layer).close();
-        $scope.layer = historia[$scope.index];
+    function closeLayer(opt) {
+        var close =1;
+        var index= $scope.index;
+        if(typeof (opt) == 'string'){
+            var aux = historia.indexOf(opt);
+            close= index - aux;
+        }
+
+        for(var i=0; i<close;i++){
+            var layer = historia[index];
+            $mdSidenav(layer).close();
+            historia[index]=null;
+            index--;
+        }
+        $scope.index= index;
+        $scope.layer = historia[index];
     }
 
     /**@deprecated*/
@@ -505,7 +559,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
                 restore('pedidoSelec');// inializa el proveedor
                 //  restore('FormData');// inializa el proveedor
                 loadDataFor();
-                ;
                 break;
         }
     });
@@ -884,16 +937,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
                 };
                 break;
             case 'filterData':
-                $scope.filterData={ monedas: new Array(), tipoEnv: new Array() };
+                $scope.filterData={ tipoPedidos: new Array()};
                 break;
             case 'todos':
                 $scope.todos = new Array();
                 break;
             case 'filterOption':
                 $scope.filterOption={
-                    prov_id:'',
-                    moneda_id:'',
-                    tipo_env_id:''
+                    tipo_pedido_id:-1,
+                    min_id:'',
+                    max_id:''
                 };
                 break;
             default: console.log('no existe key' + key);

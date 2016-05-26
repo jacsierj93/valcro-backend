@@ -195,20 +195,30 @@ class OrderController extends BaseController
             $tem['id']=$aux->id;
             $tem['tipo_pedido_id']=$aux->tipo_pedido_id;
             $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['emision']=$aux->emision;
             $tem['nro_factura']=$aux->nro_factura;
+            $tem['img_proforma']=$aux->img_proforma;
+            $tem['img_factura']=$aux->img_factura;
+            $tem['pais_id']=$aux->pais_id;
+            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+            $tem['condicion_pago_id']=$aux->condicion_pago_id;
+            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+            $tem['prioridad_id']=$aux->prioridad_id;
+            $tem['comentario']=$aux->comentario;
+            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+            $tem['mt3']=$aux->mt3;
+            $tem['peso']=$aux->peso;
+            $tem['emision']=$aux->emision;
             $tem['monto']=$aux->monto;
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-            $tem['comentario']=$aux->comentario;
             $tem['llegada']=$aux->arrival();
             $tem['tipo']=$type->where('id',$aux->tipo_pedido_id)->first()->tipo;
+            $tem['productos'] = $this->getProductoOrden($aux);
+
             // modificar cuando se sepa la logica
             $tem['aero']=1;
             $tem['maritimo']=1;
-
             $data[]=$tem;
-
         }
 
         return $data;
@@ -370,7 +380,7 @@ class OrderController extends BaseController
         $products= Array();
         foreach($items as $aux){
 
-            $aux['tipo']=MasterOrderController::getTypeProduct($aux);
+            $aux['origen']=MasterOrderController::getTypeProduct($aux)['descripcion'];
             $aux['asignado']=false;
             $ordI= OrderItem::where('pedido_id', $req->pedido_id)
                 ->where('origen_item_id', $aux->id)
@@ -657,13 +667,20 @@ class OrderController extends BaseController
     }
 
     /**
+     * @deprecated
      * obtiene toda la data de un pedido
      */
-
     public function getOrden(Request $req){
 
         $order=Order::findOrFail($req->id);
         $data= $order;
+       $data['productos']= $this->getProductoOrden($order);
+        return $data;
+
+    }
+
+    private function getProductoOrden($order){
+
         $items= $order->OrderItem()->get();
         $contra=Collection::make(Array());
         $kitchen= Collection::make(Array());
@@ -681,7 +698,7 @@ class OrderController extends BaseController
         /** importados */
         foreach($items->where('tipo_origen_id', '4') as $aux){
 
-            $id =MasterOrderController::getTypeProductId($aux);
+            $id =MasterOrderController::getTypeProduct($aux)['tipo_origen_id'];
             $imp=MasterOrderController::getOriginalHead($aux);
             $aux['titulo']="transferido del ";
             $aux['renglon_id']= $aux->id;
@@ -709,7 +726,7 @@ class OrderController extends BaseController
             $tem['descripcion']= $aux->descripcion;
             $tem['tipo_origen_id']= $aux->tipo_origen_id;
             $tem['asignado']= true;
-            $tem['Origen']= MasterOrderController::getTypeProduct($aux);
+            $tem['origen']= MasterOrderController::getTypeProduct($aux)['descripcion'];
             $all->push($tem);
         }
 
@@ -717,9 +734,7 @@ class OrderController extends BaseController
         $data['kitchenBox'] = $kitchen;
         $data['pedidoSusti'] = $pediSus;
         $data['todos'] = $all;
-
         return $data;
-
     }
 
     /**
