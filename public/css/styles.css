@@ -813,7 +813,7 @@ input[type=number]::-webkit-outer-spin-button {
 *********************************************************************************
 **** CLASE QUE DIBUJA dop en los item de lista lateral  ***
 ********************************************************************************/
-.dop-item {
+.dot-item {
     width: 20px;
     height: 20px;
     border-radius: 50%;

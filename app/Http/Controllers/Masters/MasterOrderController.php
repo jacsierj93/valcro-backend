@@ -82,7 +82,11 @@ class MasterOrderController extends BaseController
 
             } while ($idType == 4 && $i<3);
         }
-        return SourceType::findOrFail($idType)->descripcion;
+        $model =SourceType::findOrFail($idType);
+
+        $data['tipo_origen_id'] =$model ->id;
+        $data['descripcion'] =$model ->descripcion;
+        return $data;
 
     }
 
@@ -116,27 +120,6 @@ class MasterOrderController extends BaseController
     }
 
     /**
-     * @return el tipo de producto original
-     */
-    public static function getTypeProductId($producto){
-
-        $idType=$producto->tipo_origen_id;
-
-        if($idType == 4){
-            $i=0;
-            $aux= $producto;
-            do {
-                $aux= OrderItem::findOrFail($aux->origen_item_id);
-                $idType=$aux->tipo_origen_id;
-                $i++;
-
-            } while ($idType == 4 && $i<3);
-        }
-        return SourceType::findOrFail($idType)->id;
-
-    }
-
-    /**
      * determina si el producto ya a sido asignado al pedido(kitchenBox)
      * @param el producto que posea el campo cantidad
      * @param el id del pedido a donde se va a assignar
@@ -158,5 +141,8 @@ class MasterOrderController extends BaseController
 
     }
 
+    /**
+     * regresa el producto original
+    */
 
 }

@@ -2,13 +2,48 @@
 .image{
     float: right;
 }
-
-
-/*********** para los campos tipo fecha */
-.dateRow {
-    height: 30px; margin-top: 6px;
+.arrival0{ background-color: #006837;}/** llegada en <=0 */
+.arrival7{ background-color: #00862c;}/** llegada en <=0 */
+.arrival30{ background-color: #00a421;}/** llegada en <=0 */
+.arrival60{ background-color: #00c316;}/** llegada en <=0 */
+.arrival90{ background-color: #00e10b;}/** llegada en <=0 */
+.arrival100{ background-color: #00ff00;}/** llegada en <=0 */
+/**celda que contenga imagenes*/
+.cellGridImg{
+    align-self: flex-end;
+}
+/** div para selecionar, el sidenav */
+.backDiv{
+    width: 24px;
+}
+/** div para selecionar, el sidenav usar ng-class para colocar cursor */
+.backDivSelec:hover{
+   /* cursor:grab;*/
+}
+/** celdad de la grilla vacia sin efecto*/
+.cellEmpty{
+    width: 24px;
+    margin: 0px;
+    border: 0px;
+}
+/**contenedor de la grilla*/
+.gridContent{
+    overflow-y:auto;
+    height: calc(100% - 78px);
 }
 
-.dateRowTitle {
-    margin-right: 8px; margin-top:8px;
+.menuFilter{
+    width: 192px;
+    background-color: #f1f1f1;
+    padding-left: 8px;
+    color: #999999;
+}
+.btnMas{
+    background-color: transparent;
+    color: rgb(153, 153, 153);
+    border-top: 1px solid;
+    border-radius: 30px;
+}
+.preview{
+    background-color: #f1f1f1;
 }
