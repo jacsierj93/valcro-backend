@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Masters\MasterOrderController;
+use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\CustomOrders\CustomOrderItem;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
@@ -50,14 +51,15 @@ class OrderController extends BaseController
         where('id', 1)->
         get();
         $data = array();
+        //  $auxCp= Collection::make(array());
 
         foreach($provs as $prv){
             $temp["id"] = $prv->id;
             $temp["razon_social"] = $prv->razon_social;
 
             $temp['deuda']= $prv->Order()->sum('monto');
-            $temp['contraPedido']= $prv->CustomOrder()->count();
             $temp['puntoCompra']= 0;
+            $nCp=0;
             $nl0=0;
             $nl7=0;
             $nl30=0;
@@ -69,6 +71,7 @@ class OrderController extends BaseController
 
             foreach($peds as $ped){
                 $arrival=$ped->arrival();
+                $nCp +=$ped->getNumItem(2);
                 if ($arrival == 0) {
                     $nl0++;
                 } else if ($arrival == 7) {
@@ -79,9 +82,10 @@ class OrderController extends BaseController
                     $nl60++;
                 } else if ($arrival == 90) {
                     $nl90++;
-                } else if($arrival == 100){
+                } else if($arrival == 100 ){
                     $nl00++;
                 }
+
             }
 
             $temp['llega0']=$nl0;
@@ -90,8 +94,7 @@ class OrderController extends BaseController
             $temp['llega60']=$nl60;
             $temp['llega90']=$nl90;
             $temp['llega100']=$nl00;
-
-
+            $temp['contraPedido']= $nCp;
 
             $data[] =$temp;
         }
@@ -173,7 +176,7 @@ class OrderController extends BaseController
         $model->cantidad = $req->cantidad;
         $model->saldo = $req->saldo;
         $model->save();
-        
+
         $resul['accion']= "edicion ". $req->tipo_origen_id;
         $resul['item']= $model;
         return $resul;
@@ -185,18 +188,28 @@ class OrderController extends BaseController
     public function getProviderListOrder(Request $req)
     {
         $data=Array();
+        $items = Order::where('prov_id',$req->id)->get();
+        $type = OrderType::get();
+        $coin = Monedas::get();
+        foreach($items as $aux){
+            $tem['id']=$aux->id;
+            $tem['tipo_pedido_id']=$aux->tipo_pedido_id;
+            $tem['nro_proforma']=$aux->nro_proforma;
+            $tem['emision']=$aux->emision;
+            $tem['nro_factura']=$aux->nro_factura;
+            $tem['monto']=$aux->monto;
+            $tem['prov_moneda_id']=$aux->prov_moneda_id;
+            $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+            $tem['comentario']=$aux->comentario;
+            $tem['llegada']=$aux->arrival();
+            $tem['tipo']=$type->where('id',$aux->tipo_pedido_id)->first()->tipo;
+            // modificar cuando se sepa la logica
+            $tem['aero']=1;
+            $tem['maritimo']=1;
 
-        $prov=Provider::findOrFail($req->id);
-        $orders= Provider::findOrFail($req->id)->Order()
-            //   ->select('id','nro_doc','nro_proforma', 'emision', 'nro_factura', 'monto', 'tipo_pedido_id')
-            ->get();
-        $i=0;
-        foreach($orders as $aux){
-            $orders[$i]['tipo']=OrderType::findOrFail($orders[$i]->tipo_pedido_id)->first()->tipo;
-            $i++;
+            $data[]=$tem;
+
         }
-        $data['pedidos']=$orders;
-        $data['proveedor']=$prov;
 
         return $data;
 
@@ -799,13 +812,18 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getProviderCountry(Request $req){
+
         $model=  ProviderAddress::where('prov_id',$req->id)->get();
-        $pais= Array();
-        foreach( $model as $aux){
-            $pais[]= $aux->country()->first();
+        $data= Collection::make(array());
+        foreach($model as $aux){
+            if(!$data->contains($aux->pais_id)){
+                $p=Country::find($aux->pais_id);
+                $data->push($p);
+            }
 
         }
-        return $pais;
+
+        return $data;
     }
 
     /**

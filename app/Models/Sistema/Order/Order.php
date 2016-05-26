@@ -7,6 +7,7 @@
  */
 
 namespace App\Models\Sistema\Order;
+use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\ProdTime;
 use App\Models\Sistema\TiemAproTran;
 use Illuminate\Database\Eloquent\Model;
@@ -29,10 +30,29 @@ class Order extends Model
     }
 
     /**
+     * @return el numero de contra pedido asignados a este pedido
      */
 
+    public function getNumItem($tipo){
+        $i=0;
+        $items = $this->OrderItem()->get();
+        foreach($items as $aux){
+            $tip=$this->getTypeProduct($aux);
+            if($tip == $tipo){
+                $i++;
+            }
+
+        }
+
+        return $i;
+    }
+
+    /**
+     * Metodo que calcula la categoria de llegada del pedido
+     * @return categoria de llegada
+     */
     public function arrival(){
-        $estatus = -1;
+        $estatus = 100;
 
         if(
             $this->culminacion != null
@@ -52,29 +72,51 @@ class Order extends Model
             $dias=Carbon::now()->diffInDays($llegada);
 
             if ($dias <= 0) {
-                $estatus = 0; 
+                $estatus = 0;
             } else if ($dias <= 7) {
-                $estatus = 7; 
+                $estatus = 7;
             } else if ($dias > 7 && $dias <= 30) {
                 $estatus = 30;
             } else if ($dias > 30 && $dias <= 60) {
                 $estatus = 60;
             } else if ($dias > 60 && $dias <= 90) {
                 $estatus = 90;
-            } else if($dias >100){
-                $estatus = 100; ///mas de 90
             }
+
         }
 
         return $estatus;//->format("d");
     }
 
+    /**
+     * @deprecated */
     private function dateDiff($dateIni, $dateEnd)
     {
         $from = date_create($dateIni);
         $to = date_create($dateEnd);
         $diff = date_diff($to, $from);
         return (int)$diff->format('%R%d');
+    }
+
+    /**
+     * @return el tipo de producto original
+     */
+    private function getTypeProduct($producto){
+
+        $idType=$producto->tipo_origen_id;
+
+        if($idType == 4){
+            $i=0;
+            $aux= $producto;
+            do {
+                $aux= OrderItem::findOrFail($aux->origen_item_id);
+                $idType=$aux->tipo_origen_id;
+                $i++;
+
+            } while ($idType == 4 && $i<3);
+        }
+        return SourceType::findOrFail($idType)->id;
+
     }
     /**************************** descontinuado**********************
 
