@@ -32,8 +32,13 @@
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'000000'}}</div>
                     <div style="height:40px;">
                         <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
-                        <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />
-                        <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/aereo.png" />
+
+                       <!-- <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />-->
+
+                        <span ng-show="(item.contrapedido==1)" class=" icon2-contrapedidos" style="font-size: 23px"></span>
+                        <span ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" class="icon-Aereo" style="font-size: 24px"></span>
+                       <!-- <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/Aereo.svg" />-->
+                       <!-- <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/aereo.png" />-->
                         <img ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)" src="images/maritimo.png" />
                     </div>
                 </div>
@@ -49,15 +54,16 @@
                 </div>
                 <div layout="column" layout-align="center center" ng-click="addProv()">
                     <!--<i class="fa fa-plus"></i>-->
-                    <?= HTML::image("images/agregar.png") ?>
+                    <span class="icon-Agregar" style="font-size: 24px"></span>
+                    <?/*= HTML::image("images/agregar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center" ng-click="editProv()" ng-show="prov.id">
-                    <!--<i class="fa fa-filter"></i>-->
-                    <?= HTML::image("images/actualizar.png") ?>
+                    <span class="icon-Actualizar" style="font-size: 24px"></span>
+                   <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center" ng-click="toggleOtro()" ng-show="prov.id">
-                    <!--<i class="fa fa-minus"></i>-->
-                    <?= HTML::image("images/filtro.png") ?>
+                    <span class="icon-Filtro" style="font-size: 24px"></span>
+                    <?/*= HTML::image("images/filtro.png") */?>
                 </div>
             </div>
 
@@ -255,7 +261,7 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" ng-controller="DataProvController" ng-disabled="true">
+                <form name="projectForm" ng-controller="DataProvController" ng-disabled="true" click-out="projectForm.$setUntouched()">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
                         <div>
@@ -266,7 +272,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
-                            <md-select ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                            <md-select info="seleccione un tipo de proveedor" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                 <md-option ng-repeat="type in types" value="{{type.id}}">
                                     {{type.nombre}}
                                 </md-option>
@@ -281,7 +287,7 @@
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input autocomplete="off" ng-blur="check('description')" duplicate="list" field="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
+                            <input info="indique el nombre del proveedor" autocomplete="off" ng-blur="check('description')" duplicate="list" field="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
                             <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                             <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -292,7 +298,7 @@
 
                         <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
-                            <input autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
+                            <input info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
                             <!--<div ng-messages="projectForm.siglas.$error">
                                 <div ng-message="required">Obligatorio.</div>
                                 <div ng-message="md-maxlength">maximo 4</div>
@@ -301,7 +307,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
-                            <md-select ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                            <md-select info="seleccione un tipo de envio" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                     {{envio.nombre}}
                                 </md-option>
@@ -312,7 +318,7 @@
                         </md-input-container>
 
                         <md-input-container class="md-block">
-                            <md-switch class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" ng-disabled="$parent.enabled && prov.id">
+                            <md-switch info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" ng-disabled="$parent.enabled && prov.id">
                                 Contrapedidos?
                             </md-switch>
                         </md-input-container>
@@ -342,88 +348,95 @@
                             <span style="font-size: 18px; margin-left: 8px" class="icon-gift"></span>-->
                         </div>
                     </div>
-                    <md-input-container class="md-block" flex id="valcroName">
-                        <label>Nombre...</label>
-                        <input autocomplete="off" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
-                    </md-input-container>
+                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <md-input-container class="md-block" flex id="valcroName">
+                            <label>Nombre...</label>
+                            <input autocomplete="off" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
+                        </md-input-container>
 
-                    <div ng-show="isShow">
-                        <div ng-repeat="name in valcroName" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)">{{name.name}} <span ng-show="(name.id==valName.id)" class="icon-bs" ng-click="rmValName(this)"></span></div>
+                        <div ng-show="isShow">
+                            <div ng-repeat="name in valcroName" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
+                        </div>
                     </div>
                 </form>
 
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm" ng-controller="provAddrsController" ng-click="showGrid(true)" click-out="showGrid(false)">
+                <form name="direccionesForm" ng-controller="provAddrsController" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Direcciones
                         </div>
                     </div>
+                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div layout="row">
 
-                    <div layout="row">
+                            <md-input-container class="md-block" flex="20">
+                                <label>Tipo de Direccion</label>
+                                <md-select ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
+                                    <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
+                                        {{tipo.descripcion}}
+                                    </md-option>
+                                </md-select>
+                                <!--<div ng-messages="user.tipo.$error">
+                                    <div ng-message="required">Campo Obligatorio.</div>
+                                    <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+                                </div>-->
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
-                            <label>Tipo de Direccion</label>
-                            <md-select ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
-                                <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
-                                    {{tipo.descripcion}}
-                                </md-option>
-                            </md-select>
-                            <!--<div ng-messages="user.tipo.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
-                            </div>-->
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="30">
+                                <label>Pais</label>
+                                <md-select ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
+                                    <md-option ng-repeat="pais in paises" value="{{pais.id}}">
+                                        {{pais.short_name}}
+                                    </md-option>
+                                </md-select>
+                                <!--<div ng-messages="user.pais.$error">
+                                    <div ng-message="required">Campo Obligatorio.</div>
 
-                        <md-input-container class="md-block" flex="30">
-                            <label>Pais</label>
-                            <md-select ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
-                                <md-option ng-repeat="pais in paises" value="{{pais.id}}">
-                                    {{pais.short_name}}
-                                </md-option>
-                            </md-select>
-                            <!--<div ng-messages="user.pais.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
+                                </div>-->
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="20">
+                                <label>Codigo Postal</label>
+                                <input autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                            </md-input-container>
 
-                            </div>-->
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="20">
-                            <label>Codigo Postal</label>
-                            <input autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="30">
+                                <label>Telefono</label>
+                                <input autocomplete="off" ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="30">
-                            <label>Telefono</label>
-                            <input autocomplete="off" ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
-                        </md-input-container>
-
-                    </div>
-                    <md-input-container class="md-block" flex ng-show="dir.tipo==2">
-                        <label>puertos</label>
-                        <md-select ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
-                            <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
-                                {{port.Main_port_name}}
-                            </md-option>
-                        </md-select>
-                    </md-input-container>
-                    <md-input-container class="md-block" flex>
-                        <label>Direccion</label>
-                        <input autocomplete="off" ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
-                    </md-input-container>
-                    <div layout="column" ng-show="isShow">
-                        <div layout="row" class="headGridHolder">
-                            <div flex="10" class="headGrid"> Tipo</div>
-                            <div flex="20" class="headGrid"> Pais</div>
-                            <div flex class="headGrid"> Direccion</div>
-                            <div flex="20" class="headGrid"> Telefono</div>
                         </div>
-                        <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="add in address" ng-click="toEdit(this)">
-                                <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
-                                    <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
-                                    <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div>
-                                    <div flex class="cellGrid">{{add.direccion}}</div>
-                                    <div flex="20" class="cellGrid">{{add.telefono}}</div>
+                        <md-input-container class="md-block" flex ng-show="dir.tipo==2">
+                            <label>puertos</label>
+                            <md-select ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
+                                <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
+                                    {{port.Main_port_name}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex>
+                            <label>Direccion</label>
+                            <input autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                        </md-input-container>
+                        <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{address.length}})</div>
+                        </div>
+                        <div layout="column" ng-show="isShowMore" flex>
+                            <div layout="row" class="headGridHolder">
+                                <div flex="10" class="headGrid"> Tipo</div>
+                                <div flex="20" class="headGrid"> Pais</div>
+                                <div flex class="headGrid"> Direccion</div>
+                                <div flex="20" class="headGrid"> Telefono</div>
+                            </div>
+                            <div id="grid" style="overflow-y: auto">
+                                <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                    <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
+                                        <div ng-show="(add.id==dir.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
+                                        <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
+                                        <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div>
+                                        <div flex class="cellGrid">{{add.direccion}}</div>
+                                        <div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -438,86 +451,91 @@
                             Contactos Proveedor
                         </div>
                     </div>
-                    <div layout="row">
+                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div layout="row">
 
-                        <md-input-container class="md-block" flex="30">
-                            <label>Nombre y Apellido</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="30">
+                                <label>Nombre y Apellido</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="35">
-                            <label>Email</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="15">
-                            <label>Pais de Residencia</label>
-                            <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
-                                <md-option ng-repeat="pais in paises" value="{{pais.id}}">
-                                    {{pais.short_name}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="20">
-                            <label>Telefono</label>
-                            <input autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
-                        </md-input-container>
-
-                    </div>
-                    <div layout="row">
-                        <div layout="row" flex="30">
-                            <md-input-container flex>
-                                <label>Idiomas</label>
-                                <md-select  ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
-                                    <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
-
+                            <md-input-container class="md-block" flex="35">
+                                <label>Email</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="15">
+                                <label>Pais de Residencia</label>
+                                <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                    <md-option ng-repeat="pais in paises" value="{{pais.id}}">
+                                        {{pais.short_name}}
+                                    </md-option>
                                 </md-select>
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="20">
+                                <label>Telefono</label>
+                                <input autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
+                            </md-input-container>
+
+                        </div>
+                        <div layout="row">
+                            <div layout="row" flex="30">
+                                <md-input-container flex>
+                                    <label>Idiomas</label>
+                                    <md-select  ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                        <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
+
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+
+                            <div layout="row" flex="30">
+                                <md-input-container flex>
+                                    <label>cargos</label>
+                                    <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                        <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+
+                            <md-input-container class="md-block" flex="40">
+                                <label>Responsabilidades</label>
+                                <input autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                            </md-input-container>
+
+                        </div>
+                        <div layout="row" flex>
+                            <md-input-container class="md-block" flex>
+                                <label>Direccion de Oficina</label>
+                                <input autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
 
-                        <div layout="row" flex="30">
-                            <md-input-container flex>
-                                <label>cargos</label>
-                                <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
-                                    <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
-                                </md-select>
-                            </md-input-container>
+                        <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{contacts.length}})</div>
                         </div>
 
-                        <md-input-container class="md-block" flex="40">
-                            <label>Responsabilidades</label>
-                            <input autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
-                        </md-input-container>
+                        <div layout="column" ng-show="isShowMore" flex>
 
-                    </div>
-                    <div layout="row" flex>
-                        <md-input-container class="md-block" flex>
-                            <label>Direccion de Oficina</label>
-                            <input autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
-                        </md-input-container>
-                    </div>
-
-
-                    <div layout="column" ng-show="isShow">
-
-                        <div layout="row" class="headGridHolder">
-                            <div flex="20" class="headGrid"> Nombre</div>
-                            <div flex class="headGrid"> Email</div>
-                            <div flex="10" class="headGrid"> Telefono</div>
-                            <div flex="20" class="headGrid"> Pais</div>
-                        </div>
-                        <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)">
-                                <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="20" class="cellGrid"> {{cont.nombre}}</div>
-                                    <div flex class="cellGrid"> {{cont.email}}</div>
-                                    <div flex="10" class="cellGrid">{{cont.telefono}}</div>
-                                    <div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
+                            <div layout="row" class="headGridHolder">
+                                <div flex="20" class="headGrid"> Nombre</div>
+                                <div flex class="headGrid"> Email</div>
+                                <div flex="10" class="headGrid"> Telefono</div>
+                                <div flex="20" class="headGrid"> Pais</div>
+                            </div>
+                            <div id="grid" style="overflow-y: auto; height: 120px">
+                                <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)">
+                                    <div layout="row" layout-wrap class="cellGridHolder">
+                                        <div flex="20" class="cellGrid"> {{cont.nombre}}</div>
+                                        <div flex class="cellGrid"> {{cont.email}}</div>
+                                        <div flex="10" class="cellGrid">{{cont.telefono}}</div>
+                                        <div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
+                                    </div>
                                 </div>
+
                             </div>
 
                         </div>
-
                     </div>
                 </form>
 
@@ -681,7 +699,7 @@
                             </md-select>
                         </md-input-container>
                         <div layout="row" ng-repeat="coinSel in coinAssign">
-                            <div layout="10">{{coinSel.nombre}} ({{coinSel.simbolo}})</div>
+                            <div class="coinDiv">{{coinSel.simbolo}}</div>
                         </div>
                     </div>
                 </form>
@@ -908,35 +926,21 @@
                         {{head.title}} <i>({{head.line}})</i>
                     </div>
                 </div>
-                <!--<form name="headCond">
-                    <div layout="row">
-                        <md-input-container class="md-block" flex="60">
-                            <label>Titulo</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
-                        </md-input-container>
-                        <md-input-container class="md-block" flex>
-                            <label>Linea</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="condHead.line" ng-disabled="$parent.enabled" required md-no-ink>
-                                <md-option ng-repeat="line in lines" value="{{line.id}}">
-                                    {{line.linea}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                    </div>
-                </form>-->
-                <form name="itemCondForm" click-out="showGrid(false)">
+
+                <form name="itemCondForm" click-out="showInterGrid(false,$event)">
+
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>%</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condItem.percent" required>
+                            <input autocomplete="off" type="number" max="{{max}}"  ng-disabled="$parent.enabled || max<=0" ng-model="condItem.percent" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Dias</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condItem.days" required>
+                            <input autocomplete="off" ng-disabled="$parent.enabled || max<=0" ng-model="condItem.days" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Condicion</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="condItem.condit" ng-disabled="$parent.enabled" required md-no-ink>
+                            <md-select ng-disabled="$parent.enabled || max<=0" ng-model="condItem.condit" ng-disabled="$parent.enabled" required md-no-ink>
                                 <md-option ng-repeat="cond in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},]" value="{{cond.name}}">
                                     {{cond.name}}
                                 </md-option>

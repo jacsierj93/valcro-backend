@@ -1,5 +1,6 @@
 <md-sidenav layout="row" style="top: calc(100% - 144px); height: 96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
     <!-- OK   ############################################################################################## -->
+    <input id="test" type="hidden" md-autofocus> <!-- set autofocus a campo hidden para evitar perdida de focus en campo actual-->
     <div class="alertBox alertOkColor" flex ng-show="alerts.ok.length > 0" layout="row">
         <div class="alertPrevArrow" ng-click="alertPrev('ok')" ng-show="alerts.ok.length > 1"></div>
         <md-tabs class="alertContainer" layout="column" md-selected="selected.ok" flex>

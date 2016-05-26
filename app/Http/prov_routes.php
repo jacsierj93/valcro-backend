@@ -40,3 +40,5 @@ $app->get("provider/provCountries/{id}",'Providers\ProvidersController@provCount
 $app->get("provider/prodTimes/{id}",'Providers\ProvidersController@getProdTime');//obtener tiempos de produccion
 $app->get("provider/transTimes/{id}",'Providers\ProvidersController@getTimeTrans');//obtener tiempos de transito
 $app->get("provider/payConditions/{id}",'Providers\ProvidersController@getConditions');//obtener tiempos de transito
+
+$app->post("provider/delAddr",'Providers\ProvidersController@delProvDir');//guarda el items de una condicion de pago

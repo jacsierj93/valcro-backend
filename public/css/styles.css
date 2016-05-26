@@ -61,6 +61,11 @@ md-sidenav {
     max-width: 100% !important;
 }
 
+md-sidenav#lyrAlert {
+    background-color: transparent !important;
+}
+
+
 /*==================================================*/
 /*==================================================*/
 md-input-container {
@@ -353,13 +358,13 @@ md-chips .md-chips.md-focused{
     background-position: center center;
 }
 .alertOkColor{
-    background-color:rgba(255,239,0,0.9);
+    background-color:rgba(255,239,0,0.7);
 }
 .alertAlertColor{
-    background-color: rgba(245,171,0,0.9);
+    background-color: rgba(245,171,0,0.7);
 }
 .alertErrorColor{
-    background-color: rgba(255,50,0,0.9);
+    background-color: rgba(255,50,0,0.7);
 }
 .alertInfoColor{
     background-color: rgba(0,0,0,0.2);
@@ -373,17 +378,28 @@ md-chips .md-chips.md-focused{
 }
 .alertTextContent{
     overflow-y: auto;
-    height: 72px;
+    height: 63px;
     width: 100%;
     text-align: center;
+    padding-top: 8px;
 }
 .alertTextOpcs{
     height: 24px;
     width: 100%;
     text-align: center;
+
+}
+
+.alertTextOpcs>div{
+    border-top: 1px solid rgba(255,255,255,0.4);
+    padding-top: 3px;
+}
+.alertTextOpcs>div:not(:last-child){
+    border-right: 1px solid rgba(255,255,255,0.4);
 }
 .alertTextOpcs>div:hover{
     background-color: rgba(0,0,0,0.2);
+    color:#fff;
 }
 .alertTextOpcs>div:active{
     background-color: rgba(255,255,255,0.2);
@@ -731,8 +747,8 @@ md-pagination-wrapper {
 }
 
 .rowSel>div{
-    border-bottom-color: rgb(84, 180, 234);
-    color: rgb(84, 180, 234);
+    /*border-bottom-color: rgb(84, 180, 234);
+    color: rgb(84, 180, 234);*/
     font-weight: bolder !important;
 }
 
@@ -741,15 +757,6 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-/*
-#valcroName:not(.md-input-invalid) .md-input {
-    border-color: rgb(84, 180, 234) !important;
-    !*border-color: #ffffff !important;*!
-}
-
-#valcroName:not(.md-input-invalid) label {
-    color: rgb(84, 180, 234);
-}*/
 
 .title_error{
     color:rgb(221,44,0) !important;
@@ -772,6 +779,27 @@ input[type=number]::-webkit-outer-spin-button {
     margin-top: 8px;
     float: left;
     border: 1px solid #ccc;
+}
+
+.itemName>.rm{
+    color:#000 !important;
+}
+.rm:hover{
+    color:red !important;
+}
+
+.coinDiv
+{
+    width:24px;
+    height:24px;
+    border-radius:250px;
+    font-size:15px;
+    color:#ccc;
+    line-height:24px;
+    text-align:center;
+    background:#fff;
+    border: 2px solid gold;
+    margin-right: 8px;
 }
 
 

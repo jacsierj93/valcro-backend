@@ -112,6 +112,12 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function delProvDir(request $req){
+        $result = array("success" => "Registro borrado con éxito", "action" => "del","id"=>"$req->id");
+        Address::destroy($req->id);
+        return $result;
+    }
+
     public function listProvAddr($id)
     {
         if($id){

@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut','ui.mask', 'ui.utils.masks'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut'/*,'ui.mask', 'ui.utils.masks'*/];
 var MyApp = angular.module('MyApp', dependency);
 
 
@@ -25,8 +25,36 @@ var MyApp = angular.module('MyApp', dependency);
     $routeProvider
         .when('/home',  {templateUrl:"modules/home"})
 }]);*/
+MyApp.directive('info', function($timeout,setNotif) {
+    var old ={element:"",info:""};
+    var ref = false;
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            element.bind("blur", function(e) {
+                $timeout(function() {
+                    setNotif.hideByContent("info",attrs.info);
+                }, 0);
 
-var INTEGER_REGEXP = /^\-?\d+$/;
+            });
+            element.bind("focus", function(e) {
+                    $timeout(function() {
+                        if(old.element!=element[0]){
+                            setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                            old.element = element[0];
+                            old.info = attrs.info;
+                        }
+                        $timeout.cancel(ref);
+                        ref = $timeout(function() {
+                            old ={element:"",info:""};
+                        },30000);
+
+                    }, 0);
+            })
+        }
+    }
+});
+
 MyApp.directive('duplicate', function($filter,$q,$timeout) {
 
     return {

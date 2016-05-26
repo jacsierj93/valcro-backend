@@ -48,8 +48,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
 
     $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length'], function(newValues,old) {
-        open = false;
-        prev = false;
+        var open = false;
+        var prev = false;
         angular.forEach(newValues, function(v, k) {
             if(v > 0 ){
                 open = true;
@@ -82,15 +82,25 @@ MyApp.service("setNotif",function($filter,$timeout){
             return list;
         },
         addNotif : function(obj,mnsg,opcs,param){
-            var Self = this;
-            var uid = Math.random();
-            list[obj].unshift({title:"", content: mnsg, opcs: opcs, uid:uid, param:param});
-            if(param && "autohidden" in param){
-                $timeout(function(){
-                    list[obj].splice(list[obj].indexOf($filter("customFind")(list[obj],uid,function(current,compare){return current.uid == compare})[0]),1);
-                }, param.autohidden);
+            if($filter("customFind")(list[obj],mnsg,function(current,compare){return current.content == compare}).length<=0) {
+                var Self = this;
+                var uid = Math.random();
+                list[obj].unshift({title: "", content: mnsg, opcs: opcs, uid: uid, param: param});
+                if (param && "autohidden" in param) {
+                    list[obj][0].timeOut = $timeout(function () {
+                        list[obj].splice(list[obj].indexOf($filter("customFind")(list[obj], uid, function (current, compare) {
+                            return current.uid == compare
+                        })[0]), 1);
+                    }, param.autohidden);
+                }
             }
-
+        },
+        hideByContent: function(type,content){
+            var noti = $filter("customFind")(list[type],content,function(current,compare){return current.content == compare});
+            if(noti.length>0){
+                $timeout.cancel(noti[0].timeOut);
+                list[type].splice(list[type].indexOf(noti[0]),1);
+            }
 
         }
     }
