@@ -107,8 +107,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
         if(pedido && /*!$scope.selecPed &&*/ $scope.preview){
             $scope.pedidoSelec=pedido;
-            if($scope.layer !='detallePedido' ){
-                openLayer("detallePedido");
+            if($scope.layer !='resumnenPedido' ){
+                openLayer("resumnenPedido");
             }
         }
     }
@@ -116,7 +116,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     $scope.hoverLeave= function(){
 
         $timeout(function(){
-            if($scope.preview && $scope.layer== 'detallePedido'){
+            if($scope.preview && $scope.layer== 'resumnenPedido'){
                 $scope.closeLayer();
                 $scope.hoverPreview(false);
             }
@@ -220,11 +220,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
         var curren = $scope.layer;
-        switch (curren) {
+       /* switch (curren) {
             case 'detallePedido':
                 openLayer('agrPed');
                 break;
-        }
+        }*/
     }
 
     $scope.showNext = function (status) {
@@ -468,30 +468,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
         if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                openLayer('detallePedido');ue
+                openLayer('resumnenPedido');ue
                 loadPedido(pedido.id);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
             }
-        }else  if(!pedido && $scope.index <2){
-            if (segurity('newPedido')) {
-                restore("pedidoSelec");
-                openLayer('detallePedido');
-                if($scope.provSelec.id != '' &&
-                    typeof($scope.provSelec.id) !== 'undefined'){
-                    loadCoinProvider($scope.provSelec.id);
-                    loadCountryProvider($scope.provSelec.id);
-                    loadPaymentCondProvider($scope.provSelec.id);
-                }
-
-                $scope.formBlock=false;
-            }
-        }else {
-
         }
-        $scope.FormdetallePedido.$setPristine();
-
     }
 
     function closeLayer(opt) {

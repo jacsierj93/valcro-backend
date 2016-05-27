@@ -39,33 +39,33 @@
 
                     <div layout="row" style="height: 40px;">
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival0" >
-                                {{item.llega0}}
+                            <div layout layout-align="center center" class="dot-item emit100" >
+                                {{item.emit100}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival7" >
-                                {{item.llega7}}
+                            <div layout layout-align="center center" class="dot-item emit90" >
+                                {{item.emit90}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival30">
-                                {{item.llega30}}
+                            <div layout layout-align="center center" class="dot-item emit60">
+                                {{item.emit60}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival60" >
-                                {{item.llega60}}
+                            <div layout layout-align="center center" class="dot-item emit30" >
+                                {{item.emit30}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival90" >
-                                {{item.llega90}}
+                            <div layout layout-align="center center" class="dot-item emit7" >
+                                {{item.emit7}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival100">
-                                {{item.llega100}}
+                            <div layout layout-align="center center" class="dot-item emit0">
+                                {{item.emit0}}
                             </div>
                         </div>
                     </div>
@@ -127,9 +127,9 @@
 
             <div flex layout="row">
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"closeLayer()","ng-show"=>"(index>0)")) ?>
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-show"=>"(index>0)")) ?>
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
@@ -177,7 +177,7 @@
                                 <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)">
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
-                                         class="arrival{{item.llegada}}"></div>
+                                         class="emit{{item.diasEmit}}"></div>
                                 </div>
                                 <div flex="10" layout="row" class="cellGrid cellGridImg" ng-mouseover="hoverPreview()" style="float: left;">
                                     <div  ng-show="item.aero == 1 " style="margin-right: 8px;"><?= HTML::image("images/aereo.png") ?> </div>
@@ -197,230 +197,22 @@
         <!-- ########################################## LAYER RESUMEN PEDIDO   ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumnenPedido" id="resumnenPedido">
             <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
-            <md-content  layout="row" flex style="height: 100%;" >
+            <md-content  layout="row" flex style="height: 100%;"  ng-class="{'preview': preview }" flex ng-mouseover="hoverPreview(false)" >
                 <!--  ##########################################  DIV BUT ########################################## -->
                 <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'listPedido')}"
                      ng-show="(layer != 'resumnenPedido')"
                      ng-click="closeLayer('resumnenPedido')">
-
                 </div>
-                <div  layout="column" flex="">
-                    <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
-                        <div>
-                            Pedidos : <span style="color: #000;">{{provSelec.razon_social}}</span>
-                        </div>
-                    </div>
-                    <div layout="row" class="headGridHolder">
-                        <div class="headGrid cellEmpty"> </div>
-                        <div flex="5" class="headGrid"> - </div>
-                        <div flex="10" class="headGrid"> N° Pedido</div>
-                        <div flex="15" class="headGrid"> N° Proforma</div>
-                        <div flex="10" class="headGrid"> Fecha</div>
-                        <div flex="5" class="headGrid"> </div>
-                        <div flex="10" class="headGrid"> Transporte</div>
-                        <div flex="15" class="headGrid"> N° Factura</div>
-                        <div flex class="headGrid"> Monto</div>
-                        <div flex class="headGrid"> Comentario</div>
-                    </div>
-                    <div class="gridContent" ng-mouseleave="hoverLeave()" >
-                        <div   ng-repeat="item in provSelec.pedidos" ng-click="DtPedido(item)">
-                            <div layout="row" class="cellGridHolder" >
-                                <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  > </div>
-                                <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.tipo}}</div>
-                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
-                                <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
-                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
-                                <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)">
-                                    <div style="width: 16px; height: 16px; border-radius: 50%"
-                                         class="arrival{{item.llegada}}"></div>
-                                </div>
-                                <div flex="10" layout="row" class="cellGrid cellGridImg" ng-mouseover="hoverPreview()" style="float: left;">
-                                    <div  ng-show="item.aero == 1 " style="margin-right: 8px;"><?= HTML::image("images/aereo.png") ?> </div>
-                                    <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
-                                </div>
-                                <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
-                                <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.monto | currency :item.symbol :2}}</div>
-                                <div flex class="cellGrid" ng-mouseover="hoverPreview(true)">{{item.comentario}}</div>
-                            </div>
-                        </div>
-                    </div>
+                <div flex="30">
 
                 </div>
             </md-content>
-        </md-sidenav>
-
-
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0">
-            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
-                <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
-                <div layout="column" flex style="margin-right:8px;">
-                    <div class="titulo_formulario" style="height:39px;">
-                        <div>
-                            Proveedor
-                        </div>
-                    </div>
-                    <div style="height:39px;">
-                        <div class="textResm" style="width:calc(70% - 8px); height:39px; float:left;">
-                            {{prov.razon_social}}
-
-                        </div>
-
-                        <div class="textResm" style="width:calc(30% - 8px); height:39px; float:left;">
-                            {{prov.siglas}}
-                        </div>
-                    </div>
-                    <div class="titulo_formulario" style="height:39px;" layout-align="start start">
-                        <div>
-                            Nombres Valcro
-                        </div>
-                    </div>
-                    <div flex style="overflow-y:auto;">
-                        <div class="itemName" ng-repeat="name in prov.nomValc">
-                            {{name.nombre}}
-                        </div>
-                    </div>
-                    <div class="titulo_formulario" style="height:39px;">
-                        <div>
-                            Tipo de envio
-                        </div>
-                    </div>
-                    <div style="height:39px;">
-                        <div flex>
-                            <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
-                            <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />
-                        </div>
-                    </div>
-
-                    <div class="titulo_formulario" style="height:39px;">
-                        <div>
-                            Tiempos Estimados
-                        </div>
-                    </div>
-                    <div style="height:24px;">
-                        Produccion:
-                    </div>
-                    <div flex style="overflow-y: auto;">
-                        <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposP">
-                            de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
-                        </div>
-                    </div>
-                    <div style="height:24px;">
-                        Transito:
-                    </div>
-                    <div flex style="overflow-y: auto;">
-                        <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposT">
-                            de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> desde <b>{{tiempo.country.short_name}}</b>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
-                <div layout="column" flex style="margin-right:8px;">
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Direcciones
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="direccion in prov.direcciones" style="height: 60px; width:100%;">
-                                <div style="width: 30%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis; font-weight:bold;">
-                                    {{direccion.tipo.descripcion}}
-                                </div>
-                                <div style="width: 70%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                    {{direccion.country.short_name}}
-                                </div>
-                                <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                    {{direccion.direccion}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Contactos
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="contact in prov.contacts" style="height: 39px;">
-                                <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                    <span style="font-weight: bold !important; float:left;">{{contact.nombre}}: </span>
-                                    <span style="float:left;" ng-repeat="cargo in contact.cargos">{{cargo.cargo}},</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
-                <div layout="column" flex>
-                    <div style="height:78px;">
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Monedas
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="moneda in prov.monedas" style="float:left; height:24px;">
-                                <span style="font-weight:bold;">{{moneda.nombre}} &nbsp;</span>({{moneda.simbolo}})
-                            </div>
-                        </div>
-                    </div>
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Puntos
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="point in prov.monedas" ng-show="point.pivot.punto">
-                                <div style="width: 30%; float:left;">{{point.nombre}}</div>
-                                <div style="width: 70%; float:left;">{{point.pivot.punto}} {{point.simbolo}}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;" ng-class="{'title_error' : (prov.limCred.length < 1)}">
-                            <div>
-                                Limites de Credito
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="lim in prov.limites" style="width: 100%;">
-                                <div style="width: 30%; float:left;">{{lim.moneda.nombre}}</div>
-                                <div style="width: 70%; float:left;">{{lim.limite}} {{lim.moneda.simbolo}}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Cuentas Bancarias
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height:calc(100% - 39px); posi">
-                            <div ng-repeat="bank in prov.banks" style="width: 100%;">
-                                <div style="width: 100%; height:24px; font-weight:bold;">{{bank.banco}}</div>
-                                <div style="width: 100%; height:24px;">{{bank.cuenta}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </md-content>
-            <div style="width: 16px;" ng-mouseover="showNext(true,'layer1')">
-
-            </div>
-
         </md-sidenav>
 
 
         <!-- 11) ########################################## LAYER (2) FORMULARIO INFORMACION DEL pedido ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido" id="detallePedido">
-            <md-content  layout="column" ng-class="{'preview': preview }" layout-padding flex ng-mouseover="hoverPreview(false)" >
+            <md-content  layout="column" >
 
                 <form name="FormdetallePedido">
 
