@@ -668,6 +668,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         $http.get("Order/OrderDataForm").success(function (response) {
             $scope.formData.motivoPedido=response.motivoPedido;
             $scope.formData.tipo= response.tipoPedido;
+            $scope.filterData.tipoPedidos=response.tipoPedido;
             $scope.formData.prioridadPedido=response.prioridadPedido;
             $scope.formData.condicionPedido=response.condicionPedido;
             $scope.formData.estadoPedido=response.estadoPedido;

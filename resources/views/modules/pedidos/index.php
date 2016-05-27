@@ -4,7 +4,8 @@
     <div class="contentHolder" layout="row" flex>
 
         <div class="barraLateral" layout="column">
-            <div id="menu" layout="column" layout-align="start none" class="md-whiteframe-1dp" style="height: 48px; overflow-x: hidden; background-color: #f1f1f1">
+            <div id="menu" layout="column" layout-align="start none" class="md-whiteframe-1dp"
+                 style="height: 48px; overflow: hidden; background-color: #f1f1f1">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div layout="row" layout-align="start center" class="menu" >
                     <div flex layout-align="center center" >
@@ -14,20 +15,24 @@
                         <?= HTML::image("images/btn_nextArrow.png") ?>
                     </div>
                 </div>
-                <div  layout="column"  class="menuFilter" style="height: 168px;">
-                    <md-input-container class="md-block" flex="15">
+                <div   class="menuFilter" style="height: 168px;">
+                    <md-input-container class="md-block" style="height: 39px;">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
-                    <md-input-container class="md-block" flex="15">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container> <md-input-container class="md-block" flex="15">
+                    <md-input-container class="md-block" style="height: 39px;">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
+                    <md-input-container class="md-block" style="height: 39px;">
+                        <label>Buscar</label>
+                        <input  type="text">
+                    </md-input-container>
+
                 </div>
-                <div flex=""></div>
+                <div flex>
+
+                </div>
                 <div layout="row" layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
             </div>
 
@@ -88,7 +93,8 @@
         </div>
 
 
-        <div layout="column" flex class="md-whiteframe-1dp">
+        <div layout="column"flex class="md-whiteframe-1dp">
+
             <div class="botonera" layout="row" layout-align="start center">
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
@@ -100,36 +106,34 @@
                 </div>
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
 
-                <div layout="row" flex ng-show="(layer == 'listPedido')" style="height: 24px;">
-                    <md-input-container class="md-block" flex="20" layout-align="center center">
-                        <label>Tipo de Pedido</label>
-                        <md-select ng-model="filterOption.tipo_pedido_id" >
-                            <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
+                <div layout="row" ng-show="(layer == 'listPedido')" >
+                    <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                         layout-align="center center" ng-repeat="item in filterData.tipoPedidos"  >
+                        {{item.tipo}}
+                    </div>
+                    <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                         layout-align="center center"  >
+                        Todos
+                    </div>
+                    <md-input-container class="md-block" layout-align="center center"  >
+                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink >
+                            <md-option ng-repeat="item in filterData.tipoPedidos" >
                                 {{item.tipo}}
                             </md-option>
-                            <md-option value="-1">
+                            <md-option value ="-1">
                                 Todos
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <div layout="row" flex="20">
-                        <md-input-container class="md-block" >
-                            <label>Min N° Pedido</label>
-                            <input  ng-model="filterOption.min_id" ui-number-mask="0" type="text">
-                        </md-input-container>
-                        <md-input-container class="md-block" >
-                            <label>Max N° Pedido</label>
-                            <input  ng-model="filterOption. max_id" ui-number-mask="0" type="text">
-                        </md-input-container>
-                    </div>
                 </div>
             </div>
+
 
             <div flex layout="row">
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
                 <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-show"=>"(index>0)")) ?>
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-show"=>"(index >0)")) ?>
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
