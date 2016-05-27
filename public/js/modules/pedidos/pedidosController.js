@@ -87,10 +87,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
     $scope.FilterLateralMas = function(){
         if(!$scope.showLateralFilterCpl){
-            jQuery("#menu").animate({height:"100%"},400);
+            jQuery("#menu").animate({height:"60%"},400);
             $scope.showLateralFilterCpl=true;
             $scope.TextLateralFilter="Menos Opciones";
-
         }else {
             jQuery("#menu").animate({height:"232px"},400);
             $scope.showLateralFilterCpl=false;

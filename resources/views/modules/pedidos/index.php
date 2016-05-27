@@ -4,31 +4,30 @@
     <div class="contentHolder" layout="row" flex>
 
         <div class="barraLateral" layout="column">
-            <div id="menu" layout="column" layout-align="start none" class="md-whiteframe-1dp"
-                 style="height: 48px; overflow: hidden; background-color: #f1f1f1">
+            <div id="menu" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
                 <!-- 3) ########################################## MENU ########################################## -->
-                <div layout="row" layout-align="start center" class="menu" >
-                    <div flex layout-align="center center" >
+                <div class="menu" style="height: 48px; width: 100%;">
+                    <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
                         Menu
                     </div>
-                    <div layout="column" style="width: 48px; height: 48px;" layout-align="center center" ng-click="FilterLateral()" >
-                        <?= HTML::image("images/btn_nextArrow.png") ?>
+                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateral()">
+                        <img src="images/Down.png">
+                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
-                <div   class="menuFilter" style="height: 168px;">
-                    <md-input-container class="md-block" style="height: 39px;">
+                <div class="menuFilter" style="height: 90px;">
+                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
-                    <md-input-container class="md-block" style="height: 39px;">
+                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
-                    <md-input-container class="md-block" style="height: 39px;">
+                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
-
                 </div>
                 <div flex>
 
