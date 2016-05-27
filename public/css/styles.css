@@ -809,9 +809,13 @@ input[type=number]::-webkit-outer-spin-button {
     display:none;
 }
 
+/**********************EDITADO POR MIGUEL 27/05/2016****************************/
+md-datepicker{
+    background-color: transparent;
+}
 /**********************EDITADO POR MIGUEL 14/05/2016****************************
 *********************************************************************************
-**** CLASE QUE DIBUJA dop en los item de lista lateral  ***
+**** CLASE QUE DIBUJA dot en los item de lista lateral  ***
 ********************************************************************************/
 .dot-item {
     width: 20px;

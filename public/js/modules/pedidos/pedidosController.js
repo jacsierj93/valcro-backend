@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNotif) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORDER, setNotif) {
 
     var historia = [15];
     var autohidden= 2000;
@@ -14,8 +14,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
     $scope.TextLateralFilter="Mas Opciones";
-    $scope.viewMode=false;
     $scope.selecPed=false;
+    $scope.preview=false;
 
 
 
@@ -105,34 +105,26 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
 
     $scope.hoverpedido= function(pedido){
 
-        if(pedido && $scope.viewMode){
+        if(pedido && /*!$scope.selecPed &&*/ $scope.preview){
             $scope.pedidoSelec=pedido;
             if($scope.layer !='detallePedido' ){
                 openLayer("detallePedido");
             }
         }
-
-        if(!pedido ){
-            $scope.Preview=false;
-        }
     }
 
+    $scope.hoverLeave= function(){
 
-    $scope.$watch('viewMode', function (newVal) {
-        console.log('preview', newVal )
-        if(!newVal && !$scope.selecPed){
-            closeLayer('listPedido');
-        }
-    });
-   /* $scope.$watch('Preview', function(newVal){
-        if(!newVal && !$scope.selecPed){
-            closeLayer('listPedido');
-        }
-    })*/
-
-
-    $scope.hoverActivePreview= function(){
-        $scope.Preview=true;
+        $timeout(function(){
+            if($scope.preview && $scope.layer== 'detallePedido'){
+                $scope.closeLayer();
+                $scope.hoverPreview(false);
+            }
+        }, 20);
+    }
+    $scope.hoverPreview= function(val){
+        $scope.preview=val;
+        console.log('preview ', val);
     }
 
     $scope.updateForm = function () {
@@ -477,7 +469,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
         if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
                 openLayer('detallePedido');ue
-                $scope.selecPed=true;
                 loadPedido(pedido.id);
             }
             else {
