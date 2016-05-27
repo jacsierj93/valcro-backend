@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Providers;
+use App\Models\Sistema\Point;
 use App\Models\Sistema\ProviderCreditLimit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -233,6 +234,12 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function delProvContact(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        Provider::find($req->prov_id)->contacts()->detach($req->id);
+        return $result;
+    }
+
     public function getBank($id){
         if((bool)$id){
             $accounts = Provider::find($id)->bankAccount()->get();
@@ -264,6 +271,12 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function delInfoBank(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        Bank::destroy($req->id);
+        return $result;
+    }
+
     public function getCoins($id){
         if((bool)$id) {
             $coins = Provider::find($id)->getProviderCoin()->get();
@@ -279,7 +292,7 @@ class ProvidersController extends BaseController
 
     public function delCoin(request $req){
         if(!Provider::find($req->prov_id)->getProviderCoin()->find($req->id)){
-            Provider::find($req->prov_id)->getProviderCoin()->dettach($req->id);
+            Provider::find($req->prov_id)->getProviderCoin()->detach($req->id);
         }
     }
 
@@ -320,6 +333,12 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function delLimCred(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        limCred::destroy($req->id);
+        return $result;
+    }
+
     public function getConditions($id){
         if((bool)$id) {
             $conditions = Provider::find($id)->getPaymentCondition()->get();
@@ -347,6 +366,13 @@ class ProvidersController extends BaseController
         $result['id']=$cond->id;
         return $result;
     }
+
+    public function delHeadCondition(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        ProviderCondPay::destroy($req->id);
+        return $result;
+    }
+
 
     public function saveItemCond(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
@@ -401,10 +427,46 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function delConvFact(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        FactConv::destroy($req->id);
+        return $result;
+    }
+
     public function savePoint(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
-        $point = Provider::find($req->id_prov)->getProviderCoin()->updateExistingPivot($req->coin,["punto"=>$req->cost]);
+        if($req->id){
+            $point = Point::find($req->id);
+            $result['action']="upd";
+        }else{
+            $point = new Point();
+        }
+
+        $point->prov_id = $req->id_prov;
+        $point->moneda_id = $req->coin;
+        $point->linea_id = $req->line;
+        $point->costo = $req->cost;
+        $point->save();
+        $result['id']=$point->id;
         return $result;
+    }
+
+    public function delPoint(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        Point::destroy($req->id);
+        return $result;
+    }
+
+    public function getPoints($id){
+        if($id) {
+            $points = Provider::find($id)->points()->get();
+            foreach($points as $pnt){
+                $pnt->moneda;
+                $pnt->linea;
+            }
+
+            return ($points)?$points:false;
+        }
     }
 
     public function provCountries($id){

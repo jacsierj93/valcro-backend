@@ -37,8 +37,15 @@ $app->get("provider/listCoin/{id}",'Providers\ProvidersController@assignCoin');/
 $app->get("provider/provLimits/{id}",'Providers\ProvidersController@getCreditLimits');//obtener limites de creditos asignados al proveedor
 $app->get("provider/provFactors/{id}",'Providers\ProvidersController@getFactorConvers');//obtener factores de conversion asignados al proveedor
 $app->get("provider/provCountries/{id}",'Providers\ProvidersController@provCountries');//obtener paises asignados al proveedor en direcciones
+$app->get("provider/provPoint/{id}",'Providers\ProvidersController@getPoints');//obtener los puntos asignados
 $app->get("provider/prodTimes/{id}",'Providers\ProvidersController@getProdTime');//obtener tiempos de produccion
 $app->get("provider/transTimes/{id}",'Providers\ProvidersController@getTimeTrans');//obtener tiempos de transito
 $app->get("provider/payConditions/{id}",'Providers\ProvidersController@getConditions');//obtener tiempos de transito
 
-$app->post("provider/delAddr",'Providers\ProvidersController@delProvDir');//guarda el items de una condicion de pago
+$app->post("provider/delAddr",'Providers\ProvidersController@delProvDir');//elimina una direccion de proveedor
+$app->post("provider/delContac",'Providers\ProvidersController@delProvContact');//desvicula un contacto de un proveedor
+$app->post("provider/delBank",'Providers\ProvidersController@delInfoBank');//desvicula un contacto de un proveedor
+$app->post("provider/delLimCred",'Providers\ProvidersController@delLimCred');//desvicula un contacto de un proveedor
+$app->post("provider/delFactor",'Providers\ProvidersController@delConvFact');//desvicula un contacto de un proveedor
+$app->post("provider/delCondition",'Providers\ProvidersController@delHeadCondition');//desvicula un contacto de un proveedor
+$app->post("provider/delPoint",'Providers\ProvidersController@delPoint');//desvicula un contacto de un proveedor

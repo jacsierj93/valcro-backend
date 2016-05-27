@@ -579,13 +579,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
             }
         }
-    }
+    };
 
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
         $scope.$parent.expand =(sel)?"provAddrsControllers":false;
 
-    }
+    };
 
 
 });
@@ -892,7 +892,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var contact = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave"], function(nuevo) {
-        if((nuevo[0] && !nuevo[1]) || nuevo[2]) {
+        if(((nuevo[0] && !nuevo[1])) || nuevo[2]) {
 
             if(!$scope.cnt.id && $filter("customFind")($scope.allContact,$scope.cnt.emailCont,function(val,compare){return val.email == compare;}).length>0){
                 setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
@@ -915,6 +915,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     contact.languages = $scope.cnt.languaje;
                     contact.cargos = $scope.cnt.cargo;
                     if (data.action == "new" || nuevo[2]) {
+                        $scope.cnt.autoSave = false;
                         $scope.contacts.unshift(contact);
                         setGetContac.addUpd(contact,angular.copy($scope.prov));
                         setNotif.addNotif("ok", "contacto añadido", [
@@ -925,10 +926,34 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         }
     });
 
+    $scope.rmContact = function(elem){
+        setNotif.addNotif("alert", "desea desvincular este Contacto del proveedor?", [
+            {
+                name: "SI",
+                action: function () {
+                    cont = elem.cont;
+                    providers.put({type:"delContac"},cont,function(data){
+                        $scope.contacts.splice(cont.$index,1);
+                        setGetContac.addUpd(cont,$scope.prov);
+                        contact = {};
+                        setGetContac.setContact(false);
+                        $scope.provContactosForm.$setUntouched();
+                        setNotif.addNotif("ok", "Contacto desviculado!", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
+
 
 
     $scope.showGrid = function(elem,event){
-        console.log("entroo en showgrid")
         if((jQuery(event.toElement).parents("#contactBook").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
             $scope.isShow = elem;
             if(!elem){
@@ -944,10 +969,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     };
 
     $scope.viewExtend = function(sel){
-        console.log($scope.$parent);
         $scope.isShowMore = sel;
         $scope.$parent.expand =(sel)?"contactProv":false;
-        console.log($scope.$parent);
     };
 
     $scope.book=function(){
@@ -972,11 +995,12 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
             {
                 name:"si",
                 action:function(){
-                    contact = element.cont;
-                    contact.agente = 1;
-                    contact.autoSave =true;
-                    contact.prov_id = $scope.prov.id;
-                    setGetContac.setContact(contact);
+                    console.log("entro")
+                    var contact2 = element.cont;
+                    contact2.agente = 1;
+                    contact2.autoSave =true;
+                    contact2.prov_id = $scope.prov.id;
+                    setGetContac.setContact(contact2);
                     $mdSidenav("contactBook").close();
                 }
             },
@@ -1024,7 +1048,12 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
 
             var contact = $filter("customFind")(listCont,cont.id,function(val,compare){return  val.id == compare;});
             if(contact.length>0){
-                contact[0].provs.push({"prov_id":prov.id,"prov":prov.siglas});
+                var provs = $filter("customFind")(contact[0].provs,prov.id,function(val,compare){return  val.prov_id == compare;});
+                if(provs.length>0){
+                    contact[0].provs.splice(contact[0].provs.indexOf(provs[0]),1);
+                }else{
+                    contact[0].provs.push({"prov_id":prov.id,"prov":prov.siglas});
+                }
             }else{
                 cont.provs = [{"prov_id":prov.id,"prov":prov.siglas}];
                 listCont.push(cont);
@@ -1070,6 +1099,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
 });
 
 MyApp.controller('bankInfoController', function ($scope,masters,providers,setGetProv,setNotif) {
+    $scope.id = "bankInfoController";
     $scope.prov = setGetProv.getProv();
     $scope.countries = masters.query({ type:"getCountries"});
     $scope.$watch('prov.id',function(nvo){
@@ -1112,6 +1142,30 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         }
     });
 
+    $scope.rmBank = function(elem){
+        setNotif.addNotif("alert", "desea eliminar esta informacion bancaria", [
+            {
+                name: "SI",
+                action: function () {
+                    bnk = elem.account;
+                    providers.put({type:"delBank"},bnk,function(data){
+                        $scope.accounts.splice(bnk.$index,1);
+                        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                        account={};
+                        $scope.bankInfoForm.$setUntouched();
+                        setNotif.addNotif("ok", "Informacion Eliminada", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
+
     $scope.toEdit = function(acc){
         //console.log(cred)
         account = acc.account;
@@ -1126,18 +1180,30 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
     };
 
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
-            account={};
-            $scope.bankInfoForm.$setUntouched();
-         }
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
+            $scope.isShow = elem;
+            if(!elem) {
+                $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                account={};
+                $scope.bankInfoForm.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
+            }
+        }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"bankInfoController":false;
     };
 
 });
 
 MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif) {
+    $scope.id="creditCtrl";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
     $scope.$watch('prov.id',function(nvo){
@@ -1176,6 +1242,30 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
 
         }
     });
+
+    $scope.rmCredit = function(elem){
+        setNotif.addNotif("alert", "desea eliminar este limite de Credito", [
+            {
+                name: "SI",
+                action: function () {
+                    cred = elem.lim;
+                    providers.put({type:"delLimCred"},cred,function(data){
+                        $scope.limits.splice(cred.$index,1);
+                        $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
+                        credit = {};
+                        $scope.provCred.$setUntouched();
+                        setNotif.addNotif("ok", "Limite de Credito borrado", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
     $scope.toEdit = function(cred){
         //console.log(cred)
         credit = cred.lim;
@@ -1187,17 +1277,31 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         console.log($scope.cred);
     };
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.cred = {id:false,coin:"",amount:"",line:"",id_prov: $scope.prov.id};
-            credit = {};
-            $scope.provCred.$setUntouched();
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
+            $scope.isShow = elem;
+            if(!elem) {
+                $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
+                credit = {};
+                $scope.provCred.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
+
+            }
         }
-    }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"creditCtrl":false;
+    };
+
 });
 
 MyApp.controller('convController', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif) {
+    $scope.id = "convController";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
     $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",id_prov: $scope.prov.id||0};
@@ -1236,9 +1340,31 @@ MyApp.controller('convController', function ($scope,providers,setGetProv,$filter
 
         }
     });
+    $scope.rmConv = function(elem){
+        setNotif.addNotif("alert", "desea eliminar este Factor de conversion", [
+            {
+                name: "SI",
+                action: function () {
+                    conv = elem.factor;
+                    providers.put({type:"delFactor"},conv,function(data){
+                        $scope.factors.splice(conv.$index,1);
+                        $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
+                        factor = {};
+                        $scope.provConv.$setUntouched();
+                        setNotif.addNotif("ok", "Factor Borrado", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
 
     $scope.toEdit = function(fact){
-        //console.log(cred)
         factor = fact.factor;
         $scope.conv.id = factor.id;
         $scope.conv.id_prov = factor.prov_id;
@@ -1250,50 +1376,110 @@ MyApp.controller('convController', function ($scope,providers,setGetProv,$filter
         $scope.conv.line = factor.linea_id;
     };
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
-            factor = {};
-            $scope.provConv.$setUntouched();
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
+            $scope.isShow = elem;
+            if(!elem) {
+                $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
+                factor = {};
+                $scope.provConv.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
+            }
         }
-    }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"convController":false;
+    };
 });
 
-MyApp.controller('provPointController', function ($scope,providers,setGetProv,listCoins) {
+MyApp.controller('provPointController', function ($scope,providers,setGetProv,listCoins,masterLists,$filter,setNotif    ) {
+    $scope.id = "provPointController";
     $scope.prov = setGetProv.getProv();
+    $scope.lines = masterLists.getLines();
     $scope.$watch('prov.id',function(nvo){
         $scope.coins = (nvo)?listCoins.getCoins():[];
-        $scope.pnt = {id:false,cost:"",coin:"",id_prov: $scope.prov.id||0};
-        //$scope.points =  providers.query({type:"provPoints",id_prov:$scope.prov.id||0});
+        $scope.pnt = {id:false,cost:"",coin:"",line:"",id_prov: $scope.prov.id||0};
+        $scope.points =  (nvo)?providers.query({type:"provPoint",id_prov:$scope.prov.id||0}):[];
     });
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provPoint.$valid','provPoint.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"savePoint"},$scope.pnt,function(data){
+                $scope.pnt.id = data.id;
                 $scope.provPoint.$setPristine();
-                listCoins.setProv( $scope.prov.id);
-                $scope.coins = listCoins.getCoins();
+                point.moneda_id = $scope.pnt.coin;
+                point.prov_id = $scope.pnt.id_prov;
+                point.costo = $scope.pnt.cost;
+                point.linea_id = $scope.pnt.line;
+                point.moneda = $filter("filterSearch")($scope.coins,[$scope.pnt.coin])[0];
+                point.linea = $filter("filterSearch")($scope.lines,[$scope.pnt.line])[0];
+                if(data.action=="new"){
+                    point.id = $scope.pnt.id;
+                    $scope.points.unshift(point);
+                    setNotif.addNotif("ok", "nuevo valor del punto guardado", [
+                    ],{autohidden:3000});
+                }
             });
         }
     });
 
-    $scope.toEdit = function(element){
-        //console.log(cred)
-        point = element.point;
-        $scope.pnt.coin = point.pivot.moneda_id;
-        $scope.pnt.id_prov = point.pivot.prov_id;
-        $scope.pnt.cost = point.pivot.punto;
-
+    $scope.rmPoint = function(elem){
+        setNotif.addNotif("alert", "desea Borrar este Punto para este proveedor", [
+            {
+                name: "SI",
+                action: function () {
+                    point = elem.point;
+                    providers.put({type:"delPoint"},point,function(data){
+                        $scope.points.splice(point.$index,1);
+                        $scope.pnt = {id: false, cost: "", coin: "", line:"", id_prov: $scope.prov.id};
+                        $scope.provPoint.$setUntouched();
+                        point = {};
+                        setNotif.addNotif("ok", "punto Borrado", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
     };
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.pnt = {id:false,cost:"",coin:"",id_prov: $scope.prov.id};
-            $scope.provPoint.$setUntouched();
+    $scope.toEdit = function(element){
+        point = element.point;
+        $scope.pnt.id = point.id;
+        $scope.pnt.coin = point.moneda_id;
+        $scope.pnt.id_prov = point.prov_id;
+        $scope.pnt.cost = point.costo;
+        $scope.pnt.line = point.linea_id;
+    };
+
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
+            $scope.isShow = elem;
+            if(!elem) {
+                $scope.pnt = {id: false, cost: "", coin: "", line:"", id_prov: $scope.prov.id};
+                $scope.provPoint.$setUntouched();
+                point = {};
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
+            }
         }
-    }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"provPointController":false;
+    };
 });
 
 MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,masterLists,$filter,setNotif) {
@@ -1302,7 +1488,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
     $scope.$watch('prov.id',function(nvo){
         $scope.tp = {id:false,from:"",to:"",line:"",id_prov: $scope.prov.id};
         $scope.timesP =  (nvo)?providers.query({type:"prodTimes",id_prov:$scope.prov.id||0}):[];
-});
+    });
     $scope.$watch('timesP.length',function(nvo){
         setGetProv.setComplete("timesP",nvo);
     });
@@ -1418,6 +1604,7 @@ MyApp.service("setgetCondition",function(){
 })
 
 MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetProv,providers,$filter,setgetCondition,setNotif) {
+    $scope.id="condPayList";
     $scope.lines = masterLists.getLines();
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo) {
@@ -1437,6 +1624,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                 $scope.condHeadFrm.$setPristine();
                 cond.titulo = $scope.condHead.title;
                 cond.linea_id = $scope.condHead.line;
+                cond.prov_id = $scope.condHead.id_prov;
                 cond.line =  $filter("filterSearch")($scope.lines,[$scope.condHead.line])[0];
                 if(data.action=="new"){
                     cond.id = $scope.condHead.id;
@@ -1448,6 +1636,30 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         }
     });
 
+    $scope.rmCond = function(elem){
+        setNotif.addNotif("alert", "desea Borrar toda esta Condicion de pago", [
+            {
+                name: "SI",
+                action: function () {
+                    cond = elem.condition;
+                    providers.put({type:"delCondition"},cond,function(data){
+                        $scope.conditions.splice(cond.$index,1);
+                        $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+                        cond = {};
+                        $scope.condHeadFrm.$setUntouched();
+                        setNotif.addNotif("ok", "Condicion Borrada", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
+
     $scope.toEdit = function(element){
         cond = element.condition;
         $scope.condHead.id = cond.id;
@@ -1456,16 +1668,25 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         $scope.condHead.line = cond.linea_id;
     };
 
-    $scope.showGrid = function(elem){
+    $scope.showGrid = function(elem,event){
         if((jQuery(event.toElement).parents("#payCond").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
             $scope.isShow = elem;
             if(!elem){
                 $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
                 cond = {};
                 $scope.condHeadFrm.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
             }
         }
-    }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"condPayList":false;
+    };
 });
 MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
     $scope.closeCondition = function(){
