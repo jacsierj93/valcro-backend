@@ -199,7 +199,7 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER RESUMEN PEDIDO   ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumnenPedido" id="resumnenPedido">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumnePedido">
             <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
             <md-content  layout="row" flex style="height: 100%;"  ng-class="{'preview': preview }" flex ng-mouseover="hoverPreview(false)" >
                 <!--  ##########################################  DIV BUT ########################################## -->
@@ -207,8 +207,7 @@
                      ng-show="(layer != 'resumnenPedido')"
                      ng-click="closeLayer('resumnenPedido')">
                 </div>
-                <div flex="30">
-
+                <div layout="column" flex style="margin-right:8px;">
                 </div>
             </md-content>
         </md-sidenav>
@@ -1038,7 +1037,7 @@
 
 
         <!-- 14) ########################################## LAYER (5) RESUMEN de Pedido a sustotuir########################################## -->
-        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumenPedido" >
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedidoSus" id="resumenPedidoSus" >
             <!-- ) ########################################## CONTENDOR SECCION PEDIDO SUSTITO ########################################## -->
 
 

@@ -107,8 +107,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
         if(pedido && /*!$scope.selecPed &&*/ $scope.preview){
             $scope.pedidoSelec=pedido;
-            if($scope.layer !='resumnenPedido' ){
-                openLayer("resumnenPedido");
+            if($scope.layer !='resumenPedido' ){
+                openLayer("resumenPedido");
             }
         }
     }
@@ -116,7 +116,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     $scope.hoverLeave= function(){
 
         $timeout(function(){
-            if($scope.preview && $scope.layer== 'resumnenPedido'){
+            if($scope.preview && $scope.layer== 'resumenPedido'){
                 $scope.closeLayer();
                 $scope.hoverPreview(false);
             }
@@ -468,7 +468,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
         if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                openLayer('resumnenPedido');ue
+                openLayer('resumenPedido');ue
                 loadPedido(pedido.id);
             }
             else {
