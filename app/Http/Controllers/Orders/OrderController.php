@@ -60,40 +60,40 @@ class OrderController extends BaseController
             $temp['deuda']= $prv->Order()->sum('monto');
             $temp['puntoCompra']= 0;
             $nCp=0;
-            $nl0=0;
-            $nl7=0;
-            $nl30=0;
-            $nl60=0;
-            $nl90=0;
-            $nl00=0;
+            $nE0=0;
+            $nE7=0;
+            $nE30=0;
+            $nE60=0;
+            $nE90=0;
+            $nE100=0;
 
             $peds=$prv->Order()->get();
 
             foreach($peds as $ped){
-                $arrival=$ped->arrival();
+                $arrival=$ped->daysCreate();
                 $nCp +=$ped->getNumItem(2);
                 if ($arrival == 0) {
-                    $nl0++;
+                    $nE0++;
                 } else if ($arrival == 7) {
-                    $nl7++;
+                    $nE7++;
                 } else if ($arrival == 30) {
-                    $nl30++;
+                    $nE30++;
                 } else if ($arrival == 60) {
-                    $nl60++;
+                    $nE60++;
                 } else if ($arrival == 90) {
-                    $nl90++;
+                    $nE90++;
                 } else if($arrival == 100 ){
-                    $nl00++;
+                    $nE100++;
                 }
 
             }
 
-            $temp['llega0']=$nl0;
-            $temp['llega7']=$nl7;
-            $temp['llega30']=$nl30;
-            $temp['llega60']=$nl60;
-            $temp['llega90']=$nl90;
-            $temp['llega100']=$nl00;
+            $temp['emit0']=$nE0;
+            $temp['emit7']=$nE7;
+            $temp['emit30']=$nE30;
+            $temp['emit60']=$nE60;
+            $temp['emit90']=$nE90;
+            $temp['emit100']=$nE100;
             $temp['contraPedido']= $nCp;
 
             $data[] =$temp;
@@ -211,7 +211,7 @@ class OrderController extends BaseController
             $tem['monto']=$aux->monto;
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-            $tem['llegada']=$aux->arrival();
+            $tem['diasEmit']=$aux->daysCreate();
             $tem['tipo']=$type->where('id',$aux->tipo_pedido_id)->first()->tipo;
             $tem['productos'] = $this->getProductoOrden($aux);
 

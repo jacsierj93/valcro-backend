@@ -4,30 +4,34 @@
     <div class="contentHolder" layout="row" flex>
 
         <div class="barraLateral" layout="column">
-            <div id="menu" layout="column" layout-align="start none" class="md-whiteframe-1dp" style="height: 48px; overflow-x: hidden; background-color: #f1f1f1">
+            <div id="menu" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
                 <!-- 3) ########################################## MENU ########################################## -->
-                <div layout="row" layout-align="start center" class="menu" >
-                    <div flex layout-align="center center" >
+                <div class="menu" style="height: 48px; width: 100%;">
+                    <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
                         Menu
                     </div>
-                    <div layout="column" style="width: 48px; height: 48px;" layout-align="center center" ng-click="FilterLateral()" >
-                        <?= HTML::image("images/btn_nextArrow.png") ?>
+                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateral()">
+                        <img src="images/Down.png">
+                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
-                <div  layout="column"  class="menuFilter" style="height: 168px;">
-                    <md-input-container class="md-block" flex="15">
+                <div class="menuFilter" style="height: 90px;">
+                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
-                    <md-input-container class="md-block" flex="15">
+                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
                         <label>Buscar</label>
                         <input  type="text">
-                    </md-input-container> <md-input-container class="md-block" flex="15">
+                    </md-input-container>
+                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
                         <label>Buscar</label>
                         <input  type="text">
                     </md-input-container>
                 </div>
-                <div flex=""></div>
+                <div flex>
+
+                </div>
                 <div layout="row" layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
             </div>
 
@@ -39,33 +43,33 @@
 
                     <div layout="row" style="height: 40px;">
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival0" >
-                                {{item.llega0}}
+                            <div layout layout-align="center center" class="dot-item emit100" >
+                                {{item.emit100}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival7" >
-                                {{item.llega7}}
+                            <div layout layout-align="center center" class="dot-item emit90" >
+                                {{item.emit90}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival30">
-                                {{item.llega30}}
+                            <div layout layout-align="center center" class="dot-item emit60">
+                                {{item.emit60}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival60" >
-                                {{item.llega60}}
+                            <div layout layout-align="center center" class="dot-item emit30" >
+                                {{item.emit30}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival90" >
-                                {{item.llega90}}
+                            <div layout layout-align="center center" class="dot-item emit7" >
+                                {{item.emit7}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item arrival100">
-                                {{item.llega100}}
+                            <div layout layout-align="center center" class="dot-item emit0">
+                                {{item.emit0}}
                             </div>
                         </div>
                     </div>
@@ -88,7 +92,8 @@
         </div>
 
 
-        <div layout="column" flex class="md-whiteframe-1dp">
+        <div layout="column"flex class="md-whiteframe-1dp">
+
             <div class="botonera" layout="row" layout-align="start center">
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
@@ -100,36 +105,34 @@
                 </div>
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
 
-                <div layout="row" flex ng-show="(layer == 'listPedido')" style="height: 24px;">
-                    <md-input-container class="md-block" flex="20" layout-align="center center">
-                        <label>Tipo de Pedido</label>
-                        <md-select ng-model="filterOption.tipo_pedido_id" >
-                            <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
+                <div layout="row" ng-show="(layer == 'listPedido')" >
+                    <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                         layout-align="center center" ng-repeat="item in filterData.tipoPedidos"  >
+                        {{item.tipo}}
+                    </div>
+                    <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                         layout-align="center center"  >
+                        Todos
+                    </div>
+                    <md-input-container class="md-block" layout-align="center center"  >
+                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink >
+                            <md-option ng-repeat="item in filterData.tipoPedidos" >
                                 {{item.tipo}}
                             </md-option>
-                            <md-option value="-1">
+                            <md-option value ="-1">
                                 Todos
                             </md-option>
                         </md-select>
                     </md-input-container>
-                    <div layout="row" flex="20">
-                        <md-input-container class="md-block" >
-                            <label>Min N° Pedido</label>
-                            <input  ng-model="filterOption.min_id" ui-number-mask="0" type="text">
-                        </md-input-container>
-                        <md-input-container class="md-block" >
-                            <label>Max N° Pedido</label>
-                            <input  ng-model="filterOption. max_id" ui-number-mask="0" type="text">
-                        </md-input-container>
-                    </div>
                 </div>
             </div>
 
+
             <div flex layout="row">
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeLayer()">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"closeLayer()","ng-show"=>"(index>0)")) ?>
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-show"=>"(index >0)")) ?>
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
@@ -142,12 +145,12 @@
             </div>
         </div>
 
-        <!-- ########################################## LAYER (1) lista de pedidos########################################## -->
+        <!-- ########################################## LAYER LISTA DE PEDIDOS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido" id="listPedido">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex style="height: 100%;" >
                 <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'listPedido')}"
-                     ng-show="(layer != 'listPedido' && !viewMode)"
+                     ng-show="(layer != 'listPedido' && !preview)"
                      ng-click="closeTo('listPedido')"></div>
                 <div  layout="column" flex="">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
@@ -167,25 +170,25 @@
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
-                    <div class="gridContent"  >
+                    <div class="gridContent" ng-mouseleave="hoverLeave()" >
                         <div   ng-repeat="item in provSelec.pedidos" ng-click="DtPedido(item)">
                             <div layout="row" class="cellGridHolder" >
                                 <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  > </div>
-                                <div flex="5" class="cellGrid" ng-mouseover="hoverActivePreview()"> {{item.tipo}}</div>
-                                <div flex="10" class="cellGrid" ng-mouseover="hoverActivePreview()"> {{item.id}}</div>
-                                <div flex="15" class="cellGrid" ng-mouseover="hoverActivePreview()"> {{item.nro_proforma}}</div>
-                                <div flex="10" class="cellGrid" ng-mouseover="hoverActivePreview()"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
-                                <div flex="5" class="cellGrid" ng-mouseover="hoverActivePreview()">
+                                <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.tipo}}</div>
+                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
+                                <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
+                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
+                                <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)">
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
-                                         class="arrival{{item.llegada}}"></div>
+                                         class="emit{{item.diasEmit}}"></div>
                                 </div>
-                                <div flex="10" layout="row" class="cellGrid cellGridImg" ng-mouseover="hoverActivePreview()" style="float: left;">
+                                <div flex="10" layout="row" class="cellGrid cellGridImg" ng-mouseover="hoverPreview()" style="float: left;">
                                     <div  ng-show="item.aero == 1 " style="margin-right: 8px;"><?= HTML::image("images/aereo.png") ?> </div>
                                     <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
                                 </div>
-                                <div flex="15" class="cellGrid" ng-mouseover="hoverActivePreview()"> {{item.nro_factura}}</div>
-                                <div flex class="cellGrid" ng-mouseover="hoverActivePreview()"> {{item.monto | currency :item.symbol :2}}</div>
-                                <div flex class="cellGrid" ng-mouseover="hoverActivePreview()">{{item.comentario}}</div>
+                                <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
+                                <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.monto | currency :item.symbol :2}}</div>
+                                <div flex class="cellGrid" ng-mouseover="hoverPreview(true)">{{item.comentario}}</div>
                             </div>
                         </div>
                     </div>
@@ -194,10 +197,24 @@
             </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER RESUMEN PEDIDO   ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumnePedido">
+            <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
+            <md-content  layout="row" flex style="height: 100%;"  ng-class="{'preview': preview }" flex ng-mouseover="hoverPreview(false)" >
+                <!--  ##########################################  DIV BUT ########################################## -->
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'listPedido')}"
+                     ng-show="(layer != 'resumnenPedido')"
+                     ng-click="closeLayer('resumnenPedido')">
+                </div>
+                <div layout="column" flex style="margin-right:8px;">
+                </div>
+            </md-content>
+        </md-sidenav>
+
 
         <!-- 11) ########################################## LAYER (2) FORMULARIO INFORMACION DEL pedido ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido" id="detallePedido">
-            <md-content  layout="column" ng-class="{'preview': viewMode }" layout-padding flex ng-mouseover="viewMode = false" >
+            <md-content  layout="column" >
 
                 <form name="FormdetallePedido">
 
@@ -1019,7 +1036,7 @@
 
 
         <!-- 14) ########################################## LAYER (5) RESUMEN de Pedido a sustotuir########################################## -->
-        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumenPedido" >
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedidoSus" id="resumenPedidoSus" >
             <!-- ) ########################################## CONTENDOR SECCION PEDIDO SUSTITO ########################################## -->
 
 

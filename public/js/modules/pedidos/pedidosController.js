@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNotif) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORDER, setNotif) {
 
     var historia = [15];
     var autohidden= 2000;
@@ -14,8 +14,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
     $scope.TextLateralFilter="Mas Opciones";
-    $scope.viewMode=false;
     $scope.selecPed=false;
+    $scope.preview=false;
 
 
 
@@ -87,10 +87,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
 
     $scope.FilterLateralMas = function(){
         if(!$scope.showLateralFilterCpl){
-            jQuery("#menu").animate({height:"100%"},400);
+            jQuery("#menu").animate({height:"60%"},400);
             $scope.showLateralFilterCpl=true;
             $scope.TextLateralFilter="Menos Opciones";
-
         }else {
             jQuery("#menu").animate({height:"232px"},400);
             $scope.showLateralFilterCpl=false;
@@ -105,34 +104,26 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
 
     $scope.hoverpedido= function(pedido){
 
-        if(pedido && $scope.viewMode){
+        if(pedido && /*!$scope.selecPed &&*/ $scope.preview){
             $scope.pedidoSelec=pedido;
-            if($scope.layer !='detallePedido' ){
-                openLayer("detallePedido");
+            if($scope.layer !='resumenPedido' ){
+                openLayer("resumenPedido");
             }
-        }
-
-        if(!pedido ){
-            $scope.Preview=false;
         }
     }
 
+    $scope.hoverLeave= function(){
 
-    $scope.$watch('viewMode', function (newVal) {
-        console.log('preview', newVal )
-        if(!newVal && !$scope.selecPed){
-            closeLayer('listPedido');
-        }
-    });
-   /* $scope.$watch('Preview', function(newVal){
-        if(!newVal && !$scope.selecPed){
-            closeLayer('listPedido');
-        }
-    })*/
-
-
-    $scope.hoverActivePreview= function(){
-        $scope.Preview=true;
+        $timeout(function(){
+            if($scope.preview && $scope.layer== 'resumenPedido'){
+                $scope.closeLayer();
+                $scope.hoverPreview(false);
+            }
+        }, 20);
+    }
+    $scope.hoverPreview= function(val){
+        $scope.preview=val;
+        console.log('preview ', val);
     }
 
     $scope.updateForm = function () {
@@ -228,11 +219,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
         var curren = $scope.layer;
-        switch (curren) {
+       /* switch (curren) {
             case 'detallePedido':
                 openLayer('agrPed');
                 break;
-        }
+        }*/
     }
 
     $scope.showNext = function (status) {
@@ -476,31 +467,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
 
         if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                openLayer('detallePedido');ue
-                $scope.selecPed=true;
+                openLayer('resumenPedido');ue
                 loadPedido(pedido.id);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
             }
-        }else  if(!pedido && $scope.index <2){
-            if (segurity('newPedido')) {
-                restore("pedidoSelec");
-                openLayer('detallePedido');
-                if($scope.provSelec.id != '' &&
-                    typeof($scope.provSelec.id) !== 'undefined'){
-                    loadCoinProvider($scope.provSelec.id);
-                    loadCountryProvider($scope.provSelec.id);
-                    loadPaymentCondProvider($scope.provSelec.id);
-                }
-
-                $scope.formBlock=false;
-            }
-        }else {
-
         }
-        $scope.FormdetallePedido.$setPristine();
-
     }
 
     function closeLayer(opt) {
@@ -694,6 +667,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav, ORDER, setNo
         $http.get("Order/OrderDataForm").success(function (response) {
             $scope.formData.motivoPedido=response.motivoPedido;
             $scope.formData.tipo= response.tipoPedido;
+            $scope.filterData.tipoPedidos=response.tipoPedido;
             $scope.formData.prioridadPedido=response.prioridadPedido;
             $scope.formData.condicionPedido=response.condicionPedido;
             $scope.formData.estadoPedido=response.estadoPedido;
