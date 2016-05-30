@@ -3,12 +3,13 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     var historia = [15];
     $scope.index = index = 0;
     var base = 264;
-    $scope.toolBar = {"add":true,"edit":false,"filter":false} ///botonera
-    $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2":{}};
+    $scope.toolBar = {"add": true, "edit": false, "filter": false} ///botonera
+    $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
     $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
     $scope.abonos = {};
     $scope.provSelected = {};
+    $scope.deudaList = [];
 
 
     /**
@@ -22,6 +23,14 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
                 return $scope.provs[d];
             }
         }
+    }
+
+
+
+    
+    $scope.setDeudaList = function (item) {
+        $scope.deudaList.push(item);
+        console.log($scope.deudaList);
     }
 
 
@@ -44,7 +53,6 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     }
 
 
-
     function closeLayer(all) {
         if (all) {
             while ($scope.index != 0) {
@@ -65,29 +73,27 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.closeLayer = closeLayer;
 
 
-
     /////modificando botonera
-    $scope.setTool = function(add,edit,filter){
-        $scope.toolBar = {"add":add,"edit":edit,"filter":filter} ///botonera
+    $scope.setTool = function (add, edit, filter) {
+        $scope.toolBar = {"add": add, "edit": edit, "filter": filter} ///botonera
 
     }
     /////retornando el valor del boton
-    $scope.getToolValue = function(key){
-       return $scope.toolBar[key];
+    $scope.getToolValue = function (key) {
+        return $scope.toolBar[key];
     }
 
 
+    $scope.getTasaByCoinId = function (id, tipo) {
 
-    $scope.getTasaByCoinId = function(id,tipo){
-
-        $http.get('master/getCoin/'+id).success(function (response) {
+        $http.get('master/getCoin/' + id).success(function (response) {
             var tasa = response.precio_usd;
 
-            if(tipo=='abono')
-            $scope.abono.tasa = parseFloat(tasa).toFixed(1); ////abono
+            if (tipo == 'abono')
+                $scope.abono.tasa = parseFloat(tasa).toFixed(1); ////abono
             else
-            $scope.pago.tasa = parseFloat(tasa).toFixed(1); ///pago
-                
+                $scope.pago.tasa = parseFloat(tasa).toFixed(1); ///pago
+
             console.log("trae tasa de la moneda");
         });
 
@@ -97,7 +103,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     $scope.showNext = function (status, to) {
         if (status) {
-            
+
             $scope.nextLyr = to;
             //console.log($scope.nextLyr);
             $mdSidenav("NEXT").open()
@@ -141,14 +147,14 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             console.log("tipos de documentos de pago");
         });
     };
-    
+
     ////lista de cuentas bancarias
     $scope.getProvBankAccounts = function () {
         $http.get('payments/provider/getBankAccounts').success(function (response) {
             $scope.cuentasBancarias = response;
             console.log("trayendo cuentas bancarias del proveedor");
         });
-        
+
     }
 
 
@@ -174,15 +180,13 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             $scope.provData.nombre = response.razon_social;
             $scope.provData.pagos = response.pagos;
             $scope.provData.deudas = response.deudas;
-            $scope.provData.deudas2 = response.factCuo; 
+            $scope.provData.deudas2 = response.factCuo;
 
             $scope.provSelected = getProvById(response.id); ///proveedor seleccionado de la lista
 
             console.log("trayendo proveedor con id:" + prov.id);
 
         });
-        
-
 
 
         closeLayer(true)
@@ -195,7 +199,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     $scope.setDeduda = function (doc) {
 
         openLayer('lyr2pag');
-     //   $scope.setTool(true,"false",true); ///colocando funcion de filtro
+        //   $scope.setTool(true,"false",true); ///colocando funcion de filtro
 
         $http.get('payments/getDocById/' + doc.id).success(function (response) {
 
@@ -264,7 +268,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         $http.get('payments/getAbonos/all').success(function (response) {
 
             $scope.abonos = response;
-          //  $scope.abono = {};
+            //  $scope.abono = {};
 
             console.log("trayendo Abonos");
         });
@@ -272,7 +276,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     }
 
-    $scope.getAbonosNew=function () {
+    $scope.getAbonosNew = function () {
 
         $http.get('payments/getAbonos/new').success(function (response) {
 
@@ -285,13 +289,12 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     }
 
 
-
     ////formulario de registro de adelanto
     $scope.setFormAdelanto = function () {
 
         openLayer('lyr5pag');
 
-     //   openLayer('lyr6pag');
+        //   openLayer('lyr6pag');
 
         $scope.getPayDocTypes(); //tipos de documento de pago
         $scope.getPayTypes(); ///tipos de pago
@@ -304,24 +307,23 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
         openLayer('lyr6pag'); ////tre lo que puedo pagar con el documento
 
-     /*
+        /*
 
-        $http.post('payments/saveAbono', $scope.abono)
-            .success(function (data, status, headers, config) {
-                if(data.success){ ///guarda el registro
-                //    closeLayer('lyr5pag');
-                    openLayer('lyr6pag'); ////tre lo que puedo pagar con el documento
-                  //  $scope.getAbonos(); ///yendo a la lista de abonos
-                }else{ ///errores insertando
-                    alert("falla guardando documento");
-                }
+         $http.post('payments/saveAbono', $scope.abono)
+         .success(function (data, status, headers, config) {
+         if(data.success){ ///guarda el registro
+         //    closeLayer('lyr5pag');
+         openLayer('lyr6pag'); ////tre lo que puedo pagar con el documento
+         //  $scope.getAbonos(); ///yendo a la lista de abonos
+         }else{ ///errores insertando
+         alert("falla guardando documento");
+         }
 
 
-            })
-            .error(function (data, status, header, config) {
-                console.log("Error:enviando datos del abono...")
-            });*/
-
+         })
+         .error(function (data, status, header, config) {
+         console.log("Error:enviando datos del abono...")
+         });*/
 
 
     }
@@ -329,8 +331,8 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
     /////formulario de registro de pago
     $scope.saveFormPago = function () {
-        $http.post('payments/savePay',$scope.pago)
-            .success(function (data, status, headers, config){
+        $http.post('payments/savePay', $scope.pago)
+            .success(function (data, status, headers, config) {
 
                 console.log(data);
 
@@ -338,9 +340,6 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             console.log("Error:enviando datos del pago...")
         });
     }
-
-
-
 
 
 });

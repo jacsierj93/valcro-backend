@@ -278,6 +278,9 @@ class PaymentController extends BaseController
                 $temp["nro_orig"] = $deuda->nro_orig;
                 $temp["monto"] = $deuda->monto;
                 $temp["pagado"] = $deuda->monto - $deuda->saldo;
+                /////para saber si se selecciono
+                $temp["seleccionado"] = 0;
+
             }
 
 
