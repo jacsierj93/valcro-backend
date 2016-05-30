@@ -127,6 +127,7 @@ MyApp.filter('customFind', function() {
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif) {
     $scope.expand = false;
     $scope.prov=setGetProv.getProv();
+    $scope.chang = setGetProv.getChng();
     $scope.$watch('prov.id',function(nvo,old) {
         if(nvo && $scope.prov.new){
             $scope.prov.new = false;
@@ -191,13 +192,13 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.setProv = function(prov){
-        /*if($scope.edit){
-            var quit = confirm("desea cambiar de proveedor?");
-            if(quit) {
-                chngProv(prov);
-            }
-        }else{*/
-        chngProv(prov);
+        console.log(setGetProv.haveChang())
+        if(setGetProv.haveChang()){
+            openLayer("layer5");
+        }else{
+            chngProv(prov);
+        }
+
         //}
 
     };
@@ -209,6 +210,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         $scope.enabled = true;
         setGetProv.setProv(prov.item);
         openLayer("layer0");//modificado para mostrar resumen proveedor
+
     };
 
     $scope.showAlert = function(){
@@ -318,7 +320,7 @@ MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
 //###########################################################################################3
 //###################Service Providers (comunication betwen controllers)###################3
 //###########################################################################################3
-MyApp.service("setGetProv",function($http,providers){
+MyApp.service("setGetProv",function($http,providers,$q){
     var prov = {id:false,type:"",description:"",siglas:"",envio:"",contraped:true,limCred:0};
     var fullProv = {};
     var itemsel = {};
@@ -395,15 +397,8 @@ MyApp.service("setGetProv",function($http,providers){
         seeNew : function(){
             return list.length;
         },
-        getRollBack : function() {
-            return rollBack;
-
-        },
         addChng : function(val,action,form){
-            console.log(rollBack);
-            console.log(val,rollBack[form][val.id])
             if(action=="new" || !angular.equals(val,rollBack[form][val.id])){
-                console.log("entrooo")
                 if(changes[form][val.id]){
                     changes[form][val.id].datos = val;
                     if(!(changes[form][val.id].action=="new" && action=="upd")){
@@ -416,15 +411,28 @@ MyApp.service("setGetProv",function($http,providers){
                     }
                 }
             }else{
-                console.log("else")
                 delete changes[form][val.id];
             }
 
 
         },
         getChng : function(){
-        return changes;
-         }
+            return changes;
+         },
+
+        haveChang : function(){
+
+            var i = 1;
+            x = false;
+            angular.forEach(changes,function(v,k){
+                console.log(Object.keys(v).length)
+                if(Object.keys(v).length>0){
+                    x=true;
+                    console.log("entro")
+                }
+            });
+            return x;
+        }
     };
 });
 
@@ -1789,3 +1797,8 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
         }
     }
 });
+
+ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
+     $dataProv = setGetProv.getChng();
+
+ });

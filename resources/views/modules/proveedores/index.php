@@ -1125,10 +1125,15 @@
             </div>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex >
+            <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProvFinal">
                 <div flex>
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-show="dataProv.dataProv.length>0">
+                        <div>
+                            Datos Proveedor
+                        </div>
+                    </div>
 
                 </div>
                 <div flex>
