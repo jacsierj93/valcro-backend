@@ -220,12 +220,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
-        var curren = $scope.layer;
-        /* switch (curren) {
-         case 'detallePedido':
-         openLayer('agrPed');
-         break;
-         }*/
+        switch($scope.layer){
+            case "resumenPedido":
+                openLayer("detallePedido");
+                break;
+            case "detallePedido":
+                openLayer("agrPed");
+                break;
+            case "agrPed":
+                console.log('open',"listProducProv");
+                openLayer("listProducProv");
+                break;
+        }
     }
 
     $scope.showNext = function (status) {
@@ -639,7 +645,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
             ,[
                 {name: 'Ok',
                     action:function(){
-                        var url="RemoveToOrden";
+                      /*  var url="RemoveToOrden";
                         var id=item.id;
                         if(item.tipo_origen_id == 4){
                             url="RemoveOrdenItem";
@@ -647,9 +653,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
                         }
                         $http.post("Order/"+url, {id: id, pedido_id: $scope.pedidoSelec.id})
                             .success(function (response) {
-                                setNotif.addNotif("alert","Removido",[],{autohidden:2000});
+                                setNotif.addNotif("alert","Removido",[],{autohidden:autohidden});
                                 loadPedido($scope.pedidoSelec.id);
-                            });
+                            });*/
                     }
                 },{name: 'Cancel',action:function(){}}
             ]);
