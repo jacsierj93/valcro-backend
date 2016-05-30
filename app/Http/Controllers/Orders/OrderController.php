@@ -188,35 +188,56 @@ class OrderController extends BaseController
     public function getProviderListOrder(Request $req)
     {
         $data=Array();
+        $prov= Provider::findOrFail($req->id);
         $items = Order::where('prov_id',$req->id)->get();
         $type = OrderType::get();
         $coin = Monedas::get();
+        $motivo = OrderReason::get();
+        $prioridad= OrderPriority::get();
+        $estados= OrderStatus::get();
+
+/*        $paises= $this->getCountryProvider($req->id);*/
+        $paises= Country::get();
+
+
+        /* $almacen= ProviderAddress::get();*/
         foreach($items as $aux){
+            //para maquinas
             $tem['id']=$aux->id;
             $tem['tipo_pedido_id']=$aux->tipo_pedido_id;
-            $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['nro_factura']=$aux->nro_factura;
-            $tem['img_proforma']=$aux->img_proforma;
-            $tem['img_factura']=$aux->img_factura;
             $tem['pais_id']=$aux->pais_id;
             $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
             $tem['condicion_pago_id']=$aux->condicion_pago_id;
             $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
             $tem['prioridad_id']=$aux->prioridad_id;
-            $tem['comentario']=$aux->comentario;
             $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+            $tem['prov_moneda_id']=$aux->prov_moneda_id;
+            // pra humanos
+            $tem['comentario']=$aux->comentario;
+            $tem['proveedor']=$prov->razon_social;;
+            $tem['motivo']=$motivo->where('id',$aux->motivo_pedido_id)->first()->motivo;
+            $tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+            $tem['nro_proforma']=$aux->nro_proforma;
+            $tem['nro_factura']=$aux->nro_factura;
+            $tem['img_proforma']=$aux->img_proforma;
+            $tem['img_factura']=$aux->img_factura;
             $tem['mt3']=$aux->mt3;
             $tem['peso']=$aux->peso;
             $tem['emision']=$aux->emision;
             $tem['monto']=$aux->monto;
-            $tem['prov_moneda_id']=$aux->prov_moneda_id;
+            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+            $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+            $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
             $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
             $tem['diasEmit']=$aux->daysCreate();
             $tem['tipo']=$type->where('id',$aux->tipo_pedido_id)->first()->tipo;
             $tem['productos'] = $this->getProductoOrden($aux);
+            /**actualizar cuando este el final**/
+            $tem['almacen']="Desconocido";
 
             // modificar cuando se sepa la logica
             $tem['aero']=1;
+            $tem['version']=1;
             $tem['maritimo']=1;
             $data[]=$tem;
         }
@@ -671,14 +692,53 @@ class OrderController extends BaseController
      * obtiene toda la data de un pedido
      */
     public function getOrden(Request $req){
+        $aux=Order::findOrFail($req->id);
+        $tem['id']=$aux->id;
+        $tem['tipo_pedido_id']=$aux->tipo_pedido_id;
+        $tem['pais_id']=$aux->pais_id;
+        $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+        $tem['condicion_pago_id']=$aux->condicion_pago_id;
+        $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+        $tem['prioridad_id']=$aux->prioridad_id;
+        $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+        $tem['prov_moneda_id']=$aux->prov_moneda_id;
+        // pra humanos
+        $tem['comentario']=$aux->comentario;
+        $tem['proveedor']=Provider::findOrFail($aux->prov_id)->razon_social;
+        $tem['motivo']=OrderReason::findOrFail($aux->motivo_pedido_id)->motivo;
+        $tem['pais']=Country::findOrFail($aux->pais_id)->short_name;
+        $tem['nro_proforma']=$aux->nro_proforma;
+        $tem['nro_factura']=$aux->nro_factura;
+        $tem['img_proforma']=$aux->img_proforma;
+        $tem['img_factura']=$aux->img_factura;
+        $tem['mt3']=$aux->mt3;
+        $tem['peso']=$aux->peso;
+        $tem['emision']=$aux->emision;
+        $tem['monto']=$aux->monto;
+        $tem['estado']=OrderStatus::findOrFail($aux->estado_id)->estado;
+        $tem['prioridad']=OrderPriority::findOrFail($aux->prioridad_id)->descripcion;
+        $tem['moneda']=Monedas::findOrFail($aux->prov_moneda_id)->nombre;
+        $tem['symbol']=Monedas::findOrFail($aux->prov_moneda_id)->simbolo;
+        $tem['diasEmit']=$aux->daysCreate();
+        $tem['tipo']= OrderType::findOrFail($aux->tipo_pedido_id)->tipo;
+        $tem['productos'] = $this->getProductoOrden($aux);
+        /**actualizar cuando este el final**/
+        $tem['almacen']="Desconocido";
 
-        $order=Order::findOrFail($req->id);
-        $data= $order;
-       $data['productos']= $this->getProductoOrden($order);
-        return $data;
+        // modificar cuando se sepa la logica
+        $tem['aero']=1;
+        $tem['version']=1;
+        $tem['maritimo']=1;
+
+        return $tem;
 
     }
 
+    /**
+     * obtiene todos los producto de un pedido
+     * @param obj Order
+     * @return array de productos
+    */
     private function getProductoOrden($order){
 
         $items= $order->OrderItem()->get();
@@ -736,6 +796,23 @@ class OrderController extends BaseController
         $data['todos'] = $all;
         return $data;
     }
+
+    /**
+     * obtiene los paises donde un provedor tiene paises
+    */
+    private function getCountryProvider($id){
+        $model=  ProviderAddress::where('prov_id',$id)->get();
+        $data= Collection::make(array());
+        foreach($model as $aux){
+            if(!$data->contains($aux->pais_id)){
+                $p=Country::find($aux->pais_id);
+                $data->push($p);
+            }
+
+        }
+        return $data;
+    }
+
 
     /**
      * Obtiene las ordenes de compra de un provedor
@@ -827,7 +904,7 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getProviderCountry(Request $req){
-
+/*
         $model=  ProviderAddress::where('prov_id',$req->id)->get();
         $data= Collection::make(array());
         foreach($model as $aux){
@@ -836,10 +913,12 @@ class OrderController extends BaseController
                 $data->push($p);
             }
 
-        }
+        }*/
 
-        return $data;
+        return $this->getCountryProvider($req->id);
     }
+
+
 
     /**
      * obtiene los direcciones de almacen

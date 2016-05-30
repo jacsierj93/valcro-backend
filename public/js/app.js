@@ -3,28 +3,28 @@ var MyApp = angular.module('MyApp', dependency);
 
 
 /*MyApp.config(['$routeProvider', '$locationProvider',
-    function($routeProvider, $locationProvider){
-        $routeProvider.
-        when('/', {
-            templateUrl : 'modules/home/index'
-        }).when('/proveedores', {
-            templateUrl : 'modules/proveedores/index'
-        }).when('/logout', {
-            redirectTo : 'logout'
-        }).
-        otherwise({
-            redirectTo : '/'
-            //templateUrl : 'modules/home/404'
-        });
-        $locationProvider.html5Mode(true);
-    }
-]);*/
+ function($routeProvider, $locationProvider){
+ $routeProvider.
+ when('/', {
+ templateUrl : 'modules/home/index'
+ }).when('/proveedores', {
+ templateUrl : 'modules/proveedores/index'
+ }).when('/logout', {
+ redirectTo : 'logout'
+ }).
+ otherwise({
+ redirectTo : '/'
+ //templateUrl : 'modules/home/404'
+ });
+ $locationProvider.html5Mode(true);
+ }
+ ]);*/
 
 
 /*MyApp.config(['$routeProvider',function($routeProvider){
-    $routeProvider
-        .when('/home',  {templateUrl:"modules/home"})
-}]);*/
+ $routeProvider
+ .when('/home',  {templateUrl:"modules/home"})
+ }]);*/
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:""};
     var ref = false;
@@ -38,18 +38,18 @@ MyApp.directive('info', function($timeout,setNotif) {
 
             });
             element.bind("focus", function(e) {
-                    $timeout(function() {
-                        if(old.element!=element[0]){
-                            setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
-                            old.element = element[0];
-                            old.info = attrs.info;
-                        }
-                        $timeout.cancel(ref);
-                        ref = $timeout(function() {
-                            old ={element:"",info:""};
-                        },30000);
+                $timeout(function() {
+                    if(old.element!=element[0]){
+                        setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                        old.element = element[0];
+                        old.info = attrs.info;
+                    }
+                    $timeout.cancel(ref);
+                    ref = $timeout(function() {
+                        old ={element:"",info:""};
+                    },30000);
 
-                    }, 0);
+                }, 0);
             })
         }
     }
@@ -190,17 +190,17 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
 
 
 /*
-MyApp.controller('ListPaises', function ($scope,$http) {
-    $http({
-        method: 'POST',
-        url: 'master/getCountries'
-    }).then(function successCallback(response) {
-        $scope.paises = response.data;
-    }, function errorCallback(response) {
-        console.log("error=>",response)
-    });
-});
-*/
+ MyApp.controller('ListPaises', function ($scope,$http) {
+ $http({
+ method: 'POST',
+ url: 'master/getCountries'
+ }).then(function successCallback(response) {
+ $scope.paises = response.data;
+ }, function errorCallback(response) {
+ console.log("error=>",response)
+ });
+ });
+ */
 
 
 MyApp.controller('ListHerramientas', function ($scope) {
@@ -221,8 +221,8 @@ MyApp.controller('ListHerramientas', function ($scope) {
 });
 
 /*MyApp.run(['$route', function($route)  {
-    $route.reload();
-}]);*/
+ $route.reload();
+ }]);*/
 
 MyApp.controller('ListProv', function ($scope,$http) {
     $http({
@@ -239,73 +239,88 @@ MyApp.controller('ListProv', function ($scope,$http) {
 
 
 
-    function DemoCtrl1 ($timeout, $q, $log) {
-        var self = this;
-        self.simulateQuery = false;
-        self.isDisabled    = false;
-        // list of `state` value/display objects
-        self.states        = loadAll();
-        self.querySearch   = querySearch;
-        self.selectedItemChange = selectedItemChange;
-        self.searchTextChange   = searchTextChange;
-        self.newState = newState;
-        function newState(state) {
-            alert("Sorry! You'll need to create a Constituion for " + state + " first!");
+function DemoCtrl1 ($timeout, $q, $log) {
+    var self = this;
+    self.simulateQuery = false;
+    self.isDisabled    = false;
+    // list of `state` value/display objects
+    self.states        = loadAll();
+    self.querySearch   = querySearch;
+    self.selectedItemChange = selectedItemChange;
+    self.searchTextChange   = searchTextChange;
+    self.newState = newState;
+    function newState(state) {
+        alert("Sorry! You'll need to create a Constituion for " + state + " first!");
+    }
+    // ******************************
+    // Internal methods
+    // ******************************
+    /**
+     * Search for states... use $timeout to simulate
+     * remote dataservice call.
+     */
+    function querySearch (query) {
+        var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
+            deferred;
+        if (self.simulateQuery) {
+            deferred = $q.defer();
+            $timeout(function () { deferred.resolve( results ); }, Math.random() * 1000, false);
+            return deferred.promise;
+        } else {
+            return results;
         }
-        // ******************************
-        // Internal methods
-        // ******************************
-        /**
-         * Search for states... use $timeout to simulate
-         * remote dataservice call.
-         */
-        function querySearch (query) {
-            var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
-                deferred;
-            if (self.simulateQuery) {
-                deferred = $q.defer();
-                $timeout(function () { deferred.resolve( results ); }, Math.random() * 1000, false);
-                return deferred.promise;
-            } else {
-                return results;
-            }
-        }
-        function searchTextChange(text) {
-            $log.info('Text changed to ' + text);
-        }
-        function selectedItemChange(item) {
-            $log.info('Item changed to ' + JSON.stringify(item));
-        }
-        /**
-         * Build `states` list of key/value pairs
-         */
-        function loadAll() {
-            var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
+    }
+    function searchTextChange(text) {
+        $log.info('Text changed to ' + text);
+    }
+    function selectedItemChange(item) {
+        $log.info('Item changed to ' + JSON.stringify(item));
+    }
+    /**
+     * Build `states` list of key/value pairs
+     */
+    function loadAll() {
+        var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
               Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana,\
               Maine, Maryland, Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,\
               Nebraska, Nevada, New Hampshire, New Jersey, New Mexico, New York, North Carolina,\
               North Dakota, Ohio, Oklahoma, Oregon, Pennsylvania, Rhode Island, South Carolina,\
               South Dakota, Tennessee, Texas, Utah, Vermont, Virginia, Washington, West Virginia,\
               Wisconsin, Wyoming';
-            return allStates.split(/, +/g).map( function (state) {
-                return {
-                    value: state.toLowerCase(),
-                    display: state
-                };
-            });
-        }
-        /**
-         * Create filter function for a query string
-         */
-        function createFilterFor(query) {
-            var lowercaseQuery = angular.lowercase(query);
-            return function filterFn(state) {
-                return (state.value.indexOf(lowercaseQuery) === 0);
+        return allStates.split(/, +/g).map( function (state) {
+            return {
+                value: state.toLowerCase(),
+                display: state
             };
-        }
+        });
     }
+    /**
+     * Create filter function for a query string
+     */
+    function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+        return function filterFn(state) {
+            return (state.value.indexOf(lowercaseQuery) === 0);
+        };
+    }
+}
 
-
+/******************* Agregado por miguel, convertidor de date de la base de datos  *******************/
+/** obj date javascrip
+ * probado con  campo 'datetime' de base de datos
+ * @param string del campo
+ * @return  Date
+ * **/
+MyApp.service('DateParse', function() {
+    this.toDate = function (text) {
+        var aux= text;
+        if(text.length >= 10){
+            aux=text.substring(0, 10);
+            console.log(aux);
+        }
+        return new Date(Date.parse(aux));
+    }
+});
 
 
 

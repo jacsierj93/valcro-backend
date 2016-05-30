@@ -3,8 +3,10 @@
 
     <div class="contentHolder" layout="row" flex>
 
-        <div class="barraLateral" layout="column">
-            <div id="menu" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
+        <div class="barraLateral" layout="column" style="height: 100%;">
+
+
+            <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div class="menu" style="height: 48px; width: 100%;">
                     <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
@@ -15,26 +17,29 @@
                         <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
-                <div class="menuFilter" style="height: 90px;">
-                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container>
-                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container>
-                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container>
-                </div>
-                <div flex>
 
+                <div layout="column" flex="" >
+                    <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start">
+                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                            <label>Buscar</label>
+                            <input  type="text">
+                        </md-input-container>
+                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                            <label>Buscar</label>
+                            <input  type="text">
+                        </md-input-container>
+                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                            <label>Buscar</label>
+                            <input  type="text">
+                        </md-input-container>
+                    </div>
+                    <div id="expand2" flex >
+
+                    </div>
+                    <div  layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
                 </div>
-                <div layout="row" layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
+
             </div>
-
             <div  style="overflow-y:auto;" ng-hide="showLateralFilterCpl">
 
                 <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
@@ -177,7 +182,7 @@
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.tipo}}</div>
                                 <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
                                 <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
-                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
+                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)">
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
                                          class="emit{{item.diasEmit}}"></div>
@@ -198,7 +203,7 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER RESUMEN PEDIDO   ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumnePedido">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumenPedido">
             <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
             <md-content  layout="row" flex style="height: 100%;"  ng-class="{'preview': preview }" flex ng-mouseover="hoverPreview(false)" >
                 <!--  ##########################################  DIV BUT ########################################## -->
@@ -206,7 +211,111 @@
                      ng-show="(layer != 'resumnenPedido')"
                      ng-click="closeLayer('resumnenPedido')">
                 </div>
-                <div layout="column" flex style="margin-right:8px;">
+                <!----PRIMERA COLUMNA DETALLE DE PEDIDO---->
+                <div layout="column" flex="30" style="margin-right:8px;">
+                    <div class="titulo_formulario" style="height:39px;">
+                        <div>
+                            Pedido
+                        </div>
+                    </div>
+                    <div style="overflow-y:auto; overflow-x: hidden "
+                         class="rowRsm" style="margin-right: 8px;" layout="row"  >
+                        <div layout="row" class="rowRsmTitle">
+                            <div > ID: </div>
+                            <div flex> {{pedidoSelec.id}} </div>
+                        </div>
+                        <div layout="row" class="rms" flex="">
+                            <div > Version: </div>
+                            <div flex> {{pedidoSelec.version}} </div>
+                        </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Creado: </div>
+                        <div class="rms" > {{pedidoSelec.emision | date:'dd/MM/yyyy' }}
+                            <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
+                                 class="emit{{pedidoSelec.diasEmit}}"></div>
+                        </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Ult. Modif. </div>
+                        <div class="rms" > {{pedidoSelec.emision | date:'dd/MM/yyyy' }} (demo)
+                        </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Estado</div>
+                        <div class="rms" > {{pedidoSelec.estado }}</div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class=" rms rowRsmTitle"> Prioridad: </div>
+                        <div class="rms" > {{pedidoSelec.prioridad}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Proveedor: </div>
+                        <div > {{pedidoSelec.proveedor}} </div>
+                    </div>
+                    <div layout="row" class="rowRsm">
+                        <div class="rowRsmTitle" > Pais: </div>
+                        <div class="rms" > {{pedidoSelec.pais}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle" > Almacen: </div>
+                        <div class="rms" > {{pedidoSelec.almacen}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Motivo: </div>
+                        <div class="rms" > {{pedidoSelec.motivo}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> N° Proforma: </div>
+                        <div class="rms"> {{pedidoSelec.nro_proforma}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> N° Factura: </div>
+                        <div class="rms" > {{pedidoSelec.nro_factura}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Monto: </div>
+                        <div class="rms" > {{pedidoSelec.monto}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Moneda: </div>
+                        <div class="rms"> {{pedidoSelec.moneda}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Productos: </div>
+                        <div class="rms"> {{pedidoSelec.productos.todos.length}} </div>
+                    </div>
+                </div>
+                <div  layout="column" flex style="height: 100%;">
+                    <div class="titulo_formulario" style="height:39px;">
+                        <div>
+                            Productos
+                        </div>
+                    </div>
+                    <div >
+                        <div layout="row" class="headGridHolder">
+
+                            <!--                                <div flex="5" class="headGrid"></div>
+                            -->                                <div flex="15" class="headGrid"> Cod. Producto</div>
+                            <div flex class="headGrid"> Descripción.</div>
+                            <div flex class="headGrid"> Doc. Origen</div>
+                            <div flex="10" class="headGrid"> Cantidad</div>
+
+                        </div>
+                        <div class="gridContent">
+                            <div flex>
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.todos">
+                                    <!--    <div flex="5" class="cellGrid">
+                                            <md-switch class="md-primary" ng-model="item.asignado"</md-switch>
+                                        </div>-->
+                                    <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
+                                    <div flex class="cellGrid">  {{item.descripcion}}</div>
+                                    <div flex class="cellGrid"> {{item.origen}}</div>
+                                    <div flex class="cellGrid"> {{item.saldo}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </md-content>
         </md-sidenav>

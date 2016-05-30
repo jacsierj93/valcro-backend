@@ -13,6 +13,7 @@ namespace app\Http\Controllers\Masters;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\CustomOrders\CustomOrderItem;
 use App\Models\Sistema\KitchenBoxs\KitchenBox;
+use App\Models\Sistema\Order\Order;
 use App\Models\Sistema\Order\OrderItem;
 use App\Models\Sistema\Other\SourceType;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -140,9 +141,5 @@ class MasterOrderController extends BaseController
         return $it;
 
     }
-
-    /**
-     * regresa el producto original
-    */
 
 }
