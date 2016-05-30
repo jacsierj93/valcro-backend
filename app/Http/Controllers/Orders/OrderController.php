@@ -56,8 +56,8 @@ class OrderController extends BaseController
         foreach($provs as $prv){
             $temp["id"] = $prv->id;
             $temp["razon_social"] = $prv->razon_social;
-
             $temp['deuda']= $prv->Order()->sum('monto');
+            $temp['productos']= $prv->proveedor_product()->get();
             $temp['puntoCompra']= 0;
             $nCp=0;
             $nE0=0;
