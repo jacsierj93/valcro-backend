@@ -86,9 +86,13 @@ $app->routeMiddleware([
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register('Collective\Html\HtmlServiceProvider');
 $app->register('Collective\Html\InjectVarsServiceProvider');
+$app->register('Intervention\Image\ImageServiceProvider');
+
+
 
 class_alias('Collective\Html\HtmlFacade', 'Html');
 class_alias('Collective\Html\FormFacade', 'Form');
+class_alias('Intervention\Image\Facades\Image', 'Image');
 
 /*
 |--------------------------------------------------------------------------
