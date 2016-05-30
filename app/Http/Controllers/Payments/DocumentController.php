@@ -69,6 +69,7 @@ class DocumentController extends BaseController
                 $cuotas = $doc->cuotas();
                 foreach ($cuotas as $cc) {
 
+                    $temp = array();
                     $temp["id"] = $cc->id;
                     $temp["fecha_vence"] = $cc->fecha_vence;
                     $temp["nro_factura"] = $cc->nro_factura;
@@ -80,6 +81,7 @@ class DocumentController extends BaseController
 
             } else { ///factura sin cuotas (es la propia deuda)
 
+                $temp = array();
                 $temp["id"] = $doc->id;
                 $temp["fecha_vence"] = $doc->fecha_vence;
                 $temp["nro_factura"] = $doc->nro_factura;
@@ -121,6 +123,7 @@ class DocumentController extends BaseController
         $result = array();
         foreach ($lista as $pago) {
 
+            $temp = array();
             $temp["id"] = $pago->id;
             $temp["nro_factura"] = $pago->nro_factura;
             $temp["origen"] = $pago->org_factura;

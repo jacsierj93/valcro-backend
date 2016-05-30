@@ -59,3 +59,21 @@
 .filterItem{
     color: rgb(84, 180, 234);
 }
+ .rowRsm{
+     height: 28px;
+ }
+
+.rowRsmTitle{
+    width: 125px;
+    min-width: 125px
+}
+
+.rms{
+    text-overflow: ellipsis;
+    height: 16px;
+    overflow: hidden;
+}
+
+.cntLayerHolder{
+    height: 100%;
+}

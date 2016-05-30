@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORDER, setNotif) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORDER, setNotif, DateParse) {
 
     var historia = [15];
     var autohidden= 2000;
@@ -15,7 +15,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     $scope.showLateralFilterCpl=false;
     $scope.TextLateralFilter="Mas Opciones";
     $scope.selecPed=false;
-    $scope.preview=false;
+    $scope.preview=true;
 
 
 
@@ -83,11 +83,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
             jQuery("#menu").animate({height:"48px"},500);
             $scope.showLateralFilter=false;
         }
+        $scope.showLateralFilterCpl=false;
     }
 
     $scope.FilterLateralMas = function(){
+        console.log('value d',$scope.showLateralFilterCpl);
         if(!$scope.showLateralFilterCpl){
-            jQuery("#menu").animate({height:"60%"},400);
+            jQuery("#menu").animate({height:"100%"},400);
             $scope.showLateralFilterCpl=true;
             $scope.TextLateralFilter="Menos Opciones";
         }else {
@@ -117,7 +119,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         $timeout(function(){
             if($scope.preview && $scope.layer== 'resumenPedido'){
                 $scope.closeLayer();
-                $scope.hoverPreview(false);
+                $scope.hoverPreview(true);
             }
         }, 20);
     }
@@ -218,12 +220,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
-        var curren = $scope.layer;
-       /* switch (curren) {
-            case 'detallePedido':
-                openLayer('agrPed');
+        switch($scope.layer){
+            case "resumenPedido":
+                openLayer("detallePedido");
                 break;
-        }*/
+            case "detallePedido":
+                openLayer("agrPed");
+                break;
+            case "agrPed":
+                console.log('open',"listProducProv");
+                openLayer("listProducProv");
+                break;
+        }
     }
 
     $scope.showNext = function (status) {
@@ -454,6 +462,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
             var base = 264;
             $scope.index++;
             var w = base + (24 * $scope.index);
+            console.log('width ', w);
             l.css('width', 'calc(100% - ' + w + 'px)');
             $mdSidenav(layer).open();
             historia[$scope.index] = layer;
@@ -467,7 +476,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
 
         if(pedido && $scope.index <2){
             if (segurity('editPedido')) {
-                openLayer('resumenPedido');ue
+                openLayer('resumenPedido');
                 loadPedido(pedido.id);
             }
             else {
@@ -636,7 +645,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
             ,[
                 {name: 'Ok',
                     action:function(){
-                        var url="RemoveToOrden";
+                      /*  var url="RemoveToOrden";
                         var id=item.id;
                         if(item.tipo_origen_id == 4){
                             url="RemoveOrdenItem";
@@ -644,22 +653,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
                         }
                         $http.post("Order/"+url, {id: id, pedido_id: $scope.pedidoSelec.id})
                             .success(function (response) {
-                                setNotif.addNotif("alert","Removido",[],{autohidden:2000});
+                                setNotif.addNotif("alert","Removido",[],{autohidden:autohidden});
                                 loadPedido($scope.pedidoSelec.id);
-                            });
+                            });*/
                     }
                 },{name: 'Cancel',action:function(){}}
             ]);
 
     }
     function loadPedido(id){
+        restore("pedidoSelec");
         $http.get("Order/Order",{params:{id:id}}).success(function (response) {
+
             $scope.pedidoSelec = response;
-            if(response.emision != null){
-                var texto=response.emision.substring(0, 10);
-                var fecha= new Date(Date.parse(texto));
-                $scope.pedidoSelec.emision = fecha;
-            }
+            $scope.pedidoSelec.emision=DateParse.toDate(response.emision);
         });
     }
 
@@ -716,7 +723,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     function loadPedidosProvedor(id){
         $scope.provSelec.pedidos= new Array();
         $http.get("Order/OrderProvOrder",{params:{id:id}}).success(function (response) {
-            $scope.provSelec.pedidos=response;
+            var items= new Array();
+
+            angular.forEach(response, function (v, k) {
+                console.log('v ', v);
+                console.log('k ', k);
+                v.emision= DateParse.toDate(v.emision);
+                items.push(v);
+
+            });
+            $scope.provSelec.pedidos=items;
         });
     }
 
@@ -927,6 +943,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         }
     }
 });
+
+/************** SERRVICIOS   ***********************/
 
 
 MyApp.factory('ORDER', ['$resource',

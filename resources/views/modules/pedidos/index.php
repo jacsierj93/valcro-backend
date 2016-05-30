@@ -3,8 +3,10 @@
 
     <div class="contentHolder" layout="row" flex>
 
-        <div class="barraLateral" layout="column">
-            <div id="menu" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
+        <div class="barraLateral" layout="column" style="height: 100%;">
+
+
+            <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div class="menu" style="height: 48px; width: 100%;">
                     <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
@@ -15,26 +17,29 @@
                         <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
-                <div class="menuFilter" style="height: 90px;">
-                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container>
-                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container>
-                    <md-input-container class="md-block" style="width: calc(100% - 16px);">
-                        <label>Buscar</label>
-                        <input  type="text">
-                    </md-input-container>
-                </div>
-                <div flex>
 
+                <div layout="column" flex="" >
+                    <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start">
+                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                            <label>Buscar</label>
+                            <input  type="text">
+                        </md-input-container>
+                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                            <label>Buscar</label>
+                            <input  type="text">
+                        </md-input-container>
+                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                            <label>Buscar</label>
+                            <input  type="text">
+                        </md-input-container>
+                    </div>
+                    <div id="expand2" flex >
+
+                    </div>
+                    <div  layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
                 </div>
-                <div layout="row" layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
+
             </div>
-
             <div  style="overflow-y:auto;" ng-hide="showLateralFilterCpl">
 
                 <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
@@ -177,7 +182,7 @@
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.tipo}}</div>
                                 <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
                                 <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
-                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
+                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)">
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
                                          class="emit{{item.diasEmit}}"></div>
@@ -198,237 +203,343 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER RESUMEN PEDIDO   ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumnePedido">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumenPedido">
             <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
-            <md-content  layout="row" flex style="height: 100%;"  ng-class="{'preview': preview }" flex ng-mouseover="hoverPreview(false)" >
+            <md-content  layout="row" flex style="height: 100%;"
+                         ng-class="{preview: preview , cntLayerHolder: layer == 'resumenPedido' }"
+                         flex ng-mouseover="hoverPreview(false)"
+
+            >
                 <!--  ##########################################  DIV BUT ########################################## -->
-                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'listPedido')}"
-                     ng-show="(layer != 'resumnenPedido')"
-                     ng-click="closeLayer('resumnenPedido')">
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'resumenPedido')}"
+                     ng-show="(layer != 'resumenPedido')"
+                     ng-click="closeLayer('resumenPedido')">
                 </div>
-                <div layout="column" flex style="margin-right:8px;">
+                <!----PRIMERA COLUMNA DETALLE DE PEDIDO---->
+                <div layout="column" flex="30" style="margin-right:8px;">
+                    <div class="titulo_formulario" style="height:39px;">
+                        <div>
+                            Pedido
+                        </div>
+                    </div>
+                    <div style="overflow-y:auto; overflow-x: hidden "
+                         class="rowRsm" style="margin-right: 8px;" layout="row"  >
+                        <div layout="row" class="rowRsmTitle">
+                            <div > ID: </div>
+                            <div flex> {{pedidoSelec.id}} </div>
+                        </div>
+                        <div layout="row" class="rms" flex="">
+                            <div > Version: </div>
+                            <div flex> {{pedidoSelec.version}} </div>
+                        </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Creado: </div>
+                        <div class="rms" > {{pedidoSelec.emision | date:'dd/MM/yyyy' }}
+                            <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
+                                 class="emit{{pedidoSelec.diasEmit}}"></div>
+                        </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Ult. Modif. </div>
+                        <div class="rms" > {{pedidoSelec.emision | date:'dd/MM/yyyy' }} (demo)
+                        </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Estado</div>
+                        <div class="rms" > {{pedidoSelec.estado }}</div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class=" rms rowRsmTitle"> Prioridad: </div>
+                        <div class="rms" > {{pedidoSelec.prioridad}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Proveedor: </div>
+                        <div > {{pedidoSelec.proveedor}} </div>
+                    </div>
+                    <div layout="row" class="rowRsm">
+                        <div class="rowRsmTitle" > Pais: </div>
+                        <div class="rms" > {{pedidoSelec.pais}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle" > Almacen: </div>
+                        <div class="rms" > {{pedidoSelec.almacen}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Motivo: </div>
+                        <div class="rms" > {{pedidoSelec.motivo}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> N° Proforma: </div>
+                        <div class="rms"> {{pedidoSelec.nro_proforma}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> N° Factura: </div>
+                        <div class="rms" > {{pedidoSelec.nro_factura}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Monto: </div>
+                        <div class="rms" > {{pedidoSelec.monto}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Moneda: </div>
+                        <div class="rms"> {{pedidoSelec.moneda}} </div>
+                    </div>
+                    <div layout="row"  class="rowRsm">
+                        <div class="rowRsmTitle"> Productos: </div>
+                        <div class="rms"> {{pedidoSelec.productos.todos.length}} </div>
+                    </div>
                 </div>
+                <div  layout="column" flex style="height: 100%;">
+                    <div class="titulo_formulario" style="height:39px;">
+                        <div>
+                            Productos
+                        </div>
+                    </div>
+                    <div flex>
+                        <div layout="row" class="headGridHolder">
+
+                            <!--                                <div flex="5" class="headGrid"></div>
+                            -->
+                            <div flex="15" class="headGrid"> Cod. Producto</div>
+                            <div flex class="headGrid"> Descripción.</div>
+                            <div flex class="headGrid"> Doc. Origen</div>
+                            <div flex="10" class="headGrid"> Cantidad</div>
+
+                        </div>
+                        <div class="gridContent">
+                            <div flex>
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.todos">
+                                    <!--    <div flex="5" class="cellGrid">
+                                            <md-switch class="md-primary" ng-model="item.asignado"</md-switch>
+                                        </div>-->
+                                    <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
+                                    <div flex class="cellGrid">  {{item.descripcion}}</div>
+                                    <div flex class="cellGrid"> {{item.origen}}</div>
+                                    <div flex="10" class="cellGrid"> {{item.saldo}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
         </md-sidenav>
 
-
-        <!-- 11) ########################################## LAYER (2) FORMULARIO INFORMACION DEL pedido ########################################## -->
+        <!-- ) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PEDIDO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido" id="detallePedido">
-            <md-content  layout="column" >
 
-                <form name="FormdetallePedido">
+            <md-content  layout="row" flex
+                         ng-class="{cntLayerHolder: layer == 'detallePedido' }"
 
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Datos del Pedido
+            >
+
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'detallePedido')}"
+                     ng-show="(layer != 'detallePedido')"
+                     ng-click="closeLayer('detallePedido')">
+                </div>
+                <div  layout="column" flex="">
+                    <form name="FormdetallePedido">
+
+                        <div class="titulo_formulario" layout="column" layout-align="start start">
+                            <div>
+                                Datos del Pedido
+                            </div>
                         </div>
-                    </div>
-                    <!--
-                    <div layout="row" style="height: 25px;" >
-                        <div  flex="15" class="md-block" style=" color: #999999;" >
-                            Ordenes de Compra
-                        </div>
-                        <div ng-click="openOdcs()"> <?= HTML::image("images/agregar.png") ?></div>
+                        <div layout="row"  >
+                            <md-input-container class="md-block" flex="50" >
+                                <label>Proveedor</label>
+                                <md-select ng-model="provSelec.id" md-no-ink ng-disabled="(provSelec.save || formBlock)" required >
+                                    <md-option ng-repeat="prov in todos" value="{{prov.id}}">
+                                        {{prov.razon_social}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
-                        <div flex=""   class="md-block" layout="row" style="overflow: hidden;"  ng-disabled="pedidoSelec.estado_id!=1">
-                            <div style="margin-right: 4px; margin-left:4px;" ng-repeat="orden in pedidoSelec.ordenes" >
-                                {{orden.nro_orden}}
+                            <md-input-container class="md-block" flex="15">
+                                <label>Tipo de Pedido</label>
+                                <md-select ng-model="pedidoSelec.tipo_pedido_id"
+                                           ng-disabled="( formBlock || provSelec.id == '')" required>
+                                    <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
+                                        {{item.tipo}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="15">
+                                <label>N° de Pedido</label>
+                                <input  ng-model="pedidoSelec.id" ng-disabled="true">
+                            </md-input-container>
+
+                            <div layout="column" flex="15" style="margin-top: 8px;">
+                                <md-datepicker ng-model="pedidoSelec.emision"
+                                               md-placeholder="Fecha"
+                                               ng-disabled="(true)"
+                                ></md-datepicker>
                             </div>
 
-                        </div>
-                    </div>
-                    -->
 
-                    <div layout="row"  >
-                        <md-input-container class="md-block" flex="50" >
-                            <label>Proveedor</label>
-                            <md-select ng-model="provSelec.id" md-no-ink ng-disabled="(provSelec.save || formBlock)" required >
-                                <md-option ng-repeat="prov in todos" value="{{prov.id}}">
-                                    {{prov.razon_social}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="15">
-                            <label>Tipo de Pedido</label>
-                            <md-select ng-model="pedidoSelec.tipo_pedido_id"
-                                       ng-disabled="( formBlock || provSelec.id == '')" required>
-                                <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
-                                    {{item.tipo}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="15">
-                            <label>N° de Pedido</label>
-                            <input  ng-model="pedidoSelec.id" ng-disabled="true">
-                        </md-input-container>
-
-                        <div layout="column" flex="15" style="margin-top: 8px;">
-                            <md-datepicker ng-model="pedidoSelec.emision"
-                                           md-placeholder="Fecha"
-                                           ng-disabled="(true)"
-                            ></md-datepicker>
                         </div>
 
+                        <div layout="row" >
 
-                    </div>
+                            <md-input-container class="md-block" flex="30">
+                                <label>Pais</label>
+                                <md-select ng-model="pedidoSelec.pais_id" md-no-ink
+                                           ng-disabled="( formBlock || provSelec.id == '' )" required>
+                                    <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
+                                        {{item.short_name}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
-                    <div layout="row" >
+                            <md-input-container class="md-block"  flex>
+                                <label>Direccion</label>
+                                <md-select ng-model="pedidoSelec.direccion_almacen_id"
+                                           md-no-ink
+                                           ng-disabled="( formBlock || provSelec.id == '' || pedidoSelec.pais_id == ''  )" required>
+                                    <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
+                                        {{dir.direccion}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="30">
-                            <label>Pais</label>
-                            <md-select ng-model="pedidoSelec.pais_id" md-no-ink
-                                       ng-disabled="( formBlock || provSelec.id == '' )" required>
-                                <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
-                                    {{item.short_name}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                        </div>
 
-                        <md-input-container class="md-block"  flex>
-                            <label>Direccion</label>
-                            <md-select ng-model="pedidoSelec.direccion_almacen_id"
-                                       md-no-ink
-                                       ng-disabled="( formBlock || provSelec.id == '' || pedidoSelec.pais_id == ''  )" required>
-                                <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
-                                    {{dir.direccion}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                        <div layout="row" >
+                            <md-input-container class="md-block" flex="15">
+                                <label>Monto</label>
+                                <input  ng-model="pedidoSelec.monto" ui-number-mask type="text"
+                                        ng-disabled="( formBlock )" required>
+                            </md-input-container>
 
-                    </div>
+                            <md-input-container class="md-block" flex="10">
+                                <label>Moneda</label>
+                                <md-select ng-model="pedidoSelec.prov_moneda_id" md-no-ink
+                                           ng-disabled="( formBlock)" required>
+                                    <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
+                                        {{moneda.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
-                    <div layout="row" >
-                        <md-input-container class="md-block" flex="15">
-                            <label>Monto</label>
-                            <input  ng-model="pedidoSelec.monto" ui-number-mask type="text"
-                                    ng-disabled="( formBlock )" required>
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="10" ng-dblclick=" pedidoSelec.tasa_fija = 1 " >
+                                <label>Tasa</label>
+                                <input  ng-model="pedidoSelec.tasa"  ui-number-mask
+                                        ng-readonly="pedidoSelec.tasa_fija == 0 " ng-disabled="( formBlock)"required>
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="10">
-                            <label>Moneda</label>
-                            <md-select ng-model="pedidoSelec.prov_moneda_id" md-no-ink
+                            <md-input-container class="md-block" flex="">
+                                <label>Condicion de pago</label>
+                                <md-select ng-model="pedidoSelec.condicion_pago_id" ng-disabled="( formBlock)" required md-no-ink required>
+                                    <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
+                                        {{conPago.titulo}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                        </div>
+
+                        <div layout="row" >
+                            <md-input-container class="md-block" flex="">
+                                <label>Motivo Pedido </label>
+                                <md-select ng-model="pedidoSelec.motivo_pedido_id" required md-no-ink
+                                           ng-disabled="( formBlock)" required>
+                                    <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
+                                        {{motivoPed.motivo}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="">
+                                <label>Prioridad Pedido </label>
+                                <md-select  ng-model="pedidoSelec.prioridad_id"  required md-no-ink
+                                            ng-disabled="( formBlock)" required>
+                                    <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
+                                        {{prioPed.descripcion}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="">
+                                <label>Condiciones Pedido </label>
+                                <md-select ng-model="pedidoSelec.condicion_pedido_id" md-no-ink
+                                           ng-disabled="( formBlock)" required>
+                                    <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
+                                        {{condPed.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+
+                        <div layout="row" >
+                            <md-input-container class="md-block" flex >
+                                <label>Comentario</label>
+                                <input ng-model="pedidoSelec.comentario"  ng-disabled="( formBlock)">
+                            </md-input-container>
+                        </div>
+
+                        <div layout="row" >
+                            <md-input-container class="md-block" flex="20">
+                                <label>Mt3</label>
+                                <input ng-model="pedidoSelec.mt3"  name="mt3"  ng-model="number" ui-number-mask
+                                       ng-disabled="( formBlock)" required >
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="20" required>
+                                <label>Peso</label>
+                                <input ng-model="pedidoSelec.peso" name="peso"  ng-model="number" ui-number-mask
                                        ng-disabled="( formBlock)" required>
-                                <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
-                                    {{moneda.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                            </md-input-container>
+                        </div>
 
-                        <md-input-container class="md-block" flex="10" ng-dblclick=" pedidoSelec.tasa_fija = 1 " >
-                            <label>Tasa</label>
-                            <input  ng-model="pedidoSelec.tasa"  ui-number-mask
-                                    ng-readonly="pedidoSelec.tasa_fija == 0 " ng-disabled="( formBlock)"required>
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="">
-                            <label>Condicion de pago</label>
-                            <md-select ng-model="pedidoSelec.condicion_pago_id" ng-disabled="( formBlock)" required md-no-ink required>
-                                <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
-                                    {{conPago.titulo}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                    </form>
+                    <div class="titulo_formulario" layout="coumn" layout-align="start start" ng-click="showProduc()" >
+                        <div>
+                            <span style="color: #1f1f1f">({{pedidoSelec.productos.todos.length}})</span>
+                            Productos
+                        </div>
 
                     </div>
 
-                    <div layout="row" >
-                        <md-input-container class="md-block" flex="">
-                            <label>Motivo Pedido </label>
-                            <md-select ng-model="pedidoSelec.motivo_pedido_id" required md-no-ink
-                                       ng-disabled="( formBlock)" required>
-                                <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
-                                    {{motivoPed.motivo}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="">
-                            <label>Prioridad Pedido </label>
-                            <md-select  ng-model="pedidoSelec.prioridad_id"  required md-no-ink
-                                        ng-disabled="( formBlock)" required>
-                                <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
-                                    {{prioPed.descripcion}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="">
-                            <label>Condiciones Pedido </label>
-                            <md-select ng-model="pedidoSelec.condicion_pedido_id" md-no-ink
-                                       ng-disabled="( formBlock)" required>
-                                <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
-                                    {{condPed.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                    </div>
+                    <div >
+                        <div layout="row" class="headGridHolder">
 
-                    <div layout="row" >
-                        <md-input-container class="md-block" flex >
-                            <label>Comentario</label>
-                            <input ng-model="pedidoSelec.comentario"  ng-disabled="( formBlock)">
-                        </md-input-container>
-                    </div>
+                            <div flex="5" class="headGrid"></div>
+                            <div flex="15" class="headGrid"> Cod. Producto</div>
+                            <div flex="15" class="headGrid"> Cod. Profit</div>
+                            <div flex class="headGrid"> Descripción.</div>
+                            <div flex class="headGrid"> Doc. Origen</div>
+                            <div flex="10" class="headGrid"> Cantidad</div>
 
-                    <div layout="row" >
-                        <md-input-container class="md-block" flex="20">
-                            <label>Mt3</label>
-                            <input ng-model="pedidoSelec.mt3"  name="mt3"  ng-model="number" ui-number-mask
-                                   ng-disabled="( formBlock)" required >
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="20" required>
-                            <label>Peso</label>
-                            <input ng-model="pedidoSelec.peso" name="peso"  ng-model="number" ui-number-mask
-                                   ng-disabled="( formBlock)" required>
-                        </md-input-container>
-                    </div>
-
-                </form>
-                <div class="titulo_formulario" layout="coumn" layout-align="start start" ng-click="showProduc()" >
-                    <div>
-                        <span style="color: #1f1f1f">({{pedidoSelec.productos.todos.length}})</span>
-                        Productos
-                    </div>
-
-                </div>
-                <div >
-                    <div layout="row" class="headGridHolder">
-
-                        <div flex="5" class="headGrid"></div>
-                        <div flex="15" class="headGrid"> Cod. Producto</div>
-                        <div flex="15" class="headGrid"> Cod. Profit</div>
-                        <div flex class="headGrid"> Descripción.</div>
-                        <div flex class="headGrid"> Doc. Origen</div>
-                        <div flex="10" class="headGrid"> Cantidad</div>
-
-                    </div>
-                    <div id="gridResOdc">
-                        <div flex>
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.todos">
-                                <div flex="5" class="cellGrid">
-                                    <md-switch class="md-primary" ng-model="item.asignado"</md-switch>
+                        </div>
+                        <div id="gridResOdc">
+                            <div flex>
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.todos">
+                                    <div flex="5" class="cellGrid">
+                                        <md-switch class="md-primary" ng-model="item.asignado"</md-switch>
+                                    </div>
+                                    <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
+                                    <div flex="15" class="cellGrid"> {{item.cod_profit}}</div>
+                                    <div flex class="cellGrid">  {{item.descripcion}}</div>
+                                    <div flex class="cellGrid"> {{item.origen}}</div>
+                                    <md-input-container class="md-block" flex="10" >
+                                        <input  ng-model="item.saldo"
+                                                ui-number-mask type="text"
+                                                ng-disabled="(formBlock || !item.asignado )"
+                                        />
+                                    </md-input-container>
                                 </div>
-                                <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
-                                <div flex="15" class="cellGrid"> {{item.cod_profit}}</div>
-                                <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                <div flex class="cellGrid"> {{item.origen}}</div>
-                                <md-input-container class="md-block" flex="10" >
-                                    <input  ng-model="item.saldo"
-                                            ui-number-mask type="text"
-                                            ng-disabled="(formBlock || !item.asignado )"
-                                    />
-                                </md-input-container>
                             </div>
                         </div>
                     </div>
                 </div>
             </md-content>
+
             <!-----flecha siguiente -->
             <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
         </md-sidenav>
 
-        <!-- 12) ########################################## LAYER (3)ORDENES DE COMPRAS ########################################## -->
+
+        <!--  ########################################## LAYER (3)ORDENES DE COMPRAS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="odc" id="odc">
             <!--) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -561,81 +672,125 @@
             </md-content>
         </md-sidenav>
 
-
-        <!-- 15) ########################################## LAYER (5) Agregar Pedidos ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed" id="agrPed">
+        <!--  ########################################## LAYER Agregar Pedidos ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed" id="agrPed">
             <!-- ) ########################################## Agregar Pedidos ########################################## -->
-            <md-content  layout="row" style="'margin-top:0px;'" layout-padding flex>
+            <md-content  layout="row" style="margin-top:0px; height: 100%;" flex>
 
-                <!--<div class="titulo_formulario" layout="row" flex>-->
-                <div layout="column" flex>
-                    <div class="titulo_formulario md-block" layout-padding layout="row"  >
-                        <div>
-                            Contrapedidos
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'detallePedido')}"
+                     ng-show="(layer != 'detallePedido')"
+                     ng-click="closeLayer('detallePedido')" >
+                </div>
+                <div layout="row" flex>
+                    <div layout="column" flex>
+                        <div class="titulo_formulario md-block" layout-padding layout="row"  >
+                            <div>
+                                Contrapedidos
+                            </div>
+                            <div ng-click=" openLayer('agrContPed');">
+                                <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+                            </div>
                         </div>
-                        <div ng-click=" openLayer('agrContPed');">
-                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+
+                        <div >
+                            <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.contraPedido">
+
+                                    <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
+                                    <div flex="" class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
+                                    <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
+                    <div layout="column" flex>
+                        <div class="titulo_formulario md-block" layout-padding  layout="row" >
+                            <div>
+                                Kitchen Boxs
+                            </div>
+                            <div ng-click="openLayer('agrKitBoxs')">
+                                <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                            </div>
+                        </div>
 
-                    <div >
+                        <div >
+                            <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.kitchenBox">
+
+                                    <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
+                                    <div flex class="cellGrid"ng-click="selecKitchenBox(item)" > {{item.fecha | date:'dd/MM/yyyy' }}</div>
+                                    <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div layout="column" flex>
+                        <div class="titulo_formulario md-block" layout-padding  layout="row" >
+                            <div>
+                                Pedidos a Sustituir
+                            </div>
+                            <div ng-click="openLayer('agrPedPend')">
+                                <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                            </div>
+                        </div>
+
                         <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.contraPedido">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.productos.pedidoSusti">
 
-                                <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
-                                <div flex="" class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
-                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
+                                <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->
+                                <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
                                 <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
+                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
 
-                <div layout="column" flex>
-                    <div class="titulo_formulario md-block" layout-padding  layout="row" >
+            </md-content>
+        </md-sidenav>
+
+        <!--  ########################################## LAYER PRODUCTOS PROVEEDOR ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listProducProv" id="listProducProv">
+
+            <md-content  layout="row" flex
+                         ng-class="{ cntLayerHolder: layer == 'listProducProv' }"
+
+            >
+
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'listProducProv')}"
+                     ng-show="(layer != 'listProducProv')"
+                     ng-click="closeLayer('listProducProv')">
+                </div>
+                <div  layout="column" flex="">
+                    <div class="titulo_formulario" style="height:39px;">
                         <div>
-                            Kitchen Boxs
-                        </div>
-                        <div ng-click="openLayer('agrKitBoxs')">
-                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                            Pedido
                         </div>
                     </div>
-
-                    <div >
-                        <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.kitchenBox">
-
-                                <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
-                                <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
-                                <div flex class="cellGrid"ng-click="selecKitchenBox(item)" > {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                    <div layout="row" class="headGridHolder">
+                        <div flex="5" class="headGrid"> - </div>
+                        <div flex="10" class="headGrid"> Cod. Producto</div>
+                        <div flex class="headGrid"> Descripcion</div>
+                        <div flex="5" class="headGrid"> Stock</div>
+                    </div>
+                    <div class="gridContent"  >
+                        <div   ng-repeat="item in provSelec.productos" >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="5" class="cellGrid">
+                                    <md-switch class="md-primary" ng-model="item.asignado" ></md-switch>
+                                </div>                                <div flex="5" class="cellGrid" > {{item.codigo}}</div>
+                                <div flex class="cellGrid" > {{item.descripcion}}</div>
+                                <div flex="15" class="cellGrid"> {{item.stock}} (Demo)</div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div layout="column" flex>
-                    <div class="titulo_formulario md-block" layout-padding  layout="row" >
-                        <div>
-                            Pedidos a Sustituir
-                        </div>
-                        <div ng-click="openLayer('agrPedPend')">
-                            <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
-                        </div>
-                    </div>
-
-                    <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
-                        <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSelec.pedidoSusti">
-
-                            <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
-                            <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->
-                            <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
-                            <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
-                        </div>
-                    </div>
-                </div>
-                <!--</div>-->
             </md-content>
         </md-sidenav>
 
@@ -1126,8 +1281,6 @@
                         </md-input-container>
                     </div>
                 </form>
-
-
                 <form name="FormPedidoSusProduc" >
 
                     <div class="titulo_formulario"  style='margin-top: 20px;' layout="column" layout-align="start start">
