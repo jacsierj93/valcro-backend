@@ -61,7 +61,7 @@
                     <span class="icon-Actualizar" style="font-size: 24px"></span>
                    <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
-                <div layout="column" layout-align="center center" ng-click="toggleOtro()" ng-show="prov.id">
+                <div layout="column" layout-align="center center" ng-click="showAlert()" ng-show="prov.id">
                     <span class="icon-Filtro" style="font-size: 24px"></span>
                     <?/*= HTML::image("images/filtro.png") */?>
                 </div>
@@ -1123,6 +1123,21 @@
             <div style="width: 16px;" ng-mouseover="showNext(true,'END')">
 
             </div>
+        </md-sidenav>
+
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0">
+            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+            <md-content class="cntLayerHolder" layout="row" flex >
+                <div flex>
+
+                </div>
+                <div flex>
+
+                </div>
+                <div flex>
+
+                </div>
+            </md-content>
         </md-sidenav>
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">

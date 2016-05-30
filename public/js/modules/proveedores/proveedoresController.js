@@ -212,7 +212,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.showAlert = function(){
-        $mdSidenav("alert").open();
+      console.log(setGetProv.getChng());
     };
 
 
@@ -324,8 +324,8 @@ MyApp.service("setGetProv",function($http,providers){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var rollBack = {};
-    var changes = {};
+    var rollBack = {"dataProv":{}};
+    var changes = {"dataProv":{},"dirProv":{},"valName":{}};
     return {
         getProv: function () {
             return prov;
@@ -336,20 +336,20 @@ MyApp.service("setGetProv",function($http,providers){
                 id = itemsel.id;
                 providers.get({type:"getProv"},{id:id},function(data){
                     fullProv = data;
-                    rollBack = angular.copy(fullProv);
-                    purgeJson(rollBack);
                     prov.id = data.id;
                     prov.description = data.razon_social;
                     prov.siglas = data.siglas;
                     prov.type = data.tipo_id;
                     prov.envio = data.tipo_envio_id;
                     prov.contraped = (data.contrapedido==1)?true:false;
-                    ///prov.limCred = data.limCred;
+                    rollBack.dataProv[parseInt(prov.id)] = angular.copy(prov);
+
                 });
 
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
                 itemsel = {};
+                //rollBack.dataProv[0] = prov;
             }
         },
         updateItem: function(upd){
@@ -398,7 +398,33 @@ MyApp.service("setGetProv",function($http,providers){
         getRollBack : function() {
             return rollBack;
 
-        }
+        },
+        addChng : function(val,action,form){
+            console.log(rollBack);
+            console.log(val,rollBack[form][val.id])
+            if(action=="new" || !angular.equals(val,rollBack[form][val.id])){
+                console.log("entrooo")
+                if(changes[form][val.id]){
+                    changes[form][val.id].datos = val;
+                    if(!(changes[form][val.id].action=="new" && action=="upd")){
+                        changes[form][val.id].action = action;
+                    }
+                }else{
+                    changes[form][val.id] = {
+                        datos:val,
+                        action:action
+                    }
+                }
+            }else{
+                console.log("else")
+                delete changes[form][val.id];
+            }
+
+
+        },
+        getChng : function(){
+        return changes;
+         }
     };
 });
 
@@ -458,6 +484,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveProv"},$scope.dtaPrv,function(data){
+                setGetProv.addChng($scope.dtaPrv,data.action,"dataProv");
                 $scope.dtaPrv.id = data.id;
                 $scope.projectForm.$setPristine();
                 setGetProv.updateItem($scope.dtaPrv);
@@ -521,6 +548,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveProvAddr"},$scope.dir,function(data){
                 $scope.dir.id = data.id;
+                setGetProv.addChng($scope.dir,data.action,"dirProv")
                 $scope.direccionesForm.$setPristine();
                 dirSel.id = $scope.dir.id;
                 dirSel.direccion =  $scope.dir.direccProv;
@@ -547,6 +575,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                     addr = elem.add;
                     console.log(addr)
                         providers.put({type:"delAddr"},addr,function(data){
+                            setGetProv.addChng(addr,data.action,"dirProv");
                             $scope.address.splice(addr.$index,1);
                             $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
                             dirSel = {};
@@ -671,7 +700,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     function saveValcroname(){
         providers.put({type: "saveValcroName"}, $scope.valName, function (data) {
             $scope.valName.id = data.id;
+            setGetProv.addChng($scope.valName,data.action,"valName");
             $scope.nomvalcroForm.$setPristine();
+            $scope.valName.id = data.id;
+            valcroName.id = data.id;
             valcroName.name = $scope.valName.name;
             var temp = [];
             var i = 0;
@@ -686,6 +718,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             });
             if (data.action == "new") {
                 valcroName.departments = Object();
+                $scope.valName.departments = Object();
                 $scope.valcroName.unshift(valcroName);
                 setNotif.addNotif("ok", "Nuevo Nombre Valcro", [
                 ],{autohidden:3000});
@@ -705,6 +738,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         url: "provider/delValcroName",
                         data: chip
                     }).then(function successCallback(response) {
+                        setGetProv.addChng(chip,response.data.action,"valName");
                         $scope.valcroName.splice(name.$index,1);
                         $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                         valcroName = {};
@@ -902,6 +936,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
                     $scope.cnt.id = data.id;
                     $scope.provContactosForm.$setPristine();
+                    setGetProv.addChng($scope.cnt,data.action,"provContact");
                     contact.id = $scope.cnt.id;
                     contact.nombre = $scope.cnt.nombreCont;
                     contact.email = $scope.cnt.emailCont;
@@ -933,6 +968,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 action: function () {
                     cont = elem.cont;
                     providers.put({type:"delContac"},cont,function(data){
+                        setGetProv.addChng(cont,data.action,"provContact");
                         $scope.contacts.splice(cont.$index,1);
                         setGetContac.addUpd(cont,$scope.prov);
                         contact = {};
