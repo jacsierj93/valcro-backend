@@ -56,6 +56,8 @@ class PaymentController extends BaseController
 
         $result = array();
         foreach ($provs as $prv) {
+            
+            $temp = array();
 
             $temp["id"] = $prv->id;
             $temp["razon_social"] = $prv->razon_social;
@@ -145,6 +147,7 @@ class PaymentController extends BaseController
         $result = array();
         foreach ($pagos as $pago) {
 
+            $temp = array();
             $temp["id"] = $pago->id;
             $temp["monto"] = $pago->monto;
             $temp["fecha"] = $pago->fecha_pago;
@@ -203,6 +206,8 @@ class PaymentController extends BaseController
         $result = array();
         foreach ($pagos as $pago) {
 
+            $temp = array();
+
             $temp["id"] = $pago->id;
             $temp["nro_factura"] = $pago->nro_factura;
             $temp["fecha"] = $pago->fecha;
@@ -229,6 +234,8 @@ class PaymentController extends BaseController
         $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->debtsIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
+
+            $temp = array();
 
             $temp["id"] = $deuda->id;
             $temp["nro_factura"] = $deuda->nro_factura;
@@ -257,6 +264,8 @@ class PaymentController extends BaseController
         foreach ($deudas as $deuda) {
 
             if ($deuda->ncuotas() == 0) { ///puras cuotas y facturas sin cuotas
+
+                $temp = array();
 
                 $temp["id"] = $deuda->id;
                 $temp["nro_factura"] = $deuda->nro_factura;
