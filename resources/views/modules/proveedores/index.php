@@ -937,6 +937,7 @@
                             <div id="grid" style="overflow-y: auto; height: 120px">
                                 <div flex ng-repeat="point in points" ng-click="toEdit(this)" >
                                     <div layout="row" layout-wrap class="cellGridHolder">
+                                        <div ng-show="(point.id==pnt.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmPoint(this)"></div>
                                         <div flex="30" class="cellGrid"> {{point.costo}}</div>
                                         <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{point.moneda.nombre}}</div>
                                         <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{point.linea.linea}}</div>

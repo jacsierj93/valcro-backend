@@ -326,8 +326,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var rollBack = {"dataProv":{}};
-    var changes = {"dataProv":{},"dirProv":{},"valName":{}};
+    var rollBack = {"dataProv":[]};
+    var changes = {"dataProv":[],"dirProv":[],"valName":[]};
     return {
         getProv: function () {
             return prov;
@@ -351,11 +351,10 @@ MyApp.service("setGetProv",function($http,providers,$q){
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
                 itemsel = {};
-                //rollBack.dataProv[0] = prov;
+                rollBack.dataProv = false;
             }
         },
         updateItem: function(upd){
-            console.log(upd.id)
             itemsel.id = upd.id;
             itemsel.razon_social = upd.description;
             itemsel.limCred = upd.limCred;
@@ -398,23 +397,22 @@ MyApp.service("setGetProv",function($http,providers,$q){
             return list.length;
         },
         addChng : function(val,action,form){
-            if(action=="new" || !angular.equals(val,rollBack[form][val.id])){
-                if(changes[form][val.id]){
-                    changes[form][val.id].datos = val;
-                    if(!(changes[form][val.id].action=="new" && action=="upd")){
-                        changes[form][val.id].action = action;
+
+            if(!rollBack.dataProv || !angular.equals(val,rollBack[form][val.id])){
+                if(changes[form][parseInt(val.id)]){
+                    changes[form][parseInt(val.id)].datos = val;
+                    if(!(changes[form][parseInt(val.id)].action=="new" && action=="upd")){
+                        changes[form][parseInt(val.id)].action = action;
                     }
                 }else{
-                    changes[form][val.id] = {
+                    changes[form][parseInt(val.id)] = {
                         datos:val,
                         action:action
                     }
                 }
             }else{
-                delete changes[form][val.id];
+                delete changes[form][parseInt(val.id)];
             }
-
-
         },
         getChng : function(){
             return changes;
@@ -425,10 +423,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
             var i = 1;
             x = false;
             angular.forEach(changes,function(v,k){
-                console.log(Object.keys(v).length)
-                if(Object.keys(v).length>0){
+                if(v.length>0){
                     x=true;
-                    console.log("entro")
                 }
             });
             return x;
@@ -1799,6 +1795,7 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
 });
 
  MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
-     $dataProv = setGetProv.getChng();
+     $scope.prov = setGetProv.getProv();
+     $scope.dataProv = setGetProv.getChng();
 
  });
