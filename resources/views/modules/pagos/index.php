@@ -19,7 +19,7 @@
 
             </div>
             <div ng-show="provData.id!=''" layout="column" layout-align="center center" ng-click="setFormAdelanto()">
-                <?= HTML::image("images/agregar.png") ?>
+                <span class="icon-Agregar" style="font-size: 24px"></span>
             </div>
             <div ng-show="false" layout="column" layout-align="center center">
                 <?= HTML::image("images/actualizar.png") ?>
@@ -640,9 +640,9 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Tipo Pago</label>
-                            <md-select  ng-model="abono.tipo_id" required md-no-ink>
+                            <md-select ng-model="abono.tipo_id" required md-no-ink>
                                 <md-option ng-repeat="tipoPago in tipoDocsPago"
-                                           ng-selected="tipoPago.id==abono.tipo_id"    value="{{tipoPago.id}}">
+                                           ng-selected="tipoPago.id==abono.tipo_id" value="{{tipoPago.id}}">
                                     {{tipoPago.descripcion}}
                                 </md-option>
                             </md-select>
@@ -693,7 +693,6 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
-
 
 
                         <md-input-container class="md-block" flex="15">
@@ -749,7 +748,6 @@
                     </div>
 
 
-
                     <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
                         <div>
                             Deudas adquiridas con el proveedor
@@ -772,31 +770,31 @@
 
                 </form>
 
-                    <div id="grid" flex style="overflow-y: auto;">
-                        <div ng-repeat="doc in provData.deudas2" flex>
-                            <div layout="row" class="cellGridHolder">
-                                <div class="cellGrid">
-                                    <md-switch class="md-primary" ng-disabled="enabled">
-                                    </md-switch>
-                                </div>
-                                <div flex="10" class="cellGrid">{{doc.tipo}}</div>
-                                <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
-                                <div flex class="cellGrid">{{doc.fecha}}</div>
-                                <div flex class="cellGrid">{{doc.vence}} </div>
-                                <div flex class="cellGrid">
-                                    <div style="width: 16px; height: 16px; border-radius: 50%"
-                                              class="{{doc.vencido}}"></div>
-                                </div>
-                                <div flex="10" class="cellGrid">{{doc.monto | currency : $ : 2}}</div>
-                                <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-                                <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-                                <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-
+                <div id="grid" flex style="overflow-y: auto;">
+                    <div ng-repeat="doc in provData.deudas2" flex>
+                        <div layout="row" class="cellGridHolder">
+                            <div class="cellGrid">
+                                <md-switch ng-true-value="1" ng-false-value="0" class="md-primary"
+                                           ng-model="doc.seleccionado"
+                                           ng-disabled="enabled">
+                                </md-switch>
                             </div>
+                            <div flex="10" class="cellGrid">{{doc.tipo}}</div>
+                            <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
+                            <div flex class="cellGrid">{{doc.fecha}}</div>
+                            <div flex class="cellGrid">{{doc.vence}}</div>
+                            <div flex class="cellGrid">
+                                <div style="width: 16px; height: 16px; border-radius: 50%"
+                                     class="{{doc.vencido}}"></div>
+                            </div>
+                            <div flex="10" class="cellGrid">{{doc.monto | currency : $ : 2}}</div>
+                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+
                         </div>
                     </div>
-
-
+                </div>
 
 
             </md-content>
@@ -861,7 +859,7 @@
                     <div flex="10" class="headGrid"> Pagar</div>
                 </div>
                 <div id="grid" flex style="overflow-y: auto;">
-                    <div ng-repeat="doc in provData.deudas2" flex>
+                    <div ng-repeat="doc in provData.deudas2  | filter:{ seleccionado: 1 }" flex>
                         <div layout="row" class="cellGridHolder">
                             <div flex="10" class="cellGrid">{{doc.tipo}}</div>
                             <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
