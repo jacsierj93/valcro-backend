@@ -102,9 +102,17 @@
             <div class="botonera" layout="row" layout-align="start center">
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
-                    <div layout="column" layout-align="center center" ng-click="DtPedido()"><?= HTML::image("images/agregar.png") ?></div>
-                    <div layout="column" layout-align="center center" ng-show="(index > 1 )" ng-click="updateForm()"><?= HTML::image("images/actualizar.png") ?> </div>
-                    <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()"><?= HTML::image("images/filtro.png") ?></div>
+
+                    <div layout="column" layout-align="center center" ng-click="DtPedido()">
+                        <span class="icon-Agregar" style="font-size: 24px"></span>
+                    </div>
+                    <div layout="column" layout-align="center center" ng-show="(index > 1 )" ng-click="updateForm()">
+                        <span class="icon-Actualizar" style="font-size: 24px"></span>
+                    </div>
+                    <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
+                        <span class="icon-Filtro" style="font-size: 24px"></span>
+
+                    </div>
                     <div layout="column" layout-align="center center"></div>
 
                 </div>
