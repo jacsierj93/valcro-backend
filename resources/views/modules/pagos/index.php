@@ -211,7 +211,7 @@
                 </div>
 
                 <div layout="row" class="headGridHolder">
-                    <div flex="10" class="headGrid"> N° Cuota</div>
+                    <div ng-show="debData.factura_tipo=='cc'" flex="10" class="headGrid"> N° Cuota</div>
                     <div flex="10" class="headGrid"> Vencimiento</div>
                     <div flex class="headGrid"> Descripcion</div>
                     <div flex class="headGrid"> Condicion Cuota</div>
@@ -221,7 +221,7 @@
                 <div id="grid" flex style="overflow-y: auto;">
                     <div ng-repeat="cuota in debData.cuotas" flex>
                         <div layout="row" class="cellGridHolder" ng-click="setPagoCuota(debData,cuota)">
-                            <div flex="10" class="cellGrid">{{$index+1}}</div>
+                            <div ng-show="debData.factura_tipo=='cc'" flex="10" class="cellGrid">{{$index+1}}</div>
                             <div flex="10" class="cellGrid">{{cuota.fecha_vence}}</div>
                             <div flex class="cellGrid">{{cuota.nro_factura}}</div>
                             <div flex class="cellGrid">{{cuota.descripcion}}</div>

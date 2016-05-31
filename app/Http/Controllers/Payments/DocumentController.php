@@ -79,6 +79,8 @@ class DocumentController extends BaseController
                     $cdata[] = $temp;
                 }
 
+                $data["factura_tipo"] = 'cc'; ///con cuota
+
             } else { ///factura sin cuotas (es la propia deuda)
 
                 $temp = array();
@@ -89,6 +91,8 @@ class DocumentController extends BaseController
                 $temp["saldo"] = $doc->saldo;
                 $temp["vencimiento"] = 'v' . $doc->vencimiento();
                 $cdata[] = $temp;
+
+                $data["factura_tipo"] = 'sc'; ///sin cuota
 
             }
 
@@ -109,11 +113,18 @@ class DocumentController extends BaseController
     public function getAbonoList($type)
     {
 
-        $provId = Session::get("PROVID");
-        $abonos = DocumentCP::where("prov_id", $provId)->whereIn('tipo_id', $this->payIds)->orderBy('id', 'desc');
+
+        $abonos = DocumentCP::whereIn('tipo_id', $this->payIds)->orderBy('id', 'desc');
+
+        /////si esta seleccionado el proveedor / sino trae todos los documentos
+        if (Session::has('PROVID')) {
+            $provId = Session::get("PROVID");
+            $abonos = $abonos->where("prov_id", $provId);
+        }
+
 
         if ($type == "new") {
-            $abonos = $abonos->where("estatus", 1);
+            $abonos = $abonos->where("estatus", 1); ///sin usar
         }
 
 

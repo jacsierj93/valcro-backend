@@ -209,6 +209,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             $scope.debData.provid = response.prov_id;
             $scope.debData.factura = response.doc_factura;
             $scope.debData.cuotas = response.doc_cuotas;
+            $scope.debData.factura_tipo = response.factura_tipo;
 
             console.log("trayendo datos deuda:" + doc.id);
         });
