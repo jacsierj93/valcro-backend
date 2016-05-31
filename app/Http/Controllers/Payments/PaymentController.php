@@ -75,12 +75,12 @@ class PaymentController extends BaseController
 
             foreach ($docs as $doc) {
 
-                ////////totalizando abonos
+                ////////totalizando pagos (documentos tipo NDC,ADE,REB sin terminar de consumir)
                 if (in_array($doc->tipo_id, $abonos)) {
                     $total_abonos += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
                 }
 
-                ////total deudas
+                ////total deudas (saldos de cuotas y (facturas sin cuotas) sin terminar de pagar por completo)
                 if (in_array($doc->tipo_id, $deudas)) {
                     $total_deuda += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
                 }
@@ -219,7 +219,6 @@ class PaymentController extends BaseController
             $temp["tipo"] = $pago->tipo->descripcion;
             $temp["saldo"] = $pago->saldo;
             $temp["pagado"] = $pago->monto - $pago->saldo;
-
 
             $result[] = $temp;
         }

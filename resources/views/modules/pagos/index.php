@@ -569,12 +569,12 @@
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>Monto Recargo</label>
-                            <input ng-model="abono.monto_rec"/>
+                            <input ng-change="getRecargoPercent('r')" ng-model="abono.monto_rec"/>
                         </md-input-container>
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>% Recargo</label>
-                            <input ng-model="abono.monto_recp"/>
+                            <input ng-change="getRecargoPercent('c')" ng-model="abono.monto_recp"/>
                         </md-input-container>
 
 
