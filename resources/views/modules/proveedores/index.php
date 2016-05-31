@@ -937,6 +937,7 @@
                             <div id="grid" style="overflow-y: auto; height: 120px">
                                 <div flex ng-repeat="point in points" ng-click="toEdit(this)" >
                                     <div layout="row" layout-wrap class="cellGridHolder">
+                                        <div ng-show="(point.id==pnt.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmPoint(this)"></div>
                                         <div flex="30" class="cellGrid"> {{point.costo}}</div>
                                         <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{point.moneda.nombre}}</div>
                                         <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{point.linea.linea}}</div>
@@ -1125,10 +1126,15 @@
             </div>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex >
+            <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProvFinal">
                 <div flex>
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-show="dataProv.dataProv.length>0">
+                        <div>
+                            Datos Proveedor
+                        </div>
+                    </div>
 
                 </div>
                 <div flex>
