@@ -56,7 +56,7 @@ class PaymentController extends BaseController
 
         $result = array();
         foreach ($provs as $prv) {
-            
+
             $temp = array();
 
             $temp["id"] = $prv->id;
@@ -75,12 +75,12 @@ class PaymentController extends BaseController
 
             foreach ($docs as $doc) {
 
-                ////////totalizando abonos
+                ////////totalizando pagos (documentos tipo NDC,ADE,REB sin terminar de consumir)
                 if (in_array($doc->tipo_id, $abonos)) {
                     $total_abonos += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
                 }
 
-                ////total deudas
+                ////total deudas (saldos de cuotas y (facturas sin cuotas) sin terminar de pagar por completo)
                 if (in_array($doc->tipo_id, $deudas)) {
                     $total_deuda += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
                 }
@@ -118,6 +118,11 @@ class PaymentController extends BaseController
             $result[] = $temp;
 
         }
+
+
+        /////resetiando variables de sesion de proveedores
+        Session::forget("PROVNAME");
+        Session::forget("PROVID");
 
 
         return $result;
@@ -215,7 +220,6 @@ class PaymentController extends BaseController
             $temp["saldo"] = $pago->saldo;
             $temp["pagado"] = $pago->monto - $pago->saldo;
 
-
             $result[] = $temp;
         }
 
@@ -231,7 +235,7 @@ class PaymentController extends BaseController
     {
 
         /////puras facturas no pagadas por completo
-        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->debtsIds)->get();
+        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus", 1)->whereIn('tipo_id', $this->debtsIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
 
@@ -259,7 +263,7 @@ class PaymentController extends BaseController
     {
 
         ////trayendo las facturas y cuotas que no hayan sido pagadas
-        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->factCuoIds)->get();
+        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus", 1)->whereIn('tipo_id', $this->factCuoIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
 

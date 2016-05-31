@@ -211,7 +211,7 @@
                 </div>
 
                 <div layout="row" class="headGridHolder">
-                    <div flex="10" class="headGrid"> N° Cuota</div>
+                    <div ng-show="debData.factura_tipo=='cc'" flex="10" class="headGrid"> N° Cuota</div>
                     <div flex="10" class="headGrid"> Vencimiento</div>
                     <div flex class="headGrid"> Descripcion</div>
                     <div flex class="headGrid"> Condicion Cuota</div>
@@ -220,8 +220,8 @@
                 </div>
                 <div id="grid" flex style="overflow-y: auto;">
                     <div ng-repeat="cuota in debData.cuotas" flex>
-                        <div layout="row" class="cellGridHolder" ng-click="setPagoCuota(debData,cuota)">
-                            <div flex="10" class="cellGrid">{{$index+1}}</div>
+                        <div layout="row" class="cellGridHolder" ng-click="setPagoCuota(debData,cuota,$index)">
+                            <div ng-show="debData.factura_tipo=='cc'" flex="10" class="cellGrid">{{$index+1}}</div>
                             <div flex="10" class="cellGrid">{{cuota.fecha_vence}}</div>
                             <div flex class="cellGrid">{{cuota.nro_factura}}</div>
                             <div flex class="cellGrid">{{cuota.descripcion}}</div>
@@ -257,7 +257,8 @@
 
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex>
                         <div>
-                            Pago cuota: <span style="color: #000;">Nro. NUMERO DE LA CUOTA, Factura Nro. {{payData.factura}}, Proveedor: {{payData.provname}}</span>
+                            Pago: <span style="color: #000;"><span ng-show="debData.factura_tipo=='cc'">CUOTA Nro. {{debData.actual+1}}, </span>
+                                Factura Nro. {{debData.factura}}, Proveedor: {{debData.provname}}</span>
                         </div>
                     </div>
                     <div layout="row">
@@ -271,7 +272,6 @@
                         <div layout="column" flex>
                             <md-datepicker ng-model="pago.fecha" required md-placeholder="fecha"></md-datepicker>
                         </div>
-
 
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
@@ -352,14 +352,14 @@
                         </div>
                         <md-input-container class="md-block" flex>
                             <label>Saldo</label>
-                            <input ng-model="pago.saldo"/>
+                            <input ng-value="debData.saldo" ng-model="pago.saldo"/>
                         </md-input-container>
                         <div flex="5">
 
                         </div>
                         <md-input-container class="md-block" flex>
                             <label>Total A Pagar</label>
-                            <input ng-model="pago.total"/>
+                            <input ng-value="debData.total" ng-model="pago.total"/>
                         </md-input-container>
 
                     </div>
@@ -539,7 +539,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input ng-model="abono.monto" required/>
+                            <input ng-change="getRecargoPercent('m')" ng-model="abono.monto" required/>
 
                         </md-input-container>
 
@@ -569,12 +569,12 @@
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>Monto Recargo</label>
-                            <input ng-model="abono.monto_rec"/>
+                            <input ng-change="getRecargoPercent('r')" ng-model="abono.monto_rec"/>
                         </md-input-container>
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>% Recargo</label>
-                            <input ng-model="abono.monto_recp"/>
+                            <input ng-change="getRecargoPercent('c')" ng-model="abono.monto_recp"/>
                         </md-input-container>
 
 

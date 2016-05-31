@@ -5,9 +5,19 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     var base = 264;
     $scope.toolBar = {"add": true, "edit": false, "filter": false} ///botonera
     $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
-    $scope.debData = {"id": '', "provname": '', "provid": '', "factura": '', "cuotas": ''};
+    $scope.debData = {
+        "id": '',
+        "provname": '',
+        "provid": '',
+        "factura": '',
+        "cuotas": '',
+        "actual": '',
+        'total': 0.0,
+        'saldo': 0.0
+    };
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
     $scope.abonos = {};
+    $scope.abono = {"monto":0.0,"monto_rec":0.0,"monto_recp":0.0};
     $scope.provSelected = {};
     $scope.deudaList = [];
 
@@ -26,13 +36,26 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     }
 
 
-
-    
     $scope.setDeudaList = function (item) {
         $scope.deudaList.push(item);
         console.log($scope.deudaList);
     }
 
+
+    ///////calculo del recargo
+    $scope.getRecargoPercent = function (opc) {
+
+        if (opc == 'r') ///rec
+            $scope.abono.monto_recp = (($scope.abono.monto_rec * 100) / $scope.abono.monto).toFixed(2);
+        else if (opc == 'p') ///%
+            $scope.abono.monto_rec = (($scope.abono.monto * $scope.abono.monto_recp) / 100).toFixed(2);
+        else {
+            $scope.abono.monto_recp = (($scope.abono.monto_rec * 100) / $scope.abono.monto).toFixed(2);
+            $scope.abono.monto_rec = (($scope.abono.monto * $scope.abono.monto_recp) / 100).toFixed(2);
+        }
+
+
+    }
 
 
     function openLayer(layr) {
@@ -189,7 +212,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         });
 
 
-        closeLayer(true)
+        closeLayer(true);
         openLayer("lyr1pag");
 
     };
@@ -209,6 +232,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             $scope.debData.provid = response.prov_id;
             $scope.debData.factura = response.doc_factura;
             $scope.debData.cuotas = response.doc_cuotas;
+            $scope.debData.factura_tipo = response.factura_tipo;
 
             console.log("trayendo datos deuda:" + doc.id);
         });
@@ -216,9 +240,9 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     };
 
 
-    $scope.setPagoCuota = function (doc, cuota) {
+    $scope.setPagoCuota = function (doc, cuota, actual) {
 
-        openLayer('lyr3pag')
+        openLayer('lyr3pag');
 
         $http.get('payments/getDocById/' + doc.id).success(function (response) {
 
@@ -227,6 +251,11 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             $scope.payData.provname = response.prov_nombre;
             $scope.payData.provid = response.prov_id;
             $scope.payData.factura = response.doc_factura;
+
+
+            $scope.debData.actual = actual; ///cuota a pagar en  caso de...
+            $scope.debData.total = cuota.monto;
+            $scope.debData.saldo = cuota.saldo;
 
             console.log("trayendo datos del pago de la cuota:" + cuota.id);
         });
