@@ -675,11 +675,13 @@
         <!--  ########################################## LAYER Agregar Pedidos ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed" id="agrPed">
             <!-- ) ########################################## Agregar Pedidos ########################################## -->
-            <md-content  layout="row" style="margin-top:0px; height: 100%;" flex>
+            <md-content  layout="row" style="margin-top:0px; height: 100%;"
+                         ng-class="{cntLayerHolder: agrPed == 'agrPed' }"
+                         flex>
 
-                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'detallePedido')}"
-                     ng-show="(layer != 'detallePedido')"
-                     ng-click="closeLayer('detallePedido')" >
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'agrPed')}"
+                     ng-show="(layer != 'agrPed')"
+                     ng-click="closeLayer('agrPed')" >
                 </div>
                 <div layout="row" flex>
                     <div layout="column" flex>
