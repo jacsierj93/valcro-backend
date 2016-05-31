@@ -56,7 +56,7 @@ class PaymentController extends BaseController
 
         $result = array();
         foreach ($provs as $prv) {
-            
+
             $temp = array();
 
             $temp["id"] = $prv->id;
@@ -118,6 +118,11 @@ class PaymentController extends BaseController
             $result[] = $temp;
 
         }
+
+
+        /////resetiando variables de sesion de proveedores
+        Session::forget("PROVNAME");
+        Session::forget("PROVID");
 
 
         return $result;
@@ -231,7 +236,7 @@ class PaymentController extends BaseController
     {
 
         /////puras facturas no pagadas por completo
-        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->debtsIds)->get();
+        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus", 1)->whereIn('tipo_id', $this->debtsIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
 
@@ -259,7 +264,7 @@ class PaymentController extends BaseController
     {
 
         ////trayendo las facturas y cuotas que no hayan sido pagadas
-        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus",1)->whereIn('tipo_id', $this->factCuoIds)->get();
+        $deudas = DocumentCP::where("prov_id", $provId)->where("estatus", 1)->whereIn('tipo_id', $this->factCuoIds)->get();
         $result = array();
         foreach ($deudas as $deuda) {
 

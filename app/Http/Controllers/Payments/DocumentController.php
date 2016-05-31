@@ -75,6 +75,7 @@ class DocumentController extends BaseController
                     $temp["nro_factura"] = $cc->nro_factura;
                     $temp["descripcion"] = $cc->descripcion;
                     $temp["saldo"] = $cc->saldo;
+                    $temp["monto"] = $cc->monto;
                     $temp["vencimiento"] = 'v' . $cc->vencimiento();
                     $cdata[] = $temp;
                 }
@@ -89,10 +90,11 @@ class DocumentController extends BaseController
                 $temp["nro_factura"] = $doc->nro_factura;
                 $temp["descripcion"] = $doc->descripcion;
                 $temp["saldo"] = $doc->saldo;
+                $temp["monto"] = $doc->monto;
                 $temp["vencimiento"] = 'v' . $doc->vencimiento();
                 $cdata[] = $temp;
 
-                $data["factura_tipo"] = 'sc'; ///sin cuota
+                $data["factura_tipo"] = 'sc'; ///sin cuota, para direfenciar
 
             }
 
