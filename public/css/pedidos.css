@@ -57,9 +57,6 @@
     color: #CCCCCC;
 }
 
-.filterItem{
-    color: rgb(84, 180, 234);
-}
  .rowRsm{
      height: 28px;
  }
@@ -78,10 +75,12 @@
 .cntLayerHolder{
     height: 100%;
 }
-.demo{
-    background-color: red;
-}
 
 .fontEli {
     font-size: 16px; float: right; color: #0a0a0a
+}
+
+.filterIt{
+    background-color: red;
+    border-radios:0px;
 }

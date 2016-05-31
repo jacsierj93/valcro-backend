@@ -127,8 +127,9 @@
                          layout-align="center center"  >
                         Todos
                     </div>-->
-                    <md-input-container class="md-block" layout-align="center center" style="width: 84px;"  >
-                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink md-container-class=" demo">
+                    <div layout="colum" style="height: 28px;" flex="25" layout-align="center center">
+                    <!--<md-input-container class="md-block" layout-align="center center" flex  >
+                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink >
                             <md-option ng-repeat="item in filterData.tipoPedidos" >
                                 {{item.tipo}}
                             </md-option>
@@ -136,7 +137,9 @@
                                 Todos
                             </md-option>
                         </md-select>
-                    </md-input-container>
+                    </md-input-container>-->
+                        
+                    </div>
                 </div>
             </div>
 

@@ -100,6 +100,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         }
     }
 
+    $scope.filtOpen= function(){
+       if($scope.isOpen){
+           $scope.isOpen=false;
+       }else {
+           $scope.isOpen=true;
+       }
+    }
+
 
     /********************************************EVENTOS ********************************************/
 
@@ -155,7 +163,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         console.log('click ', a);
         a.click();
     }
-    $scope.isOpen= true;
+    $scope.isOpen= false;
 
     /********************************************otros ********************************************/
 
