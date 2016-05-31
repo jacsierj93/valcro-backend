@@ -539,7 +539,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input ng-model="abono.monto" required/>
+                            <input ng-change="getRecargoPercent('m')" ng-model="abono.monto" required/>
 
                         </md-input-container>
 

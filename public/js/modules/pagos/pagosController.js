@@ -17,6 +17,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     };
     $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
     $scope.abonos = {};
+    $scope.abono = {"monto":0.0,"monto_rec":0.0,"monto_recp":0.0};
     $scope.provSelected = {};
     $scope.deudaList = [];
 
@@ -44,10 +45,14 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
     ///////calculo del recargo
     $scope.getRecargoPercent = function (opc) {
 
-        if(opc=='r') ///rec
-        $scope.abono.monto_recp = (($scope.abono.monto_rec*100)/$scope.abono.monto).toFixed(2);
-        else ///%
-        $scope.abono.monto_rec = (($scope.abono.monto*$scope.abono.monto_recp)/100).toFixed(2);
+        if (opc == 'r') ///rec
+            $scope.abono.monto_recp = (($scope.abono.monto_rec * 100) / $scope.abono.monto).toFixed(2);
+        else if (opc == 'p') ///%
+            $scope.abono.monto_rec = (($scope.abono.monto * $scope.abono.monto_recp) / 100).toFixed(2);
+        else {
+            $scope.abono.monto_recp = (($scope.abono.monto_rec * 100) / $scope.abono.monto).toFixed(2);
+            $scope.abono.monto_rec = (($scope.abono.monto * $scope.abono.monto_recp) / 100).toFixed(2);
+        }
 
 
     }
@@ -260,11 +265,6 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         $scope.getAbonosNew();
 
     }
-
-
-
-
-
 
 
     $scope.setPago = function (doc) {
