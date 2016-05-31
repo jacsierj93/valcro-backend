@@ -103,7 +103,7 @@
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" layout-align="center center" ng-click="DtPedido()">
+                    <div layout="column" ng-show="(index < 1 )" layout-align="center center" ng-click="DtPedido()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center" ng-show="(index > 1 )" ng-click="updateForm()">
@@ -118,17 +118,17 @@
                 </div>
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
 
-                <div layout="row" ng-show="(layer == 'listPedido')" >
-                    <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                <div layout="row" ng-show="(layer == 'listPedido')"  flex>
+                   <!-- <div style="margin-left: 4px; margin-right: 4px" layout="colum"
                          layout-align="center center" ng-repeat="item in filterData.tipoPedidos"  >
                         {{item.tipo}}
                     </div>
                     <div style="margin-left: 4px; margin-right: 4px" layout="colum"
                          layout-align="center center"  >
                         Todos
-                    </div>
-                    <md-input-container class="md-block" layout-align="center center"  >
-                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink >
+                    </div>-->
+                    <md-input-container class="md-block" layout-align="center center" style="width: 84px;"  >
+                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink md-container-class=" demo">
                             <md-option ng-repeat="item in filterData.tipoPedidos" >
                                 {{item.tipo}}
                             </md-option>
@@ -196,7 +196,10 @@
                                          class="emit{{item.diasEmit}}"></div>
                                 </div>
                                 <div flex="10" layout="row" class="cellGrid cellGridImg" ng-mouseover="hoverPreview()" style="float: left;">
-                                    <div  ng-show="item.aero == 1 " style="margin-right: 8px;"><?= HTML::image("images/aereo.png") ?> </div>
+                                    <div  ng-show="item.aero == 1 " style="margin-right: 8px;">
+                                        <span class="icon-Aereo" style="font-size: 24px"></span>
+
+                                    </div>
                                     <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
                                 </div>
                                 <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
@@ -698,7 +701,8 @@
                                 Contrapedidos
                             </div>
                             <div ng-click=" openLayer('agrContPed');">
-                                <?= HTML::image("images/agregar.png",'null', array('class' => 'image') ) ?>
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+
                             </div>
                         </div>
 
@@ -709,7 +713,9 @@
                                     <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
                                     <div flex="" class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
                                     <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                    <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                    <div flex="10" class="cellGrid" ng-click="removeList(item)">
+                                        <span class="icon-Eliminar fontEli"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -721,7 +727,7 @@
                                 Kitchen Boxs
                             </div>
                             <div ng-click="openLayer('agrKitBoxs')">
-                                <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                             </div>
                         </div>
 
@@ -732,7 +738,9 @@
                                     <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
                                     <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
                                     <div flex class="cellGrid"ng-click="selecKitchenBox(item)" > {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                    <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                    <div flex="10" class="cellGrid" ng-click="removeList(item)">
+                                        <span class="icon-Eliminar fontEli"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -744,7 +752,7 @@
                                 Pedidos a Sustituir
                             </div>
                             <div ng-click="openLayer('agrPedPend')">
-                                <?= HTML::image("images/agregar.png",'null', array('class' => 'image')) ?>
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                             </div>
                         </div>
 
@@ -754,7 +762,9 @@
                                 <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
                                 <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->
                                 <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
-                                <div flex="5" class="cellGrid" ng-click="removeList(item)"> <?= HTML::image("images/eliminar.png",'null', array('class' => 'image') ) ?> </div>
+                                <div flex="10" class="cellGrid" ng-click="removeList(item)">
+                                    <span class="icon-Eliminar fontEli"></span>
+                                </div>
                             </div>
                         </div>
 

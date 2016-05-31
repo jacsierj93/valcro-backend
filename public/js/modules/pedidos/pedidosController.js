@@ -155,6 +155,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         console.log('click ', a);
         a.click();
     }
+    $scope.isOpen= true;
 
     /********************************************otros ********************************************/
 
@@ -232,6 +233,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
                 openLayer("listProducProv");
                 break;
         }
+        $scope.showNext(false);
     }
 
     $scope.showNext = function (status) {
@@ -531,6 +533,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         }
     });
 
+
     $scope.$watch('index', function (newVal, olvValue) {
         //actualizacion segun el index layer abierto
 
@@ -568,7 +571,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
                     loadPedido($scope.pedidoSelec.id);
                     break;
                 default :
-                    $scope.showGripro=false;
                     ;
             }
         }

@@ -53,7 +53,8 @@
     border-radius: 30px;
 }
 .preview{
-    background-color: #f1f1f1;
+    /*background-color: #f1f1f1;*/
+    color: #CCCCCC;
 }
 
 .filterItem{
@@ -76,4 +77,11 @@
 
 .cntLayerHolder{
     height: 100%;
+}
+.demo{
+    background-color: red;
+}
+
+.fontEli {
+    font-size: 16px; float: right; color: #0a0a0a
 }
