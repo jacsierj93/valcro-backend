@@ -75,7 +75,7 @@ class ProvidersController extends BaseController
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
             $prov =  Provider::findOrFail($req->id);
-            $result['action']="update";
+            $result['action']="upd";
         }else{
             $prov =  new Provider();
         }
@@ -96,7 +96,7 @@ class ProvidersController extends BaseController
 
         if($req->id){
             $addr = Address::findOrFail($req->id);
-            $result['action']="update";
+            $result['action']="upd";
         }else{
             $addr = new Address();
         }
