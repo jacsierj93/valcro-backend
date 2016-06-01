@@ -84,3 +84,9 @@
     background-color: red;
     border-radios:0px;
 }
+
+.docButton{
+    width: 94px;
+    margin: 2px;
+    background-color: aliceblue;
+    }

@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORDER, setNotif, DateParse) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,ORDER, setNotif, DateParse) {
 
     var historia = [15];
     var autohidden= 2000;
@@ -7,13 +7,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     $scope.formBlock = true;
     $scope.index = 0;
     $scope.layer = '';
+    // filtros
+    $scope.fRazSocial="";
+    $scope.fPais="";
+    $scope.fpaisSelec="";
+
+
 
     //gui
     $scope.showGripro=false;
     $scope.showFilterPed=false;
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
-    $scope.TextLateralFilter="Mas Opciones";
+    $scope.imgLateralFilter="images/Down.png";
     $scope.selecPed=false;
     $scope.preview=true;
 
@@ -47,7 +53,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     $scope.selecKitchenBox = selecKitchenBox;
     init();
 
-
+    //$filter("customFind")($scope.valcroName,$scope.valName.name,function(current,compare){return current.name==compare})
     function init() {
         /*    $http({
          method: 'POST',
@@ -59,10 +65,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
          console.log("errorrr");
          });*/
 
-        $http.get("Order/OrderProvList")
-            .success(function (response) {
-                $scope.todos = response;
-            });
+        $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
+        $http.get("master/getCountriesProvider").success(function (response) {$scope.filterData.paises = response;});
         loadDataFor();
     }
 
@@ -79,33 +83,26 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         if(!$scope.showLateralFilter){
             jQuery("#menu").animate({height:"232px"},500);
             $scope.showLateralFilter=true;
-        }else {
-            jQuery("#menu").animate({height:"48px"},500);
-            $scope.showLateralFilter=false;
         }
-        $scope.showLateralFilterCpl=false;
     }
 
     $scope.FilterLateralMas = function(){
-        console.log('value d',$scope.showLateralFilterCpl);
         if(!$scope.showLateralFilterCpl){
-            jQuery("#menu").animate({height:"100%"},400);
+            jQuery("#menu").animate({height:"80%"},400);
             $scope.showLateralFilterCpl=true;
-            $scope.TextLateralFilter="Menos Opciones";
+            $scope.imgLateralFilter="images/Down.png";
         }else {
-            jQuery("#menu").animate({height:"232px"},400);
-            $scope.showLateralFilterCpl=false;
-            $scope.TextLateralFilter="Mas Opciones";
-
+            jQuery("#menu").animate({height:"48px"},400);
+            $scope.showLateralFilter=false;
         }
     }
 
     $scope.filtOpen= function(){
-       if($scope.isOpen){
-           $scope.isOpen=false;
-       }else {
-           $scope.isOpen=true;
-       }
+        if($scope.isOpen){
+            $scope.isOpen=false;
+        }else {
+            $scope.isOpen=true;
+        }
     }
 
 
@@ -163,9 +160,26 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
         console.log('click ', a);
         a.click();
     }
-    $scope.isOpen= false;
 
-    /********************************************otros ********************************************/
+
+    /******************************************** filtros ********************************************/
+    $scope.searchCountry = function(item,texto){
+        return item.short_name.indexOf(texto) > -1;
+    }
+
+    $scope.search = function(){
+        return $scope.todos;
+    };
+
+
+
+
+    /******************************************** APERTURA DE LAYERS ********************************************/
+
+    $scope.menuAgregar= function(){
+        closeLayer("all");
+        openLayer("menuAgr");
+    }
 
 
     function selecOdc(odc) {
@@ -496,21 +510,38 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
     }
 
     function closeLayer(opt) {
-        var close =1;
-        var index= $scope.index;
-        if(typeof (opt) == 'string'){
-            var aux = historia.indexOf(opt);
-            close= index - aux;
+        if($scope.index>0){
+            var close =1;
+            var index= $scope.index;
+            if(typeof (opt) == 'string'){
+                switch (opt){
+                    case 'all':break;{
+                        close = historia.length -1;
+                    }
+
+                    default:
+                        var aux = historia.indexOf(opt);
+                        if(aux!= -1){
+                            close= index - aux;
+                        }else{
+                            console.log("no esta abierto", opt);
+                            close=0;
+                        }
+                }
+
+
+            }
+
+            for(var i=0; i<close;i++){
+                var layer = historia[index];
+                $mdSidenav(layer).close();
+                historia[index]=null;
+                index--;
+            }
+            $scope.index= index;
+            $scope.layer = historia[index];
         }
 
-        for(var i=0; i<close;i++){
-            var layer = historia[index];
-            $mdSidenav(layer).close();
-            historia[index]=null;
-            index--;
-        }
-        $scope.index= index;
-        $scope.layer = historia[index];
     }
 
     /**@deprecated*/
@@ -655,17 +686,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
             ,[
                 {name: 'Ok',
                     action:function(){
-                      /*  var url="RemoveToOrden";
-                        var id=item.id;
-                        if(item.tipo_origen_id == 4){
-                            url="RemoveOrdenItem";
-                            id=item.renglon_id;
-                        }
-                        $http.post("Order/"+url, {id: id, pedido_id: $scope.pedidoSelec.id})
-                            .success(function (response) {
-                                setNotif.addNotif("alert","Removido",[],{autohidden:autohidden});
-                                loadPedido($scope.pedidoSelec.id);
-                            });*/
+                        /*  var url="RemoveToOrden";
+                         var id=item.id;
+                         if(item.tipo_origen_id == 4){
+                         url="RemoveOrdenItem";
+                         id=item.renglon_id;
+                         }
+                         $http.post("Order/"+url, {id: id, pedido_id: $scope.pedidoSelec.id})
+                         .success(function (response) {
+                         setNotif.addNotif("alert","Removido",[],{autohidden:autohidden});
+                         loadPedido($scope.pedidoSelec.id);
+                         });*/
                     }
                 },{name: 'Cancel',action:function(){}}
             ]);
@@ -937,7 +968,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,ORD
                 };
                 break;
             case 'filterData':
-                $scope.filterData={ tipoPedidos: new Array()};
+                $scope.filterData={ paises : new Array()};
                 break;
             case 'todos':
                 $scope.todos = new Array();

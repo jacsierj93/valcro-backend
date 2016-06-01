@@ -48,7 +48,10 @@ class OrderController extends BaseController
     {
 
         $provs = Provider::
-        where('id', 1)->
+       // where('id', 1)->
+            Orderby('razon_social')->
+        skip(0)->take(20)->
+
         get();
         $data = array();
         //  $auxCp= Collection::make(array());
@@ -58,6 +61,7 @@ class OrderController extends BaseController
             $temp["razon_social"] = $prv->razon_social;
             $temp['deuda']= $prv->Order()->sum('monto');
             $temp['productos']= $prv->proveedor_product()->get();
+            $temp['paises'] = $prv->getCountry();
 
             $temp['puntoCompra']= 0;
             $nCp=0;
