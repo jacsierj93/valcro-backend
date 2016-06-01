@@ -41,6 +41,7 @@ class ProvidersController extends BaseController
     public function getProv(request $prv)
     {
         $data = Provider::find($prv->id);
+
         $data->contraped = ($data->contraped == 1);
         $data->limCred =$data->limitCredit()->max("limite");
         $data->nomValc = $data->nombres_valcro()->get();
@@ -151,6 +152,11 @@ class ProvidersController extends BaseController
             if(!$v){
                 unset($req->departments[$k]);
             }
+        }
+        if($req->preFav){
+            $temp = NombreValcro::find($req->preFav["id"]);
+            $temp->departamento()->updateExistingPivot($req->preFav["dep"],array("fav"=>0));
+            $temp->save();
         }
         $valName->departamento()->sync($req->departments);
 
