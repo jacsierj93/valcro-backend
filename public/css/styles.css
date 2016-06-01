@@ -806,6 +806,24 @@ input[type=number]::-webkit-outer-spin-button {
     color:#d1d1d1 !important;
 }
 
+.title_del{
+    color:rgb(221,44,0) !important;
+}
+.title_del>div{
+    border-color:rgb(221,44,0) !important;
+}
+
+.title_upd{
+    color:gold !important;
+}
+.title_upd>div{
+    border-color:gold !important;
+}
+
+.title_new{
+    color : rgb(84, 180, 234) !important;
+}
+
 
 
 /*========================== DATE PICKERS ===============================*/

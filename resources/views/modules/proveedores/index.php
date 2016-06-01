@@ -351,7 +351,7 @@
                     <div ng-hide="$parent.expand && id!=$parent.expand">
                         <md-input-container class="md-block" flex id="valcroName">
                             <label>Nombre...</label>
-                            <input autocomplete="off" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
+                            <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
                         </md-input-container>
 
                         <div ng-show="isShow">
@@ -372,7 +372,7 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
-                                <md-select ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
+                                <md-select info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
                                         {{tipo.descripcion}}
                                     </md-option>
@@ -385,7 +385,7 @@
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
-                                <md-select ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
+                                <md-select info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
@@ -397,18 +397,18 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>Codigo Postal</label>
-                                <input autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                                <input info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
-                                <input autocomplete="off" ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                <input info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>
                         <md-input-container class="md-block" flex ng-show="dir.tipo==2">
                             <label>puertos</label>
-                            <md-select ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
+                            <md-select info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
                                     {{port.Main_port_name}}
                                 </md-option>
@@ -416,7 +416,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Direccion</label>
-                            <input autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                            <input info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         </md-input-container>
                         <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{address.length}})</div>
@@ -456,16 +456,16 @@
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Nombre y Apellido</label>
-                                <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
+                                <input info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="35">
                                 <label>Email</label>
-                                <input autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
+                                <input info="email de contacto ej. fulano@valcro.co" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
                             </md-input-container>
                             <md-input-container class="md-block" flex="15">
                                 <label>Pais de Residencia</label>
-                                <md-select ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                <md-select info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
@@ -474,7 +474,7 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Telefono</label>
-                                <input autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
+                                <input info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
                             </md-input-container>
 
                         </div>
@@ -482,7 +482,7 @@
                             <div layout="row" flex="30">
                                 <md-input-container flex>
                                     <label>Idiomas</label>
-                                    <md-select  ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                    <md-select info="marque cada idioma que hable este contacto"  ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                         <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
 
                                     </md-select>
@@ -492,7 +492,7 @@
                             <div layout="row" flex="30">
                                 <md-input-container flex>
                                     <label>cargos</label>
-                                    <md-select ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                    <md-select info="el cargo que desempeña el contacto en el proveedor"  ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                         <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
                                     </md-select>
                                 </md-input-container>
@@ -500,14 +500,14 @@
 
                             <md-input-container class="md-block" flex="40">
                                 <label>Responsabilidades</label>
-                                <input autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                                <input info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
 
                         </div>
                         <div layout="row" flex>
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>
-                                <input autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                                <input info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
 
@@ -523,8 +523,8 @@
                                 <div flex="10" class="headGrid"> Telefono</div>
                                 <div flex="20" class="headGrid"> Pais</div>
                             </div>
-                            <div id="grid" style="overflow-y: auto; height: 120px">
-                                <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)">
+                            <div id="grid" style="overflow-y: auto;>
+                                <div flex ng-repeat=" ng-repeat="cont in contacts" ng-click="toEdit(this)">
                                     <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(cont.id == cnt.id)}">
                                         <div ng-show="(cont.id==cnt.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmContact(this)"></div>
                                         <div flex="20" class="cellGrid"> {{cont.nombre}}</div>
@@ -532,7 +532,7 @@
                                         <div flex="10" class="cellGrid">{{cont.telefono}}</div>
                                         <div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
                                     </div>
-                                </div>
+
 
                             </div>
 
@@ -1130,15 +1130,76 @@
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProvFinal">
                 <div flex>
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-show="dataProv.dataProv.length>0">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
                         <div>
                             Datos Proveedor
                         </div>
                     </div>
+                    <div ng-repeat="(k,finalProv) in prov.dataProv">
+
+                        <div layout="column">
+                            {{finalProv.datos.description}}
+                        </div>
+                        <div layout="row">
+                            <div>
+                                {{finalProv.datos.type}}
+                            </div>
+                            <div>
+                                {{finalProv.datos.siglas}}
+                            </div>
+
+                        </div>
+                        <div layout="row">
+                            <div>
+                                {{finalProv.datos.envio}}
+                            </div>
+                            <div>
+                                {{finalProv.datos.contraped}}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-show="has(prov.dirProv)">
+                        <div>
+                            Direcciones
+                        </div>
+                    </div>
+                    <div ng-repeat="(k,dir) in prov.dirProv">
+
+                        <div layout="column" ng-class="{'title_del' :dir.action =='del','title_upd' :dir.action =='upd','title_new' :dir.action =='new'}">
+                            {{dir.datos.direccProv}}
+                        </div>
+
+                    </div>
 
                 </div>
                 <div flex>
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Nombres Valcro
+                        </div>
+                    </div>
+                    <div ng-repeat="(k,name) in prov.valName">
 
+                        <div layout="column" ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}">
+                            {{name.datos.name}}
+                        </div>
+
+                    </div>
+
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div>
+                            Contactos
+                        </div>
+                    </div>
+                    <div ng-repeat="(k,cont) in prov.contProv">
+
+                        <div layout="column" ng-class="{'title_del' :cont.action =='del','title_upd' :cont.action =='upd','title_new' :cont.action =='new'}">
+                            {{cont.datos.nombreCont}}
+                        </div>
+
+                    </div>
                 </div>
                 <div flex>
 
@@ -1153,4 +1214,4 @@
         <div ng-controller="notificaciones" ng-include="template"></div>
 </div>
 
-</div>
+

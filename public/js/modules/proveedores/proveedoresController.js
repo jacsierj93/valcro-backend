@@ -192,7 +192,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.setProv = function(prov){
-        console.log(setGetProv.haveChang())
         if(setGetProv.haveChang()){
             openLayer("layer5");
         }else{
@@ -326,8 +325,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var rollBack = {"dataProv":[]};
-    var changes = {"dataProv":[],"dirProv":[],"valName":[]};
+    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{}};
+    var changes = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{}};
     return {
         getProv: function () {
             return prov;
@@ -344,14 +343,16 @@ MyApp.service("setGetProv",function($http,providers,$q){
                     prov.type = data.tipo_id;
                     prov.envio = data.tipo_envio_id;
                     prov.contraped = (data.contrapedido==1)?true:false;
+                    console.log(Object.keys(rollBack.dataProv).length)
                     rollBack.dataProv[parseInt(prov.id)] = angular.copy(prov);
 
+                    console.log(Object.keys(rollBack.dataProv).length)
                 });
 
             }else{
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;
                 itemsel = {};
-                rollBack.dataProv = false;
+                rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{}};
             }
         },
         updateItem: function(upd){
@@ -387,26 +388,29 @@ MyApp.service("setGetProv",function($http,providers,$q){
         setComplete : function(field,value){
             statusProv[field]=value;
         },
-        getStatus : function(){
-
+        getRollBack : function(){
+            return rollBack;
         },
         getFullProv : function(){
             return fullProv;
         },
-        seeNew : function(){
-            return list.length;
+        addToRllBck : function(val,form){
+            if(rollBack[form][parseInt(val.id)] === undefined){
+                rollBack[form][parseInt(val.id)] = angular.copy(val);
+            }
         },
         addChng : function(val,action,form){
-
-            if(!rollBack.dataProv || !angular.equals(val,rollBack[form][val.id])){
+            console.log(form)
+            console.log(changes[form])
+            if((changes[form][parseInt(val.id)]===undefined) || !angular.equals(val,rollBack[form][parseInt(val.id)])){
                 if(changes[form][parseInt(val.id)]){
-                    changes[form][parseInt(val.id)].datos = val;
+                    changes[form][parseInt(val.id)].datos = angular.copy(val);
                     if(!(changes[form][parseInt(val.id)].action=="new" && action=="upd")){
                         changes[form][parseInt(val.id)].action = action;
                     }
                 }else{
                     changes[form][parseInt(val.id)] = {
-                        datos:val,
+                        datos:angular.copy(val),
                         action:action
                     }
                 }
@@ -423,7 +427,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
             var i = 1;
             x = false;
             angular.forEach(changes,function(v,k){
-                if(v.length>0){
+                if(Object.keys(v).length>0){
                     x=true;
                 }
             });
@@ -545,6 +549,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.pais = dirSel.pais_id;
         $scope.dir.provTelf = dirSel.telefono;
         $scope.dir.ports = dirSel.ports;
+        setGetProv.addToRllBck($scope.dir,"dirProv");
     };
 
     /*escuah el estatus del formulario y guarda cuando este valido*/
@@ -577,13 +582,14 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 name: "SI",
                 action: function () {
                     addr = elem.add;
-                    console.log(addr)
+
                         providers.put({type:"delAddr"},addr,function(data){
-                            setGetProv.addChng(addr,data.action,"dirProv");
-                            $scope.address.splice(addr.$index,1);
-                            $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+                            setGetProv.addChng($scope.dir,data.action,"dirProv");
+                            $scope.address.splice(elem.$index,1);
+                            //$scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
                             dirSel = {};
                             $scope.direccionesForm.$setUntouched();
+                            $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
                             setNotif.addNotif("ok", "Direccion borrada", [
                             ],{autohidden:3000});
                         });
@@ -686,7 +692,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         valcroName.departments.forEach(function(v,k){
             var fav = {"fav":v.pivot.fav};
             $scope.valName.departments[v.id] = fav;
-        })
+        });
+        setGetProv.addToRllBck($scope.valName,"valName");
        /// console.log( $scope.valName.departments[v.id] = fav);
     };
     $scope.$watch('valcroName.length',function(nvo){
@@ -726,7 +733,9 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                 $scope.valcroName.unshift(valcroName);
                 setNotif.addNotif("ok", "Nuevo Nombre Valcro", [
                 ],{autohidden:3000});
-            }
+            };
+            setGetProv.addChng( $scope.valName,data.action,"valName");
+
         });
     };
 
@@ -742,7 +751,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         url: "provider/delValcroName",
                         data: chip
                     }).then(function successCallback(response) {
-                        setGetProv.addChng(chip,response.data.action,"valName");
+                        setGetProv.addChng( $scope.valName,response.data.action,"valName");
+                       /// setGetProv.addChng(chip,response.data.action,"valName");
                         $scope.valcroName.splice(name.$index,1);
                         $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                         valcroName = {};
@@ -940,7 +950,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
                     $scope.cnt.id = data.id;
                     $scope.provContactosForm.$setPristine();
-                    setGetProv.addChng($scope.cnt,data.action,"provContact");
                     contact.id = $scope.cnt.id;
                     contact.nombre = $scope.cnt.nombreCont;
                     contact.email = $scope.cnt.emailCont;
@@ -959,7 +968,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                         setGetContac.addUpd(contact,angular.copy($scope.prov));
                         setNotif.addNotif("ok", "contacto añadido", [
                         ],{autohidden:3000});
-                    }
+                    };
+                    setGetProv.addChng($scope.cnt,data.action,"contProv");
+
                 });
             }
         }
@@ -972,8 +983,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 action: function () {
                     cont = elem.cont;
                     providers.put({type:"delContac"},cont,function(data){
-                        setGetProv.addChng(cont,data.action,"provContact");
-                        $scope.contacts.splice(cont.$index,1);
+                        setGetProv.addChng($scope.cnt,data.action,"contProv");
+                        $scope.contacts.splice(elem.$index,1);
                         setGetContac.addUpd(cont,$scope.prov);
                         contact = {};
                         setGetContac.setContact(false);
@@ -1021,6 +1032,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         contact = element.cont;
         contact.prov_id = $scope.prov.id;
         setGetContac.setContact(contact);
+        setGetProv.addToRllBck($scope.cnt,"contProv")
     };
 });
 
@@ -1795,7 +1807,10 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
 });
 
  MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
-     $scope.prov = setGetProv.getProv();
-     $scope.dataProv = setGetProv.getChng();
-
+     $scope.provider = setGetProv.getProv();
+     $scope.prov = setGetProv.getChng();
+     $scope.has = function(obj){
+         return Object.keys(obj).length
+     }
+     //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
  });
