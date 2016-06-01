@@ -8,12 +8,13 @@
 
             <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1">
                 <!-- 3) ########################################## MENU ########################################## -->
-                <div class="menu" style="height: 48px; width: 100%;">
+                <div class="menu" style="min-height: 48px; width: 100%;">
                     <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
                         Menu
                     </div>
-                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateral()">
-                        <img src="images/Down.png">
+                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;"
+                         ng-click="FilterLateral()" ng-hide="showLateralFilter">
+                        <img ng-src="images/Down.png">
                         <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
@@ -21,28 +22,41 @@
                 <div layout="column" flex="" >
                     <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start">
                         <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
-                            <label>Buscar</label>
-                            <input  type="text">
+                            <label>Razon  Social</label>
+                            <input  type="text" ng-model="fRazSocial" >
                         </md-input-container>
-                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
-                            <label>Buscar</label>
-                            <input  type="text">
-                        </md-input-container>
-                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
-                            <label>Buscar</label>
-                            <input  type="text">
-                        </md-input-container>
+<!--
+                        <md-autocomplete
+                            md-selected-item="fpaisSelec"
+                            md-search-text="texto"
+                            md-items="item in filterData.paises | customFind : texto : searchCountry "
+                            md-item-text="item.short_name "
+                            placeholder="Pais">
+                            <md-item-template>
+                                <span >{{item.short_name}}</span>
+                            </md-item-template>
+                            <md-not-found>
+                                No hay resultados "{{ctrl.searchText}}"
+                            </md-not-found>
+                        </md-autocomplete>
+-->
+
+
                     </div>
                     <div id="expand2" flex >
 
                     </div>
-                    <div  layout-align="center end" class="btnMas" ng-click="FilterLateralMas()"> {{TextLateralFilter}}</div>
+                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateralMas()">
+                        <img ng-src="{{imgLateralFilter}}">
+                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
+                    </div>
                 </div>
 
             </div>
-            <div  style="overflow-y:auto;" ng-hide="showLateralFilterCpl">
 
-                <div class="boxList" layout="column" flex  ng-repeat="item in todos" ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
+            <div  style="overflow-y:auto;" flex>
+
+                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
 
                     <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
 
@@ -103,7 +117,7 @@
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" ng-show="(index < 1 )" layout-align="center center" ng-click="DtPedido()">
+                    <div layout="column" ng-show="(index < 1 )" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center" ng-show="(index > 1 )" ng-click="updateForm()">
@@ -119,24 +133,27 @@
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
 
                 <div layout="row" ng-show="(layer == 'listPedido')"  flex>
-                   <!-- <div style="margin-left: 4px; margin-right: 4px" layout="colum"
-                         layout-align="center center" ng-repeat="item in filterData.tipoPedidos"  >
-                        {{item.tipo}}
+                    <!-- <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                          layout-align="center center" ng-repeat="item in filterData.tipoPedidos"  >
+                         {{item.tipo}}
+                     </div>
+                     <div style="margin-left: 4px; margin-right: 4px" layout="colum"
+                          layout-align="center center"  >
+                         Todos
+                     </div>-->
+                    <div layout="colum" style="height: 28px;" flex="25" layout-align="center center">
+                        <!--<md-input-container class="md-block" layout-align="center center" flex  >
+                            <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink >
+                                <md-option ng-repeat="item in filterData.tipoPedidos" >
+                                    {{item.tipo}}
+                                </md-option>
+                                <md-option value ="-1">
+                                    Todos
+                                </md-option>
+                            </md-select>
+                        </md-input-container>-->
+
                     </div>
-                    <div style="margin-left: 4px; margin-right: 4px" layout="colum"
-                         layout-align="center center"  >
-                        Todos
-                    </div>-->
-                    <md-input-container class="md-block" layout-align="center center" style="width: 84px;"  >
-                        <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink md-container-class=" demo">
-                            <md-option ng-repeat="item in filterData.tipoPedidos" >
-                                {{item.tipo}}
-                            </md-option>
-                            <md-option value ="-1">
-                                Todos
-                            </md-option>
-                        </md-select>
-                    </md-input-container>
                 </div>
             </div>
 
@@ -337,7 +354,28 @@
             </md-content>
         </md-sidenav>
 
-        <!-- ) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PEDIDO ########################################## -->
+        <!-- ########################################## LAYER MENU AGREGAR DOCUMENTO  ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="menuAgr" id="menuAgr">
+            <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
+            <md-content  layout="row" flex style="height: 100%;"
+                         ng-class="{cntLayerHolder: layer == 'menuAgr' }"
+                         flex
+
+            >
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'menuAgr')}"
+                     ng-show="(layer != 'menuAgr')"
+                     ng-click="closeLayer('menuAgr')">
+                </div>
+                <div style="width: 96px" layout="column" layout-align="space-between center">
+                    <div class="docButton" layout="column" flex ><div layout="column" layout-align="end center"> Email</div> </div>
+                    <div class="docButton" layout="column" flex> <div layout="column" layout-align="end center"> Solicitud</div></div>
+                    <div class="docButton" layout="column" flex> <div layout="column" layout-align="end center"> Pedido</div></div>
+                    <div class="docButton" layout="column" flex><div layout="column" layout-align="end center"> Orden de Compra</div> </div>
+
+                </div>
+            </md-content>
+        </md-sidenav>
+        <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL PEDIDO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido" id="detallePedido">
 
             <md-content  layout="row" flex
@@ -550,7 +588,7 @@
         </md-sidenav>
 
 
-        <!--  ########################################## LAYER (3)ORDENES DE COMPRAS ########################################## -->
+        <!--  ########################################## LAYER ORDENES DE COMPRAS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="odc" id="odc">
             <!--) ########################################## CONTENDOR SECCION ORDENES DE COMPRA ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -588,7 +626,7 @@
             </md-content>
         </md-sidenav>
 
-        <!-- 13) ########################################## LAYER (4) RESUMEN ODC ########################################## -->
+        <!-- ########################################## LAYER RESUMEN ODC ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenodc" id="resumenodc">
             <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE ODC ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>

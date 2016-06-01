@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Masters;
 
 
 use App\Models\Sistema\Ports;
+use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
@@ -15,6 +16,8 @@ use App\Models\Sistema\TypeAddress;
 use App\Models\Sistema\Line;
 use App\Models\Sistema\Language;
 use App\Models\Sistema\CargoContact;
+use Illuminate\Database\Eloquent\Collection;
+
 
 class MasterController extends BaseController
 {
@@ -31,6 +34,19 @@ class MasterController extends BaseController
 			$pais->areaCode;
 		}
 		return $paises;
+	}
+
+	public function getCountriesHaveProvider()
+	{
+		$data = Collection::make(array());
+		$dirs = ProviderAddress::get();
+
+		foreach($dirs as $aux){
+			if(!$data->contains($aux->pais_id)){
+				$data->push(Country::find($aux->pais_id));
+			}
+		}
+		return $data;
 	}
 
 	public function getProviderType()
@@ -57,8 +73,6 @@ class MasterController extends BaseController
 	public function getLines(){
 		return Line::all();
 	}
-
-
 
 	public function getStates($id){
 		if($id){
