@@ -7,10 +7,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.formBlock = true;
     $scope.index = 0;
     $scope.layer = '';
+    $scope.email= {};
+    $scope.email.destinos = new Array();
+    $scope.email.content = new Array();
     // filtros
     $scope.fRazSocial="";
     $scope.fPais="";
     $scope.fpaisSelec="";
+     $scope.email.contactos = new Array();
+    $scope.emailToText = null;
 
 
 
@@ -22,6 +27,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.imgLateralFilter="images/Down.png";
     $scope.selecPed=false;
     $scope.preview=true;
+    $scope.mode = 1;
 
 
 
@@ -171,6 +177,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return $scope.todos;
     };
 
+    $scope.searchEmails= function(){
+        return $scope.email.contactos;
+    }
+
 
 
 
@@ -181,7 +191,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         openLayer("menuAgr");
     }
 
+    $scope.openEmail= function(){
+        openLayer("email");
+         $http.get("Email/ProviderEmails").success(function (response) { $scope.email.contactos = response});
+    }
 
+    $scope.newDoc= function(mode){
+        $scope.mode=mode;
+        openLayer("detallePedido");
+    }
+
+    /*************** conversores **********/
+
+    $scope.transformChip = function(chip) {
+
+        console.log('hola', chip);
+        if (angular.isObject(chip)) {
+            console.log('es objeto', chip);
+            return chip;
+        }
+        console.log('es texto', chip);
+
+        return { email: chip}
+    }
     function selecOdc(odc) {
         restore('odcSelec');
         loadOdc(odc.id);

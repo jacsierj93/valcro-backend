@@ -25,21 +25,21 @@
                             <label>Razon  Social</label>
                             <input  type="text" ng-model="fRazSocial" >
                         </md-input-container>
-<!--
-                        <md-autocomplete
-                            md-selected-item="fpaisSelec"
-                            md-search-text="texto"
-                            md-items="item in filterData.paises | customFind : texto : searchCountry "
-                            md-item-text="item.short_name "
-                            placeholder="Pais">
-                            <md-item-template>
-                                <span >{{item.short_name}}</span>
-                            </md-item-template>
-                            <md-not-found>
-                                No hay resultados "{{ctrl.searchText}}"
-                            </md-not-found>
-                        </md-autocomplete>
--->
+                        <!--
+                                                <md-autocomplete
+                                                    md-selected-item="fpaisSelec"
+                                                    md-search-text="texto"
+                                                    md-items="item in filterData.paises | customFind : texto : searchCountry "
+                                                    md-item-text="item.short_name "
+                                                    placeholder="Pais">
+                                                    <md-item-template>
+                                                        <span >{{item.short_name}}</span>
+                                                    </md-item-template>
+                                                    <md-not-found>
+                                                        No hay resultados "{{ctrl.searchText}}"
+                                                    </md-not-found>
+                                                </md-autocomplete>
+                        -->
 
 
                     </div>
@@ -367,14 +367,62 @@
                      ng-click="closeLayer('menuAgr')">
                 </div>
                 <div style="width: 96px" layout="column" layout-align="space-between center">
-                    <div class="docButton" layout="column" flex ><div layout="column" layout-align="end center"> Email</div> </div>
-                    <div class="docButton" layout="column" flex> <div layout="column" layout-align="end center"> Solicitud</div></div>
-                    <div class="docButton" layout="column" flex> <div layout="column" layout-align="end center"> Pedido</div></div>
-                    <div class="docButton" layout="column" flex><div layout="column" layout-align="end center"> Orden de Compra</div> </div>
+                    <div class="docButton" layout="column" flex  ng-click="openEmail()"><div layout="column" layout-align="end center"> Email</div> </div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc(1)"> <div layout="column" layout-align="end center"> Solicitud</div></div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc(2)"> <div layout="column" layout-align="end center"> Pedido</div></div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc(3)"><div layout="column" layout-align="end center"> Orden de Compra</div> </div>
 
                 </div>
             </md-content>
         </md-sidenav>
+
+        <!-- ########################################## LAYER EMAIL ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="email" id="email">
+            <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
+            <md-content  layout="row" flex style="height: 100%;"
+                         flex
+            >
+                <div class="backDiv"  ng-class="{'backDivSelec' : (layer != 'email')}"
+                     ng-show="(layer != 'email')"
+                     ng-click="closeLayer('email')">
+                </div>
+
+                <div layout="column" flex>
+                    <div style="background-color: #0a0a0a; width: 100%; height: 48px;"></div>
+                    <md-chips ng-model="email.destinos"
+                              md-transform-chip="transformChip($chip)"
+                              style=" padding-left:4px;">
+                        <md-autocomplete
+                            md-search-text="emailToText"
+                            md-items="item in searchEmails(emailToText)"
+                            md-item-text="item.email"
+                            placeholder="Para:">
+                            <span md-highlight-text="ctrl.searchText">{{item.email}}</span>
+
+                        </md-autocomplete>
+
+                        <md-chip-template>
+                            <strong>{{$chip.email}}</strong>
+                        </md-chip-template>
+                    </md-chips>
+                    <div class="gridContent">
+                        <md-input-container  style="overflow-y:auto; ">
+                            <textarea  ng-model="email.content"  style="border: 0px;"></textarea>
+
+                        </md-input-container>
+                    </div >
+                    <div layout="column"   layout-align="end start"style="background-color: #0a0a0a;width: 100%; color: whitesmoke; height: 48px;">
+                        <div layout="row"layout-align="start center">
+                            <div style="width:100px;"> Enviar  </div>
+                        </div>
+                    </div>
+
+
+            </md-content>
+        </md-sidenav>
+
+
+
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL PEDIDO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido" id="detallePedido">
 
