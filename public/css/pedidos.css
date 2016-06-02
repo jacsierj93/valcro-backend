@@ -96,3 +96,6 @@
     height: 44px;
     color: black;
 }
+.required{
+    border-color: rgb(221,44,0);
+}

@@ -445,37 +445,35 @@
                      ng-click="closeLayer('detallePedido')">
                 </div>
                 <div  layout="column" flex="">
+
                     <form name="FormdetallePedido">
 
                         <div class="titulo_formulario" layout="column" layout-align="start start">
                             <div>
-                                Datos de {{mode}}
+                                Datos de {{formMode}}
                             </div>
                         </div>
+
                         <div layout="row"  >
                             <md-input-container class="md-block" flex="50" >
                                 <label>Proveedor</label>
                                 <md-select ng-model="provSelec.id"
                                            md-no-ink
-                                           ng-disabled="(formBlock)"
                                            required
                                 >
                                     <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                         {{prov.razon_social}}
                                     </md-option>
-                                    <md-option value="-1" ng-click="test('nuevo provedor')" ng-show="segurity.newProvider">
-                                        Nuevo
-                                    </md-option>
                                 </md-select>
                             </md-input-container>
 
+
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo </label>
-                                <md-select ng-model="document.tipo_pedido_id"
+                                <md-select ng-model="document.tipo_id"
                                            ng-disabled="( formBlock || provSelec.id == '')"
-                                           ng-required ="(mode == 'Pedido')"
 
-                                >
+                                           >
                                     <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
                                         {{item.tipo}}
                                     </md-option>
@@ -503,7 +501,7 @@
                                 <label>Pais</label>
                                 <md-select ng-model="document.pais_id" md-no-ink
                                            ng-disabled="( formBlock )"
-                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+
                                 >
                                     <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
                                         {{item.short_name}}
@@ -512,13 +510,26 @@
                             </md-input-container>
 
                             <md-input-container class="md-block"  flex>
-                                <label>Direccion</label>
+                                <label>Direccion almacen</label>
                                 <md-select ng-model="document.direccion_almacen_id"
                                            md-no-ink
                                            ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
-                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+
                                 >
                                     <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
+                                        {{dir.direccion}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                            <md-input-container class="md-block"  flex>
+                                <label>Direccion Facturacion</label>
+                                <md-select ng-model="document.direccion_facturacion_id"
+                                           md-no-ink
+                                           ng-disabled="( formBlock || provSelec.id == '' )"
+
+                                >
+                                    <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}">
                                         {{dir.direccion}}
                                     </md-option>
                                 </md-select>
@@ -529,9 +540,12 @@
                         <div layout="row" >
                             <md-input-container class="md-block" flex="15">
                                 <label>Monto</label>
-                                <input  ng-model="document.monto" ui-number-mask type="text"
+                                <input  ng-model="document.monto"
+                                        type="number"
+
                                         ng-disabled="( formBlock )"
-                                        ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                        ng-required="(formMode == 'Solicitud')"
+
                                 >
                             </md-input-container>
 
@@ -539,7 +553,7 @@
                                 <label>Moneda</label>
                                 <md-select ng-model="document.prov_moneda_id" md-no-ink
                                            ng-disabled="( formBlock)"
-                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                           ng-required="(formMode == 'Solicitud')"
                                 >
                                     <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
                                         {{moneda.nombre}}
@@ -549,9 +563,10 @@
 
                             <md-input-container class="md-block" flex="10" ng-dblclick=" document.tasa_fija = 1 " >
                                 <label>Tasa</label>
-                                <input  ng-model="document.tasa"  ui-number-mask
-                                        ng-readonly="document.tasa_fija == 0 " ng-disabled="( formBlock)"
-                                        ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                <input  ng-model="document.tasa"
+                                        type="number"
+                                       ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
+                                        ng-required="(formMode == 'Solicitud')"
                                 >
                             </md-input-container>
 
@@ -559,7 +574,7 @@
                                 <label>Condicion de pago</label>
                                 <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)"
                                            md-no-ink
-                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+
                                 >
                                     <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
                                         {{conPago.titulo}}
@@ -572,9 +587,9 @@
                         <div layout="row" >
                             <md-input-container class="md-block" flex="">
                                 <label>Motivo Pedido </label>
-                                <md-select ng-model="document.motivo_pedido_id"  md-no-ink
+                                <md-select ng-model="document.motivo_id"  md-no-ink
                                            ng-disabled="( formBlock)"
-                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+
                                 >
                                     <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
                                         {{motivoPed.motivo}}
@@ -582,20 +597,21 @@
                                 </md-select>
                             </md-input-container>
                             <md-input-container class="md-block" flex="">
-                                <label>Prioridad Pedido </label>
+                                <label>Prioridad  </label>
                                 <md-select  ng-model="document.prioridad_id"   md-no-ink
                                             ng-disabled="( formBlock)"
-                                            ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )">
+
+                                >
                                     <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
                                         {{prioPed.descripcion}}
                                     </md-option>
                                 </md-select>
                             </md-input-container>
                             <md-input-container class="md-block" flex="">
-                                <label>Condiciones Pedido </label>
-                                <md-select ng-model="document.condicion_pedido_id" md-no-ink
+                                <label>Condiciones  </label>
+                                <md-select ng-model="document.condicion_id" md-no-ink
                                            ng-disabled="( formBlock)"
-                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+
                                 >
                                     <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
                                         {{condPed.nombre}}
@@ -612,16 +628,28 @@
                         </div>
 
                         <div layout="row" >
-                            <md-input-container class="md-block" flex="20">
+                            <md-input-container class="md-block" flex="10">
                                 <label>Mt3</label>
                                 <input ng-model="document.mt3"  name="mt3"  ng-model="number" ui-number-mask
                                        ng-disabled="( formBlock)"  >
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="20" >
+                            <md-input-container class="md-block" flex="10" >
                                 <label>Peso</label>
                                 <input ng-model="document.peso" name="peso"  ng-model="number" ui-number-mask
                                        ng-disabled="( formBlock)" >
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="10">
+                                <label>Puerto</label>
+                                <md-select ng-model="document.puerto_id"
+                                           md-no-ink
+                                           ng-disabled="( formBlock || document.direccion_almacen_id =='' || !document.direccion_almacen_id)"
+
+                                >
+                                    <md-option ng-repeat="item in formData.puertos" value="{{item.id}}">
+                                        {{item.Main_port_name}}
+                                    </md-option>
+                                </md-select>
                             </md-input-container>
 
                             <div flex layout="row" flex="40" ng-click="test()">
@@ -639,9 +667,10 @@
                         </div>
 
                     </form>
+
                     <div class="titulo_formulario" layout="coumn" layout-align="start start" ng-click="showProduc()" >
                         <div>
-                            <span style="color: #1f1f1f">({{document.productos.todos.length}})</span>
+                            <span style="color: #1f1f1f" ng-show="(document.productos.todos && document.productos.todos >0 )">({{document.productos.todos.length}})</span>
                             Productos
                         </div>
 
@@ -679,10 +708,11 @@
                         </div>
                     </div>
                 </div>
+                <!-----flecha siguiente -->
+                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
 
-            <!-----flecha siguiente -->
-            <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+
         </md-sidenav>
 
 
@@ -924,18 +954,15 @@
                      ng-click="closeLayer('listProducProv')">
                 </div>
                 <div  layout="column" flex="">
-                    <div layout="row" flex>
-                        <div class="titulo_formulario" style="height:39px;">
-                            <div>
-                                Productos
-                            </div>
+                    <div class="titulo_formulario md-block" layout-padding  layout="row" >
+                        <div>
+                            Productos
                         </div>
-                        <div ng-click=" test('redirect')">
+                        <div ng-click="openLayer('agrKitBoxs')">
                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-
                         </div>
-
                     </div>
+
 
                     <div layout="row" class="headGridHolder">
                         <div flex="5" class="headGrid"> - </div>
@@ -1394,7 +1421,7 @@
                         <md-input-container class="md-block" flex="">
                             <label>Motivo Pedido </label>
                             <md-select ng-model="pedidoSusPedSelec.motivo_pedido_id"  md-no-ink
-                                       ng-disabled="true" required>
+                                       ng-disabled="true" >
                                 <md-option ng-repeat="item in formData.motivoPedido" value="{{item.id}}">
                                     {{item.motivo}}
                                 </md-option>
@@ -1487,14 +1514,14 @@
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
-                    style="margin-top:96px;
+            style="margin-top:96px;
                     margin-bottom:48px;
                     width:96px; background-color: transparent;
                     background-image: url('images/btn_backBackground.png');
                     z-index: 100;"
-                    layout="column" layout-align="center center" class="md-sidenav-right"
-                    md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
-                    ng-mouseleave="showNext(false)" ng-click="next()">
+            layout="column" layout-align="center center" class="md-sidenav-right"
+            md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
+            ng-mouseleave="showNext(false)" ng-click="next()">
             <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
 

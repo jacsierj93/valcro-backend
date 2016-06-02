@@ -20,7 +20,18 @@ $app->get("Order/ProviderPaymentCondition",'Orders\OrderController@getProviderPa
 $app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressStore'); ///obtiene las direcciones de almacen de un proveedor
 $app->get("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtiene las direcciones de almacen de un proveedor en un pais
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
-$app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el pedido
+$app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
+
+//pedidos
+$app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
+
+//Orden de compra
+$app->post("PurchaseOrder/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
+
+// solicitudes
+$app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda el pedido
+$app->post("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
+
 
 //Genericos
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
