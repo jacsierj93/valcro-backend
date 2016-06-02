@@ -388,7 +388,9 @@
                 </div>
 
                 <div layout="column" flex>
-                    <div style="background-color: #0a0a0a; width: 100%; height: 48px;"></div>
+                    <div style="background-color: #0a0a0a; width: 100%; height: 48px; color: whitesmoke;">
+                        <div style="margin: 8px;">Mensaje Nuevo</div>
+                    </div>
                     <md-chips ng-model="email.destinos"
                               md-transform-chip="transformChip($chip)"
                               style=" padding-left:4px;">
@@ -405,17 +407,26 @@
                             <strong>{{$chip.email}}</strong>
                         </md-chip-template>
                     </md-chips>
-                    <div class="gridContent">
-                        <md-input-container  style="overflow-y:auto; ">
+                    <div class="gridContent" style="height: 100%;">
+                        <md-input-container  style="overflow-y:auto; width: calc(100% - 10px);">
                             <textarea  ng-model="email.content"  style="border: 0px;"></textarea>
 
                         </md-input-container>
                     </div >
-                    <div layout="column"   layout-align="end start"style="background-color: #0a0a0a;width: 100%; color: whitesmoke; height: 48px;">
-                        <div layout="row"layout-align="start center">
-                            <div style="width:100px;"> Enviar  </div>
+                    <div layout="row" layout-align="start center" style="background-color: #f5f5f5;width: 100%; color: whitesmoke; height: 48px;">
+                        <div  layout="column"
+                             layout-align="center center"
+                             style="background-color: #0288ff; margin: 2px;height: 44px;width: 150px;">
+                            <div>Enviar</div>
                         </div>
+                        <div  layout="column"
+                              layout-align="center center"
+                              class="btnOptEmail">
+                            <div>A</div>
+                        </div>
+
                     </div>
+                </div>
 
 
             </md-content>
