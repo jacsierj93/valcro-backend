@@ -152,6 +152,7 @@ class DocumentController extends BaseController
 
             $temp["saldo"] = $pago->saldo;
             $temp["pagado"] = $pago->monto - $pago->saldo;
+            $temp["montoUsado"] = $pago->monto; ///dispuesto a usar
 
             $result[] = $temp;
         }
