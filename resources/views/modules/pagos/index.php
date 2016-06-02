@@ -275,7 +275,7 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input ng-model="pago.monto" required/>
+                            <input ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="10">
@@ -328,7 +328,7 @@
                                 <div flex="10" class="cellGrid">
                                     <md-switch class="md-primary"
                                                ng-model="abono.asignado"
-                                               ng-change="calculateDeuda2(abonos2)"
+                                               ng-change="calculateDeuda2(abonos2,pago)"
                                                ng-disabled="enabled">
                                     </md-switch>
                                 </div>
@@ -339,7 +339,7 @@
                                 <div flex="10" class="cellGrid"> {{abono.monto}}</div>
                                 <div flex="10" class="cellGrid"> {{abono.saldo}}</div>
                                 <div flex="10" class="cellGrid">
-                                    <input type="number" ng-model="abono.montoUsado" ng-change="calculateDeuda2(abonos2)" ng-disabled="!abono.asignado" ng-value="abono.saldo" />
+                                    <input type="number" ng-model="abono.montoUsado" ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado" ng-value="abono.saldo" />
                                 </div>
                             </div>
 
@@ -465,12 +465,12 @@
                         <!--espacio-->
 
 
-                        <div>Id del pago: #100</div>
+<!--                        <div>Id del pago: #100</div>-->
 
                         <!--espacio-->
                         <span style="padding-right: 100px">&nbsp; </span>
                         <!--espacio-->
-                        <div>Fecha: <?= date("d-m-Y") ?></div>
+                     <!--   <div>Fecha: <?/*= date("d-m-Y") */?></div>-->
 
                     </div>
 
@@ -510,7 +510,6 @@
                             <label>Nro. Documento</label>
                             <input ng-model="abono.nro_doc" required/>
                         </md-input-container>
-
 
                         <div layout="column" flex>
                             <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
@@ -659,16 +658,15 @@
                         <!--espacio-->
 
 
-                        <div>Id del pago: #100</div>
+<!--                        <div>Id del pago: #100</div>-->
 
                         <!--espacio-->
                         <span style="padding-right: 100px">&nbsp; </span>
                         <!--espacio-->
-                        <div>Fecha: <?= date("d-m-Y") ?></div>
+          <!--              <div>Fecha: <?/*= date("d-m-Y") */?></div>-->
 
 
                     </div>
-
 
                     <div layout="row" style="height: 39px;">
 
@@ -677,10 +675,10 @@
                             <input ng-readonly="true" ng-model="abono.monto" required/>
                         </md-input-container>
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>fecha</label>
-                            <input ng-model="abono.fecha" required/>
-                        </md-input-container>
+                        <div flex="15">
+                            <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+                        </div>
+
 
                         <!--espacio-->
                         <span style="padding-right: 300px">&nbsp; </span>
@@ -717,7 +715,7 @@
                     <div layout="row" style="height: 39px;">
 
                         <md-input-container class="md-block" flex="35">
-                            <span class="balance_plus">{{abono.monto | currency : $ : 2}} </span> / <span
+                            <span class="balance_plus">{{abono.monto - abono.monto_rec | currency : $ : 2}} </span> / <span
                                 class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
                         </md-input-container>
 
@@ -741,12 +739,6 @@
                             <md-checkbox ng-model="isDisabled" aria-label="Disabled">
                                 Pagar todo?
                             </md-checkbox>
-                        </md-input-container>
-
-
-                        <md-input-container class="md-block">
-                            <label>Indique un monto</label>
-                            <input ng-model="abono.monto" required/>
                         </md-input-container>
 
 
@@ -804,7 +796,7 @@
 
             </md-content>
 
-            <div style="width: 16px;" ng-mouseover="showNext(true,'lyr7pag')">
+            <div style="width: 16px;" ng-mouseover="showNext(true,'lyr7pag','123')">
 
             </div>
         </md-sidenav>
@@ -881,6 +873,9 @@
 
         </md-sidenav>
 
+        
+        
+        
 
         <!-- boton para registrar pago nuevo-->
         <md-sidenav

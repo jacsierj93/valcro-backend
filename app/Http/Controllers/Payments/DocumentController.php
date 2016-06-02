@@ -11,6 +11,7 @@ namespace app\Http\Controllers\Payments;
 use App\Libs\Api\RestApi;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\DocumentCPType;
+use App\Models\Sistema\Payments\Payment;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Session;
@@ -22,8 +23,8 @@ class DocumentController extends BaseController
     private $payIds = array(1, 2, 3); ///tipos de abono ADE,NDC,RBAY
     private $debtsIds = array(4); ///facturas
     private $documentState = array(1, 2, 3); ///estatus de documentos nuevo,procesado,cancelado
-    private $ndcId = 2;
     private $adeId = 1;
+    private $ndcId = 2;
     private $rbayId = 3;
 
     public function __construct()
@@ -189,7 +190,6 @@ class DocumentController extends BaseController
 
         ]);
 
-
         if ($validator->fails()) { ///ups... erorres
 
             $rest->setError("por favor, verifique los datos de entrada");
@@ -214,12 +214,12 @@ class DocumentController extends BaseController
                 $doc->saldo = $req->monto;
                 $doc->tasa = $req->tasa;
                 $doc->descripcion = $req->descripcion;
-                $doc->save(); ////edita/inserta el docmento
+                $doc->save(); ////edita/inserta el documento
 
 
                 //*********************en caso de un adelanto*************************
 
-                if ($this->adeId == $req->tipo_id) {
+                if ($this->adeId == $req->tipo_id) { ///se debe crear un pago porque genera mov cash
 
 
                     $pago = new Payment(); ///asignado datos del pago
@@ -242,7 +242,7 @@ class DocumentController extends BaseController
                     $payDoc->abono = $req->monto;
                     $payDoc->save();
 
-                    //////forma de pago
+                    //////forma de pago, porque genera mov de cash
 
                     $form = new PaymentForm();
                     $form->pago_id = $pago->id;
@@ -271,6 +271,61 @@ class DocumentController extends BaseController
         return $rest->responseJson();
 
 
+    }
+
+
+    /**para pagos directos de cuotas o facturas sin cuotas (con o sin movimiento de cash)
+     * @param Request $req
+     */
+    public function paymentDocuments(Request $req)
+    {
+        $rest = new RestApi();
+
+        //////////validation
+        $validator = Validator::make($req->all(), [
+
+            'nro_doc' => 'required'
+
+        ]);
+
+        if ($validator->fails()) { ///ups... erorres
+
+            $rest->setError("por favor, verifique los datos de entrada");
+
+        } else {  ///ok
+
+
+            try{
+
+
+                /////se genera el pago
+                $pago = new Payment(); ///asignado datos del pago
+                $pago->prov_id = Session::get("PROVID"); ///mandatory
+                $pago->moneda_id = $req->moneda_id; ///mandatory
+                $pago->tasa = $req->tasa; ///mandatory
+                $pago->fecha_pago = $req->fecha; ///mandatory
+                $pago->monto = $req->monto; ////mandatory monto total del pago, documentos + cash
+                ///////////nro de cuenta del proveedor
+                $pago->prov_cuenta_id = $req->cuenta_id; //opc
+                $pago->save();
+
+
+                //////haciendo la relacion de que estoy pagando?? con que???
+
+
+            }catch (\Exception $e){
+
+                // Woopsy
+                DB::rollback();
+                $rest->setError("error en la Transacción");
+
+            }
+
+
+
+
+
+        }
     }
 
 

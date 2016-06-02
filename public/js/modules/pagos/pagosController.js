@@ -5,24 +5,6 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
         var base = 264;
         $scope.toolBar = {"add": true, "edit": false, "filter": false} ///botonera
         $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
-        $scope.debData = {
-            "id": '',
-            "provname": '',
-            "provid": '',
-            "factura": '',
-            "cuotas": '',
-            "actual": '',
-            'total': 0.0,
-            'saldo': 0.0,
-            'saldo2': 0.0 ///backup
-        };
-        $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
-        $scope.abonos = {};
-        $scope.abonos2 = []
-        $scope.abono = {"monto": '', "monto_rec": 0.0, "monto_recp": 0.0};
-        $scope.provSelected = {};
-        $scope.deudaList = [];
-
 
         /**
          * funcion que resetea el valor de los objetos segun la opcion colocada
@@ -31,6 +13,30 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
             if (opc == 'abono')
                 $scope.abono = {"monto": '', "monto_rec": 0.0, "monto_recp": 0.0};
+
+            if (opc == 'all') {
+                ////elementos
+                $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
+                $scope.debData = {
+                    "id": '',
+                    "provname": '',
+                    "provid": '',
+                    "factura": '',
+                    "cuotas": '',
+                    "actual": '',
+                    'total': 0.0,
+                    'total2': 0.0,///backup
+                    'saldo': 0.0,
+                    'saldo2': 0.0 ///backup
+                };
+                $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
+                $scope.pago = {"monto": ''};
+                $scope.abonos = {};
+                $scope.abonos2 = []
+                $scope.abono = {"monto": '', "monto_rec": 0.0, "monto_recp": 0.0};
+                $scope.provSelected = {};
+                $scope.deudaList = [];
+            }
 
         }
 
@@ -69,20 +75,23 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
          * @param abono
          * @param montoUsado
          */
-        $scope.calculateDeuda2 = function (abonos2) {
+        $scope.calculateDeuda2 = function (abonos2, pago) {
 
             var tempAbono = 0;
             var tempSaldo = 0;
+            var tempPago = (pago.monto == undefined) ? 0 : pago.monto;
+
             for (var d = 0, len = $scope.abonos2.length; d < len; d += 1) {
                 if ($scope.abonos2[d].asignado == true) {
                     tempAbono = Number(tempAbono) + Number($scope.abonos2[d].montoUsado);
                     tempSaldo = Number(tempSaldo) + Number($scope.abonos2[d].montoUsado);
+                } else {
+                    $scope.abonos2[d].montoUsado = Number($scope.abonos2[d].saldo);
                 }
             }
 
-            $scope.debData.total = tempAbono;
-            $scope.debData.saldo = Number($scope.debData.saldo2) - Number(tempSaldo);
-
+            $scope.debData.total = tempAbono + Number(tempPago);
+            $scope.debData.saldo = Number($scope.debData.saldo2) - Number(tempSaldo) - Number(tempPago);
 
         }
 
@@ -241,6 +250,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
             });
 
 
+            $scope.resetPayElement("all");
             closeLayer(true);
             openLayer("lyr1pag");
 
@@ -284,6 +294,7 @@ MyApp.controller('pagosCtrll', function ($scope, $mdSidenav, $http, $location, $
 
                 $scope.debData.actual = actual; ///cuota a pagar en  caso de...
                 $scope.debData.total = 0;
+                $scope.debData.total2 = 0;
                 $scope.debData.saldo = cuota.saldo;
                 $scope.debData.saldo2 = cuota.saldo;
 
