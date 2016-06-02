@@ -61,6 +61,12 @@ if (Request::is('embarques/*'))
     require __DIR__.'/embarques_routes.php';
 }
 
+//////enrutador para servicios de email
+if (Request::is('Email/*'))
+{
+    require __DIR__.'/email_routes.php';
+}
+
 //////enrutador para servicios master
 if (Request::is('master/*'))
 {

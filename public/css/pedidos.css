@@ -90,3 +90,9 @@
     margin: 2px;
     background-color: aliceblue;
     }
+.btnOptEmail{
+    background-color: transparent;
+    margin: 2px;
+    height: 44px;
+    color: black;
+}
