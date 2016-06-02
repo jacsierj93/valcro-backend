@@ -48,9 +48,9 @@ class OrderController extends BaseController
     {
 
         $provs = Provider::
-       // where('id', 1)->
-            Orderby('razon_social')->
-        skip(0)->take(20)->
+        where('id', 1)->
+/*            Orderby('razon_social')->
+        skip(0)->take(20)->*/
 
         get();
         $data = array();
