@@ -432,7 +432,7 @@
             </md-content>
         </md-sidenav>
 
-        <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL PEDIDO ########################################## -->
+        <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detallePedido" id="detallePedido">
 
             <md-content  layout="row" flex
@@ -463,13 +463,19 @@
                                     <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                         {{prov.razon_social}}
                                     </md-option>
+                                    <md-option value="-1" ng-click="test('nuevo provedor')" ng-show="segurity.newProvider">
+                                        Nuevo
+                                    </md-option>
                                 </md-select>
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="15">
-                                <label>Tipo de Pedido</label>
+                                <label>Tipo </label>
                                 <md-select ng-model="document.tipo_pedido_id"
-                                           ng-disabled="( formBlock || provSelec.id == '')" >
+                                           ng-disabled="( formBlock || provSelec.id == '')"
+                                           ng-required ="(mode == 'Pedido')"
+
+                                >
                                     <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
                                         {{item.tipo}}
                                     </md-option>
@@ -496,7 +502,9 @@
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
                                 <md-select ng-model="document.pais_id" md-no-ink
-                                           ng-disabled="( formBlock || provSelec.id == '' )" required>
+                                           ng-disabled="( formBlock )"
+                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                                     <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
                                         {{item.short_name}}
                                     </md-option>
@@ -507,7 +515,9 @@
                                 <label>Direccion</label>
                                 <md-select ng-model="document.direccion_almacen_id"
                                            md-no-ink
-                                           ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )" required>
+                                           ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
+                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                                     <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
                                         {{dir.direccion}}
                                     </md-option>
@@ -520,13 +530,17 @@
                             <md-input-container class="md-block" flex="15">
                                 <label>Monto</label>
                                 <input  ng-model="document.monto" ui-number-mask type="text"
-                                        ng-disabled="( formBlock )" required>
+                                        ng-disabled="( formBlock )"
+                                        ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="10">
                                 <label>Moneda</label>
                                 <md-select ng-model="document.prov_moneda_id" md-no-ink
-                                           ng-disabled="( formBlock)" required>
+                                           ng-disabled="( formBlock)"
+                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                                     <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
                                         {{moneda.nombre}}
                                     </md-option>
@@ -536,12 +550,17 @@
                             <md-input-container class="md-block" flex="10" ng-dblclick=" document.tasa_fija = 1 " >
                                 <label>Tasa</label>
                                 <input  ng-model="document.tasa"  ui-number-mask
-                                        ng-readonly="document.tasa_fija == 0 " ng-disabled="( formBlock)"required>
+                                        ng-readonly="document.tasa_fija == 0 " ng-disabled="( formBlock)"
+                                        ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="">
                                 <label>Condicion de pago</label>
-                                <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)" required md-no-ink required>
+                                <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)"
+                                           md-no-ink
+                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                                     <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
                                         {{conPago.titulo}}
                                     </md-option>
@@ -553,8 +572,10 @@
                         <div layout="row" >
                             <md-input-container class="md-block" flex="">
                                 <label>Motivo Pedido </label>
-                                <md-select ng-model="document.motivo_pedido_id" required md-no-ink
-                                           ng-disabled="( formBlock)" required>
+                                <md-select ng-model="document.motivo_pedido_id"  md-no-ink
+                                           ng-disabled="( formBlock)"
+                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                                     <md-option ng-repeat="motivoPed in formData.motivoPedido" value="{{motivoPed.id}}">
                                         {{motivoPed.motivo}}
                                     </md-option>
@@ -562,8 +583,9 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="">
                                 <label>Prioridad Pedido </label>
-                                <md-select  ng-model="document.prioridad_id"  required md-no-ink
-                                            ng-disabled="( formBlock)" required>
+                                <md-select  ng-model="document.prioridad_id"   md-no-ink
+                                            ng-disabled="( formBlock)"
+                                            ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )">
                                     <md-option ng-repeat="prioPed in formData.prioridadPedido" value="{{prioPed.id}}">
                                         {{prioPed.descripcion}}
                                     </md-option>
@@ -572,7 +594,9 @@
                             <md-input-container class="md-block" flex="">
                                 <label>Condiciones Pedido </label>
                                 <md-select ng-model="document.condicion_pedido_id" md-no-ink
-                                           ng-disabled="( formBlock)" required>
+                                           ng-disabled="( formBlock)"
+                                           ng-required ="(mode == 'Pedido' | mode == 'Orden de Compra' )"
+                                >
                                     <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
                                         {{condPed.nombre}}
                                     </md-option>
@@ -591,13 +615,13 @@
                             <md-input-container class="md-block" flex="20">
                                 <label>Mt3</label>
                                 <input ng-model="document.mt3"  name="mt3"  ng-model="number" ui-number-mask
-                                       ng-disabled="( formBlock)" required >
+                                       ng-disabled="( formBlock)"  >
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="20" required>
+                            <md-input-container class="md-block" flex="20" >
                                 <label>Peso</label>
                                 <input ng-model="document.peso" name="peso"  ng-model="number" ui-number-mask
-                                       ng-disabled="( formBlock)" required>
+                                       ng-disabled="( formBlock)" >
                             </md-input-container>
 
                             <div flex layout="row" flex="40" ng-click="test()">
@@ -1282,7 +1306,7 @@
                         <md-input-container class="md-block" flex="15">
                             <label>Abono </label>
                             <input  ng-model="kitchenBoxSelec.monto_abono" ui-number-mask type="text"
-                                    ng-disabled="true" required>
+                                    ng-disabled="true" >
                         </md-input-container>
 
                         <div layout="column" flex="20">

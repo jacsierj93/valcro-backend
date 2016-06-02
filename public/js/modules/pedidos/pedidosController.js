@@ -198,7 +198,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.newDoc= function(mode){
         $scope.mode=mode;
+        restore("document");
+        if($scope.provSelec.id){
+            //$scope.document.prov_id=$scope.provSelec.id;
+        }
         openLayer("detallePedido");
+        $scope.formBlock=false;
     }
 
     /*************** conversores **********/
@@ -607,26 +612,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
     });
 
-
-    $scope.$watch('index', function (newVal, olvValue) {
-        //actualizacion segun el index layer abierto
-
-        switch (newVal) {
+    $scope.$watchGroup(['index','layer'], function(newVal){
+        console.log('listener', newVal);
+        switch (newVal[0]){
             case 0:
-                //  $scope.formBlock = true;
                 restore('provSelec');// inializa el proveedor
                 restore('document');// inializa el proveedor
                 //  restore('FormData');// inializa el proveedor
                 loadDataFor();
                 break;
         }
-    });
-
-
-    $scope.$watch('layer', function (newVal, oldValue) {
-        if (newVal != '' && typeof(newVal) !== 'undefined') {
-
-            switch (newVal) {
+        if (newVal[1] != '' && typeof(newVal[1]) !== 'undefined') {
+            switch (newVal[1]) {
                 case 'listPedido':
                     if ($scope.provSelec.id != '') {
                         loadPedidosProvedor($scope.provSelec.id);
@@ -649,8 +646,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     });
-
-
     $scope.$watch('provSelec.id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
             loadCoinProvider(newVal);
@@ -669,14 +664,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         if (nuevo[0] && !nuevo[1]) {
 
-            saveDetaillPedido();
+            saveDoc();
         }
 
     });
 
     /*************************Guardados*************************************************/
 
-    function saveDetaillPedido() {
+    function saveDoc() {
 
 
         if ($scope.document.id == '') {
@@ -684,7 +679,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
         $scope.document.prov_id = $scope.provSelec.id;
-
+        setNotif.addNotif("ok"," Puede continuar",[],{autohidden:2000});
+/*
         $http.post("Order/Save",  $scope.document)
             .success(function (response) {
                 $scope.FormdetallePedido.$setPristine();
@@ -699,7 +695,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         ],{autohidden:2000});
                 }
 
-            });
+            });*/
     }
 
     /**************************** Conversiones ****************/
@@ -762,7 +758,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function loadDirProvider(id){
         $http.get("Order/Address",{params:{id:id}}).success(function (response) {
             $scope.formData.direcciones=response;
-            $scope.document.direccion_almacen_id= response[0].id;
+           // $scope.document.direccion_almacen_id= response[0].id;
         });
     }
 
@@ -776,7 +772,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         $http.get("provider/provCoins/"+id).success(function (response) {
             $scope.formData.monedas=response;
-            $scope.document.prov_moneda_id= response[0].id;
+          //  $scope.document.prov_moneda_id= response[0].id;
 
         });
     }
@@ -784,7 +780,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function loadPaymentCondProvider(id){
         $http.get("Order/ProviderPaymentCondition",{params:{id:id}}).success(function (response) {
             $scope.formData.condicionPago=response;
-            $scope.document.condicion_pago_id= response[0].id;
+          //  $scope.document.condicion_pago_id= response[0].id;
 
         });
     }
@@ -792,7 +788,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function loadCountryProvider(id){
         $http.get("Order/ProviderCountry",{params:{id:id}}).success(function (response) {
             $scope.formData.paises= response;
-            $scope.document.pais_id= response[0].id;
+           // $scope.document.pais_id= response[0].id;
         });
     }
 
