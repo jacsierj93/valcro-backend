@@ -276,7 +276,6 @@
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
                             <input ng-model="pago.monto" required/>
-
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="10">
@@ -321,12 +320,16 @@
                         <div flex class="headGrid"> Factura</div>
                         <div flex="10" class="headGrid"> Monto</div>
                         <div flex="10" class="headGrid"> Saldo</div>
+                        <div flex="10" class="headGrid"> Utilizar</div>
                     </div>
                     <div id="grid" flex style="overflow-y: auto;">
                         <div flex ng-repeat="abono in abonos2">
                             <div layout="row" class="cellGridHolder">
                                 <div flex="10" class="cellGrid">
-                                    <md-switch class="md-primary" ng-disabled="enabled">
+                                    <md-switch class="md-primary"
+                                               ng-model="abono.asignado"
+                                               ng-change="calculateDeuda2(abonos2)"
+                                               ng-disabled="enabled">
                                     </md-switch>
                                 </div>
                                 <div flex="10" class="cellGrid"> {{abono.nro_factura}}</div>
@@ -335,6 +338,9 @@
                                 <div flex class="cellGrid"> {{abono.fact_orig}}</div>
                                 <div flex="10" class="cellGrid"> {{abono.monto}}</div>
                                 <div flex="10" class="cellGrid"> {{abono.saldo}}</div>
+                                <div flex="10" class="cellGrid">
+                                    <input type="number" ng-model="abono.montoUsado" ng-change="calculateDeuda2(abonos2)" ng-disabled="!abono.asignado" ng-value="abono.saldo" />
+                                </div>
                             </div>
 
                         </div>
@@ -352,18 +358,17 @@
                         </div>
                         <md-input-container class="md-block" flex>
                             <label>Saldo</label>
-                            <input ng-value="debData.saldo" ng-model="pago.saldo"/>
+                            <input ng-readonly="true" ng-model="debData.saldo"/>
                         </md-input-container>
                         <div flex="5">
 
                         </div>
                         <md-input-container class="md-block" flex>
                             <label>Total A Pagar</label>
-                            <input ng-value="debData.total" ng-model="pago.total"/>
+                            <input ng-readonly="true" ng-model="debData.total"/>
                         </md-input-container>
 
                     </div>
-
 
                 </form>
 
@@ -574,7 +579,7 @@
 
                         <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
                             <label>% Recargo</label>
-                            <input ng-change="getRecargoPercent('c')" ng-model="abono.monto_recp"/>
+                            <input ng-change="getRecargoPercent('p')" ng-model="abono.monto_recp"/>
                         </md-input-container>
 
 
@@ -669,12 +674,12 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Monto</label>
-                            <input ng-readonly="true" ng-model="abono.monto" ng-value="abono.monto" required/>
+                            <input ng-readonly="true" ng-model="abono.monto" required/>
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="15">
                             <label>fecha</label>
-                            <input ng-value="abono.fecha" required/>
+                            <input ng-model="abono.fecha" required/>
                         </md-input-container>
 
                         <!--espacio-->
@@ -718,7 +723,7 @@
 
                         <md-input-container class="md-block" flex="20">
                             <label>Proceder el Pago</label>
-                            <md-select ng-model="abono2.tipo" md-no-ink>
+                            <md-select ng-model="abono.tipo" md-no-ink>
                                 <md-option ng-repeat="metodoPago in [{id:1,nombre: 'Todo por llegar'},
                             {id:2,nombre: 'Vencidos'} ]" value="{{metodoPago.id}}">
                                     {{metodoPago.nombre}}
@@ -741,7 +746,7 @@
 
                         <md-input-container class="md-block">
                             <label>Indique un monto</label>
-                            <input ng-model="abono.monto" ng-value="abono.monto" required/>
+                            <input ng-model="abono.monto" required/>
                         </md-input-container>
 
 
@@ -828,12 +833,6 @@
                     <md-input-container class="md-block" flex="35">
                         <span class="balance_plus">{{abono.monto | currency : $ : 2}} </span> / <span
                             class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
-                    </md-input-container>
-
-
-                    <md-input-container class="md-block">
-                        <label>Indique un monto</label>
-                        <input ng-value="abono.monto" required/>
                     </md-input-container>
 
 
