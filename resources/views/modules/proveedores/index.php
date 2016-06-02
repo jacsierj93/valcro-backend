@@ -349,13 +349,15 @@
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
-                        <md-input-container class="md-block" flex id="valcroName">
-                            <label>Nombre...</label>
-                            <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="siglas" ng-model="valName.name" ng-disabled="$parent.enabled">
-                        </md-input-container>
-
+                        <div layout="row">
+                            <md-input-container class="md-block" flex id="valcroName">
+                                <label>Nombre...</label>
+                                <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
+                            </md-input-container>
+                            <?= HTML::image("images/LUPA.png","",array("width"=>"24px","height"=>"24px"))?><span style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"></span>
+                        </div>
                         <div ng-show="isShow">
-                            <div ng-repeat="name in valcroName" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
+                            <div ng-repeat="name in valcroName | orderBy:order:true" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
                 </form>
@@ -549,7 +551,7 @@
 
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="nomValAssign">
                 <div layout="column" flex style="overflow-x: hidden;">
                     <div class="titulo_formulario" layout="column" layout-align="start start">

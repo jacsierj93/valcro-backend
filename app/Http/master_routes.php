@@ -1,6 +1,7 @@
 <?php
 
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
+$app->get("master/getCountriesProvider",'Masters\MasterController@getCountriesHaveProvider'); ///obtener listado de paises donde tenemos provedores
 $app->get("master/getProviderType",'Masters\MasterController@getProviderType'); ///obtener listado de tipos de proveedores
 $app->get("master/getProviderTypeSend",'Masters\MasterController@getProviderTypeSend'); ///obtener listado de tipos de envio de proveedores
 $app->get("master/getCoins",'Masters\MasterController@getCoins'); ///obtener listado de monedas
