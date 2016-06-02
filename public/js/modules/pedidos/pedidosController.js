@@ -608,7 +608,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watch('document.pais_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
-            loadDirProvider(newVal);
+            $http.get("Order/Address",{params:{id:newVal,tipo_dir: 2}}).success(function (response) {
+                $scope.formData.direcciones=response;
+                // $scope.document.direccion_almacen_id= response[0].id;
+            });
+            //loadDirProvider(newVal,2);
+            //$scope.formData.direccionesFact= response.direccionesFact;
+
         }
     });
     $scope.$watch('document.direccion_almacen_id', function (newVal) {
@@ -664,6 +670,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             loadCoinProvider(newVal);
             loadCountryProvider(newVal);
             loadPaymentCondProvider(newVal);
+            $http.get("Order/Address",{params:{id:newVal,tipo_dir: 1}}).success(function (response) {
+                $scope.formData.direccionesFact= response.direccionesFact;
+            });
         }
     });
 
@@ -774,12 +783,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.formData.condicionPedido=response.condicionPedido;
             $scope.formData.estadoPedido=response.estadoPedido;
             $scope.formData.tipoDepago= response.tipoDepago;
+
         });
     }
 
 
-    function loadDirProvider(id){
-        $http.get("Order/Address",{params:{id:id}}).success(function (response) {
+    function loadDirProvider(id, tipo){
+        $http.get("Order/Address",{params:{id:id,tipo_dir: tipo}}).success(function (response) {
             $scope.formData.direcciones=response;
             // $scope.document.direccion_almacen_id= response[0].id;
         });

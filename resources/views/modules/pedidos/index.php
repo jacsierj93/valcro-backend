@@ -526,10 +526,10 @@
                                 <label>Direccion Facturacion</label>
                                 <md-select ng-model="document.direccion_facturacion_id"
                                            md-no-ink
-                                           ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
+                                           ng-disabled="( formBlock || provSelec.id == '' )"
 
                                 >
-                                    <md-option ng-repeat="dir in formData.direcciones_fact" value="{{dir.id}}">
+                                    <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}">
                                         {{dir.direccion}}
                                     </md-option>
                                 </md-select>

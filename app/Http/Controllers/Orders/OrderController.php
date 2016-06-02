@@ -936,9 +936,11 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getAddressCountry(Request $req){
-        if($req->has('id')){
-            return ProviderAddress::where('pais_id',$req->id)->get();
+        $data =ProviderAddress::where('pais_id',$req->id)->get();
+        if($req->has('tipo_dir')){
+            $data =$data->where('tipo_dir',$req->tipo_dir );
         }
+        return $data;
     }
 
     /**
@@ -1077,6 +1079,113 @@ class OrderController extends BaseController
 
     }
 
+    public function savePurchaseOrder(Request $req)
+    {
+
+        //////////validation
+        $validator = Validator::make($req->all(), [
+            'prov_id' => 'required',
+            'monto' => 'required',
+            'tasa' => 'required',
+            'prov_moneda_id'=> 'required'
+        ]);
+        if ($validator->fails()) { ///ups... erorres
+
+            $result = array("error" => "errores en campos de formulario");
+
+        }else{
+            $result = array("success" => "Registro guardado con éxito","action"=>"new");
+            $model = new Solicitude();
+            //////////condicion para editar
+            if ($req->has('id')) {
+                $model = $model->findOrFail($req->id);
+                $result["action"]="edit";
+            }
+
+            $model->monto = $req->monto;
+            $model->prov_id = $req->prov_id;
+            $model->tasa = $req->tasa;
+
+            if($req->has('tipo_id')){
+                $model->tipo_id = $req->tipo_id;
+            }
+            if($req->has('prioridad_id')){
+                $model->prioridad_id = $req->prioridad_id;
+            }
+            if($req->has('pais_id')){
+                $model->pais_id = $req->pais_id;
+            }
+            if($req->has('condicion_pago_id')){
+                $model->condicion_pago_id = $req->condicion_pago_id;
+            }
+            if($req->has('prov_moneda_id')){
+                $model->prov_moneda_id = $req->prov_moneda_id;
+            }
+            if($req->has('motivo_id')){
+                $model->motivo_id = $req->motivo_id;
+            }
+            if($req->has('prioridad_id')){
+                $model->prioridad_id = $req->prioridad_id;
+            }
+            if($req->has('nro_proforma')){
+                $model->nro_proforma = $req->nro_proforma;
+            }
+            if($req->has('nro_factura')){
+                $model->nro_factura = $req->nro_factura;
+            }
+            if($req->has('comentario')){
+                $model->comentario = $req->comentario;
+            }
+            if($req->has('pedido_estado_id')){
+                $model->pedido_estado_id = $req->pedido_estado_id;
+            }
+            if($req->has('direccion_almacen_id')){
+                $model->direccion_almacen_id = $req->direccion_almacen_id;
+            }
+            if($req->has('condicion_id')){
+                $model->condicion_id = $req->condicion_id;
+            }
+            if($req->has('mt3')){
+                $model->mt3 = $req->mt3;
+            }
+            if($req->has('peso')){
+                $model->peso = $req->peso;
+            }
+            if($req->has('puerto_id')){
+                $model->puerto_id = $req->puerto_id;
+            }
+            if($req->has('nro_doc')){
+                $model->nro_doc = $req->nro_doc;
+            }
+
+
+
+            if($req->has('comentario_cancelacion','cancelacion')){
+                $model->comentario_cancelacion = $req->comentario_cancelacion;
+                $model->cancelacion = $req->cancelacion;
+            }
+
+            if($req->has('aprob_compras')){
+                $model->aprob_compras = $req->aprob_compras;
+            }
+
+            if($req->has('aprob_gerencia')){
+                $model->aprob_gerencia = $req->aprob_gerencia;
+            }
+
+            $model->save();
+            $result['id']= $model->id;
+
+
+
+        }
+
+
+        return $result;
+
+    }
+
+
 
     /***
      * Guarda un registro en la base de datos
@@ -1084,7 +1193,7 @@ class OrderController extends BaseController
      * @return json donde el primer valor representa 'error' en caso de q falle y
      * 'succes' si se realizo la accion
      ******/
-    public function saveOrUpdate(Request $req)
+    public function saveOrder(Request $req)
     {
 
         //////////validation

@@ -55,6 +55,12 @@ if (Request::is('Solicitude/*'))
 {
     require __DIR__.'/order_routes.php';
 }
+
+//////enrutador para servicios de ordenes de compra
+if (Request::is('PurchaseOrder/*'))
+{
+    require __DIR__.'/order_routes.php';
+}
 //////enrutador para servicios de Proveedores
 if (Request::is('provider/*'))
 {

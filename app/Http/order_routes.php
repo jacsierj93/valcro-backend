@@ -23,7 +23,10 @@ $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); 
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
 
 //pedidos
-$app->post("Order/Save",'Orders\OrderController@saveOrUpdate'); ///guarda el pedido
+$app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
+
+//Orden de compra
+$app->post("PurchaseOrder/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
 
 // solicitudes
 $app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda el pedido
