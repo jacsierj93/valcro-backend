@@ -27,7 +27,7 @@
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div flex ng-controller="ListProv" style="overflow-y:auto;">
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id)}">
+                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'000000'}}</div>
                     <div style="height:40px;">
@@ -35,11 +35,9 @@
 
                        <!-- <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />-->
 
-                        <span ng-show="(item.contrapedido==1)" class=" icon2-contrapedidos" style="font-size: 23px"></span>
-                        <span ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" class="icon-Aereo" style="font-size: 24px"></span>
-                       <!-- <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/Aereo.svg" />-->
-                       <!-- <img ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" src="images/aereo.png" />-->
-                        <img ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)" src="images/maritimo.png" />
+                        <span ng-show="(item.contrapedido==1)" class=" icon-contrapedidos" style="font-size: 23px"></span>
+                        <span ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
+                        <span ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)" style="font-size: 23px" class="icon-Barco" /></span>
                     </div>
                 </div>
             </div>
@@ -54,11 +52,11 @@
                 </div>
                 <div layout="column" layout-align="center center" ng-click="addProv()">
                     <!--<i class="fa fa-plus"></i>-->
-                    <span class="icon-Agregar" style="font-size: 24px"></span>
+                    <span class="icon-Agregar" style="font-size: 23px"></span>
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center" ng-click="editProv()" ng-show="prov.id">
-                    <span class="icon-Actualizar" style="font-size: 24px"></span>
+                    <span class="icon-Actualizar" style="font-size: 23px"></span>
                    <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center" ng-click="showAlert()" ng-show="prov.id">
@@ -102,9 +100,11 @@
 
                         </div>
 
-                        <div class="textResm" style="width:calc(30% - 8px); height:39px; float:left;">
+                        <div class="textResm" style="width:calc(30% - 40px); height:39px; float:left;">
                             {{prov.siglas}}
                         </div>
+                        <span ng-show="(prov.contrapedido==1)" class=" icon-contrapedidos" style="font-size: 23px"></span>
+
                     </div>
                     <div class="titulo_formulario" style="height:39px;" layout-align="start start">
                         <div>
@@ -123,8 +123,11 @@
                     </div>
                     <div style="height:39px;">
                         <div flex>
-                            <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
-                            <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />
+                            <span ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
+                            <span ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Barco" /></span>
+
+                           <!-- <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
+                            <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />-->
                         </div>
                     </div>
 
@@ -272,22 +275,17 @@
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo</label>
-                            <md-select info="seleccione un tipo de proveedor" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                            <md-select info="seleccione un tipo de proveedor" name="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                 <md-option ng-repeat="type in types" value="{{type.id}}">
                                     {{type.nombre}}
                                 </md-option>
                             </md-select>
-
-                            <!--<div ng-messages="projectForm.type.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
-                            </div>-->
                         </md-input-container>
 
 
                         <md-input-container class="md-block" flex>
                             <label>Razon Social</label>
-                            <input info="indique el nombre del proveedor" autocomplete="off" ng-blur="check('description')" duplicate="list" field="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk name="description" ng-model="dtaPrv.description">
+                            <input info="indique el nombre del proveedor" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
                             <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                             <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                             <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -299,22 +297,17 @@
                         <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                             <label>Siglas</label>
                             <input info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
-                            <!--<div ng-messages="projectForm.siglas.$error">
-                                <div ng-message="required">Obligatorio.</div>
-                                <div ng-message="md-maxlength">maximo 4</div>
-                            </div>-->
+
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="15">
                             <label>Tipo de Envio</label>
-                            <md-select info="seleccione un tipo de envio" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                            <md-select info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                 <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                     {{envio.nombre}}
                                 </md-option>
                             </md-select>
-                            <!--<div ng-messages="envio.$error">
-                                <div ng-message="required">Campo Obligatorio.</div>
-                            </div>-->
+
                         </md-input-container>
 
                         <md-input-container class="md-block">
@@ -344,8 +337,7 @@
                         <div flex="20" style="height: 30px;">
 
                             <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
-                            <!--<span style="font-size: 18px; margin-left: 8px" class="icon-barco"></span>
-                            <span style="font-size: 18px; margin-left: 8px" class="icon-gift"></span>-->
+
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -354,7 +346,8 @@
                                 <label>Nombre...</label>
                                 <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
                             </md-input-container>
-                            <?= HTML::image("images/LUPA.png","",array("width"=>"24px","height"=>"24px"))?><span style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"></span>
+                            <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
+
                         </div>
                         <div ng-show="isShow">
                             <div ng-repeat="name in valcroName | orderBy:order:true" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
@@ -404,13 +397,13 @@
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
-                                <input info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="provTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                <input info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>
                         <md-input-container class="md-block" flex ng-show="dir.tipo==2">
                             <label>puertos</label>
-                            <md-select info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
+                            <md-select ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
                                     {{port.Main_port_name}}
                                 </md-option>
@@ -1132,76 +1125,168 @@
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProvFinal">
                 <div flex>
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-click="has()">
+                            <div>
+                                Datos Proveedor
+                            </div>
+                        </div>
                         <div>
-                            Datos Proveedor
+                            <span ng-show="!has(prov.dataProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,finalProv) in prov.dataProv" >
+                            <div layout="column">
+                                {{finalProv.datos.description}}
+                            </div>
+                            <div layout="row">
+                                <div style="width: 32px">
+                                    <span ng-show="(finalProv.datos.contraped" style="font-size: 23px" class="icon-contrapedidos" style="font-size: 24px"></span>
+                                </div>
+                                <div flex>
+                                    {{finalProv.datos.siglas}}
+                                </div>
+
+                            </div>
+                            <div layout="row">
+                                <div>
+                                    <span ng-show="(finalProv.datos.envio==1 || finalProv.datos.envio==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
+                                    <span ng-show="(finalProv.datos.envio==2 || finalProv.datos.envio==3)" style="font-size: 23px" class="icon-Barco" /></span>
+
+                                </div>
+                                <div>
+
+                                </div>
+
+                            </div>
                         </div>
                     </div>
-                    <div ng-repeat="(k,finalProv) in prov.dataProv">
 
-                        <div layout="column">
-                            {{finalProv.datos.description}}
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Nombres Valcro
+                            </div>
                         </div>
-                        <div layout="row">
-                            <div>
-                                {{finalProv.datos.type}}
-                            </div>
-                            <div>
-                                {{finalProv.datos.siglas}}
-                            </div>
-
-                        </div>
-                        <div layout="row">
-                            <div>
-                                {{finalProv.datos.envio}}
-                            </div>
-                            <div>
-                                {{finalProv.datos.contraped}}
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-show="has(prov.dirProv)">
                         <div>
-                            Direcciones
+                            <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,name) in prov.valName">
+
+                            <div layout="column" ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}">
+                                {{name.datos.name}}
+                            </div>
+
                         </div>
                     </div>
-                    <div ng-repeat="(k,dir) in prov.dirProv">
 
-                        <div layout="column" ng-class="{'title_del' :dir.action =='del','title_upd' :dir.action =='upd','title_new' :dir.action =='new'}">
-                            {{dir.datos.direccProv}}
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Direcciones
+                            </div>
                         </div>
+                        <div>
+                            <span ng-show="!has(prov.dirProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,dir) in prov.dirProv">
 
+                            <div layout="column" ng-class="{'title_del' :dir.action =='del','title_upd' :dir.action =='upd','title_new' :dir.action =='new'}">
+                                {{dir.datos.direccProv}}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Contactos
+                            </div>
+                        </div>
+                        <div>
+                            <span ng-show="!has(prov.contProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,cont) in prov.contProv">
+
+                            <div layout="column" ng-class="{'title_del' :cont.action =='del','title_upd' :cont.action =='upd','title_new' :cont.action =='new'}">
+                                {{cont.datos.nombreCont}}
+                            </div>
+
+                        </div>
                     </div>
 
                 </div>
                 <div flex>
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Info Bancaria
+                            </div>
+                        </div>
                         <div>
-                            Nombres Valcro
+                            <span ng-show="!has(prov.infoBank)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,bnk) in prov.infoBank">
+
+                            <div layout="column" ng-class="{'title_del' :bnk.action =='del','title_upd' :bnk.action =='upd','title_new' :bnk.action =='new'}">
+                                {{bnk.datos.nombreCont}}
+                            </div>
+
                         </div>
                     </div>
-                    <div ng-repeat="(k,name) in prov.valName">
-
-                        <div layout="column" ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}">
-                            {{name.datos.name}}
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Limite de Credito
+                            </div>
                         </div>
-
-                    </div>
-
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                         <div>
-                            Contactos
+                            <span ng-show="!has(prov.limCred)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,lim) in prov.limCred">
+
+                            <div layout="column" ng-class="{'title_del' :lim.action =='del','title_upd' :lim.action =='upd','title_new' :lim.action =='new'}">
+                                {{lim.datos.nombreCont}}
+                            </div>
+
                         </div>
                     </div>
-                    <div ng-repeat="(k,cont) in prov.contProv">
-
-                        <div layout="column" ng-class="{'title_del' :cont.action =='del','title_upd' :cont.action =='upd','title_new' :cont.action =='new'}">
-                            {{cont.datos.nombreCont}}
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Factor de conversion
+                            </div>
                         </div>
+                        <div>
+                            <span ng-show="!has(prov.factConv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,conv) in prov.factConv">
 
+                            <div layout="column" ng-class="{'title_del' :conv.action =='del','title_upd' :conv.action =='upd','title_new' :conv.action =='new'}">
+                                {{conv.datos.nombreCont}}
+                            </div>
+
+                        </div>
                     </div>
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Puntos
+                            </div>
+                        </div>
+                        <div>
+                            <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,point) in prov.point">
+
+                            <div layout="column" ng-class="{'title_del' :point.action =='del','title_upd' :point.action =='upd','title_new' :point.action =='new'}">
+                                {{point.datos.nombreCont}}
+                            </div>
+
+                        </div>
+                    </div>
+
+
                 </div>
                 <div flex>
 
