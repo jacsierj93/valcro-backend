@@ -658,7 +658,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     loadPedidosASustituir($scope.provSelec.id);
                     break;
                 case 'agrPed':
-                    loadDoc($scope.document.id);
+                    //loadDoc($scope.document.id);
                     break;
                 default :
                     ;
@@ -671,7 +671,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             loadCountryProvider(newVal);
             loadPaymentCondProvider(newVal);
             $http.get("Order/Address",{params:{id:newVal,tipo_dir: 1}}).success(function (response) {
-                $scope.formData.direccionesFact= response.direccionesFact;
+                $scope.formData.direccionesFact= response;
             });
         }
     });

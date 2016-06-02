@@ -954,18 +954,15 @@
                      ng-click="closeLayer('listProducProv')">
                 </div>
                 <div  layout="column" flex="">
-                    <div layout="row" flex>
-                        <div class="titulo_formulario" style="height:39px;">
-                            <div>
-                                Productos
-                            </div>
+                    <div class="titulo_formulario md-block" layout-padding  layout="row" >
+                        <div>
+                            Productos
                         </div>
-                        <div ng-click=" test('redirect')">
+                        <div ng-click="openLayer('agrKitBoxs')">
                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-
                         </div>
-
                     </div>
+
 
                     <div layout="row" class="headGridHolder">
                         <div flex="5" class="headGrid"> - </div>
