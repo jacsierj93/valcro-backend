@@ -659,6 +659,7 @@ body {
 .headGridHolder {
     height: 40px;
     padding-right: 8px;
+    min-height: 40px;
 }
 
 .headGrid {
