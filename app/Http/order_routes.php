@@ -26,7 +26,7 @@ $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obt
 $app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
 
 //Orden de compra
-$app->post("PurchaseOrder/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
+$app->post("PurchaseOrder/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda el pedido
 
 // solicitudes
 $app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda el pedido

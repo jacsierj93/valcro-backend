@@ -638,6 +638,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 restore('document');// inializa el pedido
                 //  restore('FormData');// inializa el proveedor
                 loadDataFor();
+                $scope.FormdetallePedido.$setUntouched();
                 break;
         }
 
@@ -697,6 +698,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         switch ($scope.formMode){
             case "Solicitud":
                 url="Solicitude/Save";
+                break;
+            case "Orden de Compra":
+                url="PurchaseOrder/Save";
                 break;
         }
 
