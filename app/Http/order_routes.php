@@ -27,10 +27,11 @@ $app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
 
 //Orden de compra
 $app->post("PurchaseOrder/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda el pedido
+$app->get("PurchaseOrder/Get",'Orders\OrderController@getPurchaseOrder'); ///guarda el pedido
 
 // solicitudes
 $app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda el pedido
-$app->post("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
+$app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
 
 
 //Genericos
