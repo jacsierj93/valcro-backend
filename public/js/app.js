@@ -1,5 +1,8 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut','ui.mask', 'ui.utils.masks'];
-var MyApp = angular.module('MyApp', dependency);
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
+var MyApp = angular.module('MyApp', dependency, function() {
+
+});
+
 
 
 /*MyApp.config(['$routeProvider', '$locationProvider',

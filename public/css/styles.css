@@ -52,7 +52,7 @@ md-backdrop {
     background-color: transparent !important;
 }
 
-.md-sidenav-backdrop{
+.md-sidenav-backdrop {
     background-color: transparent !important;
     display: none;
 }
@@ -65,7 +65,6 @@ md-sidenav#lyrAlert {
     background-color: transparent !important;
 }
 
-
 /*==================================================*/
 /*==================================================*/
 md-input-container {
@@ -75,7 +74,7 @@ md-input-container {
 
 /*==================================================*/
 /*==================== INPUT =======================*/
-md-input-container .md-input{
+md-input-container .md-input {
     /*border-color: #ffffff !important;*/
 }
 
@@ -87,7 +86,6 @@ md-input-container:not(.md-input-invalid).md-input-focused .md-input {
 md-input-container:not(.md-input-invalid).md-input-focused label {
     color: rgb(84, 180, 234);
 }
-
 
 input {
     font-size: 98% !important;
@@ -190,21 +188,21 @@ md-select:not([disable]):focus .md-select-value {
     transform: scaleY(1) scaleX(1) !important;
 }
 
-md-input-container > md-select{
+md-input-container > md-select {
     margin-bottom: 10px !important;
 }
 
 /*==================================================*/
 /*================ SELECTOR MULTIPLE ===============*/
-md-select-value>span{
+md-select-value > span {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
-md-select-value>span>div{
+
+md-select-value > span > div {
     float: left !important;
     margin-left: 12px !important;
 }
-
 
 /*==================================================*/
 /*=================== SWITCH =====================*/
@@ -218,9 +216,9 @@ md-switch.md-checked.md-primary .md-bar {
 
 md-switch .md-bar {
     background-color: #ffffff !important;
-    -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.2);
-    -moz-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.2);
-    box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.2);
+    -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.2);
     left: -2px !important;
     width: 40px !important;
     top: 0px !important;
@@ -256,7 +254,7 @@ md-switch.md-focused:not([disabled]):not(.md-checked) .md-thumb:before {
 
 /*==================================================*/
 /*=================== CHPIS =====================*/
-.md-chips .md-chip{
+.md-chips .md-chip {
     border-radius: 16px !important;
     height: 24px !important;
     line-height: 24px !important;
@@ -264,55 +262,53 @@ md-switch.md-focused:not([disabled]):not(.md-checked) .md-thumb:before {
     padding: 0 16px 0 8px !important;
 }
 
-.md-chips .md-chip .md-chip-remove{
+.md-chips .md-chip .md-chip-remove {
     width: 24px !important;
     height: 24px !important;
 }
 
-md-chips .md-chip{
+md-chips .md-chip {
     background-color: #f1f1f1 !important;
 }
 
-.md-chips{
+.md-chips {
     padding: 0 !important;
 }
 
-md-chips .md-chips{
+md-chips .md-chips {
     margin-bottom: 10px !important;
 }
 
-md-chips .md-chips.md-focused{
+md-chips .md-chips.md-focused {
     box-shadow: 0 1px rgb(84, 180, 234) !important;
 }
 
-.md-chips .md-chip-input-container{
+.md-chips .md-chip-input-container {
     line-height: 20px !important;
 }
 
-.md-chips .md-chip-input-container:not(:first-child){
+.md-chips .md-chip-input-container:not(:first-child) {
     /*margin: 6px 0px 2px 0 !important;*/
     margin: 0px !important;
 }
 
-.md-chips .md-chip-input-container input:not([type]){
+.md-chips .md-chip-input-container input:not([type]) {
     height: 20px !important;
     line-height: 20px !important;
 }
 
-.md-chips .md-chip-input-container input{
+.md-chips .md-chip-input-container input {
     height: 20px !important;
     line-height: 20px !important;
 }
 
-.md-chips .md-chip-input-container md-autocomplete-wrap{
+.md-chips .md-chip-input-container md-autocomplete-wrap {
     height: 20px !important;
 }
 
-.md-chips .md-chip-input-container md-autocomplete{
+.md-chips .md-chip-input-container md-autocomplete {
     height: 20px !important;
 }
-
-
 
 /*==================================================*/
 /*==================== ALERTS ======================*/
@@ -322,26 +318,31 @@ md-chips .md-chips.md-focused{
     margin-bottom:48px !important;
     width: calc(100% - 288px) !important;
 }*/
-.alertBox md-tabs-wrapper{
+.alertBox md-tabs-wrapper {
     display: none !important;
 }
-.alertBox md-tabs-canvas{
+
+.alertBox md-tabs-canvas {
     display: none !important;
 }
-.alertBox md-tabs-content-wrapper{
+
+.alertBox md-tabs-content-wrapper {
     top: 0 !important;
 }
-.alertBox md-tabs:not(.md-no-tab-content):not(.md-dynamic-height){
+
+.alertBox md-tabs:not(.md-no-tab-content):not(.md-dynamic-height) {
     min-height: 96px !important;
 }
-.alertBox md-tab-content{
-    height: 96px;
-}
-.alertBox md-tab-content>div{
+
+.alertBox md-tab-content {
     height: 96px;
 }
 
-.alertPrevArrow{
+.alertBox md-tab-content > div {
+    height: 96px;
+}
+
+.alertPrevArrow {
     width: 16px;
     height: 96px;
     cursor: pointer;
@@ -349,7 +350,8 @@ md-chips .md-chips.md-focused{
     background-repeat: no-repeat;
     background-position: center center;
 }
-.alertNextArrow{
+
+.alertNextArrow {
     width: 16px;
     height: 96px;
     cursor: pointer;
@@ -357,61 +359,70 @@ md-chips .md-chips.md-focused{
     background-repeat: no-repeat;
     background-position: center center;
 }
-.alertOkColor{
-    background-color:rgba(255,239,0,0.7);
+
+.alertOkColor {
+    background-color: rgba(255, 239, 0, 0.7);
 }
-.alertAlertColor{
-    background-color: rgba(245,171,0,0.7);
+
+.alertAlertColor {
+    background-color: rgba(245, 171, 0, 0.7);
 }
-.alertErrorColor{
-    background-color: rgba(255,50,0,0.7);
+
+.alertErrorColor {
+    background-color: rgba(255, 50, 0, 0.7);
 }
-.alertInfoColor{
-    background-color: rgba(0,0,0,0.2);
+
+.alertInfoColor {
+    background-color: rgba(0, 0, 0, 0.2);
 }
-.alertContainer{
+
+.alertContainer {
     background-color: transparent;
     height: 96px;
 }
-.alertItem{
+
+.alertItem {
     height: 96px;
 }
-.alertTextContent{
+
+.alertTextContent {
     overflow-y: auto;
     height: 63px;
     width: 100%;
     text-align: center;
     padding-top: 8px;
 }
-.alertTextOpcs{
+
+.alertTextOpcs {
     height: 24px;
     width: 100%;
     text-align: center;
 
 }
 
-.alertTextOpcs>div{
-    border-top: 1px solid rgba(255,255,255,0.4);
+.alertTextOpcs > div {
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
     padding-top: 3px;
 }
-.alertTextOpcs>div:not(:last-child){
-    border-right: 1px solid rgba(255,255,255,0.4);
+
+.alertTextOpcs > div:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
 }
-.alertTextOpcs>div:hover{
-    background-color: rgba(0,0,0,0.2);
-    color:#fff;
+
+.alertTextOpcs > div:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #fff;
 }
-.alertTextOpcs>div:active{
-    background-color: rgba(255,255,255,0.2);
+
+.alertTextOpcs > div:active {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /*==================================================*/
 /*===================== TABS =======================*/
-md-tabs .md-tab.md-active{
+md-tabs .md-tab.md-active {
 
 }
-
-
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 body[ng-cloak] {
@@ -655,6 +666,7 @@ body {
     padding-top: 10px;
     height: 19px;
 }
+
 /*======================== GRIDS ================================*/
 .headGridHolder {
     height: 40px;
@@ -697,12 +709,13 @@ body {
 
 /* */
 
-md-tabs md-ink-bar{
+md-tabs md-ink-bar {
     height: 1px !important;
     color: rgb(84, 180, 234) !important;
     background-color: rgb(84, 180, 234) !important;
 }
-.md-tab{
+
+.md-tab {
     line-height: 20px !important;
     padding: 10px 24px 0 24px !important;
     text-transform: initial !important;
@@ -710,10 +723,12 @@ md-tabs md-ink-bar{
     font-size: 16px !important;
     text-align: left;
 }
-md-tabs .md-tab.md-active{
+
+md-tabs .md-tab.md-active {
     color: rgb(84, 180, 234);
 }
-md-tabs-canvas{
+
+md-tabs-canvas {
     height: 30px !important;
 }
 
@@ -726,27 +741,31 @@ md-pagination-wrapper {
 ****CLASES QUE MARCA ELEMENTO SELECCIONADO EN EL GRID Y LISTADO DE PROVEEDORES***
 ********************************************************************************/
 .listSel {
-   border-left:2px solid rgb(84, 180, 234);
+    border-left: 2px solid rgb(84, 180, 234);
 }
+
 .listSelTemp {
-     border-left:2px solid #febd33;
- }
+    border-left: 2px solid #febd33;
+}
 
 .iconInactive {
-    color :#d1d1d1 !important;
+    color: #d1d1d1 !important;
 }
+
 .iconActive {
-    color : rgb(84, 180, 234) !important;
+    color: rgb(84, 180, 234) !important;
 }
+
 .iconFav {
-   color: #febd33 !important;
+    color: #febd33 !important;
 }
+
 .gridSel {
     background-color: rgb(84, 180, 234);
     color: #fff;
 }
 
-.rowSel>div{
+.rowSel > div {
     /*border-bottom-color: rgb(84, 180, 234);
     color: rgb(84, 180, 234);*/
     font-weight: bolder !important;
@@ -758,21 +777,23 @@ input[type=number]::-webkit-outer-spin-button {
     margin: 0;
 }
 
-.title_error{
-    color:rgb(221,44,0) !important;
-}
-.title_error>div{
-    border-color:rgb(221,44,0) !important;
+.title_error {
+    color: rgb(221, 44, 0) !important;
 }
 
-.onlyread{
-    color:#999 !important;
-}
-.onlyread>div{
-    border-color:#999 !important;
+.title_error > div {
+    border-color: rgb(221, 44, 0) !important;
 }
 
-.itemName{
+.onlyread {
+    color: #999 !important;
+}
+
+.onlyread > div {
+    border-color: #999 !important;
+}
+
+.itemName {
     border-radius: 10px;
     padding: 5px;
     margin-right: 8px;
@@ -781,60 +802,61 @@ input[type=number]::-webkit-outer-spin-button {
     border: 1px solid #ccc;
 }
 
-.itemName>.rm{
-    color:#000 !important;
-}
-.rm:hover{
-    color:red !important;
+.itemName > .rm {
+    color: #000 !important;
 }
 
-.coinDiv
-{
-    width:24px;
-    height:24px;
-    border-radius:250px;
-    font-size:15px;
-    color:#ccc;
-    line-height:24px;
-    text-align:center;
-    background:#fff;
+.rm:hover {
+    color: red !important;
+}
+
+.coinDiv {
+    width: 24px;
+    height: 24px;
+    border-radius: 250px;
+    font-size: 15px;
+    color: #ccc;
+    line-height: 24px;
+    text-align: center;
+    background: #fff;
     border: 2px solid gold;
     margin-right: 8px;
 }
 
-.ligthCell{
-    color:#d1d1d1 !important;
+.ligthCell {
+    color: #d1d1d1 !important;
 }
 
-.title_del{
-    color:rgb(221,44,0) !important;
-}
-.title_del>div{
-    border-color:rgb(221,44,0) !important;
+.title_del {
+    color: rgb(221, 44, 0) !important;
 }
 
-.title_upd{
-    color:gold !important;
-}
-.title_upd>div{
-    border-color:gold !important;
+.title_del > div {
+    border-color: rgb(221, 44, 0) !important;
 }
 
-.title_new{
-    color : rgb(84, 180, 234) !important;
+.title_upd {
+    color: gold !important;
 }
 
+.title_upd > div {
+    border-color: gold !important;
+}
 
+.title_new {
+    color: rgb(84, 180, 234) !important;
+}
 
 /*========================== DATE PICKERS ===============================*/
-.md-datepicker-button{
-    display:none;
+.md-datepicker-button {
+    display: none;
 }
 
 /**********************EDITADO POR MIGUEL 27/05/2016****************************/
-md-datepicker{
+md-datepicker {
     background-color: transparent;
 }
+
 /**********************EDITADO POR MIGUEL 14/05/2016****************************
 *********************************************************************************
 **** CLASE QUE DIBUJA dot en los item de lista lateral  ***
@@ -845,4 +867,22 @@ md-datepicker{
     border-radius: 50%;
     color: #ffffff;
     font-size: 11px;
+}
+
+/*****
+area para subir los archivos
+***/
+
+.drop-box {
+    background: #F8F8F8;
+    border: 5px dashed #DDD;
+    width: 200px;
+    height: 65px;
+    text-align: center;
+    padding-top: 25px;
+    margin: 10px;
+}
+
+.dragover {
+    border: 5px dashed blue;
 }

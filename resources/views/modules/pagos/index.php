@@ -339,7 +339,9 @@
                                 <div flex="10" class="cellGrid"> {{abono.monto}}</div>
                                 <div flex="10" class="cellGrid"> {{abono.saldo}}</div>
                                 <div flex="10" class="cellGrid">
-                                    <input type="number" ng-model="abono.montoUsado" ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado" ng-value="abono.saldo" />
+                                    <input type="number" ng-model="abono.montoUsado"
+                                           ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado"
+                                           ng-value="abono.saldo"/>
                                 </div>
                             </div>
 
@@ -465,12 +467,12 @@
                         <!--espacio-->
 
 
-<!--                        <div>Id del pago: #100</div>-->
+                        <!--                        <div>Id del pago: #100</div>-->
 
                         <!--espacio-->
                         <span style="padding-right: 100px">&nbsp; </span>
                         <!--espacio-->
-                     <!--   <div>Fecha: <?/*= date("d-m-Y") */?></div>-->
+                        <!--   <div>Fecha: <? /*= date("d-m-Y") */ ?></div>-->
 
                     </div>
 
@@ -606,7 +608,22 @@
 
                         </md-input-container>
 
-                        <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>
+
+                        <!--                        <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>-->
+
+                    </div>
+
+                    <div layout="row">
+
+
+                        <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                             ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
+                             Subir documentos adjuntos al Pago
+                            
+                        </div>
+
+
+
 
                     </div>
 
@@ -658,12 +675,12 @@
                         <!--espacio-->
 
 
-<!--                        <div>Id del pago: #100</div>-->
+                        <!--                        <div>Id del pago: #100</div>-->
 
                         <!--espacio-->
                         <span style="padding-right: 100px">&nbsp; </span>
                         <!--espacio-->
-          <!--              <div>Fecha: <?/*= date("d-m-Y") */?></div>-->
+                        <!--              <div>Fecha: <? /*= date("d-m-Y") */ ?></div>-->
 
 
                     </div>
@@ -715,7 +732,8 @@
                     <div layout="row" style="height: 39px;">
 
                         <md-input-container class="md-block" flex="35">
-                            <span class="balance_plus">{{abono.monto - abono.monto_rec | currency : $ : 2}} </span> / <span
+                            <span class="balance_plus">{{abono.monto - abono.monto_rec | currency : $ : 2}} </span>
+                            / <span
                                 class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
                         </md-input-container>
 
@@ -873,9 +891,6 @@
 
         </md-sidenav>
 
-        
-        
-        
 
         <!-- boton para registrar pago nuevo-->
         <md-sidenav

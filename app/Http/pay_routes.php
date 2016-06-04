@@ -23,6 +23,8 @@ $app->get('payments/getProv/{id}','Payments\PaymentController@getProvById'); ///
 $app->get('payments/provider/getBankAccounts','Payments\PaymentController@getProvBankAccounts'); ///lista de cuentas bancarias del proveedor
 $app->post('payments/savePay', 'Payments\PaymentController@paySaveOrUpdate'); ///guarda un documento de abono
 
+$app->post('payments/upload','Payments\DocumentController@testUpload');
+
 
 
 
