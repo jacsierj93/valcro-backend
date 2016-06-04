@@ -362,8 +362,8 @@
                             Direcciones
                         </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
-                        <div layout="row">
+                    <div ng-hide="$parent.expand && id!=$parent.expand" layout="column" flex>
+                        <div flex layout="row">
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
@@ -401,7 +401,7 @@
                             </md-input-container>
 
                         </div>
-                        <md-input-container class="md-block" flex ng-show="dir.tipo==2">
+                        <md-input-container class="md-block" style="height: 32px" ng-show="dir.tipo==2">
                             <label>puertos</label>
                             <md-select ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
@@ -409,21 +409,21 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
-                        <md-input-container class="md-block" flex>
+                        <md-input-container class="md-block" style="height: 32px">
                             <label>Direccion</label>
                             <input info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         </md-input-container>
-                        <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
+                        <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{address.length}})</div>
                         </div>
                         <div layout="column" ng-show="isShowMore" flex>
-                            <div layout="row" class="headGridHolder">
+                            <div layout="row" class="headGridHolder" style="height:32px;">
                                 <div flex="10" class="headGrid"> Tipo</div>
                                 <div flex="20" class="headGrid"> Pais</div>
                                 <div flex class="headGrid"> Direccion</div>
                                 <div flex="20" class="headGrid"> Telefono</div>
                             </div>
-                            <div id="grid" style="overflow-y: auto">
+                            <md-content id="grid" flex>
                                 <div flex ng-repeat="add in address" ng-click="toEdit(this)">
                                     <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
                                         <div ng-show="(add.id==dir.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
@@ -433,7 +433,7 @@
                                         <div flex="20" class="cellGrid">{{add.telefono}}</div>
                                     </div>
                                 </div>
-                            </div>
+                            </md-content>
                         </div>
                     </div>
 
@@ -730,7 +730,7 @@
                                 </md-select>
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="30">
+                            <md-input-container class="md-block" flex>
                                 <label>Linea</label>
                                 <md-select ng-disabled="$parent.enabled" ng-model="cred.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
                                     <md-option ng-repeat="line in lines" value="{{line.id}}">
@@ -996,93 +996,104 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-                <form name="timeProd" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="timeProd" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Tiempo Aproximado de Producción
                         </div>
                     </div>
-                    <div layout="row">
-                        <md-input-container class="md-block" flex="20">
-                            <label>De (Dias)</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.from" required>
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="20">
-                            <label>A (Dias)</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.to" required>
-                        </md-input-container>
+                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div layout="row">
+                            <md-input-container class="md-block" flex="20">
+                                <label>De (Dias)</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.from" required>
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="20">
+                                <label>A (Dias)</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.to" required>
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
-                            <label>Linea</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
-                                <md-option ng-repeat="line in lines" value="{{line.id}}">
-                                    {{line.linea}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                    </div>
-                    <div layout="column" ng-show="isShow">
-                        <div layout="row" class="headGridHolder">
-                            <div flex="20" class="headGrid"> minimo dias</div>
-                            <div flex="20" class="headGrid">Maximo Dias</div>
-                            <div flex class="headGrid">Linea</div>
+                            <md-input-container class="md-block" flex="20">
+                                <label>Linea</label>
+                                <md-select ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
+                                    <md-option ng-repeat="line in lines" value="{{line.id}}">
+                                        {{line.linea}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
                         </div>
-                        <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="time in timesP" ng-click="toEdit(this)">
-                                <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
-                                    <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
-                                    <div flex class="cellGrid">{{time.lines.linea}}</div>
+                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                        </div>
+                        <div layout="column" ng-show="isShowMore" flex>
+                            <div layout="row" class="headGridHolder">
+                                <div flex="20" class="headGrid"> minimo dias</div>
+                                <div flex="20" class="headGrid">Maximo Dias</div>
+                                <div flex class="headGrid">Linea</div>
+                            </div>
+                            <div id="grid" style="overflow-y: auto; height: 120px">
+                                <div flex ng-repeat="time in timesP" ng-click="toEdit(this)">
+                                    <div layout="row" layout-wrap class="cellGridHolder">
+                                        <div ng-show="(time.id==tp.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmTimeProd(this)"></div>
+                                        <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
+                                        <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
+                                        <div flex class="cellGrid">{{time.lines.linea}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="timeTrans" ng-controller="transTimeController" ng-click="showGrid(true)" click-out="showGrid(false)">
+                <form name="timeTrans" ng-controller="transTimeController" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Tiempo Aproximado de Transito
                         </div>
                     </div>
-                    <div layout="row">
-                        <md-input-container class="md-block" flex="20">
-                            <label>De (Dias)</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="20">
-                            <label>A (Dias)</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
-                        </md-input-container>
+                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div layout="row">
+                            <md-input-container class="md-block" flex="20">
+                                <label>De (Dias)</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="20">
+                                <label>A (Dias)</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
-                            <label>Pais</label>
-                            <md-select ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
-                                <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
-                                    {{country.pais.short_name}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                    </div>
-                    <div layout="column" ng-show="isShow">
-                        <div layout="row" class="headGridHolder">
-                            <div flex="20" class="headGrid"> minimo dias</div>
-                            <div flex="20" class="headGrid">Maximo Dias</div>
-                            <div flex class="headGrid">Pais</div>
+                            <md-input-container class="md-block" flex="20">
+                                <label>Pais</label>
+                                <md-select ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
+                                    <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
+                                        {{country.pais.short_name}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
                         </div>
-                        <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="time in timesT" ng-click="toEdit(this)">
-                                <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
-                                    <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
-                                    <div flex class="cellGrid">{{time.country.short_name}}</div>
+                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                        </div>
+                        <div layout="column" ng-show="isShowMore" flex>
+                            <div layout="row" class="headGridHolder">
+                                <div flex="20" class="headGrid"> minimo dias</div>
+                                <div flex="20" class="headGrid">Maximo Dias</div>
+                                <div flex class="headGrid">Pais</div>
+                            </div>
+                            <div id="grid" style="overflow-y: auto; height: 120px">
+                                <div flex ng-repeat="time in timesT" ng-click="toEdit(this)">
+                                    <div layout="row" layout-wrap class="cellGridHolder">
+                                        <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
+                                        <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
+                                        <div flex class="cellGrid">{{time.country.short_name}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
 
-                <form name="provPrecList">
+                <!--<form name="provPrecList">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Listas de Precios
@@ -1114,7 +1125,7 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </form>-->
             </md-content>
             <div style="width: 16px;" ng-mouseover="showNext(true,'END')">
 
@@ -1123,8 +1134,8 @@
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProvFinal">
-                <div flex>
+            <md-content class="cntLayerHolder" layout="row" flex="grow" ng-controller="resumenProvFinal">
+                <div flex layout="column">
                     <div>
                         <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-click="has()">
                             <div>
@@ -1140,7 +1151,7 @@
                             </div>
                             <div layout="row">
                                 <div style="width: 32px">
-                                    <span ng-show="(finalProv.datos.contraped" style="font-size: 23px" class="icon-contrapedidos" style="font-size: 24px"></span>
+                                    <span ng-show="(finalProv.datos.contraped)" style="font-size: 23px" class="icon-contrapedidos" style="font-size: 24px"></span>
                                 </div>
                                 <div flex>
                                     {{finalProv.datos.siglas}}
@@ -1170,16 +1181,29 @@
                         <div>
                             <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,name) in prov.valName">
+                        <md-content flex style="max-height: 200px;">
+                            <div ng-repeat="(k,name) in prov.valName" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
 
-                            <div layout="column" ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}">
-                                {{name.datos.name}}
+                                <div layout="column" ><!--ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}"-->
+                                    <div layout="row" flex="grow">
+                                        <div ng-show="name.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
+                                        <div ng-show="name.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
+                                        <div ng-show="name.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
+                                        <div flex>
+                                            {{name.datos.name}}
+                                        </div>
+                                        <div style="width:128px">
+                                            <span ng-repeat="(id,dep) in name.datos.departments" style="font-size:23px; margin-right: 8px;" class="{{getDato(id,'depsValcroName','icon')}}" ng-class="{'iconFav' : (dep.fav == 1)}"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
                             </div>
-
-                        </div>
+                        </md-content>
                     </div>
 
-                    <div>
+                    <div layout="column">
                         <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                             <div>
                                 Direcciones
@@ -1188,17 +1212,53 @@
                         <div>
                             <span ng-show="!has(prov.dirProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,dir) in prov.dirProv">
+                        <md-content flex>
+                            <div ng-repeat="(k,dir) in prov.dirProv" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
 
-                            <div layout="column" ng-class="{'title_del' :dir.action =='del','title_upd' :dir.action =='upd','title_new' :dir.action =='new'}">
-                                {{dir.datos.direccProv}}
+                                <div layout="column" >
+                                    <div ng-show="name.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
+                                    <div ng-show="name.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
+                                    <div ng-show="name.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
+                                    <div layout="row">
+                                        <div flex="30">
+                                            {{getDato(dir.datos.tipo,'typeDir','descripcion')}}
+                                        </div>
+                                        <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                            {{getDato(dir.datos.pais,'countries','short_name')}}
+                                            <md-tooltip style="overflow:visible; float:left; width:200px">
+                                                {{getDato(dir.datos.pais,'countries','short_name')}}
+                                            </md-tooltip>
+                                        </div>
+                                    </div>
+                                    <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                        <span style="font-weight: bolder">Direccion :</span>{{dir.datos.direccProv}}
+                                        <md-tooltip >
+                                            {{dir.datos.direccProv}}
+                                        </md-tooltip>
+                                    </div>
+                                    <div layout="row">
+                                        <span style="font-weight: bolder">postal :</span>
+                                        <div flex="30">
+                                             {{dir.datos.zipCode}}
+                                        </div>
+                                        <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                            {{dir.datos.provTelf}}
+                                        </div>
+                                    </div>
+                                    <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                        <p style="float: left" ng-repeat="port in dir.datos.ports">{{getDato(port,'ports','Main_port_name')}}; </p>
+                                       <!-- <md-tooltip ng-bind="myText">
+
+                                        </md-tooltip>-->
+                                    </div>
+                                </div>
+
                             </div>
-
-                        </div>
+                        </md-content>
                     </div>
 
-                    <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex="5" >
                             <div>
                                 Contactos
                             </div>
@@ -1206,17 +1266,37 @@
                         <div>
                             <span ng-show="!has(prov.contProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,cont) in prov.contProv">
+                        <md-content flex>
+                            <div ng-repeat="(k,cont) in prov.contProv" layout="column" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
+                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                    <span style="font-weight: bolder">Nombre :</span>{{cont.datos.nombreCont}}
+                                    <md-tooltip >
+                                        {{cont.datos.nombreCont}}
+                                    </md-tooltip>
+                                </div>
+                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                    <span style="font-weight: bolder">Email :</span>{{cont.datos.emailCont}}
+                                    <md-tooltip >
+                                        {{cont.datos.emailCont}}
+                                    </md-tooltip>
+                                </div>
+                              <!--  <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                    {{cont.datos.emailCont}}
+                                    <md-tooltip >
+                                        {{cont.datos.emailCont}}
+                                    </md-tooltip>
+                                </div>-->
+                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                    <span style="font-weight: bolder">Telf :</span>{{cont.datos.contTelf}}
+                                </div>
 
-                            <div layout="column" ng-class="{'title_del' :cont.action =='del','title_upd' :cont.action =='upd','title_new' :cont.action =='new'}">
-                                {{cont.datos.nombreCont}}
                             </div>
+                        </md-content>
 
-                        </div>
                     </div>
 
                 </div>
-                <div flex>
+                <div  flex="33" layout="column">
                     <div>
                         <div class="titulo_formulario" layout="column" layout-align="start start" flex >
                             <div>
@@ -1288,7 +1368,24 @@
 
 
                 </div>
-                <div flex>
+                <div   flex="33" layout="column">
+                    <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                            <div>
+                                Puntos
+                            </div>
+                        </div>
+                        <div>
+                            <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div ng-repeat="(k,point) in prov.point">
+
+                            <div layout="column" ng-class="{'title_del' :point.action =='del','title_upd' :point.action =='upd','title_new' :point.action =='new'}">
+                                {{point.datos.nombreCont}}
+                            </div>
+
+                        </div>
+                    </div>
 
                 </div>
             </md-content>

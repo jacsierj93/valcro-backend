@@ -28,6 +28,9 @@
     <?= HTML::script("components/angular-ui-mask/dist/mask.js") ?>
     <?= HTML::script("components/angular-input-masks/angular-input-masks-standalone.min.js") ?>
 
+    <!--    demo file upload-->
+    <?= HTML::script("components/ng-file-upload/ng-file-upload.min.js") ?>
+
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>
 

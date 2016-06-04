@@ -66,7 +66,7 @@ class DocumentCP extends Model
     }
     
 
-    /**funcion que trae la diferencia de fechas en dias
+    /**funcion que trae la diferencia de fechas en dias todo: chequeo de la efectividad
      * @param $dateIni
      * @param $dateEnd
      * @return mixed
@@ -104,7 +104,6 @@ class DocumentCP extends Model
         }
 
         return $estatus;
-
 
     }
 

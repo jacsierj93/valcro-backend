@@ -9,6 +9,7 @@
 namespace app\Http\Controllers\Payments;
 
 use App\Libs\Api\RestApi;
+use App\Libs\Utils\Files;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\DocumentCPType;
 use App\Models\Sistema\Payments\Payment;
@@ -326,6 +327,15 @@ class DocumentController extends BaseController
 
 
         }
+    }
+
+
+
+
+    public function testUpload(Request $req){
+        $archivo = new Files("pay");
+      //  dd($req->file("file"));
+        $archivo->upload("file"); ///probando
     }
 
 
