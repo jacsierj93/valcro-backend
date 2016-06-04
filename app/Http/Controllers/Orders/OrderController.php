@@ -17,10 +17,12 @@ use App\Models\Sistema\Order\OrderPriority;
 use App\Models\Sistema\Order\OrderReason;
 use App\Models\Sistema\Order\OrderStatus;
 use App\Models\Sistema\Order\OrderType;
+use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Product;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\ProviderAddress;
+use App\Models\Sistema\ProviderCondPayItem;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Purchase\PurchaseOrder;
@@ -50,7 +52,7 @@ class OrderController extends BaseController
     {
 
         $provs = Provider::
-        where('id', 1)->
+        //where('id', 1)->
         /*            Orderby('razon_social')->
                 skip(0)->take(20)->*/
 
@@ -80,7 +82,7 @@ class OrderController extends BaseController
                 $nE90=0;
                 $nE100=0;
 
-                $peds=$prv->Order()->get();
+                $peds=$prv->getOrderDocuments();
 
                 foreach($peds as $ped){
                     $arrival=$ped->daysCreate();
@@ -1083,6 +1085,19 @@ class OrderController extends BaseController
                 $aux = new Purchase();
                 $aux = $this->setDocItem($aux, $req);
                 $aux->version = $model->version+1;
+            }
+
+            if($req->has("close")){
+                $model->final_id=
+                    "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
+                    ."-a".sizeof($model->attachments()->get())
+                ;
+                $model->getPaymentsDoc();
+
+
+
+
+
             }
             $model= $this->setDocItem($model, $req);
             $model->save();

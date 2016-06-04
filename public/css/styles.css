@@ -631,6 +631,7 @@ body {
     color: rgb(84, 180, 234);
     height: 39px;
     padding-right: 8px;
+    min-height: 39px;
 }
 
 .titulo_formulario div {

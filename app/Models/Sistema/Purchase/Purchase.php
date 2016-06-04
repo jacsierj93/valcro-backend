@@ -25,8 +25,12 @@ class Purchase extends Model
         return 'Orden de Compra';
     }
 
-    public function getItems(){
-        return $this->hasMany('App\Models\Sistema\Purchaseitem', 'doc_origen_id', 'id');
+    public function items(){
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseItem', 'doc_id');
+    }
+
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseAttachment', 'doc_id');
     }
 
 
@@ -55,6 +59,56 @@ class Purchase extends Model
 
         return $estatus;//->format("d");
     }
+
+    /**
+     * e
+    */
+    public function getNumItem($tipo){
+        $i=0;
+        $items = $this->items()->get();
+        foreach($items as $aux){
+            $tip=$this->getTypeProduct($aux);
+            if($tip == $tipo){
+                $i++;
+            }
+
+        }
+
+        return $i;
+    }
+
+    /**
+     * genera los documentos de pago
+    */
+
+    public function getPaymentsDoc(){
+        //**generacion de cuotas de pago*/
+        $codItems = ProviderCondPayItem::where('id_condicion', $this->condicion_pago_id)->get();
+        $cps= array();
+        $hoy= Carbon::now();
+
+        // factura
+        $aux = new DocumentCP();
+        $fVence= $hoy->addDays($codItems->sum('dias'));
+        $aux->nro_factura = $this->nro_factura;
+        $aux->moneda_id = $this->prov_moneda_id;
+        $aux->fecha = $hoy;
+        $aux->monto = $this->monto;
+        $aux->saldo = $this->monto;
+        $aux->tasa = $this->tasa;
+        $aux->fecha_vence = $fVence;
+
+
+
+        /*$auxDate= date_create($this->emision);
+        $auxEmit= Carbon::createFromDate($auxDate->format("Y"),$auxDate->format("m"),$auxDate->format("d"));*/
+
+
+
+    }
+
+
+
 
 
 }
