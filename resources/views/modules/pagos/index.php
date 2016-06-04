@@ -618,8 +618,8 @@
 
                         <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                              ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
-                             Subir documentos adjuntos al Pago
-                            
+                            Subir documentos adjuntos al Pago
+
                         </div>
 
 

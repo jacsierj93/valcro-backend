@@ -35,6 +35,10 @@ $app->get('/api/info', 'Api\UserController@info');
 $app->get('test', 'Admin\AccountController@main');
 
 
+////prueba de correo
+$app->get('email/test','Api\EmailController@test');
+
+
 
 /************************RUTAS DE LOS SERVICIOS***********************/
 

@@ -10,7 +10,8 @@
         "vlucas/phpdotenv": "~1.0",
         "vluzrmos/collective-html": "1.0.9 as 5.1",
         "league/flysystem": "~1.0",
-        "intervention/image": "^2.3"
+        "intervention/image": "^2.3",
+        "illuminate/mail": "^5.1"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",
