@@ -740,6 +740,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.layer == "finalDoc"){
             $scope.document.close=true;
         }
+        if($scope.layer == "finalDoc"){
+            $scope.document.close=true;
+        }
         switch ($scope.formMode){
             case "Solicitud":
                 url="Solicitude/Save";

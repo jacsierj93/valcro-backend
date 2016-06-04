@@ -121,7 +121,7 @@
                     <div layout="column" ng-show="(index < 1 || layer == 'listPedido' )" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
-                    <div layout="column" layout-align="center center" ng-show="(index > 1 && formBlock && pedidoSelec.id >0 )" ng-click="updateForm()">
+                    <div layout="column" layout-align="center center" ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
@@ -374,7 +374,7 @@
                 <div style="width: 96px" layout="column" layout-align="space-between center">
                     <div class="docButton" layout="column" flex  ng-click="openEmail()"><div layout="column" layout-align="end center"> Email</div> </div>
                     <div class="docButton" layout="column" flex ng-click="newDoc('Solicitud')"> <div layout="column" layout-align="end center"> Solicitud</div></div>
-                    <div class="docButton" layout="column" flex ng-click="newDoc('Pedido')"> <div layout="column" layout-align="end center"> Pedido</div></div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc('Proforma')"> <div layout="column" layout-align="end center"> Pedido</div></div>
                     <div class="docButton" layout="column" flex ng-click="newDoc('Orden de Compra')"><div layout="column" layout-align="end center"> Orden de Compra</div> </div>
 
                 </div>
@@ -594,17 +594,7 @@
                         </div>
 
                         <div layout="row" >
-                            <md-input-container class="md-block" flex="20">
-                                <label>Condiciones  </label>
-                                <md-select ng-model="document.condicion_id" md-no-ink
-                                           ng-disabled="( formBlock)"
 
-                                >
-                                    <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
-                                        {{condPed.nombre}}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
                             <md-input-container class="md-block" flex="10">
                                 <label>Mt3</label>
                                 <input ng-model="document.mt3"  name="mt3"  ng-model="number" ui-number-mask
@@ -642,7 +632,31 @@
                             </div>
                         </div>
 
-                        <div></div>
+                        <div layout="row">
+                            <md-input-container class="md-block" flex="20">
+                                <label>Condiciones  </label>
+                                <md-select ng-model="document.condicion_id" md-no-ink
+                                           ng-disabled="( formBlock)"
+
+                                >
+                                    <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
+                                        {{condPed.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex >
+                                <label>N° Factura:</label>
+                                <input ng-model="document.nro_factura"  ng-disabled="( formBlock)">
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex >
+                                <label>N° Proforma:</label>
+                                <input ng-model="document.nro_proforma"  ng-disabled="( formBlock)"
+                                       ng-required ="(formMode == 'Orden de Compra')"
+                                >
+                            </md-input-container>
+                        </div>
                         <div layout="row" >
                             <md-input-container class="md-block" flex >
                                 <label>Comentario</label>

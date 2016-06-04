@@ -7,6 +7,9 @@
  */
 
 namespace App\Models\Sistema\Purchase;
+use App\Models\Sistema\Payments\DocumentCP;
+use App\Models\Sistema\Provider;
+use App\Models\Sistema\ProviderCondPayItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
@@ -81,23 +84,65 @@ class Purchase extends Model
      * genera los documentos de pago
     */
 
-    public function getPaymentsDoc(){
+    public function builtPaymentDocs(){
         //**generacion de cuotas de pago*/
+        $resul=array();
+        $resul['acction'] = "new";
         $codItems = ProviderCondPayItem::where('id_condicion', $this->condicion_pago_id)->get();
         $cps= array();
         $hoy= Carbon::now();
+        $prv= Provider::findOrFail($this->prov_id);
 
         // factura
-        $aux = new DocumentCP();
+        $cp = new DocumentCP();
         $fVence= $hoy->addDays($codItems->sum('dias'));
-        $aux->nro_factura = $this->nro_factura;
-        $aux->moneda_id = $this->prov_moneda_id;
-        $aux->fecha = $hoy;
-        $aux->monto = $this->monto;
-        $aux->saldo = $this->monto;
-        $aux->tasa = $this->tasa;
-        $aux->fecha_vence = $fVence;
+        $cp->moneda_id = $this->prov_moneda_id;
+        $cp->fecha = $hoy;
+        $cp->monto = $this->monto;
+        $cp->saldo = $this->monto;
+        $cp->tasa = $this->tasa;
+        $cp->fecha_vence = $fVence;
+        $cp->descripcion ="Factura generada desde una Orden de Compra";
+        $cp->tipo_id=4;
+        $cp->tipo_prov=$prv->tipo_id;
+        $cp->nro_factura = $this->nro_factura;
+        $cp->doc_orig="PROF";
+        $cp->nro_orig = $this->nro_proforma;
+        $cp->prov_id=$this->prov_id;
+        if(!$this->nro_factura){
+            $cp->nro_factura = $this->nro_proforma;
+            $cp->descripcion =$cp->descripcion." perteneciente a la proforma ".$this->nro_proforma;
+        }
+        $cp->save();
+        $id=$cp->id;
 
+        $cps[] = $cp;
+        if(sizeof($codItems)>1){
+            foreach($codItems as $aux){
+                $cp = new DocumentCP();
+                $cp->prov_id=$this->prov_id;
+                $fVence= $hoy->addDays($aux->dias);
+                $cp->moneda_id = $this->prov_moneda_id;
+                $cp->fecha = $hoy;
+                $cp->monto = floatval($this->monto * (floatval(  $aux->porcentaje /100)));
+                $cp->saldo = floatval($this->monto * (floatval( $aux->porcentaje / 100)));
+                $cp->tasa = $this->tasa;
+                $cp->fecha_vence = $fVence;
+                $cp->descripcion = $aux->getText();
+                $cp->tipo_id=5;// cuota
+                $cp->tipo_prov=$prv->tipo_id;
+                $cp->doc_orig="FACT";
+                $cp->nro_orig = $id;
+                if(!$this->nro_factura){
+                    $cp->nro_factura = $this->nro_proforma;
+                }
+                $cps[] = $cp;
+                $cp->save();
+            }
+        }
+        $resul['items'] = $cps;
+
+        return $resul;
 
 
         /*$auxDate= date_create($this->emision);
@@ -106,6 +151,8 @@ class Purchase extends Model
 
 
     }
+
+
 
 
 

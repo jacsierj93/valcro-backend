@@ -1092,12 +1092,8 @@ class OrderController extends BaseController
                     "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
                     ."-a".sizeof($model->attachments()->get())
                 ;
-                $model->getPaymentsDoc();
-
-
-
-
-
+                $cps =$model->builtPaymentDocs();
+                $result['sub']= $cps;
             }
             $model= $this->setDocItem($model, $req);
             $model->save();
