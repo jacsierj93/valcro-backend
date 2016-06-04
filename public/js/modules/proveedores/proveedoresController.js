@@ -377,13 +377,13 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var list = {};
     var statusProv = {};
     var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
-    var changes = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{}};
+    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
     return {
         getProv: function () {
             return prov;
         },
         setProv: function(index) {
-            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{}};
+            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
             changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};
             if (index){
                 itemsel = index;
@@ -544,17 +544,13 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveProv"},$scope.dtaPrv,function(data){
                 $scope.dtaPrv.id = data.id;
-
                 $scope.projectForm.$setPristine();
-                console.log($scope.prov)
                 setGetProv.updateItem($scope.dtaPrv);
                 if(data.action=="new"){
                     $scope.dtaPrv.new = true;
                     setNotif.addNotif("ok", "Proveedor agregado", [
                     ],{autohidden:3000});
-                    console.log("after",$scope.prov);
-                }
-
+                };
                 setGetProv.addChng($scope.dtaPrv,data.action,"dataProv");
             });
         }
@@ -616,6 +612,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.pais = dirSel.pais_id;
         $scope.dir.provTelf = dirSel.telefono;
         $scope.dir.ports = dirSel.ports;
+        $scope.dir.zipCode = dirSel.codigo_postal;
         setGetProv.addToRllBck($scope.dir,"dirProv");
     };
 
@@ -634,6 +631,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 dirSel.pais=$filter("filterSearch")($scope.paises,[$scope.dir.pais])[0];
                 dirSel.telefono = $scope.dir.provTelf;
                 dirSel.ports = $scope.dir.ports;
+                dirSel.codigo_postal = $scope.dir.zipCode;
                 if(data.action=="new"){
                     $scope.address.unshift(dirSel);
                     setNotif.addNotif("ok", "Nueva Direccion!", [
@@ -673,7 +671,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     };
 
     $scope.showGrid = function(elem,event){
-        if(jQuery(event.toElement).parents("#lyrAlert").length==0 || jQuery(event.toElement).parents("md-select").length==0) {
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
             $scope.isShow = elem;
             if(!elem) {
                     $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
@@ -833,9 +831,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         url: "provider/delValcroName",
                         data: chip
                     }).then(function successCallback(response) {
+                        //console.log(name);
+                        $scope.valcroName.splice($scope.valcroName.indexOf($filter("filterSearch")($scope.valcroName,[chip.id])[0]),1);
+                        //console.log($scope.valcroName);
                         setGetProv.addChng( $scope.valName,response.data.action,"valName");
-                       /// setGetProv.addChng(chip,response.data.action,"valName");
-                        $scope.valcroName.splice(name.$index,1);
                         $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                         valcroName = {};
                         $scope.nomvalcroForm.$setUntouched();
@@ -1688,6 +1687,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
 });
 
 MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,masterLists,$filter,setNotif) {
+    $scope.id = 'prodTimeController';
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
     $scope.$watch('prov.id',function(nvo){
@@ -1729,17 +1729,29 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
         $scope.tp.line = time.linea_id;
     };
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.tp = {id:false,from:"",to:"",line:"",id_prov: $scope.prov.id};
-            time = {};
-            $scope.timeProd.$setUntouched();
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0){
+            $scope.isShow = elem;
+            if(!elem){
+                $scope.tp = {id:false,from:"",to:"",line:"",id_prov: $scope.prov.id};
+                time = {};
+                $scope.timeProd.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
+            }
         }
-    }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"prodTimeController":false;
+    };
 });
 
 MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$filter,masterLists,setNotif) {
+    $scope.id="transTimeController";
     $scope.prov = setGetProv.getProv();
     var paises = masterLists.getCountries();
     $scope.$watch('prov.id',function(nvo){
@@ -1782,14 +1794,26 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
         $scope.ttr.country = time.id_pais;
     };
 
-    $scope.showGrid = function(elem){
-        $scope.isShow = elem;
-        if(!elem){
-            $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id};
-            time = {};
-            $scope.timeTrans.$setUntouched();
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.toElement).parents("#lyrAlert").length==0){
+            $scope.isShow = elem;
+            if(!elem){
+                $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id};
+                time = {};
+                $scope.timeTrans.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
+            }
         }
-    }
+    };
+
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"transTimeController":false;
+    };
+
 });
 
 MyApp.service("setgetCondition",function(){
@@ -1959,12 +1983,39 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
     }
 });
 
- MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
+ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();
+     var foraneos = Object();
+     foraneos.typeDir = masterLists.getTypeDir();
+     foraneos.countries = masterLists.getCountries();
+     foraneos.ports = masterLists.getPorts();
+     foraneos.depsValcroName = [
+         {
+             id:"1",
+             icon:"icon-CarritoCompra"
+         },
+         {
+             id:"2",
+             icon:"icon-Aereo"
+         },
+         {
+             id:"3",
+             icon:"icon-TransTerrestre"
+         }
+     ];
+
+
+     $scope.getDato = function(id,find,field){
+         return $filter("filterSearch")(foraneos[find],[id])[0][field];
+     };
+
      $scope.has = function(obj){
-         //console.log($scope.prov)
-         return Object.keys(obj).length
+         if(obj){
+             return Object.keys(obj).length
+         }else{
+             return 0;
+         }
      };
      //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
  });

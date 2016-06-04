@@ -106,6 +106,7 @@ class ProvidersController extends BaseController
         $addr->pais_id = $req->pais;
         $addr->tipo_dir = $req->tipo;
         $addr->telefono = $req->provTelf;
+        $addr->codigo_postal = $req->zipCode;
         $addr->save();
         if($addr->tipo_dir == 2){
             $addr->ports()->sync($req->ports);
