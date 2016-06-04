@@ -22,6 +22,7 @@ use App\Models\Sistema\Product;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\ProviderAddress;
 use App\Models\Sistema\ProvTipoEnvio;
+use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Solicitude\Solicitude;
 use DB;
@@ -53,63 +54,79 @@ class OrderController extends BaseController
         /*            Orderby('razon_social')->
                 skip(0)->take(20)->*/
 
+
         get();
         $data = array();
         //  $auxCp= Collection::make(array());
 
         foreach($provs as $prv){
-            $temp["id"] = $prv->id;
-            $temp["razon_social"] = $prv->razon_social;
-            $temp['deuda']= $prv->Order()->sum('monto');
-            $temp['productos']= $prv->proveedor_product()->get();
-            $temp['paises'] = $prv->getCountry();
+            $paso= false;
+            if(sizeof($prv->getCountry())>0){
+                $paso= true;
+            }
+            if($paso){
+                $temp["id"] = $prv->id;
+                $temp["razon_social"] = $prv->razon_social;
+                $temp['deuda']= $prv->Order()->sum('monto');
+                $temp['productos']= $prv->proveedor_product()->get();
+                $temp['paises'] = $prv->getCountry();
 
-            $temp['puntoCompra']= 0;
-            $nCp=0;
-            $nE0=0;
-            $nE7=0;
-            $nE30=0;
-            $nE60=0;
-            $nE90=0;
-            $nE100=0;
+                $temp['puntoCompra']= 0;
+                $nCp=0;
+                $nE0=0;
+                $nE7=0;
+                $nE30=0;
+                $nE60=0;
+                $nE90=0;
+                $nE100=0;
 
-            $peds=$prv->Order()->get();
+                $peds=$prv->Order()->get();
 
-            foreach($peds as $ped){
-                $arrival=$ped->daysCreate();
-                $nCp +=$ped->getNumItem(2);
-                if ($arrival == 0) {
-                    $nE0++;
-                } else if ($arrival == 7) {
-                    $nE7++;
-                } else if ($arrival == 30) {
-                    $nE30++;
-                } else if ($arrival == 60) {
-                    $nE60++;
-                } else if ($arrival == 90) {
-                    $nE90++;
-                } else if($arrival == 100 ){
-                    $nE100++;
+                foreach($peds as $ped){
+                    $arrival=$ped->daysCreate();
+                    $nCp +=$ped->getNumItem(2);
+                    if ($arrival == 0) {
+                        $nE0++;
+                    } else if ($arrival == 7) {
+                        $nE7++;
+                    } else if ($arrival == 30) {
+                        $nE30++;
+                    } else if ($arrival == 60) {
+                        $nE60++;
+                    } else if ($arrival == 90) {
+                        $nE90++;
+                    } else if($arrival == 100 ){
+                        $nE100++;
+                    }
+
                 }
 
+                $temp['emit0']=$nE0;
+                $temp['emit7']=$nE7;
+                $temp['emit30']=$nE30;
+                $temp['emit60']=$nE60;
+                $temp['emit90']=$nE90;
+                $temp['emit100']=$nE100;
+                $temp['contraPedido']= $nCp;
+
+                $data[] =$temp;
             }
 
-            $temp['emit0']=$nE0;
-            $temp['emit7']=$nE7;
-            $temp['emit30']=$nE30;
-            $temp['emit60']=$nE60;
-            $temp['emit90']=$nE90;
-            $temp['emit100']=$nE100;
-            $temp['contraPedido']= $nCp;
-
-            $data[] =$temp;
         }
 
         return $data;
     }
 
     public function  getAddressrPort(Request $req){
-        return  ProviderAddress::findOrfail($req->id)->ports()->get();
+        $data =array();
+        if($req->has('id')){
+            $data = ProviderAddress::findOrfail($req->id)->ports()->get();
+            if(sizeof($data)>0){
+                return $data;
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -199,7 +216,7 @@ class OrderController extends BaseController
     {
         $data=Array();
         $prov= Provider::findOrFail($req->id);
-        $items = Order::where('prov_id',$req->id)->get();
+        $items = $prov->getOrderDocuments();
         $type = OrderType::get();
         $coin = Monedas::get();
         $motivo = OrderReason::get();
@@ -208,7 +225,7 @@ class OrderController extends BaseController
 
         /*        $paises= $this->getCountryProvider($req->id);*/
         $paises= Country::get();
-
+        //dd($items);
 
         /* $almacen= ProviderAddress::get();*/
         foreach($items as $aux){
@@ -224,9 +241,42 @@ class OrderController extends BaseController
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             // pra humanos
             $tem['comentario']=$aux->comentario;
-            $tem['proveedor']=$prov->razon_social;;
-            $tem['motivo']=$motivo->where('id',$aux->motivo_pedido_id)->first()->motivo;
-            $tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+            $tem['tasa']=$aux->tasa;
+            $tem['proveedor']=$prov->razon_social;
+            $tem['documento']= $aux->type;
+            $tem['diasEmit']=$aux->daysCreate();
+
+            if($aux->motivo_id){
+                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+            }
+            if($aux->pais_id){
+                $tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+            }
+            if($aux->estado_id){
+                $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+            }
+            if($aux->prioridad_id){
+                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+            }
+            if($aux->prov_moneda_id){
+                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+            }
+            if($aux->prov_moneda_id){
+                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+            }
+            if($aux->tipo_pedido_id){
+                $tem['tipo']=$type->where('id',$aux->tipo_pedido_id)->first()->tipo;
+            }
+
+
+            /*
+
+            $tem['productos'] = $this->getProductoOrden($aux);
+            $tem['diasEmit']=$aux->daysCreate();
+
+            */
+
+
             $tem['nro_proforma']=$aux->nro_proforma;
             $tem['nro_factura']=$aux->nro_factura;
             $tem['img_proforma']=$aux->img_proforma;
@@ -235,13 +285,7 @@ class OrderController extends BaseController
             $tem['peso']=$aux->peso;
             $tem['emision']=$aux->emision;
             $tem['monto']=$aux->monto;
-            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-            $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
-            $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
-            $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-            $tem['diasEmit']=$aux->daysCreate();
-            $tem['tipo']=$type->where('id',$aux->tipo_pedido_id)->first()->tipo;
-            $tem['productos'] = $this->getProductoOrden($aux);
+
             /**actualizar cuando este el final**/
             $tem['almacen']="Desconocido";
 
@@ -936,10 +980,15 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getAddressCountry(Request $req){
-        $data =ProviderAddress::where('pais_id',$req->id)->get();
-        if($req->has('tipo_dir')){
-            $data =$data->where('tipo_dir',$req->tipo_dir );
+        $data = array();
+        if($req->has('id')){
+            $data=ProviderAddress::where('pais_id',$req->id)->get();
+            if($req->has('tipo_dir')){
+                $data =$data->where('tipo_dir',$req->tipo_dir );
+            }
         }
+
+
         return $data;
     }
 
@@ -995,79 +1044,8 @@ class OrderController extends BaseController
                 $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
-
-            $model->monto = $req->monto;
-            $model->prov_id = $req->prov_id;
-            $model->tasa = $req->tasa;
-
-            if($req->has('tipo_id')){
-                $model->tipo_id = $req->tipo_id;
-            }
-            if($req->has('prioridad_id')){
-                $model->prioridad_id = $req->prioridad_id;
-            }
-            if($req->has('pais_id')){
-                $model->pais_id = $req->pais_id;
-            }
-            if($req->has('condicion_pago_id')){
-                $model->condicion_pago_id = $req->condicion_pago_id;
-            }
-            if($req->has('prov_moneda_id')){
-                $model->prov_moneda_id = $req->prov_moneda_id;
-            }
-            if($req->has('motivo_id')){
-                $model->motivo_id = $req->motivo_id;
-            }
-            if($req->has('prioridad_id')){
-                $model->prioridad_id = $req->prioridad_id;
-            }
-            if($req->has('nro_proforma')){
-                $model->nro_proforma = $req->nro_proforma;
-            }
-            if($req->has('nro_factura')){
-                $model->nro_factura = $req->nro_factura;
-            }
-            if($req->has('comentario')){
-                $model->comentario = $req->comentario;
-            }
-            if($req->has('pedido_estado_id')){
-                $model->pedido_estado_id = $req->pedido_estado_id;
-            }
-            if($req->has('direccion_almacen_id')){
-                $model->direccion_almacen_id = $req->direccion_almacen_id;
-            }
-            if($req->has('condicion_id')){
-                $model->condicion_id = $req->condicion_id;
-            }
-            if($req->has('mt3')){
-                $model->mt3 = $req->mt3;
-            }
-            if($req->has('peso')){
-                $model->peso = $req->peso;
-            }
-            if($req->has('puerto_id')){
-                $model->puerto_id = $req->puerto_id;
-            }
-            if($req->has('nro_doc')){
-                $model->nro_doc = $req->nro_doc;
-            }
-
-
-
-            if($req->has('comentario_cancelacion','cancelacion')){
-                $model->comentario_cancelacion = $req->comentario_cancelacion;
-                $model->cancelacion = $req->cancelacion;
-            }
-
-            if($req->has('aprob_compras')){
-                $model->aprob_compras = $req->aprob_compras;
-            }
-
-            if($req->has('aprob_gerencia')){
-                $model->aprob_gerencia = $req->aprob_gerencia;
-            }
-
-              $model->save();
+            $model= $this->setDocItem($model, $req);
+            $model->save();
             $result['id']= $model->id;
 
 
@@ -1095,84 +1073,18 @@ class OrderController extends BaseController
 
         }else{
             $result = array("success" => "Registro guardado con éxito","action"=>"new");
-            $model = new Solicitude();
+            $model = new Purchase();
             //////////condicion para editar
             if ($req->has('id')) {
                 $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
-
-            $model->monto = $req->monto;
-            $model->prov_id = $req->prov_id;
-            $model->tasa = $req->tasa;
-
-            if($req->has('tipo_id')){
-                $model->tipo_id = $req->tipo_id;
+            if ($req->has('copy')) {
+                $aux = new Purchase();
+                $aux = $this->setDocItem($aux, $req);
+                $aux->version = $model->version+1;
             }
-            if($req->has('prioridad_id')){
-                $model->prioridad_id = $req->prioridad_id;
-            }
-            if($req->has('pais_id')){
-                $model->pais_id = $req->pais_id;
-            }
-            if($req->has('condicion_pago_id')){
-                $model->condicion_pago_id = $req->condicion_pago_id;
-            }
-            if($req->has('prov_moneda_id')){
-                $model->prov_moneda_id = $req->prov_moneda_id;
-            }
-            if($req->has('motivo_id')){
-                $model->motivo_id = $req->motivo_id;
-            }
-            if($req->has('prioridad_id')){
-                $model->prioridad_id = $req->prioridad_id;
-            }
-            if($req->has('nro_proforma')){
-                $model->nro_proforma = $req->nro_proforma;
-            }
-            if($req->has('nro_factura')){
-                $model->nro_factura = $req->nro_factura;
-            }
-            if($req->has('comentario')){
-                $model->comentario = $req->comentario;
-            }
-            if($req->has('pedido_estado_id')){
-                $model->pedido_estado_id = $req->pedido_estado_id;
-            }
-            if($req->has('direccion_almacen_id')){
-                $model->direccion_almacen_id = $req->direccion_almacen_id;
-            }
-            if($req->has('condicion_id')){
-                $model->condicion_id = $req->condicion_id;
-            }
-            if($req->has('mt3')){
-                $model->mt3 = $req->mt3;
-            }
-            if($req->has('peso')){
-                $model->peso = $req->peso;
-            }
-            if($req->has('puerto_id')){
-                $model->puerto_id = $req->puerto_id;
-            }
-            if($req->has('nro_doc')){
-                $model->nro_doc = $req->nro_doc;
-            }
-
-
-
-            if($req->has('comentario_cancelacion','cancelacion')){
-                $model->comentario_cancelacion = $req->comentario_cancelacion;
-                $model->cancelacion = $req->cancelacion;
-            }
-
-            if($req->has('aprob_compras')){
-                $model->aprob_compras = $req->aprob_compras;
-            }
-
-            if($req->has('aprob_gerencia')){
-                $model->aprob_gerencia = $req->aprob_gerencia;
-            }
-
+            $model= $this->setDocItem($model, $req);
             $model->save();
             $result['id']= $model->id;
 
@@ -1326,6 +1238,98 @@ class OrderController extends BaseController
         }
         $model->destroy($id);
 
+
+    }
+
+    /**
+     * setea toda la data del modelo
+     **/
+    private function setDocItem($model, Request $req){
+
+        if($req->has('monto')){
+            $model->monto = $req->monto;
+        }
+
+        if($req->has('prov_id')){
+            $model->prov_id = $req->prov_id;
+        }
+        if($req->has('monto')){
+            $model->monto = $req->monto;
+        }
+        if($req->has('tasa')){
+            $model->tasa = $req->tasa;
+        }
+
+        if($req->has('tipo_id')){
+            $model->tipo_id = $req->tipo_id;
+        }
+        if($req->has('prioridad_id')){
+            $model->prioridad_id = $req->prioridad_id;
+        }
+        if($req->has('pais_id')){
+            $model->pais_id = $req->pais_id;
+        }
+        if($req->has('condicion_pago_id')){
+            $model->condicion_pago_id = $req->condicion_pago_id;
+        }
+        if($req->has('prov_moneda_id')){
+            $model->prov_moneda_id = $req->prov_moneda_id;
+        }
+        /*
+        if($req->has('motivo_id')){
+             $model->motivo_id = $req->motivo_id;
+         }
+         if($req->has('prioridad_id')){
+             $model->prioridad_id = $req->prioridad_id;
+         }
+
+        */
+        if($req->has('nro_proforma')){
+            $model->nro_proforma = $req->nro_proforma;
+        }
+        if($req->has('nro_factura')){
+            $model->nro_factura = $req->nro_factura;
+        }
+        if($req->has('comentario')){
+            $model->comentario = $req->comentario;
+        }
+        if($req->has('pedido_estado_id')){
+            $model->pedido_estado_id = $req->pedido_estado_id;
+        }
+        if($req->has('direccion_almacen_id')){
+            $model->direccion_almacen_id = $req->direccion_almacen_id;
+        }
+        if($req->has('condicion_id')){
+            $model->condicion_id = $req->condicion_id;
+        }
+        if($req->has('mt3')){
+            $model->mt3 = $req->mt3;
+        }
+        if($req->has('peso')){
+            $model->peso = $req->peso;
+        }
+        if($req->has('puerto_id')){
+            $model->puerto_id = $req->puerto_id;
+        }
+        if($req->has('nro_doc')){
+            $model->nro_doc = $req->nro_doc;
+        }
+
+        if($req->has('comentario_cancelacion','cancelacion')){
+            $model->comentario_cancelacion = $req->comentario_cancelacion;
+            $model->cancelacion = $req->cancelacion;
+        }
+
+        if($req->has('aprob_compras')){
+            $model->aprob_compras = $req->aprob_compras;
+        }
+
+        if($req->has('aprob_gerencia')){
+            $model->aprob_gerencia = $req->aprob_gerencia;
+        }
+
+
+        return $model;
 
     }
 

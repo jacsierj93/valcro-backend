@@ -15,10 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PurchaseItem extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_compra_item";
+    protected $table = "tbl_compra_orden_item";
     protected $dates = ['deleted_at'];
-
-
+/*
     public  function getAdvancePaymentProvider(){
 
         return $this->belongsTo('App\Models\Sistema\Purchase', 'compra_id');
@@ -27,7 +26,7 @@ class PurchaseItem extends Model
     public  function geProduct(){
 
         return $this->belongsTo('App\Models\Sistema\Product', 'productos_id');
-    }
+    }*/
 
 }
 

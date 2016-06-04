@@ -10,6 +10,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.email= {};
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
+    $scope.formMode = null;
+
     // filtros
     $scope.fRazSocial="";
     $scope.fPais="";
@@ -27,7 +29,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.imgLateralFilter="images/Down.png";
     $scope.selecPed=false;
     $scope.preview=true;
-    $scope.formMode = null;
+    $scope.mouseProview= false;
 
 
 
@@ -117,22 +119,34 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.hoverpedido= function(document){
 
-        if(document && /*!$scope.selecPed &&*/ $scope.preview){
-            $scope.document=document;
-            if($scope.layer !='resumenPedido' ){
-                openLayer("resumenPedido");
+       var x = $timeout(function(){
+            if(document &&  $scope.mouseProview){
+                $scope.document=document;
+                if($scope.layer !='resumenPedido' ){
+                    openLayer("resumenPedido");
+                }
             }
-        }
+        }, 1000);
+       /*
+        }*/
     }
 
-    $scope.hoverLeave= function(){
+    $scope.hoverLeave= function( val){
 
+        $scope.mouseProview= val;
+        console.log('mouse',val);
         $timeout(function(){
-            if($scope.preview && $scope.layer== 'resumenPedido'){
+            if($scope.preview && $scope.layer== 'resumenPedido' && !$scope.mouseProview){
                 $scope.closeLayer();
                 $scope.hoverPreview(true);
             }
-        }, 20);
+        }, 1000);
+
+
+    }
+
+    $scope.hoverEnter=  function(){
+        $scope.mouseProview= true;
     }
     $scope.hoverPreview= function(val){
         $scope.preview=val;
@@ -197,12 +211,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     }
 
     $scope.newDoc= function(formMode){
+
+       // openLayer("finalDoc");
         $scope.formMode=formMode;
         restore("document");
         if($scope.provSelec.id){
             //$scope.document.prov_id=$scope.provSelec.id;
         }
-        openLayer("detallePedido");
+        openLayer("detalleDoc");
         $scope.formBlock=false;
     }
 
@@ -282,14 +298,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.next = function () {
         switch($scope.layer){
             case "resumenPedido":
-                openLayer("detallePedido");
+                openLayer("detalleDoc");
+
+                //loadPedidos($scope.document.id);
                 break;
-            case "detallePedido":
+            case "detalleDoc":
                 openLayer("agrPed");
                 break;
             case "agrPed":
-                console.log('open',"listProducProv");
-                openLayer("listProducProv");
+                openLayer("finalDoc");
                 break;
         }
         $scope.showNext(false);
@@ -298,7 +315,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.showNext = function (status) {
         console.log('estada', status);
         if (status) {
-            if (!$scope.FormdetallePedido.$valid) {
+            if (!$scope.FormdetallePedido.$valid && $scope.layer== 'detalleDoc') {
                 setNotif.addNotif("error",
                     "Existen campos pendientes por completar, por favor verifica que información le falta."
                     ,[],{autohidden:autohidden});
@@ -536,12 +553,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return false;
     }
 
-    function DtPedido(pedido) {
+    function DtPedido(doc) {
 
-        if(pedido && $scope.index <2){
+
+        restore("document");
+       var aux= angular.copy(doc);
+        if(doc && $scope.index <2){
             if (segurity('editPedido')) {
+                $scope.document=aux;
+                $scope.formMode= doc.documento;
+                console.log("docuem", doc);
                 openLayer('resumenPedido');
-                loadDoc(pedido.id);
+               // loadDoc(pedido.id);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
@@ -638,6 +661,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 restore('document');// inializa el pedido
                 //  restore('FormData');// inializa el proveedor
                 loadDataFor();
+                $scope.FormdetallePedido.$setUntouched();
                 break;
         }
 
@@ -658,7 +682,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     loadPedidosASustituir($scope.provSelec.id);
                     break;
                 case 'agrPed':
-                    //loadDoc($scope.document.id);
+                    loadDoc($scope.document.id);
                     break;
                 default :
                     ;
@@ -666,7 +690,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
     });
     $scope.$watch('provSelec.id', function (newVal) {
-        if (newVal != '' && typeof(newVal) !== 'undefined') {
+        console.log('id prov', newVal);
+        if (newVal != '' && typeof(newVal) !== 'undefined' && newVal) {
             loadCoinProvider(newVal);
             loadCountryProvider(newVal);
             loadPaymentCondProvider(newVal);
@@ -697,6 +722,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         switch ($scope.formMode){
             case "Solicitud":
                 url="Solicitude/Save";
+                break;
+            case "Orden de Compra":
+                url="PurchaseOrder/Save";
                 break;
         }
 
@@ -758,11 +786,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     }
     function loadDoc(id){
-        restore("document");
+       /* restore("document");
         var url="";
         switch ($scope.formMode){
             case 'Solicitud':
                 url="Solicitude/Get"
+                break;
+            case 'Orden de Compra':
+                url="PurchaseOrder/Get"
                 break;
             default :
                 console.log('ruta actualizacion no definidad');
@@ -771,7 +802,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
             $scope.document = response;
             $scope.document.emision=DateParse.toDate(response.emision);
-        });
+            $scope.document.monto=parseFloat(response.monto);
+            $scope.document.tasa=parseFloat(response.tasa);
+        });*/
     }
 
     function loadDataFor(){
@@ -834,9 +867,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 console.log('v ', v);
                 console.log('k ', k);
                 v.emision= DateParse.toDate(v.emision);
+                console.log('v tasa', v.tasa);
+                v.monto= parseFloat(v.monto);
+                v.tasa= parseFloat(v.tasa);
+                v.isNew=false;
                 items.push(v);
 
             });
+            console.log("pedidos",items);
             $scope.provSelec.pedidos=items;
         });
     }

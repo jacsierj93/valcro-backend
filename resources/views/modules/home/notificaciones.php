@@ -1,4 +1,4 @@
-<md-sidenav layout="row" style="top: calc(100% - 144px); height: 96px; margin-bottom:48px; width: calc(100% - {{264 + (24*$parent.index)}}px);" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
+<md-sidenav layout="row" style="top: calc(100% - 144px); height: 96px; margin-bottom:48px; width: calc(100% - {{264 + (24*$parent.index)}}px); z-index:100" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
     <!-- OK   ############################################################################################## -->
     <input id="test" type="hidden" md-autofocus> <!-- set autofocus a campo hidden para evitar perdida de focus en campo actual-->
     <div class="alertBox alertOkColor" flex ng-show="alerts.ok.length > 0" layout="row">

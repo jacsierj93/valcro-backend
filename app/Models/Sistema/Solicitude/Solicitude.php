@@ -20,7 +20,22 @@ class Solicitude extends Model
     use SoftDeletes;
     protected $table = "tbl_solicitud";
     protected $dates = ['deleted_at'];
+    protected $appends = array('tipo');
 
+    public function getTypeAttribute()
+    {
+        return 'Solicitud';
+    }
+
+
+
+
+
+    /**
+    public function gettypeAttribute()
+    {
+        return $this->attributes['type'] == 'Solicitud';
+    }
 
     /**
      * obtiene los item de pedidos
