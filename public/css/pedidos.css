@@ -38,6 +38,7 @@
 .gridContent{
     overflow-y:auto;
     height: calc(100% - 78px);
+
 }
 
 .menuFilter{

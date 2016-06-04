@@ -17,5 +17,9 @@ class ProviderCondPayItem extends Model
     use SoftDeletes;
     protected $table = "tbl_prov_cond_pag_item";
 
+    public function getText(){
+        return  $this->porcentaje.'% al '.$this->descripcion." ".$this->dias.' dias';
+
+    }
 
 }

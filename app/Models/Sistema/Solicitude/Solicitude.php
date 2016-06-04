@@ -9,6 +9,7 @@
 namespace App\Models\Sistema\Solicitude;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\ProdTime;
+use App\Models\Sistema\Solicitude\SolicitudeItem;
 use App\Models\Sistema\TiemAproTran;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,21 +28,8 @@ class Solicitude extends Model
         return 'Solicitud';
     }
 
-
-
-
-
-    /**
-    public function gettypeAttribute()
-    {
-        return $this->attributes['type'] == 'Solicitud';
-    }
-
-    /**
-     * obtiene los item de pedidos
-     */
-    public function SolicitudeItem(){
-        return $this->hasMany('App\Models\Sistema\Solitude\SolicitudeItem', 'solicitud_id');
+    public function items(){
+        return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
     }
 
     /**
@@ -50,7 +38,7 @@ class Solicitude extends Model
 
     public function getNumItem($tipo){
         $i=0;
-        $items = $this->SolicitudeItem()->get();
+        $items = $this->items()->get();
         foreach($items as $aux){
             $tip=$this->getTypeProduct($aux);
             if($tip == $tipo){

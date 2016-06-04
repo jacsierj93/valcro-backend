@@ -18,6 +18,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.fpaisSelec="";
     $scope.email.contactos = new Array();
     $scope.emailToText = null;
+    $scope.productoSearch="";
 
 
 
@@ -119,7 +120,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.hoverpedido= function(document){
 
-       var x = $timeout(function(){
+        var x = $timeout(function(){
             if(document &&  $scope.mouseProview){
                 $scope.document=document;
                 if($scope.layer !='resumenPedido' ){
@@ -127,8 +128,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
             }
         }, 1000);
-       /*
-        }*/
+        /*
+         }*/
     }
 
     $scope.hoverLeave= function( val){
@@ -212,7 +213,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.newDoc= function(formMode){
 
-       // openLayer("finalDoc");
+        // openLayer("finalDoc");
         $scope.formMode=formMode;
         restore("document");
         if($scope.provSelec.id){
@@ -303,10 +304,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 //loadPedidos($scope.document.id);
                 break;
             case "detalleDoc":
+                listProducProv
+                openLayer("listProducProv");break;
+            case "listProducProv":
                 openLayer("agrPed");
                 break;
             case "agrPed":
-                openLayer("finalDoc");
+                openLayer("finalDoc");break;
+            case "finalDoc":
+                saveDoc();
                 break;
         }
         $scope.showNext(false);
@@ -530,8 +536,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     function setProvedor(prov) {
-        $scope.provSelec = prov;
-        openLayer('listPedido');
+        if($scope.index == 0){
+            $scope.provSelec = prov;
+            openLayer('listPedido');
+        }else{
+            if($scope.layer == "listPedido" ){
+                $scope.provSelec = prov;
+                loadPedidosProvedor($scope.provSelec.id);
+            }else{
+
+            }
+        }
+
     }
 
     function openLayer(layer) {
@@ -557,14 +573,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
         restore("document");
-       var aux= angular.copy(doc);
+        var aux= angular.copy(doc);
         if(doc && $scope.index <2){
             if (segurity('editPedido')) {
                 $scope.document=aux;
                 $scope.formMode= doc.documento;
                 console.log("docuem", doc);
                 openLayer('resumenPedido');
-               // loadDoc(pedido.id);
+                // loadDoc(pedido.id);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
@@ -593,6 +609,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
 
 
+            }else if(typeof (opt) == 'number'){
+                close= opt;
             }
 
             for(var i=0; i<close;i++){
@@ -704,7 +722,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watchGroup(['FormdetallePedido.$valid', 'FormdetallePedido.$pristine'], function (nuevo) {
 
-       if (nuevo[0] && !nuevo[1]) {
+        if (nuevo[0] && !nuevo[1]) {
 
             saveDoc();
         }
@@ -718,6 +736,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         var url =""
         if ($scope.document.id == '') {
             delete $scope.document.id;
+        }
+        if($scope.layer == "finalDoc"){
+            $scope.document.close=true;
+        }
+        if($scope.layer == "finalDoc"){
+            $scope.document.close=true;
         }
         switch ($scope.formMode){
             case "Solicitud":
@@ -738,10 +762,24 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     $scope.FormdetallePedido.$setUntouched();
                     $scope.document.id = response.id;
                     if(response.success  ){
-                            if(response['action'] == 'new'){
-                                setNotif.addNotif("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+                        if(response['action'] == 'new'){
+                            setNotif.addNotif("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+                        }
+                        if($scope.layer == "finalDoc"){
+                            $scope.formBlock=true;
+                            setNotif.addNotif("ok","Realizado",[{name:"ok",action:function(){closeLayer($scope.index );}}],{autohidden:autohidden});
+                            switch ($scope.formMode){
+                                case "Solicitud":
+
+                                    break;
+                                case "Orden de Compra":
+
+                                    break;
                             }
+                        }
+
                     }
+
 
                 }else{
                     console.log('error ', response);
@@ -786,25 +824,25 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     }
     function loadDoc(id){
-       /* restore("document");
-        var url="";
-        switch ($scope.formMode){
-            case 'Solicitud':
-                url="Solicitude/Get"
-                break;
-            case 'Orden de Compra':
-                url="PurchaseOrder/Get"
-                break;
-            default :
-                console.log('ruta actualizacion no definidad');
-        }
-        $http.get(url,{params:{id:id}}).success(function (response) {
+        /* restore("document");
+         var url="";
+         switch ($scope.formMode){
+         case 'Solicitud':
+         url="Solicitude/Get"
+         break;
+         case 'Orden de Compra':
+         url="PurchaseOrder/Get"
+         break;
+         default :
+         console.log('ruta actualizacion no definidad');
+         }
+         $http.get(url,{params:{id:id}}).success(function (response) {
 
-            $scope.document = response;
-            $scope.document.emision=DateParse.toDate(response.emision);
-            $scope.document.monto=parseFloat(response.monto);
-            $scope.document.tasa=parseFloat(response.tasa);
-        });*/
+         $scope.document = response;
+         $scope.document.emision=DateParse.toDate(response.emision);
+         $scope.document.monto=parseFloat(response.monto);
+         $scope.document.tasa=parseFloat(response.tasa);
+         });*/
     }
 
     function loadDataFor(){
@@ -1039,7 +1077,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 break;
             case 'document':
                 $scope.document={ pais_id:'', id:'',estado_id:'1',
-                    prov_moneda_id:'', tasa:0,direccion_almacen_id:'',  emision:new Date()};
+                    prov_moneda_id:'', tasa:0,direccion_almacen_id:'',  emision:new Date(), isNew:true};
                 break;
             case 'odcSelec':
                 $scope.odcSelec={ id:''};
