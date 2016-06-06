@@ -38,6 +38,22 @@ window.addEventListener("drop",function(e){
  $routeProvider
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
+
+MyApp.directive('number', function () {
+    return {
+        require: 'ngModel',
+        link: function (scope, elem, attrs,ctrl) {
+
+            elem[0].addEventListener('input', function(){
+               var  num = this.value.match(/^[\d\-+\.]+$/);
+                if (num === null) {
+                    this.value = this.value.substr(0, this.value.length - 1);
+                }
+            },false);
+
+        }
+    };
+});
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:""};
     var ref = false;
@@ -50,6 +66,8 @@ MyApp.directive('info', function($timeout,setNotif) {
                 }, 0);
 
             });
+
+
             element.bind("focus", function(e) {
                 $timeout(function() {
                     if(old.element!=element[0]){

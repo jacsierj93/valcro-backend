@@ -252,7 +252,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.showAlert = function(){
-      console.log(setGetProv.getChng());
+      //jQuery("#layer0>md-content").addClass("shake");
     };
 
 
@@ -582,22 +582,24 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     });
 
     $scope.checkCode = function(){
-        if($scope.dir.provTelf.indexOf($filter("filterSearch")($scope.paises, [$scope.dir.pais])[0].area_code.phone)==-1){
-            setNotif.addNotif("alert","el codigo de area indicado no coincide con el pais seleccionado", [
-                {
-                    name: "corregir",
-                    acion: function () {
-                        document.getElementsByName("dirprovTelf")[0].focus();
-                    }
-                },{
-                    name: "esta bien",
-                    acion: function () {
+        if($scope.dir.provTelf){
+            if($scope.dir.provTelf.indexOf($filter("filterSearch")($scope.paises, [$scope.dir.pais])[0].area_code.phone)==-1){
+                setNotif.addNotif("alert","el codigo de area indicado no coincide con el pais seleccionado", [
+                    {
+                        name: "corregir",
+                        acion: function () {
+                            document.getElementsByName("dirprovTelf")[0].focus();
+                        }
+                    },{
+                        name: "esta bien",
+                        acion: function () {
 
+                        }
                     }
-                }
-            ])
-        }
-    }
+                ])
+            }
+        };
+    };
 
     $scope.searchPort = function(ports,pais){
         return ports.pais_id == pais;
@@ -1917,6 +1919,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         $scope.$parent.expand =(sel)?"condPayList":false;
     };
 });
+
 MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
     $scope.closeCondition = function(){
         $mdSidenav("payCond").close();
@@ -1983,7 +1986,20 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
     }
 });
 
- MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists) {
+MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers){
+    $scope.openSide = function(){
+        $mdSidenav('adjuntoLyr').open()
+    };
+
+});
+MyApp.controller('adjController',function($scope,$mdSidenav,setGetProv,providers){
+    $scope.imgs = providers.query({type:"listFiles"});
+    $scope.callImg = function(name){
+        return providers.get({type:"getImg"},{name:name});
+    }
+
+});
+MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();
      var foraneos = Object();

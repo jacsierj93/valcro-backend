@@ -632,7 +632,7 @@ body {
     min-height: 39px;
 }
 
-.titulo_formulario div {
+.titulo_formulario>div {
     border-bottom: solid 1px rgb(84, 180, 234);
     width: 100%;
     padding-top: 10px;
@@ -844,6 +844,17 @@ input[type=number]::-webkit-outer-spin-button {
     color : rgb(84, 180, 234) !important;
 }
 
+.imgItem{
+    width: 149px;
+    height: 152px;
+    background-color: gray;
+    margin: 0px 8px 8px 0px;
+    float: left;
+}
+.imgItem:not(:last-child){
+
+}
+
 
 
 
@@ -874,15 +885,50 @@ area para subir los archivos
 ***/
 
 .drop-box {
-    background: #F8F8F8;
+/*    background: #F8F8F8;
     border: 5px dashed #DDD;
     width: 200px;
     height: 65px;
-    text-align: center;
+
     padding-top: 25px;
-    margin: 10px;
+    margin: 10px;*/
+
+    /*modificado por Jacsiel 06/06/2016*/
+    color: rgb(84, 180, 234);
+    height: 48px;
+    width: 100%;
+    font-size: 24px;
+    border: 1px dashed #ccc;
+    margin: 0px 0px 8px 0px;
+    padding: 0px;
+    background-color: transparent;
+    text-align: center;
 }
 
 .dragover {
-    border: 5px dashed blue;
+    border: 2px dashed rgb(84, 180, 234);
+}
+
+
+@keyframes shake {
+    0% {transform: translateX(0);}
+    12.5% {transform: translateX(-6px) rotateY(-5deg)}
+    37.5% {transform: translateX(5px) rotateY(4deg)}
+    62.5% {transform: translateX(-3px) rotateY(-2deg)}
+    87.5% {transform: translateX(2px) rotateY(1deg)}
+    100% {transform: translateX(0)}
+}
+
+@-webkit-keyframes shake {
+    0% {-webkit-transform: translateX(0);}
+    12.5% {-webkit-transform: translateX(-6px) rotateY(-5deg)}
+    37.5% {-webkit-transform: translateX(5px) rotateY(4deg)}
+    62.5% {-webkit-transform: translateX(-3px) rotateY(-2deg)}
+    87.5% {-webkit-transform: translateX(2px) rotateY(1deg)}
+    100% {-webkit-transform: translateX(0)}
+}
+
+.shake {
+    -webkit-animation: shake 400ms ease-in-out;
+    animation: shake 400ms ease-in-out;
 }

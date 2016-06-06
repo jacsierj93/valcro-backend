@@ -18,6 +18,7 @@ use App\Models\Sistema\TiemAproTran;
 use App\Models\Sistema\ProviderCondPay;
 use App\Models\Sistema\ProviderCondPayItem;
 use App\Models\Sistema\Line;
+use App\Libs\Utils\Files;
 use Session;
 use Validator;
 
@@ -28,6 +29,26 @@ class ProvidersController extends BaseController
 
         $this->middleware('auth');
     }
+
+
+    public function provUpload(Request $req){
+        $archivo = new Files("prov");
+        $archivo->upload("file"); ///probando
+    }
+    public function getFiles(){
+
+        //return Files::getFileList("prov");
+        $archivo = new Files("pay");
+        //dd($archivo);
+        return $archivo->getFileList("docs/"); ///probando
+    }
+
+    public function getFile(request $name){
+        $archivo = new Files("pay");
+        //dd($archivo);
+        return $archivo->getFile($name->name); ///probando
+    }
+
 
     public function getList()
     {
@@ -550,5 +571,7 @@ class ProvidersController extends BaseController
         $result['id']=$time->id;
         return $result;
     }
+
+
 
 }

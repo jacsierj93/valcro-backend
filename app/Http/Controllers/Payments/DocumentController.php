@@ -330,8 +330,6 @@ class DocumentController extends BaseController
     }
 
 
-
-
     public function testUpload(Request $req){
         $archivo = new Files("pay");
       //  dd($req->file("file"));

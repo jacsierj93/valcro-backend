@@ -7,6 +7,9 @@
  */
 
 ///Providers
+$app->post('provider/upload','Providers\ProvidersController@provUpload');
+$app->get('provider/listFiles','Providers\ProvidersController@getFiles');
+$app->get('provider/getImg','Providers\ProvidersController@getFile');
 
 $app->get("provider/provList",'Providers\ProvidersController@getList'); ///obtener lista general de proveedores
 $app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///guarda datos basicos de un prov
