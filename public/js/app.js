@@ -2,7 +2,17 @@ var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','clickOut','
 var MyApp = angular.module('MyApp', dependency, function() {
 
 });
-
+/***Jacsiel 06-06-2016
+ * prevent open files on drop in browser ****/
+window.addEventListener("dragover",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
+window.addEventListener("drop",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
+/********************************************************/
 
 
 /*MyApp.config(['$routeProvider', '$locationProvider',
