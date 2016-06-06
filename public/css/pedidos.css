@@ -41,6 +41,10 @@
 
 }
 
+.inputFilter{
+    width: 100%;
+    border: 0;
+}
 .menuFilter{
     width: 192px;
     background-color: #f1f1f1;
