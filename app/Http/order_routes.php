@@ -21,6 +21,7 @@ $app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressS
 $app->get("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtiene las direcciones de almacen de un proveedor en un pais
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
+$app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
 
 //pedidos
 $app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido

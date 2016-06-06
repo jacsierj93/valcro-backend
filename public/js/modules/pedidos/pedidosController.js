@@ -11,6 +11,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
     $scope.formMode = null;
+    var timePreview;
+
 
     // filtros
     $scope.fRazSocial="";
@@ -18,12 +20,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.fpaisSelec="";
     $scope.email.contactos = new Array();
     $scope.emailToText = null;
-    $scope.productoSearch="";
+   $scope.productoSearch={
+        //codProducto:"",
+        //descripcion:"",
+        //pCompra:"",
+        //cantidad:"",
+        //stock:""
 
-
+    };
 
     //gui
-    $scope.showGripro=false;
+   // $scope.showGripro=false;
     $scope.showFilterPed=false;
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
@@ -31,6 +38,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.selecPed=false;
     $scope.preview=true;
     $scope.mouseProview= false;
+    $scope.gridView=4;
+
 
 
 
@@ -119,9 +128,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     $scope.hoverpedido= function(document){
+        document.isNew=false;
 
-        var x = $timeout(function(){
+        $timeout(function(){
             if(document &&  $scope.mouseProview){
+                $scope.formMode=document.documento;
                 $scope.document=document;
                 if($scope.layer !='resumenPedido' ){
                     openLayer("resumenPedido");
@@ -135,8 +146,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.hoverLeave= function( val){
 
         $scope.mouseProview= val;
-        console.log('mouse',val);
-        $timeout(function(){
+        if(timePreview){
+            $timeout.cancel(timePreview);
+        }
+
+        timePreview= $timeout(function(){
             if($scope.preview && $scope.layer== 'resumenPedido' && !$scope.mouseProview){
                 $scope.closeLayer();
                 $scope.hoverPreview(true);
@@ -304,7 +318,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 //loadPedidos($scope.document.id);
                 break;
             case "detalleDoc":
-                listProducProv
+
                 openLayer("listProducProv");break;
             case "listProducProv":
                 openLayer("agrPed");
@@ -576,9 +590,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         var aux= angular.copy(doc);
         if(doc && $scope.index <2){
             if (segurity('editPedido')) {
+                document.isNew=false;
                 $scope.document=aux;
                 $scope.formMode= doc.documento;
-                console.log("docuem", doc);
+                $scope.preview=false;
+
                 openLayer('resumenPedido');
                 // loadDoc(pedido.id);
             }
@@ -679,8 +695,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 restore('document');// inializa el pedido
                 //  restore('FormData');// inializa el proveedor
                 loadDataFor();
-                $scope.FormdetallePedido.$setUntouched();
+
+                $scope.gridView=4;
                 break;
+            default:
+                $scope.FormdetallePedido.$setUntouched();
         }
 
         if (newVal[1] != '' && typeof(newVal[1]) !== 'undefined') {
@@ -701,6 +720,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     break;
                 case 'agrPed':
                     loadDoc($scope.document.id);
+                    break;
+                case "listProducProv":
+                    $http.get("Order/ProviderProds",{params:{id:$scope.provSelec.id}}).success(function (response) {
+                        $scope.provSelec.productos= response;
+                    });
                     break;
                 default :
                     ;
@@ -740,12 +764,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.layer == "finalDoc"){
             $scope.document.close=true;
         }
-        if($scope.layer == "finalDoc"){
+        /*if($scope.layer == "finalDoc"){
             $scope.document.close=true;
-        }
+        }*/
         switch ($scope.formMode){
             case "Solicitud":
                 url="Solicitude/Save";
+                break;
+            case "Proforma":
+                url="Order/Save";
                 break;
             case "Orden de Compra":
                 url="PurchaseOrder/Save";
