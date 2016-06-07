@@ -126,6 +126,7 @@ MyApp.filter('customFind', function() {
 
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif) {
     $scope.expand = false;
+    $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
     $scope.chang = setGetProv.getChng();
     $scope.$watch('prov.id',function(nvo,old) {
@@ -135,6 +136,10 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             $scope.edit = true;
         }
     });
+
+    $scope.$watch('isSetting.setting',function(nvo,old) {
+        console.log(nvo)
+    })
 /*    $scope.isNew = function(){
 
     };*/
@@ -145,8 +150,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     function openLayer(layr){
         $scope.showNext(false);
-        layer = layr||$scope.nextLyr;
+        var layer = layr||$scope.nextLyr;
         if(historia.indexOf(layer)==-1 && layer!="END"){
+            console.log("normal",$scope.index);
             var l=angular.element("#"+layer);
             $scope.index++;
             var w= base+(24*$scope.index);
@@ -155,12 +161,15 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             historia[$scope.index]=layer;
             return true;
         }else if(historia.indexOf(layer)==-1 && layer=="END"){
+
             if(setGetProv.haveChang()){
                 openLayer("layer5");
 
             }else {
                 closeLayer(true);
             }
+        }else{
+
         }
 
     }
@@ -179,7 +188,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             $scope.index--;
             $mdSidenav(layer).close();
         }
-        if($scope.index==0){
+        /*if($scope.index==0){
             if(setGetProv.haveChang()){
                 openLayer("layer5");
                 setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
@@ -202,7 +211,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                 setGetProv.setProv(false);
             }
 
-        }
+        }*/
 
     }
     $scope.openLayer = openLayer;
@@ -378,16 +387,18 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var statusProv = {};
     var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
     var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
+    var onSet = {setting:false};
     return {
         getProv: function () {
             return prov;
         },
         setProv: function(index) {
+            onSet.setting = true;
             rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
             changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};
             if (index){
                 itemsel = index;
-                id = itemsel.id;
+                id = itemsel.id;console.log(prov);
                 providers.get({type:"getProv"},{id:id},function(data){
                     fullProv = data;
                     prov.id = data.id;
@@ -398,6 +409,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
                     prov.contraped = (data.contrapedido==1)?true:false;
                     prov.created = false;
                     rollBack.dataProv[parseInt(prov.id)] = angular.copy(prov);
+                    onSet.setting = false;
                 });
 
             }else{
@@ -438,8 +450,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
         setComplete : function(field,value){
             statusProv[field]=value;
         },
-        getRollBack : function(){
-            return rollBack;
+        isSetting : function(){
+            return onSet;
         },
         getFullProv : function(){
             return fullProv;
@@ -1992,6 +2004,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     };
 
 });
+
 MyApp.controller('adjController',function($scope,$mdSidenav,setGetProv,providers){
     $scope.imgs = providers.query({type:"listFiles"});
     $scope.callImg = function(name){
@@ -1999,6 +2012,7 @@ MyApp.controller('adjController',function($scope,$mdSidenav,setGetProv,providers
     }
 
 });
+
 MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();
