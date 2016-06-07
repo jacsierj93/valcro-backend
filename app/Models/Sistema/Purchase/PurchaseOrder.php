@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-
+/**@deprecate**/
 class PurchaseOrder extends Model
 {
     use SoftDeletes;

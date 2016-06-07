@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
+/**@deprecate**/
 
 class PurchasingDocumentType extends Model
 {
