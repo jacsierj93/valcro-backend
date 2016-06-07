@@ -136,10 +136,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             $scope.edit = true;
         }
     });
-
-    $scope.$watch('isSetting.setting',function(nvo,old) {
-        console.log(nvo)
-    })
 /*    $scope.isNew = function(){
 
     };*/
@@ -373,6 +369,7 @@ MyApp.controller('ListHerramientas', function ($scope) {
 
 MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
     setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
+    console.log($scope.todos)
     $scope.prov = setGetProv.getProv();
 });
 
