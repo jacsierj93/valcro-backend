@@ -27,9 +27,17 @@ class Purchase extends Model
     {
         return 'Orden de Compra';
     }
+    public function getTypevalueAttribute()
+    {
+        return 23;
+    }
 
     public function items(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseItem', 'doc_id');
+    }
+
+    public function newItem(){
+        return new PurchaseItem();
     }
 
     public function attachments(){
@@ -118,6 +126,7 @@ class Purchase extends Model
 
         $cps[] = $cp;
         if(sizeof($codItems)>1){
+            $fac= $cp->replicate();
             foreach($codItems as $aux){
                 $cp = new DocumentCP();
                 $cp->prov_id=$this->prov_id;
@@ -139,6 +148,11 @@ class Purchase extends Model
                 $cps[] = $cp;
                 $cp->save();
             }
+            $fac->fecha_vence=$fVence;
+
+        }else{
+            $cp->saldo=0;
+            $cp->save();
         }
         $resul['items'] = $cps;
 

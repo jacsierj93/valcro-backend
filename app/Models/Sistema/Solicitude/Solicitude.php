@@ -28,8 +28,16 @@ class Solicitude extends Model
         return 'Solicitud';
     }
 
+    public function getTypevalueAttribute()
+    {
+        return 21;
+    }
+
     public function items(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
+    }
+    public function newItem(){
+        return new SolicitudeItem();
     }
 
     /**
