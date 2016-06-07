@@ -74,6 +74,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.preview=true;
     $scope.mouseProview= false;
     $scope.gridView=4;
+    $scope.productTexto="";
 
     /**testes **/
 
@@ -162,6 +163,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** ROLLBACK SETTER **/
 
     $scope.toEditHead= function(id,val){
+        console.log('faaaa');
         var aux= {id:id,value:val};
         FormChange.addTrace(aux,"FormHeadDocument");
 
@@ -179,6 +181,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.document=document;
                 if($scope.layer !='resumenPedido' ){
                     openLayer("resumenPedido");
+                    $scope.formAction="upd";
+
                 }
             }
         }, 1000);
@@ -625,7 +629,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.document=aux;
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
-
+                $scope.formAction="upd";
                 openLayer('resumenPedido');
                 // loadDoc(pedido.id);
             }
@@ -700,14 +704,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $http.get("Order/Address",{params:{id:newVal,tipo_dir: 2}}).success(function (response) {
                 $scope.formData.direcciones=response;
             });
+            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
+                FormChange.addChange({id:"pais_id",value:newVal,text:"Pais"},$scope.formAction,"FormHeadDocument");
+            }
         }
     });
     $scope.$watch('document.direccion_almacen_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
-            /*      FormChange.addChange($scope.document,"",
-             {id:"direccion_almacen_id",value:newVal,text:"Direccion de almacen"}
-             );
-             */
+            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
+                FormChange.addChange({id:"direccion_almacen_id",value:newVal,text:"Almacen"},$scope.formAction,"FormHeadDocument");
+            }
             $http.get("Order/AdrressPorts",{params:{id:newVal}})
                 .success(function(response){$scope.formData.puertos=response;});
         }
@@ -715,7 +721,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watch('document.prov_moneda_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
-            //FormChange.addChange($scope.document,"",{id:"prov_moneda_id",value:newVal});
+            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
+                FormChange.addChange({id:"prov_moneda_id",value:newVal,text:"Moneda"},$scope.formAction,"FormHeadDocument");
+            }
 
             loadTasa(newVal);
         }
@@ -731,11 +739,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $http.get("Order/Address",{params:{id:newVal,tipo_dir: 1}}).success(function (response) {
                 $scope.formData.direccionesFact= response;
             });
+            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
+                FormChange.addChange({id:"prov_id",value:newVal,text:"Proveedor"},$scope.formAction,"FormHeadDocument");
+            }
         }
     });
     //para los select
     $scope.$watch("document.tipo_id", function (newVal){
         if (newVal != '' && typeof(newVal) !== 'undefined' && newVal && $scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine) {
+            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
+                FormChange.addChange({id:"tipo_id",value:newVal,text:"Tipo"},$scope.formAction,"FormHeadDocument");
+            }
         }
     });
 
@@ -765,10 +779,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 restore('document');// inializa el pedido
                 //  restore('FormData');// inializa el proveedor
                 loadDataFor();
+                $scope.formAction="new";
+
 
                 $scope.gridView=4;
                 break;
             default:
+                console.log('changes',FormChange.getChanges());
                 $scope.FormHeadDocument.$setUntouched();
         }
 
@@ -1245,27 +1262,32 @@ MyApp.service('FormChange', function() {
     };
 
     this.addTrace = function(val,form){
+        console.log("focus");
         if(trace[form][parseInt(val.id)] === undefined){
             trace[form][parseInt(val.id)] = angular.copy(val);
         }
     }
 
     this.addChange = function(val,action,form){
-        if((changes[form][parseInt(val.id)]===undefined) || !angular.equals(val,rollBack[form][parseInt(val.id)])){
-            if(changes[form][parseInt(val.id)]){
-                changes[form][parseInt(val.id)].datos = angular.copy(val);
-                if(!(changes[form][parseInt(val.id)].action=="new" && action=="upd")){
-                    changes[form][parseInt(val.id)].action = action;
+
+        if((changes[form][val.id]===undefined) || !angular.equals(val,trace[form][val.id])){
+            if(changes[form][val.id]){
+                changes[form][val.id].datos = angular.copy(val);
+                if(!(changes[form][val.id].action=="new" && action=="upd")){
+                    changes[form][val.id].action = action;
                 }
             }else{
-                changes[form][parseInt(val.id)] = {
+                changes[form][val.id] = {
                     datos:angular.copy(val),
                     action:action
                 }
             }
         }else{
-            delete changes[form][parseInt(val.id)];
+            delete changes[form][val.id];
         }
+    }
+    this.getChanges= function(){
+        return changes;
     }
 });
 

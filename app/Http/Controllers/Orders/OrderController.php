@@ -1276,6 +1276,7 @@ class OrderController extends BaseController
                 $aux = $this->setDocItem($aux, $req);
                 $aux->version = $model->version+1;
             }
+            $model = $this->setDocItem($model,$req);
 
             $result['response']= $model->save();
             $result['item']=$model;

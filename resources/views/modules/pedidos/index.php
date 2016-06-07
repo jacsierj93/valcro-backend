@@ -121,7 +121,8 @@
                     <div layout="column" ng-show="(index < 1 || layer == 'listPedido' )" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
-                    <div layout="column" layout-align="center center" ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras  && !document.isNew  )" ng-click="updateForm()">
+                    <div layout="column" layout-align="center center"
+                         ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
@@ -129,7 +130,7 @@
 
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras  && !document.isNew  )"
+                         ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras    )"
                          ng-click="test('eliminadndo')">
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
 
@@ -469,7 +470,7 @@
                         </div>
 
                         <div layout="row"  >
-                            <md-input-container class="md-block" flex="50" ng-click="toEditHead('prov_id',provSelec.id)">
+                            <md-input-container class="md-block" flex="50" >
                                 <label>Proveedor</label>
                                 <md-select ng-model="provSelec.id"
                                            md-no-ink
@@ -483,7 +484,7 @@
                             </md-input-container>
 
 
-                            <md-input-container class="md-block" flex="15">
+                            <md-input-container class="md-block" flex="15" ng-click="toEditHead('tipo_id',document.tipo_id)">
                                 <label>Tipo </label>
                                 <md-select ng-model="document.tipo_id"
                                            ng-disabled="( formBlock || provSelec.id == '')"
@@ -700,8 +701,8 @@
                                 </div>
 
                                 <div layout="column" flex="20">
-                                   <!-- <md-datepicker ng-model="document.fecha_aprob_compra"
-                                                   ng-disabled="(formBlock)"       ></md-datepicker>-->
+                                    <!-- <md-datepicker ng-model="document.fecha_aprob_compra"
+                                                    ng-disabled="(formBlock)"       ></md-datepicker>-->
                                 </div>
 
                                 <!--<md-input-container class="md-block" >
@@ -791,46 +792,48 @@
                                     </form>
                     -->
 
-                    <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 4">
-                        <div>
-                            <span style="color: #1f1f1f" ng-show="(document.productos.todos && document.productos.todos >0 )">({{document.productos.todos.length}})</span>
-                            Productos
-                        </div>
-
-                    </div>
-
-                    <div ng-show="gridView == 4">
-                        <div layout="row" class="headGridHolder">
-
-                            <div flex="5" class="headGrid"></div>
-                            <div flex="15" class="headGrid"> Cod. Producto</div>
-                            <div flex="15" class="headGrid"> Cod. Profit</div>
-                            <div flex class="headGrid"> Descripción.</div>
-                            <div flex class="headGrid"> Doc. Origen</div>
-                            <div flex="10" class="headGrid"> Cantidad</div>
+                    <form>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 4">
+                            <div>
+                                <span style="color: #1f1f1f" ng-show="(document.productos.todos && document.productos.todos >0 )">({{document.productos.todos.length}})</span>
+                                Productos
+                            </div>
 
                         </div>
-                        <div id="gridResOdc">
-                            <div flex>
-                                <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.todos">
-                                    <div flex="5" class="cellGrid">
-                                        <md-switch class="md-primary" ng-model="item.asignado"</md-switch>
+
+                        <div ng-show="gridView == 4">
+                            <div layout="row" class="headGridHolder">
+
+                                <div flex="5" class="headGrid"></div>
+                                <div flex="15" class="headGrid"> Cod. Producto</div>
+                                <div flex="15" class="headGrid"> Cod. Profit</div>
+                                <div flex class="headGrid"> Descripción.</div>
+                                <div flex class="headGrid"> Doc. Origen</div>
+                                <div flex="10" class="headGrid"> Cantidad</div>
+
+                            </div>
+                            <div id="gridResOdc">
+                                <div flex>
+                                    <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.todos">
+                                        <div flex="5" class="cellGrid">
+                                            <md-switch class="md-primary" ng-model="item.asignado"</md-switch>
+                                        </div>
+                                        <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
+                                        <div flex="15" class="cellGrid"> {{item.cod_profit}}</div>
+                                        <div flex class="cellGrid">  {{item.descripcion}}</div>
+                                        <div flex class="cellGrid"> {{item.origen}}</div>
+                                        <md-input-container class="md-block" flex="10" >
+                                            <input  ng-model="item.saldo"
+                                                    ui-number-mask type="text"
+                                                    ng-disabled="(formBlock || !item.asignado )"
+                                            />
+                                        </md-input-container>
                                     </div>
-                                    <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
-                                    <div flex="15" class="cellGrid"> {{item.cod_profit}}</div>
-                                    <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                    <div flex class="cellGrid"> {{item.origen}}</div>
-                                    <md-input-container class="md-block" flex="10" >
-                                        <input  ng-model="item.saldo"
-                                                ui-number-mask type="text"
-                                                ng-disabled="(formBlock || !item.asignado )"
-                                        />
-                                    </md-input-container>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
+                </form>
                 <!-----flecha siguiente -->
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
@@ -1060,7 +1063,7 @@
 
                     </div>
 
-                    <div layout="column" flex>
+                   <!-- <div layout="column" flex>
                         <div class="titulo_formulario md-block" layout-padding  layout="row" >
                             <div>
                                 Otros
@@ -1075,14 +1078,14 @@
 
                                 <div flex class="cellGrid" ng-click="test('detalle producto')"> {{item.id}}</div>
                                 <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->
-                                <div flex class="cellGrid" ng-click="test('detalle producto')"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
+                               <!-- <div flex class="cellGrid" ng-click="test('detalle producto')"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
                                 <div flex="10" class="cellGrid" ng-click="test('detalle producto')">
                                     <span class="icon-Eliminar fontEli"></span>
                                 </div>
                             </div>
                         </div>
 
-                    </div>
+                    </div>-->
 
                 </div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
@@ -1151,7 +1154,8 @@
                     </div>
 
                     <div class="gridContent"  flex >
-                        <div   ng-repeat="item in provSelec.productos | filter:productoSearch:strict " >
+                        <div   ng-repeat="item in provSelec.productos | filter:productoSearch:strict "
+                               ng-mouseover = " productTexto = item.adicional ">
                             <div layout="row" class="cellGridHolder" >
                                 <div flex="5" class="cellGrid">
                                     <md-switch class="md-primary" ng-model="item.asignado" ></md-switch>
@@ -1162,7 +1166,7 @@
                                     <md-switch class="md-primary" ng-model="item.puntoCompra"></md-switch>
                                 </div>
                                 <div flex="15" class="cellGrid">
-                                    <input type="number" ng-mode="item.cantidad" ng-disabled="!item.asignado"/>
+                                    <input  ng-mode="item.cantidad" ng-disabled="!item.asignado"/>
                                 </div>
 
 
@@ -1172,8 +1176,9 @@
 
                     </div>
                     <div layout="column" style=" height: 148px;">
-
-
+                        <div flex>
+                            {{productTexto}}
+                        </div>
                     </div>
                 </div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
