@@ -8,18 +8,20 @@
 
 namespace app\Libs\Utils;
 
-use Intervention\Image\Facades\Image;
-use Storage;
-use Request;
+use App\Models\Sistema\FileModel;
 use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
+use Request;
+use Storage;
 
 class Files
 {
 
 
     private $fileSystem;
-    private $docsPath ="docs/"; ///ruta para los documentos
-    private $imagePath="images/"; ///ruta para las imagenes
+    private $module;
+    private $docsPath = "docs/"; ///ruta para los documentos
+    private $imagePath = "images/"; ///ruta para las imagenes
 
     /**
      * Files constructor.
@@ -29,18 +31,44 @@ class Files
     {
 
         $this->fileSystem = Storage::disk($disk);
+        $this->module = $disk;
     }
 
 
     /**subir archivo
      * @param $fileName
      */
-    public function upload($fileName){
+    public function upload($fileName)
+    {
 
         $file = Request::file($fileName);
 
+        $type = (substr($file->getMimeType(), 0, 5) == "image") ? $this->imagePath : $this->docsPath;
         $extension = $file->getClientOriginalExtension();
-        $this->fileSystem->put($this->docsPath.$file->getFilename().'.'.$extension,  File::get($file));
+
+        try {
+
+            ///////generando nombre de archivo
+            $archivo = new FileModel();
+            $archivo->modulo = $this->module;
+            $archivo->tipo = $type;
+            $archivo->save();
+            ////regla para el nombre
+            $fileName = $archivo->id . '-' . md5($file->getFilename()) . '-' . date("Y-m-d_h_i_s") . "." . $extension;
+
+            /////subiendo archivo
+            $this->fileSystem->put($type . $fileName, File::get($file));
+
+            //////asignado el nombre
+            $archivo->archivo = $fileName;
+            $archivo->save();
+
+        } catch (\Exception $e) {
+
+
+        }
+
+
     }
 
 
@@ -59,7 +87,8 @@ class Files
      * @param $path
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getFileList($path){
+    public function getFileList($path)
+    {
 
         $files = $this->fileSystem->files($path);
         return response()->json($files);
@@ -70,16 +99,15 @@ class Files
      * @param $name
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getFile($name){
+    public function getFile($name)
+    {
 
         return response()->make($this->fileSystem->get($name), 200, [
             'Content-Type' => $this->fileSystem->mimeType($name),
-            'Content-Disposition' => 'inline; '.$name,
+            'Content-Disposition' => 'inline; ' . $name,
         ]);
 
     }
-
-
 
 
 }
