@@ -46,7 +46,7 @@ class DocumentCP extends Model
      */
     public function ncuotas(){
 
-        return DocumentCP::where("nro_orig",$this->nro_factura)->where("tipo_id",5)->count();
+        return DocumentCP::where("nro_orig",$this->id)->where("tipo_id",5)->count();
 
     }
 
@@ -55,7 +55,7 @@ class DocumentCP extends Model
      * @return mixed
      */
     public function cuotas(){
-        return DocumentCP::where("nro_orig",$this->nro_factura)->where("tipo_id",5)->get();
+        return DocumentCP::where("nro_orig",$this->id)->where("tipo_id",5)->get();
     }
 
 
