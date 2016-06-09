@@ -16,6 +16,7 @@ class KitchenBox extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_kitchen_box";
+    protected $hidden = ['updated_at','deleted_at'];
 
 
 /*

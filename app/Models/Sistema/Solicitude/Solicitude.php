@@ -23,18 +23,22 @@ class Solicitude extends Model
     protected $dates = ['deleted_at'];
     protected $appends = array('tipo');
 
-    public function getTypeAttribute()
-    {
+    public function  getTipo(){
         return 'Solicitud';
     }
-
-    public function getTypevalueAttribute()
-    {
+    public function  getTipoId(){
         return 21;
     }
 
     public function items(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
+    }
+
+    /**
+     * adjuntos del documento
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAttachment', 'doc_id');
     }
     public function newItem(){
         return new SolicitudeItem();

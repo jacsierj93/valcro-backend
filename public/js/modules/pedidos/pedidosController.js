@@ -1,12 +1,11 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,ORDER, FormChange,setNotif, DateParse) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,ORDER,Layers,FormChange,setNotif, DateParse) {
 
-    var historia = [15];
+    // var historia = [15];
     var autohidden= 2000;
 
     // controlers
     $scope.formBlock = true;
-    $scope.index = 0;
-    $scope.layer = '';
+
     $scope.email= {};
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
@@ -46,9 +45,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     };
+
     var timePreview;
-
-
     // filtros
     $scope.fRazSocial="";
     $scope.fPais="";
@@ -98,14 +96,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     restore('FormDataKitchenBox'); // formulario de ckitchen box
     restore('pedidoSusPedSelec'); // pedido sustitu selecionado
 
+
+    //$scope.openLayer =  LayersCtrl.openLayer;
+    //$scope.closeLayer = LayersCtrl.closeLayer;
+    //$scope.index = LayersCtrl.index;
+    //$scope.layer =LayersCtrl.layer;
+    $scope.layers=LayersCtrl;
+    $scope.demo=Layers;
+
+
+    //$scope.layers=LayersCtrl.get();
     $scope.setProvedor = setProvedor;
-    $scope.openLayer = openLayer;
-    $scope.closeLayer = closeLayer;
     $scope.DtPedido = DtPedido;
     $scope.selecOdc = selecOdc;
     $scope.selecContraP = selecContraP;
     $scope.selecPedidoSust = selecPedidoSust;
     $scope.selecKitchenBox = selecKitchenBox;
+    console.log($scope.layers);
     init();
 
     //$filter("customFind")($scope.valcroName,$scope.valName.name,function(current,compare){return current.name==compare})
@@ -176,11 +183,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         $timeout(function(){
             if(document &&  $scope.mouseProview){
+                console.log(document);
                 $scope.formMode=$scope.forModeAvilable.getXValue(document.tipo_value);
-
                 $scope.document=document;
-                if($scope.layer !='resumenPedido' ){
-                    openLayer("resumenPedido");
+                if($scope.layers.layer !='resumenPedido' ){
+                    LayersCtrl.openLayer("resumenPedido");
                     $scope.formAction="upd";
 
                 }
@@ -198,8 +205,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
         timePreview= $timeout(function(){
-            if($scope.preview && $scope.layer== 'resumenPedido' && !$scope.mouseProview){
-                $scope.closeLayer();
+            if($scope.preview && $scope.layers.layer== 'resumenPedido' && !$scope.mouseProview){
+                LayersCtrl.closeLayer();
                 $scope.hoverPreview(true);
             }
         }, 1000);
@@ -227,7 +234,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     }
 
     $scope.closeTo = function(layer){
-        closeLayer(layer);
+        LayersCtrl.closeLayer(layer);
     }
 
     /********************************************DEBUGGIN ********************************************/
@@ -260,12 +267,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** APERTURA DE LAYERS ********************************************/
 
     $scope.menuAgregar= function(){
-        closeLayer("all");
-        openLayer("menuAgr");
+        LayersCtrl.closeLayer("all");
+        LayersCtrl.openLayer("menuAgr");
     }
 
     $scope.openEmail= function(){
-        openLayer("email");
+        LayersCtrl.openLayer("email");
         $http.get("Email/ProviderEmails").success(function (response) { $scope.email.contactos = response});
     }
 
@@ -277,7 +284,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.provSelec.id){
             //$scope.document.prov_id=$scope.provSelec.id;
         }
-        openLayer("detalleDoc");
+        LayersCtrl.openLayer("detalleDoc");
         $scope.formBlock=false;
     }
 
@@ -294,7 +301,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function selecOdc(odc) {
         restore('odcSelec');
         loadOdc(odc.id);
-        openLayer("resumenodc");
+        LayersCtrl.openLayer("resumenodc");
 
     }
 
@@ -321,7 +328,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         $scope.formDataContraP.contraPedidoMotivo = ORDER.query({type: 'CustomOrderReason'});
         $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type: 'CustomOrderPriority'});
-        openLayer("resumenContraPedido");
+        LayersCtrl.openLayer("resumenContraPedido");
     }
 
     function selecPedidoSust(item) {
@@ -330,7 +337,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             .success(function (response) {
                 $scope.pedidoSusPedSelec = response;
             });
-        openLayer("resumenPedido");
+        LayersCtrl.openLayer("resumenPedido");
     }
 
     function selecKitchenBox(item) {
@@ -346,23 +353,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
         });
-        openLayer("resumenKitchenbox");
+        LayersCtrl.openLayer("resumenKitchenbox");
     }
 
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
-        switch($scope.layer){
+        switch($scope.layers.layer){
             case "resumenPedido":
-                openLayer("detalleDoc");
+                LayersCtrl.openLayer("detalleDoc");
                 //loadPedidos($scope.document.id);
                 break;
             case "detalleDoc":
-                openLayer("listProducProv");break;
+                LayersCtrl.openLayer("listProducProv");break;
             case "listProducProv":
-                openLayer("agrPed");
+                LayersCtrl.openLayer("agrPed");
                 break;
             case "agrPed":
-                openLayer("finalDoc");break;
+                LayersCtrl.openLayer("finalDoc");break;
             case "finalDoc":
                 saveDoc();
                 break;
@@ -436,50 +443,38 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     $scope.changeContraPItem = function (item) {
-        item.pedido_id = $scope.document.id;
-        if ($scope.FormResumenContra.$valid) {
-            if (item.asignado) {
-                var paso=true;
-                if(item.renglon_id == null && item.saldo >item.cantidad){
-                    setNotif.addNotif("ok","el monto excede la cantidad por defecto",[],{autohidden:autohidden});
-                }
-                if(paso){
-                    $http.post("Order/AddCustomOrderItem", item)
-                        .success(function (response) {
-                            if (item.renglon_id == null) {
-                                setNotif.addNotif("info","Asignado",[],{autohidden:autohidden});
+        item.doc_id = $scope.document.id;
+        if (item.asignado) {
+            $http.post("Order/AddCustomOrderItem", item)
+                .success(function (response) {
+                    setNotif.addNotif("info","Asignado",[],{autohidden:autohidden});
+                });
 
-                            }
-                            item.renglon_id = response.id;
-                        });
-                }
-            } else {
+        } else {
 
-                setNotif.addNotif("alert",
-                    "Se eliminara el contra pedido ¿Desea continuar?"
-                    ,[
-                        {name: 'Ok',
-                            action:function(){
-                                $http.post("Order/RemoveCustomOrderItem", {id: item.renglon_id, pedido_id:$scope.document.id})
-                                    .success(function (response) {
-                                        setNotif.addNotif("ok","Removido" ,[],{autohidden:autohidden});
-                                    });
-                            }
-                        },{name: 'Cancel',
-                            action:function(){
-                                item.asignado=true;
-                            }
+            setNotif.addNotif("alert",
+                "Se eliminara el contra pedido ¿Desea continuar?"
+                ,[
+                    {name: 'Ok',
+                        action:function(){
+                            $http.post("Order/RemoveCustomOrderItem", {id: item.renglon_id, pedido_id:$scope.document.id})
+                                .success(function (response) {
+                                    setNotif.addNotif("ok","Removido" ,[],{autohidden:autohidden});
+                                });
                         }
-                    ]);
-            }
+                    },{name: 'Cancel',
+                        action:function(){
+                            item.asignado=true;
+                        }
+                    }
+                ]);
         }
 
-    }
-
+    };
 
     $scope.changeKitchenBox = function (item) {
         if (item.asignado) {
-            $http.post("Order/AddkitchenBox", { id:item.id, pedido_id:$scope.document.id})
+            $http.post("Order/AddkitchenBox",{ id:item.id, doc_id:$scope.document.id, tipo:$scope.formMode.value})
                 .success(function (response) {
                     if (item.renglon_id == null) {
                         setNotif.addNotif("ok","Asignado",[],{autohidden:autohidden});
@@ -587,11 +582,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     function setProvedor(prov) {
-        if($scope.index == 0){
+
+        if($scope.demo.index == 0){
             $scope.provSelec = prov;
-            openLayer('listPedido');
+            console.log(prov);
+            Layers.accion({open:{name:"listPedido",after:function(){alert("text");}}});
         }else{
-            if($scope.layer == "listPedido" ){
+            if($scope.layers.layer == "listPedido" ){
                 $scope.provSelec = prov;
                 loadPedidosProvedor($scope.provSelec.id);
             }else{
@@ -603,19 +600,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     function openLayer(layer) {
 
-        if (historia.indexOf(layer) == -1) {
-            var l = angular.element(document).find("#" + layer);
-            var base = 264;
-            $scope.index++;
-            var w = base + (24 * $scope.index);
-            l.css('width', 'calc(100% - ' + w + 'px)');
-            $mdSidenav(layer).open();
-            l.css('z-index', String(60  + $scope.index));
-            historia[$scope.index] = layer;
-            $scope.layer = layer;
-            return true;
-        }
-        return false;
+        /*   if (historia.indexOf(layer) == -1) {
+         var l = angular.element(document).find("#" + layer);
+         var base = 264;
+         $scope.index++;
+         var w = base + (24 * $scope.index);
+         l.css('width', 'calc(100% - ' + w + 'px)');
+         $mdSidenav(layer).open();
+         l.css('z-index', String(60  + $scope.index));
+         historia[$scope.index] = layer;
+         $scope.layer = layer;
+         return true;
+         }
+         return false;*/
     }
 
     function DtPedido(doc) {
@@ -623,14 +620,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         restore("document");
         var aux= angular.copy(doc);
-        if(doc && $scope.index <2){
+        if(doc && $scope.layers.index <2){
             if (segurity('editPedido')) {
                 document.isNew=false;
                 $scope.document=aux;
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
                 $scope.formAction="upd";
-                openLayer('resumenPedido');
+                LayersCtrl.openLayer('resumenPedido');
                 // loadDoc(pedido.id);
             }
             else {
@@ -640,39 +637,39 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     }
 
     function closeLayer(opt) {
-        if($scope.index>0){
-            var close =1;
-            var index= $scope.index;
-            if(typeof (opt) == 'string'){
-                switch (opt){
-                    case 'all':break;{
-                        close = historia.length -1;
-                    }
+        /* if($scope.index>0){
+         var close =1;
+         var index= $scope.index;
+         if(typeof (opt) == 'string'){
+         switch (opt){
+         case 'all':break;{
+         close = historia.length -1;
+         }
 
-                    default:
-                        var aux = historia.indexOf(opt);
-                        if(aux!= -1){
-                            close= index - aux;
-                        }else{
-                            console.log("no esta abierto", opt);
-                            close=0;
-                        }
-                }
+         default:
+         var aux = historia.indexOf(opt);
+         if(aux!= -1){
+         close= index - aux;
+         }else{
+         console.log("no esta abierto", opt);
+         close=0;
+         }
+         }
 
 
-            }else if(typeof (opt) == 'number'){
-                close= opt;
-            }
+         }else if(typeof (opt) == 'number'){
+         close= opt;
+         }
 
-            for(var i=0; i<close;i++){
-                var layer = historia[index];
-                $mdSidenav(layer).close();
-                historia[index]=null;
-                index--;
-            }
-            $scope.index= index;
-            $scope.layer = historia[index];
-        }
+         for(var i=0; i<close;i++){
+         var layer = historia[index];
+         $mdSidenav(layer).close();
+         historia[index]=null;
+         index--;
+         }
+         $scope.index= index;
+         $scope.layer = historia[index];
+         }*/
 
     }
 
@@ -692,7 +689,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
         if (paso) {
-            closeLayer();
+            LayersCtrl.closeLayer();
         }
     }
 
@@ -772,7 +769,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         });
 
     /**layers*/
-    $scope.$watchGroup(['index','layer'], function(newVal){
+    $scope.$watchGroup(['demo.index','demo.layer'], function(newVal){
+        console.log('new value', newVal[0]);
         switch (newVal[0]){
             case 0:
                 restore('provSelec');// inializa el proveedor
@@ -857,23 +855,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if ($scope.document.id == '') {
             delete $scope.document.id;
         }
-        if($scope.layer == "finalDoc"){
+        if($scope.layers.layer == "finalDoc"){
             $scope.document.close=true;
         }
-
+        if($scope.layers.layer == "finalDoc"){
+            $scope.document.close=true;
+        }
         switch ($scope.formMode.value){
-            case 21:
-                url="Solicitude/Save";
-                break;
-            case 22:
-                url="Order/Save";
-                break;
-            case 23:
-                url="PurchaseOrder/Save"
-                if($scope.layer == "finalDoc"){
-                    $scope.document.close=true;
-                }
-                break;
+            case 21:url="Solicitude/Save";break;
+            case 22:url="Order/Save";break;
+            case 23:url="PurchaseOrder/Save";break;
         }
 
         $scope.document.prov_id = $scope.provSelec.id;
@@ -888,9 +879,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         if(response['action'] == 'new'){
                             setNotif.addNotif("ok","Creado, Puede continuar",[],{autohidden:autohidden});
                         }
-                        if($scope.layer == "finalDoc"){
+                        if($scope.layers.layer == "finalDoc"){
                             $scope.formBlock=true;
-                            setNotif.addNotif("ok","Realizado",[{name:"ok",action:function(){closeLayer($scope.index );}}],{autohidden:autohidden});
+                            setNotif.addNotif("ok","Realizado",[{name:"ok",action:function(){LayersCtrl.closeLayer($scope.layers.index );}}],{autohidden:autohidden});
                             switch ($scope.formMode){
                                 case "Solicitud":
 
@@ -1074,14 +1065,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         });
     }
     function loadContraPedidosProveedor(id){
-        $http.get("Order/CustomOrders",{params:{prov_id:id, pedido_id: $scope.document.id}}).success(function (response) {
+        $http.get("Order/CustomOrders",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
             $scope.formData.contraPedido= response;
         });
     }
 
     function loadkitchenBoxProveedor(id){
 
-        $http.get("Order/KitchenBoxs",{params:{prov_id:id, pedido_id: $scope.document.id}}).success(function (response) {
+        $http.get("Order/KitchenBoxs",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
             $scope.formData.kitchenBox= response;
             $scope.formData.kitchenBox.fecha = Date.parse(response.fecha);        });
     }
@@ -1252,6 +1243,7 @@ MyApp.service('FormChange', function() {
     var trace = {};
     var changes ={};
     var forms ={};
+    var formAction= "new";
 
     this.setForms =function(data){
         forms= data;
@@ -1289,7 +1281,95 @@ MyApp.service('FormChange', function() {
     this.getChanges= function(){
         return changes;
     }
+    this.setformAction= function(action){
+        formAction=action;
+    };
 });
+/*
+
+MyApp.service('LayersCtrl', function($mdSidenav){
+    this.historia= [30];
+    this.layer="";
+    this.index=0;
+    this.blockBack=false;
+    this.openLayer= function(name){
+        console.log("abriendo");
+        if (this.historia.indexOf(name) == -1) {
+            console.log("abriendo entro");
+            var l = angular.element(document).find("#" + name);
+            var base = 264;
+            this.index++;
+            var w = base + (24 * this.index);
+            l.css('width', 'calc(100% - ' + w + 'px)');
+            $mdSidenav(name).open();
+            l.css('z-index', String(60  + this.index));
+            this.historia[this.index] = name;
+            this.layer = name;
+            return true;
+        }
+        return false;
+    };
+
+    this.closeLayer= function(opt){
+        if(this.index>0 && !this.blockBack){
+            this.blockBack=true;
+            var close =1;
+            var current= this.index;
+            if(typeof (opt) == 'string'){
+                switch (opt){
+                    case 'all':break;{
+                        close = this.historia.length -1;
+                    }
+
+                    default:
+                        var aux = this.historia.indexOf(opt);
+                        if(aux!= -1){
+                            close= current - aux;
+                        }else{
+                            console.log("no esta abierto", opt);
+                            close=0;
+                        }
+                }
+
+
+            }else if(typeof (opt) == 'number'){
+                close= opt;
+            }
+
+            for(var i=0; i<close;i++){
+                var l = this.historia[current];
+                $mdSidenav(l).close();
+                this.historia[current]=null;
+                current--;
+            }
+            this.index= current;
+            this.layer = this.historia[this.index];
+            this.blockBack=false;
+        }
+    };
+
+    this.clearLayer= function(){
+        this.historia= new Array();
+        this. layer="";
+        this.index=0;
+        this.blockBack=false;
+    };
+    this.get = function(){
+        this.clearLayer();
+        return this;
+    }
+
+
+});
+*/
+
+MyApp.service('Layers', function($mdSidenav){
+
+
+
+});
+
+MyApp.controller("LayersCtrl",function($mdSidenav){});
 
 MyApp.factory('ORDER', ['$resource',
     function ($resource) {
@@ -1303,3 +1383,198 @@ MyApp.factory('ORDER', ['$resource',
     }
 ]);
 
+/**
+ this.historia= [30];
+ this.layer="";
+ this.index=0;
+ this.blockBack=false;
+ this.layers= new Array();
+ this.accion = function(arg){
+        if(arg.open){
+            this.openLayer(arg.open);
+        }
+        if(arg.layers){
+            this.layers=arg.layer;
+        }
+    }
+ this.openLayer= function(arg){
+        console.log("abriendo");
+        var paso= true;
+        if (this.historia.indexOf(arg.name) == -1) {
+            if(arg.before){
+                if(!arg.validate){
+                   arg.before();
+                }else{
+                    paso=arg.before();
+                }
+            }
+            if(paso){
+                var l = angular.element(document).find("#" + arg.name);
+               if(!arg.width){
+                   var base = 264;
+                   this.index++;
+                   var w = base + (24 * this.index);
+                   l.css('width', 'calc(100% - ' + w + 'px)');
+                   l.css('z-index', String(60  + this.index));
+               } else{
+                   l.css('width', 'calc(100% - ' + arg.width + 'px)');
+               }
+                $mdSidenav(arg.name).open().then(function(){
+                    if(arg.after){
+                        arg.after();
+                    }
+                });
+                this.historia[this.index] = arg.name;
+                this.layer = arg.name;
+                return true;
+            }
+
+        }
+        return false;
+    };
+
+ this.closeLayer= function(opt){
+        if(this.index>0 && !this.blockBack){
+            this.blockBack=true;
+            var close =1;
+            var current= this.index;
+            if(typeof (opt) == 'string'){
+                switch (opt){
+                    case 'all':break;{
+                        close = this.historia.length -1;
+                    }
+
+                    default:
+                        var aux = this.historia.indexOf(opt);
+                        if(aux!= -1){
+                            close= current - aux;
+                        }else{
+                            console.log("no esta abierto", opt);
+                            close=0;
+                        }
+                }
+
+
+            }else if(typeof (opt) == 'number'){
+                close= opt;
+            }
+
+            for(var i=0; i<close;i++){
+                var l = this.historia[current];
+                $mdSidenav(l).close();
+                this.historia[current]=null;
+                current--;
+            }
+            this.index= current;
+            this.layer = this.historia[this.index];
+            this.blockBack=false;
+        }
+    };
+
+ this.clearLayer= function(){
+        this.historia= new Array();
+        this. layer="";
+        this.index=0;
+        this.blockBack=false;
+    };
+ this.get = function(){
+        this.clearLayer();
+        return this;
+    }    this.historia= [30];
+ this.layer="";
+ this.index=0;
+ this.blockBack=false;
+ this.layers= new Array();
+ this.accion = function(arg){
+        if(arg.open){
+            this.openLayer(arg.open);
+        }
+        if(arg.layers){
+            this.layers=arg.layer;
+        }
+    }
+ this.openLayer= function(arg){
+        console.log("abriendo");
+        var paso= true;
+        if (this.historia.indexOf(arg.name) == -1) {
+            if(arg.before){
+                if(!arg.validate){
+                   arg.before();
+                }else{
+                    paso=arg.before();
+                }
+            }
+            if(paso){
+                var l = angular.element(document).find("#" + arg.name);
+               if(!arg.width){
+                   var base = 264;
+                   this.index++;
+                   var w = base + (24 * this.index);
+                   l.css('width', 'calc(100% - ' + w + 'px)');
+                   l.css('z-index', String(60  + this.index));
+               } else{
+                   l.css('width', 'calc(100% - ' + arg.width + 'px)');
+               }
+                $mdSidenav(arg.name).open().then(function(){
+                    if(arg.after){
+                        arg.after();
+                    }
+                });
+                this.historia[this.index] = arg.name;
+                this.layer = arg.name;
+                return true;
+            }
+
+        }
+        return false;
+    };
+
+ this.closeLayer= function(opt){
+        if(this.index>0 && !this.blockBack){
+            this.blockBack=true;
+            var close =1;
+            var current= this.index;
+            if(typeof (opt) == 'string'){
+                switch (opt){
+                    case 'all':break;{
+                        close = this.historia.length -1;
+                    }
+
+                    default:
+                        var aux = this.historia.indexOf(opt);
+                        if(aux!= -1){
+                            close= current - aux;
+                        }else{
+                            console.log("no esta abierto", opt);
+                            close=0;
+                        }
+                }
+
+
+            }else if(typeof (opt) == 'number'){
+                close= opt;
+            }
+
+            for(var i=0; i<close;i++){
+                var l = this.historia[current];
+                $mdSidenav(l).close();
+                this.historia[current]=null;
+                current--;
+            }
+            this.index= current;
+            this.layer = this.historia[this.index];
+            this.blockBack=false;
+        }
+    };
+
+ this.clearLayer= function(){
+        this.historia= new Array();
+        this. layer="";
+        this.index=0;
+        this.blockBack=false;
+    };
+ this.get = function(){
+        this.clearLayer();
+        return this;
+    }
+ **/

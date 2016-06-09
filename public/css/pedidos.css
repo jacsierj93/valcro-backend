@@ -104,3 +104,9 @@
 .required{
     border-color: rgb(221,44,0);
 }
+.sideNavContent{
+    height: 100%;
+}
+.layerColumn{
+    padding-top: 4px;
+}

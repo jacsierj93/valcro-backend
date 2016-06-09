@@ -40,11 +40,12 @@ $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
 $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae tod el detalle de contraPedido
+$app->post("Order/Copy",'Orders\OrderController@copyDoc'); ///trae tod el detalle de contraPedido
 
 
 // contra pedidos
 $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
-$app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae tod el detalle de contraPedido
+$app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae los motivos de contrapedido
 $app->get("Order/CustomOrderPriority",'Orders\OrderController@getCustomOrderPriority'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido
 $app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///agrega el  contrapedido
