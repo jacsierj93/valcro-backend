@@ -7,6 +7,7 @@
  */
 
 namespace App\Models\Sistema\Purchase;
+use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\ProviderCondPayItem;
@@ -23,15 +24,21 @@ class Purchase extends Model
     protected $dates = ['deleted_at'];
     protected $appends = array('tipo');
 
-    public function getTypeAttribute()
-    {
+    public function  getTipo(){
         return 'Orden de Compra';
     }
-    public function getTypevalueAttribute()
-    {
+    public function  getTipoId(){
         return 23;
     }
+    /*   public function getTypeAttribute()
+      {
 
+      }
+     public function getTypevalueAttribute()
+      {
+          return 23;
+      }
+  */
     public function items(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseItem', 'doc_id');
     }
@@ -40,6 +47,9 @@ class Purchase extends Model
         return new PurchaseItem();
     }
 
+    /**
+     * adjuntos del documento
+     */
     public function attachments(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseAttachment', 'doc_id');
     }
@@ -73,7 +83,7 @@ class Purchase extends Model
 
     /**
      * e
-    */
+     */
     public function getNumItem($tipo){
         $i=0;
         $items = $this->items()->get();
@@ -90,7 +100,7 @@ class Purchase extends Model
 
     /**
      * genera los documentos de pago
-    */
+     */
 
     public function builtPaymentDocs(){
         //**generacion de cuotas de pago*/
@@ -167,6 +177,27 @@ class Purchase extends Model
     }
 
 
+
+    /**
+     * @return el tipo de producto original
+     */
+    private function getTypeProduct($producto){
+
+        $idType=$producto->tipo_origen_id;
+
+        if($idType == 4){
+            $i=0;
+            $aux= $producto;
+            do {
+                $aux= PurchaseItem::findOrFail($aux->origen_item_id);
+                $idType=$aux->tipo_origen_id;
+                $i++;
+
+            } while ($idType == 4 && $i<3);
+        }
+        return SourceType::findOrFail($idType)->id;
+
+    }
 
 
 

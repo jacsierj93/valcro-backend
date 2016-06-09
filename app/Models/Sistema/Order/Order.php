@@ -21,12 +21,37 @@ class Order extends Model
     protected $table = "tbl_pedido";
     protected $dates = ['deleted_at'];
 
+    protected $appends = array('tipo');
+
+    public function  getTipo(){
+        return 'Proforma';
+    }
+    public function  getTipoId(){
+        return 22;
+    }
+
+/*    public function getTypeAttribute()
+    {
+        return 'Proforma';
+    }
+    public function getTypevalueAttribute()
+    {
+        return 22;
+    }*/
 
     /**
      * obtiene los item de pedidos
      */
-    public function OrderItem(){
+    public function items(){
         return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'pedido_id');
+    }
+
+
+    /**
+     * adjuntos del documento
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Order\OrderAttachment', 'doc_id');
     }
 
     /**
@@ -35,7 +60,7 @@ class Order extends Model
 
     public function getNumItem($tipo){
         $i=0;
-        $items = $this->OrderItem()->get();
+        $items = $this->items()->get();
         foreach($items as $aux){
             $tip=$this->getTypeProduct($aux);
             if($tip == $tipo){
