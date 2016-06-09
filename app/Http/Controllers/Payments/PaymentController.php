@@ -76,13 +76,13 @@ class PaymentController extends BaseController
             foreach ($docs as $doc) {
 
                 ////////totalizando pagos (documentos tipo NDC,ADE,REB sin terminar de consumir)
-                if (in_array($doc->tipo_id, $abonos)) {
-                    $total_abonos += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
+                if (in_array($doc->tipo_id, $abonos) && $doc->estatus==1) {
+                    $total_abonos += MasterFinancialController::getCostByCoin($doc->saldo, $doc->moneda_id); //base $
                 }
 
                 ////total deudas (saldos de cuotas y (facturas sin cuotas) sin terminar de pagar por completo)
-                if (in_array($doc->tipo_id, $deudas)) {
-                    $total_deuda += MasterFinancialController::getCostByCoin($doc->monto, $doc->moneda_id); //base $
+                if (in_array($doc->tipo_id, $deudas) && $doc->ncuotas()==0 && $doc->estatus==1) {
+                    $total_deuda += MasterFinancialController::getCostByCoin($doc->saldo, $doc->moneda_id); //base $
                 }
 
 

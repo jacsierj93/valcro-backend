@@ -26,6 +26,7 @@
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div flex ng-controller="ListProv" style="overflow-y:auto;">
+                <md-progress-linear ng-show="!todos.$resolved"></md-progress-linear>
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
                 <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
@@ -84,176 +85,179 @@
 
 
         <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0" id="layer0">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0" id="layer0">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
-                <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
-                <div layout="column" flex style="margin-right:8px;">
-                    <div class="titulo_formulario" style="height:39px;">
-                        <div>
-                            Proveedor
+            <md-progress-linear ng-show="isSetting.setting"></md-progress-linear>
+            <div layout="row" flex>
+                <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
+                    <div style="width:24px"></div>
+                    <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
+                    <div layout="column" flex style="margin-right:8px;">
+                        <div class="titulo_formulario" style="height:39px;">
+                            <div>
+                                Proveedor
+                            </div>
                         </div>
-                    </div>
-                    <div style="height:39px;">
-                        <div class="textResm" style="width:calc(70% - 8px); height:39px; float:left;">
-                            {{prov.razon_social}}
+                        <div style="height:39px;">
+                            <div class="textResm" style="width:calc(70% - 8px); height:39px; float:left;">
+                                {{prov.razon_social}}
+
+                            </div>
+
+                            <div class="textResm" style="width:calc(30% - 40px); height:39px; float:left;">
+                                {{prov.siglas}}
+                            </div>
+                            <span ng-show="(prov.contrapedido==1)" class=" icon-contrapedidos" style="font-size: 23px"></span>
 
                         </div>
+                        <div class="titulo_formulario" style="height:39px;" layout-align="start start">
+                            <div>
+                                Nombres Valcro
+                            </div>
+                        </div>
+                        <div flex style="overflow-y:auto;">
+                            <div class="itemName" ng-repeat="name in prov.nomValc">
+                                {{name.nombre}}
+                            </div>
+                        </div>
+                        <div class="titulo_formulario" style="height:39px;">
+                            <div>
+                                Tipo de envio
+                            </div>
+                        </div>
+                        <div style="height:39px;">
+                            <div flex>
+                                <span ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
+                                <span ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Barco" /></span>
 
-                        <div class="textResm" style="width:calc(30% - 40px); height:39px; float:left;">
-                            {{prov.siglas}}
+                               <!-- <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
+                                <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />-->
+                            </div>
                         </div>
-                        <span ng-show="(prov.contrapedido==1)" class=" icon-contrapedidos" style="font-size: 23px"></span>
+
+                        <div class="titulo_formulario" style="height:39px;">
+                            <div>
+                                Tiempos Estimados
+                            </div>
+                        </div>
+                        <div style="height:24px;">
+                            Produccion:
+                        </div>
+                        <div flex style="overflow-y: auto;">
+                            <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposP">
+                                de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
+                            </div>
+                        </div>
+                        <div style="height:24px;">
+                            Transito:
+                        </div>
+                        <div flex style="overflow-y: auto;">
+                            <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposT">
+                                de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> desde <b>{{tiempo.country.short_name}}</b>
+                            </div>
+                        </div>
 
                     </div>
-                    <div class="titulo_formulario" style="height:39px;" layout-align="start start">
-                        <div>
-                            Nombres Valcro
-                        </div>
-                    </div>
-                    <div flex style="overflow-y:auto;">
-                        <div class="itemName" ng-repeat="name in prov.nomValc">
-                            {{name.nombre}}
-                        </div>
-                    </div>
-                    <div class="titulo_formulario" style="height:39px;">
-                        <div>
-                            Tipo de envio
-                        </div>
-                    </div>
-                    <div style="height:39px;">
+
+                    <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
+                    <div layout="column" flex style="margin-right:8px;">
                         <div flex>
-                            <span ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
-                            <span ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Barco" /></span>
+                            <div class="titulo_formulario" style="height: 39px;">
+                                <div>
+                                    Direcciones
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto; height: calc(100% - 39px);">
+                                <div ng-repeat="direccion in prov.direcciones" style="height: 60px; width:100%;">
+                                    <div style="width: 30%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis; font-weight:bold;">
+                                        {{direccion.tipo.descripcion}}
+                                    </div>
+                                    <div style="width: 70%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis;">
+                                        {{direccion.country.short_name}}
+                                    </div>
+                                    <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
+                                        {{direccion.direccion}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div flex>
+                            <div class="titulo_formulario" style="height: 39px;">
+                                <div>
+                                    Contactos
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto; height: calc(100% - 39px);">
+                                <div ng-repeat="contact in prov.contacts" style="height: 39px;">
+                                    <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
+                                        <span style="font-weight: bold !important; float:left;">{{contact.nombre}}: </span>
+                                        <span style="float:left;" ng-repeat="cargo in contact.cargos">{{cargo.cargo}},</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
+                    <div layout="column" flex>
+                        <div style="height:78px;">
+                            <div class="titulo_formulario" style="height: 39px;">
+                                <div>
+                                    Monedas
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto; height: calc(100% - 39px);">
+                                <div ng-repeat="moneda in prov.monedas" style="float:left; height:24px;">
+                                    <span style="font-weight:bold;">{{moneda.nombre}} &nbsp;</span>({{moneda.simbolo}})
+                                </div>
+                            </div>
+                        </div>
+                        <div flex>
+                            <div class="titulo_formulario" style="height: 39px;">
+                                <div>
+                                    Puntos
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto; height: calc(100% - 39px);">
+                                <div ng-repeat="point in prov.monedas" ng-show="point.pivot.punto">
+                                    <div style="width: 30%; float:left;">{{point.nombre}}</div>
+                                    <div style="width: 70%; float:left;">{{point.pivot.punto | number:2}} {{point.simbolo}}</div>
+                                </div>
+                            </div>
+                        </div>
 
-                           <!-- <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
-                            <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />-->
+                        <div flex>
+                            <div class="titulo_formulario" style="height: 39px;" ng-class="{'title_error' : (prov.limCred.length < 1)}">
+                                <div>
+                                    Limites de Credito
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto; height: calc(100% - 39px);">
+                                <div ng-repeat="lim in prov.limites" style="width: 100%;">
+                                    <div style="width: 30%; float:left;">{{lim.moneda.nombre}}</div>
+                                    <div style="width: 70%; float:left;">{{lim.limite | number:2}} {{lim.moneda.simbolo}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div flex>
+                            <div class="titulo_formulario" style="height: 39px;">
+                                <div>
+                                    Cuentas Bancarias
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto; height:calc(100% - 39px); posi">
+                                <div ng-repeat="bank in prov.banks" style="width: 100%;">
+                                    <div style="width: 100%; height:24px; font-weight:bold;">{{bank.banco}}</div>
+                                    <div style="width: 100%; height:24px;">{{bank.cuenta}}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="titulo_formulario" style="height:39px;">
-                        <div>
-                            Tiempos Estimados
-                        </div>
-                    </div>
-                    <div style="height:24px;">
-                        Produccion:
-                    </div>
-                    <div flex style="overflow-y: auto;">
-                        <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposP">
-                            de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
-                        </div>
-                    </div>
-                    <div style="height:24px;">
-                        Transito:
-                    </div>
-                    <div flex style="overflow-y: auto;">
-                        <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposT">
-                            de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> desde <b>{{tiempo.country.short_name}}</b>
-                        </div>
-                    </div>
+                </md-content>
+                <div style="width: 16px;" ng-mouseover="showNext(true,'layer1')">
 
                 </div>
-
-                <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
-                <div layout="column" flex style="margin-right:8px;">
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Direcciones
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="direccion in prov.direcciones" style="height: 60px; width:100%;">
-                                <div style="width: 30%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis; font-weight:bold;">
-                                    {{direccion.tipo.descripcion}}
-                                </div>
-                                <div style="width: 70%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                    {{direccion.country.short_name}}
-                                </div>
-                                <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                    {{direccion.direccion}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Contactos
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="contact in prov.contacts" style="height: 39px;">
-                                <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                    <span style="font-weight: bold !important; float:left;">{{contact.nombre}}: </span>
-                                    <span style="float:left;" ng-repeat="cargo in contact.cargos">{{cargo.cargo}},</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
-                <div layout="column" flex>
-                    <div style="height:78px;">
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Monedas
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="moneda in prov.monedas" style="float:left; height:24px;">
-                                <span style="font-weight:bold;">{{moneda.nombre}} &nbsp;</span>({{moneda.simbolo}})
-                            </div>
-                        </div>
-                    </div>
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Puntos
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="point in prov.monedas" ng-show="point.pivot.punto">
-                                <div style="width: 30%; float:left;">{{point.nombre}}</div>
-                                <div style="width: 70%; float:left;">{{point.pivot.punto | number:2}} {{point.simbolo}}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;" ng-class="{'title_error' : (prov.limCred.length < 1)}">
-                            <div>
-                                Limites de Credito
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height: calc(100% - 39px);">
-                            <div ng-repeat="lim in prov.limites" style="width: 100%;">
-                                <div style="width: 30%; float:left;">{{lim.moneda.nombre}}</div>
-                                <div style="width: 70%; float:left;">{{lim.limite | number:2}} {{lim.moneda.simbolo}}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div flex>
-                        <div class="titulo_formulario" style="height: 39px;">
-                            <div>
-                                Cuentas Bancarias
-                            </div>
-                        </div>
-                        <div style="overflow-y: auto; height:calc(100% - 39px); posi">
-                            <div ng-repeat="bank in prov.banks" style="width: 100%;">
-                                <div style="width: 100%; height:24px; font-weight:bold;">{{bank.banco}}</div>
-                                <div style="width: 100%; height:24px;">{{bank.cuenta}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </md-content>
-            <div style="width: 16px;" ng-mouseover="showNext(true,'layer1')">
-
             </div>
-
         </md-sidenav>
 
 
@@ -264,7 +268,7 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" ng-controller="DataProvController" ng-disabled="true" click-out="projectForm.$setUntouched()">
+                <form name="projectForm" ng-controller="DataProvController" ng-class="{'focused':isShow}" ng-disabled="true" click-out="projectForm.$setUntouched()">
 
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
                         <div>
@@ -326,10 +330,11 @@
                         <div flex></div>
 
                     </div>
-                </form>
 
+                </form>
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" ng-controller="valcroNameController"  ng-click="showGrid(true)" click-out="showGrid(false,$event)">
+                <form name="nomvalcroForm" ng-controller="valcroNameController" ng-class="{'focused':isShow}"  ng-click="showGrid(true)" click-out="showGrid(false,$event)" >
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Nombres Valcro
@@ -353,16 +358,22 @@
                             <div ng-repeat="name in valcroName | orderBy:order:true" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
+                    <div style="width:24px">
+                        <span class="icon-Agregar"></span>
+                    </div>
                 </form>
-
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm" ng-controller="provAddrsController" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="direccionesForm" ng-controller="provAddrsController" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Direcciones
                         </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
+                        </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand" layout="column" flex>
+                    <div ng-hide="$parent.expand && id!=$parent.expand" layout="column" flex="">
                         <div flex layout="row">
 
                             <md-input-container class="md-block" flex="20">
@@ -424,7 +435,7 @@
                                 <div flex="20" class="headGrid"> Telefono</div>
                             </div>
                             <md-content id="grid" flex>
-                                <div flex ng-repeat="add in address" ng-click="toEdit(this)">
+                                <div flex ng-repeat="add in address" ng-focus="toEdit(this)">
                                     <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
                                         <div ng-show="(add.id==dir.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
                                         <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
@@ -438,12 +449,15 @@
                     </div>
 
                 </form>
-
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm" ng-controller="contactProv" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="provContactosForm" ng-controller="contactProv" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Contactos Proveedor
+                        </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -534,7 +548,7 @@
                         </div>
                     </div>
                 </form>
-
+                <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
 
             </md-content>
 
@@ -591,10 +605,13 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
-                <form ng-controller="bankInfoController" name="bankInfoForm" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                <form ng-controller="bankInfoController" name="bankInfoForm" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Informacion Bancaria
+                        </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -683,9 +700,9 @@
                         </div>
                     </div>
                 </form>
-
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda" ng-controller="coinController">
+                <form name="provMoneda"  ng-controller="coinController"  ng-class="{'focused':isShow}">
                     <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Moneda
@@ -707,11 +724,15 @@
                         </div>
                     </div>
                 </form>
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="provCred" ng-controller="creditCtrl" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="provCred" ng-controller="creditCtrl"  ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length<1)}">
                         <div>
                             Credito
+                        </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -767,12 +788,15 @@
                         </div>
                     </div>
                 </form>
-
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="condHeadFrm" ng-controller="condPayList" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="condHeadFrm" ng-controller="condPayList"  ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Condiciones de pago
+                        </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -819,11 +843,15 @@
                         </div>
                     </div>
                 </form>
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
-                <form name="provConv" ng-controller="convController" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="provConv" ng-controller="convController"  ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
                         <div>
                             Factor de Conversión
+                        </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -889,11 +917,15 @@
                         </div>
                     </div>
                 </form>
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
-                <form name="provPoint" ng-controller="provPointController" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="provPoint" ng-controller="provPointController" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
                         <div>
                             Puntos
+                        </div>
+                        <div style="width:24px">
+                            <span class="icon-Agregar"></span>
                         </div>
                     </div>
                     <div ng-hide="$parent.expand && id!=$parent.expand">
@@ -943,7 +975,7 @@
                         </div>
                     </div>
                 </form>
-
+                <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
             </md-content>
             <div style="width: 16px;" ng-mouseover="showNext(true,'layer3')">
 
@@ -996,7 +1028,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-                <form name="timeProd" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" click-out="showGrid(false,$event)">
+                <form name="timeProd" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" ng-class="{'focused':isShow}" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Tiempo Aproximado de Producción
@@ -1044,8 +1076,9 @@
                         </div>
                     </div>
                 </form>
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="timeTrans" ng-controller="transTimeController" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="timeTrans" ng-controller="transTimeController" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Tiempo Aproximado de Transito
@@ -1092,8 +1125,8 @@
                         </div>
                     </div>
                 </form>
-
-                <form name="provPrecList" ng-controller="priceListController">
+                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
+                <form name="provPrecList" ng-controller="priceListController" ng-class="{'focused':isShow}">
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
                         <div>
                             Listas de Precios
@@ -1132,7 +1165,7 @@
             </div>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5" id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="row" flex="grow" ng-controller="resumenProvFinal">
                 <div flex layout="column">
