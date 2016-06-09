@@ -140,21 +140,21 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };*/
 
-    var historia= [15];
+    historia= [15];
     $scope.index = index=0;
     var base =264;
-
     function openLayer(layr){
         $scope.showNext(false);
         var layer = layr||$scope.nextLyr;
         if(historia.indexOf(layer)==-1 && layer!="END"){
-            console.log("normal",$scope.index);
+
             var l=angular.element("#"+layer);
             $scope.index++;
             var w= base+(24*$scope.index);
             l.css('width','calc(100% - '+w+'px)');
             $mdSidenav(layer).open();
             historia[$scope.index]=layer;
+            $scope.layer = layer;
             return true;
         }else if(historia.indexOf(layer)==-1 && layer=="END"){
 
@@ -163,11 +163,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
             }else {
                 closeLayer(true);
+                $scope.layer = "";
             }
         }else{
 
         }
 
+    }
+
+    $scope.checkLayer = function(compare){
+        console.log(compare)
+        //return compare != $scope.layer;
     }
 
     function closeLayer(all){
@@ -177,12 +183,14 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                 historia[$scope.index]=null;
                 $scope.index--;
                 $mdSidenav(layer).close();
+                $scope.layer = "";
             }
         }else{
             var layer=historia[$scope.index];
             historia[$scope.index]=null;
             $scope.index--;
             $mdSidenav(layer).close();
+            $scope.layer = historia[$scope.index];
         }
         /*if($scope.index==0){
             if(setGetProv.haveChang()){
@@ -296,7 +304,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             id: false,
             siglas:""
         });
-        console.log( setGetProv.getProv());
     };
     $scope.editProv = function(){
         $scope.edit = true;
@@ -317,7 +324,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     setGetContac.setList();
     $scope.menuExpand = function(){
         jQuery("#menu").animate({height:"200px"},500);
-    }
+    };
 });
 
 
@@ -420,26 +427,20 @@ MyApp.service("setGetProv",function($http,providers,$q){
             itemsel.limCred = upd.limCred;
             itemsel.contrapedido = upd.contraped;
             itemsel.tipo_envio_id= upd.envio;
-
-            //console.log(upd,itemsel)
         },
         setList : function(val){
             list = val;
-            //itemsel.list[0];
         },
         addToList : function(elem){
             if(list[0].id){
                 list.unshift(elem);
                 itemsel = list[0];
             }
-
-            //setProv(elem);
         },
         cancelNew : function(){
             if(!list[0].id){
                 list.splice(0,1);
             }
-
         },
         seeList : function(){
             return list;
@@ -478,7 +479,6 @@ MyApp.service("setGetProv",function($http,providers,$q){
         getChng : function(){
             return changes;
          },
-
         haveChang : function(){
 
             var i = 1;
@@ -515,16 +515,6 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     };
 
     $scope.prov = setGetProv.getProv();
-    $scope.showSimpleToast = function() {
-        $mdToast.show(/*{
-            template: "<md-toast style='width:100%'>prueba</md-toast>",
-            hideDelay: 6000,
-            position: 'bottom right'}*/
-            $mdToast.simple()
-                .textContent('guardado!')
-                .hideDelay(3000)
-        );
-    };
     $scope.list = setGetProv.seeList();
     $scope.$watch('prov.id',function(nvo){
         $scope.localId = nvo
@@ -538,15 +528,26 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
             }}]);
         }
     });
-    $scope.check = function(elem){
 
+    var lawletters = new RegExp(["S.L.U.","S.L.","CO","LTD.","LLC","S.A.","LDA","S.P.A.","s.p.a.","LIMITED","CORP.","S.A.E","S.L.","S.R.L.","S.A.S","INC.","INC","GMBH CO.KG","NV","CO."].join("| "));
+    $scope.check = function(elem){
+        var htmlElem = document.getElementsByName(elem)[0];
         if($scope.projectForm[elem].$error.duplicate){
             setNotif.addNotif("error","existe un Proveedor con el mismo nombre o siglas",[{name:"corregir!",action:function(){
-                document.getElementsByName("razon_social")[0].focus();
+                htmlElem.focus();
             }}]);
-        }
-    };
+        }else{
+            setNotif.hideByContent("error","existe un Proveedor con el mismo nombre o siglas");
+        };
 
+        if(elem == "razon_social" && htmlElem.value!=""){
+            if(!lawletters.test(htmlElem.value.toUpperCase())){
+                setNotif.addNotif("alert","esta razon social no termina en siglas conocidas, esta seguro?",[{name:"corregir!",action:function(){
+                    htmlElem.focus();
+                }}]);
+            };
+        };
+    };
 
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {

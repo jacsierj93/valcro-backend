@@ -41,7 +41,9 @@ md-switch.md-checked.md-primary .md-ink-ripple {
 /*==================================================*/
 form {
     padding: 0 !important;
-    margin-left: 24px;
+    background-image: url("../images/shadowUp.jpg");
+    background-position: bottom;
+    background-repeat: repeat-x;
 }
 
 /*==================================================*/
@@ -640,6 +642,20 @@ body {
     height: 19px;
 }
 
+form .titulo_formulario>div{
+    border-bottom-color: #ccc;
+}
+form .titulo_formulario{
+    color: #ccc;
+}
+
+form.focused .titulo_formulario>div{
+    border-bottom-color: rgb(84, 180, 234);
+}
+form.focused .titulo_formulario{
+    color: rgb(84, 180, 234);
+}
+
 .cntLayerHolder {
     padding: 10px 0px 24px 0px !important; /*modificado por jacsiel 07/06/2016*/
 }
@@ -796,6 +812,9 @@ md-input-container.md-default-theme.md-input-invalid .md-input, md-input-contain
 .onlyread{
     color:#999 !important;
 }
+.preNew{
+    opacity:0.2;
+}
 .onlyread>div{
     border-color:#999 !important;
 }
@@ -804,9 +823,25 @@ md-input-container.md-default-theme.md-input-invalid .md-input, md-input-contain
     border-radius: 10px;
     padding: 5px;
     margin-right: 8px;
-    margin-top: 8px;
+    margin-bottom: 8px;
     float: left;
     border: 1px solid #ccc;
+}
+
+.iconValName{
+    height: 31px;
+    width:108px;
+}
+.iconValName span:before{
+    margin-top: 8px;
+}
+
+#valNameContainer{
+    padding: 5px;
+    margin-right: 8px;
+    float: left;
+    width:40%;
+    height: 31px;
 }
 
 .itemName>.rm{
@@ -873,6 +908,7 @@ md-input-container.md-default-theme.md-input-invalid .md-input, md-input-contain
     margin: 0px 8px 8px 0px;
     float: left;
 }
+/*
 .space{
     background-image: url("../images/shadowUp.jpg");
     background-repeat: repeat-x;
@@ -881,14 +917,42 @@ md-input-container.md-default-theme.md-input-invalid .md-input, md-input-contain
     margin: 8px 0px 0px 0px;
     padding: 0px;
 }
+*/
 
-md-progress-linear ._md-bar,.md-bar{
+div.activeleft{
+    width: 24px;
+}
+.white{
+    background-color: #fff;
+}
+
+md-progress-linear ._md-bar,md-progress-linear .md-bar{
     background-color:rgb(84, 180, 234) !important;
 }
-md-progress-linear ._md-container,.md-container{
+md-progress-linear ._md-container,md-progress-linear .md-container{
     background-color:#cccccc !important;
 }
 
+@-webkit-keyframes loadingBlue {
+    from {
+        border-color:rgba(0,0,0,0.22) !important;
+        color: rgba(0,0,0,0.22);
+    }
+    50% {
+        border-color:rgb(84, 180, 234) !important;
+        color: rgb(84, 180, 234);
+    }
+    to {
+        border-color:rgba(0,0,0,0.22) !important;
+        color: rgba(0,0,0,0.22);
+    }
+}
+
+.loadArea.loading, .loadArea.loading div{
+    -webkit-animation-name: loadingBlue;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+}
 
 
 

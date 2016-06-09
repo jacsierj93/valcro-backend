@@ -26,7 +26,6 @@
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div flex ng-controller="ListProv" style="overflow-y:auto;">
-                <md-progress-linear ng-show="!todos.$resolved"></md-progress-linear>
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
                 <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
@@ -74,8 +73,8 @@
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
-                <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
-                    <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                <div class="loadArea" ng-class="{'loading':!todos.$resolved}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+                    <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; ">
                         P
                     </div>
                     <br> Selecciones un Proveedor
@@ -268,112 +267,109 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" ng-controller="DataProvController" ng-class="{'focused':isShow}" ng-disabled="true" click-out="projectForm.$setUntouched()">
-
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
-                        <div>
-                            Datos Proveedor
+                <form name="projectForm" layout="row" ng-controller="DataProvController" ng-class="{'focused':isShow}" ng-disabled="true" click-out="projectForm.$setUntouched()">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
+                            <div>
+                                Datos Proveedor
+                            </div>
                         </div>
-                    </div>
-                    <div layout="row">
+                        <div layout="row">
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>Tipo</label>
-                            <md-select info="seleccione un tipo de proveedor" name="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
-                                <md-option ng-repeat="type in types" value="{{type.id}}">
-                                    {{type.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-
-                        <md-input-container class="md-block" flex>
-                            <label>Razon Social</label>
-                            <input info="indique el nombre del proveedor" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
-                            <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
-                            <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
-                            <!--<div ng-messages="projectForm.description.$error" ng-hide>
-                                <div ng-message="required">Campo Obligatorio.</div>
-                                <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
-                            </div>-->
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
-                            <label>Siglas</label>
-                            <input info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
-
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="15">
-                            <label>Tipo de Envio</label>
-                            <md-select info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
-                                <md-option ng-repeat="envio in envios" value="{{envio.id}}">
-                                    {{envio.nombre}}
-                                </md-option>
-                            </md-select>
-
-                        </md-input-container>
-
-                        <md-input-container class="md-block">
-                            <md-switch info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" ng-disabled="$parent.enabled && prov.id">
-                                Contrapedidos?
-                            </md-switch>
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="15">
+                                <label>Tipo</label>
+                                <md-select info="seleccione un tipo de proveedor" name="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                    <md-option ng-repeat="type in types" value="{{type.id}}">
+                                        {{type.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
 
+                            <md-input-container class="md-block" flex>
+                                <label>Razon Social</label>
+                                <input info="indique el nombre del proveedor" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
+                                <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
+                                <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
+                                <!--<div ng-messages="projectForm.description.$error" ng-hide>
+                                    <div ng-message="required">Campo Obligatorio.</div>
+                                    <div ng-message="md-maxlength">La razon social debe tener un maximo de 80 caracteres.</div>
+                                </div>-->
+                            </md-input-container>
 
-                    </div>
+                            <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
+                                <label>Siglas</label>
+                                <input info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
 
-                    <div layout="row">
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="15">
+                                <label>Tipo de Envio</label>
+                                <md-select info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                    <md-option ng-repeat="envio in envios" value="{{envio.id}}">
+                                        {{envio.nombre}}
+                                    </md-option>
+                                </md-select>
+
+                            </md-input-container>
+
+                            <md-input-container class="md-block">
+                                <md-switch info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" ng-disabled="$parent.enabled && prov.id">
+                                    Contrapedidos?
+                                </md-switch>
+                            </md-input-container>
 
 
-                        <div flex></div>
 
+                        </div>
                     </div>
 
                 </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
+                <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" ng-controller="valcroNameController" ng-class="{'focused':isShow}"  ng-click="showGrid(true)" click-out="showGrid(false,$event)" >
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Nombres Valcro
+                <form name="nomvalcroForm" layout="row" ng-controller="valcroNameController" ng-class="{'focused':isShow,'preNew':!prov.id}"  ng-click="showGrid(true)" click-out="showGrid(false,$event)" >
+                    <div active-left></div>
+                    <div flex layout="column">
+                        <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Nombres Valcro
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
                         </div>
-                        <div flex="20" style="height: 30px;">
-
-                            <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
-
-                        </div>
-                    </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
-                        <div layout="row">
-                            <md-input-container class="md-block" flex id="valcroName">
-                                <label>Nombre...</label>
-                                <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
-                            </md-input-container>
-                            <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
-
-                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div ng-show="isShow">
+                            <div layout="row" id="valNameContainer">
+                                <md-input-container flex id="valcroName">
+                                    <label>Nombre...</label>
+                                    <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
+                                </md-input-container>
+                                <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
+                                <div class="iconValName">
+                                    <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
+                                </div>
+                            </div>
                             <div ng-repeat="name in valcroName | orderBy:order:true" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
-                    <div style="width:24px">
-                        <span class="icon-Agregar"></span>
                     </div>
                 </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
+                <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm" ng-controller="provAddrsController" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Direcciones
+                <form name="direccionesForm" layout="row" ng-controller="provAddrsController" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Direcciones
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
                         </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
-                    </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand" layout="column" flex="">
+                        <div ng-hide="$parent.expand && id!=$parent.expand" layout="column" flex="">
                         <div flex layout="row">
 
                             <md-input-container class="md-block" flex="20">
@@ -447,20 +443,22 @@
                             </md-content>
                         </div>
                     </div>
-
+                     </div>
                 </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
+                <!--div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm" ng-controller="contactProv" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Contactos Proveedor
+                <form name="provContactosForm" layout="row" ng-controller="contactProv" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Contactos Proveedor
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
                         </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
-                    </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
 
                             <md-input-container class="md-block" flex="30">
@@ -547,6 +545,7 @@
 
                         </div>
                     </div>
+                    </div>
                 </form>
                 <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
 
@@ -605,16 +604,18 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
 
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
-                <form ng-controller="bankInfoController" name="bankInfoForm" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Informacion Bancaria
+                <form ng-controller="bankInfoController" layout="row" name="bankInfoForm" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Informacion Bancaria
+                            </div>
+                            <div style="width:24px" ng-show="bankInfoController.$touched">
+                                <span class="icon-Agregar"></span>
+                            </div>
                         </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
-                    </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="30">
                                 <label>Banco</label>
@@ -699,16 +700,19 @@
 
                         </div>
                     </div>
-                </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda"  ng-controller="coinController"  ng-class="{'focused':isShow}">
-                    <div class="titulo_formulario" layout="Column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Moneda
-                        </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                </form>
+
+                <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
+                <form name="provMoneda" layout="row"  ng-controller="coinController"  ng-class="{'focused':isShow,'preNew':!prov.id}">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Moneda
+                            </div>
+                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
@@ -723,19 +727,22 @@
                             </div>
                         </div>
                     </div>
-                </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="provCred" ng-controller="creditCtrl"  ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length<1)}">
-                        <div>
-                            Credito
-                        </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                </form>
+
+                <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
+                <form name="provCred" layout="row" ng-controller="creditCtrl"  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length<1)}">
+                            <div>
+                                Credito
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
+                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="30">
                                 <label>Limite de Credito</label>
@@ -787,19 +794,22 @@
 
                         </div>
                     </div>
-                </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
-                <form name="condHeadFrm" ng-controller="condPayList"  ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Condiciones de pago
-                        </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                </form>
+
+                <!-- ########################################## FORMULARIO CREDITOS ########################################## -->
+                <form name="condHeadFrm" layout="row" ng-controller="condPayList"  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Condiciones de pago
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
+                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="60">
                                 <label>Titulo</label>
@@ -842,19 +852,21 @@
 
                         </div>
                     </div>
-                </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
-                <form name="provConv" ng-controller="convController"  ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
-                        <div>
-                            Factor de Conversión
-                        </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                </form>
+                <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
+                <form name="provConv" layout="row" ng-controller="convController"  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
+                            <div>
+                                Factor de Conversión
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
+                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="10">
                                 <label>% Flete</label>
@@ -916,19 +928,22 @@
                             </div>
                         </div>
                     </div>
-                </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
-                <form name="provPoint" ng-controller="provPointController" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
-                        <div>
-                            Puntos
-                        </div>
-                        <div style="width:24px">
-                            <span class="icon-Agregar"></span>
-                        </div>
                     </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                </form>
+
+                <!-- ########################################## FORMULARIO PUNTOS ########################################## -->
+                <form name="provPoint" layout="row" ng-controller="provPointController" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
+                            <div>
+                                Puntos
+                            </div>
+                            <div style="width:24px">
+                                <span class="icon-Agregar"></span>
+                            </div>
+                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="30">
                                 <label>Costo del punto</label>
@@ -973,6 +988,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                     </div>
                 </form>
                 <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
@@ -1028,13 +1044,15 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-                <form name="timeProd" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" ng-class="{'focused':isShow}" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Tiempo Aproximado de Producción
+                <form name="timeProd" layout="row" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" ng-class="{'focused':isShow,'preNew':!prov.id}" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Tiempo Aproximado de Producción
+                            </div>
                         </div>
-                    </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>De (Dias)</label>
@@ -1075,76 +1093,84 @@
                             </div>
                         </div>
                     </div>
+                   </div>
                 </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="timeTrans" ng-controller="transTimeController" ng-class="{'focused':isShow}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Tiempo Aproximado de Transito
-                        </div>
-                    </div>
-                    <div ng-hide="$parent.expand && id!=$parent.expand">
-                        <div layout="row">
-                            <md-input-container class="md-block" flex="20">
-                                <label>De (Dias)</label>
-                                <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
-                            </md-input-container>
-                            <md-input-container class="md-block" flex="20">
-                                <label>A (Dias)</label>
-                                <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
-                            </md-input-container>
 
-                            <md-input-container class="md-block" flex="20">
-                                <label>Pais</label>
-                                <md-select ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
-                                    <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
-                                        {{country.pais.short_name}}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
-                        </div>
-                        <div layout="column" ng-show="isShowMore" flex>
-                            <div layout="row" class="headGridHolder">
-                                <div flex="20" class="headGrid"> minimo dias</div>
-                                <div flex="20" class="headGrid">Maximo Dias</div>
-                                <div flex class="headGrid">Pais</div>
+                <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
+                <form name="timeTrans" layout="row" ng-controller="transTimeController" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Tiempo Aproximado de Transito
                             </div>
-                            <div id="grid" style="overflow-y: auto; height: 120px">
-                                <div flex ng-repeat="time in timesT" ng-click="toEdit(this)">
-                                    <div layout="row" layout-wrap class="cellGridHolder">
-                                        <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
-                                        <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
-                                        <div flex class="cellGrid">{{time.country.short_name}}</div>
+                        </div>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
+                            <div layout="row">
+                                <md-input-container class="md-block" flex="20">
+                                    <label>De (Dias)</label>
+                                    <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="20">
+                                    <label>A (Dias)</label>
+                                    <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
+                                </md-input-container>
+
+                                <md-input-container class="md-block" flex="20">
+                                    <label>Pais</label>
+                                    <md-select ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
+                                        <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
+                                            {{country.pais.short_name}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+                            <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                            </div>
+                            <div layout="column" ng-show="isShowMore" flex>
+                                <div layout="row" class="headGridHolder">
+                                    <div flex="20" class="headGrid"> minimo dias</div>
+                                    <div flex="20" class="headGrid">Maximo Dias</div>
+                                    <div flex class="headGrid">Pais</div>
+                                </div>
+                                <div id="grid" style="overflow-y: auto; height: 120px">
+                                    <div flex ng-repeat="time in timesT" ng-click="toEdit(this)">
+                                        <div layout="row" layout-wrap class="cellGridHolder">
+                                            <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
+                                            <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
+                                            <div flex class="cellGrid">{{time.country.short_name}}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
-                <div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>
-                <form name="provPrecList" ng-controller="priceListController" ng-class="{'focused':isShow}">
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
-                        <div>
-                            Listas de Precios
+                <form name="provPrecList" layout="row" ng-controller="priceListController" ng-class="{'focused':isShow,'preNew':!prov.id}">
+                    <div active-left></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
+                            <div>
+                                Listas de Precios
+                            </div>
                         </div>
-                    </div>
-                    <div layout="row">
-                        <md-input-container class="md-block" flex="40">
-                            <label>Referencia</label>
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
-                        </md-input-container>
-                        <md-input-container class="md-block" flex="20" ng-click="openSide()">
-                            <label>Archivo</label>
+                        <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div layout="row">
+                            <md-input-container class="md-block" flex="40">
+                                <label>Referencia</label>
+                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="20" ng-click="openSide()">
+                                <label>Archivo</label>
 
-                            <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
-                        </md-input-container>
-                    </div>
-
-                    <div layout="column" ng-show="isShow">
+                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
+                            </md-input-container>
+                        </div>
+                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                        </div>
+                        <div layout="column" ng-show="isShowMore" flex>
                         <div layout="row" class="headGridHolder">
                             <div flex="70" class="headGrid"> Referencias</div>
                             <div flex="30" class="headGrid"> Archivo</div>
@@ -1157,6 +1183,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    </div>
                     </div>
                 </form>
             </md-content>

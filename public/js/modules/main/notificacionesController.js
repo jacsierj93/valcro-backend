@@ -87,6 +87,7 @@ MyApp.service("setNotif",function($filter,$timeout){
                 var uid = Math.random();
                 list[obj].unshift({title: "", content: mnsg, opcs: opcs, uid: uid, param: param});
                 if (param && "autohidden" in param) {
+                    console.log(param.autohidden)
                     list[obj][0].timeOut = $timeout(function () {
                         list[obj].splice(list[obj].indexOf($filter("customFind")(list[obj], uid, function (current, compare) {
                             return current.uid == compare

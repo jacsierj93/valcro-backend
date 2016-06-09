@@ -54,6 +54,19 @@ MyApp.directive('number', function () {
         }
     };
 });
+
+MyApp.directive('activeLeft', function ($compile) {
+    return {
+        link: function (scope, elem, attrs) {
+            elem.removeAttr("active-left");
+            elem.addClass("activeleft");
+            elem.attr("ng-click","$parent.closeLayer()");
+            elem.attr("ng-class","{'white': '"+jQuery(elem).parents("md-sidenav").first().attr("id")+"'!=$parent.layer}");
+            $compile(elem[0])(scope);
+        }
+    };
+});
+
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:""};
     var ref = false;
