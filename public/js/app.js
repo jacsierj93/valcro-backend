@@ -228,7 +228,6 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
     //###########################################################################################3
     //###########################################################################################3
 
-
 });
 
 
@@ -366,7 +365,7 @@ MyApp.service('DateParse', function() {
     }
 });
 
-
+var shareModule =  angular.module("shareModule", []);
 
 
 

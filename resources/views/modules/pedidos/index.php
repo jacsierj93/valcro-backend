@@ -1,3 +1,4 @@
+<div ng-controller="LayersCtrl"></div>
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION PEDIDOS########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="PedidosCtrll" xmlns="http://www.w3.org/1999/html">
 
@@ -118,11 +119,11 @@
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" ng-show="(layers.index < 1 || layers.layer == 'listPedido' )" layout-align="center center" ng-click="menuAgregar()">
+                    <div layout="column" ng-show="(module.index < 1 || module.layer == 'listPedido' )" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras )" ng-click="updateForm()">
+                         ng-show="(module.index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
@@ -130,7 +131,7 @@
 
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras    )"
+                         ng-show="(module.index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras    )"
                          ng-click="test('eliminadndo')">
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
 
@@ -168,9 +169,9 @@
 
             <div flex layout="row">
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="layers.closeLayer()">
+                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="moduleAccion({close:true})">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-show"=>"(layers.index >0)")) ?>
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-show"=>"(module.index >0)")) ?>
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
@@ -187,11 +188,12 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido" id="listPedido">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" >
-                <div class="backDiv"
+     <!--           <div class="backDiv"
                      ng-show="(!preview && layer != 'listPedido')"
                      ng-click="layers.closeLayer('listPedido')">
 
-                </div>
+                </div>-->
+                <div active-left></div>
                 <div  layout="column" flex="" class="layerColumn">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
                         <div>
@@ -983,7 +985,7 @@
                         <div>
                             Contrapedidos
                         </div>
-                        <div ng-click=" openLayer('agrContPed');" style="width:24px;">
+                        <div  ng-click="moduleAccion({open:{name:'agrContPed'}})" style="width:24px;">
                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
 
                         </div>
@@ -1009,7 +1011,9 @@
                         <div>
                             Kitchen Boxs
                         </div>
-                        <div ng-click="openLayer('agrKitBoxs')" style="width:24px;">
+                        <div
+                            ng-click="moduleAccion({open:{name:'agrKitBoxs'}})"
+                            style="width:24px;">
                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                         </div>
                     </div>
@@ -1035,7 +1039,10 @@
                         <div>
                             Pedidos a Sustituir
                         </div>
-                        <div ng-click="openLayer('agrPedPend')" style="width: 24px;">
+                        <div
+                            ng-click="moduleAccion({open:{name:'agrPedPend'}})"
+
+                            style="width: 24px;">
                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                         </div>
                     </div>
