@@ -376,7 +376,6 @@ MyApp.controller('ListHerramientas', function ($scope) {
 
 MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
     setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
-    console.log($scope.todos)
     $scope.prov = setGetProv.getProv();
 });
 
@@ -510,9 +509,16 @@ function purgeJson (json){
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
 MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers,$filter,setNotif) {
+    $scope.id="DataProvController";
     $scope.inputSta = function(inp){
         $scope.toCheck = true;
     };
+    $scope.test = function(e){
+       console.log(e    );
+
+        /*var list = angular.element(this).parents("form").first().find("[info]:visible");
+        angular.element(list[list.index(this)+1]).focus().click();*/
+    }
 
     $scope.prov = setGetProv.getProv();
     $scope.list = setGetProv.seeList();
@@ -520,11 +526,20 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         $scope.localId = nvo
     });
     $scope.$watch('dtaPrv.envio',function(nvo){
+
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
-
             }},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provTypesend")[0].click();
+            }}]);
+        }
+    });
+    $scope.$watch('projectForm.provType.$modelValue',function(nvo){
+        //console.log($scope.projectForm)
+        if(nvo==4 && !$scope.projectForm.provType.$untouched){
+            setNotif.addNotif("alert","estas seguro que es tipo TRADER/FABRICA?",[{name:"Si, si lo estoy",action:function(){
+            }},{name:"No, dejame cambiarlo",action:function(){
+                document.getElementsByName("provType")[0].click();
             }}]);
         }
     });
@@ -542,9 +557,22 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
         if(elem == "razon_social" && htmlElem.value!=""){
             if(!lawletters.test(htmlElem.value.toUpperCase())){
-                setNotif.addNotif("alert","esta razon social no termina en siglas conocidas, esta seguro?",[{name:"corregir!",action:function(){
-                    htmlElem.focus();
-                }}]);
+                setNotif.addNotif("alert","esta razon social no termina en siglas conocidas, esta seguro?",
+                    [
+                        {
+                            name:"corregir!",
+                            action:function(){
+                                htmlElem.focus();
+                            }
+                        },
+                        {
+                            name:"esta bien",
+                            action:function(){
+
+                            }
+                        },
+                    ]
+                );
             };
         };
     };
@@ -565,6 +593,13 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
             });
         }
     });
+
+    $scope.show = function(stat){
+        $scope.isShow = stat;
+        $scope.$parent = "DataProvController";
+    }
+
+
 
 });
 
@@ -767,18 +802,18 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
         }
 
-    }
+    };
     $scope.toEdit = function(nomVal){
         valcroName = nomVal.name;
         $scope.valName.id = valcroName.id;
-        $scope.valName.prov_id = $scope.prov.id
+        $scope.valName.prov_id = $scope.prov.id;
         $scope.valName.fav = valcroName.fav;
         $scope.valName.name = valcroName.name;
         $scope.valName.departments = {};
         angular.forEach(valcroName.departments,function(v,k){
             var fav = {"fav":v.pivot.fav};
             $scope.valName.departments[v.id] = fav;
-        })
+        });
         //valcroName.departments.forEach();
         setGetProv.addToRllBck($scope.valName,"valName");
     };

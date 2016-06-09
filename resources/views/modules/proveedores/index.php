@@ -267,15 +267,16 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
 
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" layout="row" ng-controller="DataProvController" ng-class="{'focused':isShow}" ng-disabled="true" click-out="projectForm.$setUntouched()">
+                <form name="projectForm" layout="row" ng-controller="DataProvController" ng-class="{'focused':isShow}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
                     <div active-left></div>
-                    <div flex>
-                        <div class="titulo_formulario" layout="Column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
+                    <div flex layout="column">
+                        <div class="titulo_formulario" layout="column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
                             <div>
                                 Datos Proveedor
                             </div>
                         </div>
-                        <div layout="row">
+                        <div flex layout="column" ng-hide="$parent.expand && id!=$parent.expand"     class="area-form">
+                            <div class="row" layout="row">
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
@@ -289,7 +290,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Razon Social</label>
-                                <input info="indique el nombre del proveedor" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
+                                <input info="indique el nombre del proveedor" ng-disabled="$parent.enabled && prov.id" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
                                 <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                                 <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                                 <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -306,7 +307,7 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo de Envio</label>
-                                <md-select info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-select md-on-close="test(this)" info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                         {{envio.nombre}}
                                     </md-option>
@@ -323,6 +324,7 @@
 
 
                         </div>
+                        </div>
                     </div>
 
                 </form>
@@ -335,11 +337,9 @@
                             <div>
                                 Nombres Valcro
                             </div>
-                            <div style="width:24px">
-                                <span class="icon-Agregar"></span>
-                            </div>
+
                         </div>
-                        <div ng-hide="$parent.expand && id!=$parent.expand">
+                        <div class="area-form" ng-hide="$parent.expand && id!=$parent.expand">
                         <div ng-show="isShow">
                             <div layout="row" id="valNameContainer">
                                 <md-input-container flex id="valcroName">
@@ -351,7 +351,7 @@
                                     <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
                                 </div>
                             </div>
-                            <div ng-repeat="name in valcroName | orderBy:order:true" class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
+                            <div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
                     </div>
@@ -360,7 +360,8 @@
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
                 <form name="direccionesForm" layout="row" ng-controller="provAddrsController" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
-                    <div flex>
+                    <div flex layout="column">
+
                         <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                             <div>
                                 Direcciones
@@ -369,9 +370,8 @@
                                 <span class="icon-Agregar"></span>
                             </div>
                         </div>
-                        <div ng-hide="$parent.expand && id!=$parent.expand" layout="column" flex="">
-                        <div flex layout="row">
-
+                        <div ng-hide="$parent.expand && id!=$parent.expand" flex layout="column" class="area-form">
+                        <div layout="row" class="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
                                 <md-select info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
@@ -384,7 +384,6 @@
                                     <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
                                 </div>-->
                             </md-input-container>
-
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
                                 <md-select info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
@@ -401,14 +400,13 @@
                                 <label>Codigo Postal</label>
                                 <input type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
                             </md-input-container>
-
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
                                 <input ng-pattern="/^[\d\-+]+$/" number info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>
-                        <md-input-container class="md-block" style="height: 32px" ng-show="dir.tipo==2">
+                        <md-input-container class="md-block"ng-show="dir.tipo==2">
                             <label>puertos</label>
                             <md-select ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
@@ -416,24 +414,24 @@
                                 </md-option>
                             </md-select>
                         </md-input-container>
-                        <md-input-container class="md-block" style="height: 32px">
+                        <md-input-container class="md-block">
                             <label>Direccion</label>
                             <input info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         </md-input-container>
-                        <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)">
+                        <div layout="column" ng-show="isShow && !isShowMore" class="row" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{address.length}})</div>
                         </div>
                         <div layout="column" ng-show="isShowMore" flex>
-                            <div layout="row" class="headGridHolder" style="height:32px;">
+                            <div layout="row" class="headGridHolder" class="row">
                                 <div flex="10" class="headGrid"> Tipo</div>
                                 <div flex="20" class="headGrid"> Pais</div>
                                 <div flex class="headGrid"> Direccion</div>
                                 <div flex="20" class="headGrid"> Telefono</div>
                             </div>
                             <md-content id="grid" flex>
-                                <div flex ng-repeat="add in address" ng-focus="toEdit(this)">
+                                <div flex ng-repeat="add in address" ng-focus="toEdit(this)" class="row">
                                     <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
-                                        <div ng-show="(add.id==dir.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
+                                        <div ng-show="(add.id==dir.id)" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
                                         <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
                                         <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div>
                                         <div flex class="cellGrid">{{add.direccion}}</div>
@@ -449,7 +447,7 @@
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
                 <form name="provContactosForm" layout="row" ng-controller="contactProv" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
-                    <div flex>
+                    <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                             <div>
                                 Contactos Proveedor
@@ -458,8 +456,8 @@
                                 <span class="icon-Agregar"></span>
                             </div>
                         </div>
-                        <div ng-hide="$parent.expand && id!=$parent.expand">
-                        <div layout="row">
+                        <div ng-hide="$parent.expand && id!=$parent.expand" flex layout="column" class="area-form">
+                        <div class="row" layout="row">
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Nombre y Apellido</label>
@@ -485,7 +483,7 @@
                             </md-input-container>
 
                         </div>
-                        <div layout="row">
+                        <div class="row" layout="row">
                             <div layout="row" flex="30">
                                 <md-input-container flex>
                                     <label>Idiomas</label>
@@ -511,27 +509,25 @@
                             </md-input-container>
 
                         </div>
-                        <div layout="row" flex>
+                        <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>
                                 <input info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
-
-                        <div layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
+                        <div class="row" layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{contacts.length}})</div>
                         </div>
-
-                        <div layout="column" ng-show="isShowMore" flex>
+                        <md-content layout="column" ng-show="isShowMore" flex>
 
                             <div layout="row" class="headGridHolder">
-                                <div flex="20" class="headGrid"> Nombre</div>
-                                <div flex class="headGrid"> Email</div>
-                                <div flex="10" class="headGrid"> Telefono</div>
-                                <div flex="20" class="headGrid"> Pais</div>
+                                <div flex="20" class="headGrid row"> Nombre</div>
+                                <div flex class="headGrid row"> Email</div>
+                                <div flex="10" class="headGrid row"> Telefono</div>
+                                <div flex="20" class="headGrid row"> Pais</div>
                             </div>
-                            <div id="grid" style="overflow-y: auto;>
-                                <div flex ng-repeat=" ng-repeat="cont in contacts" ng-click="toEdit(this)">
+                            <md-content id="grid" flex>
+                                <div flex ng-repeat="cont in contacts" ng-click="toEdit(this)" class="row">
                                     <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(cont.id == cnt.id)}">
                                         <div ng-show="(cont.id==cnt.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmContact(this)"></div>
                                         <div flex="20" class="cellGrid"> {{cont.nombre}}</div>
@@ -540,8 +536,7 @@
                                         <div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
                                     </div>
 
-
-                            </div>
+                            </md-content>
 
                         </div>
                     </div>
