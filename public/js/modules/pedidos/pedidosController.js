@@ -394,7 +394,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.showNext = function (status) {
         if (status) {
-            if (!$scope.FormHeadDocument.$valid && $scope.layer== 'detalleDoc') {
+            if (!$scope.FormHeadDocument.$valid && $scope.module.layer== 'detalleDoc') {
                 setNotif.addNotif("error",
                     "Existen campos pendientes por completar, por favor verifica que información le falta."
                     ,[],{autohidden:autohidden});
@@ -822,10 +822,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     loadPedidosProvedor($scope.provSelec.id);
                 }
                 if(layer == "agrPedPend" ){
-                    loadPedidosASustituir($scope.provSelec.id);
+                    $http.get("Order/OrderSubstitutes",{params:{id:$scope.document.id,tipo:$scope.formMode.value}}).success(function (response) {
+
+
+                    });
+
                 }
                 if(layer == "listProducProv" ){
-                    $http.get("Order/ProviderProds",{params:{id:$scope.provSelec.id}}).success(function (response) {
+                    $http.get("Order/ProviderProds",{params:{id:$scope.document.id,tipo:$scope.formMode.value}}).success(function (response) {
                         var items=new Array();
                         $scope.provSelec.productos= response;
 
@@ -1303,83 +1307,7 @@ MyApp.service('FormChange', function() {
         formAction=action;
     };
 });
-/*
 
- MyApp.service('LayersCtrl', function($mdSidenav){
- this.historia= [30];
- this.layer="";
- this.index=0;
- this.blockBack=false;
- this.openLayer= function(name){
- console.log("abriendo");
- if (this.historia.indexOf(name) == -1) {
- console.log("abriendo entro");
- var l = angular.element(document).find("#" + name);
- var base = 264;
- this.index++;
- var w = base + (24 * this.index);
- l.css('width', 'calc(100% - ' + w + 'px)');
- $mdSidenav(name).open();
- l.css('z-index', String(60  + this.index));
- this.historia[this.index] = name;
- this.layer = name;
- return true;
- }
- return false;
- };
-
- this.closeLayer= function(opt){
- if(this.index>0 && !this.blockBack){
- this.blockBack=true;
- var close =1;
- var current= this.index;
- if(typeof (opt) == 'string'){
- switch (opt){
- case 'all':break;{
- close = this.historia.length -1;
- }
-
- default:
- var aux = this.historia.indexOf(opt);
- if(aux!= -1){
- close= current - aux;
- }else{
- console.log("no esta abierto", opt);
- close=0;
- }
- }
-
-
- }else if(typeof (opt) == 'number'){
- close= opt;
- }
-
- for(var i=0; i<close;i++){
- var l = this.historia[current];
- $mdSidenav(l).close();
- this.historia[current]=null;
- current--;
- }
- this.index= current;
- this.layer = this.historia[this.index];
- this.blockBack=false;
- }
- };
-
- this.clearLayer= function(){
- this.historia= new Array();
- this. layer="";
- this.index=0;
- this.blockBack=false;
- };
- this.get = function(){
- this.clearLayer();
- return this;
- }
-
-
- });
- */
 
 MyApp.service('Layers', function(){
 
@@ -1432,12 +1360,12 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
             if(arg.close){
                 close(arg.close,module);
             }
-            if(arg.back){
-                close(true, module);
-            }
-            if(arg.backTo){
-                close(true, module);
-            }
+            //if(arg.back){
+            //    close(true, module);
+            //}
+            //if(arg.backTo){
+            //    close(true, module);
+            //}
 
         }
         $scope.accion.estado=false;
@@ -1449,7 +1377,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     });
 
     function close(arg, module){
-        console.log("otro moduel entro", module);
         if(module.index>0 && !module.blockBack){
             var paso=true;
             if(arg.before){
@@ -1464,24 +1391,21 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 module.blockBack=true;
                 var close =1;
                 var current= module.index;
-                if(typeof (arg) == 'string'){
-                    switch (arg){
-                        case 'all':break;{
-                            close = module.historia.length -1;
-                        }
-
-                        default:
-                            var aux = module.historia.indexOf(arg);
-                            if(aux!= -1){
-                                close= current - aux;
-                            }else{
-                                console.log("no esta abierto", arg);
-                                close=0;
-                            }
+                if(arg.name){
+                    var aux = module.historia.indexOf(arg.name);
+                    if(aux!= -1){
+                        close= current - aux;
+                    }else{
+                        close=0;
                     }
-                }else if(typeof (arg) == 'number'){
-                    close= arg;
                 }
+                else if(arg.to){
+                    close = arg.to;
+                }else if(arg.all){
+                    close = module.index -1;
+                }
+
+
                 for(var i=0; i<close;i++){
                     var l = module.historia[current];
                     console.log("cerrando",l);
@@ -1502,7 +1426,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     };
     //**operacion apertura */
     function open(arg, module){
-        console.log("abriendo", arg);
         var paso= true;
         if (module.historia.indexOf(arg.name) == -1) {
             if(arg.before){
@@ -1549,199 +1472,3 @@ MyApp.factory('ORDER', ['$resource',
         });
     }
 ]);
-
-/**
- this.historia= [30];
- this.layer="";
- this.index=0;
- this.blockBack=false;
- this.layers= new Array();
- this.accion = function(arg){
-        if(arg.open){
-            this.openLayer(arg.open);
-        }
-        if(arg.layers){
-            this.layers=arg.layer;
-        }
-    }
- this.openLayer= function(arg){
-        console.log("abriendo");
-        var paso= true;
-        if (this.historia.indexOf(arg.name) == -1) {
-            if(arg.before){
-                if(!arg.validate){
-                   arg.before();
-                }else{
-                    paso=arg.before();
-                }
-            }
-            if(paso){
-                var l = angular.element(document).find("#" + arg.name);
-               if(!arg.width){
-                   var base = 264;
-                   this.index++;
-                   var w = base + (24 * this.index);
-                   l.css('width', 'calc(100% - ' + w + 'px)');
-                   l.css('z-index', String(60  + this.index));
-               } else{
-                   l.css('width', 'calc(100% - ' + arg.width + 'px)');
-               }
-                $mdSidenav(arg.name).open().then(function(){
-                    if(arg.after){
-                        arg.after();
-                    }
-                });
-                this.historia[this.index] = arg.name;
-                this.layer = arg.name;
-                return true;
-            }
-
-        }
-        return false;
-    };
-
- this.closeLayer= function(opt){
-        if(this.index>0 && !this.blockBack){
-            this.blockBack=true;
-            var close =1;
-            var current= this.index;
-            if(typeof (opt) == 'string'){
-                switch (opt){
-                    case 'all':break;{
-                        close = this.historia.length -1;
-                    }
-
-                    default:
-                        var aux = this.historia.indexOf(opt);
-                        if(aux!= -1){
-                            close= current - aux;
-                        }else{
-                            console.log("no esta abierto", opt);
-                            close=0;
-                        }
-                }
-
-
-            }else if(typeof (opt) == 'number'){
-                close= opt;
-            }
-
-            for(var i=0; i<close;i++){
-                var l = this.historia[current];
-                $mdSidenav(l).close();
-                this.historia[current]=null;
-                current--;
-            }
-            this.index= current;
-            this.layer = this.historia[this.index];
-            this.blockBack=false;
-        }
-    };
-
- this.clearLayer= function(){
-        this.historia= new Array();
-        this. layer="";
-        this.index=0;
-        this.blockBack=false;
-    };
- this.get = function(){
-        this.clearLayer();
-        return this;
-    }    this.historia= [30];
- this.layer="";
- this.index=0;
- this.blockBack=false;
- this.layers= new Array();
- this.accion = function(arg){
-        if(arg.open){
-            this.openLayer(arg.open);
-        }
-        if(arg.layers){
-            this.layers=arg.layer;
-        }
-    }
- this.openLayer= function(arg){
-        console.log("abriendo");
-        var paso= true;
-        if (this.historia.indexOf(arg.name) == -1) {
-            if(arg.before){
-                if(!arg.validate){
-                   arg.before();
-                }else{
-                    paso=arg.before();
-                }
-            }
-            if(paso){
-                var l = angular.element(document).find("#" + arg.name);
-               if(!arg.width){
-                   var base = 264;
-                   this.index++;
-                   var w = base + (24 * this.index);
-                   l.css('width', 'calc(100% - ' + w + 'px)');
-                   l.css('z-index', String(60  + this.index));
-               } else{
-                   l.css('width', 'calc(100% - ' + arg.width + 'px)');
-               }
-                $mdSidenav(arg.name).open().then(function(){
-                    if(arg.after){
-                        arg.after();
-                    }
-                });
-                this.historia[this.index] = arg.name;
-                this.layer = arg.name;
-                return true;
-            }
-
-        }
-        return false;
-    };
-
- this.closeLayer= function(opt){
-        if(this.index>0 && !this.blockBack){
-            this.blockBack=true;
-            var close =1;
-            var current= this.index;
-            if(typeof (opt) == 'string'){
-                switch (opt){
-                    case 'all':break;{
-                        close = this.historia.length -1;
-                    }
-
-                    default:
-                        var aux = this.historia.indexOf(opt);
-                        if(aux!= -1){
-                            close= current - aux;
-                        }else{
-                            console.log("no esta abierto", opt);
-                            close=0;
-                        }
-                }
-
-
-            }else if(typeof (opt) == 'number'){
-                close= opt;
-            }
-
-            for(var i=0; i<close;i++){
-                var l = this.historia[current];
-                $mdSidenav(l).close();
-                this.historia[current]=null;
-                current--;
-            }
-            this.index= current;
-            this.layer = this.historia[this.index];
-            this.blockBack=false;
-        }
-    };
-
- this.clearLayer= function(){
-        this.historia= new Array();
-        this. layer="";
-        this.index=0;
-        this.blockBack=false;
-    };
- this.get = function(){
-        this.clearLayer();
-        return this;
-    }
- **/

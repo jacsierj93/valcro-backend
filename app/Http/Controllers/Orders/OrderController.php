@@ -167,6 +167,26 @@ class OrderController extends BaseController
 
     }
 
+    public function getDocumentsToImport(Request $req){
+        $data = Array();
+        $items= array();
+        if($req->tipo == 22){
+            $items= Solicitude::where("aprob_compras",1)
+                ->where("aprob_gerencia", 1)
+                ->get();
+        }else if($req->tipo== 23){
+            $items= Purchase::where("aprob_compras",1)
+                ->where("aprob_gerencia", 1)
+                ->get();
+        }
+        foreach($items as $aux){
+            $aux['tipo'] = $aux->getTipo();
+            $aux['tipo_id'] = $aux->getTipoId();
+            $data[]=$aux;
+        }
+        dd($data);
+        return $data;
+    }
     /**
      * llena los camppos de los filtros
      */
@@ -185,9 +205,50 @@ class OrderController extends BaseController
      * @param tipo de documento
      */
     public  function copyDoc(Request $req){
+        $resul["action"] ="copy";
+        $newItems= array();
+        $newAtt= array();
         if($req->tipo == 21){
+           $newModel= new Solicitude();
+            $oldModel= Solicitude::findOrFaild($req>-id);
+        }
+        if($req->tipo == 22){
+            $newModel= new Order();
+            $oldModel= Order::findOrFaild($req>-id);
+        }
+        if($req->tipo == 23){
+            $newModel= new Purchase();
+            $oldModel= Purchase::findOrFaild($req>-id);
+        }
+        $newModel = $this->transferDataDoc($oldModel,$newModel);
+        $newModel->parent_id=$oldModel->id;
+        $newModel->version=$oldModel->version+1;
+        $newModel->save();
+        $oldModel->cancelacion= Carbon::now();
+        $oldModel->comentario_cancelacion= "#sistema: copiado por traza  new id#".$newModel->id;
+        $oldModel->save();
+
+        foreach($oldModel->items() as $aux){
+            $it=$newModel->newItem();
+            $it= $this->transferItem($aux, $it);
+            $it->doc_id=$newModel->id;
+            $newItems[]=$it;
 
         }
+
+        foreach($oldModel->attachments() as $aux){
+            $it=$newModel->newAttachment();
+            $it= $this->transferAttachments($aux, $it);
+            $it->doc_id=$newModel->id;
+            $newAtt[]=$it;
+
+        }
+
+        $newModel->items()->saveMany($newItems);
+        $newModel->attachments()->saveMany($newAtt);
+        $resul['id']= $newModel->id;
+        return $resul;
+
     }
     /**
      * prueba para metodos
@@ -471,33 +532,33 @@ class OrderController extends BaseController
      **/
 
     public function getOrderSubstituteOrder(Request $req){
-        $data= Array();
-        $items =Order::where('prov_id',$req->prov_id)
-            ->where('id','<>',$req->pedido_id)
-            ->where('aprob_gerencia',1)
-            ->get();
+        /*       $data= Array();
+               $items =Order::where('prov_id',$req->prov_id)
+                   ->where('id','<>',$req->pedido_id)
+                   ->where('aprob_gerencia',1)
+                   ->get();
 
-        foreach($items as $aux){
-            if(sizeof($aux->OrderItem()->get() )> 0){
-                $aux['asignado']=false;
-                $auxAsig = null;
-                $auxAsig=OrderItem::where('tipo_origen_id',4)
-                    ->where('doc_origen_id', $aux->id)
-                    //  ->where('pedido_id', $req->pedido_id)
-                    ->first();
-                if($auxAsig == null){
-                    $data[]=$aux;
-                }else{
-                    if($auxAsig->pedido_id== $req->pedido_id){
-                        $aux['asignado']=true;
-                        $data[]=$aux;
-                    }
-                }
+               foreach($items as $aux){
+                   if(sizeof($aux->OrderItem()->get() )> 0){
+                       $aux['asignado']=false;
+                       $auxAsig = null;
+                       $auxAsig=OrderItem::where('tipo_origen_id',4)
+                           ->where('doc_origen_id', $aux->id)
+                           //  ->where('pedido_id', $req->pedido_id)
+                           ->first();
+                       if($auxAsig == null){
+                           $data[]=$aux;
+                       }else{
+                           if($auxAsig->pedido_id== $req->pedido_id){
+                               $aux['asignado']=true;
+                               $data[]=$aux;
+                           }
+                       }
 
-            }
+                   }
 
-        }
-        return $data;
+               }
+               return $data;*/
     }
 
     /**
@@ -1465,13 +1526,6 @@ class OrderController extends BaseController
         if($req->has('tasa')){
             $model->tasa = $req->tasa;
         }
-
-        if($req->has('tipo_id')){
-            $model->tipo_id = $req->tipo_id;
-        }
-        if($req->has('prioridad_id')){
-            $model->prioridad_id = $req->prioridad_id;
-        }
         if($req->has('pais_id')){
             $model->pais_id = $req->pais_id;
         }
@@ -1490,8 +1544,8 @@ class OrderController extends BaseController
         if($req->has('comentario')){
             $model->comentario = $req->comentario;
         }
-        if($req->has('pedido_estado_id')){
-            $model->pedido_estado_id = $req->pedido_estado_id;
+        if($req->has('estado_id')){
+            $model->estado_id = $req->estado_id;
         }
         if($req->has('direccion_almacen_id')){
             $model->direccion_almacen_id = $req->direccion_almacen_id;
@@ -1531,8 +1585,8 @@ class OrderController extends BaseController
     }
 
     private function transferDataDoc($oldmodel, $newModel){
-        $newModel->tipo_id = $oldmodel->tipo_id;
-        $newModel->final_id = $oldmodel->final_id;
+        $resul = array();
+        //$newModel->final_id = $oldmodel->final_id;
         $newModel->nro_proforma = $oldmodel->nro_proforma;
         $newModel->nro_factura = $oldmodel->nro_factura;
         $newModel->img_proforma = $oldmodel->img_proforma;
@@ -1562,6 +1616,26 @@ class OrderController extends BaseController
         $newModel->tasa = $oldmodel->tasa;
         $newModel->version = $oldmodel->version;
         return $newModel;
+    }
+
+    private  function  transferItem($oldItem, $newItem){
+        //$newItem->final_id =$oldItem->final_id;
+        $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+        $newItem->doc_id =$oldItem->doc_id;
+        $newItem->origen_item_id =$oldItem->origen_item_id;
+        $newItem->doc_origen_id =$oldItem->doc_origen_id;
+        $newItem->cantidad =$oldItem->cantidad;
+        $newItem->saldo =$oldItem->saldo;
+        $newItem->producto_id =$oldItem->producto_id;
+        $newItem->descripcion =$oldItem->descripcion;
+
+        return $newItem;
+
+    }
+
+    private  function  transferAttachments($oldItem, $newItem){
+
+
     }
 
 }

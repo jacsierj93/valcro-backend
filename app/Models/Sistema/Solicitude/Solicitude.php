@@ -21,7 +21,6 @@ class Solicitude extends Model
     use SoftDeletes;
     protected $table = "tbl_solicitud";
     protected $dates = ['deleted_at'];
-    protected $appends = array('tipo');
 
     public function  getTipo(){
         return 'Solicitud';
@@ -42,6 +41,9 @@ class Solicitude extends Model
     }
     public function newItem(){
         return new SolicitudeItem();
+    }
+    public function newAttachment(){
+        return new SolicitudeAttachment();
     }
 
     /**

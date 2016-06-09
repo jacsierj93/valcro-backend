@@ -30,15 +30,12 @@ class Order extends Model
         return 22;
     }
 
-/*    public function getTypeAttribute()
-    {
-        return 'Proforma';
+    public function newItem(){
+        return new OrderItem();
     }
-    public function getTypevalueAttribute()
-    {
-        return 22;
-    }*/
-
+    public function newAttachment(){
+        return new OrderAttachment();
+    }
     /**
      * obtiene los item de pedidos
      */

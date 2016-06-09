@@ -46,6 +46,9 @@ class Purchase extends Model
     public function newItem(){
         return new PurchaseItem();
     }
+    public function newAttachment(){
+        return new PurchaseAttachment();
+    }
 
     /**
      * adjuntos del documento

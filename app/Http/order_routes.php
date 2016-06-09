@@ -22,7 +22,10 @@ $app->get("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtien
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
+
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
+$app->get("Order/DocumentsImport",'Orders\OrderController@getDocumentsToImport'); ///obtiene el documento
+$app->post("Order/DocumentCopy",'Orders\OrderController@copyDoc'); ///guarda el pedido
 
 //pedidos
 $app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
