@@ -22,7 +22,7 @@ class Purchase extends Model
     use SoftDeletes;
     protected $table = "tbl_compra_orden";
     protected $dates = ['deleted_at'];
-    protected $appends = array('tipo');
+    //protected $appends = array('tipo');
 
     public function  getTipo(){
         return 'Orden de Compra';

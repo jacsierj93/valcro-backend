@@ -9,6 +9,9 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+// systema
+$app->get("Order/UnClosetDoc",'Orders\OrderController@getUnClosetDocument'); ///trae tod el detalle de pedido
+
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///trae tod el detalle de pedido

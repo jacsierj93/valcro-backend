@@ -2,6 +2,10 @@
 namespace App\Http\Controllers\Masters;
 
 
+use App\Models\Sistema\Order\OrderCondition;
+use App\Models\Sistema\Order\OrderReason;
+use App\Models\Sistema\Order\OrderStatus;
+use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Ports;
 use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
@@ -114,5 +118,13 @@ class MasterController extends BaseController
 	public function getPorts(){
 		return Ports::select("id","Main_port_name","pais_id")->get();
 	}
+
+	/*Maestros para modulo de pedido**/
+	public function getReason(){  return OrderReason::get();}
+	public function getCondition(){  return OrderCondition::get();}
+	public function getStatus(){  return OrderStatus::get();}
+	public function getPaymentType(){  return PaymentType::get();}
+
+
 
 }

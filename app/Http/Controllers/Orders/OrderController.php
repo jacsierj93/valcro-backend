@@ -48,6 +48,29 @@ class OrderController extends BaseController
         $this->middleware('auth');
     }
 
+    /** revision **/
+
+    public function getUnClosetDocument(){
+        $data = array();
+        $data['23'] = Purchase::whereNull("final_id")
+            ->where('aprob_compras',0)
+            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+            ->get();
+        $data['21'] = Solicitude::whereNull("final_id")
+            ->where('aprob_compras',0)
+            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+
+            ->get();
+        $data['22'] = Order::whereNull("final_id")
+            ->where('aprob_compras',0)
+            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+            ->get();
+        dd($data);
+        return $data;
+    }
     /**
      * obtiene la lista de proveedores
      */
@@ -209,7 +232,7 @@ class OrderController extends BaseController
         $newItems= array();
         $newAtt= array();
         if($req->tipo == 21){
-           $newModel= new Solicitude();
+            $newModel= new Solicitude();
             $oldModel= Solicitude::findOrFaild($req>-id);
         }
         if($req->tipo == 22){
@@ -343,7 +366,7 @@ class OrderController extends BaseController
             //para maquinas
             $tem = array();
             $tem['id']=$aux->id;
-            $tem['tipo_id']=$aux->tipo_pedido_id;
+            //$tem['tipo_id']=$aux->tipo_pedido_id;
             $tem['pais_id']=$aux->pais_id;
             $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
             $tem['condicion_pago_id']=$aux->condicion_pago_id;
@@ -352,7 +375,7 @@ class OrderController extends BaseController
             $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['estado_id']=$aux->estado_id;
-            $tem['tipo_value']=$aux->typevalue;
+            // $tem['tipo_value']=$aux->typevalue;
             // pra humanos
             $tem['comentario']=$aux->comentario;
             $tem['tasa']=$aux->tasa;
@@ -419,6 +442,7 @@ class OrderController extends BaseController
     /**
      * carga formulario
      * @param Request $req
+     * @deprecated
      */
     public function getForm()
     {
@@ -426,15 +450,14 @@ class OrderController extends BaseController
         $data= Array();
         /**maestros*/
         //$data['proveedor']= Provider::select('razon_social', 'id')->where("deleted_at",NULL)->get();
-        $data['tipoPedido'] = OrderType::select('tipo', 'id')->where("deleted_at",NULL)->get();
         $data['motivoPedido']= OrderReason::select('motivo', 'id')->where("deleted_at",NULL)->get();
-        $data['prioridadPedido'] = OrderPriority::select('descripcion', 'id')->where("deleted_at",NULL)->get();
         $data['condicionPedido'] = OrderCondition::select('nombre', 'id')->where("deleted_at",NULL)->get();
         $data['estadoPedido'] = OrderStatus::select('estado', 'id')->where("deleted_at",NULL)->get();
         $data['tipoDepago'] = PaymentType::select('nombre', 'id')->where("deleted_at",NULL)->get();
         return $data;
 
     }
+
 
     /*********************************** PEDIDOS A SUSTITUIR ***********************************/
 

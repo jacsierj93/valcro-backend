@@ -13,3 +13,7 @@ $app->get("master/prodLines",'Masters\MasterController@getLines'); ///obtener Li
 $app->get("master/languajes",'Masters\MasterController@getLanguajes'); ///obtener Idiomas
 $app->get("master/cargoContact",'Masters\MasterController@getCargos'); ///obtener Cargos
 $app->get("master/getPorts",'Masters\MasterController@getPorts'); ///obtener Puertos
+$app->get("master/getOrderReason",'Masters\MasterController@getPorts'); ///obtener  motivo de pedido
+$app->get("master/getOrderCondition",'Masters\MasterController@getPorts'); ///obtener condiciones de pedido
+$app->get("master/getOrderStatus",'Masters\MasterController@getPorts'); ///obtener estado de pedidos
+$app->get("master/getPaymentType",'Masters\MasterController@getPorts'); ///obtener tipos de pagos
