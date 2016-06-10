@@ -5,9 +5,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     // controlers
     $scope.formBlock = true;
-    $scope.module= Layers.setModule("pedidos");
-    console.log($scope.module);
 
+    $scope.module= Layers.setModule("pedidos");
     $scope.email= {};
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
@@ -104,10 +103,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $timeout(function(){
         review();
-    },1000);
+    },0);
     $timeout(function(){
         init();
-    },2000);
+    },0);
 
 
     $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
@@ -165,7 +164,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** ROLLBACK SETTER **/
 
     $scope.toEditHead= function(id,val){
-        console.log('faaaa');
         var aux= {id:id,value:val};
         setGetOrder.addTrace(aux,"FormHeadDocument");
 
@@ -178,7 +176,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         $timeout(function(){
             if(document &&  $scope.mouseProview){
-                console.log(document);
                 $scope.formMode=$scope.forModeAvilable.getXValue(document.tipo_value);
                 $scope.document=document;
                 if($scope.module.layer !='resumenPedido' ){
@@ -495,7 +492,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $http.post("Order/RemovekitchenBox", {id: item.id, pedido_id:$scope.document.id})
                                 .success(function (response) {
                                     setNotif.addNotif("ok","Removido" ,[],{autohidden:autohidden});
-                                    loadDoc($scope.document.id);
+
                                 });
                         }
                     },{name: 'Cancel',
@@ -592,7 +589,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         if($scope.module.index == 0){
             $scope.provSelec = prov;
-            console.log(prov);
             Layers.setAccion({open:{name:"listPedido"}});
         }else{
             if($scope.module.layer == "listPedido" ){
@@ -604,24 +600,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
     }
-
-    function openLayer(layer) {
-
-        /*   if (historia.indexOf(layer) == -1) {
-         var l = angular.element(document).find("#" + layer);
-         var base = 264;
-         $scope.index++;
-         var w = base + (24 * $scope.index);
-         l.css('width', 'calc(100% - ' + w + 'px)');
-         $mdSidenav(layer).open();
-         l.css('z-index', String(60  + $scope.index));
-         historia[$scope.index] = layer;
-         $scope.layer = layer;
-         return true;
-         }
-         return false;*/
-    }
-
     function DtPedido(doc) {
 
 
@@ -642,64 +620,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     }
-
-    function closeLayer(opt) {
-        /* if($scope.index>0){
-         var close =1;
-         var index= $scope.index;
-         if(typeof (opt) == 'string'){
-         switch (opt){
-         case 'all':break;{
-         close = historia.length -1;
-         }
-
-         default:
-         var aux = historia.indexOf(opt);
-         if(aux!= -1){
-         close= index - aux;
-         }else{
-         console.log("no esta abierto", opt);
-         close=0;
-         }
-         }
-
-
-         }else if(typeof (opt) == 'number'){
-         close= opt;
-         }
-
-         for(var i=0; i<close;i++){
-         var layer = historia[index];
-         $mdSidenav(layer).close();
-         historia[index]=null;
-         index--;
-         }
-         $scope.index= index;
-         $scope.layer = historia[index];
-         }*/
-
-    }
-
-    /**@deprecated*/
-    function closeLayeValid() {
-        var layer = historia[$scope.index];
-
-        var paso = true;
-        switch (layer) {
-            case 'resumenContraPedido':
-
-                if (!$scope.FormResumenContra.$valid) {
-                    alert('problemas en el formulario');
-                    paso = false;
-                }
-                break;
-        }
-
-        if (paso) {
-            LayersCtrl.closeLayer();
-        }
-    }
-
     /****** **************************listener ***************************************/
 
     /** formulario  head*/
@@ -778,7 +698,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /**layers*/
     $scope.$watchGroup(['module.index','module.layer'], function(newVal){
-        console.log('new value', newVal[1]);
         switch (newVal[0]){
             case 0:
                 restore('provSelec');// inializa el proveedor
@@ -789,14 +708,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.gridView=4;
 
                 break;
+            case 1:$scope.FormHeadDocument.$setUntouched();
             default:
-                console.log('changes',setGetOrder.getChanges());
-                $scope.FormHeadDocument.$setUntouched();
+
         }
 
         if (newVal[1] != '' && typeof(newVal[1]) !== 'undefined') {
             var layer= newVal[1];
-            console.log("entro a validar");
             if($scope.provSelec.id != ''){
                 if(layer == "listPedido" ){
                     loadPedidosProvedor($scope.provSelec.id);
@@ -907,7 +825,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
                 }else{
-                    console.log('error ', response);
+
                 }
 
             });
@@ -947,49 +865,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 },{name: 'Cancel',action:function(){}}
             ]);
 
-    }
-    function loadDoc(id){
-        /* restore("document");
-         var url="";
-         switch ($scope.formMode){
-         case 'Solicitud':
-         url="Solicitude/Get"
-         break;
-         case 'Orden de Compra':
-         url="PurchaseOrder/Get"
-         break;
-         default :
-         console.log('ruta actualizacion no definidad');
-         }
-         $http.get(url,{params:{id:id}}).success(function (response) {
-
-         $scope.document = response;
-         $scope.document.emision=DateParse.toDate(response.emision);
-         $scope.document.monto=parseFloat(response.monto);
-         $scope.document.tasa=parseFloat(response.tasa);
-         });*/
-    }
-
-    function loadDataFor(){
-       /* $http.get("Order/OrderDataForm").success(function (response) {
-            $scope.formData.motivoPedido=response.motivoPedido;
-            $scope.formData.tipo= response.tipoPedido;
-            $scope.filterData.tipoPedidos=response.tipoPedido;
-            $scope.formData.prioridadPedido=response.prioridadPedido;
-            $scope.formData.condicionPedido=response.condicionPedido;
-            $scope.formData.estadoPedido=response.estadoPedido;
-            $scope.formData.tipoDepago= response.tipoDepago;
-
-        });*/
-    }
-
-
-    function loadDirProvider(id, tipo){
-        $http.get("Order/Address",{params:{id:id,tipo_dir: tipo}}).success(function (response) {
-            $scope.formData.direcciones=response;
-            // $scope.document.direccion_almacen_id= response[0].id;
-        });
-    }
+    };
 
     function loadTasa(id){
         $http.get("master/getCoin/"+id).success(function (response) {
@@ -1009,6 +885,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function loadPaymentCondProvider(id){
         $http.get("Order/ProviderPaymentCondition",{params:{id:id}}).success(function (response) {
             $scope.formData.condicionPago=response;
+
             //  $scope.document.condicion_pago_id= response[0].id;
 
         });
@@ -1034,7 +911,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 items.push(v);
 
             });
-            console.log("pedidos",items);
             $scope.provSelec.pedidos=items;
         });
     }
@@ -1058,7 +934,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
             $scope.formData.odc=odcs;
         }, function errorCallback(response) {
-            console.log("errorrr");
         })
     }
 
@@ -1072,7 +947,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }).then(function successCallback(response) {
             $scope.odcSelec= response.data;
         }, function errorCallback(response) {
-            console.log("errorrr");
         });
     }
     function loadContraPedidosProveedor(id){
@@ -1105,7 +979,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }).then(function successCallback(response) {
             alert('Asignado');
         }, function errorCallback(response) {
-            console.log("errorrr");
         });
     }
     function removeOrdenCompra(id,pedido_id){
@@ -1333,6 +1206,7 @@ MyApp.service('Layers' , function(){
         }
     }
 
+
 });
 
 MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
@@ -1344,8 +1218,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
         if(newVal){
             var module = Layers.getModule();
             var arg = $scope.accion.data;
-            console.log("modulo", module);
-            console.log("acc", arg);
             if(arg.open){
                 open(arg.open, module);
             }
@@ -1419,6 +1291,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     //**operacion apertura */
     function open(arg, module){
         var paso= true;
+
         if (module.historia.indexOf(arg.name) == -1) {
             if(arg.before){
                 if(!arg.validate){

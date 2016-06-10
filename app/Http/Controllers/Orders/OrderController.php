@@ -1165,6 +1165,9 @@ class OrderController extends BaseController
             $tem['saldo']= $aux->saldo;
             $tem['descripcion']= $aux->descripcion;
             $tem['tipo_origen_id']= $aux->tipo_origen_id;
+            $tem['origen_item_id']= $aux->origen_item_id;
+            $tem['doc_origen_id']= $aux->doc_origen_id;
+            $tem['doc_id']= $aux->doc_id;
             $tem['asignado']= true;
             //$tem['origen']= MasterOrderController::getTypeProduct($aux)['descripcion'];
             $all->push($tem);

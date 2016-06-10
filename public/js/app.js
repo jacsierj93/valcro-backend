@@ -365,7 +365,6 @@ MyApp.service('DateParse', function() {
     }
 });
 
-var shareModule =  angular.module("shareModule", []);
 
 
 
