@@ -68,8 +68,8 @@ class OrderController extends BaseController
             ->where('aprob_gerencia',0)
             ->whereNull('cancelacion')
             ->get();
-        dd($data);
-        return $data;
+        //dd($data);
+        return array();
     }
     /**
      * obtiene la lista de proveedores
@@ -78,7 +78,7 @@ class OrderController extends BaseController
     {
 
         $provs = Provider::
-        //where('id', 1)->
+        where('id', 2)->
               /*     Orderby('razon_social')->
                 skip($req->skit)->take($req->take)->*/
 

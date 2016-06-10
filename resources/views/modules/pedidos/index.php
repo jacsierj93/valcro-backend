@@ -111,63 +111,64 @@
 
             </div>
 
-<!--
 
-            <md-virtual-repeat-container  flex>
+            <!--
 
-                <div   class="boxList" layout="column" flex  md-virtual-repeat="item in  provList " md-on-demand ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
+                        <md-virtual-repeat-container  flex>
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
+                            <div   class="boxList" layout="column" flex  md-virtual-repeat="item in  provList " md-on-demand ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
 
-                    <div layout="row" style="height: 40px;">
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item emit100" >
-                                {{item.emit100}}
+                                <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
+
+                                <div layout="row" style="height: 40px;">
+                                    <div flex layout layout-align="center center">
+                                        <div layout layout-align="center center" class="dot-item emit100" >
+                                            {{item.emit100}}
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center">
+                                        <div layout layout-align="center center" class="dot-item emit90" >
+                                            {{item.emit90}}
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center">
+                                        <div layout layout-align="center center" class="dot-item emit60">
+                                            {{item.emit60}}
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center">
+                                        <div layout layout-align="center center" class="dot-item emit30" >
+                                            {{item.emit30}}
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center">
+                                        <div layout layout-align="center center" class="dot-item emit7" >
+                                            {{item.emit7}}
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center">
+                                        <div layout layout-align="center center" class="dot-item emit0">
+                                            {{item.emit0}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="height:40px;" layout="row" layout-align="space-between center">
+                                    <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
+
+                                    <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
+                                        <div >{{item.puntoCompra}}</div>
+                                        <img  style="float: left;" src="images/punto_compra.png"/>
+                                    </div>
+                                    <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contraPedido > 0" >
+                                        <div >{{item.contraPedido}}</div>
+                                        <img  style="float: left;" src="images/contra_pedido.png"/>
+                                    </div>
+                                </div>
+
                             </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item emit90" >
-                                {{item.emit90}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item emit60">
-                                {{item.emit60}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item emit30" >
-                                {{item.emit30}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item emit7" >
-                                {{item.emit7}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-item emit0">
-                                {{item.emit0}}
-                            </div>
-                        </div>
-                    </div>
-                    <div style="height:40px;" layout="row" layout-align="space-between center">
-                        <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
 
-                        <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
-                            <div >{{item.puntoCompra}}</div>
-                            <img  style="float: left;" src="images/punto_compra.png"/>
-                        </div>
-                        <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contraPedido > 0" >
-                            <div >{{item.contraPedido}}</div>
-                            <img  style="float: left;" src="images/contra_pedido.png"/>
-                        </div>
-                    </div>
-
-                </div>
-
-            </md-virtual-repeat-container>
--->
+                        </md-virtual-repeat-container>
+            -->
         </div>
 
 
@@ -246,11 +247,11 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido" id="listPedido">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" >
-     <!--           <div class="backDiv"
-                     ng-show="(!preview && layer != 'listPedido')"
-                     ng-click="layers.closeLayer('listPedido')">
+                <!--           <div class="backDiv"
+                                ng-show="(!preview && layer != 'listPedido')"
+                                ng-click="layers.closeLayer('listPedido')">
 
-                </div>-->
+                           </div>-->
                 <div active-left></div>
                 <div  layout="column" flex="" class="layerColumn">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
@@ -505,9 +506,12 @@
                 <div class="backDiv"  ng-click="layers.closeLayer('detalleDoc')"> </div>
                 <div  layout="column" flex="" class="layerColumn">
                     <form name="FormHeadDocument">
-                        <div class="titulo_formulario" layout="column" layout-align="start start">
-                            <div>
-                                Datos de {{formMode.name}}
+                        <div layout="row" flex>
+                            <div style="height: 48px; width: 48px;margin: 11px;">IMG</div>
+                            <div class="titulo_formulario" layout="column" layout-align="start start">
+                                <div>
+                                    Datos de {{formMode.name}}
+                                </div>
                             </div>
                         </div>
                         <div>

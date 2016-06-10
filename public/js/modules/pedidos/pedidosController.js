@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,ORDER,Layers,setGetOrder,setNotif, DateParse) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,Layers,setGetOrder,setNotif, DateParse) {
 
     // var historia = [15];
     var autohidden= 2000;
@@ -101,14 +101,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.moduleAccion = Layers.setAccion;
 
     $timeout(function(){
-        review();
+        //review();
     },0);
     $timeout(function(){
         init();
     },0);
 
 
-    $scope.provs = [];
     $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
 
 
@@ -117,13 +116,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         numLoaded_: 0,
         toLoad_: 0,
         provs:[],
+        pedio:false,
         // Required.
         getItemAtIndex: function(index) {
             if (index > this.numLoaded_) {
                 this.fetchMoreItems_(index);
                 return null;
+                this.pedio=true;
+
             }
-            return provs[index];
+            return{razon_social :index};
         },
         // Required.
         // For infinite scroll behavior, we always return a slightly higher
@@ -135,9 +137,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             // For demo purposes, we simulate loading more items with a timed
             // promise. In real code, this function would likely contain an
             // $http request.
-            if (this.toLoad_ < index) {
-                $http.get("Order/OrderProvList", {params: data}).success(function(response){
-                    this.provs.push(response);
+            if (this.toLoad_ < index && !this.pedio) {
+                $http.get("Order/OrderProvList", {params: {skit:index,take:10}}).success(function(response){
+                    //this.provs.push(response);
                 });
             }
         }
@@ -145,11 +147,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     function init() {
-        $http.get("master/getCountriesProvider").success(function (response) {$scope.filterData.paises = response;});
-        $http.get("master/getOrderReason").success(function (response) {$scope.formData.motivoPedido=response;});
-        $http.get("master/getOrderCondition").success(function (response) {$scope.formData.condicionPedido=response;});
-        $http.get("master/getOrderStatus").success(function (response) {$scope.formData.estadoPedido=response;});
-        $http.get("master/getPaymentType").success(function (response) {$scope.formData.tipoDepago= response;});
+        $scope.filterData.paises = masters.query({type: 'getCountriesProvider'});
+        $scope.filterData.motivoPedido = masters.query({type: 'getOrderReason'});
+        $scope.filterData.condicionPedido = masters.query({type: 'getOrderCondition'});
+        $scope.filterData.estadoPedido = masters.query({type: 'getOrderStatus'});
+        $scope.filterData.tipoDepago = masters.query({type: 'getPaymentType'});
+
     }
 
     function review(){
@@ -357,8 +360,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
             });
 
-        $scope.formDataContraP.contraPedidoMotivo = ORDER.query({type: 'CustomOrderReason'});
-        $scope.formDataContraP.contraPedidoPrioridad = ORDER.query({type: 'CustomOrderPriority'});
+        $scope.formDataContraP.contraPedidoMotivo = Order.query({type: 'CustomOrderReason'});
+        $scope.formDataContraP.contraPedidoPrioridad = Order.query({type: 'CustomOrderPriority'});
         $scope.moduleAccion({open:{name:"resumenContraPedido"}});
 
     }
@@ -637,6 +640,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
         restore("document");
+        //init();
         var aux= angular.copy(doc);
         if(doc && $scope.module.index <2){
             if (segurity('editPedido')) {
@@ -1359,7 +1363,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     }
 });
 
-MyApp.factory('ORDER', ['$resource',
+MyApp.factory('Order', ['$resource',
     function ($resource) {
         return $resource('Order/:type/:id', {}, {
             query: {method: 'GET',params: {type: "",id:""}, isArray: true},

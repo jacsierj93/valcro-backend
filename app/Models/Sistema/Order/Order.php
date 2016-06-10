@@ -21,7 +21,7 @@ class Order extends Model
     protected $table = "tbl_pedido";
     protected $dates = ['deleted_at'];
 
-    protected $appends = array('tipo');
+   // protected $appends = array('tipo');
 
     public function  getTipo(){
         return 'Proforma';
