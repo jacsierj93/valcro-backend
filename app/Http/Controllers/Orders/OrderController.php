@@ -74,13 +74,13 @@ class OrderController extends BaseController
     /**
      * obtiene la lista de proveedores
      */
-    public function getProviderList()
+    public function getProviderList(Request $req)
     {
 
         $provs = Provider::
         //where('id', 1)->
-        /*            Orderby('razon_social')->
-                skip(0)->take(20)->*/
+              /*     Orderby('razon_social')->
+                skip($req->skit)->take($req->take)->*/
 
 
         get();

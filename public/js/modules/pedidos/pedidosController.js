@@ -100,7 +100,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.selecKitchenBox = selecKitchenBox;
     $scope.moduleAccion = Layers.setAccion;
 
-
     $timeout(function(){
         review();
     },0);
@@ -109,7 +108,41 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     },0);
 
 
+    $scope.provs = [];
     $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
+
+
+
+    $scope.provList ={
+        numLoaded_: 0,
+        toLoad_: 0,
+        provs:[],
+        // Required.
+        getItemAtIndex: function(index) {
+            if (index > this.numLoaded_) {
+                this.fetchMoreItems_(index);
+                return null;
+            }
+            return provs[index];
+        },
+        // Required.
+        // For infinite scroll behavior, we always return a slightly higher
+        // number than the previously loaded items.
+        getLength: function() {
+            return this.numLoaded_ + 5;
+        },
+        fetchMoreItems_: function(index) {
+            // For demo purposes, we simulate loading more items with a timed
+            // promise. In real code, this function would likely contain an
+            // $http request.
+            if (this.toLoad_ < index) {
+                $http.get("Order/OrderProvList", {params: data}).success(function(response){
+                    this.provs.push(response);
+                });
+            }
+        }
+    };
+
 
     function init() {
         $http.get("master/getCountriesProvider").success(function (response) {$scope.filterData.paises = response;});
@@ -612,7 +645,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
                 setGetOrder.setGlobalAction("upd");
-               // $scope.formAction="upd";
+                // $scope.formAction="upd";
                 $scope.moduleAccion({open:{name:"resumenPedido"}})
             }
             else {
@@ -703,7 +736,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 restore('provSelec');// inializa el proveedor
                 restore('document');// inializa el pedido
                 //  restore('FormData');// inializa el proveedor
-               // loadDataFor();
+                // loadDataFor();
                 setGetOrder.setGlobalAction("new");
                 $scope.gridView=4;
 
