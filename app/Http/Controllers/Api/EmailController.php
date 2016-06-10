@@ -20,7 +20,7 @@ class EmailController extends BaseController
     {
         Mail::send('emails.prueba', [], function ($m) {
 
-            $m->to("delimce@gmail.com", "luis de lima")->subject('Prueba de correo desde valcro.co');
+            $m->to("luisnavarro.dg@gmail.com", "Luis Navarro")->subject('Prueba de correo desde valcro.co');
         });
     }
 

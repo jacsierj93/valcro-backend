@@ -433,10 +433,10 @@
                 <div class="backDiv" ng-click="layers.closeLayer('menuAgr')">
                 </div>
                 <div style="width: 96px" layout="column" layout-align="space-between center">
-                    <div class="docButton" layout="column" flex  ng-click="openEmail()"><div layout="column" layout-align="end center"> Email</div> </div>
-                    <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.solicitud)"> <div layout="column" layout-align="end center"> Solicitud</div></div>
-                    <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.proforma)"> <div layout="column" layout-align="end center"> Proforma</div></div>
-                    <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.odc)"><div layout="column" layout-align="end center"> Orden de Compra</div> </div>
+                    <div class="docButton" layout="column" flex  ng-click="openEmail()"> <img src="images/mail_icon_48x48.gif" width="48" height="48"/></div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.solicitud)"> <img src="images/solicitud_icon_48x48.gif" width="48" height="48"/></div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.proforma)"> <img src="images/proforma_icon_48x48.gif"  width="48" height="48"/></div>
+                    <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.odc)"><img src="images/odc_icon_48x48.gif"  width="48" height="48"/> </div>
 
                 </div>
             </md-content>

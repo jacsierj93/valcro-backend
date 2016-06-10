@@ -93,7 +93,7 @@
 .docButton{
     width: 94px;
     margin: 2px;
-    background-color: aliceblue;
+    /*background-color: aliceblue;*/
     }
 .btnOptEmail{
     background-color: transparent;

@@ -307,6 +307,12 @@
 
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex>
                         <div>
+                            Pagos
+                        </div>
+                    </div>
+
+                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                        <div>
                             Adelantos y Notas de credito
                         </div>
                     </div>
