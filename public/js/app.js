@@ -55,6 +55,39 @@ MyApp.directive('number', function () {
     };
 });
 
+MyApp.directive('chip', function ($timeout) {
+    return {
+        link: function (scope, elem, attrs,ctrl) {
+            elem.bind("keydown",function(e){
+                e.stopPropagation();
+                if(e.which=="39"){
+                    x = elem.next();
+                    if(x.length>0){
+                        x.focus().click();
+                     }else{
+                        elem.parent().find("[chip]").first().focus().click();
+                     }
+                }else if(e.which=="37"){
+                    x = elem.prev();
+                    if(x.length>0 && !x.is("#valNameContainer")){
+                        x.focus().click();
+                    }else{
+                        elem.parent().find("[chip]").last().focus().click();
+                    }
+                }else if(e.which=="13"){
+                    $timeout(function(){elem.parent().find("input").focus()},0);
+                }
+
+            })
+
+            elem.bind("click",function(){
+                $timeout(function(){elem[0].focus();},0);
+            })
+
+        }
+    };
+});
+
 MyApp.directive('activeLeft', function ($compile) {
     return {
         link: function (scope, elem, attrs) {
@@ -68,7 +101,7 @@ MyApp.directive('activeLeft', function ($compile) {
 });
 
 MyApp.directive('info', function($timeout,setNotif) {
-    var old ={element:"",info:""};
+    var old ={element:"",info:"",scope:null};
     var ref = false;
     return {
         restrict: 'A',
@@ -79,6 +112,20 @@ MyApp.directive('info', function($timeout,setNotif) {
                 }, 0);
 
             });
+            element.bind("keypress",function(e){
+
+                if(e.which  == 13){
+                    e.stopPropagation();
+                    var list = angular.element(this).parents("form").first().find("[info]:visible");
+                    if(list.index(this)<list.length-1){
+                        angular.element(list[list.index(this)+1]).focus().click();
+                    }else{
+                        angular.element(this).parents("form").first().next().find("[info]:visible").first().focus();
+                        scope.showGrid(false,element)
+                    }
+
+                }
+            });
 
 
             element.bind("focus", function(e) {
@@ -87,6 +134,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                         setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
                         old.element = element[0];
                         old.info = attrs.info;
+                        scope.isShow = true;
                     }
                     $timeout.cancel(ref);
                     ref = $timeout(function() {
