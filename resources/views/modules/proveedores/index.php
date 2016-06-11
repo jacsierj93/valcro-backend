@@ -280,7 +280,7 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
-                                <md-select info="seleccione un tipo de proveedor" name="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-select skip-tab info="seleccione un tipo de proveedor" name="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="type in types" value="{{type.id}}">
                                         {{type.nombre}}
                                     </md-option>
@@ -290,7 +290,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Razon Social</label>
-                                <input info="indique el nombre del proveedor" ng-disabled="$parent.enabled && prov.id" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
+                                <input skip-tab info="indique el nombre del proveedor" ng-disabled="$parent.enabled && prov.id" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
                                 <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                                 <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                                 <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -301,13 +301,13 @@
 
                             <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                                 <label>Siglas</label>
-                                <input info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
+                                <input skip-tab info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
 
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo de Envio</label>
-                                <md-select md-on-close="test(this)" info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-select skip-tab info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                         {{envio.nombre}}
                                     </md-option>
@@ -316,7 +316,7 @@
                             </md-input-container>
 
                             <md-input-container class="md-block">
-                                <md-switch info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" ng-disabled="$parent.enabled && prov.id">
+                                <md-switch skip-tab info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" name="provContraped" ng-disabled="$parent.enabled && prov.id">
                                     Contrapedidos?
                                 </md-switch>
                             </md-input-container>
@@ -344,7 +344,7 @@
                             <div layout="row" id="valNameContainer">
                                 <md-input-container flex id="valcroName">
                                     <label>Nombre...</label>
-                                    <input info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
+                                    <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
                                 </md-input-container>
                                 <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
                                 <div class="iconValName">
@@ -374,7 +374,7 @@
                         <div layout="row" class="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
-                                <md-select info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
+                                <md-select skip-tab name="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
                                         {{tipo.descripcion}}
                                     </md-option>
@@ -386,7 +386,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
-                                <md-select info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
+                                <md-select skip-tab name="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
@@ -398,17 +398,17 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>Codigo Postal</label>
-                                <input type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                                <input skip-tab name="disZipCode" type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
-                                <input ng-pattern="/^[\d\-+]+$/" number info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                <input skip-tab name="dirPhone" ng-pattern="/^[\d\-+]+$/" number info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>
                         <md-input-container class="md-block"ng-show="dir.tipo==2">
                             <label>puertos</label>
-                            <md-select ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
+                            <md-select skip-tab name="dirPort" ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
                                     {{port.Main_port_name}}
                                 </md-option>
@@ -416,7 +416,7 @@
                         </md-input-container>
                         <md-input-container class="md-block">
                             <label>Direccion</label>
-                            <input info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                            <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         </md-input-container>
                         <div layout="column" ng-show="isShow && !isShowMore" class="row" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{address.length}})</div>
@@ -461,7 +461,7 @@
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Nombre y Apellido</label>
-                                <input info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
+                                <input skip-tab info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="35">

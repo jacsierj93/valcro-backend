@@ -50,9 +50,9 @@ class ProvidersController extends BaseController
     }
 
 
-    public function getList()
+    public function getList(request $prvs)
     {
-        $data = Provider::all();
+        $data = Provider::take(20)->get();
         foreach($data as $prov){
             $prov['limCred']=$prov->limitCredit()->max("limite");
         }

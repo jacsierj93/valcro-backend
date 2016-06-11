@@ -1,4 +1,4 @@
-MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter", function ($scope, $mdSidenav,setNotif,$filter) {
+MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter", function ($scope, $mdSidenav,setNotif,$filter,$timeout) {
 
     $scope.template = "modules/home/notificaciones";
 
@@ -42,11 +42,11 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         }
     };
 
-    $scope.launchParam = function(tab){
+ /*   $scope.launchParam = function(tab){
         console.log("select",tab);
-    }
+    };*/
 
-
+    $scope.curFocus = angular.element("#test");
     $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length'], function(newValues,old) {
         var open = false;
         var prev = false;
@@ -87,7 +87,6 @@ MyApp.service("setNotif",function($filter,$timeout){
                 var uid = Math.random();
                 list[obj].unshift({title: "", content: mnsg, opcs: opcs, uid: uid, param: param});
                 if (param && "autohidden" in param) {
-                    console.log(param.autohidden)
                     list[obj][0].timeOut = $timeout(function () {
                         list[obj].splice(list[obj].indexOf($filter("customFind")(list[obj], uid, function (current, compare) {
                             return current.uid == compare
@@ -99,8 +98,11 @@ MyApp.service("setNotif",function($filter,$timeout){
         hideByContent: function(type,content){
             var noti = $filter("customFind")(list[type],content,function(current,compare){return current.content == compare});
             if(noti.length>0){
-                $timeout.cancel(noti[0].timeOut);
-                list[type].splice(list[type].indexOf(noti[0]),1);
+                $timeout(function(){
+                    $timeout.cancel(noti[0].timeOut);
+                    list[type].splice(list[type].indexOf(noti[0]),1);
+                },0);
+
             }
 
         }
