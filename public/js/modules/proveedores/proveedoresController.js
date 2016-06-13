@@ -1317,17 +1317,35 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
 
 });
 
-MyApp.controller('bankInfoController', function ($scope,masters,providers,setGetProv,setNotif) {
+MyApp.controller('bankInfoController', function ($scope,masters,providers,setGetProv,setNotif,$filter,$timeout,$q) {
     $scope.id = "bankInfoController";
     $scope.prov = setGetProv.getProv();
     $scope.countries = masters.query({ type:"getCountries"});
+    /*$scope.cities = masters.query({ type:"getCities"});*/
     $scope.$watch('prov.id',function(nvo){
-        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
+        $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
         $scope.accounts = (nvo)?providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0}):[];
     });
     $scope.$watch('accounts.length',function(nvo){
         setGetProv.setComplete("bank",nvo);
     });
+
+    $scope.querySearch = function(search){
+        if(search){
+            console.log("enter")
+            var results = $filter("customFind")($scope.cities,search,function(c,v){
+                return c.local_name.toLowerCase().indexOf(v)!==-1;
+            });
+            var deferred = $q.defer();
+            $timeout(function () { deferred.resolve( results ); },2000, false);
+            return deferred.promise;
+        }else{
+            console.log("leave")
+            return [];
+        }
+
+    };
+
     $scope.$watch('bnk.pais', function(nvo) {
         $scope.states = (nvo)?masters.query({ type:"getStates",id:$scope.bnk.pais||0}):[];
     });
@@ -1346,6 +1364,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
                 account.prov_id = $scope.bnk.id_prov;
                 account.banco = $scope.bnk.bankName;
                 account.beneficiario = $scope.bnk.bankBenef;
+                account.dir_beneficiario = $scope.bnk.bankBenefAddr;
                 account.dir_banco = $scope.bnk.bankAddr;
                 account.swift = $scope.bnk.bankSwift;
                 account.cuenta = $scope.bnk.bankIban;
@@ -1388,12 +1407,12 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
     };
 
     $scope.toEdit = function(acc){
-        //console.log(cred)
         account = acc.account;
         $scope.bnk.id = account.id;
         $scope.bnk.id_prov = account.prov_id;
         $scope.bnk.bankName = account.banco;
         $scope.bnk.bankBenef = account.beneficiario;
+        $scope.bnk.bankBenefAddr = account.dir_beneficiario;
         $scope.bnk.bankAddr = account.dir_banco;
         $scope.bnk.bankSwift = account.swift;
         $scope.bnk.bankIban = account.cuenta;
@@ -1406,7 +1425,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
             $scope.isShow = elem;
             if(!elem) {
-                $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
                 account={};
                 $scope.bankInfoForm.$setUntouched();
                 if($scope.$parent.expand==$scope.id){
@@ -1416,7 +1435,6 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
             }
         }
     };
-
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
         $scope.$parent.expand =(sel)?"bankInfoController":false;

@@ -82,14 +82,14 @@ md-sidenav#lyrAlert {
 
 /*==================================================*/
 /*==================================================*/
-md-input-container {
+md-input-container,md-autocomplete {
     padding: 0 8px 0 0 !important;
     margin: 10px 0 0 0 !important;
 }
 
 /*==================================================*/
 /*==================== INPUT =======================*/
-md-input-container .md-input, .md-select-value {
+md-autocomplete .md-input, md-input-container .md-input, .md-select-value {
     border-color: transparent !important;
 }
 

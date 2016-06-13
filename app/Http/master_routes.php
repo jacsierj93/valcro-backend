@@ -7,6 +7,7 @@ $app->get("master/getProviderTypeSend",'Masters\MasterController@getProviderType
 $app->get("master/getCoins",'Masters\MasterController@getCoins'); ///obtener listado de monedas
 $app->get("master/getStates/{id}",'Masters\MasterController@getStates'); ///obtener listado de paises->estados
 $app->get("master/getCities/{id}",'Masters\MasterController@getCities'); ///obtener listado de estados->ciudad
+$app->get("master/getCities",'Masters\MasterController@getAllCities'); ///obtener listado de estados->ciudad
 $app->get("master/getCoin/{id}",'Masters\MasterController@getCoin'); ///obtener una maneda
 $app->get("master/addressType",'Masters\MasterController@getAddressType'); ///obtener tipo direccion
 $app->get("master/prodLines",'Masters\MasterController@getLines'); ///obtener Lineas

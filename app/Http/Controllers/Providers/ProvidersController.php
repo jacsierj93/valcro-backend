@@ -56,7 +56,7 @@ class ProvidersController extends BaseController
         foreach($data as $prov){
             $prov['limCred']=$prov->limitCredit()->max("limite");
         }
-        return $data;
+        return json_encode($data);
     }
 
     public function getProv(request $prv)
@@ -89,7 +89,7 @@ class ProvidersController extends BaseController
             $lim->moneda = Monedas::find($lim->moneda_id);
         }
         $data->banks = $data->bankAccount()->get();
-        return $data;
+        return json_encode($data);
     }
 
 
@@ -290,7 +290,7 @@ class ProvidersController extends BaseController
         $bank->swift = $req->bankSwift;
         $bank->beneficiario = $req->bankBenef;
         $bank->dir_banco = $req->bankAddr;
-        $bank->dir_beneficiario = $req->dirBenef;
+        $bank->dir_beneficiario = $req->bankBenefAddr;
         $bank->ciudad_id = $req->ciudad;
         $bank->prov_id = $req->idProv;
 
