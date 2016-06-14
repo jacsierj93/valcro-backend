@@ -280,7 +280,7 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
-                                <md-select skip-tab info="seleccione un tipo de proveedor" name="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-select skip-tab info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="type in types" value="{{type.id}}">
                                         {{type.nombre}}
                                     </md-option>
@@ -307,7 +307,7 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo de Envio</label>
-                                <md-select skip-tab info="seleccione un tipo de envio" name="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-select skip-tab info="seleccione un tipo de envio" id="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                         {{envio.nombre}}
                                     </md-option>
@@ -328,7 +328,7 @@
                     </div>
 
                 </form>
-                <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
+
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
                 <form name="nomvalcroForm" layout="row" ng-controller="valcroNameController" ng-class="{'focused':isShow,'preNew':!prov.id}"  ng-click="showGrid(true)" click-out="showGrid(false,$event)" >
                     <div active-left></div>
@@ -351,6 +351,7 @@
                                     <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
                                 </div>
                             </div>
+                            <div style="width:8px; float:left;" class="row" tabindex="1" skip-tab id="intermediate"></div>
                             <div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
@@ -374,7 +375,7 @@
                         <div layout="row" class="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
-                                <md-select skip-tab name="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
+                                <md-select skip-tab id="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
                                         {{tipo.descripcion}}
                                     </md-option>
@@ -386,7 +387,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
-                                <md-select skip-tab name="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
+                                <md-select skip-tab id="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
@@ -398,7 +399,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>Codigo Postal</label>
-                                <input skip-tab name="disZipCode" type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                                <input skip-tab id="disZipCode" type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
@@ -408,7 +409,7 @@
                         </div>
                         <md-input-container class="md-block"ng-show="dir.tipo==2">
                             <label>puertos</label>
-                            <md-select skip-tab name="dirPort" ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
+                            <md-select skip-tab id="dirPort" ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
                                     {{port.Main_port_name}}
                                 </md-option>
@@ -429,7 +430,7 @@
                                 <div flex="20" class="headGrid"> Telefono</div>
                             </div>
                             <md-content id="grid" flex>
-                                <div flex ng-repeat="add in address" ng-focus="toEdit(this)" class="row">
+                                <div flex ng-repeat="add in address" ng-click="toEdit(this)" class="row">
                                     <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
                                         <div ng-show="(add.id==dir.id)" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
                                         <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
@@ -619,7 +620,7 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Pais</label>
-                                <md-select skip-tab name="bankPais" required ng-disabled="$parent.enabled" ng-model="bnk.pais" name="state" ng-disabled="$parent.enabled" ng-change="setState(this)" md-no-ink>
+                                <md-select skip-tab id="bankPais" required ng-disabled="$parent.enabled" ng-model="bnk.pais" name="state" ng-disabled="$parent.enabled" ng-change="setState(this)" md-no-ink>
                                     <md-option ng-repeat="country in countries" value="{{country.id}}">
                                         {{country.short_name}}
                                     </md-option>
@@ -628,7 +629,7 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>{{(states.length==0)?'sin estados para mostrar':'Estado'}}</label>
-                                <md-select skip-tab name="bankState" required ng-disabled="$parent.enabled || states.length==0" ng-model="bnk.est" name="state" ng-disabled="$parent.enabled || (bnk.pais==false)" md-no-ink>
+                                <md-select skip-tab id="bankState" required ng-disabled="$parent.enabled || states.length==0" ng-model="bnk.est" name="state" ng-disabled="$parent.enabled || (bnk.pais==false)" md-no-ink>
                                     <md-option ng-repeat="state in states" value="{{state.id}}">
                                         {{state.local_name}}
                                     </md-option>
@@ -637,7 +638,7 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>{{(states.length==0)?'sin ciudades para mostrar':'Ciudades'}}</label>
-                                <md-select skip-tab name="bankCity" ng-disabled="$parent.enabled || cities.length==0" ng-model="bnk.ciudad" name="state" ng-disabled="$parent.enabled || (bnk.est==false)" required md-no-ink>
+                                <md-select skip-tab id="bankCity" ng-disabled="$parent.enabled || cities.length==0" ng-model="bnk.ciudad" name="state" ng-disabled="$parent.enabled || (bnk.est==false)" required md-no-ink>
                                     <md-option ng-repeat="city in cities" value="{{city.id}}">
                                         {{city.local_name}}
                                     </md-option>
