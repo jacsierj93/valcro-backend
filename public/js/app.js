@@ -78,7 +78,7 @@ MyApp.directive('chip', function ($timeout) {
                     $timeout(function(){elem.parent().find("input").focus()},0);
                 }
 
-            });
+            })
 
             elem.bind("click",function(){
                 $timeout(function(){elem[0].focus();},0);
@@ -200,12 +200,12 @@ MyApp.directive('info', function($timeout,setNotif) {
             element.bind("blur", function(e) {
                 $timeout(function() {
                     setNotif.hideByContent("info",attrs.info);
-                },0);
+                }, 0);
 
             });
-/*
             element.bind("keypress",function(e){
-                if(e.which  == 13 && !angular.element(this).is("md-select")){
+
+                if(e.which  == 13){
                     e.stopPropagation();
                     var list = angular.element(this).parents("form").first().find("[info]:visible");
                     if(list.index(this)<list.length-1){
@@ -214,9 +214,11 @@ MyApp.directive('info', function($timeout,setNotif) {
                         angular.element(this).parents("form").first().next().find("[info]:visible").first().focus();
                         scope.showGrid(false,element)
                     }
+
                 }
             });
-*/
+
+
             element.bind("focus", function(e) {
                 $timeout(function() {
                     if(old.element!=element[0]){

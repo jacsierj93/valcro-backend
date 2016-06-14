@@ -13,6 +13,7 @@
 $app->get("Order/UnClosetDoc",'Orders\OrderController@getUnClosetDocument'); ///trae tod el detalle de pedido
 
 
+
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///trae tod el detalle de pedido
 $app->get("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
@@ -25,6 +26,15 @@ $app->get("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtien
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
+// import
+$app->get("Order/SolicitudeToImport",'Orders\OrderController@getSolicitudeToImport'); ///obtine los paises donde un proveedor tiene almacenes
+$app->get("Order/OrderToImport",'Orders\OrderController@getOrderToImport'); ///obtine los paises donde un proveedor tiene almacenes
+
+// compare
+$app->get("Order/BetweenOrderToSolicitud",'Orders\OrderController@getDiffbetweenSolicitudToOrder'); ///obtine los paises donde un proveedor tiene almacenes
+$app->get("Order/BetweenOrderToPurchase",'Orders\OrderController@getDiffbetweenOrderToPurchase'); ///obtine los paises donde un proveedor tiene almacenes
+
+
 
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
 $app->get("Order/DocumentsImport",'Orders\OrderController@getDocumentsToImport'); ///obtiene el documento

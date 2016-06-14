@@ -5,13 +5,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     // controlers
     $scope.formBlock = true;
-
     $scope.module= Layers.setModule("pedidos");
     $scope.email= {};
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
     $scope.formMode = null;
     $scope.tempDoc= new Array();
+    $scope.emails = new Array();
+    $scope.layer=$scope.module.layer;
+    $scope.index=$scope.module.index;
+    $scope.docImports= new Array();
+
+    $scope.formGlobal = "new";
+
 
     $scope.forModeAvilable={
         solicitud: {
@@ -70,11 +76,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.gridView=4;
     $scope.productTexto="";
 
-    /**testes **/
-
-
-
-
 
     /******************* declaracion defunciones de eventos */
     /*******incializacion de $scope*****/
@@ -110,40 +111,40 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
 
+    /*
 
+     $scope.provList ={
+     numLoaded_: 0,
+     toLoad_: 0,
+     provs:[],
+     pedio:false,
+     // Required.
+     getItemAtIndex: function(index) {
+     if (index > this.numLoaded_) {
+     this.fetchMoreItems_(index);
+     return null;
+     this.pedio=true;
 
-    $scope.provList ={
-        numLoaded_: 0,
-        toLoad_: 0,
-        provs:[],
-        pedio:false,
-        // Required.
-        getItemAtIndex: function(index) {
-            if (index > this.numLoaded_) {
-                this.fetchMoreItems_(index);
-                return null;
-                this.pedio=true;
-
-            }
-            return{razon_social :index};
-        },
-        // Required.
-        // For infinite scroll behavior, we always return a slightly higher
-        // number than the previously loaded items.
-        getLength: function() {
-            return this.numLoaded_ + 5;
-        },
-        fetchMoreItems_: function(index) {
-            // For demo purposes, we simulate loading more items with a timed
-            // promise. In real code, this function would likely contain an
-            // $http request.
-            if (this.toLoad_ < index && !this.pedio) {
-                $http.get("Order/OrderProvList", {params: {skit:index,take:10}}).success(function(response){
-                    //this.provs.push(response);
-                });
-            }
-        }
-    };
+     }
+     return{razon_social :index};
+     },
+     // Required.
+     // For infinite scroll behavior, we always return a slightly higher
+     // number than the previously loaded items.
+     getLength: function() {
+     return this.numLoaded_ + 5;
+     },
+     fetchMoreItems_: function(index) {
+     // For demo purposes, we simulate loading more items with a timed
+     // promise. In real code, this function would likely contain an
+     // $http request.
+     if (this.toLoad_ < index && !this.pedio) {
+     $http.get("Order/OrderProvList", {params: {skit:index,take:10}}).success(function(response){
+     //this.provs.push(response);
+     });
+     }
+     }
+     };*/
 
 
     function init() {
@@ -296,6 +297,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /******************************************** APERTURA DE LAYERS ********************************************/
 
+    $scope.openImport = function(){
+        console.log($scope.formMode);
+        if($scope.formMode.value == 21){
+            $scope.moduleAccion({open:{name:"listEmailsImport"}});
+        }else  if($scope.formMode.value == 22 || $scope.formMode.value ==23 ){
+            $scope.moduleAccion({open:{name:"listImport"}});
+        }
+    };
     $scope.menuAgregar= function(){
         $scope.moduleAccion({close:"all"});
 
@@ -621,8 +630,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     function setProvedor(prov) {
 
-
-
         if($scope.module.index == 0){
             $scope.provSelec = prov;
             Layers.setAccion({open:{name:"listPedido"}});
@@ -638,7 +645,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     }
     function DtPedido(doc) {
 
-
         restore("document");
         //init();
         var aux= angular.copy(doc);
@@ -649,7 +655,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
                 setGetOrder.setGlobalAction("upd");
-                // $scope.formAction="upd";
+                $scope.formGlobal ="upd";
                 $scope.moduleAccion({open:{name:"resumenPedido"}})
             }
             else {
@@ -657,6 +663,294 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     }
+
+    $scope.docImport = function (doc){
+
+        var url="BetweenOrderToSolicitud";
+        if($scope.formMode.value= 23){
+            url="BetweenOrderToPurchase";
+        }
+        Order.get({type:url, princ_id:$scope.document.id,impor_id: doc.id}, {},function(response){
+            var errors = response.error;
+            if(Object.keys(errors).length == 0){
+                setNotif.addNotif("alert","Se agregaran "+Object.keys(errors).length +"  en informacion al documento",[{name: "ok", action:function(){
+                    angular.forEach(response.asignado, function(v,k){
+                        $scope.document[k]=v;
+                    });
+                    saveDoc();
+                } }]);
+            }else{
+
+                setNotif.addNotif("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
+                    "\n¿ Que desea hacer ?",[
+                    {name:" Omitir diferencias ",
+                        action:function(){
+                            angular.forEach(response.asignado, function(v,k){
+                                $scope.document[k]=v;
+                            });
+                            saveDoc();
+                        }
+                    }
+                    ,{name:"Dejarme elegir ",
+                        action:function(){
+                            setNotif.addNotif("error"," ¿Que desea hacer? "
+                                ,[
+                                    {name:" Usar solicitud ",
+                                        action:function(){
+                                            angular.forEach(response.asignado, function(v,k){
+                                                $scope.document[k]=v;
+                                            });
+                                            angular.forEach(response.error, function(v,k){
+                                                $scope.document[k]= v[0].key;
+                                            });
+                                            console.log("new doc",$scope.document);
+                                            saveDoc();
+
+                                        }
+                                    }
+                                    ,{name:"Usar proforma",
+                                        action:function(){
+                                            angular.forEach(response.asignado, function(v,k){
+                                                $scope.document[k]=v;
+                                            });
+                                            angular.forEach(response.error, function(v,k){
+                                                $scope.document[k]= v[1].key;
+                                            });
+                                            console.log("new doc",$scope.document);
+                                            saveDoc();
+                                        }
+                                    },
+                                    {name:"Preguntarme en cada caso("+Object.keys(errors).length+")",action:function(){
+                                        console.log("error",errors);
+                                        //indices dependientes
+                                        var tasa;
+                                        if(errors.prov_moneda_id){
+                                            var tasa = angular.copy(errors.tasa);
+                                            delete  errors.tasa;
+                                        }
+
+                                        //indices dependientes
+                                        var direccion_almacen_id = angular.copy(errors.direccion_almacen_id);
+                                        delete  errors.direccion_almacen_id;
+
+                                        console.log("error",errors);
+                                        if(errors.prov_moneda_id){
+                                            setNotif.addNotif("alert", "Selecione moneda a usar",[
+                                                {name:errors.prov_moneda_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.prov_moneda_id=errors.prov_moneda_id[0].key;
+                                                        if(tasa){
+                                                            setNotif("info","Se usara la tasa por defecto"+tasa[0].key);
+                                                            $scope.document.tasa=parseFloat(tasa[0].key);
+                                                        }else{
+                                                            console.log("tasa por defecto no registrada");
+                                                        }
+
+                                                    }
+                                                },
+                                                {name:errors.prov_moneda_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.prov_moneda_id=errors.prov_moneda_id[1].key;
+                                                        if(tasa){
+                                                            setNotif("info","Se usara la tasa por defecto "+ tasa[1].key);
+                                                            $scope.document.tasa=parseFloat(tasa[1].key);
+                                                        }else{
+                                                            console.log("tasa por defecto no registrada");
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.titulo){
+                                            setNotif.addNotif("alert", "Selecione titulo a usar",[
+                                                {name:errors.titulo[0].key,
+                                                    action: function(){
+                                                        $scope.document.titulo=errors.titulo[0].key;
+                                                    }
+                                                },
+                                                {name:errors.titulo[1].key,
+                                                    action: function(){
+                                                        $scope.document.titulo=errors.titulo[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.comentario){
+                                            setNotif.addNotif("alert", "Selecione comentario a usar",[
+                                                {name:errors.comentario[0].key,
+                                                    action: function(){
+                                                        $scope.document.comentario=errors.comentario[0].key;
+                                                    }
+                                                },
+                                                {name:errors.comentario[1].key,
+                                                    action: function(){
+                                                        $scope.document.comentario=errors.comentario[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.pais_id){
+                                            setNotif.addNotif("alert", "Selecione pais a usar",[
+                                                {name:errors.pais_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.pais_id=errors.pais_id[0].key;
+                                                        if(direccion_almacen_id){
+                                                            if(direccion_almacen_id){
+                                                                setNotif("info","Se usara la direccion de almacen segun el pais selecionado"
+                                                                    +direccion_almacen_id[0].key);
+                                                                $scope.document.direccion_almacen_id = direccion_almacen_id[0].key;
+                                                            }else{
+                                                                console.log("direccion_almacen_id por defecto no registrada");
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                {name:errors.pais_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.pais_id=errors.pais_id[1].key;
+                                                        if(direccion_almacen_id){
+                                                            setNotif.addNotif("info","Se usara la direccion de almacen segun el pais selecionado"
+                                                                +direccion_almacen_id[1].key);
+                                                            $scope.document.direccion_almacen_id = direccion_almacen_id[1].key;
+                                                        }else{
+                                                            console.log("direccion_almacen_id por defecto no registrada");
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.condicion_pago_id){
+                                            setNotif.addNotif("alert", "Selecione la condicon de pago a usar",[
+                                                {name:errors.condicion_pago_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_pago_id=errors.condicion_pago_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.pais_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.pais_id=errors.pais_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+
+                                        if(errors.direccion_facturacion_id){
+                                            setNotif.addNotif("alert", "Selecione la direcion de facturacion a usar",[
+                                                {name:errors.direccion_facturacion_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.direccion_facturacion_id=errors.direccion_facturacion_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.direccion_facturacion_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.direccion_facturacion_id=errors.direccion_facturacion_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+
+                                            ]);
+                                        }
+                                        if(errors.puerto_id){
+                                            setNotif.addNotif("alert", "Selecione el puerto a usar",[
+                                                {name:errors.puerto_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.puerto_id=errors.puerto_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.puerto_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.puerto_id=errors.puerto_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.condicion_id){
+                                            setNotif.addNotif("alert", "Selecione la condicion a usar",[
+                                                {name:errors.condicion_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.condicion_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.tasa){
+                                            setNotif.addNotif("alert", "Selecione la tasa a usar",[
+                                                {name:errors.tasa[0].key,
+                                                    action: function(){
+                                                        $scope.document.tasa=errors.tasa[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.tasa[1].key,
+                                                    action: function(){
+                                                        $scope.document.tasa=errors.tasa[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        /*if(errors.tipo_pago){
+                                            setNotif("alert", "Selecione pais a usar",[
+                                                {name:errors.tipo_pago[0].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.condicion_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[1].key;
+                                                    }
+                                                }
+                                            ]);
+                                        }*/
+                                    }
+                                    },
+                                    {name:"Cancelar",action:function(){}}
+                                ]);
+                        }
+                    },
+                    {name:"Cancelar",action:function(){}}
+                ]);
+
+            }
+
+        });
+    };
     /****** **************************listener ***************************************/
 
     /** formulario  head*/
@@ -735,6 +1029,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /**layers*/
     $scope.$watchGroup(['module.index','module.layer'], function(newVal){
+        $scope.layer= newVal[1];
+        $scope.index= newVal[0];
+        console.log( $scope.layer)
         switch (newVal[0]){
             case 0:
                 restore('provSelec');// inializa el proveedor
@@ -745,8 +1042,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.gridView=4;
 
                 break;
-            case 1:$scope.FormHeadDocument.$setUntouched();
-            default:
+            case 1:$scope.FormHeadDocument.$setUntouched();break;
+            default:;
 
         }
 
@@ -755,7 +1052,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if($scope.provSelec.id != ''){
                 if(layer == "listPedido" ){
                     loadPedidosProvedor($scope.provSelec.id);
-
                 }
                 if(layer == "agrContPed" ){
                     loadContraPedidosProveedor($scope.provSelec.id);
@@ -774,18 +1070,35 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                 }
                 if(layer == "listProducProv" ){
+
                     $http.get("Order/ProviderProds",{params:{id:$scope.document.id,tipo:$scope.formMode.value}}).success(function (response) {
                         var items=new Array();
                         $scope.provSelec.productos= response;
 
                     });
                 }
+                if(layer == "listImport"){
+                    if($scope.formMode.value ==21 ){
+
+                    }else {
+                        var url ="";
+                        switch ($scope.formMode.value){
+                            case  22: url = "SolicitudeToImport";break;
+                            case  23: url = "OrderToImport";break;
+                        }
+                        $scope.docImports = Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id});
+                    }
+
+
+
+                }
+
+
+
                 if(layer == "agrPed" || layer == "detalleDoc" || layer == "agrPed" || layer == "finalDoc"
                 ){
                     if(!$scope.document.isNew){
-                        $http.get("Order/Document",{
-                            params:{id:$scope.document.id,tipo:$scope.formMode.value}}
-                        ).success(function (response) {
+                        Order.get({type:"Document", id:$scope.document.id,tipo:$scope.formMode.value}, {},function(response){
                             $scope.document= response;
                             $scope.document.emision=DateParse.toDate(response.emision);
                             $scope.document.monto=parseFloat(response.monto);
@@ -795,7 +1108,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             }
                         });
                     }
-
                 }
 
 
@@ -1175,7 +1487,7 @@ MyApp.service('setGetOrder', function() {
         if(trace[form][parseInt(val.id)] === undefined){
             trace[form][parseInt(val.id)] = angular.copy(val);
         }
-    }
+    };
 
     this.addChange = function(val,action,form){
         if(globalAction== "new"){
@@ -1365,9 +1677,9 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
 MyApp.factory('Order', ['$resource',
     function ($resource) {
-        return $resource('Order/:type/:id', {}, {
-            query: {method: 'GET',params: {type: "",id:""}, isArray: true},
-            get: {method: 'GET',params: {type:" "}, isArray: false},
+        return $resource('Order/:type', {}, {
+            query: {method: 'GET',params: {type: ""}, isArray: true},
+            get: {method: 'GET',params: {type:""}, isArray: false},
             post: {method: 'POST',params: {type:" "}, isArray: false},
             postAll: {method: 'POST',params: {type:" "}, isArray: false}
 
