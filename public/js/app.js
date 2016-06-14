@@ -78,7 +78,7 @@ MyApp.directive('chip', function ($timeout) {
                     $timeout(function(){elem.parent().find("input").focus()},0);
                 }
 
-            })
+            });
 
             elem.bind("click",function(){
                 $timeout(function(){elem[0].focus();},0);
@@ -100,6 +100,80 @@ MyApp.directive('activeLeft', function ($compile) {
     };
 });
 
+MyApp.directive('skipTab', function ($compile,$timeout) {
+    var skip = function(jqObject,scope){
+        var elem = angular.element("[name='"+jqObject+"']");
+        var list = angular.element(elem).parents("form").first().find("[step]:visible");
+        if(list.index(elem)<list.length-1){
+            $timeout(function(){
+                angular.element(list[list.index(elem)+1]).focus().click();
+            },100);
+        }else{
+            $timeout(function(){
+                angular.element(elem).parents("form").first().next().find("[step]").first().click().delay(100).focus();
+            },0);
+            //console.log(angular.element(elem).parents("form").first().next().find("[step]").first().focus())
+            if(scope.showGrid){
+                scope.showGrid(false,elem)
+            }else{
+                scope.isShow=false;
+                scope.projectForm.$setUntouched();
+            }
+
+        }
+    };
+
+    return {
+        priority: 1001,
+        terminal:true,
+        link: function (scope, element, attrs) {
+            element.removeAttr("skip-tab");
+            element.attr("step","");
+            //console.log("")
+            if(angular.element(element).is("md-switch")){
+                element.attr("ng-change","skip('"+element.attr("name")+"',this)");
+                if(!("skip" in  scope)){
+                    scope.skip = skip;
+                }
+                //console.log(scope)
+            }else if(angular.element(element).is("md-select")){
+                element.attr("md-on-close","skip('"+element.attr("name")+"',this)");
+
+                if(!("skip" in  scope)){
+                    scope.skip = skip;
+                }
+
+
+            }else{
+                element.bind("keypress",function(e){
+                    if(e.which == "13"){
+                        e.stopPropagation();
+                        var list = angular.element(this).parents("form").first().find("[step]:visible");
+                        if(list.index(this)<list.length-1){
+                            angular.element(list[list.index(this)+1]).focus().click();
+                        }else{
+                            console.log("entro")
+                            var nextFrm = angular.element(this).parents("form").first().next().find("[step]").first();
+                            if(angular.element(nextFrm[0]).is("input")){
+                                angular.element(nextFrm[0]).focus();
+                            }else{
+                                angular.element(nextFrm[0]).click();
+                            }
+
+                            /*$timeout(function(){
+                                angular.element(nextFrm[0]).focus();
+                            },100);*/
+                            scope.showGrid(false,element)
+                        }
+
+                    }
+                });
+            }
+            $compile(element[0])(scope);
+        }
+    };
+});
+
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
@@ -109,12 +183,12 @@ MyApp.directive('info', function($timeout,setNotif) {
             element.bind("blur", function(e) {
                 $timeout(function() {
                     setNotif.hideByContent("info",attrs.info);
-                }, 0);
+                },0);
 
             });
+/*
             element.bind("keypress",function(e){
-
-                if(e.which  == 13){
+                if(e.which  == 13 && !angular.element(this).is("md-select")){
                     e.stopPropagation();
                     var list = angular.element(this).parents("form").first().find("[info]:visible");
                     if(list.index(this)<list.length-1){
@@ -123,11 +197,9 @@ MyApp.directive('info', function($timeout,setNotif) {
                         angular.element(this).parents("form").first().next().find("[info]:visible").first().focus();
                         scope.showGrid(false,element)
                     }
-
                 }
             });
-
-
+*/
             element.bind("focus", function(e) {
                 $timeout(function() {
                     if(old.element!=element[0]){
@@ -413,6 +485,7 @@ MyApp.service('DateParse', function() {
     }
 });
 
+var shareModule =  angular.module("shareModule", []);
 
 
 

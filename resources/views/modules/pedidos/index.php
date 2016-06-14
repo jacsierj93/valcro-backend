@@ -243,6 +243,94 @@
             </div>
         </div>
 
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listImport" id="listImport">
+            <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
+            <md-content  layout="row" flex class="sideNavContent" >
+                <div active-left></div>
+                <div  layout="column" flex="" class="layerColumn">
+                    <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
+                        <div>
+                            {{formMode.name}}
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div class="headGrid cellEmpty"> </div>
+                        <div flex="5" class="headGrid"> - </div>
+                        <div flex="5" class="headGrid"> N° </div>
+                        <div flex="15" class="headGrid"> Titulo</div>
+                        <div flex="15" class="headGrid"> N° Proforma</div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex="5" class="headGrid"> </div>
+                        <div flex="10" class="headGrid"> Transporte</div>
+                        <div flex="15" class="headGrid"> N° Factura</div>
+                        <div flex class="headGrid"> Monto</div>
+                        <div flex class="headGrid"> Comentario</div>
+                    </div>
+                    <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
+                        <div   ng-repeat="item in docImports" ng-click="docImport(item)">
+                            <div layout="row" class="cellGridHolder" ng-click="docImport(item)" >
+                                <div  class=" cellGrid cellEmpty"  > </div>
+                                <div flex="5" class="cellGrid" > {{item.tipo}}</div>
+                                <div flex="5" class="cellGrid" > {{item.id}}</div>
+                                <div flex="15" class="cellGrid" > {{item.documento}}</div>
+                                <div flex="15" class="cellGrid"> {{item.nro_proforma}}</div>
+                                <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                <div flex="5" class="cellGrid" >
+                                    <div style="width: 16px; height: 16px; border-radius: 50%"
+                                         class="emit{{item.diasEmit}}"></div>
+                                </div>
+                                <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;">
+                                    <div  ng-show="item.aero == 1 " style="margin-right: 8px;">
+                                        <span class="icon-Aereo" style="font-size: 24px"></span>
+
+                                    </div>
+                                    <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
+                                </div>
+                                <div flex="15" class="cellGrid" > {{item.nro_factura}}</div>
+                                <div flex class="cellGrid" > {{item.monto | currency :item.symbol :2}}</div>
+                                <div flex class="cellGrid" >{{item.comentario}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </md-content>
+        </md-sidenav>
+
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listEmailsImport" id="listEmailsImport">
+            <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
+            <md-content  layout="row" flex class="sideNavContent" >
+                <div active-left></div>
+                <div  layout="column" flex="" class="layerColumn">
+                    <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
+                        <div>
+                            Correos
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder">
+                        <div class="headGrid cellEmpty"> </div>
+                        <div flex class="headGrid"> Enviado </div>
+                        <div flex class="headGrid"> Provedor </div>
+                        <div flex class="headGrid"> Asunto</div>
+                        <div flex class="headGrid"> Correo</div>
+                        <div flex class="headGrid">  Desde</div>
+                    </div>
+                    <div class="gridContent"   >
+                        <div   ng-repeat="item in emails" ng-click="test('email')">
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex class="cellGrid"  >{{item.emision}}</div>
+                                <div flex class="cellGrid"  >{{item.provedor}}</div>
+                                <div flex= class="cellGrid" > {{item.titulo}}</div>
+                                <div flex= class="cellGrid"  > {{item.email_destino}}</div>
+                                <div flex= class="cellGrid" > {{item.email_origen}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </md-content>
+        </md-sidenav>
+
         <!-- ########################################## LAYER LISTA DE PEDIDOS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido" id="listPedido">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
@@ -503,11 +591,11 @@
 
             <md-content  layout="row" flex class="sideNavContent">
 
-                <div class="backDiv"  ng-click="layers.closeLayer('detalleDoc')"> </div>
+                <div class="backDiv"  > </div>
                 <div  layout="column" flex="" class="layerColumn">
                     <form name="FormHeadDocument">
-                        <div layout="row" flex>
-                            <div style="height: 48px; width: 48px;margin: 11px;">IMG</div>
+                        <div layout="row" flex style="height: 48px;">
+                            <div style="height: 48px; width: 48px;margin-top: 11px;" ng-click="openImport()">IMG</div>
                             <div class="titulo_formulario" layout="column" layout-align="start start">
                                 <div>
                                     Datos de {{formMode.name}}
@@ -523,22 +611,10 @@
                                                md-no-ink
                                                info="Seleccione un proveedor para el documento"
                                                required
+                                               ng-disabled="( formBlock || formGlobal == 'upd')"
                                     >
                                         <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                             {{prov.razon_social}}
-                                        </md-option>
-                                    </md-select>
-                                </md-input-container>
-
-
-                                <md-input-container class="md-block" flex="15" ng-click="toEditHead('tipo_id',document.tipo_id)">
-                                    <label>Tipo </label>
-                                    <md-select ng-model="document.tipo_id"
-                                               ng-disabled="( formBlock || provSelec.id == '')"
-
-                                    >
-                                        <md-option ng-repeat="item in formData.tipo" value="{{item.id}}">
-                                            {{item.tipo}}
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
@@ -558,6 +634,12 @@
 
                             </div>
 
+                            <md-input-container class="md-block" flex>
+                                <label>Titulo</label>
+                                <input  ng-model="document.titulo"
+                                        ng-disabled="( formBlock )"
+                                >
+                            </md-input-container>
                             <div layout="row" >
 
                                 <md-input-container class="md-block" flex="30">
