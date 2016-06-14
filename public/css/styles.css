@@ -82,24 +82,24 @@ md-sidenav#lyrAlert {
 
 /*==================================================*/
 /*==================================================*/
-md-input-container {
+md-input-container,md-autocomplete {
     padding: 0 8px 0 0 !important;
     margin: 10px 0 0 0 !important;
 }
 
 /*==================================================*/
 /*==================== INPUT =======================*/
-md-input-container .md-input, .md-select-value {
+md-autocomplete .md-input, md-input-container .md-input, .md-select-value {
     border-color: transparent !important;
 }
 
-md-input-container:not(.md-input-invalid).md-input-focused .md-input {
+md-input-container.md-input-focused :not(.md-input-invalid).md-input {
     border-color: rgb(84, 180, 234) !important;
     /*border-color: #ffffff !important;*/
 }
 
 md-input-container:not(.md-input-invalid).md-input-focused label {
-    color: rgb(84, 180, 234) !important;
+    color: rgb(84, 180, 234) ;
 }
 
 input {

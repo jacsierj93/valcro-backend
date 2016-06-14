@@ -20,6 +20,7 @@ use App\Models\Sistema\TypeAddress;
 use App\Models\Sistema\Line;
 use App\Models\Sistema\Language;
 use App\Models\Sistema\CargoContact;
+use App\Models\Sistema\City;
 use Illuminate\Database\Eloquent\Collection;
 
 
@@ -37,7 +38,7 @@ class MasterController extends BaseController
 		foreach($paises as $pais){
 			$pais->areaCode;
 		}
-		return $paises;
+		return json_encode($paises);
 	}
 
 	public function getCountriesHaveProvider()
@@ -50,40 +51,40 @@ class MasterController extends BaseController
 				$data->push(Country::find($aux->pais_id));
 			}
 		}
-		return $data;
+		return json_encode($data);
 	}
 
 	public function getProviderType()
 	{
-		$paises = ProviderType::select("id","nombre")->get();
-		return $paises;
+		$type = ProviderType::select("id","nombre")->get();
+		return json_encode($type);
 	}
 
 	public function getProviderTypeSend()
 	{
-		$paises = ProvTipoEnvio::select("id","nombre")->get();
-		return $paises;
+		$send = ProvTipoEnvio::select("id","nombre")->get();
+		return json_encode($send);
 	}
 	public function getCoins()
 	{
 		//return Monedas::select("id","nombre","simbolo","codigo")->get();
-		return Monedas::all();
+		return json_encode(Monedas::all());
 	}
 
 	public function getAddressType(){
-		return TypeAddress::all();
+		return json_encode(TypeAddress::all());
 	}
 
 	public function getLines(){
-		return Line::all();
+		return json_encode(Line::all());
 	}
 
 	public function getStates($id){
 		if($id){
 			$states = Country::find($id)->states()->get();
-			return ($states)?$states:[];
+			return json_encode(($states)?$states:[]);
 		}else{
-			return [];
+			return json_encode([]);
 		}
 
 	}
@@ -91,32 +92,36 @@ class MasterController extends BaseController
 	public function getCities($id){
 		if($id){
 			$cities = State::find($id)->cities()->get();
-			return ($cities)?$cities:[];
+			return json_encode(($cities)?$cities:[]);
 		}else{
-			return [];
+			return json_encode([]);
 		}
 
+	}
+
+	public function getAllCities(){
+		return json_encode(City::select("id","local_name")->get());
 	}
 
 	/**
 	 * obtiene la moneda segun id
 	 **/
 	public function getCoin($id){
-		return Monedas::findOrFail($id);
+		return json_encode(Monedas::findOrFail($id));
 	}
 
 	/**
 	 * obtiene la moneda segun id
 	 **/
 	public function getLanguajes(){
-		return Language::all();
+		return json_encode(Language::all());
 	}
 
 	public function getCargos(){
-		return CargoContact::all();
+		return json_encode(CargoContact::all());
 	}
 	public function getPorts(){
-		return Ports::select("id","Main_port_name","pais_id")->get();
+		return json_encode(Ports::select("id","Main_port_name","pais_id")->get());
 	}
 
 	/*Maestros para modulo de pedido**/
