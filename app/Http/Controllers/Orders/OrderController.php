@@ -19,6 +19,7 @@ use App\Models\Sistema\Order\OrderStatus;
 use App\Models\Sistema\Order\OrderType;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\PaymentType;
+use App\Models\Sistema\Ports;
 use App\Models\Sistema\Product;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\ProviderAddress;
@@ -334,21 +335,23 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /**
+     * moetod que compara una solicitud  y un pedido y muestra las diferencias por campos entre ellos
+     */
     public function getDiffbetweenSolicitudToOrder (Request $req){
         $data  = array();
         $error = array();
         $asigna = array();
-        $compare =array('titulo', 'pais_id',    'motivo_id','prov_moneda_id',
+        $compare =array('titulo', 'pais_id',  'motivo_id','prov_moneda_id','mt3','peso',
             'direccion_almacen_id','direccion_facturacion_id','puerto_id','condicion_id','tasa', 'comentario'
         );
-        //print_r($compare);
-        $ord = Order::findOrFail($req->ord_id);// id de la proforma
-        $sol = Solicitude::findOrFail($req->sol_id);// id de la solicitud
-
-        //getAttributeValue
+        $princi = Order::findOrFail($req->princ_id);// id de la proforma
+        $import = Solicitude::findOrFail($req->impor_id);// id de la solicitud
+        $asigna['monto'] = $princi->monto + $import->monto;
+        // validadando la cabecera
         foreach($compare as $aux){
-            $ordval = $ord->getAttributeValue($aux);
-            $solval = $sol->getAttributeValue($aux);
+            $ordval = $princi->getAttributeValue($aux);
+            $solval = $import->getAttributeValue($aux);
             $data['comp'][]= array('ord' =>$ordval, 'solv' => $solval ,'key' => $aux);
             if($solval == null &&  $ordval != null) {
                 $asigna[$aux] = $ordval;
@@ -367,6 +370,43 @@ class OrderController extends BaseController
                             $temp0['text'] =$mon->nombre;
                             $temp1['text'] =$mon2->nombre;
                             break;
+                        case "pais_id":
+                            $mon=Country::findOrFail($solval);
+                            $mon2=Country::findOrFail($ordval);
+                            $temp0['text'] =$mon->short_name;
+                            $temp1['text'] =$mon2->short_name;
+                            break;
+                        case "motivo_id":
+                            $mon=OrderReason::findOrFail($solval);
+                            $mon2=OrderReason::findOrFail($ordval);
+                            $temp0['text'] =$mon->motivo;
+                            $temp1['text'] =$mon2->motivo;
+                            break;
+                        case "direccion_almacen_id"  ||  "direccion_facturacion_id":
+                            $mon=ProviderAddress::findOrFail($solval);
+                            $mon2=ProviderAddress::findOrFail($ordval);
+                            $temp0['text'] =$mon->direccion;
+                            $temp1['text'] =$mon2->direccion;
+                            break;
+                        /*       case "direccion_facturacion_id":
+                                   $mon=ProviderAddress::findOrFail($solval);
+                                   $mon2=ProviderAddress::findOrFail($ordval);
+                                   $temp0['text'] =$mon->direccion;
+                                   $temp1['text'] =$mon2->direccion;
+                                   break;*/
+                        case "puerto_id" :
+                            $mon=Ports::findOrFail($solval);
+                            $mon2=Ports::findOrFail($ordval);
+                            $temp0['text'] =$mon->Main_port_name;
+                            $temp1['text'] =$mon2->Main_port_name;
+                            break;
+                        case "condicion_id" :
+                            $mon=OrderCondition::findOrFail($solval);
+                            $mon2=OrderCondition::findOrFail($ordval);
+                            $temp0['text'] =$mon->Main_port_name;
+                            $temp1['text'] =$mon2->Main_port_name;
+                            break;
+
 
                     }
                     $error[$aux][] =$temp0;
@@ -375,10 +415,109 @@ class OrderController extends BaseController
                 }
             }
         }
-
         $data['error'] = $error;
         $data['asignado'] = $asigna;
-        //  dd( $data);
+
+        $solItms= $import->items()->get();
+        if(sizeof($solItms) > 0 ){
+            $prods=  array();
+        }
+
+
+        return $data;
+    }
+
+    /**
+     * moetod que compara un pedido  y una orden de compra y muestra las diferencias por campos entre ellos
+     */
+    public function getDiffbetweenOrderToPurchase (Request $req){
+        $data  = array();
+        $error = array();
+        $asigna = array();
+        $compare =array('titulo', 'pais_id',  'motivo_id','prov_moneda_id','mt3','peso',
+            'direccion_almacen_id','direccion_facturacion_id','puerto_id','condicion_id','tasa', 'comentario'
+        );
+        $prin = Purchase::findOrFail($req->princ_id);// id de la proforma
+        $import = Order::findOrFail($req->impor_id);// id de la solicitud
+        $asigna['monto'] = $prin->monto + $import->monto;
+        // validadando la cabecera
+        foreach($compare as $aux){
+            $ordval = $prin->getAttributeValue($aux);
+            $solval = $import->getAttributeValue($aux);
+            $data['comp'][]= array('ord' =>$ordval, 'solv' => $solval ,'key' => $aux);
+            if($solval == null &&  $ordval != null) {
+                $asigna[$aux] = $ordval;
+            }else if($solval != null &&  $ordval != null) {
+
+                if($solval != $ordval){
+                    $temp0 = array();
+                    $temp1 = array();
+                    $temp0['key'] = $solval;
+                    $temp1['key'] =$ordval;
+
+                    switch($aux){
+                        case "prov_moneda_id":
+                            $mon=Monedas::findOrFail($solval);
+                            $mon2=Monedas::findOrFail($ordval);
+                            $temp0['text'] =$mon->nombre;
+                            $temp1['text'] =$mon2->nombre;
+                            break;
+                        case "pais_id":
+                            $mon=Country::findOrFail($solval);
+                            $mon2=Country::findOrFail($ordval);
+                            $temp0['text'] =$mon->short_name;
+                            $temp1['text'] =$mon2->short_name;
+                            break;
+                        case "motivo_id":
+                            $mon=OrderReason::findOrFail($solval);
+                            $mon2=OrderReason::findOrFail($ordval);
+                            $temp0['text'] =$mon->motivo;
+                            $temp1['text'] =$mon2->motivo;
+                            break;
+                        case "direccion_almacen_id"  ||  "direccion_facturacion_id":
+                            if($solval != 0 &&  $ordval !=0){
+                                $mon=ProviderAddress::findOrFail($solval);
+                                $mon2=ProviderAddress::findOrFail($ordval);
+                                $temp0['text'] =$mon->direccion;
+                                $temp1['text'] =$mon2->direccion;
+                            }
+
+                            break;
+                        /*       case "direccion_facturacion_id":
+                                   $mon=ProviderAddress::findOrFail($solval);
+                                   $mon2=ProviderAddress::findOrFail($ordval);
+                                   $temp0['text'] =$mon->direccion;
+                                   $temp1['text'] =$mon2->direccion;
+                                   break;*/
+                        case "puerto_id" :
+                            $mon=Ports::findOrFail($solval);
+                            $mon2=Ports::findOrFail($ordval);
+                            $temp0['text'] =$mon->Main_port_name;
+                            $temp1['text'] =$mon2->Main_port_name;
+                            break;
+                        case "condicion_id" :
+                            $mon=OrderCondition::findOrFail($solval);
+                            $mon2=OrderCondition::findOrFail($ordval);
+                            $temp0['text'] =$mon->Main_port_name;
+                            $temp1['text'] =$mon2->Main_port_name;
+                            break;
+
+
+                    }
+                    $error[$aux][] =$temp0;
+                    $error[$aux][] =$temp1;
+
+                }
+            }
+        }
+        $data['error'] = $error;
+        $data['asignado'] = $asigna;
+
+        $solItms= $import->items()->get();
+        if(sizeof($solItms) > 0 ){
+            $prods=  array();
+        }
+
 
         return $data;
     }

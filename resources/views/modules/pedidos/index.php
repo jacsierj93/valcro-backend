@@ -250,7 +250,7 @@
                 <div  layout="column" flex="" class="layerColumn">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
                         <div>
-                            {{formMode.name}}
+                            {{forModeAvilable.getXValue(formMode.value -1 ).name}}
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">

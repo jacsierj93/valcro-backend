@@ -666,117 +666,290 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.docImport = function (doc){
 
-        if($scope.formMode.value= 22){
-            Order.get({type:"BetweenOrderToSolicitud", ord_id:$scope.document.id,sol_id: doc.id}, {},function(response){
-                console.log("compare ", response);
-                var errors = response.error;
-                if(Object.keys(errors).length == 0){
-                    setNotif.addNotif("alert","Realizado",[],{autohidden:autohidden});
-                }else{
-                    setNotif.addNotif("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
-                        "\n¿ Que desea hacer ?",[
-                        {name:" Omitir diferencias ",
-                            action:function(){
-                                angular.forEach(response.asignado, function(v,k){
-                                    $scope.document[k]=v;
-                                });
-                                saveDoc();
-                            }
-                        },
-                        {name:" Usar solicitud",
-                            action:function(){
-                                angular.forEach(response.asignado, function(v,k){
-                                    $scope.document[k]=v;
-                                });
-                                angular.forEach(response.error, function(v,k){
-                                    $scope.document[k]= v[0].key;
-                                });
-                                console.log("new doc",$scope.document);
-                                saveDoc();
-
-                            }
-                        },
-                        {name:"Usar proforma",
-                            action:function(){
-                                angular.forEach(response.asignado, function(v,k){
-                                    $scope.document[k]=v;
-                                });
-                                angular.forEach(response.error, function(v,k){
-                                    $scope.document[k]= v[1].key;
-                                });
-                                console.log("new doc",$scope.document);
-                                saveDoc();
-                            }
-                        }
-                        ,{name:"Dejarme elegir ("+Object.keys(errors).length+")",
-
-
-                            action:function(){
-                                var a="";
-                                var b="";
-                                var titulo;
-                                if(errors.prov_moneda_id){
-
-                                    setNotif.addNotif("alert","Moneda",[
-                                        {name:errors.prov_moneda_id[0].text,
-                                            action:function(){
-                                                $scope.document.prov_moneda_id =errors.prov_moneda_id[0].key;
-                                                if(errors.tasa){
-                                                    $scope.document.prov_moneda_id =errors.tasa[0].key;
-                                                    setNotif.addNotif("info","La tasa fue asignada segun la moneda selecionada",[],{autohidden:autohidden});
-
-                                                    delete  errors.tasa;
-                                                }
-                                            }
-                                        },
-                                        {name:errors.prov_moneda_id[1].text,
-                                            action:function(){
-                                                $scope.document.prov_moneda_id =errors.prov_moneda_id[1].key;
-                                                if(errors.tasa){
-                                                    $scope.document.prov_moneda_id =errors.tasa[1].key;
-                                                    setNotif.addNotif("info","La tasa fue asignada segun la moneda selecionada",[],{autohidden:autohidden});
-                                                    delete  errors.tasa;
-                                                }
-                                            }
-                                        }
-                                    ]);
-                                }
-
-                                angular.forEach(errors, function(v,k){
-                                    if(v[0].text){
-                                        a=v[0].text;
-                                    }else{
-                                        a= v[0].key;
-                                    }
-                                    if(v[1].text){
-                                        b=v[1].text;
-                                    }else{
-                                        b= v[1].key;
-                                    }
-                                    switch (k){
-                                        default:
-                                            titulo=  +k;
-                                    }
-                                    setNotif.addNotif("alert",titulo,[
-                                        {name :a, action: function (){
-                                            $scope.document[k]=v[0].key;
-                                        }
-                                        },
-                                        {name :b, action: function (){
-                                            $scope.document[k]=v[1].key;
-                                        }
-                                        }
-                                    ]);
-
-                                });
-                            }
-                        },
-                        {name:"Cancelar",action:function(){}}
-                    ]);
-                }
-
-            });
+        var url="BetweenOrderToSolicitud";
+        if($scope.formMode.value= 23){
+            url="BetweenOrderToPurchase";
         }
+        Order.get({type:url, princ_id:$scope.document.id,impor_id: doc.id}, {},function(response){
+            var errors = response.error;
+            if(Object.keys(errors).length == 0){
+                setNotif.addNotif("alert","Se agregaran "+Object.keys(errors).length +"  en informacion al documento",[{name: "ok", action:function(){
+                    angular.forEach(response.asignado, function(v,k){
+                        $scope.document[k]=v;
+                    });
+                    saveDoc();
+                } }]);
+            }else{
+
+                setNotif.addNotif("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
+                    "\n¿ Que desea hacer ?",[
+                    {name:" Omitir diferencias ",
+                        action:function(){
+                            angular.forEach(response.asignado, function(v,k){
+                                $scope.document[k]=v;
+                            });
+                            saveDoc();
+                        }
+                    }
+                    ,{name:"Dejarme elegir ",
+                        action:function(){
+                            setNotif.addNotif("error"," ¿Que desea hacer? "
+                                ,[
+                                    {name:" Usar solicitud ",
+                                        action:function(){
+                                            angular.forEach(response.asignado, function(v,k){
+                                                $scope.document[k]=v;
+                                            });
+                                            angular.forEach(response.error, function(v,k){
+                                                $scope.document[k]= v[0].key;
+                                            });
+                                            console.log("new doc",$scope.document);
+                                            saveDoc();
+
+                                        }
+                                    }
+                                    ,{name:"Usar proforma",
+                                        action:function(){
+                                            angular.forEach(response.asignado, function(v,k){
+                                                $scope.document[k]=v;
+                                            });
+                                            angular.forEach(response.error, function(v,k){
+                                                $scope.document[k]= v[1].key;
+                                            });
+                                            console.log("new doc",$scope.document);
+                                            saveDoc();
+                                        }
+                                    },
+                                    {name:"Preguntarme en cada caso("+Object.keys(errors).length+")",action:function(){
+                                        console.log("error",errors);
+                                        //indices dependientes
+                                        var tasa;
+                                        if(errors.prov_moneda_id){
+                                            var tasa = angular.copy(errors.tasa);
+                                            delete  errors.tasa;
+                                        }
+
+                                        //indices dependientes
+                                        var direccion_almacen_id = angular.copy(errors.direccion_almacen_id);
+                                        delete  errors.direccion_almacen_id;
+
+                                        console.log("error",errors);
+                                        if(errors.prov_moneda_id){
+                                            setNotif.addNotif("alert", "Selecione moneda a usar",[
+                                                {name:errors.prov_moneda_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.prov_moneda_id=errors.prov_moneda_id[0].key;
+                                                        if(tasa){
+                                                            setNotif("info","Se usara la tasa por defecto"+tasa[0].key);
+                                                            $scope.document.tasa=parseFloat(tasa[0].key);
+                                                        }else{
+                                                            console.log("tasa por defecto no registrada");
+                                                        }
+
+                                                    }
+                                                },
+                                                {name:errors.prov_moneda_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.prov_moneda_id=errors.prov_moneda_id[1].key;
+                                                        if(tasa){
+                                                            setNotif("info","Se usara la tasa por defecto "+ tasa[1].key);
+                                                            $scope.document.tasa=parseFloat(tasa[1].key);
+                                                        }else{
+                                                            console.log("tasa por defecto no registrada");
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.titulo){
+                                            setNotif.addNotif("alert", "Selecione titulo a usar",[
+                                                {name:errors.titulo[0].key,
+                                                    action: function(){
+                                                        $scope.document.titulo=errors.titulo[0].key;
+                                                    }
+                                                },
+                                                {name:errors.titulo[1].key,
+                                                    action: function(){
+                                                        $scope.document.titulo=errors.titulo[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.comentario){
+                                            setNotif.addNotif("alert", "Selecione comentario a usar",[
+                                                {name:errors.comentario[0].key,
+                                                    action: function(){
+                                                        $scope.document.comentario=errors.comentario[0].key;
+                                                    }
+                                                },
+                                                {name:errors.comentario[1].key,
+                                                    action: function(){
+                                                        $scope.document.comentario=errors.comentario[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.pais_id){
+                                            setNotif.addNotif("alert", "Selecione pais a usar",[
+                                                {name:errors.pais_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.pais_id=errors.pais_id[0].key;
+                                                        if(direccion_almacen_id){
+                                                            if(direccion_almacen_id){
+                                                                setNotif("info","Se usara la direccion de almacen segun el pais selecionado"
+                                                                    +direccion_almacen_id[0].key);
+                                                                $scope.document.direccion_almacen_id = direccion_almacen_id[0].key;
+                                                            }else{
+                                                                console.log("direccion_almacen_id por defecto no registrada");
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                {name:errors.pais_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.pais_id=errors.pais_id[1].key;
+                                                        if(direccion_almacen_id){
+                                                            setNotif.addNotif("info","Se usara la direccion de almacen segun el pais selecionado"
+                                                                +direccion_almacen_id[1].key);
+                                                            $scope.document.direccion_almacen_id = direccion_almacen_id[1].key;
+                                                        }else{
+                                                            console.log("direccion_almacen_id por defecto no registrada");
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.condicion_pago_id){
+                                            setNotif.addNotif("alert", "Selecione la condicon de pago a usar",[
+                                                {name:errors.condicion_pago_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_pago_id=errors.condicion_pago_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.pais_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.pais_id=errors.pais_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+
+                                        if(errors.direccion_facturacion_id){
+                                            setNotif.addNotif("alert", "Selecione la direcion de facturacion a usar",[
+                                                {name:errors.direccion_facturacion_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.direccion_facturacion_id=errors.direccion_facturacion_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.direccion_facturacion_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.direccion_facturacion_id=errors.direccion_facturacion_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+
+                                            ]);
+                                        }
+                                        if(errors.puerto_id){
+                                            setNotif.addNotif("alert", "Selecione el puerto a usar",[
+                                                {name:errors.puerto_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.puerto_id=errors.puerto_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.puerto_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.puerto_id=errors.puerto_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.condicion_id){
+                                            setNotif.addNotif("alert", "Selecione la condicion a usar",[
+                                                {name:errors.condicion_id[0].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.condicion_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.tasa){
+                                            setNotif.addNotif("alert", "Selecione la tasa a usar",[
+                                                {name:errors.tasa[0].key,
+                                                    action: function(){
+                                                        $scope.document.tasa=errors.tasa[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.tasa[1].key,
+                                                    action: function(){
+                                                        $scope.document.tasa=errors.tasa[1].key;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){}
+                                                }
+                                            ]);
+                                        }
+                                        /*if(errors.tipo_pago){
+                                            setNotif("alert", "Selecione pais a usar",[
+                                                {name:errors.tipo_pago[0].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[0].key;
+
+                                                    }
+                                                },
+                                                {name:errors.condicion_id[1].text,
+                                                    action: function(){
+                                                        $scope.document.condicion_id=errors.condicion_id[1].key;
+                                                    }
+                                                }
+                                            ]);
+                                        }*/
+                                    }
+                                    },
+                                    {name:"Cancelar",action:function(){}}
+                                ]);
+                        }
+                    },
+                    {name:"Cancelar",action:function(){}}
+                ]);
+
+            }
+
+        });
     };
     /****** **************************listener ***************************************/
 
@@ -858,6 +1031,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.$watchGroup(['module.index','module.layer'], function(newVal){
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
+        console.log( $scope.layer)
         switch (newVal[0]){
             case 0:
                 restore('provSelec');// inializa el proveedor

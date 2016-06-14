@@ -32,6 +32,8 @@ $app->get("Order/OrderToImport",'Orders\OrderController@getOrderToImport'); ///o
 
 // compare
 $app->get("Order/BetweenOrderToSolicitud",'Orders\OrderController@getDiffbetweenSolicitudToOrder'); ///obtine los paises donde un proveedor tiene almacenes
+$app->get("Order/BetweenOrderToPurchase",'Orders\OrderController@getDiffbetweenOrderToPurchase'); ///obtine los paises donde un proveedor tiene almacenes
+
 
 
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
