@@ -238,7 +238,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                     action: function () {
                         $mdSidenav("layer5").close();
                         chngProv(prov);
-                    }
+                    },
+                    default:10
                 },
                 {
                     name: "NO",
@@ -529,7 +530,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
-            }},{name:"No, dejame cambiarlo",action:function(){
+            },default:5},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provTypesend")[0].click();
             }}]);
         }
@@ -538,7 +539,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         //console.log($scope.projectForm)
         if(nvo==4 && !$scope.projectForm.provType.$untouched){
             setNotif.addNotif("alert","estas seguro que es tipo TRADER/FABRICA?",[{name:"Si, si lo estoy",action:function(){
-            }},{name:"No, dejame cambiarlo",action:function(){
+            },default:5},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provType")[0].click();
             }}]);
         }
@@ -550,7 +551,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         if($scope.projectForm[elem].$error.duplicate){
             setNotif.addNotif("error","existe un Proveedor con el mismo nombre o siglas",[{name:"corregir!",action:function(){
                 htmlElem.focus();
-            }}]);
+            }}],{block:true});
         }else{
             setNotif.hideByContent("error","existe un Proveedor con el mismo nombre o siglas");
         };
@@ -569,7 +570,8 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                             name:"esta bien",
                             action:function(){
 
-                            }
+                            },
+                            default:5
                         },
                     ]
                 );
@@ -639,7 +641,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                         name: "esta bien",
                         acion: function () {
 
-                        }
+                        },
+                        default:5
                     }
                 ])
             }
@@ -668,7 +671,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveProvAddr"},$scope.dir,function(data){
                 $scope.dir.id = data.id;
-                setGetProv.addChng($scope.dir,data.action,"dirProv")
+                setGetProv.addChng($scope.dir,data.action,"dirProv");
                 $scope.direccionesForm.$setPristine();
                 dirSel.id = $scope.dir.id;
                 dirSel.direccion =  $scope.dir.direccProv;
@@ -712,7 +715,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             {
                 name: "NO",
                 action: function () {
-                }
+                },
+                default:5
             }
         ]);
     };
@@ -721,12 +725,29 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
             $scope.isShow = elem;
             if(!elem) {
-                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
-                    $scope.direccionesForm.$setUntouched();
-                    if($scope.$parent.expand==$scope.id){
-                        $scope.isShowMore = elem;
-                        $scope.$parent.expand = false;
+
+/*
+                if($filter("customFind")($scope.address,"3",function(curr,val){ return curr.tipo_dir == val; }).length<=0){
+                    if($filter("customFind")($scope.address,"2",function(curr,val){ return curr.tipo_dir == val; }).length<=0 || $filter("customFind")($scope.address,"1",function(curr,val){ return curr.tipo_dir == val; }).length<=0){
+                        setNotif.addNotif("alert","deberias tener al menos una direccion de fabrica y otra de almacen",[
+                            {
+                                name:"aceptar",
+                                action:function(){
+
+                                },
+                                default:3
+                            }
+                        ]);
                     }
+                }
+
+*/
+                $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
+                $scope.direccionesForm.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
 
             }
         }
@@ -901,6 +922,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     };
 
+
+
     $scope.showGrid = function(elem,a){
         if(!elem){
             if(jQuery(a.toElement).parents("#lyrAlert").length==0 && jQuery(a.toElement).parents("#nomValLyr").length==0){
@@ -915,16 +938,16 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                                 $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                                 valcroName = {};
                                 $scope.nomvalcroForm.$setUntouched();
-                            }
+                            },
+                            default:3
                         },
                         {
                             name:"NO",
                             action:function(){
-                                ///console.log(document.getElementsByName("name"));
                                 document.getElementsByName("name")[0].focus()
                             }
                         }
-                    ]);
+                    ],{block:true});
                 }else{
                     $scope.isShow = elem;
                     $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
@@ -935,6 +958,12 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             }
 
         }else{
+            if(!(angular.element(a.toElement).is("[chip]") || angular.element(a.toElement).parents("#valNameContainer").length>0)){
+                $scope.nomvalcroForm.$setUntouched();
+                $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                valcroName = {};
+                document.getElementsByName("name")[0].focus();
+            }
             $scope.isShow = elem;
         }
     };

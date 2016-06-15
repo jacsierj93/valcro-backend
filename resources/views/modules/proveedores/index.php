@@ -330,7 +330,7 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" layout="row" ng-controller="valcroNameController" ng-class="{'focused':isShow,'preNew':!prov.id}"  ng-click="showGrid(true)" click-out="showGrid(false,$event)" >
+                <form name="nomvalcroForm" layout="row" ng-controller="valcroNameController" ng-class="{'focused':isShow,'preNew':!prov.id}"  ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)" >
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
@@ -352,7 +352,7 @@
                                 </div>
                             </div>
                             <div style="width:8px; float:left;" class="row" tabindex="1" skip-tab id="intermediate"></div>
-                            <div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this)" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
+                            <div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
                     </div>
@@ -419,9 +419,11 @@
                             <label>Direccion</label>
                             <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         </md-input-container>
-                        <div layout="column" ng-show="isShow && !isShowMore" class="row" ng-click="viewExtend(true)">
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{address.length}})</div>
+
+                        <div layout="column" ng-show="(isShow && !isShowMore) && address.length>0" class="row" ng-click="viewExtend(true)">
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
+
                         <div layout="column" ng-show="isShowMore" flex>
                             <div layout="row" class="headGridHolder" class="row">
                                 <div flex="10" class="headGrid"> Tipo</div>
@@ -440,6 +442,9 @@
                                     </div>
                                 </div>
                             </md-content>
+                            <div layout="column" class="row" ng-click="viewExtend(false)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+                            </div>
                         </div>
                     </div>
                      </div>
@@ -516,10 +521,10 @@
                                 <input info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
-                        <div class="row" layout="column" ng-show="isShow && !isShowMore" style="height: 40px" ng-click="viewExtend(true)" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{contacts.length}})</div>
+                        <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
-                        <md-content layout="column" ng-show="isShowMore" flex>
+                        <div layout="column" ng-show="isShowMore" flex>
 
                             <div layout="row" class="headGridHolder">
                                 <div flex="20" class="headGrid row"> Nombre</div>
@@ -536,9 +541,11 @@
                                         <div flex="10" class="cellGrid">{{cont.telefono}}</div>
                                         <div flex="20" class="cellGrid">{{cont.pais.short_name}}</div>
                                     </div>
-
+                                </div>
                             </md-content>
-
+                            <div layout="column" class="row" ng-click="viewExtend(false)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+                            </div>
                         </div>
                     </div>
                     </div>
@@ -687,8 +694,8 @@
 
                         </md-input-container>
 
-                        <div layout="column" ng-show="isShow && !isShowMore" class="row" ng-click="viewExtend(true)" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{accounts.length}})</div>
+                        <div layout="column" ng-show="(isShow && !isShowMore) && accounts.length>0" class="row" ng-click="viewExtend(true)">
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
                         <div layout="column" ng-show="isShowMore" flex>
 
@@ -709,7 +716,9 @@
                                 </div>
 
                             </md-content>
-
+                            <div layout="column" class="row" ng-click="viewExtend(false)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+                            </div>
                         </div>
                     </div>
                     </div>
@@ -779,9 +788,10 @@
                                 </md-select>
                             </md-input-container>
                         </div>
-                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv row"  ng-click="viewExtend(true)" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{limits.length}})</div>
+                        <div layout="column" ng-show="(isShow && !isShowMore) && limits.length>0" class="row" ng-click="viewExtend(true)">
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
+
                         <div layout="column" ng-show="isShowMore" flex>
 
                             <div layout="row" class="headGridHolder">
@@ -803,7 +813,9 @@
                                 </div>
 
                             </md-content>
-
+                            <div layout="column" class="row" ng-click="viewExtend(false)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+                            </div>
                         </div>
                     </div>
                     </div>
@@ -839,9 +851,10 @@
                                     <?= HTML::image("images/menu.png","",array("ng-click"=>"openFormCond()","ng-show"=>"(condHead.id)")) ?>
                                 </div>
                             </div>
-                            <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv row" ng-click="viewExtend(true)" >
-                                <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{conditions.length}})</div>
+                            <div layout="column" ng-show="(isShow && !isShowMore) && conditions.length>0" class="row" ng-click="viewExtend(true)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                             </div>
+
                             <div layout="column" ng-show="isShowMore" flex>
 
                                 <div layout="row" class="headGridHolder row">
@@ -861,7 +874,9 @@
                                     </div>
 
                                 </md-content>
-
+                                <div layout="column" class="row" ng-click="viewExtend(false)">
+                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
