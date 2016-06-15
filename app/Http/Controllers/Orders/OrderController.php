@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Masters\MasterOrderController;
+use App\Http\Controllers\Masters\MasterProductController;
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\CustomOrders\CustomOrderItem;
@@ -535,25 +536,42 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /*********************** PRODUCTOS ************************/
     public function getProviderProducts(Request $req){
         $data = array();
-        $items = Provider::findOrFail($req->id)->proveedor_product()->get();
+        $items = Provider::findOrFail($req->id)
+            ->proveedor_product()
+            ->where('tipo_producto_id', '<>', 3)
+            ->get();
+        $types = Product\ProductType::get();
         $i=0;
+
+        $model= $this->getDocumentIntance($req->tipo);
+        $model = $model->findOrFail($req->doc_id);
+        $modelIts= $model->items()->get();
         foreach($items as $aux){
             $temp= array();
             $temp['id'] = $aux->id;
             $temp['descripcion'] = $aux->descripcion;
             $temp['codigo'] = "(demo".$i.")";
+            $temp['codigo_fabrica'] =$aux->codigo_fabrica;
             $temp['puntoCompra'] = false;
             $temp['cantidad'] =0;
             $temp['stock'] = $i;
+            $temp['tipo_producto_id'] = $aux->tipo_producto_id;
+            $temp['tipo_producto'] = $types->get($aux->tipo_producto_id)->descripcion;
             $temp['asignado'] = false;
-            $temp['adicional'] ="este es un texto adicional de ".$aux->descripcion;
-
-
             $i++;
             if($aux->descripcion == null){
                 $temp['descripcion'] = "Profit ".$aux->descripcion_profit;
+            }
+            $itMo=$modelIts->where('producto_id',$aux->id)->first();
+            $temp['otre']=$itMo;
+            if($itMo != null){
+                $temp['asignado'] = true;
+                $temp['cantidad'] = $itMo->cantidad;
+                $temp['reng_id'] = $itMo->id;
+
             }
             $data[]=$temp;
 
@@ -562,6 +580,91 @@ class OrderController extends BaseController
         return $data;
 
     }
+
+    /**
+     * crea un producto temporarl
+     */
+    public function createTemp(Request $req){
+        $prodTemp = MasterProductController::createProduct(array('prov_id' => $req->prov_id));
+        $temp= array();
+        $temp['id'] = $prodTemp->id;
+        $temp['descripcion'] = $prodTemp->descripcion;
+        $temp['codigo'] = "(demo".")";
+        $temp['codigo_fabrica'] =$prodTemp->codigo_fabrica;
+        $temp['puntoCompra'] = false;
+        $temp['cantidad'] =$req->cantidad;
+        $temp['saldo'] =$req->cantidad;
+        $temp['stock'] = 0;
+        $temp['tipo_producto_id'] = $prodTemp->tipo_producto_id;
+        $temp['tipo_producto'] = Product\ProductType::findOrFail($prodTemp->tipo_producto_id)->descripcion;
+        $temp['asignado'] = false;
+        if($prodTemp->descripcion == null){
+            $temp['descripcion'] = "Profit ".$prodTemp->descripcion_profit;
+        }
+
+        return $temp;
+    }
+
+    /**asigna el producto a la solicitud */
+
+    public  function  changeProductoSolicitud (Request $req){
+        $res= array();
+        $item= new SolicitudeItem();
+        $res['accion']= "new";
+        if($req->asignado){
+
+            if($req->has('reng_id')){
+                $item = SolicitudeItem::findOrFail($req->reng_id);
+                $res['accion'] ='upd';
+            }
+            $item->tipo_origen_id=1;
+            $item->doc_id=$req->doc_id;
+            $item->origen_item_id=$req->id;
+            $item->cantidad = $req->cantidad;
+            $item->saldo = $req->cantidad;
+            $item->producto_id = $req->id;
+            $item->save();
+            $res['reng_id'] = $item->id;
+            $res['items'] = $item;
+        }else{
+            if($req->has('reng_id')){
+                $item = SolicitudeItem::findOrFail($req->reng_id);
+                $res['accion'] ='del';
+                $item->destroy($item);
+            }
+        }
+
+        return $res;
+
+
+    }
+
+    public function addRemoveSolicitudItem(Request $req){
+        $resul['accion']= "new";
+        if($req->asignado){
+            $model = new SolicitudeItem();
+            $model->tipo_origen_id = $req->tipo_origen_id;
+            $model->doc_id = $req->doc_id;
+            $model->origen_item_id= $req->origen_item_id;
+            $model->doc_origen_id= $req->doc_origen_id;
+            $model->cantidad= $req->cantidad;
+            $model->saldo= $req->saldo;
+            $model->producto_id= $req->producto_id;
+            $model->descripcion= $req->descripcion;
+            if($req->has("final_id")){
+                $model->final_id= $req->final_id;
+
+            }
+         //   $resul['response']=$model->save();
+
+        }else{
+            $resul['accion']= "del";
+          //  $resul['response']=SolicitudeItem::destroy($req->id);
+        }
+        return $resul;
+    }
+
+
 
     public function getDocumentsToImport(Request $req){
         $data = Array();
@@ -1065,6 +1168,8 @@ class OrderController extends BaseController
         $item = OrderItem:: findOrFail($req->id);
         $item->destroy($item->id);
     }
+
+
     /**
      *
      * revisar por intergar al maestro de Order
@@ -1972,6 +2077,10 @@ class OrderController extends BaseController
 
         if($req->has('aprob_gerencia')){
             $model->aprob_gerencia = $req->aprob_gerencia;
+        }
+
+        if($req->has('titulo')){
+            $model->titulo = $req->titulo;
         }
 
 

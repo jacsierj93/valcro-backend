@@ -15,6 +15,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.layer=$scope.module.layer;
     $scope.index=$scope.module.index;
     $scope.docImports= new Array();
+    $scope.providerProds= new Array();
 
     $scope.formGlobal = "new";
 
@@ -75,6 +76,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.mouseProview= false;
     $scope.gridView=4;
     $scope.productTexto="";
+    $scope.layer ="";
 
 
     /******************* declaracion defunciones de eventos */
@@ -111,41 +113,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
 
-    /*
-
-     $scope.provList ={
-     numLoaded_: 0,
-     toLoad_: 0,
-     provs:[],
-     pedio:false,
-     // Required.
-     getItemAtIndex: function(index) {
-     if (index > this.numLoaded_) {
-     this.fetchMoreItems_(index);
-     return null;
-     this.pedio=true;
-
-     }
-     return{razon_social :index};
-     },
-     // Required.
-     // For infinite scroll behavior, we always return a slightly higher
-     // number than the previously loaded items.
-     getLength: function() {
-     return this.numLoaded_ + 5;
-     },
-     fetchMoreItems_: function(index) {
-     // For demo purposes, we simulate loading more items with a timed
-     // promise. In real code, this function would likely contain an
-     // $http request.
-     if (this.toLoad_ < index && !this.pedio) {
-     $http.get("Order/OrderProvList", {params: {skit:index,take:10}}).success(function(response){
-     //this.provs.push(response);
-     });
-     }
-     }
-     };*/
-
 
     function init() {
         $scope.filterData.paises = masters.query({type: 'getCountriesProvider'});
@@ -170,14 +137,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }else{
             $scope.showFilterPed=true;
         }
-    }
+    };
 
     $scope.FilterLateral = function(){
         if(!$scope.showLateralFilter){
             jQuery("#menu").animate({height:"232px"},500);
             $scope.showLateralFilter=true;
         }
-    }
+    };
 
     $scope.FilterLateralMas = function(){
         if(!$scope.showLateralFilterCpl){
@@ -188,7 +155,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             jQuery("#menu").animate({height:"48px"},400);
             $scope.showLateralFilter=false;
         }
-    }
+    };
 
     $scope.filtOpen= function(){
         if($scope.isOpen){
@@ -196,7 +163,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }else {
             $scope.isOpen=true;
         }
-    }
+    };
+
+    $scope.mouseEnterProd = function(prod){
+        //$scope.productTexto =prod;
+    };
 
     /******************************************** ROLLBACK SETTER **/
 
@@ -268,14 +239,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
 
+
+    $scope.createProduct = function(item){
+
+        item.prov_id =$scope.provSelec.id;
+        Order.post({type:"CreateTemp"},item,function(response){
+            item= response;
+        });
+    };
+
+
+
     /********************************************DEBUGGIN ********************************************/
 
     $scope.test = function (test) {
         alert(test);
-    }
+    };
     $scope.simulateClick = function (id) {
         var a = angular.element(document).find(id);
         a.click();
+    };
+
+    $scope.consoleTest = function(text){
+        console.log("console test", text);
     }
 
 
@@ -307,10 +293,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
     $scope.menuAgregar= function(){
         $scope.moduleAccion({close:"all"});
-
         $scope.moduleAccion({open:{name:"menuAgr"}});
-
-    }
+        $scope.gridView=-1;
+    };
 
     $scope.openEmail= function(){
         $scope.moduleAccion({open:{name:"email"}});
@@ -409,8 +394,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 //loadPedidos($scope.document.id);
                 break;
             case "detalleDoc":
-                $scope.moduleAccion({open:{name:"detalleDoc"}});
-
+                $scope.moduleAccion({open:{name:"listProducProv"}})
+                ;break;
             case "listProducProv":
                 $scope.moduleAccion({open:{name:"agrPed"}});
                 break;
@@ -486,7 +471,52 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 ]);
         }
 
-    }
+    };
+    /**
+     * */
+    $scope.changeProducto = function (item){
+
+        var url= "SolicitudeProductChange";
+        if(item.asignado){
+            item.prov_id =$scope.provSelec.id;
+            item.doc_id =$scope.document.id;
+            Order.post({type:url},item,function(response){
+                if(!item.reng_id){
+                    setNotif.addNotif("alert",
+                        "agregado"
+                        ,[],{autohidden:autohidden});
+                }
+                item.reng_id=response.reng_id;
+            });
+        }else{
+            setNotif.addNotif("alert",
+                "Se eliminara el producto del documento ¿Deseas continuar?"
+                ,[
+                    {name: 'Ok',
+                        action:function(){
+                            Order.post({type:url},item,function(response){
+                                setNotif.addNotif("info",
+                                    "Removido"
+                                    ,[],{autohidden:autohidden});
+                            });
+                        }
+                    },{name: 'Cancel',
+                        action:function(){item.asignado=true;}
+                    }
+                ]);
+        }
+
+    };
+
+    $scope.addERemoveItem = function(item){
+        var  url = "";
+            switch ($scope.formMode.value){
+
+            }
+        Order.post({type:url},item, function(response){
+            console.log(response);
+        });
+    };
 
 
     $scope.changeContraPItem = function (item) {
@@ -646,6 +676,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function DtPedido(doc) {
 
         restore("document");
+        $scope.gridView=-1;
         //init();
         var aux= angular.copy(doc);
         if(doc && $scope.module.index <2){
@@ -1031,7 +1062,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.$watchGroup(['module.index','module.layer'], function(newVal){
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
-        console.log( $scope.layer)
+
         switch (newVal[0]){
             case 0:
                 restore('provSelec');// inializa el proveedor
@@ -1071,9 +1102,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
                 if(layer == "listProducProv" ){
 
-                    $http.get("Order/ProviderProds",{params:{id:$scope.document.id,tipo:$scope.formMode.value}}).success(function (response) {
-                        var items=new Array();
-                        $scope.provSelec.productos= response;
+                    $http.get("Order/ProviderProds",
+                        {params:{id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id}}).success(function (response) {
+                        $scope.providerProds= response;
 
                     });
                 }
@@ -1528,6 +1559,8 @@ MyApp.service('Layers' , function(){
     var modules ={};
     var accion ={estado:false,data:{}};
     var modulekey="";
+    var layer = "";
+    var index= 0;
 
 
     return {
@@ -1552,6 +1585,12 @@ MyApp.service('Layers' , function(){
             console.log("accc", arg);
             accion.data=arg;
             accion.estado=true;
+        },
+        getLayer : function (){
+            return layer;
+        },
+        setLayer: function( arg ){
+          layer =   arg;
         }
     }
 

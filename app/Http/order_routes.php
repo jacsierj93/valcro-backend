@@ -34,6 +34,11 @@ $app->get("Order/OrderToImport",'Orders\OrderController@getOrderToImport'); ///o
 $app->get("Order/BetweenOrderToSolicitud",'Orders\OrderController@getDiffbetweenSolicitudToOrder'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/BetweenOrderToPurchase",'Orders\OrderController@getDiffbetweenOrderToPurchase'); ///obtine los paises donde un proveedor tiene almacenes
 
+// productos
+
+$app->post("Order/CreateTemp",'Orders\OrderController@createTemp'); ///guarda el pedido
+$app->post("Order/ChangeProd",'Orders\OrderController@createTemp'); ///guarda el pedido
+$app->post("Order/SolicitudeProductChange",'Orders\OrderController@changeProductoSolicitud'); ///guarda el pedido
 
 
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
@@ -48,8 +53,10 @@ $app->post("PurchaseOrder/Save",'Orders\OrderController@savePurchaseOrder'); ///
 $app->get("PurchaseOrder/Get",'Orders\OrderController@getPurchaseOrder'); ///guarda el pedido
 
 // solicitudes
-$app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda el pedido
+$app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
+$app->post("Order/Solicitude/AdddRemoveItem",'Orders\OrderController@addRemoveSolicitudItem'); ///guarda la solicitud
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
+
 
 
 //Genericos
