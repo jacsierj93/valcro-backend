@@ -458,9 +458,9 @@
                             <div>
                                 Contactos Proveedor
                             </div>
-                            <div style="width:24px">
+                            <!--<div style="width:24px">
                                 <span class="icon-Agregar"></span>
-                            </div>
+                            </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand" flex layout="column" class="area-form">
                         <div class="row" layout="row">
@@ -499,20 +499,29 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
+                            <md-input-container class="md-block" flex>
+                                <label>Responsabilidades</label>
+                                <input info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                            </md-input-container>
 
-                            <div layout="row" flex="30">
-                                <md-input-container flex>
+                            <div layout="column" style="width:{{(cargos.length*32)}}px;">
+                                <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
+                                <div flex>
+                                     <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center;" ng-click="((cnt.id===false)  || $parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
+                                        <md-tooltip>
+                                            {{cargo.cargo}}
+                                        </md-tooltip>
+                                    </span>
+                                </div>
+
+                                <!--<md-input-container flex>
                                     <label>cargos</label>
                                     <md-select info="el cargo que desempeña el contacto en el proveedor"  ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                         <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
                                     </md-select>
-                                </md-input-container>
+                                </md-input-container>-->
                             </div>
 
-                            <md-input-container class="md-block" flex="40">
-                                <label>Responsabilidades</label>
-                                <input info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
-                            </md-input-container>
 
                         </div>
                         <div class="row" layout="row">
@@ -837,7 +846,7 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="60">
                                     <label>Titulo</label>
-                                    <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                    <input autocomplete="off" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>

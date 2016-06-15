@@ -1134,8 +1134,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     });
     var contact = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
-    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave"], function(nuevo) {
-        if(((nuevo[0] && !nuevo[1])) || nuevo[2]) {
+    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave","cnt.cargo.length"], function(nuevo,old) {
+        if(((nuevo[0] && !nuevo[1])) || nuevo[2] || (nuevo[3]!=old[3])) {
 
             if(!$scope.cnt.id && $filter("customFind")($scope.allContact,$scope.cnt.emailCont,function(val,compare){return val.email == compare;}).length>0){
                 setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
@@ -1170,6 +1170,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             }
         }
     });
+
+    $scope.setCargo = function(elem){
+        var cargo = elem.id;
+        var k = $scope.cnt.cargo.indexOf(cargo);
+        if(k!=-1){
+            $scope.cnt.cargo.splice(k,1);
+        }else{
+            $scope.cnt.cargo.push(""+cargo);
+        }
+    };
 
     $scope.rmContact = function(elem){
         setNotif.addNotif("alert", "desea desvincular este Contacto del proveedor?", [
