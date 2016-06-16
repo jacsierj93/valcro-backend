@@ -93,29 +93,31 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
         };
 
-        var def = $filter("customFind")(notif.opcs,"default",function(current,compare){return (compare in  current);})[0];
-        if(def){
-            def.count = def.default;
-            def.end = $interval(function(){
-                def.count--;
-                /* if(def.count==1){
-                 angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
-                 }*/
-                if(def.count==0){
-                    $interval.cancel(def.end);
-                    $timeout(function(){
-                        angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
+        if(notif.opcs.length>0){
+            var def = $filter("customFind")(notif.opcs,"default",function(current,compare){return (compare in  current);})[0];
+            if(def){
+                def.count = def.default;
+                def.end = $interval(function(){
+                    def.count--;
+                    /* if(def.count==1){
+                     angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
+                     }*/
+                    if(def.count==0){
+                        $interval.cancel(def.end);
                         $timeout(function(){
-                            angular.element("[autotrigger='"+def.$$hashKey+"']").click();
-                        },100)
+                            angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
+                            $timeout(function(){
+                                angular.element("[autotrigger='"+def.$$hashKey+"']").click();
+                            },100)
 
-                    },0);
+                        },0);
 
-                }
-            },1000);
+                    }
+                },1000);
 
+            }
         }
-        console.log(def);
+
     };
         $scope.shakeOnBlock = function(){
             console.log("shake");

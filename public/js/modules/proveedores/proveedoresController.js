@@ -779,6 +779,10 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             icon:"icon-TransTerrestre"
         }
     ];
+
+    $scope.test = function(){
+        alert("FOCUSSSSSSSSSSSSSS");
+    }
     var valcroName = {};
     $scope.$watch('prov.id',function(nvo){
         $scope.valcroName = (nvo)?providers.query({type: "provNomValList", id_prov: $scope.prov.id || 0}):[];
@@ -958,7 +962,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             }
 
         }else{
-            if(!(angular.element(a.toElement).is("[chip]") || angular.element(a.toElement).parents("#valNameContainer").length>0)){
+            if(!(angular.element(a.toElement).is("[chip],#transition") || angular.element(a.toElement).parents("#valNameContainer").length>0)){
                 $scope.nomvalcroForm.$setUntouched();
                 $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                 valcroName = {};
