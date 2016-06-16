@@ -45,17 +45,15 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         }
     };
 
+ /*   $scope.launchParam = function(tab){
+        console.log("select",tab);
+    };*/
+
     $scope.curFocus = angular.element("#test");
-    var names = ["ok","alert","error","info"];
     $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length'], function(newValues,old) {
         var open = false;
         var prev = false;
         angular.forEach(newValues, function(v, k) {
-            /*escucha nuevas notificaciones e invoca los parametros*/
-            if(old[k]<v){
-                console.log("nueva")
-                $scope.invoiceParams($scope.alerts[names[k]][v-1]);
-            }
             if(v > 0 ){
                 open = true;
                 $mdSidenav('lyrAlert').open();
@@ -95,31 +93,29 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
         };
 
-        if(notif.opcs.length>0){
-            var def = $filter("customFind")(notif.opcs,"default",function(current,compare){return (compare in  current);})[0];
-            if(def){
-                def.count = def.default;
-                def.end = $interval(function(){
-                    def.count--;
-                    /* if(def.count==1){
-                     angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
-                     }*/
-                    if(def.count==0){
-                        $interval.cancel(def.end);
+        var def = $filter("customFind")(notif.opcs,"default",function(current,compare){return (compare in  current);})[0];
+        if(def){
+            def.count = def.default;
+            def.end = $interval(function(){
+                def.count--;
+                /* if(def.count==1){
+                 angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
+                 }*/
+                if(def.count==0){
+                    $interval.cancel(def.end);
+                    $timeout(function(){
+                        angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
                         $timeout(function(){
-                            angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
-                            $timeout(function(){
-                                angular.element("[autotrigger='"+def.$$hashKey+"']").click();
-                            },100)
+                            angular.element("[autotrigger='"+def.$$hashKey+"']").click();
+                        },100)
 
-                        },0);
+                    },0);
 
-                    }
-                },1000);
+                }
+            },1000);
 
-            }
         }
-
+        console.log(def);
     };
         $scope.shakeOnBlock = function(){
             console.log("shake");
