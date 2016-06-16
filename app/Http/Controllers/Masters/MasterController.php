@@ -76,7 +76,7 @@ class MasterController extends BaseController
 	}
 
 	public function getLines(){
-		return json_encode(Line::all());
+		return json_encode(Line::all()->prepend(array("id"=>"","linea"=>"TODAS","siglas"=>"todo")));
 	}
 
 	public function getStates($id){

@@ -235,29 +235,34 @@ class ProvidersController extends BaseController
     public function saveContact(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
-            $valName = Contactos::find($req->id);
+            $contact = Contactos::find($req->id);
             $result['action']="upd";
         }else{
             $valName = new Contactos();
         }
-        if($valName->agente != 1){
+
+        if(!$contact->id){
+            $contact->nombre = $req->nombreCont;
+            $contact->pais_id = ($req->pais)?$req->pais:NULL;
+            $contact->save();
+            $contact->idiomas()->sync($req->languaje);
+        }
+
+        updateExistingPivot($req->preFav["dep"],array("fav"=>0));
+
+
+        /*if($valName->agente != 1){
             $valName->email = $req->emailCont;
-            $valName->nombre = $req->nombreCont;
+
             $valName->telefono = $req->contTelf;
             $valName->responsabilidades = $req->responsability;
             $valName->direccion = $req->dirOff;
             $valName->agente = $req->isAgent;
-            $valName->pais_id = ($req->pais)?$req->pais:NULL;
-            $valName->save();
-            //echo $req->languaje;
-            //if(count($req->languaje) > 0){
-            $valName->idiomas()->sync($req->languaje);
-            //}
             $valName->cargos()->sync($req->cargo);
         }
         if(!Provider::find($req->prov_id)->contacts()->find($valName->id)){
             Provider::find($req->prov_id)->contacts()->attach($valName->id);
-        }
+        }*/
         $result['id']=$valName->id;
         return $result;
     }

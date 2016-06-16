@@ -141,9 +141,9 @@
                                                      class="{{deuda.vencido}}"></div>
                                             </div>
                                             <div flex class="cellGrid"> {{deuda.cuotas}}</div>
-                                            <div flex class="cellGrid"> {{deuda.monto | currency : $ : 2}}</div>
-                                            <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}</div>
-                                            <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}</div>
+                                            <div flex class="cellGrid"> {{deuda.monto | currency : $ : 2}}$</div>
+                                            <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}$</div>
+                                            <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}$</div>
                                         </div>
                                     </div>
 
@@ -167,6 +167,7 @@
                                 <div flex class="headGrid"> Tipo</div>
                                 <div flex class="headGrid"> Pagado</div>
                                 <div flex class="headGrid"> Resta</div>
+                                <div flex class="headGrid"> 000000</div>
                             </div>
                             <div id="grid">
                                 <div ng-repeat="pago in provData.pagos" flex>
@@ -176,6 +177,7 @@
                                         <div flex class="cellGrid">{{pago.tipo}}</div>
                                         <div flex class="cellGrid">{{pago.pagado | currency : $ : 2}}</div>
                                         <div flex class="cellGrid"> Data 5</div>
+                                        <div flex class="cellGrid"> Data 6</div>
                                     </div>
                                 </div>
 
@@ -303,12 +305,6 @@
 
                         <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>
 
-                    </div>
-
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
-                        <div>
-                            Pagos
-                        </div>
                     </div>
 
                     <div class="titulo_formulario" layout="column" layout-align="start start" flex>
@@ -596,7 +592,6 @@
 
                         </md-input-container>
 
-                        
 
                         <!-- ################################################################################################ -->
                         <!-- ################################################################################################ -->

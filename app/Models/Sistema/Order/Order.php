@@ -40,7 +40,7 @@ class Order extends Model
      * obtiene los item de pedidos
      */
     public function items(){
-        return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'pedido_id');
+        return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'doc_id');
     }
 
 

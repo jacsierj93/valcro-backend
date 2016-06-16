@@ -55,6 +55,24 @@ MyApp.directive('number', function () {
     };
 });
 
+MyApp.directive('decimal', function () {
+    return {
+        require: 'ngModel',
+        link: function (scope, elem, attrs,ctrl) {
+            ctrl.$validators.decimal = function(modelValue, viewValue) {
+                if(viewValue === undefined || viewValue==""){
+                    return true;
+                }
+                elem[0].value = viewValue.replace(/([a-z]|[A-Z]| )+/,"")
+
+                var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
+
+                return !(num === null)
+            };
+        }
+    };
+});
+
 MyApp.directive('chip', function ($timeout) {
     return {
         link: function (scope, elem, attrs,ctrl) {
@@ -94,7 +112,7 @@ MyApp.directive('activeLeft', function ($compile) {
             elem.removeAttr("active-left");
             elem.addClass("activeleft");
             elem.attr("ng-click","$parent.closeLayer()");
-            elem.attr("ng-class","{'white': '"+jQuery(elem).parents("md-sidenav").first().attr("id")+"'!=$parent.layer}");
+            elem.attr("ng-class","{'white': ('"+jQuery(elem).parents("md-sidenav").first().attr("id")+"'!=layer)}");
             $compile(elem[0])(scope);
         }
     };
@@ -102,8 +120,9 @@ MyApp.directive('activeLeft', function ($compile) {
 
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
-        var elem = angular.element("[name='"+jqObject+"']");
+        var elem = angular.element("#"+jqObject);
         var list = angular.element(elem).parents("form").first().find("[step]:visible");
+        console.log(list)
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
@@ -143,12 +162,12 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             element.removeAttr("skip-tab");
             element.attr("step","");
             if(angular.element(element).is("md-switch")){
-                element.attr("ng-change","skip('"+element.attr("name")+"',this)");
+                element.attr("ng-change","skip('"+element.attr("id")+"',this)");
                 if(!("skip" in  scope)){
                     scope.skip = skip;
                 }
             }else if(angular.element(element).is("md-select")){
-                element.attr("md-on-close","skip('"+element.attr("name")+"',this)");
+                element.attr("md-on-close","skip('"+element.attr("id")+"',this)");
                 if(!("skip" in  scope)){
                     scope.skip = skip;
                 }
@@ -158,14 +177,16 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         e.stopPropagation();
                         var list = angular.element(this).parents("form").first().find("[step]:visible");
                         if(list.index(this)<list.length-1){
-                            if(angular.element(list[list.index(this)+1]).is("input,md-switch")){
-                                angular.element(list[list.index(this)+1]).focus()
+                            if(angular.element(list[list.index(this)+1]).is("md-select")){
+                                angular.element(list[list.index(this)+1]).focus().click();
                             }else{
-                                angular.element(list[list.index(this)+1]).click();
+                                document.getElementById(angular.element(list[list.index(this)+1]).attr("id")).focus()
+                                //console.log(angular.element(list[list.index(this)+1]).focus())
+                                angular.element(list[list.index(this)+1]).focus()
                             }
                         }else{
                             var nextFrm = angular.element(this).parents("form").first().next().find("[step]").first();
-                            angular.element(elem).parents("form").first().next().click();
+                            angular.element(this).parents("form").first().next().click();
                             $timeout(function(){
                                 if(angular.element(nextFrm[0]).is("md-select")){
                                     angular.element(nextFrm[0]).focus().click();

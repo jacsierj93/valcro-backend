@@ -238,7 +238,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                     action: function () {
                         $mdSidenav("layer5").close();
                         chngProv(prov);
-                    }
+                    },
+                    default:10
                 },
                 {
                     name: "NO",
@@ -529,7 +530,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
-            }},{name:"No, dejame cambiarlo",action:function(){
+            },default:5},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provTypesend")[0].click();
             }}]);
         }
@@ -538,7 +539,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         //console.log($scope.projectForm)
         if(nvo==4 && !$scope.projectForm.provType.$untouched){
             setNotif.addNotif("alert","estas seguro que es tipo TRADER/FABRICA?",[{name:"Si, si lo estoy",action:function(){
-            }},{name:"No, dejame cambiarlo",action:function(){
+            },default:5},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provType")[0].click();
             }}]);
         }
@@ -550,7 +551,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         if($scope.projectForm[elem].$error.duplicate){
             setNotif.addNotif("error","existe un Proveedor con el mismo nombre o siglas",[{name:"corregir!",action:function(){
                 htmlElem.focus();
-            }}]);
+            }}],{block:true});
         }else{
             setNotif.hideByContent("error","existe un Proveedor con el mismo nombre o siglas");
         };
@@ -569,7 +570,8 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                             name:"esta bien",
                             action:function(){
 
-                            }
+                            },
+                            default:5
                         },
                     ]
                 );
@@ -639,7 +641,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                         name: "esta bien",
                         acion: function () {
 
-                        }
+                        },
+                        default:5
                     }
                 ])
             }
@@ -668,7 +671,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveProvAddr"},$scope.dir,function(data){
                 $scope.dir.id = data.id;
-                setGetProv.addChng($scope.dir,data.action,"dirProv")
+                setGetProv.addChng($scope.dir,data.action,"dirProv");
                 $scope.direccionesForm.$setPristine();
                 dirSel.id = $scope.dir.id;
                 dirSel.direccion =  $scope.dir.direccProv;
@@ -712,7 +715,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             {
                 name: "NO",
                 action: function () {
-                }
+                },
+                default:5
             }
         ]);
     };
@@ -721,12 +725,29 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
             $scope.isShow = elem;
             if(!elem) {
-                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
-                    $scope.direccionesForm.$setUntouched();
-                    if($scope.$parent.expand==$scope.id){
-                        $scope.isShowMore = elem;
-                        $scope.$parent.expand = false;
+
+/*
+                if($filter("customFind")($scope.address,"3",function(curr,val){ return curr.tipo_dir == val; }).length<=0){
+                    if($filter("customFind")($scope.address,"2",function(curr,val){ return curr.tipo_dir == val; }).length<=0 || $filter("customFind")($scope.address,"1",function(curr,val){ return curr.tipo_dir == val; }).length<=0){
+                        setNotif.addNotif("alert","deberias tener al menos una direccion de fabrica y otra de almacen",[
+                            {
+                                name:"aceptar",
+                                action:function(){
+
+                                },
+                                default:3
+                            }
+                        ]);
                     }
+                }
+
+*/
+                $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
+                $scope.direccionesForm.$setUntouched();
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }
 
             }
         }
@@ -901,6 +922,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     };
 
+
+
     $scope.showGrid = function(elem,a){
         if(!elem){
             if(jQuery(a.toElement).parents("#lyrAlert").length==0 && jQuery(a.toElement).parents("#nomValLyr").length==0){
@@ -915,16 +938,16 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                                 $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                                 valcroName = {};
                                 $scope.nomvalcroForm.$setUntouched();
-                            }
+                            },
+                            default:3
                         },
                         {
                             name:"NO",
                             action:function(){
-                                ///console.log(document.getElementsByName("name"));
                                 document.getElementsByName("name")[0].focus()
                             }
                         }
-                    ]);
+                    ],{block:true});
                 }else{
                     $scope.isShow = elem;
                     $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
@@ -935,6 +958,12 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             }
 
         }else{
+            if(!(angular.element(a.toElement).is("[chip]") || angular.element(a.toElement).parents("#valNameContainer").length>0)){
+                $scope.nomvalcroForm.$setUntouched();
+                $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                valcroName = {};
+                document.getElementsByName("name")[0].focus();
+            }
             $scope.isShow = elem;
         }
     };
@@ -1105,8 +1134,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     });
     var contact = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
-    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave"], function(nuevo) {
-        if(((nuevo[0] && !nuevo[1])) || nuevo[2]) {
+    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave","cnt.cargo.length"], function(nuevo,old) {
+        if(((nuevo[0] && !nuevo[1])) || nuevo[2] || (nuevo[3]!=old[3])) {
 
             if(!$scope.cnt.id && $filter("customFind")($scope.allContact,$scope.cnt.emailCont,function(val,compare){return val.email == compare;}).length>0){
                 setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
@@ -1141,6 +1170,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             }
         }
     });
+
+    $scope.setCargo = function(elem){
+        var cargo = elem.id;
+        var k = $scope.cnt.cargo.indexOf(cargo);
+        if(k!=-1){
+            $scope.cnt.cargo.splice(k,1);
+        }else{
+            $scope.cnt.cargo.push(""+cargo);
+        }
+    };
 
     $scope.rmContact = function(elem){
         setNotif.addNotif("alert", "desea desvincular este Contacto del proveedor?", [
@@ -1332,7 +1371,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
 
     $scope.querySearch = function(search){
         if(search){
-            console.log("enter")
+
             var results = $filter("customFind")($scope.cities,search,function(c,v){
                 return c.local_name.toLowerCase().indexOf(v)!==-1;
             });
@@ -1340,7 +1379,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
             $timeout(function () { deferred.resolve( results ); },2000, false);
             return deferred.promise;
         }else{
-            console.log("leave")
+
             return [];
         }
 
@@ -1964,7 +2003,6 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
 
     $scope.showGrid = function(elem,event){
         if((jQuery(event.toElement).parents("#payCond").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
-            $scope.isShow = elem;
             if(!elem){
                 $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
                 cond = {};
@@ -1973,7 +2011,13 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                     $scope.isShowMore = elem;
                     $scope.$parent.expand = false;
                 }
+            }else{
+                if(!$scope.isShow){
+                    $scope.condHead.title = $scope.conditions.length+1;
+                }
+
             }
+            $scope.isShow = elem;
         }
     };
 

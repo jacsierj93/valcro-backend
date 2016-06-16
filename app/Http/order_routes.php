@@ -26,6 +26,8 @@ $app->get("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtien
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
+$app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
+
 // import
 $app->get("Order/SolicitudeToImport",'Orders\OrderController@getSolicitudeToImport'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/OrderToImport",'Orders\OrderController@getOrderToImport'); ///obtine los paises donde un proveedor tiene almacenes
@@ -36,9 +38,10 @@ $app->get("Order/BetweenOrderToPurchase",'Orders\OrderController@getDiffbetweenO
 
 // productos
 
-$app->post("Order/CreateTemp",'Orders\OrderController@createTemp'); ///guarda el pedido
-$app->post("Order/ChangeProd",'Orders\OrderController@createTemp'); ///guarda el pedido
-$app->post("Order/SolicitudeProductChange",'Orders\OrderController@changeProductoSolicitud'); ///guarda el pedido
+$app->post("Order/CreateTemp",'Orders\OrderController@createTemp'); ///crea un producto temporar
+$app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); ///guarda el pedido
+$app->post("Order/Purchase/ProductChange",'Orders\OrderController@changeProductoPurchase'); ///guarda el pedido
+$app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrden'); ///guarda el pedido
 
 
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
@@ -46,24 +49,52 @@ $app->get("Order/DocumentsImport",'Orders\OrderController@getDocumentsToImport')
 $app->post("Order/DocumentCopy",'Orders\OrderController@copyDoc'); ///guarda el pedido
 
 //pedidos
-$app->post("Order/Save",'Orders\OrderController@saveOrder'); ///guarda el pedido
+$app->post("Order/Order/Save",'Orders\OrderController@saveOrder'); ///guarda la solicitud
+$app->post("Order/Order/AdddRemoveItem",'Orders\OrderController@addRemoveOrderItem'); ///asigna y remove item a l solicitud
+$app->post("Order/Order/ChangeItem",'Orders\OrderController@changeItemOrder'); ///actuliza el item de solicitud
+$app->post("Order/Order/AddCustomOrder",'Orders\OrderController@addCustomOrderOrder'); ///agrega el contra pedido
+$app->post("Order/Order/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderOrder'); ///actuliza el item de solicitud
+$app->post("Order/Order/AddkitchenBox",'Orders\OrderController@addkitchenBoxOrder'); ///agrega un kitchen box
+$app->post("Order/Order/RemovekitchenBox",'Orders\OrderController@removekitchenBoxOrder'); ///quita  kitchen box
+$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se úeden sustituir
+
 
 //Orden de compra
-$app->post("PurchaseOrder/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda el pedido
-$app->get("PurchaseOrder/Get",'Orders\OrderController@getPurchaseOrder'); ///guarda el pedido
+$app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda el pedido
+$app->post("Order/Purchase/AdddRemoveItem",'Orders\OrderController@addRemovePurchaseItem'); ///asigna y remove item a l solicitud
+$app->post("Order/Purchase/ChangeItem",'Orders\OrderController@changeItemPurchase'); ///actuliza el item de solicitud
+$app->post("Order/Purchase/AddCustomOrder",'Orders\OrderController@addCustomOrderPurchase'); ///actuliza el item de solicitud
+$app->post("Order/Purchase/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderPurchase'); ///actuliza el item de solicitud
+$app->post("Order/Purchase/AddkitchenBox",'Orders\OrderController@addkitchenBoxPurchase'); ///actuliza el item de solicitud
+$app->post("Order/Purchase/RemovekitchenBox",'Orders\OrderController@removekitchenBoxPurchase'); ///quita  kitchen box
+$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos los pedidos que se úeden sustituir
+
 
 // solicitudes
-$app->post("Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
-$app->post("Order/Solicitude/AdddRemoveItem",'Orders\OrderController@addRemoveSolicitudItem'); ///guarda la solicitud
+$app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
+$app->post("Order/Solicitude/AdddRemoveItem",'Orders\OrderController@addRemoveSolicitudItem'); ///asigna y remove item a l solicitud
+$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); ///actuliza el item de solicitud
+$app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///actuliza el item de solicitud
+$app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); ///actuliza el item de solicitud
+$app->post("Order/Solicitude/AddkitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///actuliza el item de solicitud
+$app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekitchenBoxSolicitude'); ///quita  kitchen box
+$app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
+$app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///lista de todos los pedidos que se úeden sustituir
+
+$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos los pedidos que se úeden sustituir
+
+
+
+
+
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
-
-
 
 //Genericos
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
 $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae tod el detalle de contraPedido
-$app->post("Order/Copy",'Orders\OrderController@copyDoc'); ///trae tod el detalle de contraPedido
+//$app->post("Order/Copy",'Orders\OrderController@copyDoc'); ///trae tod el detalle de contraPedido
+
 
 
 // contra pedidos
@@ -71,10 +102,8 @@ $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae 
 $app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae los motivos de contrapedido
 $app->get("Order/CustomOrderPriority",'Orders\OrderController@getCustomOrderPriority'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido
-$app->post("Order/AddCustomOrder",'Orders\OrderController@addCustomOrder'); ///agrega el  contrapedido
 $app->post("Order/AddCustomOrderItem",'Orders\OrderController@addCustomOrderItem'); ///agrega un item de contra pedido
 $app->post("Order/RemoveCustomOrderItem",'Orders\OrderController@removeCustomOrderItem'); ///agrega un item de contra pedido
-$app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 
 // kitchenBox
 $app->get("Order/KitchenBox/{id}",'Orders\OrderController@getKitchenBox'); ///trae tod el detalle de contraPedido
@@ -83,7 +112,6 @@ $app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); /// ob
 $app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); /// obtiene las kitchen box de proveedor
 
 // pedido a  sustituir
-$app->get("Order/OrderSubstitutes",'Orders\OrderController@getOrderSubstituteOrder'); ///lista de todos los pedidos que se úeden sustituir
 $app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina todo el pedido sustituto
 $app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega todo el pedido sustituto
 $app->post("Order/AddOrderSubstituteItem",'Orders\OrderController@OrderSubstituteItem'); ///agrega todo el pedido sustituto
