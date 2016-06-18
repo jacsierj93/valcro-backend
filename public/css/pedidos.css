@@ -114,3 +114,11 @@
 .titleForm{
     min-height: 39px;
 }
+
+.divAux{
+    width: 360px;
+}
+
+.none{
+    display: none !important;
+}

@@ -590,7 +590,7 @@
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detalleDoc" id="detalleDoc">
 
-            <md-content  layout="row" flex class="cntLayerHolder">
+            <md-content  layout="row" flex class="sideNavContent">
                 <div  layout="column" flex="" >
                     <form name="FormHeadDocument" layout="row">
                         <div active-left></div>
@@ -778,6 +778,7 @@
                                         <label>N° Factura:</label>
                                         <input ng-model="document.nro_factura"  ng-disabled="( formBlock)">
                                     </md-input-container>
+                                    <div style="width: 24px;" ng-click="openAdj()">%%</div>
 
                                     <md-input-container class="md-block" flex >
                                         <label>N° Proforma:</label>
@@ -785,6 +786,7 @@
                                                ng-required ="(formMode.value == 23)"
                                         >
                                     </md-input-container>
+                                    <div style="width: 24px;" ng-click="openAdj()" >%%</div>
                                 </div>
                                 <div   ng-show="( gridView != 4 )"  layout="row" >
                                     <md-input-container class="md-block" flex >
@@ -843,12 +845,14 @@
                                     </div>
 
                                     <div layout="column" flex="20">
-
+                                        <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
+                                                       ng-disabled="(formBlock)"
+                                        ></md-datepicker>
                                     </div>
 
                                     <md-input-container class="md-block" flex="20">
                                         <label>N° Documento</label>
-                                        <input ng-model="pedidoSelec.nro_doc"  ng-disabled="(formBlock)">
+                                        <input ng-model="document.nro_doc"  ng-disabled="(formBlock)">
                                     </md-input-container>
 
                                     <div flex layout="row" flex ng-click="test()">
@@ -888,7 +892,6 @@
 
                           </div>
                       </form>
-
                     </div>
                     <form name=" productos" layout="row">
                         <div active-left></div>
@@ -935,9 +938,12 @@
                         </div>
                     </form>
                 </div>
+                <div  ng-class="{divAux :openAdjDtPedido}" >
+
+                </div>
 
                 <!-----flecha siguiente -->
-                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+                <div style="width: 16px;"  ng-class="{none : openAdjDtPedido}"  ng-mouseover="showNext(true)"  > </div>
             </md-content>
 
 
@@ -2022,6 +2028,29 @@
             </md-content>
         </md-sidenav>
 
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px; z-index:66;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true"
+                    md-component-id="adjuntoProforma" id="adjuntoProforma"
+        >
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+                <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
+                    <div ng-click="">
+                        Adjuntos
+                    </div>
+                </div>
+                <div flex layout="column">
+                    <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                         ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
+                        insertar archivo
+                    </div>
+
+                    <md-content flex>
+
+                        <div class="imgItem" ng-repeat="pic in imgs"><img height="149px" width="149px" src="images/prueba/pagos/{{pic}}"/></div>
+                    </md-content>
+                </div>
+            </md-content>
+        </md-sidenav>
+
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
@@ -2035,6 +2064,7 @@
             ng-mouseleave="showNext(false)" ng-click="next()">
             <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
+
 
         <!------------------------------------------- Alertas ------------------------------------------------>
         <div ng-controller="notificaciones" ng-include="template"></div>

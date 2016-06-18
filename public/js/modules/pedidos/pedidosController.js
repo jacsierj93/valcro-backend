@@ -84,6 +84,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.gridView=4;
     $scope.productTexto="";
     $scope.layer ="";
+    $scope.openAdjDtPedido= false;
 
 
     /******************* declaracion defunciones de eventos */
@@ -311,6 +312,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /******************************************** APERTURA DE LAYERS ********************************************/
 
+    $scope.openAdj = function(){
+
+        $mdSidenav("adjuntoProforma").toggle().then(function(){
+            if($scope.openAdjDtPedido){
+                $scope.openAdjDtPedido= false;
+            }else {
+                $scope.openAdjDtPedido= true;
+            }
+        });
+    };
     $scope.openDocSusti = function(){
         console.log("sdf");
         $scope.docsSustitos = new Array();
@@ -1397,7 +1408,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $scope.document.emision=DateParse.toDate(response.emision);
                             $scope.document.monto=parseFloat(response.monto);
                             $scope.document.tasa=parseFloat(response.tasa);
-                            if(response.fecha_aprob_compra){
+                            if(response.fecha_aprob_compra =! null && response.fecha_aprob_compra ){
                                 $scope.document.fecha_aprob_compra= DateParse.toDate(response.fecha_aprob_compra);
                             }
                         });
@@ -1849,6 +1860,13 @@ MyApp.service('Layers' , function(){
         setModule: function (name){
             if(!modules[name]){
                 modules[name]={historia: new Array(),layers:new Array(),index: 0,layer:"",blockBack:false};
+
+            }else{
+                modules[name].historia = new Array();
+                modules[name].layers = new Array();
+                modules[name].layer ="";
+                modules[name].index ="";
+                modules[name].blockBack =false;
 
             }
             modulekey=name;
