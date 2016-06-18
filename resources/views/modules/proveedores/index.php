@@ -351,7 +351,9 @@
                                     <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
                                 </div>
                             </div>
-                            <input id="transition" skip-tab style="width:8px; float:left">
+                            <!--<md-input-container class="md-block" style="float:left; width:1px" ng-click="inputSta(true)">
+
+                            </md-input-container>--> <div skip-tab tabindex="-1" info="" style="float:left; width:8px; cursor:none; border:none"></div>
                             <div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
