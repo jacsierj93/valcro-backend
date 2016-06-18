@@ -45,7 +45,7 @@ $app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrd
 
 
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
-$app->get("Order/DocumentsImport",'Orders\OrderController@getDocumentsToImport'); ///obtiene el documento
+//$app->get("Order/DocumentsImport",'Orders\OrderController@getDocumentsToImport'); ///obtiene el documento
 $app->post("Order/DocumentCopy",'Orders\OrderController@copyDoc'); ///guarda el pedido
 
 //pedidos
@@ -57,6 +57,12 @@ $app->post("Order/Order/RemoveCustomOrder",'Orders\OrderController@RemoveCustomO
 $app->post("Order/Order/AddkitchenBox",'Orders\OrderController@addkitchenBoxOrder'); ///agrega un kitchen box
 $app->post("Order/Order/RemovekitchenBox",'Orders\OrderController@removekitchenBoxOrder'); ///quita  kitchen box
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Order/SetStatus",'Orders\OrderController@setStatusOrder'); // cambia el estado del documento
+$app->post("Order/Order/AdddRemoveItems",'Orders\OrderController@addRemoveOrderItems'); // agrega y quita items a la solicud por lotes
+$app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
+$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
+
+
 
 
 //Orden de compra
@@ -68,6 +74,12 @@ $app->post("Order/Purchase/RemoveCustomOrder",'Orders\OrderController@RemoveCust
 $app->post("Order/Purchase/AddkitchenBox",'Orders\OrderController@addkitchenBoxPurchase'); ///actuliza el item de solicitud
 $app->post("Order/Purchase/RemovekitchenBox",'Orders\OrderController@removekitchenBoxPurchase'); ///quita  kitchen box
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
+$app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
+$app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
+$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // cierra el documento y notifica por correo
+
+
 
 
 // solicitudes
@@ -79,6 +91,11 @@ $app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCu
 $app->post("Order/Solicitude/AddkitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///actuliza el item de solicitud
 $app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekitchenBoxSolicitude'); ///quita  kitchen box
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
+$app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
+$app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
+$app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // cierra el documento y notifica por correo
+
+
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos los pedidos que se úeden sustituir

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Masters\MasterOrderController;
+use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Masters\MasterProductController;
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
@@ -170,8 +171,8 @@ class OrderController extends BaseController
     public  function getOrderToImport(Request $req){
         $data = array();
         $items = Order::where('aprob_compras' ,1)
-          //  ->where("aprob_gerencia", 1)
-         //   ->where('id', "<>" ,$req->id)
+            //  ->where("aprob_gerencia", 1)
+            //   ->where('id', "<>" ,$req->id)
             ->whereNull("comentario_cancelacion");
 
         $type = OrderType::get();
@@ -182,7 +183,13 @@ class OrderController extends BaseController
         $prioridad= OrderPriority::get();
         $estados= OrderStatus::get();
         $paises= Country::get();
+        $purchase = Purchase::get();
         foreach($items as $aux){
+            $paso= true;
+            if(sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id','21'))>0){
+                $paso=false;
+            }
+            if($paso){
             //para maquinas
             $tem = array();
             $tem['id']=$aux->id;
@@ -244,7 +251,7 @@ class OrderController extends BaseController
             $tem['aero']=1;
             $tem['version']=1;
             $tem['maritimo']=1;
-            $data[]=$tem;
+            $data[]=$tem;}
         }
 
 
@@ -258,13 +265,15 @@ class OrderController extends BaseController
         $data  = array();
         $error = array();
         $asigna = array();
+        $values = array();
         $compare =array('titulo', 'pais_id',  'motivo_id','prov_moneda_id','mt3','peso',
             'direccion_almacen_id','direccion_facturacion_id','puerto_id','condicion_id','tasa', 'comentario'
         );
         $princi = Order::findOrFail($req->princ_id);// id de la proforma
         $import = Solicitude::findOrFail($req->impor_id);// id de la solicitud
-        //$asigna['monto'] = $princi->monto + $import->monto;
-        // validadando la cabecera
+        $values['monto'] =$princi->monto + $import->monto;
+        $values['mt3'] =$princi->mt3 + $import->mt3;
+
         foreach($compare as $aux){
             $ordval = $princi->getAttributeValue($aux);
             $solval = $import->getAttributeValue($aux);
@@ -540,6 +549,7 @@ class OrderController extends BaseController
     public  function getSolicitudeToImport(Request $req){
         $data = array();
         $items = Solicitude::where('id', "<>" ,$req->id)
+
             //where('aprob_compras' ,1)
             //  ->where("aprob_gerencia", 1)
 
@@ -552,9 +562,21 @@ class OrderController extends BaseController
         $prioridad= OrderPriority::get();
         $estados= OrderStatus::get();
         $paises= Country::get();
+        $ord = Order::get();
+        $purchase = Order::get();
         foreach($items as $aux){
-            //para maquinas
+            $paso =true;
             $tem = array();
+
+            if(sizeof($ord->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id','21'))>0){
+                $paso=false;
+            }
+            if(sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id','21'))>0){
+                $paso=false;
+            }
+
+            if($paso){
+            //para maquinas
             $tem['id']=$aux->id;
             //$tem['tipo_id']=$aux->tipo_pedido_id;
             $tem['pais_id']=$aux->pais_id;
@@ -615,6 +637,7 @@ class OrderController extends BaseController
             $tem['version']=1;
             $tem['maritimo']=1;
             $data[]=$tem;
+            }
         }
 
 
@@ -755,9 +778,77 @@ class OrderController extends BaseController
         $asig= array();
         $remo= array();
         $model= Solicitude::findOrFail($req->doc_id);
+        /*foreach($req->items  as $aux){
+            /*if($req->asignado){
+                $item = new SolicitudeItem();
+//                $item->tipo_origen_id = $aux->tipo_origen_id;
+//                $item->doc_id = $req->doc_id;
+//                $item->origen_item_id= $aux->origen_item_id;
+//                $item->doc_origen_id= $aux->doc_origen_id;
+//                $item->cantidad= $aux->cantidad;
+//                $item->saldo= $aux->saldo;
+//                $item->producto_id= $aux->producto_id;
+//                $item->descripcion= $aux->descripcion;
+//                $item->save();
+//                $asig[]=$item;
+
+            }else{
+                $remo[]= $aux->id;
+                $resul['accionSub']= "del";
+            }*/
+        //}
+
+        $resul['new']= $asig;
+        $resul['del']= $remo;
+        $resul['success']= "Items agregados";
+        $model->destroy($remo);
+
+        return $resul;
+    }
+
+    /**agrega o quita item de la solicitud*/
+    public function addRemoveOrderItems(Request $req){
+        $resul['accion']= "new";
+        $asig= array();
+        $remo= array();
+        $model= Order::findOrFail($req->doc_id);
         foreach($req->items  as $aux){
             if($req->asignado){
-                $item = new SolicitudeItem();
+               $item = new OrderItem();
+                $item->tipo_origen_id = $aux['tipo_origen_id'];
+                $item->doc_id = $req->doc_id;
+                $item->origen_item_id= $aux['origen_item_id'];
+                $item->doc_origen_id= $aux['doc_origen_id'];
+                $item->cantidad= $aux['cantidad'];
+                $item->saldo= $aux['saldo'];
+                $item->producto_id= $aux['producto_id'];
+                $item->descripcion= $aux['descripcion'];
+                $item->save();
+                $asig[]=$aux;
+
+            }else{
+                $remo[]= $aux->id;
+                $resul['accionSub']= "del";
+            }
+        }
+
+        $resul['new']= $asig;
+        $resul['del']= $remo;
+        $resul['success']= "Items agregados";
+        $model->destroy($remo);
+
+        return $resul;
+    }
+
+    /**agrega o quita item de la solicitud*/
+    public function addRemovePurchaseItems(Request $req){
+        $resul['accion']= "new";
+        $asig= array();
+        $remo= array();
+        $model= Purchase::findOrFail($req->doc_id);
+        foreach($req->items  as $aux){
+            if($req->asignado){
+                $item = new PurchaseItem();
                 $item->tipo_origen_id = $aux->tipo_origen_id;
                 $item->doc_id = $req->doc_id;
                 $item->origen_item_id= $aux->origen_item_id;
@@ -766,6 +857,7 @@ class OrderController extends BaseController
                 $item->saldo= $aux->saldo;
                 $item->producto_id= $aux->producto_id;
                 $item->descripcion= $aux->descripcion;
+                $item->save();
                 $asig[]=$item;
 
             }else{
@@ -773,9 +865,10 @@ class OrderController extends BaseController
                 $resul['accionSub']= "del";
             }
         }
+
         $resul['new']= $asig;
         $resul['del']= $remo;
-        $model->saveMany($asig);
+        $resul['success']= "Items agregados";
         $model->destroy($remo);
 
         return $resul;
@@ -838,15 +931,86 @@ class OrderController extends BaseController
         return $resul;
     }
 
+
+
     /**
-     * cambio el estado
-    */
-    public function setEstatusSolicitude(Request $req){
+     * cambio el estado de una solicitud
+     */
+    public function setStatusSolicitude(Request $req){
         $resul = array();
-        Solicitude::finOrFail($req->id);
+        $model = Solicitude::finOrFail($req->id);
+        $status = OrderStatus::findOrfail($req->estado_id);
+        $model->estado->id = $status->id;
+        $model->save();
+        $resul['accion']='upd';
+        $resul['item'] = $status;
+        return $resul;
+    }
+
+    /**
+     * Asigna el parent a un pedido(proforma)
+     */
+    public function setParentOrder(Request $req){
+        $resul = array();
+        $princ = Order::findOrFail($req->princ_id);
+        $princ->doc_parent_id = $req->doc_parent_id;
+        $princ->doc_parent_origen_id = 21;
+        $princ->save();
+        return $resul;
+    }
+
+    /**
+     * Asigna el parent a un pedido(proforma)
+     */
+    public function setParentPurchase(Request $req){
+        $resul = array();
+        $princ = Purchase::findOrFail($req->princ_id);
+        $princ->doc_parent_id = $req->doc_parent_id;
+        $princ->doc_parent_origen_id = 21;
+        $princ->save();
 
         return $resul;
     }
+
+    /**
+     * Asigna el parent a un pedido(proforma)
+     */
+    public function setParentSolicitude(Request $req){
+        $resul = array();
+        $princ = Solicitude::findOrFail($req->princ_id);
+        $princ->doc_parent_id = $req->doc_parent_id;
+        $princ->doc_parent_origen_id = 21;
+        $princ->save();
+
+        return $resul;
+    }
+    /**
+     * cambio el estado de una solicitud
+     */
+    public function setStatusOrder(Request $req){
+        $resul = array();
+        $model = Order::findOrFail($req->id);
+        $status = OrderStatus::findOrfail($req->estado_id);
+        $model->estado_id = $status->id;
+        $model->save();
+        $resul['accion']='upd';
+        $resul['item'] = $status;
+        return $resul;
+    }
+    /**
+     * cambio el estado de una solicitud
+     */
+    public function setStatusPurchase(Request $req){
+        $resul = array();
+        $model = Purchase::finOrFail($req->id);
+        $status = OrderStatus::findOrfail($req->estado_id);
+        $model->estado->id = $status->id;
+        $model->save();
+        $resul['accion']='upd';
+        $resul['item'] = $status;
+        return $resul;
+    }
+
     public function changeItemSolicitude(Request $req){
         $resul['accion']= "upd";
         $model = SolicitudeItem::findOrFail($req->id);
@@ -905,26 +1069,9 @@ class OrderController extends BaseController
         $resul['id']=$model->id;
         return $resul;
     }
-    public function getDocumentsToImport(Request $req){
-        $data = Array();
-        $items= array();
-        if($req->tipo == 22){
-            $items= Solicitude::where("aprob_compras",1)
-                ->where("aprob_gerencia", 1)
-                ->get();
-        }else if($req->tipo== 23){
-            $items= Purchase::where("aprob_compras",1)
-                ->where("aprob_gerencia", 1)
-                ->get();
-        }
-        foreach($items as $aux){
-            $aux['tipo'] = $aux->getTipo();
-            $aux['tipo_id'] = $aux->getTipoId();
-            $data[]=$aux;
-        }
-        //dd($data);
-        return $data;
-    }
+
+
+
     /**
      * llena los camppos de los filtros
      */
@@ -976,9 +1123,9 @@ class OrderController extends BaseController
         $newModel->items()->saveMany($newItems);
         $newModel->attachments()->saveMany($newAtt);
         $resul['id']= $newModel->id;
-/*        $resul['doc']= $newModel;
-        $resul['adjs']= $newAtt;
-        $resul['items']= $newItems;*/
+        /*        $resul['doc']= $newModel;
+                $resul['adjs']= $newAtt;
+                $resul['items']= $newItems;*/
         return $resul;
 
     }
@@ -1084,6 +1231,7 @@ class OrderController extends BaseController
             $tem['comentario']=$aux->comentario;
             $tem['tasa']=$aux->tasa;
             $tem['proveedor']=$prov->razon_social;
+            $tem['titulo']=$aux->titulo;
             $tem['documento']= $aux->getTipo();
             $tem['diasEmit']=$aux->daysCreate();
             $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
@@ -1766,6 +1914,8 @@ class OrderController extends BaseController
         $tem['condicion_pedido_id']=$model->condicion_pedido_id;
         $tem['prov_moneda_id']=$model->prov_moneda_id;
         $tem['estado_id']=$model->estado_id;
+        $tem['doc_parent_id']=$model->doc_parent_id;
+        $tem['doc_parent_origen_id']=$model->doc_parent_origen_id;
         // pra humanos
         $tem['comentario']=$model->comentario;
         $tem['tasa']=$model->tasa;
@@ -2620,6 +2770,8 @@ class OrderController extends BaseController
 
     }
 
+
+
     public function savePurchaseOrder(Request $req)
     {
 
@@ -2701,11 +2853,6 @@ class OrderController extends BaseController
                 $model = $model->findOrFail($req->id);
                 $result["action"]="upd";
             }
-            if ($req->has('copy')) {
-                $aux = new Order();
-                $aux = $this->setDocItem($aux, $req);
-                $aux->version = $model->version+1;
-            }
             $model = $this->setDocItem($model,$req);
 
             if($req->has("close")){
@@ -2725,6 +2872,56 @@ class OrderController extends BaseController
 
     }
 
+    /***/
+    public function CloseSolicitude(Request $req)
+    {
+        $result['success'] = "Registro guardado con éxito!";
+        $result['action'] = "new";
+        $model = Solicitude::findOrFail($req->id);
+        $model->final_id=
+            "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
+            ."-a".sizeof($model->attachments()->get());
+        $model->save();
+
+       // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
+
+
+        return $result;
+
+    }
+
+    /***/
+    public function ClosePurchase(Request $req)
+    {
+        $result['success'] = "Registro guardado con éxito!";
+        $result['action'] = "new";
+        $model = Purchase::findOrFail($req->id);
+        $model->final_id=
+            "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
+            ."-a".sizeof($model->attachments()->get());
+        $model->save();
+       // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
+
+
+        return $result;
+
+    }
+    /***/
+    public function CloseOrder(Request $req)
+    {
+        $result['success'] = "Registro guardado con éxito!";
+        $result['action'] = "new";
+        $model = Order::findOrFail($req->id);
+        $model->final_id=
+            "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
+            ."-a".sizeof($model->attachments()->get());
+        $model->save();
+       // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
+
+
+        return $result;
+
+    }
 
 
     /** Elimina el registro de la base de datos7
@@ -2823,6 +3020,13 @@ class OrderController extends BaseController
             $model->titulo = $req->titulo;
         }
 
+        if($req->has('doc_parent_id')){
+            $model->doc_parent_id = $req->doc_parent_id;
+        }
+
+        if($req->has('doc_parent_origen_id')){
+            $model->doc_parent_id = $req->doc_parent_id;
+        }
 
         return $model;
 

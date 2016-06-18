@@ -24,6 +24,17 @@ class EmailController extends BaseController
         });
     }
 
+    public  static  function  sendEmail($templ, $data, $opt){
+        $resul= array();
+
+        Mail::send($templ,$data, function ($m) use($opt, $data){
+            $m->to("mquevedo.sistemas@valcro.co", "Miguel")->subject('Prueba de correo desde valcro.co');
+        });
+        $resul['data'] = view("emails.prueba");
+        return $resul;
+    }
+
+
 
 
 

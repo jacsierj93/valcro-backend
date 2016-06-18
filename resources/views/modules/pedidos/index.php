@@ -355,14 +355,14 @@
                     </div>
                     <div layout="row" class="headGridHolder">
                         <div class="headGrid cellEmpty"> </div>
-                        <div flex="5" class="headGrid"> - </div>
                         <div flex="5" class="headGrid"> N° </div>
                         <div flex="15" class="headGrid"> Documento</div>
-                        <div flex="15" class="headGrid"> N° Proforma</div>
+                        <div flex class="headGrid"> Titulo</div>
+                        <div flex="10" class="headGrid"> N° Proforma</div>
                         <div flex="10" class="headGrid"> Fecha</div>
                         <div flex="5" class="headGrid"> </div>
                         <div flex="10" class="headGrid"> Transporte</div>
-                        <div flex="15" class="headGrid"> N° Factura</div>
+                        <div flex="10" class="headGrid"> N° Factura</div>
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
@@ -370,10 +370,10 @@
                         <div   ng-repeat="item in provSelec.pedidos" ng-click="DtPedido(item)">
                             <div layout="row" class="cellGridHolder" >
                                 <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
-                                <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.tipo}}</div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
                                 <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.documento}}</div>
-                                <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
+                                <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.titulo}}</div>
+                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
                                 <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)">
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
@@ -386,7 +386,7 @@
                                     </div>
                                     <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
                                 </div>
-                                <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
+                                <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
                                 <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.monto | currency :item.symbol :2}}</div>
                                 <div flex class="cellGrid" ng-mouseover="hoverPreview(true)">{{item.comentario}}</div>
                             </div>
@@ -590,21 +590,22 @@
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detalleDoc" id="detalleDoc">
 
-            <md-content  layout="row" flex class="sideNavContent">
+            <md-content  layout="row" flex class="cntLayerHolder">
                 <div  layout="column" flex="" >
                     <form name="FormHeadDocument" layout="row">
                         <div active-left></div>
                         <div layout="column" flex>
-                            <div layout="row" flex style="height: 48px;">
-                                <div style="height: 48px; width: 48px;margin-top: 11px;" ng-click="openImport()">IMG</div>
+                            <div layout="row" flex style="height: 39px; min-height: 39px;">
+                                <div style="height: 39px; width: 39px;" ng-click="openImport()"
+                                     ng-show="document.doc_parent_id == 'null' || !document.doc_parent_id">IMG</div>
                                 <div class="titulo_formulario" layout="column" layout-align="start start"  ng-click=" gridView = -1">
                                     <div>
                                         Datos de {{formMode.name}}
                                     </div>
                                 </div>
                             </div>
-                            <div ng-show="( gridView != 4 )">
-                                <div layout="row"  >
+                            <!--<div ng-show="( gridView != 4 )" >-->
+                                <div   ng-show="( gridView != 4 )"  layout="row"  >
                                     <md-input-container class="md-block" flex="50" >
                                         <label>Proveedor</label>
                                         <md-select ng-model="provSelec.id"
@@ -618,29 +619,24 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>
-
                                     <md-input-container class="md-block" flex="15">
                                         <label>N° de Pedido</label>
                                         <input  ng-model="document.id" ng-disabled="true">
                                     </md-input-container>
-
                                     <div layout="column" flex="15" style="margin-top: 8px;">
                                         <md-datepicker ng-model="document.emision"
                                                        md-placeholder="Fecha"
                                                        ng-disabled="(true)"
                                         ></md-datepicker>
                                     </div>
-
-
                                 </div>
-
-                                <md-input-container class="md-block" flex>
+                                <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex>
                                     <label>Titulo</label>
                                     <input  ng-model="document.titulo"
                                             ng-disabled="( formBlock )"
                                     >
                                 </md-input-container>
-                                <div layout="row" >
+                                <div  ng-show="( gridView != 4 )"  layout="row" >
 
                                     <md-input-container class="md-block" flex="30">
                                         <label>Pais</label>
@@ -681,8 +677,7 @@
                                     </md-input-container>
 
                                 </div>
-
-                                <div layout="row" >
+                                <div   ng-show="( gridView != 4 )"  layout="row" >
                                     <md-input-container class="md-block" flex="15">
                                         <label>Monto</label>
                                         <input  ng-model="document.monto"
@@ -728,8 +723,7 @@
                                     </md-input-container>
 
                                 </div>
-
-                                <div layout="row" >
+                                <div   ng-show="( gridView != 4 )" layout="row" >
 
                                     <md-input-container class="md-block" flex="10">
                                         <label>Mt3</label>
@@ -767,8 +761,7 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div layout="row">
+                                <div   ng-show="( gridView != 4 )"  layout="row">
                                     <md-input-container class="md-block" flex="20">
                                         <label>Condiciones  </label>
                                         <md-select ng-model="document.condicion_id" md-no-ink
@@ -793,24 +786,26 @@
                                         >
                                     </md-input-container>
                                 </div>
-
-                                <div layout="row" >
+                                <div   ng-show="( gridView != 4 )"  layout="row" >
                                     <md-input-container class="md-block" flex >
                                         <label>Comentario</label>
                                         <input ng-model="document.comentario"  ng-disabled="( formBlock)">
                                     </md-input-container>
                                 </div>
-
-                            </div>
+                          <!--  </div>-->
                         </div>
                     </form>
                     <div ng-hide="document.isNew">
+
                         <form name="FormEstatusDoc" layout="row">
                             <div active-left></div>
+                            <div></div>
                             <div layout="column" flex >
-                                <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 1">
-                                    <div>
-                                        Aprobacion de Gerente
+                                <div layout="row" flex style="height: 39px; min-height: 39px;">
+                                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 1">
+                                        <div>
+                                            Aprobacion de Gerente
+                                        </div>
                                     </div>
                                 </div>
 
@@ -829,12 +824,15 @@
                             </div>
 
                         </form>
+
                         <form name="FormAprobCompras" layout="row">
                             <div active-left></div>
                             <div layout="column" flex>
-                                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 2">
-                                    <div>
-                                        Aprobación
+                                <div layout="row" flex style="height: 39px; min-height: 39px;">
+                                    <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 2">
+                                        <div>
+                                            Aprobación
+                                        </div>
                                     </div>
                                 </div>
 
@@ -845,8 +843,7 @@
                                     </div>
 
                                     <div layout="column" flex="20">
-                                        <!-- <md-datepicker ng-model="document.fecha_aprob_compra"
-                                                        ng-disabled="(formBlock)"       ></md-datepicker>-->
+
                                     </div>
 
                                     <md-input-container class="md-block" flex="20">
@@ -870,23 +867,28 @@
                                 </div>
                             </div>
                         </form>
-                        <form name="FormCancelDoc" layout="row" >
-                            <div active-left></div>
-                            <div layout="column" flex>
-                                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
-                                    <div>
-                                        Cancelacion
-                                    </div>
-                                </div>
 
-                                <md-input-container class="md-block" flex  ng-show="( gridView == 3 )" >
-                                    <label>Motivo de cancelacion </label>
-                                    <input  ng-model="document.comentario_cancelacion"
-                                            ng-disabled="(formBlock)">
-                                </md-input-container>
+                      <form name="FormCancelDoc" layout="row" >
+                          <div active-left></div>
+                          <div layout="column" flex>
+                              <div layout="row" flex style="height: 39px; min-height: 39px;">
 
-                            </div>
-                        </form>
+                              <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
+                                  <div>
+                                      Cancelacion
+                                  </div>
+                              </div>
+                                  </div>
+
+                              <md-input-container class="md-block" flex  ng-show="( gridView == 3 )" >
+                                  <label>Motivo de cancelacion </label>
+                                  <input  ng-model="document.comentario_cancelacion"
+                                          ng-disabled="(formBlock)">
+                              </md-input-container>
+
+                          </div>
+                      </form>
+
                     </div>
                     <form name=" productos" layout="row">
                         <div active-left></div>

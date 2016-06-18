@@ -110,3 +110,7 @@
 .layerColumn{
     padding-top: 4px;
 }
+
+.titleForm{
+    min-height: 39px;
+}
