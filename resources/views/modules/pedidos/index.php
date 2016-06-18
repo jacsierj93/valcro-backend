@@ -1,4 +1,3 @@
-<div ng-controller="LayersCtrl"></div>
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION PEDIDOS########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="PedidosCtrll" xmlns="http://www.w3.org/1999/html">
 
@@ -182,7 +181,7 @@
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras )" ng-click="updateForm()">
+                         ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
@@ -190,13 +189,13 @@
 
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras    )"
-                         ng-click="test('eliminadndo')">
+                         ng-show="(module.index > 1 && !document.estado_id != 3 )"
+                         ng-click="cancelDoc()">
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && formBlock && !pedidoSelect.aprob_gerencia && !pedidoSelect.aprob_compras    )"
-                         ng-click="test('eliminadndo')">
+                         ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras    )"
+                         ng-click="test('Copi doc')">
                         <span style="font-size: 24px"> CP</span>
                     </div>
                     <div layout="column" layout-align="center center"></div>
@@ -605,196 +604,196 @@
                                 </div>
                             </div>
                             <!--<div ng-show="( gridView != 4 )" >-->
-                                <div   ng-show="( gridView != 4 )"  layout="row"  >
-                                    <md-input-container class="md-block" flex="50" >
-                                        <label>Proveedor</label>
-                                        <md-select ng-model="provSelec.id"
-                                                   md-no-ink
-                                                   info="Seleccione un proveedor para el documento"
-                                                   required
-                                                   ng-disabled="( formBlock || formGlobal == 'upd')"
-                                        >
-                                            <md-option ng-repeat="prov in todos" value="{{prov.id}}">
-                                                {{prov.razon_social}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex="15">
-                                        <label>N° de Pedido</label>
-                                        <input  ng-model="document.id" ng-disabled="true">
-                                    </md-input-container>
-                                    <div layout="column" flex="15" style="margin-top: 8px;">
-                                        <md-datepicker ng-model="document.emision"
-                                                       md-placeholder="Fecha"
-                                                       ng-disabled="(true)"
-                                        ></md-datepicker>
-                                    </div>
+                            <div   ng-show="( gridView != 4 )"  layout="row"  >
+                                <md-input-container class="md-block" flex="50" >
+                                    <label>Proveedor</label>
+                                    <md-select ng-model="provSelec.id"
+                                               md-no-ink
+                                               info="Seleccione un proveedor para el documento"
+                                               required
+                                               ng-disabled="( formBlock || formGlobal == 'upd')"
+                                    >
+                                        <md-option ng-repeat="prov in todos" value="{{prov.id}}">
+                                            {{prov.razon_social}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15">
+                                    <label>N° de Pedido</label>
+                                    <input  ng-model="document.id" ng-disabled="true">
+                                </md-input-container>
+                                <div layout="column" flex="15" style="margin-top: 8px;">
+                                    <md-datepicker ng-model="document.emision"
+                                                   md-placeholder="Fecha"
+                                                   ng-disabled="(true)"
+                                    ></md-datepicker>
                                 </div>
-                                <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex>
-                                    <label>Titulo</label>
-                                    <input  ng-model="document.titulo"
+                            </div>
+                            <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex>
+                                <label>Titulo</label>
+                                <input  ng-model="document.titulo"
+                                        ng-disabled="( formBlock )"
+                                >
+                            </md-input-container>
+                            <div  ng-show="( gridView != 4 )"  layout="row" >
+
+                                <md-input-container class="md-block" flex="30">
+                                    <label>Pais</label>
+                                    <md-select ng-model="document.pais_id" md-no-ink
+                                               ng-disabled="( formBlock )"
+
+                                    >
+                                        <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
+                                            {{item.short_name}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+
+                                <md-input-container class="md-block"  flex>
+                                    <label>Direccion almacen</label>
+                                    <md-select ng-model="document.direccion_almacen_id"
+                                               md-no-ink
+                                               ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
+
+                                    >
+                                        <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
+                                            {{dir.direccion}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+
+                                <md-input-container class="md-block"  flex>
+                                    <label>Direccion Facturacion</label>
+                                    <md-select ng-model="document.direccion_facturacion_id"
+                                               md-no-ink
+                                               ng-disabled="( formBlock || provSelec.id == '' )"
+
+                                    >
+                                        <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}">
+                                            {{dir.direccion}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+
+                            </div>
+                            <div   ng-show="( gridView != 4 )"  layout="row" >
+                                <md-input-container class="md-block" flex="15">
+                                    <label>Monto</label>
+                                    <input  ng-model="document.monto"
+                                            decimal
                                             ng-disabled="( formBlock )"
+                                            required
+
                                     >
                                 </md-input-container>
-                                <div  ng-show="( gridView != 4 )"  layout="row" >
 
-                                    <md-input-container class="md-block" flex="30">
-                                        <label>Pais</label>
-                                        <md-select ng-model="document.pais_id" md-no-ink
-                                                   ng-disabled="( formBlock )"
+                                <md-input-container class="md-block" flex="10">
+                                    <label>Moneda</label>
+                                    <md-select ng-model="document.prov_moneda_id" md-no-ink
+                                               ng-disabled="( formBlock)"
+                                               required
+                                    >
+                                        <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
+                                            {{moneda.nombre}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
 
-                                        >
-                                            <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
-                                                {{item.short_name}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
+                                <md-input-container class="md-block" flex="10" ng-dblclick=" document.tasa_fija = 1 " >
+                                    <label>Tasa</label>
+                                    <input  ng-model="document.tasa"
+                                            type="number"
+                                            ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
+                                            required
+                                    >
+                                </md-input-container>
 
+                                <md-input-container class="md-block" flex="">
+                                    <label>Condicion de pago</label>
+                                    <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)"
+                                               md-no-ink
+                                               ng-required ="(formMode.value == 23)"
+
+                                    >
+                                        <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
+                                            {{conPago.titulo}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+
+                            </div>
+                            <div   ng-show="( gridView != 4 )" layout="row" >
+
+                                <md-input-container class="md-block" flex="10">
+                                    <label>Mt3</label>
+                                    <input ng-model="document.mt3"  name="mt3"  ng-model="number" ui-number-mask
+                                           ng-disabled="( formBlock)"  >
+                                </md-input-container>
+
+                                <md-input-container class="md-block" flex="10" >
+                                    <label>Peso</label>
+                                    <input ng-model="document.peso" name="peso"  ng-model="number" ui-number-mask
+                                           ng-disabled="( formBlock)" >
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="10">
+                                    <label>Puerto</label>
+                                    <md-select ng-model="document.puerto_id"
+                                               md-no-ink
+                                               ng-disabled="( formBlock || document.direccion_almacen_id =='' || !document.direccion_almacen_id)"
+
+                                    >
+                                        <md-option ng-repeat="item in formData.puertos" value="{{item.id}}">
+                                            {{item.Main_port_name}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <div flex layout="row" flex ng-click="test()">
                                     <md-input-container class="md-block"  flex>
-                                        <label>Direccion almacen</label>
-                                        <md-select ng-model="document.direccion_almacen_id"
-                                                   md-no-ink
-                                                   ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
-
-                                        >
-                                            <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
-                                                {{dir.direccion}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
-
-                                    <md-input-container class="md-block"  flex>
-                                        <label>Direccion Facturacion</label>
-                                        <md-select ng-model="document.direccion_facturacion_id"
-                                                   md-no-ink
-                                                   ng-disabled="( formBlock || provSelec.id == '' )"
-
-                                        >
-                                            <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}">
-                                                {{dir.direccion}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
-
-                                </div>
-                                <div   ng-show="( gridView != 4 )"  layout="row" >
-                                    <md-input-container class="md-block" flex="15">
-                                        <label>Monto</label>
-                                        <input  ng-model="document.monto"
-                                                decimal
-                                                ng-disabled="( formBlock )"
-                                                required
-
+                                        <label>Adjunto</label>
+                                        <input ng-model="document.adj" name="peso"  ng-model="number" ui-number-mask
+                                               ng-disabled="true"
                                         >
                                     </md-input-container>
 
-                                    <md-input-container class="md-block" flex="10">
-                                        <label>Moneda</label>
-                                        <md-select ng-model="document.prov_moneda_id" md-no-ink
-                                                   ng-disabled="( formBlock)"
-                                                   required
-                                        >
-                                            <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
-                                                {{moneda.nombre}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
-
-                                    <md-input-container class="md-block" flex="10" ng-dblclick=" document.tasa_fija = 1 " >
-                                        <label>Tasa</label>
-                                        <input  ng-model="document.tasa"
-                                                type="number"
-                                                ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
-                                                required
-                                        >
-                                    </md-input-container>
-
-                                    <md-input-container class="md-block" flex="">
-                                        <label>Condicion de pago</label>
-                                        <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)"
-                                                   md-no-ink
-                                                   ng-required ="(formMode.value == 23)"
-
-                                        >
-                                            <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
-                                                {{conPago.titulo}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
-
-                                </div>
-                                <div   ng-show="( gridView != 4 )" layout="row" >
-
-                                    <md-input-container class="md-block" flex="10">
-                                        <label>Mt3</label>
-                                        <input ng-model="document.mt3"  name="mt3"  ng-model="number" ui-number-mask
-                                               ng-disabled="( formBlock)"  >
-                                    </md-input-container>
-
-                                    <md-input-container class="md-block" flex="10" >
-                                        <label>Peso</label>
-                                        <input ng-model="document.peso" name="peso"  ng-model="number" ui-number-mask
-                                               ng-disabled="( formBlock)" >
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex="10">
-                                        <label>Puerto</label>
-                                        <md-select ng-model="document.puerto_id"
-                                                   md-no-ink
-                                                   ng-disabled="( formBlock || document.direccion_almacen_id =='' || !document.direccion_almacen_id)"
-
-                                        >
-                                            <md-option ng-repeat="item in formData.puertos" value="{{item.id}}">
-                                                {{item.Main_port_name}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
-                                    <div flex layout="row" flex ng-click="test()">
-                                        <md-input-container class="md-block"  flex>
-                                            <label>Adjunto</label>
-                                            <input ng-model="document.adj" name="peso"  ng-model="number" ui-number-mask
-                                                   ng-disabled="true"
-                                            >
-                                        </md-input-container>
-
-                                        <div layout="column" layout-align="center center">
-                                            <span class="icon-Agregar" style="font-size: 24px"></span>
-                                        </div>
+                                    <div layout="column" layout-align="center center">
+                                        <span class="icon-Agregar" style="font-size: 24px"></span>
                                     </div>
                                 </div>
-                                <div   ng-show="( gridView != 4 )"  layout="row">
-                                    <md-input-container class="md-block" flex="20">
-                                        <label>Condiciones  </label>
-                                        <md-select ng-model="document.condicion_id" md-no-ink
-                                                   ng-disabled="( formBlock)"
+                            </div>
+                            <div   ng-show="( gridView != 4 )"  layout="row">
+                                <md-input-container class="md-block" flex="20">
+                                    <label>Condiciones  </label>
+                                    <md-select ng-model="document.condicion_id" md-no-ink
+                                               ng-disabled="( formBlock)"
 
-                                        >
-                                            <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
-                                                {{condPed.nombre}}
-                                            </md-option>
-                                        </md-select>
-                                    </md-input-container>
+                                    >
+                                        <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
+                                            {{condPed.nombre}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
 
-                                    <md-input-container class="md-block" flex >
-                                        <label>N° Factura:</label>
-                                        <input ng-model="document.nro_factura"  ng-disabled="( formBlock)">
-                                    </md-input-container>
-                                    <div style="width: 24px;" ng-click="openAdj()">%%</div>
+                                <md-input-container class="md-block" flex >
+                                    <label>N° Factura:</label>
+                                    <input ng-model="document.nro_factura"  ng-disabled="( formBlock)">
+                                </md-input-container>
+                                <div style="width: 24px;" ng-click="openAdj()">%%</div>
 
-                                    <md-input-container class="md-block" flex >
-                                        <label>N° Proforma:</label>
-                                        <input ng-model="document.nro_proforma"  ng-disabled="( formBlock)"
-                                               ng-required ="(formMode.value == 23)"
-                                        >
-                                    </md-input-container>
-                                    <div style="width: 24px;" ng-click="openAdj()" >%%</div>
-                                </div>
-                                <div   ng-show="( gridView != 4 )"  layout="row" >
-                                    <md-input-container class="md-block" flex >
-                                        <label>Comentario</label>
-                                        <input ng-model="document.comentario"  ng-disabled="( formBlock)">
-                                    </md-input-container>
-                                </div>
-                          <!--  </div>-->
+                                <md-input-container class="md-block" flex >
+                                    <label>N° Proforma:</label>
+                                    <input ng-model="document.nro_proforma"  ng-disabled="( formBlock)"
+                                           ng-required ="(formMode.value == 23)"
+                                    >
+                                </md-input-container>
+                                <div style="width: 24px;" ng-click="openAdj()" >%%</div>
+                            </div>
+                            <div   ng-show="( gridView != 4 )"  layout="row" >
+                                <md-input-container class="md-block" flex >
+                                    <label>Comentario</label>
+                                    <input ng-model="document.comentario"  ng-disabled="( formBlock)">
+                                </md-input-container>
+                            </div>
+                            <!--  </div>-->
                         </div>
                     </form>
                     <div ng-hide="document.isNew">
@@ -872,26 +871,28 @@
                             </div>
                         </form>
 
-                      <form name="FormCancelDoc" layout="row" >
-                          <div active-left></div>
-                          <div layout="column" flex>
-                              <div layout="row" flex style="height: 39px; min-height: 39px;">
+                        <form name="FormCancelDoc" layout="row" >
+                            <div active-left></div>
+                            <div layout="column" flex>
+                                <div layout="row" flex style="height: 39px; min-height: 39px;">
 
-                              <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
-                                  <div>
-                                      Cancelacion
-                                  </div>
-                              </div>
-                                  </div>
+                                    <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
+                                        <div>
+                                            Cancelacion
+                                        </div>
+                                    </div>
+                                </div>
 
-                              <md-input-container class="md-block" flex  ng-show="( gridView == 3 )" >
-                                  <label>Motivo de cancelacion </label>
-                                  <input  ng-model="document.comentario_cancelacion"
-                                          ng-disabled="(formBlock)">
-                              </md-input-container>
+                                <md-input-container class="md-block" flex  ng-show="( gridView == 3 )" >
+                                    <label>Motivo de cancelacion </label>
+                                    <input  ng-model="document.comentario_cancelacion"
+                                            ng-disabled="(formBlock)"
+                                            id="mtvCancelacion"
+                                    >
+                                </md-input-container>
 
-                          </div>
-                      </form>
+                            </div>
+                        </form>
                     </div>
                     <form name=" productos" layout="row">
                         <div active-left></div>

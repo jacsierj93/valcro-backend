@@ -106,13 +106,17 @@ MyApp.directive('chip', function ($timeout) {
     };
 });
 
-MyApp.directive('activeLeft', function ($compile) {
+MyApp.directive('activeLeft', function ($compile, Layers) {
     return {
         link: function (scope, elem, attrs) {
+            var ly =jQuery(elem).parents("md-sidenav").first().attr("id");
+            scope.close=function(name){
+                Layers.setAccion({ close:{name:name}});
+            };
             elem.removeAttr("active-left");
             elem.addClass("activeleft");
-            elem.attr("ng-click","$parent.closeLayer()");
-            elem.attr("ng-class","{'white': ('"+jQuery(elem).parents("md-sidenav").first().attr("id")+"'!=layer)}");
+            elem.attr("ng-click","close('"+ly+"')");
+            elem.attr("ng-class","{'white': ('"+ly+"'!=layer)}");
             $compile(elem[0])(scope);
         }
     };

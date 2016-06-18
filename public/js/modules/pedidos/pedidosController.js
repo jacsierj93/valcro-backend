@@ -72,6 +72,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
 
+
     //gui
     // $scope.showGripro=false;
     $scope.showFilterPed=false;
@@ -223,14 +224,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }, 1000);
 
 
-    }
+    };
 
     $scope.hoverEnter=  function(){
         $scope.mouseProview= true;
-    }
+    };
     $scope.hoverPreview= function(val){
         $scope.preview=val;
-    }
+    };
 
     $scope.updateForm = function () {
         $scope.formBlock = false;
@@ -249,6 +250,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
 
+    $scope.cancelDoc = function(){
+
+        $scope.formBlock= false;
+        $scope.moduleAccion({open:{name:"detalleDoc"}});
+        $scope.document.estado_id=3;// se cambia el estado a cancelado
+        $scope.gridView =3;
+        var mo= jQuery("#mtvCancelacion");
+        mo[0].autofocus = true;
+
+
+    };
 
     $scope.createProduct = function(item){
 
@@ -1321,7 +1333,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     });
 
 
-
+/*
 
     $scope.$watchGroup(
         ['document.tipo_id','document.direccion_facturacion_id',
@@ -1336,7 +1348,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             'document.mt3','document.peso','document.puerto_id','document.condicion_id'
             ,'document.nro_factura',''], function(newVal){
 
-        });
+        });*/
 
     /**layers*/
     $scope.$watchGroup(['module.index','module.layer'], function(newVal){
@@ -1453,6 +1465,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
 
             });
+        }
+    });
+
+
+
+    $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
+
+        if (nuevo[0] && !nuevo[1]) {
+
+           /* $scope.document.prov_id = $scope.provSelec.id;
+            //{id:$scope.document.id, estado_id:$scope.document.estado_id}
+            Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
+                if (response.success) {
+                    setNotif.addNotif("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+                }
+
+            });*/
         }
 
 
@@ -1900,11 +1929,12 @@ MyApp.service('Layers' , function(){
 MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
     $scope.accion= Layers.getAccion();
-
+    console.log("lyer bien");
     $scope.$watch("accion.estado", function(newVal){
 
         if(newVal){
             var module = Layers.getModule();
+            console.log("moduel est", module);
             var arg = $scope.accion.data;
             if(arg.open){
                 open(arg.open, module);
@@ -1943,8 +1973,11 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 module.blockBack=true;
                 var close =1;
                 var current= module.index;
+                console.log("aas  ", arg);
                 if(arg.name){
+                    console.log("name  ", arg.name);
                     var aux = module.historia.indexOf(arg.name);
+                    console.log("aux  ",aux);
                     if(aux!= -1){
                         close= current - aux;
                     }else{

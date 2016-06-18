@@ -75,7 +75,7 @@
     </div>
 
 </div>
-
+<div ng-controller="LayersCtrl"></div>
 
 <?= HTML::script('js/app.js') ?>
 <?= HTML::script('js/appTemp.js') ?>
