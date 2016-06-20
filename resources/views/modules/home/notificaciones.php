@@ -41,7 +41,7 @@
                 <div class="alertTextOpcs" layout="row">
                     <div flex layout="row" ng-repeat="opc in tab.opcs" autotrigger="{{opc.$$hashKey}}" tabindex="0" ng-click="closeThis('alert');ok(this)">
                         <div style="width:32px" ng-show="opc.default"><span class="icon-Tiempo" >{{opc.count}}</span></div>
-                         <div flex>{{opc.name}}</div>
+                        <div flex>{{opc.name}}</div>
                     </div>
                 </div>
             </md-tab>
@@ -89,4 +89,34 @@
             <div  ng-show="alerts.info.length>1">{{selected.info + 1}}/{{alerts.info.length}}</div>
         </div>
     </div>
+    <!-- INPUT ############################################################################################## -->
+    <div class="alertBox"  style="background-color: #f1f1f1"  flex ng-show="alerts.input.length > 0" layout="row" id="info">
+        <div class="alertPrevArrow" ng-click="alertPrev('input')" ng-show="alerts.input.length > 1"></div>
+        <md-tabs  md-selected="selected.info" flex>
+            <md-tab label="{{tab.title}}" ng-repeat="tab in alerts.input" flex>
+                <div style="" class="alertTextContent" >
+                    {{tab.content}}
+                </div>
+                <div  layout="row" flex>
+                    <md-input-container class="md-block" layout-align="center center" flex   style="height: 24px;">
+                        <label>{{tab.content}}</label>
+                        <input  type="text" ng-model="text"  style="background: none; border: none;" flex>
+                    </md-input-container>
+                    <div flex layout="row" style="height: 39px;">
+                        <div layout="column" layout-align="center center" ng-click="closeThis('info');" flex >
+                            <span class="icon-Filtro" style="font-size: 16px"></span>
+                        </div>
+                        <div layout="column" layout-align="center center"  ng-click="closeThis('info');ok(this)" flex="" >
+                            <span class="icon-Filtro" style="font-size: 16px"></span>
+                        </div>
+                    </div>
+                </div>
+            </md-tab>
+        </md-tabs>
+        <div class="alertNextArrow" ng-click="alertNext('input')" ng-show="alerts.input.length > 1" style="width: 50px;">
+            <div  ng-show="alerts.input.length>1">{{selected.input + 1}}/{{alerts.input.length}}</div>
+        </div>
+    </div>
+
+
 </md-sidenav>

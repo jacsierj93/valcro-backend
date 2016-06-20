@@ -8,8 +8,13 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     // ####################################################################################################
     $scope.alerts = setNotif.listNotif();
 
-    $scope.ok = function(call){
-        call.opc.action();
+    $scope.ok = function(call, val){
+        if(val){
+            call.opc.action(val);
+        }else {
+            call.opc.action();
+        }
+
     };
 
     $scope.closeThis = function(target){
@@ -23,7 +28,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
     // ========================================================================
     // ========================================================================
-    $scope.selected = {alert: 0, error: 0, info: 0, ok: 0};
+    $scope.selected = {alert: 0, error: 0, info: 0, ok: 0, input:0};
     // ========================================================================
     $scope.alertNext = function (obj) {
         var total = $scope.alerts[obj].length - 1;
@@ -46,8 +51,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     };
 
     $scope.curFocus = angular.element("#test");
-    var names = ["ok","alert","error","info"];
-    $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length'], function(newValues,old) {
+    var names = ["ok","alert","error","info","input"];
+    $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length', 'alerts.input.length'], function(newValues,old) {
         var open = false;
         var prev = false;
         angular.forEach(newValues, function(v, k) {
@@ -92,6 +97,10 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
                 angular.element(":focus").blur();
                 $scope.block = notif.type;
             }
+            if("inputTitle" in params){
+                console.log(" title")
+                $scope.inputTitle = params.inputTitle;
+            }
 
         };
 
@@ -128,6 +137,10 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
             angular.element("#"+$scope.block).removeClass("shake");
         },1000);
     };
+/*
+    $scope.$watch("alerts.input.length", function(newVal){
+
+    });*/
 
 }]);
 
@@ -138,7 +151,8 @@ MyApp.service("setNotif",function($filter,$timeout){
         ok: [],
         alert: [],
         error: [],
-        info: []
+        info: [],
+        input: []
     };
     return {
         listNotif : function(){
@@ -148,6 +162,7 @@ MyApp.service("setNotif",function($filter,$timeout){
             if($filter("customFind")(list[obj],mnsg,function(current,compare){return current.content == compare}).length<=0) {
                 var Self = this;
                 var uid = Math.random();
+
                 list[obj].unshift({title: "", content: mnsg, opcs: opcs, uid: uid, param: param,type:obj});
                 if (param && "autohidden" in param) {
                     list[obj][0].timeOut = $timeout(function () {

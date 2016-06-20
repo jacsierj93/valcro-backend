@@ -3,6 +3,7 @@
 
     <span ng-click="callInfo()"> ABRIR ALERTA </span>
     <span ng-click="callAlert()"> ABRIR ALERTA2 </span>
+    <span ng-click="callInput()"> ABRIR ALERTA2 </span>
     <div ng-controller="notificaciones" ng-include="template"></div>
 
 

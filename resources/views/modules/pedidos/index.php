@@ -186,7 +186,6 @@
                     </div>
                     <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
                         <span class="icon-Filtro" style="font-size: 24px"></span>
-
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-show="(module.index > 1 && document.estado_id != 3 && document.id)"

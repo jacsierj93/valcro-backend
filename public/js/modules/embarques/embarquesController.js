@@ -29,6 +29,22 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'setNotif', fun
             }
         }
         ]);
-    }
+    };
+
+    $scope.callInput = function () {
+        setNotif.addNotif("input", "Aqui va", [
+            {
+                name: "",
+                action: function () {
+                    alert("algo");
+                }
+            }, {
+                name: "",
+                action: function () {
+                    console.log("Ejecuta cualquier accion o funcion que se programe aqui.");
+                }
+            }
+        ],{inputTitle:" titulo de prueba"/*, autohidden:10000*/});
+    };
 
 }]);
