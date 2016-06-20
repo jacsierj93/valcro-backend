@@ -2,6 +2,7 @@
  * Created by delimce on 14/3/2016.
  */
 /////variable global de la ruta de la aplicacion
+//console.log(window.location.pathname);
 var puerto = window.location.port;
 
 //console.log("puerto",puerto);
@@ -11,7 +12,9 @@ if(puerto != 80 || puerto != ""){
     prt = "";
 }
 
-var PATHAPP = "http://"+window.location.hostname+prt+"/dev/";
+var base2 = "/"+window.location.pathname.split("/")[1]+"/";
+
+var PATHAPP = "http://"+window.location.hostname+prt+base2;
 
 /////////token para los request ajax
 $.ajaxSetup({
