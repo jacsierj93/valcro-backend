@@ -1,5 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION PEDIDOS########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="PedidosCtrll" xmlns="http://www.w3.org/1999/html">
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="PedidosCtrll" global xmlns="http://www.w3.org/1999/html">
 
     <div class="contentHolder" layout="row" flex>
 
@@ -189,7 +189,7 @@
 
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && !document.estado_id != 3 )"
+                         ng-show="(module.index > 1 && document.estado_id != 3 && document.id)"
                          ng-click="cancelDoc()">
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
                     </div>
@@ -950,7 +950,6 @@
 
                         <md-content flex>
 
-                            <div class="imgItem" ng-repeat="pic in imgs"><img height="149px" width="149px" src="images/prueba/pagos/{{pic}}"/></div>
                         </md-content>
                     </div>
             </md-content>
@@ -1886,7 +1885,7 @@
                                     <div > ID: </div>
                                     <div flex> {{document.id}} </div>
                                 </div>
-                                <div layout="row" class="rms" flex="">
+                                <div layout="row" class="rms" flex="" ng-show="document.version > 1">
                                     <div > Version: </div>
                                     <div flex> {{document.version}} </div>
                                 </div>
@@ -1898,28 +1897,28 @@
                                          class="emit{{document.diasEmit}}"></div>
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
-                                <div class="rowRsmTitle"> Ult. Modif. </div>
-                                <div class="rms" > {{document.emision | date:'dd/MM/yyyy' }} (demo)
+                            <div layout="row"  class="rowRsm" ng-show="document.ult_revision">
+                                <div class="rowRsmTitle"> Revisado </div>
+                                <div class="rms" > {{document.ult_revision | date:'dd/MM/yyyy' }} (demo)
                                 </div>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div class="rowRsmTitle"> Estado</div>
                                 <div class="rms" > {{document.estado }}</div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="document.prioridad">
                                 <div class=" rms rowRsmTitle"> Prioridad: </div>
                                 <div class="rms" > {{document.prioridad}} </div>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div class="rowRsmTitle"> Proveedor: </div>
-                                <div > {{document.proveedor}} </div>
+                                <div  class="rms" > {{document.proveedor}} </div>
                             </div>
-                            <div layout="row" class="rowRsm">
+                            <div layout="row" class="rowRsm" ng-show="document.pais">
                                 <div class="rowRsmTitle" > Pais: </div>
                                 <div class="rms" > {{document.pais}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="document.direccion_almacen_id">
                                 <div class="rowRsmTitle" > Almacen: </div>
                                 <div class="rms" > {{document.almacen}} </div>
                             </div>
@@ -1927,23 +1926,23 @@
                                 <div class="rowRsmTitle"> Motivo: </div>
                                 <div class="rms" > {{document.motivo}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="document.nro_proforma">
                                 <div class="rowRsmTitle"> N° Proforma: </div>
                                 <div class="rms"> {{document.nro_proforma}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="document.nro_factura">
                                 <div class="rowRsmTitle"> N° Factura: </div>
                                 <div class="rms" > {{document.nro_factura}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm"  ng-show="document.monto">
                                 <div class="rowRsmTitle"> Monto: </div>
                                 <div class="rms" > {{document.monto}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="document.moneda_prov_id">
                                 <div class="rowRsmTitle"> Moneda: </div>
                                 <div class="rms"> {{document.moneda}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="document.productos.todos.length > 0">
                                 <div class="rowRsmTitle"> Productos: </div>
                                 <div class="rms"> {{document.productos.todos.length}} </div>
                             </div>

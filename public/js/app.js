@@ -39,13 +39,23 @@ window.addEventListener("drop",function(e){
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
 
+MyApp.directive('global', function (Layers, setNotif) {
+    return {
+        link: function (scope) {
+            scope.LayersAction = Layers.setAccion;
+            scope.NotifAction = setNotif.addNotif;
+            scope.index = Layers.getIndex();
+        }
+    };
+});
+
 MyApp.directive('number', function () {
     return {
         require: 'ngModel',
         link: function (scope, elem, attrs,ctrl) {
 
             elem[0].addEventListener('input', function(){
-               var  num = this.value.match(/^[\d\-+\.]+$/);
+                var  num = this.value.match(/^[\d\-+\.]+$/);
                 if (num === null) {
                     this.value = this.value.substr(0, this.value.length - 1);
                 }
@@ -107,19 +117,12 @@ MyApp.directive('chip', function ($timeout) {
 });
 
 MyApp.directive('activeLeft', function ($compile, Layers) {
-     var fn =function(name){
-        Layers.setAccion({ close:{name:name}});
-    };
     return {
         link: function (scope, elem, attrs) {
             var ly =jQuery(elem).parents("md-sidenav").first().attr("id");
-            if(!("close" in  scope)){
-                scope.close=fn;
-            }
-
             elem.removeAttr("active-left");
             elem.addClass("activeleft");
-            elem.attr("ng-click","close('"+ly+"')");
+            elem.attr("ng-click","LayersAction({close:{name:'"+ly+"'}})");
             elem.attr("ng-class","{'white': ('"+ly+"'!=layer)}");
             $compile(elem[0])(scope);
         }
@@ -355,7 +358,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 }]);
 
 
-MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
+MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv, Layers) {
     /*$scope.project = {
      description: 'Nuclear Missile Defense System',
      rate: 500
@@ -386,6 +389,7 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv) {
     $scope.seccion = $scope.secciones[0];
     $scope.seccLink = function (indx){
         $scope.seccion = $scope.secciones[indx.$index];
+        Layers.setModule($scope.seccion.secc);
         angular.forEach($scope.secciones, function(value, key) {
             if(key == indx.$index){
                 value.selct = 'btnLine';

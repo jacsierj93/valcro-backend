@@ -1907,6 +1907,7 @@ class OrderController extends BaseController
         $tem['id']=$model->id;
         $tem['tipo_id']=$model->tipo_id;
         $tem['pais_id']=$model->pais_id;
+        $tem['final_id']=$model->final_id;
         $tem['direccion_almacen_id']=$model->direccion_almacen_id;
         $tem['condicion_pago_id']=$model->condicion_pago_id;
         $tem['motivo_pedido_id']=$model->motivo_pedido_id;
@@ -2882,8 +2883,8 @@ class OrderController extends BaseController
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
         $model->save();
-
-       // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
+        EmailController::sendEmail("emails.prueba", [],[]);
+        $result['template'] = view("emails.prueba", []);
 
 
         return $result;

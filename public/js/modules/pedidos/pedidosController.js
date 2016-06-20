@@ -1,11 +1,11 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,Layers,setGetOrder,setNotif, DateParse) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,Layers,setGetOrder, DateParse) {
 
     // var historia = [15];
     var autohidden= 2000;
 
     // controlers
     $scope.formBlock = true;
-    $scope.module= Layers.setModule("pedidos");
+    $scope.module= Layers.getModule();
     $scope.email= {};
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
@@ -18,6 +18,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.providerProds= new Array();
     $scope.docsSustitos= new Array();
     $scope.estadosDoc= new Array();
+
 
 
     $scope.formGlobal = "new";
@@ -63,14 +64,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.fpaisSelec="";
     $scope.email.contactos = new Array();
     $scope.emailToText = null;
-    $scope.productoSearch={
-        //codProducto:"",
-        //descripcion:"",
-        //pCompra:"",
-        //cantidad:"",
-        //stock:""
-
-    };
+    $scope.productoSearch={};
 
 
     //gui
@@ -84,7 +78,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.mouseProview= false;
     $scope.gridView=4;
     $scope.productTexto="";
-    $scope.layer ="";
+   // $scope.layer ="";
     $scope.openAdjDtPedido= false;
 
 
@@ -253,11 +247,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.cancelDoc = function(){
 
         $scope.formBlock= false;
-        $scope.moduleAccion({open:{name:"detalleDoc"}});
-        $scope.document.estado_id=3;// se cambia el estado a cancelado
-        $scope.gridView =3;
-        var mo= jQuery("#mtvCancelacion");
-        mo[0].autofocus = true;
+        $scope.moduleAccion({search:{name:"detalleDoc", after: function(){
+            $scope.document.estado_id=3;// se cambia el estado a cancelado
+            $scope.gridView =3;
+            var mo= jQuery("#mtvCancelacion");
+            mo[0].autofocus = true;
+        }}});
+
 
 
     };
@@ -314,17 +310,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.openAdjDtPedido){
             adjPane.animate({width:"0px"},400, function(){
                adjPane.css({display:"none"});
-
             });
-
             $scope.openAdjDtPedido= false;
         }else {
             adjPane.animate({width:"360px", display:"block"},400, function(){
-
-
+                $scope.openAdjDtPedido= true;
             });
 
-            $scope.openAdjDtPedido= true;
         }
 
     };
@@ -342,7 +334,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         console.log($scope.formBlock);
         if($scope.formBlock ){
             console.log("mode", $scope.formMode);
-            setNotif.addNotif("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
+            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
+           // setNotif.addNotif("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
         }else{
             console.log("modee", $scope.formMode);
             if($scope.formMode.value == 21){
@@ -773,7 +766,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         if($scope.module.index == 0){
             $scope.provSelec = prov;
-            Layers.setAccion({open:{name:"listPedido"}});
+            $scope.LayersAction({open:{name:"listPedido"}});
+            //Layers.setAccion({open:{name:"listPedido"}});
         }else{
             if($scope.module.layer == "listPedido" ){
                 $scope.provSelec = prov;
@@ -1881,6 +1875,7 @@ MyApp.service('Layers' , function(){
 
     return {
         setModule: function (name){
+            console.log("set moduel", name);
             if(!modules[name]){
                 modules[name]={historia: new Array(),layers:new Array(),index: 0,layer:"",blockBack:false};
 
@@ -1910,10 +1905,10 @@ MyApp.service('Layers' , function(){
             accion.estado=true;
         },
         getLayer : function (){
-            return layer;
+            return  modules[modulekey].index;
         },
-        setLayer: function( arg ){
-            layer =   arg;
+        getIndex : function (){
+            return  modules[modulekey].layer;
         }
     }
 
@@ -1923,18 +1918,26 @@ MyApp.service('Layers' , function(){
 MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
     $scope.accion= Layers.getAccion();
-    console.log("lyer bien");
     $scope.$watch("accion.estado", function(newVal){
 
         if(newVal){
             var module = Layers.getModule();
-            console.log("moduel est", module);
             var arg = $scope.accion.data;
             if(arg.open){
                 open(arg.open, module);
-            }
+            }else
             if(arg.close){
                 close(arg.close,module);
+            }else
+            if(arg.search){
+                if(module.historia.indexOf(arg.search.name) == -1) {
+                   open(arg.search, module);
+
+                }else {
+                    close(arg.search, module);
+                }
+            }else {
+                console.log("error parametro no implemtnado")
             }
             //if(arg.back){
             //    close(true, module);
@@ -1953,6 +1956,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     });
 
     function close(arg, module){
+        console.log("open");
         if(module.index>0 && !module.blockBack){
             var paso=true;
             if(arg.before){
@@ -1967,11 +1971,8 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 module.blockBack=true;
                 var close =1;
                 var current= module.index;
-                console.log("aas  ", arg);
                 if(arg.name){
-                    console.log("name  ", arg.name);
                     var aux = module.historia.indexOf(arg.name);
-                    console.log("aux  ",aux);
                     if(aux!= -1){
                         close= current - aux;
                     }else{
@@ -2008,7 +2009,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     //**operacion apertura */
     function open(arg, module){
         var paso= true;
-
+        console.log("open");
         if (module.historia.indexOf(arg.name) == -1) {
             if(arg.before){
                 if(!arg.validate){
