@@ -107,12 +107,16 @@ MyApp.directive('chip', function ($timeout) {
 });
 
 MyApp.directive('activeLeft', function ($compile, Layers) {
+     var fn =function(name){
+        Layers.setAccion({ close:{name:name}});
+    };
     return {
         link: function (scope, elem, attrs) {
             var ly =jQuery(elem).parents("md-sidenav").first().attr("id");
-            scope.close=function(name){
-                Layers.setAccion({ close:{name:name}});
-            };
+            if(!("close" in  scope)){
+                scope.close=fn;
+            }
+
             elem.removeAttr("active-left");
             elem.addClass("activeleft");
             elem.attr("ng-click","close('"+ly+"')");

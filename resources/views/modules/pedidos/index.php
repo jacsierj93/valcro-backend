@@ -796,8 +796,7 @@
                             <!--  </div>-->
                         </div>
                     </form>
-                    <div ng-hide="document.isNew">
-
+                    <div ng-show="document.final_id != null ">
                         <form name="FormEstatusDoc" layout="row">
                             <div active-left></div>
                             <div></div>
@@ -825,7 +824,6 @@
                             </div>
 
                         </form>
-
                         <form name="FormAprobCompras" layout="row">
                             <div active-left></div>
                             <div layout="column" flex>
@@ -870,7 +868,6 @@
                                 </div>
                             </div>
                         </form>
-
                         <form name="FormCancelDoc" layout="row" >
                             <div active-left></div>
                             <div layout="column" flex>
@@ -939,8 +936,24 @@
                         </div>
                     </form>
                 </div>
-                <div  ng-class="{divAux :openAdjDtPedido}" >
+                <div   class="md-whiteframe-2dp" id="adjuntoProforma" style="width: 0px; display:none; padding: 4px;">
+                    <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
+                        <div ng-click="">
+                            Adjuntos
+                        </div>
+                    </div>
+                    <div flex layout="column">
+                        <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                             ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
+                            insertar archivo
+                        </div>
 
+                        <md-content flex>
+
+                            <div class="imgItem" ng-repeat="pic in imgs"><img height="149px" width="149px" src="images/prueba/pagos/{{pic}}"/></div>
+                        </md-content>
+                    </div>
+            </md-content>
                 </div>
 
                 <!-----flecha siguiente -->
@@ -2029,6 +2042,7 @@
             </md-content>
         </md-sidenav>
 
+        <!--
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px; z-index:66;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true"
                     md-component-id="adjuntoProforma" id="adjuntoProforma"
         >
@@ -2051,7 +2065,7 @@
                 </div>
             </md-content>
         </md-sidenav>
-
+-->
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav

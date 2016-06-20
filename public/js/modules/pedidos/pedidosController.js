@@ -186,7 +186,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         var aux= {id:id,value:val};
         setGetOrder.addTrace(aux,"FormHeadDocument");
 
-    }
+    };
     /********************************************EVENTOS ********************************************/
 
 
@@ -271,21 +271,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 descripcion :response.descripcion,id: response.id,otre:null,puntoCompra:false,stock:0,tipo_producto:response.tipo_producto,
                 tipo_producto_id:response.tipo_producto};
             $scope.providerProds.push(aux);
-
-            /* copy= response;
-             /* copy.asignado= false;
-             // $scope.providerProds.push(item);
-             /* Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
-             if(!item.reng_id){
-             setNotif.addNotif("alert",
-             "agregado"
-             ,[],{autohidden:autohidden});
-             var prod= angular.copy(response);
-             prod.cantidad = parseFloat(prod.cantidad);
-             $scope.providerProds.push(prod);
-             }
-             item.reng_id=response.reng_id;
-             });*/
         });
     };
 
@@ -325,14 +310,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** APERTURA DE LAYERS ********************************************/
 
     $scope.openAdj = function(){
+        var adjPane =angular.element("#adjuntoProforma");
+        if($scope.openAdjDtPedido){
+            adjPane.animate({width:"0px"},400, function(){
+               adjPane.css({display:"none"});
 
-        $mdSidenav("adjuntoProforma").toggle().then(function(){
-            if($scope.openAdjDtPedido){
-                $scope.openAdjDtPedido= false;
-            }else {
-                $scope.openAdjDtPedido= true;
-            }
-        });
+            });
+
+            $scope.openAdjDtPedido= false;
+        }else {
+            adjPane.animate({width:"360px", display:"block"},400, function(){
+
+
+            });
+
+            $scope.openAdjDtPedido= true;
+        }
+
     };
     $scope.openDocSusti = function(){
         console.log("sdf");
