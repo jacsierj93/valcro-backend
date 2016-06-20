@@ -130,6 +130,8 @@ MyApp.directive('activeLeft', function ($compile, Layers) {
     };
 });
 
+
+
 /*MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = angular.element("#"+jqObject);
