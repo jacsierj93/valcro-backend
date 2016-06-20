@@ -124,7 +124,7 @@ MyApp.filter('customFind', function() {
     }
 });
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers) {
     $scope.expand = false;
     $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
@@ -172,9 +172,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     }
 
     $scope.checkLayer = function(compare){
-        console.log(compare)
+        console.log(compare);
         //return compare != $scope.layer;
-    }
+    };
 
     function closeLayer(all){
         if(all){
@@ -230,7 +230,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.setProv = function(prov){
-        if(setGetProv.haveChang()){
+        endProvider(chngProv,null,prov);
+        /*if(setGetProv.haveChang()){
             openLayer("layer5");
             setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
                 {
@@ -249,7 +250,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             ]);
         }else{
             chngProv(prov);
-        }
+        }*/
 
         //}
 
@@ -266,11 +267,36 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.showAlert = function(){
-      //jQuery("#layer0>md-content").addClass("shake");
+        console.log(setGetProv.getChng());
     };
 
 
     $scope.addProv = function(){
+        endProvider(newProv,null);
+        /*        if(setGetProv.haveChang()){
+         openLayer("layer5");
+         setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
+         {
+         name: "SI",
+         action: function () {
+         $mdSidenav("layer5").close();
+         newProv();
+         }
+         },
+         {
+         name: "NO",
+         action: function () {
+         }
+         }
+         ]);
+         }else{
+         newProv();
+         }*/
+
+    };
+
+    var endProvider = function(yes,not,id){
+        console.log(setGetProv.haveChang())
         if(setGetProv.haveChang()){
             openLayer("layer5");
             setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
@@ -278,8 +304,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                     name: "SI",
                     action: function () {
                         $mdSidenav("layer5").close();
-                        newProv();
-                    }
+                        yes(id);
+                    },
+                    default:10
                 },
                 {
                     name: "NO",
@@ -288,9 +315,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                 }
             ]);
         }else{
-            newProv();
+            yes(id);
         }
-    };
+    }
 
     var newProv = function(){
         setGetProv.setProv(false);
@@ -328,8 +355,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 });
 
-
-
 MyApp.controller('resumenProv', function ($scope,setGetProv,providers) {
     $scope.provider = setGetProv.getProv();
     $scope.prov = {tiemposP:[],tiemposT:[],direcciones:[]};
@@ -337,8 +362,6 @@ MyApp.controller('resumenProv', function ($scope,setGetProv,providers) {
         $scope.prov = setGetProv.getFullProv();
     })
 });
-
-
 
 MyApp.controller('provCoins', function ($scope,listCoins,setGetProv) {
     $scope.prov = setGetProv.getProv();
@@ -458,6 +481,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
             if(rollBack[form][parseInt(val.id)] === undefined){
                 rollBack[form][parseInt(val.id)] = angular.copy(val);
             }
+            console.log(rollBack)
         },
         addChng : function(val,action,form){
             if((changes[form][parseInt(val.id)]===undefined) || !angular.equals(val,rollBack[form][parseInt(val.id)])){
@@ -475,6 +499,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
             }else{
                 delete changes[form][parseInt(val.id)];
             }
+            console.log(changes)
         },
         getChng : function(){
             return changes;
@@ -1460,6 +1485,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         $scope.bnk.bankSwift = account.swift;
         $scope.bnk.bankIban = account.cuenta;
         $scope.bnk.ciudad = account.ciudad_id;
+
         setGetProv.addToRllBck($scope.bnk,"infoBank")
     };
 
@@ -2102,13 +2128,50 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
         $mdSidenav('adjuntoLyr').open()
     };
 
+
+
 });
 
-MyApp.controller('adjController',function($scope,$mdSidenav,setGetProv,providers){
+MyApp.controller('adjController',function($scope,$mdSidenav,setGetProv,providers,Upload){
     $scope.imgs = providers.query({type:"listFiles"});
     $scope.callImg = function(name){
         return providers.get({type:"getImg"},{name:name});
-    }
+    };
+
+    /********SUBIDA DE ARCHIVOS ********/
+    $scope.uploaded = [];
+    $scope.uploadNow = '';
+
+    $scope.$watch('files', function () {
+        $scope.upload($scope.files);
+    });
+    $scope.$watch('file', function () {
+        if ($scope.file != null) {
+            $scope.upload([$scope.file]);
+        }
+    });
+
+
+    $scope.upload = function (files) {
+        if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                Upload.upload({
+                    url: 'provider/upload',
+                    file: file
+                }).progress(function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    uploadNow = progressPercentage;
+
+                    console.log('subiendo: ' + progressPercentage + '% ' + evt.config.file.name);
+                }).success(function (data, status, headers, config) {
+                    console.log('archivo subido con exito ' + config.file.name + ' uploaded. Response: ' + data);
+                    $scope.uploadNow = data;
+                    //   $scope.getfiles();
+                });
+            }
+        }
+    };
 
 });
 

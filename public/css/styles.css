@@ -920,14 +920,20 @@ input[type=number]::-webkit-outer-spin-button {
     color : rgb(84, 180, 234) !important;
 }
 
-.imgItem{
-    width: 149px;
-    height: 152px;
-    background-color: gray;
-    margin: 0px 8px 8px 0px;
-    float: left;
+.collapseResum{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 32px;
+    white-space:nowrap;
 }
 
+.imgItem{
+    width: 72px;
+    height: 72px;
+    margin: 0px 8px 8px 0px;
+    float: left;
+    border: 1px dashed #ccc;
+}
 
 div.activeleft{
     width: 24px;
