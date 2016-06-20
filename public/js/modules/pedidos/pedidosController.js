@@ -5,15 +5,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     // controlers
     $scope.formBlock = true;
-    $scope.module= Layers.getModule();
+    //$scope.module= Layers.getModule();
     $scope.email= {};
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
     $scope.formMode = null;
     $scope.tempDoc= new Array();
     $scope.emails = new Array();
-    $scope.layer=$scope.module.layer;
-    $scope.index=$scope.module.index;
     $scope.docImports= new Array();
     $scope.providerProds= new Array();
     $scope.docsSustitos= new Array();

@@ -42,6 +42,7 @@ window.addEventListener("drop",function(e){
 MyApp.directive('global', function (Layers, setNotif) {
     return {
         link: function (scope) {
+            scope.module= Layers.getModule();
             scope.LayersAction = Layers.setAccion;
             scope.NotifAction = setNotif.addNotif;
             scope.index = Layers.getIndex();
