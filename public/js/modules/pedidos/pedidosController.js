@@ -16,6 +16,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.providerProds= new Array();
     $scope.docsSustitos= new Array();
     $scope.estadosDoc= new Array();
+    $scope.gridViewCp= 1;
+    $scope.gridViewSus= 1;
 
 
 
@@ -319,12 +321,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
     $scope.openDocSusti = function(){
-        console.log("sdf");
         $scope.docsSustitos = new Array();
-        Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id},function(response){
-            $scope.docsSustitos =response;
-            $scope.moduleAccion({open:{name:"agrPedPend"}});
-        });
+        $scope.moduleAccion({open:{name:"agrPedPend", before: function(){
+
+            Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id},function(response){
+                $scope.docsSustitos =response;
+            });
+        }}});
+
 
     };
     $scope.openImport = function(){
@@ -333,7 +337,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.formBlock ){
             console.log("mode", $scope.formMode);
             $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
-           // setNotif.addNotif("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
         }else{
             console.log("modee", $scope.formMode);
             if($scope.formMode.value == 21){
@@ -388,56 +391,61 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     function selecContraP(item) {
         restore('contraPedSelec');
-        var data ={id: item.id, pedido_id: $scope.document.id};
-        if(item.tipo_origen_id){
-            data.tipo_origen_id=4;
-            data.renglon_id=item.renglon_id;
-        }
-        $http.get("Order/CustomOrder", {params: data})
-            .success(function (response) {
-                $scope.contraPedSelec= response;
+        $scope.moduleAccion({open:{name:"resumenContraPedido", before: function(){
 
-                if(response.fecha_aprox_entrega != null){
-                    $scope.contraPedSelec.fecha_aprox_entrega = new Date(Date.parse(response.fecha_aprox_entrega));
-                }
-                if(response.fecha != null){
-                    $scope.contraPedSelec.fecha = new Date(Date.parse(response.fecha));
+            Order.get({type:"CustomOrder", id: item.id, doc_id: $scope.document.id, tipo: $scope.formMode.value}, {},
+                function(response){
+                    console.log("respnose customer", response);
+                    $scope.contraPedSelec= response;
+                    if(response.fecha_aprox_entrega != null){
+                        $scope.contraPedSelec.fecha_aprox_entrega = new Date(Date.parse(response.fecha_aprox_entrega));
+                    }
+                    if(response.fecha != null){
+                        $scope.contraPedSelec.fecha = new Date(Date.parse(response.fecha));
 
-                }
+                    }
 
-            });
+                });
 
-        $scope.formDataContraP.contraPedidoMotivo = Order.query({type: 'CustomOrderReason'});
-        $scope.formDataContraP.contraPedidoPrioridad = Order.query({type: 'CustomOrderPriority'});
-        $scope.moduleAccion({open:{name:"resumenContraPedido"}});
+            if($scope.formDataContraP.contraPedidoMotivo.length <= 0){
+                $scope.formDataContraP.contraPedidoPrioridad = Order.query({type: 'CustomOrderReason'});
+            }
+            if($scope.formDataContraP.contraPedidoPrioridad.length <= 0){
+                $scope.formDataContraP.contraPedidoPrioridad = Order.query({type: 'CustomOrderPriority'});
+            }
+        }}});
 
     }
 
     function selecPedidoSust(item) {
         restore('pedidoSusPedSelec');
-        $http.get("Order/OrderSubstitute", {params: {id: item.id, pedido_id: $scope.document.id}})
-            .success(function (response) {
+        $scope.moduleAccion({open:{name:"resumenPedidoSus", before: function(){
+            Order.get({type:"Document", id:item.id,tipo:$scope.formMode.value}, {},function(response){
+                console.log("sustitu", response);
                 $scope.pedidoSusPedSelec = response;
             });
 
-        LayersCtrl.openLayer("resumenPedido");
+        }}});
+
     }
 
     function selecKitchenBox(item) {
-        restore('kitchenBoxSelec');
-        ORDER.get({type: 'KitchenBox', id: item.id}, {}, function (response) {
-            $scope.kitchenBoxSelec = response;
-            if (response.fecha != null) {
-                $scope.kitchenBoxSelec.fecha = new Date(Date.parse(response.fecha));
-            }
-            if (response.fecha_aprox_entrega != null) {
-                $scope.kitchenBoxSelec.fecha_aprox_entrega = new Date(Date.parse(response.fecha_aprox_entrega));
-            }
 
+        $scope.moduleAccion({open:{name:"resumenKitchenbox", before: function(){
 
-        });
-        $scope.moduleAccion({open:{name:"resumenKitchenbox"}});
-    }
+            Order.get({type:"KitchenBox", id: item.id, doc_id: $scope.document.id, tipo: $scope.formMode.value}, {},
+                function(response){
+                    $scope.kitchenBoxSelec = response;
+                    if (response.fecha != null) {
+                        $scope.kitchenBoxSelec.fecha = new Date(Date.parse(response.fecha));
+                    }
+                    if (response.fecha_aprox_entrega != null) {
+                        $scope.kitchenBoxSelec.fecha_aprox_entrega = new Date(Date.parse(response.fecha_aprox_entrega));
+                    }
+
+                });
+        }}});
+    };
 
     /** al pulsar la flecha siguiente**/
     $scope.next = function () {
@@ -459,7 +467,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
 
                     if (response.success) {
-                        setNotif.addNotif("ok","Finalizado",[
+                        $scope.NotifAction("ok","Finalizado",[
                             {name:"Ok", action: function(){
                                 $scope.moduleAccion({close:{first:true}});
                             }}
@@ -474,7 +482,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.showNext = function (status) {
         if (status) {
             if (!$scope.FormHeadDocument.$valid && $scope.module.layer== 'detalleDoc') {
-                setNotif.addNotif("error",
+                $scope.NotifAction("error",
                     "Existen campos pendientes por completar, por favor verifica que información le falta."
                     ,[],{autohidden:autohidden});
 
@@ -507,39 +515,39 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             removeOrdenCompra(odc.id, $scope.document.id);
         }
 
-    }
+    };
     $scope.changeContraP = function (item) {
         item.doc_id=$scope.document.id;
         if(item.asignado){
             if(item.asignadoOtro.length >0){
-                setNotif.addNotif("alert",
+                $scope.NotifAction("alert",
                     "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
                     ,[
                         {name: 'Si',
                             action:function(){
                                 Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
-                                    setNotif.addNotif("ok","Asignado",[],{autohidden:autohidden});
+                                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                                 });
                             }
                         },{name: 'No',
-                            action:function(){item.asignado=true;}
+                            action:function(){item.asignado=false;}
                         }
                     ]);
             }else{
                 Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
-                    setNotif.addNotif("ok","Asignado",[],{autohidden:autohidden});
+                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                 });
             }
 
         }
         else{
-            setNotif.addNotif("alert",
+            $scope.NotifAction("alert",
                 "Se eliminara el contra pedido ¿Desea continuar?"
                 ,[
                     {name: 'Ok',
                         action:function(){
                             Order.postMod({type:$scope.formMode.mod,mod:"RemoveCustomOrder"},item,function(response){
-                                setNotif.addNotif("ok","Removido",[],{autohidden:autohidden});
+                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
                             });
                         }
                     },{name: 'Cancel',
@@ -551,13 +559,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.changeProducto = function (item){
-
-        if(item.asignado){
+        var paso = true;
+        if(item.asignado && item.saldo > 0){
             item.prov_id =$scope.provSelec.id;
             item.doc_id =$scope.document.id;
             Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
                 if(!item.reng_id){
-                    setNotif.addNotif("alert",
+                    $scope.NotifAction("alert",
                         "agregado"
                         ,[],{autohidden:autohidden});
                     var prod= angular.copy(response);
@@ -566,14 +574,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
                 item.reng_id=response.reng_id;
             });
-        }else{
-            setNotif.addNotif("alert",
+        }else if(!item.asignado && item.reng_id){
+            $scope.NotifAction("alert",
                 "Se eliminara el producto del documento ¿Deseas continuar?"
                 ,[
                     {name: 'Ok',
                         action:function(){
                             Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
-                                setNotif.addNotif("info",
+                                $scope.NotifAction("info",
                                     "Removido"
                                     ,[],{autohidden:autohidden});
                             });
@@ -589,9 +597,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.addRemoveItem = function(item){
         Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItem"},item, function(response){
             if(response.accion == "del"){
-                setNotif.addNotif("alert","Eliminado",[],{autohidden:autohidden});
+                $scope.NotifAction("alert","Eliminado",[],{autohidden:autohidden});
             } else if(response.accion == "new"){
-                setNotif.addNotif("alert","Agregado",[],{autohidden:autohidden});
+                $scope.NotifAction("alert","Agregado",[],{autohidden:autohidden});
                 item.id=response.id;
             }
         });
@@ -600,33 +608,105 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.changeItem = function(item){
         Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
             if(response.accion == "del"){
-                setNotif.addNotif("alert","Eliminado",[],{autohidden:autohidden});
+                $scope.NotifAction("alert","Eliminado",[],{autohidden:autohidden});
             } else if(response.accion == "new"){
-                setNotif.addNotif("alert","Agregado",[],{autohidden:autohidden});
+                $scope.NotifAction("alert","Agregado",[],{autohidden:autohidden});
                 item.id=response.id;
             }
         });
     };
 
+    $scope.addRemoveCpItem = function(item){
+        console.log(" item ",item);
+        var aux = {
+            asignado:item.asignado,
+            tipo_origen_id: 2,
+            doc_origen_id: item.contra_pedido_id,
+            doc_id: $scope.document.id,
+            cantidad:  item.cantidad,
+            saldo:  item.cantidad,
+            producto_id:  item.producto_id,
+            descripcion:  item.descripcion,
+            id:item.id
 
+        };
+        if(item.asignado){
+            if(item.asignadoOtro.length == 0){
+                Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                    if(response.accion == "new"){
+                        $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                        item.renglon_id= response.renglon_id;
+                    }
+
+                });
+            }else{
+                var text="Este item se encuentra agregado a ";
+                angular.forEach(item.asignadoOtro, function(v,k){
+                    text += v[0] +" " + v[1].length +" veces ";
+                });
+                $scope.NotifAction("alert",text,[
+                    {name:'Cancelar',default: 2,
+                        action: function(){
+
+                        }
+                    },
+                    {name:'Continuar de todas formas',
+                        action: function(){
+                            Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                                if(response.accion == "new"){
+                                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                                    item.renglon_id= response.renglon_id;
+                                }
+
+                            });
+                        }
+                    }
+                ]);
+            }
+        }else if(!item.asignado && item.renglon_id){
+            $scope.NotifAction("alert","Se Removera el articulo",[
+                {name:'Cancelar',default:2,
+                    action: function(){
+
+                    }
+                },
+                {name:'Continuar',
+                    action: function(){
+                        Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                            if(response.accion == "new"){
+                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+                                item.renglon_id= response.renglon_id;
+                            }
+                        });
+
+                    }
+                }
+            ]);
+        }
+
+
+
+        };
+
+/*
     $scope.changeContraPItem = function (item) {
         item.doc_id = $scope.document.id;
         if (item.asignado) {
             $http.post("Order/AddCustomOrderItem", item)
                 .success(function (response) {
-                    setNotif.addNotif("info","Asignado",[],{autohidden:autohidden});
+                    $scope.NotifAction("info","Asignado",[],{autohidden:autohidden});
                 });
 
         } else {
 
-            setNotif.addNotif("alert",
+            $scope.NotifAction("alert",
                 "Se eliminara el contra pedido ¿Desea continuar?"
                 ,[
                     {name: 'Ok',
                         action:function(){
                             $http.post("Order/RemoveCustomOrderItem", {id: item.renglon_id, pedido_id:$scope.document.id})
                                 .success(function (response) {
-                                    setNotif.addNotif("ok","Removido" ,[],{autohidden:autohidden});
+                                    $scope.NotifAction("ok","Removido" ,[],{autohidden:autohidden});
                                 });
                         }
                     },{name: 'Cancel',
@@ -638,19 +718,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
     };
+*/
 
     $scope.changeKitchenBox = function (item) {
 
         item.doc_id=$scope.document.id;
         if(item.asignado){
             if(item.asignadoOtro.length >0){
-                setNotif.addNotif("alert",
+                $scope.NotifAction("alert",
                     "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
                     ,[
                         {name: 'Si',
                             action:function(){
                                 Order.postMod({type:$scope.formMode.mod,mod:"AddkitchenBox"},item,function(response){
-                                    setNotif.addNotif("ok","Asignado",[],{autohidden:autohidden});
+                                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                                 });
                             }
                         },{name: 'No',
@@ -659,19 +740,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     ]);
             }else{
                 Order.postMod({type:$scope.formMode.mod,mod:"AddkitchenBox"},item,function(response){
-                    setNotif.addNotif("ok","Asignado",[],{autohidden:autohidden});
+                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                 });
             }
 
         }
         else{
-            setNotif.addNotif("alert",
+            $scope.NotifAction("alert",
                 "Se eliminara el KitchenBox ¿Desea continuar?"
                 ,[
                     {name: 'Ok',
                         action:function(){
                             Order.postMod({type:$scope.formMode.mod,mod:"RemovekitchenBox"},item,function(response){
-                                setNotif.addNotif("ok","Removido",[],{autohidden:autohidden});
+                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
                             });
                         }
                     },{name: 'Cancel',
@@ -700,7 +781,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $http.post("Order/AddOrderSubstituteItem", item)
                     .success(function (response) {
                         if (item.renglon_id == null) {
-                            setNotif.addNotif("info",
+                            $scope.NotifAction("info",
                                 "Asignado"
                                 ,[
                                     {name: 'Ok',
@@ -713,7 +794,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }else
             // if(item.renglon_id == null)
             {
-                setNotif.addNotif("warn",
+                $scope.NotifAction("warn",
                     "El saldo anterior supera la cantidad inicial "
                     ,[
                         {name: 'Ok',
@@ -726,14 +807,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     });
             }
         }else {
-            setNotif.addNotif("alert",
+            $scope.NotifAction("alert",
                 "Se eliminara el Pedido a sustituir ¿Desea continuar?"
                 ,[
                     {name: 'Ok',
                         action:function(){
                             $http.post("Order/RemoveOrdenItem", {id: item.renglon_id,pedido_id:$scope.document.id})
                                 .success(function (response) {
-                                    setNotif.addNotif("info",
+                                    $scope.NotifAction("info",
                                         "Removido"
                                         ,[
                                             {name: 'Ok',
@@ -812,14 +893,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             var errors = response.error;
 
             if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length == 0 &&  Object.keys(response.items).length == 0 ){
-                setNotif.addNotif("alert"," Sin cambios, ¿Desea que se asigne  la "+$scope.formMode.name+" como origen del nuevo?",
+                $scope.NotifAction("alert"," Sin cambios, ¿Desea que se asigne  la "+$scope.formMode.name+" como origen del nuevo?",
                     [
                         {name: "Si", default:2,
                             action:function(){
                                 $scope.document.prov_id=$scope.provSelec.id;
                                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
                                     if (response.success) {
-                                        setNotif.addNotif("ok","Documento vinculado",[
+                                        $scope.NotifAction("ok","Documento vinculado",[
                                             {name:"Ok", action: function(){
                                                 $scope.moduleAccion({close:true});
                                             }}
@@ -835,7 +916,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }
                     ],{block:true});
             }else if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length == 0 &&  Object.keys(response.items).length > 0 ){
-                setNotif.addNotif("alert"," Se Agregaran " +Object.keys(response.items).length+" productos ",
+                $scope.NotifAction("alert"," Se Agregaran " +Object.keys(response.items).length+" productos ",
                     [
                         {name: "Si", default:2,
                             action:function(){
@@ -852,7 +933,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             $scope.document[k]=v;
                                         });
                                         Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                        setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                                     }
                                 });
                             }
@@ -866,7 +947,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }else
             if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length > 0 &&  Object.keys(response.items).length > 0){
 
-                setNotif.addNotif("alert"," Se asignaran " +Object.keys(response.items).length+" productos  y se modificaran " +Object.keys(response.asignado).length ,
+                $scope.NotifAction("alert"," Se asignaran " +Object.keys(response.items).length+" productos  y se modificaran " +Object.keys(response.asignado).length ,
                     [
                         {name: "Si", default:2,
                             action:function(){
@@ -884,7 +965,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                         });
                                         Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                         Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                        setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                                     }
                                 });
                             }
@@ -899,14 +980,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
             }else   if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length > 0 &&  Object.keys(response.items).length == 0){
 
-                setNotif.addNotif("alert"," Se modificaran " +Object.keys(response.asignado).length,
+                $scope.NotifAction("alert"," Se modificaran " +Object.keys(response.asignado).length,
                     [
                         {name: "Si", default:2,
                             action:function(){
                                 $scope.document.prov_id=$scope.provSelec.id;
                                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                 Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                             }
                         },
                         {name: "Cancelar",
@@ -919,7 +1000,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
             }else {
 
-                setNotif.addNotif("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
+                $scope.NotifAction("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
                     "\n¿ Que desea hacer ?",[
                     {name:" Omitir diferencias ",
                         action:function(){
@@ -931,12 +1012,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $scope.document.prov_id=$scope.provSelec.id;
                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                            setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                         }
                     }
                     ,{name:"Dejarme elegir ",
                         action:function(){
-                            setNotif.addNotif("error"," ¿Que desea hacer? "
+                            $scope.NotifAction("error"," ¿Que desea hacer? "
                                 ,[
                                     {name:" Usar solicitud ",
                                         action:function(){
@@ -966,7 +1047,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                            setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                                         }
                                     }
                                     ,{name:"Usar proforma",
@@ -998,7 +1079,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                            setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                                         }
                                     },
                                     {name:"Preguntarme en cada caso("+Object.keys(errors).length+")",action:function(){
@@ -1020,7 +1101,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ['accions.cancel',
                                                 'accions.total','accions.data.length'], function(newVal){
                                                 if(newVal[0]){
-                                                    setNotif.addNotif("error", "Cancelado",[],{autohidden:autohidden});
+                                                    $scope.NotifAction("error", "Cancelado",[],{autohidden:autohidden});
                                                     delete $scope.accions;
                                                 }else{
                                                     if(newVal[1] == newVal[2]){
@@ -1046,13 +1127,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                                                         Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                                         Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                                        setNotif.addNotif("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
                                                     }
                                                 }
                                             });
 
                                         if(errors.prov_moneda_id){
-                                            setNotif.addNotif("alert", "Selecione moneda a usar",[
+                                            $scope.NotifAction("alert", "Selecione moneda a usar",[
                                                 {name:errors.prov_moneda_id[0].text,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'prov_moneda_id', v:errors.prov_moneda_id[0].key});
@@ -1078,7 +1159,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.titulo){
-                                            setNotif.addNotif("alert", "Selecione titulo a usar",[
+                                            $scope.NotifAction("alert", "Selecione titulo a usar",[
                                                 {name:errors.titulo[0].key,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'titulo', v:errors.titulo[0].key});
@@ -1098,7 +1179,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.comentario){
-                                            setNotif.addNotif("alert", "Selecione comentario a usar",[
+                                            $scope.NotifAction("alert", "Selecione comentario a usar",[
                                                 {name:errors.comentario[0].key,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'comentario', v:errors.comentario[0].key});
@@ -1118,7 +1199,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.pais_id){
-                                            setNotif.addNotif("alert", "Selecione pais a usar",[
+                                            $scope.NotifAction("alert", "Selecione pais a usar",[
                                                 {name:errors.pais_id[0].text,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'pais_id', v:errors.pais_id[0].key});
@@ -1147,7 +1228,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.condicion_pago_id){
-                                            setNotif.addNotif("alert", "Selecione la condicon de pago a usar",[
+                                            $scope.NotifAction("alert", "Selecione la condicon de pago a usar",[
                                                 {name:errors.condicion_pago_id[0].text,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'condicion_pago_id', v:errors.condicion_pago_id[0].key});
@@ -1168,7 +1249,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                         }
 
                                         if(errors.direccion_facturacion_id){
-                                            setNotif.addNotif("alert", "Selecione la direcion de facturacion a usar",[
+                                            $scope.NotifAction("alert", "Selecione la direcion de facturacion a usar",[
                                                 {name:errors.direccion_facturacion_id[0].text,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'direccion_facturacion_id', v:errors.direccion_facturacion_id[0].key});
@@ -1189,7 +1270,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.puerto_id){
-                                            setNotif.addNotif("alert", "Selecione el puerto a usar",[
+                                            $scope.NotifAction("alert", "Selecione el puerto a usar",[
                                                 {name:errors.puerto_id[0].text,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'puerto_id', v:errors.puerto_id[0].key});
@@ -1208,7 +1289,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.condicion_id){
-                                            setNotif.addNotif("alert", "Selecione la condicion a usar",[
+                                            $scope.NotifAction("alert", "Selecione la condicion a usar",[
                                                 {name:errors.condicion_id[0].text,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'condicion_id', v:errors.condicion_id[0].key});
@@ -1228,7 +1309,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                             ]);
                                         }
                                         if(errors.tasa){
-                                            setNotif.addNotif("alert", "Selecione la tasa a usar",[
+                                            $scope.NotifAction("alert", "Selecione la tasa a usar",[
                                                 {name:errors.tasa[0].key,
                                                     action: function(){
                                                         $scope.accions.data.push({k:'tasa', v:errors.tasa[0].key});
@@ -1375,7 +1456,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                     $http.get("Order/ProviderProds",
                         {params:{id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id}}).success(function (response) {
-                        $scope.providerProds= response;
+                        var data = new Array();
+                        var aux ={};
+                        angular.forEach(response , function(v,k){
+                            aux ={};
+                            aux = v;
+                            aux.saldo=parseFloat(v.saldo);
+                            data.push(aux);
+                        });
+                        $scope.providerProds= data;
 
                     });
                 }
@@ -1429,7 +1518,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 if (response.success) {
                     $scope.document.id = response.id;
                     if(response['action'] == 'new'){
-                        setNotif.addNotif("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+                        $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
                     }
 
                 }
@@ -1447,7 +1536,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             //{id:$scope.document.id, estado_id:$scope.document.estado_id}
             Order.postMod({type:$scope.formMode.mod, mod:"SetStatus"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
                 if (response.success) {
-                    setNotif.addNotif("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+                    $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
                 }
 
             });
@@ -1464,7 +1553,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             //{id:$scope.document.id, estado_id:$scope.document.estado_id}
             Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
                 if (response.success) {
-                    setNotif.addNotif("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+                    $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
                 }
 
             });*/
@@ -1494,11 +1583,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
          if(response.success  ){
          $scope.document.isNew= false;
          if(response['action'] == 'new'){
-         setNotif.addNotif("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+         $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
          }
          if($scope.module.layer == "finalDoc"){
          $scope.formBlock=true;
-         setNotif.addNotif("ok","Finalizado",[],{autohidden:autohidden});
+         $scope.NotifAction("ok","Finalizado",[],{autohidden:autohidden});
          Layers.setAccion({close:{all:true}});
          switch ($scope.formMode){
          case "Solicitud":
@@ -1533,7 +1622,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.removeList= function(item){
 
-        setNotif.addNotif("alert",
+        $scope.NotifAction("alert",
             "Se removera todos los productos asociados ¿Desea continuar?"
             ,[
                 {name: 'Ok',
@@ -1546,7 +1635,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                          }
                          $http.post("Order/"+url, {id: id, pedido_id: $scope.document.id})
                          .success(function (response) {
-                         setNotif.addNotif("alert","Removido",[],{autohidden:autohidden});
+                         $scope.NotifAction("alert","Removido",[],{autohidden:autohidden});
                          loadPedido($scope.document.id);
                          });*/
                     }
@@ -1643,6 +1732,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         });
     }
 
+    /**@deprecated*/
     function loadkitchenBoxProveedor(id){
 
         $http.get("Order/KitchenBoxs",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
@@ -1753,6 +1843,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function segurity(key){
         return true;
     }
+
     function  restore(key){
         switch (key){
             case 'provSelec':
@@ -1958,9 +2049,9 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
         if(module.index>0 && !module.blockBack){
             var paso=true;
             if(arg.before){
-                var aux=arg.before();
-                console.log("respuesta ",aux);
-                if(!aux){
+                var res=arg.before();
+                console.log("respuesta ",res);
+                if(!res){
                     paso=false;
                 }
 

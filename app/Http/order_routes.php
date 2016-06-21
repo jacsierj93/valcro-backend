@@ -27,6 +27,8 @@ $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); 
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
+$app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
+
 
 // import
 $app->get("Order/SolicitudeToImport",'Orders\OrderController@getSolicitudeToImport'); ///obtine los paises donde un proveedor tiene almacenes
@@ -94,7 +96,7 @@ $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveS
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // cierra el documento y notifica por correo
-
+$app->post("Order/Solicitude/Replace",'Orders\OrderController@replaceSolicitude'); // reemplaza la solicutud
 
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///lista de todos los pedidos que se úeden sustituir
 
@@ -115,7 +117,6 @@ $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae t
 
 
 // contra pedidos
-$app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
 $app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae los motivos de contrapedido
 $app->get("Order/CustomOrderPriority",'Orders\OrderController@getCustomOrderPriority'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido
@@ -123,7 +124,7 @@ $app->post("Order/AddCustomOrderItem",'Orders\OrderController@addCustomOrderItem
 $app->post("Order/RemoveCustomOrderItem",'Orders\OrderController@removeCustomOrderItem'); ///agrega un item de contra pedido
 
 // kitchenBox
-$app->get("Order/KitchenBox/{id}",'Orders\OrderController@getKitchenBox'); ///trae tod el detalle de contraPedido
+$app->get("Order/KitchenBox",'Orders\OrderController@getKitchenBox'); ///trae tod el detalle de kitchenbox
 $app->get("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
 $app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); /// obtiene las kitchen box de proveedor
 $app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); /// obtiene las kitchen box de proveedor
