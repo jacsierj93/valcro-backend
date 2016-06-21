@@ -6,6 +6,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
     var base = 264;
     $scope.toolBar = {"add": true, "edit": false, "filter": false} ///botonera
     $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
+   
 
     /**
      * funcion que resetea el valor de los objetos segun la opcion colocada
@@ -406,6 +407,8 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             .success(function (data, status, headers, config) {
 
                 console.log(data);
+
+              //  $scope.NotifAction("alert","por favor escriba un monto",[{"name":"aceptar","action":null,"default":5}],{"autohidden":5})
 
             }).error(function (data, status, header, config) {
             console.log("Error:enviando datos del pago...")

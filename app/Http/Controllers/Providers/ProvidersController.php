@@ -19,6 +19,7 @@ use App\Models\Sistema\ProviderCondPay;
 use App\Models\Sistema\ProviderCondPayItem;
 use App\Models\Sistema\Line;
 use App\Libs\Utils\Files;
+use App\Models\Sistema\FileModel;
 use Session;
 use Validator;
 
@@ -39,13 +40,15 @@ class ProvidersController extends BaseController
 
         //return Files::getFileList("prov");
         $archivo = new Files("pay");
-        //dd($archivo);
-        return $archivo->getFileList("docs/"); ///probando
+        $files = FileModel::all();
+        foreach($files as $v){
+            $v["archivo"] = str_replace(".jpg","_thumb.jpg",$v["archivo"]);
+        }
+        return $files;
     }
 
     public function getFile(request $name){
         $archivo = new Files("pay");
-        //dd($archivo);
         return $archivo->getFile($name->name); ///probando
     }
 
@@ -168,13 +171,13 @@ class ProvidersController extends BaseController
         }
         $valName->prov_id = $req->prov_id;
         $valName->nombre = $req->name;
-        $valName->fav = $req->fav;
+        //$valName->fav = $req->fav;
         $valName->save();
-        foreach($req->departments as $k=>$v){
+        /*foreach($req->departments as $k=>$v){
             if(!$v){
                 unset($req->departments[$k]);
             }
-        }
+        }*/
         if($req->preFav){
             $temp = NombreValcro::find($req->preFav["id"]);
             $temp->departamento()->updateExistingPivot($req->preFav["dep"],array("fav"=>0));

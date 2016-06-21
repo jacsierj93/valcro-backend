@@ -112,42 +112,47 @@
                 <md-tabs md-dynamic-height md-border-bottom md-no-ink>
                     <md-tab label="Deudas" md-no-ink>
                         <md-content style="padding-top: 10px;">
-                            <form>
+                            <form layout="row">
 
-                                <div class="titulo_formulario" layout="Column" layout-align="start start">
-                                    <div>
-                                        Pagos Pendientes a:
-                                        <spam style="color: #000;">{{provData.nombre}}</spam>
-                                    </div>
-                                </div>
-                                <div layout="row" class="headGridHolder">
-                                    <div flex="10" class="headGrid"> N° Factura</div>
-                                    <div flex="10" class="headGrid"> Emitido</div>
-                                    <div flex="10" class="headGrid"> Vence</div>
-                                    <div flex="5" class="headGrid"></div>
-                                    <div flex class="headGrid"> Cuotas</div>
-                                    <div flex class="headGrid"> Total Deuda</div>
-                                    <div flex class="headGrid"> Pagado</div>
-                                    <div flex class="headGrid"> Saldo</div>
-                                </div>
-                                <div id="grid">
-                                    <div ng-repeat="deuda in provData.deudas" flex>
-                                        <div layout="row" class="cellGridHolder" ng-click="setDeduda(deuda)">
-                                            <div flex="10" class="cellGrid"> {{deuda.nro_factura}}</div>
-                                            <div flex="10" class="cellGrid">{{deuda.fecha}}</div>
-                                            <div flex="10" class="cellGrid">{{deuda.vence}}</div>
-                                            <div flex="5" class="cellGrid" style="text-align: right;">
-                                                <div style="width: 16px; height: 16px; border-radius: 50%"
-                                                     class="{{deuda.vencido}}"></div>
-                                            </div>
-                                            <div flex class="cellGrid"> {{deuda.cuotas}}</div>
-                                            <div flex class="cellGrid"> {{deuda.monto | currency : $ : 2}}$</div>
-                                            <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}$</div>
-                                            <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}$</div>
+                                <div active-left></div>
+
+                                <div flex layout="column">
+                                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                                        <div>
+                                            Pagos Pendientes a:
+                                            <spam style="color: #000;">{{provData.nombre}}</spam>
                                         </div>
                                     </div>
+                                    <div layout="row" class="headGridHolder">
+                                        <div flex="10" class="headGrid"> N° Factura</div>
+                                        <div flex="10" class="headGrid"> Emitido</div>
+                                        <div flex="10" class="headGrid"> Vence</div>
+                                        <div flex="5" class="headGrid"></div>
+                                        <div flex class="headGrid"> Cuotas</div>
+                                        <div flex class="headGrid"> Total Deuda</div>
+                                        <div flex class="headGrid"> Pagado</div>
+                                        <div flex class="headGrid"> Saldo</div>
+                                    </div>
+                                    <div id="grid">
+                                        <div ng-repeat="deuda in provData.deudas" flex>
+                                            <div layout="row" class="cellGridHolder" ng-click="setDeduda(deuda)">
+                                                <div flex="10" class="cellGrid"> {{deuda.nro_factura}}</div>
+                                                <div flex="10" class="cellGrid">{{deuda.fecha}}</div>
+                                                <div flex="10" class="cellGrid">{{deuda.vence}}</div>
+                                                <div flex="5" class="cellGrid" style="text-align: right;">
+                                                    <div style="width: 16px; height: 16px; border-radius: 50%"
+                                                         class="{{deuda.vencido}}"></div>
+                                                </div>
+                                                <div flex class="cellGrid"> {{deuda.cuotas}}</div>
+                                                <div flex class="cellGrid"> {{deuda.monto | currency : $ : 2}}$</div>
+                                                <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}$</div>
+                                                <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}$</div>
+                                            </div>
+                                        </div>
 
+                                    </div>
                                 </div>
+
 
                             </form>
 
@@ -156,32 +161,45 @@
                     <md-tab label="Pagos">
                         <md-content style="padding-top: 10px;">
 
-                            <div class="titulo_formulario" layout="Column" layout-align="start start">
-                                <div>
-                                    Pagos Realizados
-                                </div>
-                            </div>
-                            <div layout="row" class="headGridHolder">
-                                <div flex="20" class="headGrid"> N° Factura</div>
-                                <div flex="10" class="headGrid"> Emitido</div>
-                                <div flex class="headGrid"> Tipo</div>
-                                <div flex class="headGrid"> Pagado</div>
-                                <div flex class="headGrid"> Resta</div>
-                                <div flex class="headGrid"> 000000</div>
-                            </div>
-                            <div id="grid">
-                                <div ng-repeat="pago in provData.pagos" flex>
-                                    <div layout="row" class="cellGridHolder" ng-click="setPago(pago)">
-                                        <div flex="20" class="cellGrid">{{pago.nro_factura}}</div>
-                                        <div flex="10" class="cellGrid">{{pago.fecha}}</div>
-                                        <div flex class="cellGrid">{{pago.tipo}}</div>
-                                        <div flex class="cellGrid">{{pago.pagado | currency : $ : 2}}</div>
-                                        <div flex class="cellGrid"> Data 5</div>
-                                        <div flex class="cellGrid"> Data 6</div>
+                            <form layout="row">
+
+                                <div active-left></div>
+
+                                <div flex layout="column">
+
+
+                                    <div class="titulo_formulario" layout="Column" layout-align="start start">
+                                        <div>
+                                            Pagos Realizados
+                                        </div>
+                                    </div>
+
+
+                                    <div layout="row" class="headGridHolder">
+                                        <div flex="20" class="headGrid"> N° Factura</div>
+                                        <div flex="10" class="headGrid"> Emitido</div>
+                                        <div flex class="headGrid"> Tipo</div>
+                                        <div flex class="headGrid"> Pagado</div>
+                                        <div flex class="headGrid"> Resta</div>
+                                        <div flex class="headGrid"> 000000</div>
+                                    </div>
+                                    <div id="grid">
+                                        <div ng-repeat="pago in provData.pagos" flex>
+                                            <div layout="row" class="cellGridHolder" ng-click="setPago(pago)">
+                                                <div flex="20" class="cellGrid">{{pago.nro_factura}}</div>
+                                                <div flex="10" class="cellGrid">{{pago.fecha}}</div>
+                                                <div flex class="cellGrid">{{pago.tipo}}</div>
+                                                <div flex class="cellGrid">{{pago.pagado | currency : $ : 2}}</div>
+                                                <div flex class="cellGrid"> Data 5</div>
+                                                <div flex class="cellGrid"> Data 6</div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
 
-                            </div>
+
+                            </form>
 
                         </md-content>
                     </md-tab>
@@ -202,37 +220,47 @@
             <!-- ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
             <md-content class="cntLayerHolder" layout="column" flex>
 
-                <div class="titulo_formulario" layout="Column" layout-align="start start">
-                    <div>
-                        Listado de cuotas:
-                        <spam style="color: #000;">Factura Nro. {{debData.factura}}, Proveedor: {{debData.provname}}
-                        </spam>
-                    </div>
-                </div>
 
-                <div layout="row" class="headGridHolder">
-                    <div ng-show="debData.factura_tipo=='cc'" flex="10" class="headGrid"> N° Cuota</div>
-                    <div flex="10" class="headGrid"> Vencimiento</div>
-                    <div flex class="headGrid"> Descripcion</div>
-                    <div flex class="headGrid"> Condicion Cuota</div>
-                    <div flex="10" class="headGrid"> Estatus</div>
-                    <div flex="10" class="headGrid"> Saldo</div>
-                </div>
-                <div id="grid" flex style="overflow-y: auto;">
-                    <div ng-repeat="cuota in debData.cuotas" flex>
-                        <div layout="row" class="cellGridHolder" ng-click="setPagoCuota(debData,cuota,$index)">
-                            <div ng-show="debData.factura_tipo=='cc'" flex="10" class="cellGrid">{{$index+1}}</div>
-                            <div flex="10" class="cellGrid">{{cuota.fecha_vence}}</div>
-                            <div flex class="cellGrid">{{cuota.nro_factura}}</div>
-                            <div flex class="cellGrid">{{cuota.descripcion}}</div>
-                            <div flex="10" class="cellGrid">
-                                <div style="width: 16px; height: 16px; border-radius: 50%"
-                                     class="{{cuota.vencimiento}}"></div>
+                <form layout="row">
+
+                    <div active-left></div>
+
+                    <div flex layout="column">
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Listado de cuotas:
+                                <spam style="color: #000;">Factura Nro. {{debData.factura}}, Proveedor:
+                                    {{debData.provname}}
+                                </spam>
                             </div>
-                            <div flex="10" class="cellGrid">{{cuota.saldo | currency : $ : 2}}</div>
+                        </div>
+
+                        <div layout="row" class="headGridHolder">
+                            <div ng-show="debData.factura_tipo=='cc'" flex="10" class="headGrid"> N° Cuota</div>
+                            <div flex="10" class="headGrid"> Vencimiento</div>
+                            <div flex class="headGrid"> Descripcion</div>
+                            <div flex class="headGrid"> Condicion Cuota</div>
+                            <div flex="10" class="headGrid"> Estatus</div>
+                            <div flex="10" class="headGrid"> Saldo</div>
+                        </div>
+                        <div id="grid" flex style="overflow-y: auto;">
+                            <div ng-repeat="cuota in debData.cuotas" flex>
+                                <div layout="row" class="cellGridHolder" ng-click="setPagoCuota(debData,cuota,$index)">
+                                    <div ng-show="debData.factura_tipo=='cc'" flex="10" class="cellGrid">{{$index+1}}
+                                    </div>
+                                    <div flex="10" class="cellGrid">{{cuota.fecha_vence}}</div>
+                                    <div flex class="cellGrid">{{cuota.nro_factura}}</div>
+                                    <div flex class="cellGrid">{{cuota.descripcion}}</div>
+                                    <div flex="10" class="cellGrid">
+                                        <div style="width: 16px; height: 16px; border-radius: 50%"
+                                             class="{{cuota.vencimiento}}"></div>
+                                    </div>
+                                    <div flex="10" class="cellGrid">{{cuota.saldo | currency : $ : 2}}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
 
 
             </md-content>
@@ -253,126 +281,137 @@
 
             <md-content class="cntLayerHolder" layout="column" flex>
 
-                <form name="formPago" ng-submit="saveFormPago()">
 
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
-                        <div>
-                            Pago: <span style="color: #000;"><span ng-show="debData.factura_tipo=='cc'">CUOTA Nro. {{debData.actual+1}}, </span>
+                <form layout="row">
+
+                    <div active-left></div>
+
+                    <div flex layout="column">
+
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                            <div>
+                                Pago: <span style="color: #000;"><span ng-show="debData.factura_tipo=='cc'">CUOTA Nro. {{debData.actual+1}}, </span>
                                 Factura Nro. {{debData.factura}}, Proveedor: {{debData.provname}}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div layout="row">
+                        <div layout="row">
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>Nro. Documento</label>
-                            <input ng-model="pago.nro_doc" required/>
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="15">
+                                <label>Nro. Documento</label>
+                                <input ng-model="pago.nro_doc" required/>
+                            </md-input-container>
 
 
-                        <div layout="column" flex>
-                            <md-datepicker ng-model="pago.fecha" required md-placeholder="fecha"></md-datepicker>
-                        </div>
-
-                        <md-input-container class="md-block" flex="15">
-                            <label>Monto</label>
-                            <input ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="10">
-                            <label>Moneda</label>
-                            <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')"
-                                       required md-no-ink>
-                                <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
-                                    {{moneda.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="10">
-                            <label>Tasa</label>
-                            <input ng-model="pago.tasa" ng-readonly="true" required/>
-
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="20">
-                            <label>Tipo Pago</label>
-                            <md-select ng-model="pago.tipo_id" required md-no-ink>
-                                <md-option ng-repeat="tipoPago in tipoPagos" value="{{tipoPago.id}}">
-                                    {{tipoPago.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>
-
-                    </div>
-
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
-                        <div>
-                            Adelantos y Notas de credito
-                        </div>
-                    </div>
-                    <div layout="row" class="headGridHolder">
-                        <div flex="10" class="cellGrid"> Accion</div>
-                        <div flex="10" class="headGrid"> N° Documento</div>
-                        <div flex="10" class="headGrid"> Tipo</div>
-                        <div flex="10" class="headGrid"> Fecha</div>
-                        <div flex class="headGrid"> Factura</div>
-                        <div flex="10" class="headGrid"> Monto</div>
-                        <div flex="10" class="headGrid"> Saldo</div>
-                        <div flex="10" class="headGrid"> Utilizar</div>
-                    </div>
-                    <div id="grid" flex style="overflow-y: auto;">
-                        <div flex ng-repeat="abono in abonos2">
-                            <div layout="row" class="cellGridHolder">
-                                <div flex="10" class="cellGrid">
-                                    <md-switch class="md-primary"
-                                               ng-model="abono.asignado"
-                                               ng-change="calculateDeuda2(abonos2,pago)"
-                                               ng-disabled="enabled">
-                                    </md-switch>
-                                </div>
-                                <div flex="10" class="cellGrid"> {{abono.nro_factura}}</div>
-                                <div flex="10" class="cellGrid"> {{abono.tipo}}</div>
-                                <div flex="10" class="cellGrid"> {{abono.fecha}}</div>
-                                <div flex class="cellGrid"> {{abono.fact_orig}}</div>
-                                <div flex="10" class="cellGrid"> {{abono.monto}}</div>
-                                <div flex="10" class="cellGrid"> {{abono.saldo}}</div>
-                                <div flex="10" class="cellGrid">
-                                    <input type="number" ng-model="abono.montoUsado"
-                                           ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado"
-                                           ng-value="abono.saldo"/>
-                                </div>
+                            <div layout="column" flex>
+                                <md-datepicker ng-model="pago.fecha" required md-placeholder="fecha"></md-datepicker>
                             </div>
 
+                            <md-input-container class="md-block" flex="15">
+                                <label>Monto</label>
+                                <input ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="10">
+                                <label>Moneda</label>
+                                <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')"
+                                           required md-no-ink>
+                                    <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
+                                        {{moneda.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="10">
+                                <label>Tasa</label>
+                                <input ng-model="pago.tasa" ng-readonly="true" required/>
+
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="20">
+                                <label>Tipo Pago</label>
+                                <md-select info="prueba" ng-model="pago.tipo_id" required md-no-ink>
+                                    <md-option ng-repeat="tipoPago in tipoPagos" value="{{tipoPago.id}}">
+                                        {{tipoPago.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                            <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>
+
                         </div>
-                    </div>
 
-                    <div class="titulo_formulario" layout="column" layout-align="start start" flex>
-                        <div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                            <div>
+                                Adelantos y Notas de credito
+                            </div>
+                        </div>
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="cellGrid"> Accion</div>
+                            <div flex="10" class="headGrid"> N° Documento</div>
+                            <div flex="10" class="headGrid"> Tipo</div>
+                            <div flex="10" class="headGrid"> Fecha</div>
+                            <div flex class="headGrid"> Factura</div>
+                            <div flex="10" class="headGrid"> Monto</div>
+                            <div flex="10" class="headGrid"> Saldo</div>
+                            <div flex="10" class="headGrid"> Utilizar</div>
+                        </div>
+                        <div id="grid" flex style="overflow-y: auto;">
+                            <div flex ng-repeat="abono in abonos2">
+                                <div layout="row" class="cellGridHolder">
+                                    <div flex="10" class="cellGrid">
+                                        <md-switch class="md-primary"
+                                                   ng-model="abono.asignado"
+                                                   ng-change="calculateDeuda2(abonos2,pago)"
+                                                   ng-disabled="enabled">
+                                        </md-switch>
+                                    </div>
+                                    <div flex="10" class="cellGrid"> {{abono.nro_factura}}</div>
+                                    <div flex="10" class="cellGrid"> {{abono.tipo}}</div>
+                                    <div flex="10" class="cellGrid"> {{abono.fecha}}</div>
+                                    <div flex class="cellGrid"> {{abono.fact_orig}}</div>
+                                    <div flex="10" class="cellGrid"> {{abono.monto}}</div>
+                                    <div flex="10" class="cellGrid"> {{abono.saldo}}</div>
+                                    <div flex="10" class="cellGrid">
+                                        <input type="number" ng-model="abono.montoUsado"
+                                               ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado"
+                                               ng-value="abono.saldo"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                            <div>
+
+                            </div>
+                        </div>
+
+                        <div layout="row">
+                            <div flex="50">
+
+                            </div>
+                            <md-input-container class="md-block" flex>
+                                <label>Saldo</label>
+                                <input ng-readonly="true" ng-model="debData.saldo"/>
+                            </md-input-container>
+                            <div flex="5">
+
+                            </div>
+                            <md-input-container class="md-block" flex>
+                                <label>Total A Pagar</label>
+                                <input ng-readonly="true" ng-model="debData.total"/>
+                            </md-input-container>
 
                         </div>
-                    </div>
-
-                    <div layout="row">
-                        <div flex="50">
-
-                        </div>
-                        <md-input-container class="md-block" flex>
-                            <label>Saldo</label>
-                            <input ng-readonly="true" ng-model="debData.saldo"/>
-                        </md-input-container>
-                        <div flex="5">
-
-                        </div>
-                        <md-input-container class="md-block" flex>
-                            <label>Total A Pagar</label>
-                            <input ng-readonly="true" ng-model="debData.total"/>
-                        </md-input-container>
 
                     </div>
 
                 </form>
+
+         <!--       <form name="formPago" ng-submit="saveFormPago()">
+
+                </form>-->
 
             </md-content>
 
@@ -390,37 +429,46 @@
                     class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr4pag"
                     id="lyr4pag">
             <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
-                <div class="titulo_formulario" layout="column" layout-align="start start">
-                    <div>
-                        Listado de documentos a favor
-                    </div>
-                </div>
 
-                <div layout="row" class="headGridHolder">
-                    <div flex="10" class="headGrid" contenteditable> N° Docu.</div>
-                    <div flex="10" class="headGrid" contenteditable> Tipo</div>
-                    <div flex class="headGrid" contenteditable> Origen</div>
-                    <div flex="10" class="headGrid"> Fecha</div>
-                    <div flex="10" class="headGrid"> Monto</div>
-                    <div flex="5" class="headGrid" contenteditable> Mnd.</div>
-                    <div flex="5" class="headGrid"> Tasa</div>
-                    <div flex="10" class="headGrid"> Saldo</div>
-                </div>
+                <form layout="row">
 
-                <div id="grid" flex style="overflow-y: auto;">
-                    <div flex>
-                        <div layout="row" class="cellGridHolder" ng-repeat="pay in abonos">
-                            <div flex="10" class="cellGrid"> {{pay.nro_factura}}</div>
-                            <div flex="10" class="cellGrid"> {{pay.tipo}}</div>
-                            <div flex class="cellGrid"> {{pay.origen}}</div>
-                            <div flex="10" class="cellGrid"> {{pay.fecha}}</div>
-                            <div flex="10" class="cellGrid"> {{pay.monto | currency : $ : 2 }}</div>
-                            <div flex="5" class="cellGrid"> {{pay.moneda}}</div>
-                            <div flex="5" class="cellGrid">{{pay.tasa}}</div>
-                            <div flex="10" class="cellGrid"> {{pay.saldo | currency : $ : 2 }}</div>
+                    <div active-left></div>
+
+                    <div flex layout="column">
+                        <div class="titulo_formulario" layout="column" layout-align="start start">
+                            <div>
+                                Listado de documentos a favor
+                            </div>
+                        </div>
+
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid" contenteditable> N° Docu.</div>
+                            <div flex="10" class="headGrid" contenteditable> Tipo</div>
+                            <div flex class="headGrid" contenteditable> Origen</div>
+                            <div flex="10" class="headGrid"> Fecha</div>
+                            <div flex="10" class="headGrid"> Monto</div>
+                            <div flex="5" class="headGrid" contenteditable> Mnd.</div>
+                            <div flex="5" class="headGrid"> Tasa</div>
+                            <div flex="10" class="headGrid"> Saldo</div>
+                        </div>
+
+                        <div id="grid" flex style="overflow-y: auto;">
+                            <div flex>
+                                <div layout="row" class="cellGridHolder" ng-repeat="pay in abonos">
+                                    <div flex="10" class="cellGrid"> {{pay.nro_factura}}</div>
+                                    <div flex="10" class="cellGrid"> {{pay.tipo}}</div>
+                                    <div flex class="cellGrid"> {{pay.origen}}</div>
+                                    <div flex="10" class="cellGrid"> {{pay.fecha}}</div>
+                                    <div flex="10" class="cellGrid"> {{pay.monto | currency : $ : 2 }}</div>
+                                    <div flex="5" class="cellGrid"> {{pay.moneda}}</div>
+                                    <div flex="5" class="cellGrid">{{pay.tasa}}</div>
+                                    <div flex="10" class="cellGrid"> {{pay.saldo | currency : $ : 2 }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                </form>
 
 
             </md-content>
@@ -437,197 +485,211 @@
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);"
                     class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr5pag"
                     id="lyr5pag" ng-scope>
+
             <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
 
 
-                <form name="formAbono" ng-submit="saveFormAbono()">
+                <form layout="row">
 
-                    <div class="titulo_formulario" layout="column" layout-align="start start">
-                        <div>
-                            Carga de Pagos
-                        </div>
-                    </div>
+                    <div active-left></div>
 
+                    <div flex layout="column">
 
-                    <div layout="row">
-
-
-                        <md-input-container class="md-block" flex="20">
-                            <label>Tipo Pago</label>
-                            <md-select ng-model="abono.tipo_id" required md-no-ink>
-                                <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
-                                    {{tipoPago.descripcion}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-
-                        <!--espacio-->
-                        <span style="padding-right: 300px">&nbsp; </span>
-                        <!--espacio-->
-
-
-                        <!--                        <div>Id del pago: #100</div>-->
-
-                        <!--espacio-->
-                        <span style="padding-right: 100px">&nbsp; </span>
-                        <!--espacio-->
-                        <!--   <div>Fecha: <? /*= date("d-m-Y") */ ?></div>-->
-
-                    </div>
-
-
-                    <div layout="row">
-
-
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- Este campo debe cargar las cuentas acrgadas desde el provedor y asignarle una al pago en cuestion --->
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-
-                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
-                            <label>Cuenta destino provedor</label>
-                            <md-select ng-model="abono.cuenta_id" md-no-ink>
-                                <md-option ng-repeat="cuenta in cuentasBancarias" value="{{cuenta.id}}">
-                                    {{cuenta.banco}} , {{cuenta.cuenta}} , {{cuenta.beneficiario}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-
-
-                        <md-input-container ng-hide="abono.tipo_id==1" class="md-block" flex>
-                            <label>Nro. Documento Origen</label>
-                            <input ng-model="abono.org_factura"/>
-                        </md-input-container>
-
-
-                        <md-input-container class="md-block" flex>
-                            <label>Nro. Documento</label>
-                            <input ng-model="abono.nro_doc" required/>
-                        </md-input-container>
-
-                        <div layout="column" flex>
-                            <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+                        <div class="titulo_formulario" layout="column" layout-align="start start">
+                            <div>
+                                Carga de Pagos
+                            </div>
                         </div>
 
-                        <md-input-container ng-show="abono.tipo_id==2" class="md-block" flex>
-                            <label>Nro. Reclamo</label>
-                            <input ng-model="abono.nro_rec"/>
-                        </md-input-container>
+
+                        <div layout="row">
 
 
-                    </div>
+                            <md-input-container class="md-block" flex="20">
+                                <label>Tipo Pago</label>
+                                <md-select ng-model="abono.tipo_id" required md-no-ink>
+                                    <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
+                                        {{tipoPago.descripcion}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
 
-                    <div layout="row">
-
-                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
-                            <label>Metodo de Pago</label>
-                            <md-select ng-model="abono.pago_id" md-no-ink>
-                                <md-option ng-repeat="metodoPago in tipoPagos" value="{{metodoPago.id}}">
-                                    {{metodoPago.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
-                            <label>Referencia</label>
-                            <input ng-model="abono.ref_pago" type="number"/>
-                        </md-input-container>
+                            <!--espacio-->
+                            <span style="padding-right: 300px">&nbsp; </span>
+                            <!--espacio-->
 
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>Monto</label>
-                            <input ng-change="getRecargoPercent('m')" ng-model="abono.monto" required/>
+                            <!--                        <div>Id del pago: #100</div>-->
 
-                        </md-input-container>
-
-                        <md-input-container class="md-block" flex="10">
-                            <label>Moneda</label>
-                            <md-select ng-model="abono.moneda_id" required
-                                       ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
-                                <md-option ng-repeat="moneda in monedas" ng-value="{{moneda.id}}">
-                                    {{moneda.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-
-                        <md-input-container class="md-block" flex="10">
-                            <label>Tasa</label>
-                            <input ng-model="abono.tasa" ng-readonly="true" required/>
-
-                        </md-input-container>
-
-
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- ################################### Estos dos campos son calculados del monto ingresado ################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- Estos varian dependiendo del procentaje o el monto solocados en uno de los 3 campos (Monto, Monto recargo y porcentaje recargo) -->
-
-                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
-                            <label>Monto Recargo</label>
-                            <input ng-change="getRecargoPercent('r')" ng-model="abono.monto_rec"/>
-                        </md-input-container>
-
-                        <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
-                            <label>% Recargo</label>
-                            <input ng-change="getRecargoPercent('p')" ng-model="abono.monto_recp"/>
-                        </md-input-container>
-
-
-                        <md-input-container ng-show="abono.tipo_id>1" class="md-block">
-
-                            <md-switch class="md-primary" ng-disabled="enabled">
-                                Restricción Limitante
-                            </md-switch>
-
-                        </md-input-container>
-
-
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-                        <!-- ################################################################################################ -->
-
-
-                    </div>
-
-                    <div layout="row">
-                        <md-input-container class="md-block" flex>
-                            <label>Comentarios</label>
-                            <input ng-model="abono.descripcion" required/>
-
-                        </md-input-container>
-
-
-                        <!--                        <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>-->
-
-                    </div>
-
-                    <div layout="row">
-
-
-                        <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                             ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
-                            Subir documentos adjuntos al Pago
+                            <!--espacio-->
+                            <span style="padding-right: 100px">&nbsp; </span>
+                            <!--espacio-->
+                            <!--   <div>Fecha: <? /*= date("d-m-Y") */ ?></div>-->
 
                         </div>
 
 
+                        <div layout="row">
 
+
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- Este campo debe cargar las cuentas acrgadas desde el provedor y asignarle una al pago en cuestion --->
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+
+                            <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
+                                <label>Cuenta destino provedor</label>
+                                <md-select ng-model="abono.cuenta_id" md-no-ink>
+                                    <md-option ng-repeat="cuenta in cuentasBancarias" value="{{cuenta.id}}">
+                                        {{cuenta.banco}} , {{cuenta.cuenta}} , {{cuenta.beneficiario}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+
+
+                            <md-input-container ng-hide="abono.tipo_id==1" class="md-block" flex>
+                                <label>Nro. Documento Origen</label>
+                                <input ng-model="abono.org_factura"/>
+                            </md-input-container>
+
+
+                            <md-input-container class="md-block" flex>
+                                <label>Nro. Documento</label>
+                                <input info="por favor introduzca el nro de documento del abono"
+                                       ng-model="abono.nro_doc"
+                                       required/>
+                            </md-input-container>
+
+                            <div layout="column" flex>
+                                <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+                            </div>
+
+                            <md-input-container ng-show="abono.tipo_id==2" class="md-block" flex>
+                                <label>Nro. Reclamo</label>
+                                <input ng-model="abono.nro_rec"/>
+                            </md-input-container>
+
+
+                        </div>
+
+
+                        <div layout="row">
+
+                            <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex>
+                                <label>Metodo de Pago</label>
+                                <md-select ng-model="abono.pago_id" md-no-ink>
+                                    <md-option ng-repeat="metodoPago in tipoPagos" value="{{metodoPago.id}}">
+                                        {{metodoPago.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+                            <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
+                                <label>Referencia</label>
+                                <input ng-model="abono.ref_pago" type="number"/>
+                            </md-input-container>
+
+
+                            <md-input-container class="md-block" flex="15">
+                                <label>Monto</label>
+                                <input ng-change="getRecargoPercent('m')" ng-model="abono.monto" required/>
+
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="10">
+                                <label>Moneda</label>
+                                <md-select ng-model="abono.moneda_id" required
+                                           ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
+                                    <md-option ng-repeat="moneda in monedas" ng-value="{{moneda.id}}">
+                                        {{moneda.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+
+                            <md-input-container class="md-block" flex="10">
+                                <label>Tasa</label>
+                                <input ng-model="abono.tasa" ng-readonly="true" required/>
+
+                            </md-input-container>
+
+
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- ################################### Estos dos campos son calculados del monto ingresado ################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- Estos varian dependiendo del procentaje o el monto solocados en uno de los 3 campos (Monto, Monto recargo y porcentaje recargo) -->
+
+                            <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
+                                <label>Monto Recargo</label>
+                                <input ng-change="getRecargoPercent('r')" ng-model="abono.monto_rec"/>
+                            </md-input-container>
+
+                            <md-input-container ng-hide="abono.tipo_id!=1" class="md-block" flex="15">
+                                <label>% Recargo</label>
+                                <input ng-change="getRecargoPercent('p')" ng-model="abono.monto_recp"/>
+                            </md-input-container>
+
+
+                            <md-input-container ng-show="abono.tipo_id>1" class="md-block">
+
+                                <md-switch class="md-primary" ng-disabled="enabled">
+                                    Restricción Limitante
+                                </md-switch>
+
+                            </md-input-container>
+
+
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+                            <!-- ################################################################################################ -->
+
+
+                        </div>
+
+                        <div layout="row">
+                            <md-input-container class="md-block" flex>
+                                <label>Comentarios</label>
+                                <input ng-model="abono.descripcion" required/>
+
+                            </md-input-container>
+
+
+                            <!--                        <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>-->
+
+                        </div>
+
+                        <div layout="row">
+
+
+                            <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                                 ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
+                                Subir documentos adjuntos al Pago
+
+                            </div>
+
+
+                        </div>
 
                     </div>
 
                 </form>
+
+
+                <!--    <form name="formAbono" ng-submit="saveFormAbono()">
+
+                    </form>
+
+                    -->
 
             </md-content>
 
@@ -646,170 +708,184 @@
                     id="lyr6pag">
             <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
 
-                <form name="formAbono" ng-submit="saveFormAbono()">
 
-                    <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
-                        <div>
-                            Uso del pago a Proveedor: <span style="color:#000">{{provData.nombre}}</span>
-                        </div>
-                    </div>
+                <form layout="row">
 
-                    <!-- datos del pago-->
+                    <div active-left></div>
 
-                    <div layout="row" style="height: 39px;">
+                    <div flex layout="column">
 
-
-                        <md-input-container class="md-block" flex="20">
-                            <label>Tipo Pago</label>
-                            <md-select ng-model="abono.tipo_id" required md-no-ink>
-                                <md-option ng-repeat="tipoPago in tipoDocsPago"
-                                           ng-selected="tipoPago.id==abono.tipo_id" value="{{tipoPago.id}}">
-                                    {{tipoPago.descripcion}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-
-                        <!--espacio-->
-                        <span style="padding-right: 300px">&nbsp; </span>
-                        <!--espacio-->
-
-
-                        <!--                        <div>Id del pago: #100</div>-->
-
-                        <!--espacio-->
-                        <span style="padding-right: 100px">&nbsp; </span>
-                        <!--espacio-->
-                        <!--              <div>Fecha: <? /*= date("d-m-Y") */ ?></div>-->
-
-
-                    </div>
-
-                    <div layout="row" style="height: 39px;">
-
-                        <md-input-container class="md-block" flex="15">
-                            <label>Monto</label>
-                            <input ng-readonly="true" ng-model="abono.monto" required/>
-                        </md-input-container>
-
-                        <div flex="15">
-                            <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
+                            <div>
+                                Uso del pago a Proveedor: <span style="color:#000">{{provData.nombre}}</span>
+                            </div>
                         </div>
 
+                        <!-- datos del pago-->
 
-                        <!--espacio-->
-                        <span style="padding-right: 300px">&nbsp; </span>
-                        <!--espacio-->
-
-
-                        <md-input-container class="md-block" flex="15">
-                            <label>Moneda</label>
-                            <md-select ng-model="abono.moneda_id" required
-                                       ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
-                                <md-option
-                                    ng-selected="moneda.id==abono.moneda_id"
-                                    ng-repeat="moneda in monedas" ng-value="{{moneda.id}}">
-                                    {{moneda.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                        <div layout="row" style="height: 39px;">
 
 
-                        <md-input-container class="md-block" flex="15">
-                            <label>Tasa</label>
-                            <input ng-model="abono.tasa" ng-value="abono.tasa" required/>
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="20">
+                                <label>Tipo Pago</label>
+                                <md-select ng-model="abono.tipo_id" required md-no-ink>
+                                    <md-option ng-repeat="tipoPago in tipoDocsPago"
+                                               ng-selected="tipoPago.id==abono.tipo_id" value="{{tipoPago.id}}">
+                                        {{tipoPago.descripcion}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
-                    </div>
+
+                            <!--espacio-->
+                            <span style="padding-right: 300px">&nbsp; </span>
+                            <!--espacio-->
 
 
-                    <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
-                        <div>
-                            Montos: abono/deuda
+                            <!--                        <div>Id del pago: #100</div>-->
+
+                            <!--espacio-->
+                            <span style="padding-right: 100px">&nbsp; </span>
+                            <!--espacio-->
+                            <!--              <div>Fecha: <? /*= date("d-m-Y") */ ?></div>-->
+
+
                         </div>
-                    </div>
 
-                    <div layout="row" style="height: 39px;">
+                        <div layout="row" style="height: 39px;">
 
-                        <md-input-container class="md-block" flex="35">
-                            <span class="balance_plus">{{abono.monto - abono.monto_rec | currency : $ : 2}} </span>
-                            / <span
-                                class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="15">
+                                <label>Monto</label>
+                                <input ng-readonly="true" ng-model="abono.monto" required/>
+                            </md-input-container>
 
-                        <md-input-container class="md-block" flex="20">
-                            <label>Proceder el Pago</label>
-                            <md-select ng-model="abono.tipo" md-no-ink>
-                                <md-option ng-repeat="metodoPago in [{id:1,nombre: 'Todo por llegar'},
+                            <div flex="15">
+                                <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+                            </div>
+
+
+                            <!--espacio-->
+                            <span style="padding-right: 300px">&nbsp; </span>
+                            <!--espacio-->
+
+
+                            <md-input-container class="md-block" flex="15">
+                                <label>Moneda</label>
+                                <md-select ng-model="abono.moneda_id" required
+                                           ng-change="getTasaByCoinId(abono.moneda_id,'abono')" md-no-ink>
+                                    <md-option
+                                        ng-selected="moneda.id==abono.moneda_id"
+                                        ng-repeat="moneda in monedas" ng-value="{{moneda.id}}">
+                                        {{moneda.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
+
+                            <md-input-container class="md-block" flex="15">
+                                <label>Tasa</label>
+                                <input ng-model="abono.tasa" ng-value="abono.tasa" required/>
+                            </md-input-container>
+
+                        </div>
+
+
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
+                            <div>
+                                Montos: abono/deuda
+                            </div>
+                        </div>
+
+                        <div layout="row" style="height: 39px;">
+
+                            <md-input-container class="md-block" flex="35">
+                                <span class="balance_plus">{{abono.monto - abono.monto_rec | currency : $ : 2}} </span>
+                                / <span
+                                    class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
+                            </md-input-container>
+
+                            <md-input-container class="md-block" flex="20">
+                                <label>Proceder el Pago</label>
+                                <md-select ng-model="abono.tipo" md-no-ink>
+                                    <md-option ng-repeat="metodoPago in [{id:1,nombre: 'Todo por llegar'},
                             {id:2,nombre: 'Vencidos'} ]" value="{{metodoPago.id}}">
-                                    {{metodoPago.nombre}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
+                                        {{metodoPago.nombre}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
 
 
-                        <!--espacio-->
-                        <span style="padding-right: 40px">&nbsp; </span>
-                        <!--espacio-->
+                            <!--espacio-->
+                            <span style="padding-right: 40px">&nbsp; </span>
+                            <!--espacio-->
 
 
-                        <md-input-container class="md-block" flex="20">
-                            <md-checkbox ng-model="isDisabled" aria-label="Disabled">
-                                Pagar todo?
-                            </md-checkbox>
-                        </md-input-container>
+                            <md-input-container class="md-block" flex="20">
+                                <md-checkbox ng-model="isDisabled" aria-label="Disabled">
+                                    Pagar todo?
+                                </md-checkbox>
+                            </md-input-container>
 
 
-                    </div>
-
-
-                    <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
-                        <div>
-                            Deudas adquiridas con el proveedor
                         </div>
+
+
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
+                            <div>
+                                Deudas adquiridas con el proveedor
+                            </div>
+                        </div>
+
+                        <div layout="row" class="headGridHolder">
+                            <div>&nbsp;</div>
+                            <div flex="10" class="headGrid"> Tipo Doc</div>
+                            <div flex="10" class="headGrid"> Doc Origen</div>
+                            <div flex class="headGrid"> Emitido</div>
+                            <div flex class="headGrid"> Vence</div>
+                            <div>&nbsp;</div>
+                            <div flex="10" class="headGrid"> Total Deuda</div>
+
+                            <div flex="10" class="headGrid"> Pagado</div>
+                            <div flex="10" class="headGrid"> Saldo</div>
+                            <div flex="10" class="headGrid"> Pagar</div>
+                        </div>
+
+
+                        <div id="grid" flex style="overflow-y: auto;">
+                            <div ng-repeat="doc in provData.deudas2" flex>
+                                <div layout="row" class="cellGridHolder">
+                                    <div class="cellGrid">
+                                        <md-switch ng-true-value="1" ng-false-value="0" class="md-primary"
+                                                   ng-model="doc.seleccionado"
+                                                   ng-disabled="enabled">
+                                        </md-switch>
+                                    </div>
+                                    <div flex="10" class="cellGrid">{{doc.tipo}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
+                                    <div flex class="cellGrid">{{doc.fecha}}</div>
+                                    <div flex class="cellGrid">{{doc.vence}}</div>
+                                    <div flex class="cellGrid">
+                                        <div style="width: 16px; height: 16px; border-radius: 50%"
+                                             class="{{doc.vencido}}"></div>
+                                    </div>
+                                    <div flex="10" class="cellGrid">{{doc.monto | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div layout="row" class="headGridHolder">
-                        <div>&nbsp;</div>
-                        <div flex="10" class="headGrid"> Tipo Doc</div>
-                        <div flex="10" class="headGrid"> Doc Origen</div>
-                        <div flex class="headGrid"> Emitido</div>
-                        <div flex class="headGrid"> Vence</div>
-                        <div>&nbsp;</div>
-                        <div flex="10" class="headGrid"> Total Deuda</div>
-
-                        <div flex="10" class="headGrid"> Pagado</div>
-                        <div flex="10" class="headGrid"> Saldo</div>
-                        <div flex="10" class="headGrid"> Pagar</div>
-                    </div>
 
                 </form>
 
-                <div id="grid" flex style="overflow-y: auto;">
-                    <div ng-repeat="doc in provData.deudas2" flex>
-                        <div layout="row" class="cellGridHolder">
-                            <div class="cellGrid">
-                                <md-switch ng-true-value="1" ng-false-value="0" class="md-primary"
-                                           ng-model="doc.seleccionado"
-                                           ng-disabled="enabled">
-                                </md-switch>
-                            </div>
-                            <div flex="10" class="cellGrid">{{doc.tipo}}</div>
-                            <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
-                            <div flex class="cellGrid">{{doc.fecha}}</div>
-                            <div flex class="cellGrid">{{doc.vence}}</div>
-                            <div flex class="cellGrid">
-                                <div style="width: 16px; height: 16px; border-radius: 50%"
-                                     class="{{doc.vencido}}"></div>
-                            </div>
-                            <div flex="10" class="cellGrid">{{doc.monto | currency : $ : 2}}</div>
-                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-
-                        </div>
-                    </div>
-                </div>
+                <!--
+                                <form name="formAbono" ng-submit="saveFormAbono()">
+                                </form>
+                                  -->
 
 
             </md-content>
@@ -831,60 +907,71 @@
 
             <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
 
-                <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
-                    <div style="text-align: center">
-                        SE HA REALIZADO LA OPERACION CORRECTAMENTE
-                    </div>
-                </div>
 
+                <form layout="row">
 
-                <div layout="row" style="height: 39px;">
+                    <div active-left></div>
 
-                    <md-input-container class="md-block" flex="35">
-                        <span class="balance_plus">{{abono.monto | currency : $ : 2}} </span> / <span
-                            class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
-                    </md-input-container>
+                    <div flex layout="column">
 
-
-                </div>
-
-
-                <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
-                    <div>
-                        Deudas pagadas por selección
-                    </div>
-                </div>
-
-
-                <div layout="row" class="headGridHolder">
-                    <div flex="10" class="headGrid"> Tipo Doc</div>
-                    <div flex="10" class="headGrid"> Doc Origen</div>
-                    <div flex class="headGrid"> Emitido</div>
-                    <div flex class="headGrid"> Vence</div>
-                    <div flex="10" class="headGrid"> Total Deuda</div>
-
-                    <div flex="10" class="headGrid"> Pagado</div>
-                    <div flex="10" class="headGrid"> Saldo</div>
-                    <div flex="10" class="headGrid"> Pagar</div>
-                </div>
-                <div id="grid" flex style="overflow-y: auto;">
-                    <div ng-repeat="doc in provData.deudas2  | filter:{ seleccionado: 1 }" flex>
-                        <div layout="row" class="cellGridHolder">
-                            <div flex="10" class="cellGrid">{{doc.tipo}}</div>
-                            <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
-                            <div flex class="cellGrid">{{doc.fecha}}</div>
-                            <div flex class="cellGrid">{{doc.fecha_vence}}
-                                <div style="width: 16px; height: 16px; border-radius: 50%"
-                                     class="{{doc.vencimiento}}"></div>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
+                            <div style="text-align: center">
+                                SE HA REALIZADO LA OPERACION CORRECTAMENTE
                             </div>
-                            <div flex="10" class="cellGrid">{{doc.monto | currency : $ : 2}}</div>
-                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
-                            <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                        </div>
+
+
+                        <div layout="row" style="height: 39px;">
+
+                            <md-input-container class="md-block" flex="35">
+                                <span class="balance_plus">{{abono.monto | currency : $ : 2}} </span> / <span
+                                    class="balance_sub">{{provSelected.tdeuda | currency : $ : 2}}</span>
+                            </md-input-container>
+
 
                         </div>
+
+
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="height: 39px;">
+                            <div>
+                                Deudas pagadas por selección
+                            </div>
+                        </div>
+
+
+                        <div layout="row" class="headGridHolder">
+                            <div flex="10" class="headGrid"> Tipo Doc</div>
+                            <div flex="10" class="headGrid"> Doc Origen</div>
+                            <div flex class="headGrid"> Emitido</div>
+                            <div flex class="headGrid"> Vence</div>
+                            <div flex="10" class="headGrid"> Total Deuda</div>
+
+                            <div flex="10" class="headGrid"> Pagado</div>
+                            <div flex="10" class="headGrid"> Saldo</div>
+                            <div flex="10" class="headGrid"> Pagar</div>
+                        </div>
+                        <div id="grid" flex style="overflow-y: auto;">
+                            <div ng-repeat="doc in provData.deudas2  | filter:{ seleccionado: 1 }" flex>
+                                <div layout="row" class="cellGridHolder">
+                                    <div flex="10" class="cellGrid">{{doc.tipo}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.doc_orig}}</div>
+                                    <div flex class="cellGrid">{{doc.fecha}}</div>
+                                    <div flex class="cellGrid">{{doc.fecha_vence}}
+                                        <div style="width: 16px; height: 16px; border-radius: 50%"
+                                             class="{{doc.vencimiento}}"></div>
+                                    </div>
+                                    <div flex="10" class="cellGrid">{{doc.monto | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{doc.saldo | currency : $ : 2}}</div>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
+
+                </form>
 
             </md-content>
 
