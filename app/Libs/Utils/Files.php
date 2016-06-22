@@ -8,11 +8,15 @@
 
 namespace app\Libs\Utils;
 
+use App\Libs\Api\RestApi;
 use App\Models\Sistema\FileModel;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
+use Log;
 use Request;
+use Session;
 use Storage;
+
 
 class Files
 {
@@ -22,6 +26,10 @@ class Files
     private $module;
     private $docsPath = "docs/"; ///ruta para los documentos
     private $imagePath = "images/"; ///ruta para las imagenes
+    private $imagePathThumb = "/public/images/thumbs/"; //ruta para los archivos thumbnail
+    private $imageThumbWidth = 72;
+    private $currentFileName; ////nombre del ultimo archivo
+    private $currentFileId; ///id en la tabla tbl_archivo del ultimo archivo subido
 
     /**
      * Files constructor.
@@ -32,6 +40,7 @@ class Files
 
         $this->fileSystem = Storage::disk($disk);
         $this->module = $disk;
+        $this->imagePathThumb = base_path() . $this->imagePathThumb;
     }
 
 
@@ -41,33 +50,68 @@ class Files
     public function upload($fileName)
     {
 
-        $file = Request::file($fileName);
-
-        $type = (substr($file->getMimeType(), 0, 5) == "image") ? $this->imagePath : $this->docsPath;
-        $extension = $file->getClientOriginalExtension();
+        $rest = new RestApi();
 
         try {
+
+            Log::info("Subiendo archivo al servidor");
+
+            $file = Request::file($fileName);
+
+            $mime = $file->getMimeType();
+            $type = (substr($mime, 0, 5) == "image") ? $this->imagePath : $this->docsPath;
+            $extension = $file->getClientOriginalExtension();
+
+            Log::info("archivo subido!! obteniendo datos del archivo");
 
             ///////generando nombre de archivo
             $archivo = new FileModel();
             $archivo->modulo = $this->module;
             $archivo->tipo = $type;
+            $archivo->mime = $mime;
+            $dataUser = Session::get("DATAUSER");
+            $archivo->user_id = $dataUser["id"]; // id del ususario
             $archivo->save();
             ////regla para el nombre
-            $fileName = $archivo->id . '-' . md5($file->getFilename()) . '-' . date("Y-m-d_h_i_s") . "." . $extension;
+            $fileName = $archivo->id . '-' . str_random(13) . '-' . $dataUser["id"] . '-' . date("Y-m-d_h_i_s");
 
+            ////en caso de ser una imagen hacer el redimensionado para obtener el thumbnail
+
+
+            if ($type == "images/") {
+                Log::info("guardando imagen $fileName en thumb ");
+                Image::make(File::get($file))->resize($this->imageThumbWidth, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->save($this->imagePathThumb . $fileName . '_thumb' . '.' . $extension); ///guardando imagenes
+            }
+
+
+            $fileName = $fileName . "." . $extension; ///extension
             /////subiendo archivo
             $this->fileSystem->put($type . $fileName, File::get($file));
 
+
+            Log::info("guardando registro de archivo a base de datos");
             //////asignado el nombre
             $archivo->archivo = $fileName;
             $archivo->save();
 
+            ////setiando nombre de archivo adjunto e ID
+            $this->currentFileName = $fileName;
+            $this->currentFileId = $archivo->id;
+
+            $rest->setContent("ok");
+
+
         } catch (\Exception $e) {
 
+            Log::error("Error guardando Archivo $fileName, Ref:" . $e);
+            $rest->setError("fallo");
 
         }
 
+
+        return $rest->responseJson();
 
     }
 
@@ -108,6 +152,25 @@ class Files
         ]);
 
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentFileName()
+    {
+        return $this->currentFileName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentFileId()
+    {
+        return $this->currentFileId;
+    }
+
+
+
 
 
 }
