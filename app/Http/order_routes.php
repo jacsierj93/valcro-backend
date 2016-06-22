@@ -96,7 +96,9 @@ $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveS
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // cierra el documento y notifica por correo
-$app->post("Order/Solicitude/Replace",'Orders\OrderController@replaceSolicitude'); // reemplaza la solicutud
+$app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteSolicitude'); // add un solicitud vieja a un anueva
+$app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
+
 
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///lista de todos los pedidos que se úeden sustituir
 

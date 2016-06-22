@@ -344,7 +344,7 @@
                                 ng-click="layers.closeLayer('listPedido')">
 
                            </div>-->
-                <div active-left  ng-show="(!preview && layer != 'listPedido')"></div>
+                <div active-left  ng-show="(!preview && layer != 'listPedido')" after="test('cierre')"></div>
                 <div  layout="column" flex="" class="layerColumn">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
                         <div>
@@ -1297,7 +1297,7 @@
                                ng-mouseenter = "mouseEnterProd(item) ">
                             <div layout="row" class="cellGridHolder" >
                                 <div flex="5" class="cellGrid">
-                                    <md-switch class="md-primary"  ng-change=" changeProducto(item) " ng-model="item.asignado"></md-switch>
+                                    <md-switch class="md-primary"  ng-change=" changeProducto(item) " ng-disabled="(formBlock)" ng-model="item.asignado"></md-switch>
                                 </div>
                                 <div flex="20" class="cellGrid" > {{item.codigo}}</div>
                                 <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
@@ -1851,7 +1851,6 @@
                             <div flex>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos.todos">
                                     <div flex="5" class="cellGrid">
-
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                     <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>

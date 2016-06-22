@@ -78,7 +78,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.mouseProview= false;
     $scope.gridView=4;
     $scope.productTexto="";
-   // $scope.layer ="";
+    // $scope.layer ="";
     $scope.openAdjDtPedido= false;
 
 
@@ -309,7 +309,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         var adjPane =angular.element("#adjuntoProforma");
         if($scope.openAdjDtPedido){
             adjPane.animate({width:"0px"},400, function(){
-               adjPane.css({display:"none"});
+                adjPane.css({display:"none"});
             });
             $scope.openAdjDtPedido= false;
         }else {
@@ -351,6 +351,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         $scope.moduleAccion({close:"all"});
         $scope.moduleAccion({open:{name:"menuAgr"}});
         $scope.gridView=-1;
+        $scope.preview =false;
+
     };
 
     $scope.openEmail= function(){
@@ -366,8 +368,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.provSelec.id){
             //$scope.document.prov_id=$scope.provSelec.id;
         }
-        $scope.moduleAccion({open:{name:"detalleDoc"}});
 
+        $scope.moduleAccion({open:{name:"detalleDoc"}});
         $scope.formBlock=false;
     }
 
@@ -381,6 +383,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         return { email: chip}
     }
+
     function selecOdc(odc) {
         restore('odcSelec');
         loadOdc(odc.id);
@@ -686,39 +689,39 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
 
-        };
-
-/*
-    $scope.changeContraPItem = function (item) {
-        item.doc_id = $scope.document.id;
-        if (item.asignado) {
-            $http.post("Order/AddCustomOrderItem", item)
-                .success(function (response) {
-                    $scope.NotifAction("info","Asignado",[],{autohidden:autohidden});
-                });
-
-        } else {
-
-            $scope.NotifAction("alert",
-                "Se eliminara el contra pedido ¿Desea continuar?"
-                ,[
-                    {name: 'Ok',
-                        action:function(){
-                            $http.post("Order/RemoveCustomOrderItem", {id: item.renglon_id, pedido_id:$scope.document.id})
-                                .success(function (response) {
-                                    $scope.NotifAction("ok","Removido" ,[],{autohidden:autohidden});
-                                });
-                        }
-                    },{name: 'Cancel',
-                        action:function(){
-                            item.asignado=true;
-                        }
-                    }
-                ]);
-        }
-
     };
-*/
+
+    /*
+     $scope.changeContraPItem = function (item) {
+     item.doc_id = $scope.document.id;
+     if (item.asignado) {
+     $http.post("Order/AddCustomOrderItem", item)
+     .success(function (response) {
+     $scope.NotifAction("info","Asignado",[],{autohidden:autohidden});
+     });
+
+     } else {
+
+     $scope.NotifAction("alert",
+     "Se eliminara el contra pedido ¿Desea continuar?"
+     ,[
+     {name: 'Ok',
+     action:function(){
+     $http.post("Order/RemoveCustomOrderItem", {id: item.renglon_id, pedido_id:$scope.document.id})
+     .success(function (response) {
+     $scope.NotifAction("ok","Removido" ,[],{autohidden:autohidden});
+     });
+     }
+     },{name: 'Cancel',
+     action:function(){
+     item.asignado=true;
+     }
+     }
+     ]);
+     }
+
+     };
+     */
 
     $scope.changeKitchenBox = function (item) {
 
@@ -766,10 +769,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.changePedidoSustituto = function (item) {
 
         if (item.asignado) {
-
-            addPedidoSustituto(item.id, $scope.document.id);
+            Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+                $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                $scope.document.id = response.id;
+            });
+            // addPedidoSustituto(item.id, $scope.document.id);
         } else {
-            removePedidoSustituto(item.id, $scope.document.id);
+            Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+                $scope.document.id = response.id;
+            });
         }
 
     };
@@ -1400,22 +1409,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     });
 
 
-/*
+    /*
 
-    $scope.$watchGroup(
-        ['document.tipo_id','document.direccion_facturacion_id',
-            'document.condicion_pago_id','document.puerto_id','document.condicion_id'], function(newVal){
+     $scope.$watchGroup(
+     ['document.tipo_id','document.direccion_facturacion_id',
+     'document.condicion_pago_id','document.puerto_id','document.condicion_id'], function(newVal){
 
-        });
+     });
 
-    //para los campos de texto
-    $scope.$watchGroup(
-        ['document.tipo_id','document.direccion_facturacion_id',
-            'document.monto', 'document.tasa', 'document.condicion_pago_id',
-            'document.mt3','document.peso','document.puerto_id','document.condicion_id'
-            ,'document.nro_factura',''], function(newVal){
+     //para los campos de texto
+     $scope.$watchGroup(
+     ['document.tipo_id','document.direccion_facturacion_id',
+     'document.monto', 'document.tasa', 'document.condicion_pago_id',
+     'document.mt3','document.peso','document.puerto_id','document.condicion_id'
+     ,'document.nro_factura',''], function(newVal){
 
-        });*/
+     });*/
 
     /**layers*/
     $scope.$watchGroup(['module.index','module.layer'], function(newVal){
@@ -1549,14 +1558,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         if (nuevo[0] && !nuevo[1]) {
 
-           /* $scope.document.prov_id = $scope.provSelec.id;
-            //{id:$scope.document.id, estado_id:$scope.document.estado_id}
-            Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
-                if (response.success) {
-                    $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
-                }
+            /* $scope.document.prov_id = $scope.provSelec.id;
+             //{id:$scope.document.id, estado_id:$scope.document.estado_id}
+             Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
+             if (response.success) {
+             $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+             }
 
-            });*/
+             });*/
         }
 
 
@@ -1815,7 +1824,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     }
 
-    /*****/
+    /**@deprecated
+     * **/
     function addPedidoSustituto(id, pedido_id){
         $http({
             method: 'POST',
@@ -1900,6 +1910,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 });
 
 /************** SERRVICIOS   ***********************/
+
+
 
 
 MyApp.service('setGetOrder', function() {
@@ -2020,7 +2032,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
             }else
             if(arg.search){
                 if(module.historia.indexOf(arg.search.name) == -1) {
-                   open(arg.search, module);
+                    open(arg.search, module);
 
                 }else {
                     close(arg.search, module);
