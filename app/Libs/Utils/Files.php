@@ -30,6 +30,8 @@ class Files
     private $imageThumbWidth = 72;
     private $currentFileName; ////nombre del ultimo archivo
     private $currentFileId; ///id en la tabla tbl_archivo del ultimo archivo subido
+    private $currentFileType; ///tipo de archivo subido
+    private $currentFileThumbName; ///nombre de la imagen en miniatura
 
     /**
      * Files constructor.
@@ -59,6 +61,7 @@ class Files
             $file = Request::file($fileName);
 
             $mime = $file->getMimeType();
+            $this->currentFileType = $mime;
             $type = (substr($mime, 0, 5) == "image") ? $this->imagePath : $this->docsPath;
             $extension = $file->getClientOriginalExtension();
 
@@ -82,8 +85,11 @@ class Files
                 Log::info("guardando imagen $fileName en thumb ");
                 Image::make(File::get($file))->resize($this->imageThumbWidth, null, function ($constraint) {
                     $constraint->aspectRatio();
+
                 })->save($this->imagePathThumb . $fileName . '_thumb' . '.' . $extension); ///guardando imagenes
             }
+
+            $this->currentFileThumbName = $fileName . '_thumb' . '.' . $extension;
 
 
             $fileName = $fileName . "." . $extension; ///extension
@@ -167,6 +173,22 @@ class Files
     public function getCurrentFileId()
     {
         return $this->currentFileId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentFileType()
+    {
+        return $this->currentFileType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentFileThumbName()
+    {
+        return $this->currentFileThumbName;
     }
 
 

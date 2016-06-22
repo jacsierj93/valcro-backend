@@ -2,17 +2,17 @@
 
 return array(
 
-    'default' => 'valcrosis',
+    'default' => 'valcro2',
 
     'connections' => array(
 
         # Our primary database connection
         'valcrosis' => array(
             'driver'    => 'mysql',
-            'host'      => 'localhost',
-            'database'  => 'valcro_db2',
-            'username'  => 'userVal',
-            'password'  => 'ntmJX2zn92CQFc6P',
+            'host'      => 'userver',
+            'database'  => 'valcro_db',
+            'username'  => 'root',
+            'password'  => 'delimce',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
