@@ -533,17 +533,15 @@
         <!-- ########################################## LAYER EMAIL ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="email" id="email">
             <!--  ########################################## CONTENDOR  EMAIL ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent" flex >
+            <md-content  layout="row" flex class="sideNavContent">
 
-                <div class="backDiv"  ng-click="layers.closeLayer('email')"> </div>
-
-                <div layout="column" flex >
-                    <div style="background-color: #0a0a0a; width: 100%; height: 48px; color: whitesmoke;">
+                <div  layout="column" flex="" >
+                    <div style="background-color: #0a0a0a; width: 100%; height: 36px; min-height: 36px;">
                         <div style="margin: 8px;">Mensaje Nuevo</div>
                     </div>
                     <md-chips ng-model="email.destinos"
                               md-transform-chip="transformChip($chip)"
-                              style=" padding-left:4px;">
+                              style="  height: 48px;">
                         <md-autocomplete
                             md-search-text="emailToText"
                             md-items="item in searchEmails(emailToText)"
@@ -557,27 +555,27 @@
                             <strong>{{$chip.email}}</strong>
                         </md-chip-template>
                     </md-chips>
-                    <div flex>
-                        <div class="gridContent" style="height: 100%;">
-                            <md-input-container  style="overflow-y:auto; width: calc(100% - 10px);">
-                                <textarea  ng-model="email.content"  style="border: 0px;"></textarea>
-
-                            </md-input-container>
-                        </div >
+                    <input  ng-model="email.asunto" placeholder="Asunto" style="border-top: 0; border-left: 0; border-right:0 ;">
+                    <div flex layout="column" style="padding: 2px;">
+                    <md-content   >
+                        <div contenteditable
+                             ng-model="emailText"
+                             strip-br="true"
+                             required style="min-height: 20px; width: 100%;"></div>
+                    </md-content>
+                        <div></div>
                     </div>
 
-                    <div layout="row" layout-align="start end" style="background-color: #f5f5f5;width: 100%; color: whitesmoke; height: 48px; bottom: 0;">
-                        <div  layout="column"
-                              layout-align="center center"
-                              style="background-color: #0288ff; margin: 2px;height: 44px;width: 150px;">
-                            <div>Enviar</div>
+                    <div layout="row"
+                         style="background-color: #f5f5f5;width: 100%; min-height: 44px; height: 44px;">
+                        <div  layout="column" layout-align="center center"   style="width: 80px;" ng-click="sendEmail()">
+                            <div class="btn">Enviar</div>
                         </div>
                         <div  layout="column"
                               layout-align="center center"
                               class="btnOptEmail">
                             <div>A</div>
                         </div>
-
                     </div>
                 </div>
 
@@ -937,7 +935,7 @@
                         </div>
                     </form>
                 </div>
-                <div   class="md-whiteframe-2dp" id="adjuntoProforma" style="width: 0px; display:none; padding: 4px;  height: 100%;" flex>
+                <div   class="md-whiteframe-2dp" id="adjuntoProforma" style="width: 0px; display:none; padding: 4px;  height: 100%;" >
                     <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
                         <div layout="row">
                             <div layout="column" layout-align="center center" ng-click="closeAdj()" >
@@ -1105,7 +1103,7 @@
         <!--  ########################################## LAYER Agregar Pedidos ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed" id="agrPed">
             <!-- ) ########################################## Agregar Pedidos ########################################## -->
-            <md-content  layout="row" class="sideNavContent" flex >
+            <md-content  layout="row" class="sideNavContent" flex ng-init="overSusitu = -1">
 
                 <div class="backDiv"      ng-click="closeLayer('agrPed')" > </div>
                 <div layout="row" flex>
@@ -1153,7 +1151,7 @@
                         </form>
                         <div >
                             <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
-                                <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.kitchenBox">
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.kitchenBox" ng-class="{resalt : overSusitu == item.sustituto }">
 
                                     <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
                                     <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
@@ -1182,7 +1180,7 @@
                             </div>
                         </form>
                         <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.pedidoSusti">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.pedidoSusti" ng-mouseover = "overSusitu =  item.id">
 
                                 <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
                                 <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->

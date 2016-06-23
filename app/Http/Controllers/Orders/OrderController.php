@@ -2333,6 +2333,7 @@ class OrderController extends BaseController
             $asigOtro = array();
             $paso = true;
             if($aux->saldo <= 0){
+                //$tem['saldo'] = $aux->saldo;
                 $paso= false;
             }
             if($paso){
@@ -3238,26 +3239,25 @@ class OrderController extends BaseController
         foreach($items->where('tipo_origen_id', '3') as $aux){
             $kitchen->push(KitchenBox::find($aux->origen_item_id));
         }
-        /** importados */
-        foreach($items->where('tipo_origen_id', '4') as $aux){
 
-            /* $id =MasterOrderController::getTypeProduct($aux)['tipo_origen_id'];
-             $imp=MasterOrderController::getOriginalHead($aux);
-             $aux['titulo']="transferido del ";
-             $aux['renglon_id']= $aux->id;
-             $aux->id=$imp->id;
-             switch($id){
+        /** importados */
+        foreach($items->where('tipo_origen_id', ''.$order->getTipoId()) as $aux){
+                $first= $this->getFirstProducto($aux);
+             switch($first->tipo_origen_id){
                  case 2:
-                     $contra->push($aux);
+                     $tem= CustomOrder::findOrFail($first->doc_origen_id);
+                     $tem['sustitute'] = $aux->doc_origen_id;
+                     $contra->push($tem);
                      break;
                  case 3:
                      $kitchen->push($aux);
-
+                     $tem= KitchenBox::findOrFail($first->doc_origen_id);
+                     $tem['sustituto'] = $aux->doc_origen_id;
                      break;
              }
              if(!$pediSus->contains($aux->doc_origen_id)){
-                 $pediSus[]=Order::find($aux->doc_origen_id);
-             }*/
+                 $pediSus[]=$order::find($aux->doc_origen_id);
+             }
 
         }
 
@@ -3873,6 +3873,24 @@ class OrderController extends BaseController
 
         return $newItem;
 
+    }
+
+    private function getFirstProducto($model){
+        $aux = $model->replicate();
+
+        $i =0;
+        $traza= array();
+        //dd($type);
+        while(true || $i <5){
+            if($aux->tipo_origen_id == 2 || $aux->tipo_origen_id == 3 || $aux->tipo_origen_id == 1){
+                break;
+            }
+            $aux = $model->findOrFail($aux->origen_item_id);
+            $i = $i +1;
+            $traza[]= $aux;
+        }
+
+        return $aux;
     }
 
     private  function  transferAttachments($oldItem, $newItem){

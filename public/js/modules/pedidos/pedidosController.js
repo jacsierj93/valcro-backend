@@ -52,12 +52,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     };
-
-    /**
-     {id, thumbail, complete, tipo,
-     }
-     */
-
     $scope.imagenes = new Array();
     $scope.imgKey=0;
 
@@ -68,6 +62,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.fpaisSelec="";
     $scope.email.contactos = new Array();
     $scope.emailToText = null;
+    $scope.emailText = "demo";
+    $scope.emailAsunto = "demo";
     $scope.productoSearch={};
 
 
@@ -84,6 +80,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.productTexto="";
     // $scope.layer ="";
     $scope.openAdjDtPedido= false;
+
+
 
     restore('provSelec');// inializa el proveedor
     restore('document');// inializa el pedido
@@ -181,7 +179,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
     /********************************************EVENTOS ********************************************/
 
-
+$scope.sendEmail = function(){
+    $scope.NotifAction("ok","Enviado",[
+        {
+        name:"ok",
+        action: function(){
+            $scope.moduleAccion({close:true});
+        }
+    }
+    ],{block:true});
+}
 
     $scope.$watchGroup(
         ['cola.total',
