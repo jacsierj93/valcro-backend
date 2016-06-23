@@ -47,9 +47,9 @@ class ProvidersController extends BaseController
         return $files;
     }
 
-    public function getFile(request $name){
+    public function getFile(){
         $archivo = new Files("pay");
-        return $archivo->getFile($name->name); ///probando
+        return $archivo->getFile("images/5-QEhW6CgSn28mm-1-2016-06-20_05_04_07.jpg"); ///probando
     }
 
 
@@ -251,7 +251,10 @@ class ProvidersController extends BaseController
             $contact->idiomas()->sync($req->languaje);
         }
 
-        updateExistingPivot($req->preFav["dep"],array("fav"=>0));
+        if(Provider::find($req->prov_id)->contactos_campos()->find($valName->id)->where("camp_id",1)){
+            Provider::find($req->prov_id)->contactos_campos()->attach(array($contact->id =>array("camp_id"=>1,"value")));
+        }
+        //Provider::find($req->prov_id)->contactos_campos()->attach($contact->id);
 
 
         /*if($valName->agente != 1){

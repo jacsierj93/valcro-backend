@@ -544,7 +544,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
         /*var list = angular.element(this).parents("form").first().find("[info]:visible");
         angular.element(list[list.index(this)+1]).focus().click();*/
-    }
+    };
 
     $scope.prov = setGetProv.getProv();
     $scope.list = setGetProv.seeList();
@@ -570,7 +570,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         }
     });
 
-    var lawletters = new RegExp(["S.L.U.","S.L.","CO","LTD.","LLC","S.A.","LDA","S.P.A.","s.p.a.","LIMITED","CORP.","S.A.E","S.L.","S.R.L.","S.A.S","INC.","INC","GMBH CO.KG","NV","CO."].join("| "));
+    var lawletters = new RegExp(["S.L.U.","S.L.","CO","LTD.","LLC","S.A.","LDA","S.P.A.","s.p.a.","LIMITED","CORP.","S.A.E","S.L.","S.R.L.","S.A.S","INC.","INC","GMBH CO.KG","NV","CO."].join("| ")+"$");
     $scope.check = function(elem){
         var htmlElem = document.getElementsByName(elem)[0];
         if($scope.projectForm[elem].$error.duplicate){
@@ -602,6 +602,36 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                 );
             };
         };
+
+        if(elem == "siglas" && htmlElem.value!=""){
+            console.log($scope.dtaPrv);
+            var nomProv = $scope.dtaPrv.description.replace(lawletters, "");
+            var consonantes = nomProv.replace(/[aeiou ]/gi,"");
+            var first = consonantes[0];
+            var primero = new RegExp(first,"g");
+            var last = consonantes.replace(primero,"").substr(-1)
+            consonantes = consonantes.substr(1,consonantes.length-2);
+            var patt = new RegExp("^"+first+"["+consonantes+"]"+"+"+last+"$","i");
+            if(!patt.test(htmlElem.value)){
+                setNotif.addNotif("alert","estas siglas no se parecen a la razon social, estas seguro que son correctas?",
+                    [
+                        {
+                            name:"si, lo estoy",
+                            action:function(){
+                            },
+                            default:5
+                        },
+                        {
+                            name:"dejame corregirlo",
+                            action:function(){
+                                htmlElem.focus();
+                            },
+
+                        },
+                    ]
+                );
+            }
+        }
     };
 
     $scope.dtaPrv = setGetProv.getProv();

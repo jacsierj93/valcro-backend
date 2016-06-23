@@ -299,20 +299,6 @@ MyApp.directive('info', function($timeout,setNotif) {
                 }, 0);
 
             });
-            /*element.bind("keypress",function(e){
-
-                if(e.which  == 13){
-                    e.stopPropagation();
-                    var list = angular.element(this).parents("form").first().find("[info]:visible");
-                    if(list.index(this)<list.length-1){
-                        angular.element(list[list.index(this)+1]).focus().click();
-                    }else{
-                        angular.element(this).parents("form").first().next().find("[info]:visible").first().focus();
-                        scope.showGrid(false,element)
-                    }
-
-                }
-            });*/
 
 
             element.bind("focus", function(e) {
