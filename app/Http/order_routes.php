@@ -11,8 +11,17 @@
 */
 // systema
 $app->get("Order/UnClosetDoc",'Orders\OrderController@getUnClosetDocument'); ///trae tod el detalle de pedido
+$app->post("Order/UpLoad",'Orders\OrderController@UpLoadFiles'); ///trae tod el detalle de pedido
 
+//Genericos
+$app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
+$app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
+$app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae tod el detalle de contraPedido
+//$app->post("Order/Copy",'Orders\OrderController@copyDoc'); ///trae tod el detalle de contraPedido
 
+//otros modulos
+$app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountry'); ///obtiene las direcciones de facturacion
+$app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry'); ///obtiene las direcciones de facturacion
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///trae tod el detalle de pedido
@@ -21,13 +30,13 @@ $app->get("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///ll
 $app->get("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
 $app->get("Order/OrderDataForm",'Orders\OrderController@getForm'); //data para el llenado de formulario
 $app->get("Order/ProviderPaymentCondition",'Orders\OrderController@getProviderPaymentCondition'); ///obtiene las condiciones de pago a proveedor
-$app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressStore'); ///obtiene las direcciones de almacen de un proveedor
-$app->get("Order/Address",'Orders\OrderController@getAddressCountry'); ///obtiene las direcciones de almacen de un proveedor en un pais
+$app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressStore'); ///obtiene las direcciones de alma
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
+$app->post("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
 
 
 // import
@@ -63,9 +72,9 @@ $app->post("Order/Order/SetStatus",'Orders\OrderController@setStatusOrder'); // 
 $app->post("Order/Order/AdddRemoveItems",'Orders\OrderController@addRemoveOrderItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
 $app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
-
-
-
+$app->post("Order/Order/AddSustitute",'Orders\OrderController@addSustituteOrder'); // add un solicitud vieja a un anueva
+$app->post("Order/Order/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
+$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos las solicitudes
 
 //Orden de compra
 $app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda el pedido
@@ -79,9 +88,10 @@ $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubsti
 $app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
 $app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
-$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // cierra el documento y notifica por correo
-
-
+$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
+$app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addSustitutOrder'); // add un solicitud vieja a un anueva
+$app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
+$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes
 
 
 // solicitudes
@@ -98,23 +108,13 @@ $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); /
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteSolicitude'); // add un solicitud vieja a un anueva
 $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
-
-
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///lista de todos los pedidos que se úeden sustituir
-
-$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos los pedidos que se úeden sustituir
-
-
-
+$app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); ///lista de todos los pedidos que se úeden sustituir
+$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes
 
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
 
-//Genericos
-$app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
-$app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
-$app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae tod el detalle de contraPedido
-//$app->post("Order/Copy",'Orders\OrderController@copyDoc'); ///trae tod el detalle de contraPedido
 
 
 

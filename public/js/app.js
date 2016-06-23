@@ -122,8 +122,18 @@ MyApp.directive('activeLeft', function ($compile, Layers) {
         link: function (scope, elem, attrs) {
             var ly =jQuery(elem).parents("md-sidenav").first().attr("id");
             elem.removeAttr("active-left");
+            var jso="{close:{name:'"+ly+"'";
+            var after = elem.attr('after');
+            if(after){
+                jso +=",after:"+after
+            }
+            var before = elem.attr('before');
+            if(before){
+                jso +=",before:"+before
+            }
+
             elem.addClass("activeleft");
-            elem.attr("ng-click","LayersAction({close:{name:'"+ly+"'}})");
+            elem.attr("ng-click","LayersAction("+jso+"}})");
             elem.attr("ng-class","{'white': ('"+ly+"'!=layer)}");
             $compile(elem[0])(scope);
         }

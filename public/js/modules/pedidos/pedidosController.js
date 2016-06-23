@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,Layers,setGetOrder, DateParse) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,providers,Upload,Layers,setGetOrder, DateParse) {
 
     // var historia = [15];
     var autohidden= 2000;
@@ -19,11 +19,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.gridViewCp= 1;
     $scope.gridViewSus= 1;
 
-
-
     $scope.formGlobal = "new";
-
-
     $scope.forModeAvilable={
         solicitud: {
             name: "Solicitud",
@@ -57,6 +53,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
     };
 
+    /**
+     {id, thumbail, complete, tipo,
+     }
+     */
+
+    $scope.imagenes = new Array();
+    $scope.imgKey=0;
+
     var timePreview;
     // filtros
     $scope.fRazSocial="";
@@ -80,10 +84,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.productTexto="";
     // $scope.layer ="";
     $scope.openAdjDtPedido= false;
-
-
-    /******************* declaracion defunciones de eventos */
-    /*******incializacion de $scope*****/
 
     restore('provSelec');// inializa el proveedor
     restore('document');// inializa el pedido
@@ -118,11 +118,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     function init() {
-        $scope.filterData.paises = masters.query({type: 'getCountriesProvider'});
         $scope.filterData.motivoPedido = masters.query({type: 'getOrderReason'});
         $scope.filterData.condicionPedido = masters.query({type: 'getOrderCondition'});
         $scope.filterData.tipoDepago = masters.query({type: 'getPaymentType'});
-
         $scope.estadosDoc = masters.query({type: 'getOrderStatus'});
 
 
@@ -182,6 +180,53 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
     /********************************************EVENTOS ********************************************/
+
+
+
+    $scope.$watchGroup(
+        ['cola.total',
+            'cola.respuesta.length'], function(newVal){
+            console.log("iguakle", newVal);
+            if(newVal[0] >0 ){
+                console.log("iguakle 2");
+
+                if(newVal[0] == newVal[1]){
+                    console.log("iguakle 3");
+                    Order.postMod({type:$scope.formMode.mod, mod:"AddAdjuntos"},
+                        {id:$scope.document.id,adjuntos: $scope.imagenes}, function(response){
+                            $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                        });
+                }
+            }
+        });
+
+    $scope.cola ={
+        total:0,
+        respuesta: new Array(),
+    };
+    $scope.upload = function (files) {
+        console.log("sdfadsfa");
+        $scope.cola.total= files.length;
+
+        if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                Upload.upload({
+                    url: 'Order/UpLoad',
+                    file: file
+                }).progress(function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    uploadNow = progressPercentage;
+                }).success(function (data, status, headers, config) {
+                    var data ={id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
+                    $scope.imagenes.push(data);
+                    $scope.cola.respuesta.push(data);
+
+                });
+            }
+        }
+    };
+
 
 
     $scope.hoverpedido= function(document){
@@ -286,6 +331,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         console.log("console test", text);
     }
 
+    $scope.cancelClose = function(){
+        console.log("entrp al cancel");
+        return false;
+    }
+
 
     /******************************************** filtros ********************************************/
     $scope.searchCountry = function(item,texto){
@@ -305,19 +355,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /******************************************** APERTURA DE LAYERS ********************************************/
 
-    $scope.openAdj = function(){
+    $scope.openAdj = function(folder){
+        $scope.folder = folder;
         var adjPane =angular.element("#adjuntoProforma");
-        if($scope.openAdjDtPedido){
-            adjPane.animate({width:"0px"},400, function(){
-                adjPane.css({display:"none"});
-            });
-            $scope.openAdjDtPedido= false;
-        }else {
-            adjPane.animate({width:"360px", display:"block"},400, function(){
-                $scope.openAdjDtPedido= true;
-            });
+        if(!$scope.openAdjDtPedido){
+            $scope.openAdjDtPedido= true;
+            adjPane.css({display:"block"});
+            adjPane.animate({width:"360px"},400, function(){
 
+            });
         }
+
+    };
+
+    $scope.closeAdj = function(){
+        var adjPane =angular.element("#adjuntoProforma");
+        adjPane.animate({width:"0px"},400, function(){
+            adjPane.css({display:"none"});
+
+        });
+        $timeout(function(){
+            $scope.openAdjDtPedido= false;
+        },399);
+
 
     };
     $scope.openDocSusti = function(){
@@ -1355,9 +1415,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /** formulario  head*/
     $scope.$watch('document.pais_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
-            $http.get("Order/Address",{params:{id:newVal,tipo_dir: 2}}).success(function (response) {
-                $scope.formData.direcciones=response;
-            });
+            $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:newVal, pais_id:newVal});
+
             if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
 
                 setGetOrder.addChange({id:"pais_id",value:newVal,text:"Pais"},$scope.formAction,"FormHeadDocument");
@@ -1387,16 +1446,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watch('provSelec.id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined' && newVal) {
+            console.log(newVal)
+            $scope.formData.direccionesFact= Order.query({type:"InvoiceAddress", prov_id:newVal});
+            $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal || 0});
+            $scope.formData.paises= Order.query({type:"ProviderCountry",id:newVal});
+            $scope.formData.condicionPago= Order.query({type:"ProviderPaymentCondition", id:newVal});
 
-            loadCoinProvider(newVal);
-            loadCountryProvider(newVal);
-            loadPaymentCondProvider(newVal);
-            $http.get("Order/Address",{params:{id:newVal,tipo_dir: 1}}).success(function (response) {
-                $scope.formData.direccionesFact= response;
-            });
-            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
-                setGetOrder.addChange({id:"prov_id",value:newVal,text:"Proveedor"},$scope.formAction,"FormHeadDocument");
-            }
+            //if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
+            //    setGetOrder.addChange({id:"prov_id",value:newVal,text:"Proveedor"},$scope.formAction,"FormHeadDocument");
+            //}
         }
     });
     //para los select
@@ -1439,6 +1497,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 setGetOrder.setGlobalAction("new");
                 $scope.gridView=4;
                 $scope.FormHeadDocument.$setUntouched();
+                $scope.imagenes = new Array();
 
                 break;
             case 1:$scope.FormHeadDocument.$setUntouched();break;
@@ -1500,12 +1559,21 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined'){
                         Order.get({type:"Document", id:$scope.document.id,tipo:$scope.formMode.value}, {},function(response){
                             $scope.document= response;
+                            $scope.imagenes= new Array();
 
                             $scope.document.emision=DateParse.toDate(response.emision);
                             $scope.document.monto=parseFloat(response.monto);
                             $scope.document.tasa=parseFloat(response.tasa);
                             if(response.fecha_aprob_compra =! null && response.fecha_aprob_compra ){
                                 $scope.document.fecha_aprob_compra= DateParse.toDate(response.fecha_aprob_compra);
+                            }
+                            if(response.adjuntos.length >0 ){
+                                angular.forEach(response.adjuntos,function(v,k){
+                                    console.log('value', v)
+                                  $scope.imagenes.push(v.file);
+
+                                });
+                                console.log("adjuntos", $scope.imagenes)
                             }
                         });
                     }
@@ -1521,17 +1589,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.$watchGroup(['FormHeadDocument.$valid', 'FormHeadDocument.$pristine'], function (nuevo) {
 
         if (nuevo[0] && !nuevo[1]) {
-            $scope.document.prov_id = $scope.provSelec.id;
+            console.log("form",nuevo);
 
-            Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
-                if (response.success) {
-                    $scope.document.id = response.id;
-                    if(response['action'] == 'new'){
-                        $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+            $timeout(function(){
+                $scope.document.prov_id = angular.copy($scope.provSelec.id);
+                $scope.FormHeadDocument.$setPristine();
+                Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
+                    if (response.success) {
+                        $scope.document.id = response.id;
+                        if(response['action'] == 'new'){
+                            $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+                        }
+
                     }
+                });
+            },500);
 
-                }
-            });
         }
 
     });
@@ -1660,12 +1733,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     }
 
     function loadCoinProvider(id){
-
-        $http.get("provider/provCoins/"+id).success(function (response) {
+        $scope.formData.monedas = providers.query({type: "provCoins", id_prov: id || 0});
+       /* $http.get("provider/provCoins/"+id).success(function (response) {
             $scope.formData.monedas=response;
             //  $scope.document.prov_moneda_id= response[0].id;
 
-        });
+        });*/
     }
 
     function loadPaymentCondProvider(id){
@@ -1912,110 +1985,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 /************** SERRVICIOS   ***********************/
 
 
-
-
-MyApp.service('setGetOrder', function() {
-    var trace = {};
-    var changes ={};
-    var globalAction= "new";
-
-    var forms ={FormHeadDocument:{action:"new"},productosDoc:{action:"new"}};
-    angular.forEach(forms, function (v, k) {
-        trace[k]={};
-        changes[k]={};
-    });
-    this.addTrace = function(val,form){
-        console.log("focus");
-        if(trace[form][parseInt(val.id)] === undefined){
-            trace[form][parseInt(val.id)] = angular.copy(val);
-        }
-    };
-
-    this.addChange = function(val,action,form){
-        if(globalAction== "new"){
-            action = "new";
-        }
-        if((changes[form][val.id]===undefined) || !angular.equals(val,trace[form][val.id])){
-            if(changes[form][val.id]){
-                changes[form][val.id].datos = angular.copy(val);
-                if(!(changes[form][val.id].action=="new" && action=="upd")){
-                    changes[form][val.id].action = action;
-                }
-            }else{
-                changes[form][val.id] = {
-                    datos:angular.copy(val),
-                    action:action
-                }
-            }
-        }else{
-            delete changes[form][val.id];
-        }
-    }
-
-    this.getChanges= function(){return changes; }
-    this.setGlobalAction= function(action){globalAction=action; };
-    this.getGlobagAction= function(){ return globalAction};
-
-    this.setFormAction = function(key, action){
-        forms[key].action=action;
-    }
-    this.setFormAction = function(key){
-        return forms[key].action;
-    }
-});
-
-
-MyApp.service('Layers' , function(){
-
-    var modules ={};
-    var accion ={estado:false,data:{}};
-    var modulekey="";
-    var layer = "";
-    var index= 0;
-
-
-    return {
-        setModule: function (name){
-            console.log("set moduel", name);
-            if(!modules[name]){
-                modules[name]={historia: new Array(),layers:new Array(),index: 0,layer:"",blockBack:false};
-
-            }else{
-                modules[name].historia = new Array();
-                modules[name].layers = new Array();
-                modules[name].layer ="";
-                modules[name].index ="";
-                modules[name].blockBack =false;
-
-            }
-            modulekey=name;
-            return modules[name];
-        }, getModule : function(name){
-            if(!name){
-                return modules[modulekey];
-            }else{
-                return modules[name];
-            }
-
-        },
-        getAccion : function(){
-            return accion;
-        }, setAccion: function(arg){
-            console.log("accc", arg);
-            accion.data=arg;
-            accion.estado=true;
-        },
-        getLayer : function (){
-            return  modules[modulekey].index;
-        },
-        getIndex : function (){
-            return  modules[modulekey].layer;
-        }
-    }
-
-
-});
-
 MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
     $scope.accion= Layers.getAccion();
@@ -2063,7 +2032,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
             if(arg.before){
                 var res=arg.before();
                 console.log("respuesta ",res);
-                if(!res){
+                if(res == false){
                     paso=false;
                 }
 
@@ -2143,6 +2112,107 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
         }
         return false;
     }
+});
+
+MyApp.service('setGetOrder', function() {
+    var trace = {};
+    var changes ={};
+    var globalAction= "new";
+
+    var forms ={FormHeadDocument:{action:"new"},productosDoc:{action:"new"}};
+    angular.forEach(forms, function (v, k) {
+        trace[k]={};
+        changes[k]={};
+    });
+    this.addTrace = function(val,form){
+        console.log("focus");
+        if(trace[form][parseInt(val.id)] === undefined){
+            trace[form][parseInt(val.id)] = angular.copy(val);
+        }
+    };
+
+    this.addChange = function(val,action,form){
+        if(globalAction== "new"){
+            action = "new";
+        }
+        if((changes[form][val.id]===undefined) || !angular.equals(val,trace[form][val.id])){
+            if(changes[form][val.id]){
+                changes[form][val.id].datos = angular.copy(val);
+                if(!(changes[form][val.id].action=="new" && action=="upd")){
+                    changes[form][val.id].action = action;
+                }
+            }else{
+                changes[form][val.id] = {
+                    datos:angular.copy(val),
+                    action:action
+                }
+            }
+        }else{
+            delete changes[form][val.id];
+        }
+    }
+
+    this.getChanges= function(){return changes; }
+    this.setGlobalAction= function(action){globalAction=action; };
+    this.getGlobagAction= function(){ return globalAction};
+
+    this.setFormAction = function(key, action){
+        forms[key].action=action;
+    }
+    this.setFormAction = function(key){
+        return forms[key].action;
+    }
+});
+
+MyApp.service('Layers' , function(){
+
+    var modules ={};
+    var accion ={estado:false,data:{}};
+    var modulekey="";
+    var layer = "";
+    var index= 0;
+
+
+    return {
+        setModule: function (name){
+            console.log("set moduel", name);
+            if(!modules[name]){
+                modules[name]={historia: new Array(),layers:new Array(),index: 0,layer:"",blockBack:false};
+
+            }else{
+                modules[name].historia = new Array();
+                modules[name].layers = new Array();
+                modules[name].layer ="";
+                modules[name].index ="";
+                modules[name].blockBack =false;
+
+            }
+            modulekey=name;
+            return modules[name];
+        }, getModule : function(name){
+            if(!name){
+                return modules[modulekey];
+            }else{
+                return modules[name];
+            }
+
+        },
+        getAccion : function(){
+            return accion;
+        }, setAccion: function(arg){
+            console.log("accc", arg);
+            accion.data=arg;
+            accion.estado=true;
+        },
+        getLayer : function (){
+            return  modules[modulekey].index;
+        },
+        getIndex : function (){
+            return  modules[modulekey].layer;
+        }
+    }
+
+
 });
 
 MyApp.factory('Order', ['$resource',

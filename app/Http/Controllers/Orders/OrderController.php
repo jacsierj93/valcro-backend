@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Masters\MasterProductController;
+use App\Libs\Utils\Files;
+
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
+use App\Models\Sistema\FileModel;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
 use App\Models\Sistema\CustomOrders\CustomOrderReason;
@@ -29,6 +32,7 @@ use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Purchase\PurchaseItem;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Solicitude\Solicitude;
+use App\Models\Sistema\Solicitude\SolicitudeAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeItem;
 use Carbon\Carbon;
 use DB;
@@ -47,6 +51,9 @@ class OrderController extends BaseController
     }
 
     /*********************** SYSTEM ************************/
+    /**
+     * trae los documentos que no fueron fnalizados
+     */
     public function getUnClosetDocument(){
         $data = array();
         $data['23'] = Purchase::whereNull("final_id")
@@ -67,6 +74,24 @@ class OrderController extends BaseController
             ->get();
         return array();
     }
+
+    public function UpLoadFiles(Request $req){
+
+        $fil= array();
+        $archivo = new Files("orders");
+        //  dd($req->file("file"));
+        $archivo->upload("file"); ///probando
+        $resul['accion']= "upLoad";
+
+        $fil['id']= $archivo->getCurrentFileId();
+        $fil['file']= $archivo->getCurrentFileName();
+        $fil['thumb']= $archivo->getCurrentFileThumbName();
+        $fil['tipo']= $archivo->getCurrentFileType();
+        $resul['file']= $fil;
+
+        return $resul;
+    }
+
 
     /*********************** PROVIDER ************************/
 
@@ -437,6 +462,9 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * agrega la solicitud al nuevo documento
+     */
     public  function  addSustituteSolicitude(Request $req){
         $resul = array();
         $princi = Solicitude::findOrFail($req->princ_id);
@@ -493,7 +521,9 @@ class OrderController extends BaseController
         return $resul;
 
     }
-
+    /**
+     * remueve la solicitud al documento
+     */
     public function removeSustiteSolicitude(Request $req){
         $resul = array();
         $princi = Solicitude::findOrFail($req->princ_id);
@@ -530,6 +560,392 @@ class OrderController extends BaseController
         $resul['response']= $model->items()->saveMany($newIts);
         return $resul;
     }
+
+    /**
+     * obtiene las proformas que pueden ser reempladas
+     */
+
+    public  function  getOrderToReplace(Request $req){
+        $items = Order::where('id', '<>', $req->id)
+            ->whereNull('fecha_sustitucion')
+            ->get();
+        $data = array();
+        $type = OrderType::get();
+        $prov = Provider::findOrFail($req->prov_id);
+        $coin = Monedas::get();
+        $motivo = OrderReason::get();
+        $prioridad= OrderPriority::get();
+        $estados= OrderStatus::get();
+        foreach($items as $aux){
+            //para maquinas
+            $tem = array();
+            $tem['id']=$aux->id;
+            //$tem['tipo_id']=$aux->tipo_pedido_id;
+            $tem['pais_id']=$aux->pais_id;
+            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+            $tem['condicion_pago_id']=$aux->condicion_pago_id;
+            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+            $tem['prioridad_id']=$aux->prioridad_id;
+            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+            $tem['prov_moneda_id']=$aux->prov_moneda_id;
+            $tem['estado_id']=$aux->estado_id;
+            // $tem['tipo_value']=$aux->typevalue;
+            // pra humanos
+            $tem['comentario']=$aux->comentario;
+            $tem['tasa']=$aux->tasa;
+            $tem['proveedor']=$prov->razon_social;
+            $tem['documento']= $aux->getTipo();
+            $tem['diasEmit']=$aux->daysCreate();
+            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+            $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
+            $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
+            $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+
+
+            if($aux->motivo_id){
+                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+            }
+            if($aux->pais_id){
+                //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+            }
+            if($aux->prioridad_id){
+                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+            }
+            if($aux->prov_moneda_id){
+                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+            }
+            if($aux->prov_moneda_id){
+                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+            }
+            if($aux->tipo_id != null){
+                $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+            }
+
+
+            $tem['nro_proforma']=$aux->nro_proforma;
+            $tem['nro_factura']=$aux->nro_factura;
+            $tem['img_proforma']=$aux->img_proforma;
+            $tem['img_factura']=$aux->img_factura;
+            $tem['mt3']=$aux->mt3;
+            $tem['peso']=$aux->peso;
+            $tem['emision']=$aux->emision;
+            $tem['monto']=$aux->monto;
+
+            /**actualizar cuando este el final**/
+            $tem['almacen']="Desconocido";
+
+            // modificar cuando se sepa la logica
+            $tem['aero']=1;
+            $tem['version']=1;
+            $tem['maritimo']=1;
+            $data[]=$tem;
+
+        }
+        return $data;
+
+    }
+
+    /**
+     * agrega la solicitud al nuevo documento
+     */
+    public  function  addSustituteOrder(Request $req){
+        $resul = array();
+        $princi = Order::findOrFail($req->princ_id);
+        $reemplaze = Order::findOrFail($req->reemplace_id);
+        $model = new Order();
+        $model = $this->transferDataDoc($princi,$model);
+        $princi->final_id= $this->getFinalId($princi);
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+
+
+        $princi->parent_id = $reemplaze->id;
+        $princi->version = $reemplaze->version + 1;
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+        $princi->fecha_sustitucion= Carbon::now();
+        $reemplaze->fecha_sustitucion= Carbon::now();
+
+        $princi->save();
+        $reemplaze->save();
+        $model->save();
+        $newIts = array();
+        foreach($princi->items()->get() as $oldItem){
+            $newItem = new OrderItem();
+            /*            $newItem->final_id =$oldItem->final_id;*/
+            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newIts[] = $newItem;
+        }
+        foreach($reemplaze->items()->get() as $oldItem){
+            $newItem = new OrderItem();
+            /*            $newItem->final_id =$oldItem->final_id."&temp";*/
+            $newItem->tipo_origen_id =21;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->id;
+            $newItem->doc_origen_id =$reemplaze->id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newIts[] = $newItem;
+        }
+
+        $resul['accion']= "impor";
+        $resul['id']= $model->id;
+        $reemplaze->save();
+
+        $resul['response']= $model->items()->saveMany($newIts);
+        return $resul;
+
+    }
+    /**
+     * remueve la solicitud al documento
+     */
+    public function removeSustiteOrder(Request $req){
+        $resul = array();
+        $princi = Order::findOrFail($req->princ_id);
+        $reemplaze = Order::findOrFail($req->reemplace_id);
+
+        $model = new Order();
+        $model = $this->transferDataDoc($princi,$model);
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+        $model->save();
+        $newIts= array();
+
+        foreach($princi->items()->where('doc_origen_id','<>', $reemplaze->id)->get() as $oldItem){
+            $newItem = new OrderItem();
+            $newItem->final_id =$oldItem->final_id;
+            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newIts[] = $newItem;
+        }
+
+
+        $resul['accion']= "inpor";
+        $resul['id']= $model->id;
+        $reemplaze->fecha_sustitucion=null;
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+        $reemplaze->save();
+
+        $resul['response']= $model->items()->saveMany($newIts);
+        return $resul;
+    }
+
+    /**
+     * obtiene las proformas que pueden ser reempladas
+     */
+
+    public  function  getPurchaseToReplace(Request $req){
+        $items = Purchase::where('id', '<>', $req->id)
+            ->whereNull('fecha_sustitucion')
+            ->get();
+        $data = array();
+        $type = OrderType::get();
+        $prov = Provider::findOrFail($req->prov_id);
+        $coin = Monedas::get();
+        $motivo = OrderReason::get();
+        $prioridad= OrderPriority::get();
+        $estados= OrderStatus::get();
+        foreach($items as $aux){
+            //para maquinas
+            $tem = array();
+            $tem['id']=$aux->id;
+            //$tem['tipo_id']=$aux->tipo_pedido_id;
+            $tem['pais_id']=$aux->pais_id;
+            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+            $tem['condicion_pago_id']=$aux->condicion_pago_id;
+            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+            $tem['prioridad_id']=$aux->prioridad_id;
+            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+            $tem['prov_moneda_id']=$aux->prov_moneda_id;
+            $tem['estado_id']=$aux->estado_id;
+            // $tem['tipo_value']=$aux->typevalue;
+            // pra humanos
+            $tem['comentario']=$aux->comentario;
+            $tem['tasa']=$aux->tasa;
+            $tem['proveedor']=$prov->razon_social;
+            $tem['documento']= $aux->getTipo();
+            $tem['diasEmit']=$aux->daysCreate();
+            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+            $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
+            $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
+            $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+
+
+            if($aux->motivo_id){
+                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+            }
+            if($aux->pais_id){
+                //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+            }
+            if($aux->prioridad_id){
+                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+            }
+            if($aux->prov_moneda_id){
+                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+            }
+            if($aux->prov_moneda_id){
+                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+            }
+            if($aux->tipo_id != null){
+                $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+            }
+
+
+            $tem['nro_proforma']=$aux->nro_proforma;
+            $tem['nro_factura']=$aux->nro_factura;
+            $tem['img_proforma']=$aux->img_proforma;
+            $tem['img_factura']=$aux->img_factura;
+            $tem['mt3']=$aux->mt3;
+            $tem['peso']=$aux->peso;
+            $tem['emision']=$aux->emision;
+            $tem['monto']=$aux->monto;
+
+            /**actualizar cuando este el final**/
+            $tem['almacen']="Desconocido";
+
+            // modificar cuando se sepa la logica
+            $tem['aero']=1;
+            $tem['version']=1;
+            $tem['maritimo']=1;
+            $data[]=$tem;
+
+        }
+        return $data;
+
+    }
+
+    /**
+     * agrega la solicitud al nuevo documento
+     */
+    public  function  addPurchaseOrder(Request $req){
+        $resul = array();
+        $princi = Purchase::findOrFail($req->princ_id);
+        $reemplaze = Purchase::findOrFail($req->reemplace_id);
+        $model = new Purchase();
+        $model = $this->transferDataDoc($princi,$model);
+        $princi->final_id= $this->getFinalId($princi);
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+
+
+        $princi->parent_id = $reemplaze->id;
+        $princi->version = $reemplaze->version + 1;
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+        $princi->fecha_sustitucion= Carbon::now();
+        $reemplaze->fecha_sustitucion= Carbon::now();
+
+        $princi->save();
+        $reemplaze->save();
+        $model->save();
+        $newIts = array();
+        foreach($princi->items()->get() as $oldItem){
+            $newItem = new PurchaseItem();
+            /*            $newItem->final_id =$oldItem->final_id;*/
+            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newIts[] = $newItem;
+        }
+        foreach($reemplaze->items()->get() as $oldItem){
+            $newItem = new PurchaseItem();
+            /*            $newItem->final_id =$oldItem->final_id."&temp";*/
+            $newItem->tipo_origen_id =21;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->id;
+            $newItem->doc_origen_id =$reemplaze->id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newIts[] = $newItem;
+        }
+
+        $resul['accion']= "impor";
+        $resul['id']= $model->id;
+        $reemplaze->save();
+
+        $resul['response']= $model->items()->saveMany($newIts);
+        return $resul;
+
+    }
+    /**
+     * remueve la solicitud al documento
+     */
+    public function removePurchaseOrder(Request $req){
+        $resul = array();
+        $princi = Purchase::findOrFail($req->princ_id);
+        $reemplaze = Purchase::findOrFail($req->reemplace_id);
+
+        $model = new Purchase();
+        $model = $this->transferDataDoc($princi,$model);
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+        $model->save();
+        $newIts= array();
+
+        foreach($princi->items()->where('doc_origen_id','<>', $reemplaze->id)->get() as $oldItem){
+            $newItem = new PurchaseItem();
+            $newItem->final_id =$oldItem->final_id;
+            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newIts[] = $newItem;
+        }
+
+
+        $resul['accion']= "inpor";
+        $resul['id']= $model->id;
+        $reemplaze->fecha_sustitucion=null;
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+        $reemplaze->save();
+
+        $resul['response']= $model->items()->saveMany($newIts);
+        return $resul;
+    }
+
+    /*********************** Attachments ************************/
+
+    public function addAttachmentsSolicitude (Request $req){
+        $resul= array();
+        $model = Solicitude::findOrFail($req->id);
+        $attacs= array();
+        foreach($req->adjuntos  as $aux){
+            $attac=  new SolicitudeAttachment();
+            $attac->archivo_id = $aux['id'];
+            $attac->doc_id = $model->id;
+            $attac->documento = strtoupper($aux['documento']);
+            $attacs[]= $attac;
+        }
+        $resul['accion']= "new";
+        $resul['items']= $attacs;
+        $resul['response']= $model->attachments()->saveMany($attacs);
+        return $resul;
+    }
+
 
     /*********************** COMPARE ************************/
     /**
@@ -1485,6 +1901,7 @@ class OrderController extends BaseController
     /*********************************** PEDIDOS A SUSTITUIR ***********************************/
 
     /**
+     * @deprecated
      * agrega todo el pedido viejo al nuevo pedido
      * id  siempre va a ser del articulo a
      * asigna un pedido a un nuevo pedido
@@ -1596,13 +2013,13 @@ class OrderController extends BaseController
             //para maquinas
             $tem = array();
             $tem['asignado']=false;
-           if($aux->fecha_sustitucion != null){
-               if($aux->id == $model->parent_id){
-                   $tem['asignado']=true;
-               }else{
-                   $paso= false;
-               }
-           }
+            if($aux->fecha_sustitucion != null){
+                if($aux->id == $model->parent_id){
+                    $tem['asignado']=true;
+                }else{
+                    $paso= false;
+                }
+            }
 
             if($paso){
 
@@ -2196,6 +2613,7 @@ class OrderController extends BaseController
         }
         $prov= Provider::findOrFail($model->prov_id);
         $mone=Monedas::findOrFail($model->prov_moneda_id);
+        $adjs = array();
         //para maquinas
         $tem = array();
         $tem['id']=$model->id;
@@ -2254,6 +2672,12 @@ class OrderController extends BaseController
         $tem['monto']=$model->monto;
         $tem['productos'] =$this->getProductoItem($model);
 
+        /*      foreach( as $aux){
+                  $at= array();
+                  $at['id']= $aux->id
+                  {id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
+              }*/
+
         /**actualizar cuando este el final**/
         $tem['almacen']="Desconocido";
 
@@ -2261,6 +2685,29 @@ class OrderController extends BaseController
         $tem['aero']=1;
         $tem['version']=1;
         $tem['maritimo']=1;
+        $atts = array();
+        //                                var data ={id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
+
+        foreach($model->attachments()->get() as $aux){
+            $auxFile= array();
+            $file= FileModel::findOrFail($aux->archivo_id);
+            $att['id'] = $aux->id;
+            $att['final_id'] = $aux->final_id;
+            $att['archivo_id'] = $aux->archivo_id;
+            $att['doc_id'] = $aux->doc_id;
+            $att['documento'] = $aux->documento;
+            $att['comentario'] = $aux->comentario;
+            $auxFile['id']=$file->id;
+            $auxFile['thumb']=$file->getThumbName();
+            $auxFile['tipo']=$file->tipo;
+            $auxFile['documento'] = $aux->documento;
+            $att['file'] = $auxFile;
+            $atts[]= $att;
+
+
+
+        }
+        $tem['adjuntos'] = $atts;
 
         return $tem;
 
@@ -2901,36 +3348,30 @@ class OrderController extends BaseController
         }
         return $model;
     }
+    /*
+        public function addPurchaseOrder(Request $req){
 
-    /**
-     * asigna la orden de compra a un pedido
-     **/
-    public function addPurchaseOrder(Request $req){
+            $odc= PurchaseOrder::findOrFail($req->id);
 
-        $odc= PurchaseOrder::findOrFail($req->id);
+            foreach(  $odc->PurchaseOrderItem()->get() as $aux){
+                $item = new OrderItem();
+                $item->pedido_id=$req->pedido_id;
+                $item->producto_id=$aux->id;
+                $item->pedido_tipo_origen_id='1';
+                $item->origen_id=$req->id;
+                $item->save();
+            }
 
-        foreach(  $odc->PurchaseOrderItem()->get() as $aux){
-            $item = new OrderItem();
-            $item->pedido_id=$req->pedido_id;
-            $item->producto_id=$aux->id;
-            $item->pedido_tipo_origen_id='1';
-            $item->origen_id=$req->id;
-            $item->save();
         }
 
-    }
-
-    /**
-     * elimina la orden de compra de un pedido
-     **/
-    public function RemovePurchaseOrder(Request $req){
-        $model = OrderItem::where('origen_id', $req->id)
-            ->where('pedido_id',$req->pedido_id)
-            ->get();
-        foreach(  $model as $aux){
-            $aux->destroy($aux->id);
-        }
-    }
+        public function RemovePurchaseOrder(Request $req){
+            $model = OrderItem::where('origen_id', $req->id)
+                ->where('pedido_id',$req->pedido_id)
+                ->get();
+            foreach(  $model as $aux){
+                $aux->destroy($aux->id);
+            }
+        }*/
 
 
     /**
@@ -2977,20 +3418,28 @@ class OrderController extends BaseController
 
 
     /**
-     * obtiene los direcciones de almacen
+     * obtiene los direcciones de
      * donde un proveeed
      * almacen
      **/
-    public function getAddressCountry(Request $req){
-        $data = array();
-        if($req->has('id')){
-            $data=ProviderAddress::where('pais_id',$req->id)->get();
-            if($req->has('tipo_dir')){
-                $data =$data->where('tipo_dir',$req->tipo_dir );
-            }
+    public function getInvoiceAddressCountry(Request $req){
+        $data =ProviderAddress::where('prov_id', $req->prov_id)->where(
+            function ($query){
+            $query->where('tipo_dir',1)->orWhere('tipo_dir',3);
+        })->get();
+        if($req->has('pais_id')){
+            $data = $data->where('pais_id', $req->pais_id);
         }
+        return $data;
+    }
 
-
+    public function getStoreAddressCountry(Request $req){
+        $data =ProviderAddress::where('prov_id', $req->prov_id)->where(
+            function ($query){
+                $query->where('tipo_dir',2)->orWhere('tipo_dir',3);
+            })->get();        if($req->has('pais_id')){
+            $data = $data->where('pais_id', $req->pais_id);
+        }
         return $data;
     }
 
@@ -3290,6 +3739,13 @@ class OrderController extends BaseController
         if($req->has('monto')){
             $model->monto = $req->monto;
         }
+        if($req->has('tasa')){
+            $model->tasa = $req->tasa;
+        }
+        if($req->has('direccion_facturacion_id')){
+            $model->direccion_facturacion_id = $req->tasa;
+        }
+
 
         if($req->has('prov_id')){
             $model->prov_id = $req->prov_id;
