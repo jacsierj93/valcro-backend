@@ -1514,6 +1514,8 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         $scope.bnk.bankAddr = account.dir_banco;
         $scope.bnk.bankSwift = account.swift;
         $scope.bnk.bankIban = account.cuenta;
+        $scope.bnk.pais = account.pais.id;
+        $scope.bnk.est = account.estado.id;
         $scope.bnk.ciudad = account.ciudad_id;
 
         setGetProv.addToRllBck($scope.bnk,"infoBank")

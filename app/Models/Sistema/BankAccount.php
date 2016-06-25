@@ -25,6 +25,12 @@ class BankAccount extends Model
         return $this->belongsTo('App\Models\Sistema\Provider', 'cuenta_id');
     }
 
+    /**@return ciudad de la cuenta*/
+    public function ciudad(){
+        return $this->belongsTo('App\Models\Sistema\City', 'ciudad_id');
+    }
+
+
 
 
 }

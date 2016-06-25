@@ -157,7 +157,6 @@
                         </div>
 
                     </div>
-
                     <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
                     <div layout="column" flex style="margin-right:8px;">
                         <div flex>

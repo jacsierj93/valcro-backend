@@ -1,7 +1,9 @@
 <?php
 namespace App\Http\Controllers\Providers;
+use App\Models\Sistema\Country;
 use App\Models\Sistema\Point;
 use App\Models\Sistema\ProviderCreditLimit;
+use App\Models\Sistema\State;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -282,7 +284,13 @@ class ProvidersController extends BaseController
     public function getBank($id){
         if((bool)$id){
             $accounts = Provider::find($id)->bankAccount()->get();
-            return ($accounts)?$accounts:[];
+//            dd($accounts);
+            foreach ($accounts as $acc){
+                $acc["ciudad"]=$acc->ciudad()->first();
+                $acc["estado"] = $acc["ciudad"]->state()->first();
+                $acc["pais"] = $acc["estado"]->country()->first();
+            }
+            return ($accounts)?json_encode($accounts):[];
         }
 
     }

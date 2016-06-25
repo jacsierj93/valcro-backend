@@ -173,11 +173,10 @@ MyApp.directive('contenteditable', function() {
 });
 
 
-/*MyApp.directive('skipTab', function ($compile,$timeout) {
+MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = angular.element("#"+jqObject);
-        var list = angular.element(elem).parents("form").first().find("[step]:visible");
-        console.log(list)
+        var list = angular.element(elem).parents("form").first().find("[step]:visible")
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
@@ -240,9 +239,9 @@ MyApp.directive('contenteditable', function() {
 
                                 $timeout(function(){
                                     console.log(elem, angular.element(list[list.index(elem)+1]).focus())
-                                    /!*var elem = angular.element(list[list.index(this)+1])
+                                    /*var elem = angular.element(list[list.index(this)+1])
 
-                                    angular.element(elem[0]).focus()*!/
+                                    angular.element(elem[0]).focus()*/
                                 },0)
 
 
@@ -273,9 +272,7 @@ MyApp.directive('contenteditable', function() {
                     }else if(e.which=="40"){
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){
                             if(angular.element("#lyrAlert").find(".alertTextOpcs:visible").length > 0){
-
                                var focus =angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first();
-                                console.log(focus)
                                 angular.element(focus).focus();
                             };
                         }
@@ -285,7 +282,29 @@ MyApp.directive('contenteditable', function() {
             $compile(element[0])(scope);
         }
     };
-});*/
+});
+
+MyApp.directive('notifButtom', function($compile,$timeout) {
+
+    return {
+        priority: 1001,
+        terminal: true,
+        link: function (scope, element, attrs) {
+            element.removeAttr("notif-buttom");
+            element.attr("notOpc","");
+            element.bind("keydown",function(e){
+                if(e.which == "39"){
+                    element.next().focus();
+                }else if(e.which == "37"){
+                    element.prev().focus();
+                }
+
+            })
+        }
+    }
+});
+
+
 
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:"",scope:null};

@@ -16,7 +16,7 @@ class City extends Model
 {
     protected $table = "tbl_ciudad";
 
-    public function estate(){
+    public function state(){
         return $this->belongsTo("App\Models\Sistema\State","in_location");
     }
 }
