@@ -197,6 +197,11 @@
                          ng-click="test('Copi doc')">
                         <span style="font-size: 24px"> CP</span>
                     </div>
+
+                    <div layout="column" layout-align="center center"
+                         ng-click="printTrace()">
+                        <span style="font-size: 24px"> TEST</span>
+                    </div>
                     <div layout="column" layout-align="center center"></div>
 
                 </div>
@@ -493,7 +498,7 @@
                     <div layout="row" class="headGridHolder">
                         <div flex="15" class="headGrid"> Cod. Producto</div>
                         <div flex class="headGrid"> Descripción.</div>
-                        <div flex class="headGrid"> Doc. Origen</div>
+                        <div flex class="headGrid"> Documento</div>
                         <div flex="10" class="headGrid"> Cantidad</div>
                     </div>
                     <div flex class="gridContent">
@@ -502,7 +507,7 @@
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.todos">
                                     <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
                                     <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                    <div flex class="cellGrid"> {{item.origen}}</div>
+                                    <div flex class="cellGrid"> {{item.documento}}</div>
                                     <div flex="10" class="cellGrid"> {{item.saldo}}</div>
                                 </div>
                             </div>
@@ -609,15 +614,22 @@
                                                info="Seleccione un proveedor para el documento"
                                                required
                                                ng-disabled="( formBlock || formGlobal == 'upd')"
+                                               ng-click="toEditHead('prov_id', provSelect.id)"
+
                                     >
                                         <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                             {{prov.razon_social}}
                                         </md-option>
+                                        <!--<md-option  value="-1">
+                                           Nuevo P
+                                        </md-option>-->
                                     </md-select>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="15">
                                     <label>N° de Pedido</label>
-                                    <input  ng-model="document.id" ng-disabled="true">
+                                    <input  ng-model="document.id"
+                                            ng-disabled="true"
+                                    >
                                 </md-input-container>
                                 <div layout="column" flex="15" style="margin-top: 8px;">
                                     <md-datepicker ng-model="document.emision"
@@ -631,6 +643,8 @@
                                 <input  ng-model="document.titulo"
                                         ng-disabled="( formBlock )"
                                         required
+                                        ng-change="toEditHead('titulo', document.titulo)"
+
                                 >
                             </md-input-container>
                             <div  ng-show="( gridView != 4 )"  layout="row" >
@@ -639,6 +653,8 @@
                                     <label>Pais</label>
                                     <md-select ng-model="document.pais_id" md-no-ink
                                                ng-disabled="( formBlock )"
+                                               ng-change="toEditHead('pais_id', document.pais_id)"
+
 
                                     >
                                         <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
@@ -652,6 +668,8 @@
                                     <md-select ng-model="document.direccion_almacen_id"
                                                md-no-ink
                                                ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
+                                               ng-change="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
+
 
                                     >
                                         <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
@@ -665,6 +683,8 @@
                                     <md-select ng-model="document.direccion_facturacion_id"
                                                md-no-ink
                                                ng-disabled="( formBlock || provSelec.id == '' )"
+                                               ng-change="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
+
 
                                     >
                                         <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}">
@@ -681,6 +701,8 @@
                                             decimal
                                             ng-disabled="( formBlock )"
                                             required
+                                            ng-change="toEditHead('monto', document.monto)"
+
 
                                     >
                                 </md-input-container>
@@ -690,6 +712,8 @@
                                     <md-select ng-model="document.prov_moneda_id" md-no-ink
                                                ng-disabled="( formBlock)"
                                                required
+                                               ng-change="toEditHead('prov_moneda_id', document.prov_moneda_id)"
+
                                     >
                                         <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
                                             {{moneda.nombre}}
@@ -702,6 +726,8 @@
                                     <input  ng-model="document.tasa"
                                             type="number"
                                             ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
+                                            ng-click="toEditHead('tasa', document.tasa)"
+                                            ng-only="document.tasa_fija != 1"
                                             required
 
                                     >
@@ -710,6 +736,7 @@
                                 <md-input-container class="md-block" flex="">
                                     <label>Condicion de pago</label>
                                     <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)"
+                                               ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                md-no-ink
                                                ng-required ="(formMode.value == 23)"
 
@@ -725,21 +752,27 @@
 
                                 <md-input-container class="md-block" flex="10">
                                     <label>Mt3</label>
-                                    <input ng-model="document.mt3"  name="mt3"  ng-model="number" ui-number-mask
-                                           ng-disabled="( formBlock)"  >
+                                    <input ng-model="document.mt3"  name="mt3"
+                                           ng-model="number" decimal
+                                           ng-disabled="( formBlock)"
+                                           ng-change="toEditHead('mt3', document.mt3)"
+                                    >
                                 </md-input-container>
 
                                 <md-input-container class="md-block" flex="10" >
                                     <label>Peso</label>
-                                    <input ng-model="document.peso" name="peso"  ng-model="number" ui-number-mask
-                                           ng-disabled="( formBlock)" >
+                                    <input ng-model="document.peso" name="peso" decimal
+                                           ng-disabled="( formBlock)"
+                                           ng-change="toEditHead('peso', document.peso)"
+
+                                    >
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10">
                                     <label>Puerto</label>
                                     <md-select ng-model="document.puerto_id"
                                                md-no-ink
                                                ng-disabled="( formBlock || document.direccion_almacen_id =='' || !document.direccion_almacen_id)"
-
+                                               ng-change="toEditHead('puerto_id', document.puerto_id)"
                                     >
                                         <md-option ng-repeat="item in formData.puertos" value="{{item.id}}">
                                             {{item.Main_port_name}}
@@ -764,7 +797,7 @@
                                     <label>Condiciones  </label>
                                     <md-select ng-model="document.condicion_id" md-no-ink
                                                ng-disabled="( formBlock)"
-
+                                               ng-click="toEditHead('condicion_id', document.condicion_id)"
                                     >
                                         <md-option ng-repeat="condPed in formData.condicionPedido" value="{{condPed.id}}">
                                             {{condPed.nombre}}
@@ -774,7 +807,10 @@
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Factura:</label>
-                                    <input ng-model="document.nro_factura"  ng-disabled="( formBlock)">
+                                    <input ng-model="document.nro_factura"  ng-disabled="( formBlock)"
+                                           ng-change="toEditHead('nro_factura', document.nro_factura)"
+
+                                    >
                                 </md-input-container>
                                 <div style="width: 24px;" ng-click="openAdj('Factura')">%%</div>
 
@@ -782,6 +818,8 @@
                                     <label>N° Proforma:</label>
                                     <input ng-model="document.nro_proforma"  ng-disabled="( formBlock)"
                                            ng-required ="(formMode.value == 23)"
+                                           ng-change="toEditHead('nro_proforma', document.nro_proforma)"
+
                                     >
                                 </md-input-container>
                                 <div style="width: 24px;" ng-click="openAdj('proforma')" >%%</div>
@@ -789,7 +827,10 @@
                             <div   ng-show="( gridView != 4 )"  layout="row" >
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
-                                    <input ng-model="document.comentario"  ng-disabled="( formBlock)">
+                                    <input ng-model="document.comentario"  ng-disabled="( formBlock)"
+                                           ng-change="toEditHead('nro_proforma', document.nro_proforma)"
+
+                                    >
                                 </md-input-container>
                             </div>
                             <!--  </div>-->
@@ -812,7 +853,10 @@
 
                                     <md-input-container class="md-block" flex="">
                                         <label>Estatus</label>
-                                        <md-select ng-model="document.estado_id"  ng-disabled="formBlock">
+                                        <md-select ng-model="document.estado_id"  ng-disabled="formBlock"
+                                                   ng-change="toEditHead('estado_id', document.estado_id)"
+
+                                        >
                                             <md-option ng-repeat="item in estadosDoc" value="{{item.id}}">
                                                 {{item.estado}}
                                             </md-option>
@@ -843,12 +887,17 @@
                                     <div layout="column" flex="20">
                                         <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
                                                        ng-disabled="(formBlock)"
+                                                       ng-change="toEditHead('fecha_aprob_compra', document.fecha_aprob_compra)"
+
                                         ></md-datepicker>
                                     </div>
 
                                     <md-input-container class="md-block" flex="20">
                                         <label>N° Documento</label>
-                                        <input ng-model="document.nro_doc"  ng-disabled="(formBlock)">
+                                        <input ng-model="document.nro_doc"  ng-disabled="(formBlock)"
+                                               ng-click="toEditHead('nro_doc', document.nro_doc)"
+
+                                        >
                                     </md-input-container>
 
                                     <div flex layout="row" flex ng-click="test()">
@@ -884,6 +933,8 @@
                                     <input  ng-model="document.comentario_cancelacion"
                                             ng-disabled="(formBlock)"
                                             id="mtvCancelacion"
+                                            ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
+
                                     >
                                 </md-input-container>
 
@@ -919,7 +970,7 @@
                                                 </div>
                                                 <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
                                                 <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                                <div flex class="cellGrid"> {{item.origen}}</div>
+                                                <div flex class="cellGrid"> {{item.documento}}</div>
                                                 <md-input-container class="md-block" flex="10" >
                                                     <input  ng-model="item.saldo"
                                                             ng-change="changeItem(item)"
@@ -1878,82 +1929,102 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
 
             <md-content  layout="row" flex class="sideNavContent">
-                <div class="backDiv"  ng-click="closeLayer('finalDoc')"> </div>
+                <div active-left></div>
                 <div  layout="column" flex class="layerColumn" >
                     <div layout="row" flex>
                         <!----PRIMERA COLUMNA DETALLE DE PEDIDO---->
                         <div layout="column" flex="30" style="margin-right:8px;">
                             <div class="titulo_formulario" style="height:39px;">
                                 <div>
-                                    Pedido
+                                    {{formMode.name}}
                                 </div>
                             </div>
                             <div style="overflow-y:auto; overflow-x: hidden "
                                  class="rowRsm" style="margin-right: 8px;" layout="row"  >
                                 <div layout="row" class="rowRsmTitle">
                                     <div > ID: </div>
-                                    <div flex> {{document.id}} </div>
+                                    <div flex> {{finalDoc.id.v}} </div>
                                 </div>
                                 <div layout="row" class="rms" flex="" ng-show="document.version > 1">
                                     <div > Version: </div>
-                                    <div flex> {{document.version}} </div>
+                                    <div flex> {{document.version.v}} </div>
                                 </div>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div class="rowRsmTitle"> Creado: </div>
-                                <div class="rms" > {{document.emision | date:'dd/MM/yyyy' }}
+                                <div class="rms" > {{finalDoc.emision.v | date:'dd/MM/yyyy' }}
                                     <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
                                          class="emit{{document.diasEmit}}"></div>
                                 </div>
                             </div>
+
+                            <div layout="row"  class="rowRsm">
+                                <div layout="column" ng-show="finalDoc.titulo.action == 'new'" layout-align="center center" ng-click="menuAgregar()">
+                                    <span class="icon-Agregar" style="font-size: 16px"></span>
+                                </div>
+                                <div layout="column" ng-show="finalDoc.titulo.action == 'upd'" layout-align="center center" ng-click="menuAgregar()">
+                                    <span class="icon-Actualizar" style="font-size: 16px"></span>
+                                </div>
+                                <div class="rowRsmTitle"> Titulo </div>
+                                <div class="rms" > {{finalDoc.titulo.v | date:'dd/MM/yyyy' }} (demo)
+                                </div>
+                            </div>
                             <div layout="row"  class="rowRsm" ng-show="document.ult_revision">
+                                <div layout="column" ng-show="finalDoc.ult_revision.action == 'new'" layout-align="center center" ng-click="menuAgregar()">
+                                    <span class="icon-Agregar" style="font-size: 16px"></span>
+                                </div>
+                                <div layout="column" ng-show="finalDoc.ult_revision.action == 'upd'" layout-align="center center" ng-click="menuAgregar()">
+                                    <span class="icon-Actualizar" style="font-size: 16px"></span>
+                                </div>
                                 <div class="rowRsmTitle"> Revisado </div>
-                                <div class="rms" > {{document.ult_revision | date:'dd/MM/yyyy' }} (demo)
+                                <div class="rms" > {{finalDoc.ult_revision.v | date:'dd/MM/yyyy' }} (demo)
                                 </div>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div class="rowRsmTitle"> Estado</div>
-                                <div class="rms" > {{document.estado }}</div>
+                                <div class="rms" > {{finalDoc.estado.v }}</div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="document.prioridad">
                                 <div class=" rms rowRsmTitle"> Prioridad: </div>
-                                <div class="rms" > {{document.prioridad}} </div>
+                                <div class="rms" > {{finalDoc.prioridad.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div class="rowRsmTitle"> Proveedor: </div>
-                                <div  class="rms" > {{document.proveedor}} </div>
+                                <div  class="rms" > {{finalDoc.proveedor.v}} </div>
                             </div>
                             <div layout="row" class="rowRsm" ng-show="document.pais">
-                                <div class="rowRsmTitle" > Pais: </div>
-                                <div class="rms" > {{document.pais}} </div>
+                                <div class="rowRsmTitle" >
+                                    Pais:
+                                </div>
+                                <div class="rms" > {{finalDoc.pais.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="document.direccion_almacen_id">
                                 <div class="rowRsmTitle" > Almacen: </div>
-                                <div class="rms" > {{document.almacen}} </div>
+                                <div class="rms" > {{finalDoc.almacen.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="motivo_pedido_id">
                                 <div class="rowRsmTitle"> Motivo: </div>
-                                <div class="rms" > {{document.motivo}} </div>
+                                <div class="rms" > {{finalDoc.motivo.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="document.nro_proforma">
                                 <div class="rowRsmTitle"> N° Proforma: </div>
-                                <div class="rms"> {{document.nro_proforma}} </div>
+                                <div class="rms"> {{finalDoc.nro_proforma}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="document.nro_factura">
                                 <div class="rowRsmTitle"> N° Factura: </div>
-                                <div class="rms" > {{document.nro_factura}} </div>
+                                <div class="rms" > {{finalDoc.nro_factura.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm"  ng-show="document.monto">
                                 <div class="rowRsmTitle"> Monto: </div>
-                                <div class="rms" > {{document.monto}} </div>
+                                <div class="rms" > {{finalDoc.monto.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="document.moneda_prov_id">
                                 <div class="rowRsmTitle"> Moneda: </div>
-                                <div class="rms"> {{document.moneda}} </div>
+                                <div class="rms"> {{finalDoc.moneda.v}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="document.productos.todos.length > 0">
                                 <div class="rowRsmTitle"> Productos: </div>
-                                <div class="rms"> {{document.productos.todos.length}} </div>
+                                <div class="rms"> {{finalDoc.productos.todos.length}} </div>
                             </div>
                         </div>
 

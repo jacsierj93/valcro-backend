@@ -265,7 +265,7 @@ class OrderController extends BaseController
 
                 // modificar cuando se sepa la logica
                 $tem['aero']=1;
-                $tem['version']=1;
+                $tem['version']=$aux->version;
                 $tem['maritimo']=1;
                 $data[]=$tem;}
         }
@@ -3223,6 +3223,7 @@ class OrderController extends BaseController
     private function getProductoItem($order){
 
         $items= $order->items()->get();
+        $origen = SourceType::get();
         $contra=Collection::make(Array());
         $kitchen= Collection::make(Array());
         $pediSus= Collection::make(Array());
@@ -3263,6 +3264,7 @@ class OrderController extends BaseController
 
         /** todos */
         foreach($items as $aux){
+            $tem = array();
             $tem['id']= $aux->id;
             $tem['cantidad']= $aux->cantidad;
             $tem['saldo']= $aux->saldo;
@@ -3273,6 +3275,7 @@ class OrderController extends BaseController
             $tem['doc_id']= $aux->doc_id;
             $tem['producto_id']= $aux->producto_id;
             $tem['cod_producto']= $aux->id;
+            $tem['documento']=  $origen->where('id', $aux->tipo_origen_id)->first()->descripcion;
 
             $tem['asignado']= true;
             //$tem['origen']= MasterOrderController::getTypeProduct($aux)['descripcion'];
