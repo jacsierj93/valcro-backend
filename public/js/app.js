@@ -39,6 +39,20 @@ window.addEventListener("drop",function(e){
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
 
+
+//###########################################################################################3
+//##############################REST service (factory)#############################################3
+//###########################################################################################3
+MyApp.factory('masters', ['$resource',
+    function ($resource) {
+        return $resource('master/:type/:id', {}, {
+            query: {method: 'GET', params: {type: "",id:""}, isArray: true}
+        });
+    }
+]);
+
+
+
 MyApp.directive('global', function (Layers, setNotif) {
     return {
         link: function (scope) {
