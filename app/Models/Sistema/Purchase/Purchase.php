@@ -30,6 +30,10 @@ class Purchase extends Model
     public function  getTipoId(){
         return 23;
     }
+
+    public function type_origen(){
+        return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id');
+    }
     /*   public function getTypeAttribute()
       {
 

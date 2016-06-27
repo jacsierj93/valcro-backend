@@ -21,13 +21,16 @@ class Order extends Model
     protected $table = "tbl_pedido";
     protected $dates = ['deleted_at'];
 
-   // protected $appends = array('tipo');
 
     public function  getTipo(){
         return 'Proforma';
     }
     public function  getTipoId(){
         return 22;
+    }
+
+    public function type_origen(){
+        return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id','id');
     }
 
     public function newItem(){

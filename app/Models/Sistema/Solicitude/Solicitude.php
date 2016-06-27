@@ -29,6 +29,10 @@ class Solicitude extends Model
         return 21;
     }
 
+    public function type_origen(){
+        return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id');
+    }
+
     public function items(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
     }
