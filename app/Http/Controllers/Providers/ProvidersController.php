@@ -19,7 +19,7 @@ use App\Models\Sistema\ProdTime;
 use App\Models\Sistema\TiemAproTran;
 use App\Models\Sistema\ProviderCondPay;
 use App\Models\Sistema\ProviderCondPayItem;
-use App\Models\Sistema\ProviderContactField;
+use App\Models\Sistema\ContactField;
 use App\Models\Sistema\Line;
 use App\Libs\Utils\Files;
 use App\Models\Sistema\FileModel;
@@ -245,7 +245,7 @@ class ProvidersController extends BaseController
             $contact = Contactos::find($req->id);
             $result['action']="upd";
         }else{
-            $valName = new Contactos();
+            $contact = new Contactos();
         }
 
         if(!$contact->id){
@@ -254,23 +254,38 @@ class ProvidersController extends BaseController
             $contact->save();
             $contact->idiomas()->sync($req->languaje);
         }
-        //Provider::find($req->prov_id)->contactos_campos()->attach($contact->id);
+        //dd(array($contact->id=>$req->emailCont,$contact->id=>$req->contTelf,$contact->id=>$req->dirOff));
 
 
-        /*if($valName->agente != 1){
-            $valName->email = $req->emailCont;
-
-            $valName->telefono = $req->contTelf;
-            $valName->responsabilidades = $req->responsability;
-            $valName->direccion = $req->dirOff;
-            $valName->agente = $req->isAgent;
-            $valName->cargos()->sync($req->cargo);
+        if(!Provider::find($req->prov_id)->contacts()->find($contact->id)){
+            Provider::find($req->prov_id)->contacts()->attach($contact->id);
         }
-        if(!Provider::find($req->prov_id)->contacts()->find($valName->id)){
-            Provider::find($req->prov_id)->contacts()->attach($valName->id);
-        }*/
-        $result['id']=$valName->id;
+
+
+        $contact->campos()->create([
+            'campo' => 'telefono',
+            "valor" => $req->contTelf["valor"],
+            "prov_id" => $req->prov_id
+        ]);
+        $contact->campos()->create([
+            'campo' => 'direccion',
+            "valor" => $req->dirOff["valor"],
+            "prov_id" => $req->prov_id
+        ]);
+        dd(Provider::find($req->prov_id)->contacts()->find($contact->id)->first()->campos()->get());
+
+        $result['id']=$contact->id;
         return $result;
+    }
+
+    public function contactEmail(request $req){
+        if($req->id){
+            $email = Contactos::find($req->cont_id)->campos()->find($req->id);
+        }else{
+            $email = new ContactField();
+        }
+
+
     }
 
     public function delProvContact(request $req){

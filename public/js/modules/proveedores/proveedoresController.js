@@ -1172,7 +1172,7 @@ MyApp.controller('nomValAssign', function ($scope,setGetProv,valcroNameDetail,$m
     }
 });
 
-MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif) {
+MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout) {
     $scope.id = "contactProv";
     $scope.prov = setGetProv.getProv();
     $scope.cnt = setGetContac.getContact();
@@ -1186,11 +1186,37 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     });
     $scope.$watch('cnt.pais',function(nvo,old){
         var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
-        $scope.cnt.contTelf = (nvo!=0 && $scope.cnt.contTelf=="")?$scope.cnt.contTelf.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf;
+        $scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
     $scope.$watch('contacts.length',function(nvo){
         setGetProv.setComplete("contact",nvo);
     });
+
+    $scope.transformChip = function(chip,erro){
+        if (angular.isObject(chip)) {
+            return chip;
+        }
+        var reg = new RegExp("^.+@.+\..+$");
+
+        if(!reg.test(chip)){
+            setNotif.addNotif("error", "el email no tiene un formato adecuado", [
+            ],{autohidden:3000});
+            return null ;
+        }
+        var chip = { id:false,valor:chip,campo:"email"};
+        /*$http({
+            method: 'POST',
+            url: "provider/saveValcroName",
+            data: chip,
+        }).then(function successCallback(response) {
+            $scope.valcroName[$scope.valcroName.length-1].id = response.data.id;
+        }, function errorCallback(response) {
+            console.log("error=>", response)
+        });*/
+        // Otherwise, create a new o
+        console.log(erro);
+        return chip;
+    };
     var contact = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave","cnt.cargo.length"], function(nuevo,old) {
@@ -1206,12 +1232,12 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     $scope.provContactosForm.$setPristine();
                     contact.id = $scope.cnt.id;
                     contact.nombre = $scope.cnt.nombreCont;
-                    contact.email = $scope.cnt.emailCont;
-                    contact.telefono = $scope.cnt.contTelf;
+                    contact.email = $scope.cnt.emailCont.valor;
+                    contact.telefono = $scope.cnt.contTelf.valor;
                     contact.pais_id = $scope.cnt.pais;
                     contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
                     contact.responsabilidades =  $scope.cnt.responsability;
-                    contact.direccion = $scope.cnt.dirOff;
+                    contact.direccion = $scope.cnt.dirOff.valor;
                     contact.agente = $scope.cnt.isAgent;
                     contact.prov_id = $scope.cnt.prov_id;
                     contact.languages = $scope.cnt.languaje;
@@ -1339,18 +1365,18 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
 });
 
 MyApp.service("setGetContac",function(providers,setGetProv,$filter){
-    var contact = {id:false,nombreCont:"",emailCont:"",contTelf:"",pais:"",languaje:[],cargo:[],responsability:"",dirOff:"",prov_id:false, isAgent:0,autoSave:false};
+    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:{campo:"telefono",valor:""},pais:"",languaje:[],cargo:[],responsability:"",dirOff:{campo:"direccion",valor:""},prov_id:false, isAgent:0,autoSave:false};
     var listCont = [];
     return {
         setContact : function(cont){
                 var prov = setGetProv.getProv();
                 contact.id = cont.id||false;
                 contact.nombreCont = cont.nombre||"";
-                contact.emailCont = cont.email||"";
-                contact.contTelf = cont.telefono||"";
+                contact.emailCont.valor = cont.email||"";
+                contact.contTelf.valor = cont.telefono||"";
                 contact.pais = cont.pais_id||"";
                 contact.responsability = cont.responsabilidades||"";
-                contact.dirOff = cont.direccion||"";
+                contact.dirOff.valor = cont.direccion||"";
                 contact.isAgent = cont.agente || 0;
                 contact.autoSave = cont.autoSave || false;
                 contact.prov_id = cont.prov_id||prov.id;
