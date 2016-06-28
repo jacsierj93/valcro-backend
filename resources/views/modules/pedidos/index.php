@@ -1,8 +1,6 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION PEDIDOS########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="PedidosCtrll" global xmlns="http://www.w3.org/1999/html">
-
     <div class="contentHolder" layout="row" flex>
-
         <div class="barraLateral" layout="column" >
 
 
@@ -169,8 +167,6 @@
                         </md-virtual-repeat-container>
             -->
         </div>
-
-
         <div layout="column"flex class="md-whiteframe-1dp">
 
             <div class="botonera" layout="row" layout-align="start center">
@@ -1927,19 +1923,18 @@
 
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
-
             <md-content  layout="row" flex class="sideNavContent">
-                <div active-left></div>
-                <div  layout="column" flex class="layerColumn" >
-                    <div layout="row" flex>
-                        <!----PRIMERA COLUMNA DETALLE DE PEDIDO---->
-                        <div layout="column" flex="30" style="margin-right:8px;">
-                            <div class="titulo_formulario" style="height:39px;">
+                <div layout="column" flex="30">
+                    <form></form><!-- solucion angular se como el form-->
+                    <form layout="row" >
+                        <div active-left> </div>
+                        <div layout="column" flex>
+                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
                                 <div>
                                     {{formMode.name}}
                                 </div>
                             </div>
-                            <div style="overflow-y:auto; overflow-x: hidden "
+                            <div style="overflow-y:auto; overflow-x: hidden " ng-show="gridViewFinalDoc == 1"
                                  class="rowRsm" style="margin-right: 8px;" layout="row"  >
                                 <div layout="row" class="rowRsmTitle">
                                     <div > ID: </div>
@@ -1950,26 +1945,28 @@
                                     <div flex> {{document.version.v}} </div>
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div class="rowRsmTitle"> Creado: </div>
                                 <div class="rms" > {{finalDoc.emision.v | date:'dd/MM/yyyy' }}
                                     <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
                                          class="emit{{document.diasEmit}}"></div>
                                 </div>
                             </div>
-
-                            <div layout="row"  class="rowRsm">
-                                <div layout="column" ng-show="finalDoc.titulo.action == 'new'" layout-align="center center" ng-click="menuAgregar()">
+                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
+                                <div layout="column" ng-show="finalDoc.titulo.action == 'new'" layout-align="center center">
                                     <span class="icon-Agregar" style="font-size: 16px"></span>
                                 </div>
-                                <div layout="column" ng-show="finalDoc.titulo.action == 'upd'" layout-align="center center" ng-click="menuAgregar()">
+                                <div layout="column" ng-show="finalDoc.titulo.action == 'upd'" layout-align="center center" >
                                     <span class="icon-Actualizar" style="font-size: 16px"></span>
+                                </div>
+                                <div layout="column" ng-show="finalDoc.titulo.action == 'del'" layout-align="center center" >
+                                    <span class="icon-Eliminar" style="font-size: 16px"></span>
                                 </div>
                                 <div class="rowRsmTitle"> Titulo </div>
                                 <div class="rms" > {{finalDoc.titulo.v | date:'dd/MM/yyyy' }} (demo)
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.ult_revision">
+                            <div layout="row"  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
                                 <div layout="column" ng-show="finalDoc.ult_revision.action == 'new'" layout-align="center center" ng-click="menuAgregar()">
                                     <span class="icon-Agregar" style="font-size: 16px"></span>
                                 </div>
@@ -1980,144 +1977,126 @@
                                 <div class="rms" > {{finalDoc.ult_revision.v | date:'dd/MM/yyyy' }} (demo)
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div class="rowRsmTitle"> Estado</div>
                                 <div class="rms" > {{finalDoc.estado.v }}</div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.prioridad">
+                            <div layout="row"  class="rowRsm" ng-show="(document.prioridad && gridViewFinalDoc == 1 )">
                                 <div class=" rms rowRsmTitle"> Prioridad: </div>
                                 <div class="rms" > {{finalDoc.prioridad.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm">
+                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div class="rowRsmTitle"> Proveedor: </div>
                                 <div  class="rms" > {{finalDoc.proveedor.v}} </div>
                             </div>
-                            <div layout="row" class="rowRsm" ng-show="document.pais">
+                            <div layout="row" class="rowRsm" ng-show="(document.pais && gridViewFinalDoc == 1)" >
                                 <div class="rowRsmTitle" >
                                     Pais:
                                 </div>
                                 <div class="rms" > {{finalDoc.pais.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.direccion_almacen_id">
+                            <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
                                 <div class="rowRsmTitle" > Almacen: </div>
                                 <div class="rms" > {{finalDoc.almacen.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="motivo_pedido_id">
+                            <div layout="row"  class="rowRsm" ng-show="(motivo_pedido_id  && gridViewFinalDoc == 1)">
                                 <div class="rowRsmTitle"> Motivo: </div>
                                 <div class="rms" > {{finalDoc.motivo.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.nro_proforma">
+                            <div layout="row"  class="rowRsm" ng-show="(document.nro_proforma && gridViewFinalDoc == 1)">
                                 <div class="rowRsmTitle"> N° Proforma: </div>
                                 <div class="rms"> {{finalDoc.nro_proforma}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.nro_factura">
+                            <div layout="row"  class="rowRsm" ng-show="(document.nro_factura &&  gridViewFinalDoc == 1)">
                                 <div class="rowRsmTitle"> N° Factura: </div>
                                 <div class="rms" > {{finalDoc.nro_factura.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm"  ng-show="document.monto">
+                            <div layout="row"  class="rowRsm"  ng-show="( document.monto && gridViewFinalDoc == 1) ">
                                 <div class="rowRsmTitle"> Monto: </div>
                                 <div class="rms" > {{finalDoc.monto.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.moneda_prov_id">
+                            <div layout="row"  class="rowRsm" ng-show="(document.moneda_prov_id && gridViewFinalDoc == 1 ) ">
                                 <div class="rowRsmTitle"> Moneda: </div>
                                 <div class="rms"> {{finalDoc.moneda.v}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="document.productos.todos.length > 0">
+                            <div layout="row"  class="rowRsm" ng-show="(document.productos.todos.length > 0  && gridViewFinalDoc == 1)">
                                 <div class="rowRsmTitle"> Productos: </div>
                                 <div class="rms"> {{finalDoc.productos.todos.length}} </div>
                             </div>
                         </div>
-
-                        <div  layout="column" flex >
-                            <div layout="column" flex >
-                                <div class="titulo_formulario" style="height:39px;">
-                                    <div>
-                                        Productos
-                                    </div>
-                                </div>
-                                <div flex>
-                                    <div layout="row" class="headGridHolder">
-
-                                        <div flex class="headGrid"> Cod.</div>
-                                        <div flex class="headGrid"> Descripción.</div>
-                                        <div flex class="headGrid"> Cantidad</div>
-                                        <div flex class="headGrid"> Precio</div>
-
-                                    </div>
-                                    <div class="gridContent">
-                                        <div flex>
-                                            <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.todos">
-                                                <div flex class="cellGrid"> {{item.cod_producto}}</div>
-                                                <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                                <div flex class="cellGrid"> {{item.Precio}}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div layout="column" flex="10" >
-                                <div layout="row"  class="rowRsm">
-                                    <div class="rowRsmTitle"> Monto Ingresado: </div>
-                                    <div class="rms" > {{document.monto }}</div>
-                                </div>
-                                <div layout="row"  class="rowRsm">
-                                    <div class="rowRsmTitle"> Monto Real: </div>
-                                    <div class="rms" > {{document.montoPro }}</div>
-                                </div>
-                            </div>
-                        </div>
-
+                    </form>
+                    <form   layout="row" >
+                        <div active-left> </div>
                         <div layout="column" flex>
-                            <div layout="column" flex="50">
-                                <div class="titulo_formulario" style="height:39px;">
-                                    <div>
-                                        Informacion Pago
-                                    </div>
-                                </div>
-                                <div flex>
-                                    <div layout="row" class="headGridHolder">
-                                        <div flex="15" class="headGrid"> Fecha</div>
-                                        <div flex class="headGrid"> Monto</div>
-
-                                    </div>
-                                    <div class="gridContent">
-                                        <div flex>
-                                            <div layout="row" class="cellGridHolder" ng-repeat="item in document.pagos">
-                                                <div flex="15" class="cellGrid"> {{item.fecha}}</div>
-                                                <div flex class="cellGrid">  {{item.monto}}</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 2">
+                                <div>
+                                    ContraPedido
                                 </div>
                             </div>
 
-                            <div layout="column" flex="50">
-                                <div class="titulo_formulario" style="height:39px;">
-                                    <div>
-                                        Adjuntos
-                                    </div>
-                                </div>
-                                <div flex>
-                                    <div layout="row" class="headGridHolder">
-                                        <div flex="15" class="headGrid"> Fecha</div>
-                                        <div flex class="headGrid"> Documento</div>
+                        </div>
 
-                                    </div>
-                                    <div class="gridContent">
-                                        <div flex>
-                                            <div layout="row" class="cellGridHolder" ng-repeat="item in document.pagos">
-                                                <div flex="15" class="cellGrid"> {{item.fecha}}</div>
-                                                <div flex class="cellGrid">  {{item.documento}}</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                    </form>
+                    <form   layout="row" >
+                        <div active-left> </div>
+                        <div layout="column" flex>
+                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 3">
+                                <div>
+                                    KitchenBox
                                 </div>
+                            </div>
+
+                        </div>
+                    </form>
+                    <form   layout="row" >
+                        <div active-left> </div>
+                        <div layout="column" flex>
+                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 4">
+                                <div>
+                                    {{formMode.name}} Sustitutos
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div flex >
+                    <div layout="column">
+                        <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
+                            <div>
+                               Productos
                             </div>
                         </div>
+                        <div flex>
+                            <div layout="row" class="headGridHolder">
+                                <div flex="20" class="headGrid"> Codigo </div>
+                                <div flex="20" class="headGrid"> Cod. Fabrica </div>
+                                <div flex class="headGrid"> Descripcion</div>
+                                <div flex="15" class="headGrid"> Cantidad</div>
+                            </div>
+
+                            <div class="gridContent"  >
+                                <div  flex >
+                                    <div  ng-repeat="item in finalDoc.productos "
+
+                                        <div layout="row" class="cellGridHolder" >
+                                            <div flex="20" class="cellGrid" > {{item.codigo}}</div>
+                                            <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
+                                            <div flex class="cellGrid" > {{item.descripcion}}</div>
+                                            <div flex="15" class="cellGrid">{{item.cantidad}}</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
                     </div>
+
                 </div>
-                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+                <div flex="20" ng-show="false"></div>
             </md-content>
         </md-sidenav>
 

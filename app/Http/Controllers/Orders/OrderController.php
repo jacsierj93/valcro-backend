@@ -92,7 +92,6 @@ class OrderController extends BaseController
         return $resul;
     }
 
-
     /*********************** PROVIDER ************************/
 
     /**

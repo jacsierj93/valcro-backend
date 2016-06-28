@@ -113,17 +113,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         init();
     },0);
 
-
-    $http.get("Order/OrderProvList").success(function (response) {$scope.todos = response;});
-
-
+    $scope.todos = Order.query({type:"OrderProvList"});
+    $scope.tempDoc = Order.query({type:"UnClosetDoc"});
     function init() {
         $scope.filterData.motivoPedido = masters.query({type: 'getOrderReason'});
         $scope.filterData.condicionPedido = masters.query({type: 'getOrderCondition'});
         $scope.filterData.tipoDepago = masters.query({type: 'getPaymentType'});
         $scope.estadosDoc = masters.query({type: 'getOrderStatus'});
-
-
     }
 
     function review(){
@@ -180,26 +176,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
     /********************************************EVENTOS ********************************************/
 
-$scope.sendEmail = function(){
-    $scope.NotifAction("ok","Enviado",[
-        {
-        name:"ok",
-        action: function(){
-            $scope.moduleAccion({close:true});
-        }
+    $scope.sendEmail = function(){
+        $scope.NotifAction("ok","Enviado",[
+            {
+                name:"ok",
+                action: function(){
+                    $scope.moduleAccion({close:true});
+                }
+            }
+        ],{block:true});
     }
-    ],{block:true});
-}
 
     $scope.$watchGroup(
         ['cola.total',
             'cola.respuesta.length'], function(newVal){
-            console.log("iguakle", newVal);
             if(newVal[0] >0 ){
-                console.log("iguakle 2");
 
                 if(newVal[0] == newVal[1]){
-                    console.log("iguakle 3");
                     Order.postMod({type:$scope.formMode.mod, mod:"AddAdjuntos"},
                         {id:$scope.document.id,adjuntos: $scope.imagenes}, function(response){
                             $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
@@ -343,10 +336,13 @@ $scope.sendEmail = function(){
         console.log("entrp al cancel");
         return false;
     };
-     $scope.printTrace = function(){
-         setGetOrder.print();
-         console.log(" final ", setGetOrder.get())
-     };
+    $scope.printTrace = function(){
+        setGetOrder.print();
+        console.log(" final ", setGetOrder.get())
+        /* $scope.LayersAction({
+         open:{name:"finalDoc"}
+         });*/
+    };
 
 
     /******************************************** filtros ********************************************/
@@ -538,8 +534,8 @@ $scope.sendEmail = function(){
             case "agrPed":
                 $scope.moduleAccion({open:{name:"finalDoc",
                     after: function(){
-                    $scope.finalDoc = setGetOrder.get();
-                }
+                        $scope.finalDoc = setGetOrder.get();
+                    }
                 }});
                 break;
             case "finalDoc":
@@ -585,18 +581,19 @@ $scope.sendEmail = function(){
                 });
         }
     }
-   /* /!**@deprecated
+    /* /!**@deprecated
      * *!/
-    $scope.change = function (odc) {
-        if (odc.asig) {
-            addOrdenCompra(odc.id, $scope.document.id);
-        } else {
-            removeOrdenCompra(odc.id, $scope.document.id);
-        }
+     $scope.change = function (odc) {
+     if (odc.asig) {
+     addOrdenCompra(odc.id, $scope.document.id);
+     } else {
+     removeOrdenCompra(odc.id, $scope.document.id);
+     }
 
-    };*/
+     };*/
     $scope.changeContraP = function (item) {
-        item.doc_id=$scope.document.id;
+        setGetOrder.change({k:['productos','contraPedido',0,'sustitute']});
+        /*item.doc_id=$scope.document.id;
         if(item.asignado){
             if(item.asignadoOtro.length >0){
                 $scope.NotifAction("alert",
@@ -633,7 +630,7 @@ $scope.sendEmail = function(){
                         action:function(){item.asignado=true;}
                     }
                 ]);
-        }
+        }*/
 
     };
 
@@ -956,10 +953,10 @@ $scope.sendEmail = function(){
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
                 setGetOrder.setIni(doc);
-               // setGetOrder.setGlobalAction("upd");
+                // setGetOrder.setGlobalAction("upd");
                 $scope.formGlobal ="upd";
                 $scope.moduleAccion({open:{name:"resumenPedido"}});
-                setGetOrder.setIni(doc);
+               // setGetOrder.setIni(doc);
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
@@ -1563,7 +1560,7 @@ $scope.sendEmail = function(){
                             if(response.adjuntos.length >0 ){
                                 angular.forEach(response.adjuntos,function(v,k){
                                     console.log('value', v)
-                                  $scope.imagenes.push(v.file);
+                                    $scope.imagenes.push(v.file);
 
                                 });
                                 console.log("adjuntos", $scope.imagenes)
@@ -1728,11 +1725,11 @@ $scope.sendEmail = function(){
 
     function loadCoinProvider(id){
         $scope.formData.monedas = providers.query({type: "provCoins", id_prov: id || 0});
-       /* $http.get("provider/provCoins/"+id).success(function (response) {
-            $scope.formData.monedas=response;
-            //  $scope.document.prov_moneda_id= response[0].id;
+        /* $http.get("provider/provCoins/"+id).success(function (response) {
+         $scope.formData.monedas=response;
+         //  $scope.document.prov_moneda_id= response[0].id;
 
-        });*/
+         });*/
     }
 
     function loadPaymentCondProvider(id){
@@ -2109,35 +2106,48 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 });
 
 MyApp.service('setGetOrder', function() {
-     var document={};
+    var document={};
     var historia =new Array();
     var original={};
     var changes = {};
-     function  clearJson(clear){
-         var aux = angular.copy(clear);
-           angular.forEach(clear, function(v,k){
-             if (v == null){
-                 delete  aux[k];
-             }
+    function  clearJson(clear){
+        var aux = angular.copy(clear);
+        console.log("original le", clear);
+        angular.forEach(clear, function(v,k){
+            if(v == null){
+                delete  aux[k];
+            }else if( ! (v instanceof Date) ) {
+                 /*if (typeof(v) == 'object') {
+                    var aux2={};
+                     angular.forEach(v, function(v,k){
+                         aux2[k]=clearJson(v);
+                     });
+                     aux[k]=aux2;
+                 }
+                if (typeof(v) == 'array') {
 
-         });
-         return aux;
+                    var aux2=new  Array();
+                    angular.forEach(v, function(v,k){
+                        aux2.push(clearJson(v));
+                    });
+                    aux[k]=aux2;
 
-     }
+                }*/
+            }
+
+        });
+        return aux;
+
+    }
     return {
         setIni:function(first){
             document = clearJson(first);
-
-            angular.forEach(document, function(v,k){
-                if(typeof(v) == 'array' || typeof(v) == 'object' ){
-                    document[k] = clearJson(v);
-                }
-            });
             original = angular.copy(document);
         },
         change: function(change){
+            console.log("tipo de ",typeof(change.k));
             var trace = change;
-            if(typeof(change.v) == 'string'){
+            if(typeof(change.k) == 'string'){
 
                 if(!document[change.k]){
                     document[change.k]= change.v;
@@ -2157,20 +2167,17 @@ MyApp.service('setGetOrder', function() {
                         trace.event ={
                             old: angular.copy(document[change.k]),
                         };
-                       // delete document[change.k];
+                        // delete document[change.k];
                         changes[change.k]={action:"del", v:change.v};
 
                     }
                 }
+                historia.push(trace);
+                if(original[change.k] == document[change.k]){
+                    delete changes[change.k];
+                    console.log("eliminando");
+                }
 
-
-            }else{
-
-            }
-            historia.push(trace);
-            if(original[change.k] == document[change.k]){
-                delete changes[change.k];
-                console.log("eliminando");
             }
         },
         print: function(){
@@ -2196,48 +2203,48 @@ MyApp.service('setGetOrder', function() {
 
     };
     /*var trace = {};
-    var changes ={};
-    var globalAction= "new";
+     var changes ={};
+     var globalAction= "new";
 
-    var forms ={FormHeadDocument:{action:"new"},productosDoc:{action:"new"}};
-    angular.forEach(forms, function (v, k) {
-        trace[k]={};
-        changes[k]={};
-    });
-    this.addTrace = function(val,form){
-        if(trace[form][val.id] === undefined){
-            trace[form][val.id] = angular.copy(val);
-        }
-    };
+     var forms ={FormHeadDocument:{action:"new"},productosDoc:{action:"new"}};
+     angular.forEach(forms, function (v, k) {
+     trace[k]={};
+     changes[k]={};
+     });
+     this.addTrace = function(val,form){
+     if(trace[form][val.id] === undefined){
+     trace[form][val.id] = angular.copy(val);
+     }
+     };
 
-    this.addChange = function(val,action,form){
-        if((changes[form][val.id]===undefined) || !angular.equals(val,trace[form][val.id])){
-            if(changes[form][val.id]){
-                changes[form][val.id].datos = angular.copy(val);
-                if(!(changes[form][val.id].action=="new" && action=="upd")){
-                    changes[form][val.id].action = action;
-                }
-            }else{
-                changes[form][val.id] = {
-                    datos:angular.copy(val),
-                    action:action
-                }
-            }
-        }else{
-            delete changes[form][val.id];
-        }
-    }
+     this.addChange = function(val,action,form){
+     if((changes[form][val.id]===undefined) || !angular.equals(val,trace[form][val.id])){
+     if(changes[form][val.id]){
+     changes[form][val.id].datos = angular.copy(val);
+     if(!(changes[form][val.id].action=="new" && action=="upd")){
+     changes[form][val.id].action = action;
+     }
+     }else{
+     changes[form][val.id] = {
+     datos:angular.copy(val),
+     action:action
+     }
+     }
+     }else{
+     delete changes[form][val.id];
+     }
+     }
 
-    this.getChanges= function(){return changes; }
-    this.setGlobalAction= function(action){globalAction=action; };
-    this.getGlobagAction= function(){ return globalAction};
+     this.getChanges= function(){return changes; }
+     this.setGlobalAction= function(action){globalAction=action; };
+     this.getGlobagAction= function(){ return globalAction};
 
-    this.setFormAction = function(key, action){
-        forms[key].action=action;
-    }
-    this.setFormAction = function(key){
-        return forms[key].action;
-    }*/
+     this.setFormAction = function(key, action){
+     forms[key].action=action;
+     }
+     this.setFormAction = function(key){
+     return forms[key].action;
+     }*/
 });
 
 MyApp.service('Layers' , function(){
