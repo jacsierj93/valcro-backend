@@ -19,9 +19,11 @@ use App\Models\Sistema\ProdTime;
 use App\Models\Sistema\TiemAproTran;
 use App\Models\Sistema\ProviderCondPay;
 use App\Models\Sistema\ProviderCondPayItem;
+use App\Models\Sistema\ProviderContactField;
 use App\Models\Sistema\Line;
 use App\Libs\Utils\Files;
 use App\Models\Sistema\FileModel;
+
 use Session;
 use Validator;
 
@@ -251,10 +253,6 @@ class ProvidersController extends BaseController
             $contact->pais_id = ($req->pais)?$req->pais:NULL;
             $contact->save();
             $contact->idiomas()->sync($req->languaje);
-        }
-
-        if(Provider::find($req->prov_id)->contactos_campos()->find($valName->id)->where("camp_id",1)){
-            Provider::find($req->prov_id)->contactos_campos()->attach(array($contact->id =>array("camp_id"=>1,"value")));
         }
         //Provider::find($req->prov_id)->contactos_campos()->attach($contact->id);
 
