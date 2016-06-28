@@ -2401,6 +2401,8 @@ class OrderController extends BaseController
                     $tem['saldo'] = $exist->saldo;
                     $tem['cantidad'] = $exist->cantidad;
                 }
+
+
                 $prods[]= $tem;
 
             }
@@ -2493,8 +2495,9 @@ class OrderController extends BaseController
 
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
-        $coins= Monedas::get();
-        $docIt= $doc->items()->where('tipo_origen_id',2)->get();
+       // $coins= Monedas::get();
+        $impors= $doc->items()->where('tipo_origen_id', $req->tipo)->get();
+
 
         foreach($items as $aux){
             $paso=true;
@@ -2532,6 +2535,22 @@ class OrderController extends BaseController
 
                     }
                 }
+                /*** importados*/
+                //$tem['ex']= $impors;
+                foreach($impors as $imps){
+                    $first= $this->getFirstProducto($imps);
+                    //$tem['exf']=$first->tipo_origen_id;
+                    if($first->tipo_origen_id == 2){
+                       // $tem['exf2']=$first->tipo_origen_id;
+
+                        if($first->doc_origen_id == $aux->id){
+                            $tem['asignado'] = true;
+                            $tem['import'] = $imps;
+                        }
+                    }
+
+                }
+
 
                 switch ($req->tipo){
                     case  21:
@@ -2912,6 +2931,10 @@ class OrderController extends BaseController
         $purchaIts=PurchaseItem::where('tipo_origen_id',3)->get();
         $orderIts=OrderItem::where('tipo_origen_id',3)->get();
         $solIts=SolicitudeItem::where('tipo_origen_id',3)->get();
+        $doc= $this->getDocumentIntance($req->tipo);
+        $doc = $doc->findOrFail($req->doc_id);
+        // $coins= Monedas::get();
+        $impors= $doc->items()->where('tipo_origen_id', $req->tipo)->get();
 
         foreach($items as $aux){
             $paso=true;
@@ -2946,6 +2969,21 @@ class OrderController extends BaseController
                 }
             }
 
+            /*** importados*/
+            //$tem['ex']= $impors;
+            foreach($impors as $imps){
+                $first= $this->getFirstProducto($imps);
+                //$tem['exf']=$first->tipo_origen_id;
+                if($first->tipo_origen_id == 3){
+                    // $tem['exf2']=$first->tipo_origen_id;
+
+                    if($first->doc_origen_id == $aux->id){
+                        $tem['asignado'] = true;
+                        $tem['import'] = $imps;
+                    }
+                }
+
+            }
             switch ($req->tipo){
                 case  21:
                     if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
@@ -2983,6 +3021,7 @@ class OrderController extends BaseController
                     }
                     ;break;
             }
+
 
             if($paso){
                 $tem['id']=$aux->id;

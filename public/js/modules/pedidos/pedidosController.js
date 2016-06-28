@@ -172,7 +172,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.toEditHead= function(id,val){
         //change
-        setGetOrder.change({k:id,v:val});
+        setGetOrder.change('document',id,val);
     };
     /********************************************EVENTOS ********************************************/
 
@@ -337,8 +337,35 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return false;
     };
     $scope.printTrace = function(){
-        setGetOrder.print();
-        console.log(" final ", setGetOrder.get())
+        var final={};
+        var head= {};
+        var cp= new Array();
+        var k= {};
+        var sus= {};
+        var todos={};
+        angular.forEach(setGetOrder.getForm(), function(v,k){
+                if(k.startsWith('contra')){
+                    cp.push(v);
+                }else
+                if(k.startsWith('kitchen')){
+                   // cp.push(v);
+                }
+                else
+                if(k.startsWith('pedidoSusti')){
+                //    cp.push(v);
+                }
+            }
+
+        );
+        angular.forEach(setGetOrder.getForm('document'), function(v,k){
+            final[k]=v;
+            }
+
+        );
+        final.contraPedido = cp;
+        console.log(" final doc", final);
+
+
         /* $scope.LayersAction({
          open:{name:"finalDoc"}
          });*/
@@ -592,9 +619,24 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
      };*/
     $scope.changeContraP = function (item) {
-        setGetOrder.change({k:['productos','contraPedido',0,'sustitute']});
-        /*item.doc_id=$scope.document.id;
-        if(item.asignado){
+        var paso=true;
+        if(item.import){
+            $scope.NotifAction("error",
+                "Este Contra pedido fue agregado a partir de otra solicitud "
+                ,[],{autohidden:autohidden});
+            item.asignado=true;
+           paso= false;
+
+        }
+      /*  if(item.asignado){
+            setGetOrder.change('contraPedido'+item.id,'sustitute', true);
+        }else {
+            setGetOrder.change('contraPedido'+item.id,'sustitute',undefined);
+        }*/
+
+        if(paso){
+        item.doc_id=$scope.document.id;
+            if(item.asignado){
             if(item.asignadoOtro.length >0){
                 $scope.NotifAction("alert",
                     "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
@@ -609,14 +651,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             action:function(){item.asignado=false;}
                         }
                     ]);
-            }else{
+            }else {
                 Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
                     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                 });
             }
 
         }
-        else{
+            else{
             $scope.NotifAction("alert",
                 "Se eliminara el contra pedido ¿Desea continuar?"
                 ,[
@@ -630,7 +672,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         action:function(){item.asignado=true;}
                     }
                 ]);
-        }*/
+        }
+        }
 
     };
 
@@ -797,45 +840,70 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
      */
 
     $scope.changeKitchenBox = function (item) {
+        var paso = true;
+        if (item.import) {
+            $scope.NotifAction("error",
+                "Este KitchenBox fue agregado a partir de otra solicitud "
+                , [], {autohidden: autohidden});
+            item.asignado = true;
+            paso = false;
 
-        item.doc_id=$scope.document.id;
-        if(item.asignado){
-            if(item.asignadoOtro.length >0){
+        }
+        if (paso) {
+            item.doc_id = $scope.document.id;
+            if (item.asignado) {
+                if (item.asignadoOtro.length > 0) {
+                    $scope.NotifAction("alert",
+                        "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
+                        , [
+                            {
+                                name: 'Si',
+                                action: function () {
+                                    Order.postMod({
+                                        type: $scope.formMode.mod,
+                                        mod: "AddkitchenBox"
+                                    }, item, function (response) {
+                                        $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                                    });
+                                }
+                            }, {
+                                name: 'No',
+                                action: function () {
+                                    item.asignado = false;
+                                }
+                            }
+                        ]);
+                } else {
+                    Order.postMod({type: $scope.formMode.mod, mod: "AddkitchenBox"}, item, function (response) {
+                        $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                    });
+                }
+
+            }
+            else {
                 $scope.NotifAction("alert",
-                    "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
-                    ,[
-                        {name: 'Si',
-                            action:function(){
-                                Order.postMod({type:$scope.formMode.mod,mod:"AddkitchenBox"},item,function(response){
-                                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                    "Se eliminara el KitchenBox ¿Desea continuar?"
+                    , [
+                        {
+                            name: 'Ok',
+                            action: function () {
+                                Order.postMod({
+                                    type: $scope.formMode.mod,
+                                    mod: "RemovekitchenBox"
+                                }, item, function (response) {
+                                    $scope.NotifAction("ok", "Removido", [], {autohidden: autohidden});
                                 });
                             }
-                        },{name: 'No',
-                            action:function(){item.asignado=false;}
+                        }, {
+                            name: 'Cancel',
+                            action: function () {
+                                item.asignado = true;
+                            }
                         }
                     ]);
-            }else{
-                Order.postMod({type:$scope.formMode.mod,mod:"AddkitchenBox"},item,function(response){
-                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-                });
             }
 
-        }
-        else{
-            $scope.NotifAction("alert",
-                "Se eliminara el KitchenBox ¿Desea continuar?"
-                ,[
-                    {name: 'Ok',
-                        action:function(){
-                            Order.postMod({type:$scope.formMode.mod,mod:"RemovekitchenBox"},item,function(response){
-                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-                            });
-                        }
-                    },{name: 'Cancel',
-                        action:function(){item.asignado=true;}
-                    }
-                ]);
-        }
+        };
 
     };
 
@@ -952,8 +1020,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.document=aux;
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
-                setGetOrder.setIni(doc);
-                // setGetOrder.setGlobalAction("upd");
+                setGetOrder.addForm('document',doc);
+                angular.forEach(doc.productos.contraPedido, function(v,k){
+                    setGetOrder.addForm('contraPedido'+ v.id,v);
+
+                });
                 $scope.formGlobal ="upd";
                 $scope.moduleAccion({open:{name:"resumenPedido"}});
                // setGetOrder.setIni(doc);
@@ -1451,10 +1522,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watch('document.prov_moneda_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
-            if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
-                setGetOrder.addChange({id:"prov_moneda_id",value:newVal,text:"Moneda"},$scope.formAction,"FormHeadDocument");
-            }
-
+           masters.get({id:newVal});
             loadTasa(newVal);
         }
     });
@@ -1462,7 +1530,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watch('provSelec.id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined' && newVal) {
-            console.log(newVal)
             $scope.formData.direccionesFact= Order.query({type:"InvoiceAddress", prov_id:newVal});
             $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal || 0});
             $scope.formData.paises= Order.query({type:"ProviderCountry",id:newVal});
@@ -1589,7 +1656,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         $scope.document.id = response.id;
                         if(response['action'] == 'new'){
                             $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
-                            setGetOrder.setIni($scope.document);
+                            setGetOrder.addForm('document',$scope.document);
                         }
 
                     }
@@ -2106,100 +2173,66 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 });
 
 MyApp.service('setGetOrder', function() {
-    var document={};
-    var historia =new Array();
-    var original={};
-    var changes = {};
-    function  clearJson(clear){
-        var aux = angular.copy(clear);
-        console.log("original le", clear);
-        angular.forEach(clear, function(v,k){
-            if(v == null){
-                delete  aux[k];
-            }else if( ! (v instanceof Date) ) {
-                 /*if (typeof(v) == 'object') {
-                    var aux2={};
-                     angular.forEach(v, function(v,k){
-                         aux2[k]=clearJson(v);
-                     });
-                     aux[k]=aux2;
-                 }
-                if (typeof(v) == 'array') {
 
-                    var aux2=new  Array();
-                    angular.forEach(v, function(v,k){
-                        aux2.push(clearJson(v));
-                    });
-                    aux[k]=aux2;
-
-                }*/
+    /**
+     form[k]:{
+         filds :{
+            j:{
+                c:v
             }
+     }
 
-        });
-        return aux;
+     */
+    var forms ={};
 
-    }
     return {
-        setIni:function(first){
-            document = clearJson(first);
-            original = angular.copy(document);
+
+        addForm: function(k, field){
+          if(!forms[k]){
+              forms[k]={};
+              angular.forEach(field, function(v,k2){
+                  if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer'){
+                      forms[k][k2]={original:v, value:v, estado:'new',trace:new Array()};
+                  }
+
+              });
+              console.log('fomr', forms);
+          }
         },
-        change: function(change){
-            console.log("tipo de ",typeof(change.k));
-            var trace = change;
-            if(typeof(change.k) == 'string'){
-
-                if(!document[change.k]){
-                    document[change.k]= change.v;
-                    changes[change.k]={action:"new", v:change.v};
-                }else{
-                    if(document[change.k] != change.v && typeof(change.v) != 'undefined' && change.v != -1){
-                        trace.event ={
-                            old: angular.copy(document[change.k]),
-                            new:angular.copy(change.v)
-                        };
-                        trace.action='upd';
-                        document[change.k]= change.v;
-                        changes[change.k]={action:"upd", v:change.v};
-
-                    }else if( typeof(change.v) == 'undefined'){
-                        trace.action='del';
-                        trace.event ={
-                            old: angular.copy(document[change.k]),
-                        };
-                        // delete document[change.k];
-                        changes[change.k]={action:"del", v:change.v};
-
-                    }
+        change: function(form,fiel, value){
+            if(typeof (value) != 'undefined'){
+                if(forms[form][fiel].original != value  ){
+                    forms[form][fiel].value= value;
+                    forms[form][fiel].trace.push(value);
+                    forms[form][fiel].estado='upd';
+                }else
+                if(forms[form][fiel].original == value  ){
+                    forms[form][fiel].estado='new';
+                    forms[form][fiel].trace.push(value);
+                    forms[form][fiel].value= value;
                 }
-                historia.push(trace);
-                if(original[change.k] == document[change.k]){
-                    delete changes[change.k];
-                    console.log("eliminando");
-                }
+           }else {
+                    forms[form][fiel].estado='del';
+                forms[form][fiel].trace.push();
 
             }
         },
-        print: function(){
-            console.log("original", original);
-            console.log("documento", document);
-            console.log("historia", historia);
-            console.log("cambios", changes);
-        },
-        get: function(){
-            var final ={};
-            var aux ={};
-            angular.forEach(document, function(v,k){
-
-                aux= {v:v};
-
-                if(changes[k]){
-                    aux.action= changes[k].action;
-                }
-                final[k]=aux;
-            });
-            return  final;
+        getForm: function(name){
+            if(name){
+                return forms[name];
+            }
+            else{
+                return forms;
+            }
+        }, restore: function(name){
+            if(name){
+                forms[name]={};
+            }
+            else {
+                forms={};
+            }
         }
+
 
     };
     /*var trace = {};
@@ -2312,3 +2345,69 @@ MyApp.factory('Order', ['$resource',
         });
     }
 ]);
+/******************************** trash ***********************************/
+/*setIni:function(first){
+ document = clearJson(first);
+ original = angular.copy(document);
+ },
+ change: function(change){
+ console.log("tipo de ",typeof(change.k));
+ var trace = change;
+ if(typeof(change.k) == 'string'){
+
+ if(!document[change.k]){
+ document[change.k]= change.v;
+ changes[change.k]={action:"new", v:change.v};
+ }else{
+ if(document[change.k] != change.v && typeof(change.v) != 'undefined' && change.v != -1){
+ trace.event ={
+ old: angular.copy(document[change.k]),
+ new:angular.copy(change.v)
+ };
+ trace.action='upd';
+ document[change.k]= change.v;
+ changes[change.k]={action:"upd", v:change.v};
+
+ }else if( typeof(change.v) == 'undefined'){
+ trace.action='del';
+ trace.event ={
+ old: angular.copy(document[change.k]),
+ };
+ // delete document[change.k];
+ changes[change.k]={action:"del", v:change.v};
+
+ }
+ }
+ historia.push(trace);
+ if(original[change.k] == document[change.k]){
+ delete changes[change.k];
+ console.log("eliminando");
+ }
+
+ }
+ },
+ print: function(){
+ console.log("original", original);
+ console.log("documento", document);
+ console.log("historia", historia);
+ console.log("cambios", changes);
+ },
+ get: function(){
+ var final ={};
+ var aux ={};
+ angular.forEach(document, function(v,k){
+
+ aux= {v:v};
+
+ if(changes[k]){
+ aux.action= changes[k].action;
+ }
+ final[k]=aux;
+ });
+ return  final;
+ },
+ addForm: function(arg){
+ var aux = clearJson(arg.v);
+ var ori= angular.copy(aux);
+ forms[arg.k] = ori;
+ }*/
