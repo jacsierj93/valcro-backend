@@ -471,11 +471,7 @@
                                 <input skip-tab info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="35">
-                                <label>Email</label>
-                                <input info="email de contacto ej. fulano@valcro.co" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont" ng-pattern="/^.+@.+\..+$/" />
-                            </md-input-container>
-                            <md-input-container class="md-block" flex="15">
+                            <md-input-container class="md-block" flex>
                                 <label>Pais de Residencia</label>
                                 <md-select info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
@@ -484,13 +480,6 @@
                                 </md-select>
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="20">
-                                <label>Telefono</label>
-                                <input ng-pattern="/^[\d\-+]+$/" number info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
-                            </md-input-container>
-
-                        </div>
-                        <div class="row" layout="row">
                             <div layout="row" flex="30">
                                 <md-input-container flex>
                                     <label>Idiomas</label>
@@ -500,7 +489,24 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
-                            <md-input-container class="md-block" flex>
+
+                        </div>
+                        <div class="row" layout="row">
+                            <md-chips flex  info="email de contacto ej. fulano@valcro.co" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChip($chip,provContactosForm.emailCont.$error)" md-on-remove="rmContEmail(this,$chip)">
+                                <md-chip-template>
+                                    <span>
+                                      <strong>{{$chip.valor}}</strong>
+                                    </span>
+                                </md-chip-template>
+                            </md-chips>
+
+                            <md-input-container class="md-block" flex="20">
+                                <label>Telefono</label>
+                                <input ng-pattern="/^[\d\-+]+$/" number info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf.valor" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
+                            </md-input-container>
+
+
+                            <md-input-container class="md-block" flex="30">
                                 <label>Responsabilidades</label>
                                 <input info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
@@ -528,7 +534,7 @@
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>
-                                <input info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                                <input info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff.valor" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">

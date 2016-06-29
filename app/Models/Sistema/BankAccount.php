@@ -16,6 +16,7 @@ class BankAccount extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_cuenta_bancaria";
+    protected $touches = ['provider'];
 
     public  function getAdvancePaymentProvider(){
         return $this->belongsTo('App\Models\Sistema\AdvancePaymentProvider', 'cuenta_id');

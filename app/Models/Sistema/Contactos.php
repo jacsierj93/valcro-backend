@@ -15,7 +15,12 @@ class Contactos extends  Model
     ////foreing key
     public function contacto_proveedor()
     {
-        return $this->belongsToMany('App\Models\Sistema\Provider', 'tbl_prov_cont', 'cont_id', 'prov_id')->withPivot("direccion","responsabilidades");
+        return $this->belongsToMany('App\Models\Sistema\Provider', 'tbl_prov_cont', 'cont_id', 'prov_id');
+    }
+
+    public function campos()
+    {
+        return $this->hasMany('App\Models\Sistema\ContactField', 'cont_id');
     }
 
     public function cont_telefono()
