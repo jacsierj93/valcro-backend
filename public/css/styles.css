@@ -743,6 +743,10 @@ form.focused .titulo_formulario{
     color: #999999;
     font-size: 15px;
     font-weight: 400;
+    min-width: 16px;
+    margin-left: 2px;
+    margin-right: 2px;
+
 }
 
 /* */

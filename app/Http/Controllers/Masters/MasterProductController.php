@@ -40,6 +40,7 @@ class MasterProductController extends BaseController
         if($ser == null){
             $ser  = new Product();
             $ser->prov_id= $data['prov_id'];
+            $ser->tipo_producto_id=3;
             $ser->save();
         }
         $prod->prov_id =$data['prov_id'];

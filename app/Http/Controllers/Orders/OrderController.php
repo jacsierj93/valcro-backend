@@ -375,6 +375,29 @@ class OrderController extends BaseController
 
     }
 
+    /*********************** SUMMARY ************************/
+
+    public function getSolicitudeSummary(Request $req){
+        $data = array();
+        $prod = array();
+        $model= Solicitude::findOrFail($req->id);
+        $provProd = Product::where('prov_id',$model->prov_id)->get();
+        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        foreach($items as $aux){
+            $temp= array();
+            $p= $provProd->get($aux->producto_id);
+            $temp['id']=$aux->id;
+            $temp['codigo']=$p->codigo;
+            $temp['codigo_fabrica']=$p->codigo_fabrica;
+            $temp['descripcion']=$aux->descripcion;
+            $temp['cantidad']=$aux->cant;
+            $prod[]= $temp;
+        }
+
+
+        $data['productos']= $prod;
+        return $data;
+    }
     /*********************** SUSTITUTE ************************/
 
     /**
@@ -1232,6 +1255,7 @@ class OrderController extends BaseController
 
         return $temp;
     }
+
     /*********************** SOLICITUD ************************/
 
     /**
@@ -1812,6 +1836,7 @@ class OrderController extends BaseController
             $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['estado_id']=$aux->estado_id;
+            $tem['final_id']=$aux->final_id;
             // $tem['tipo_value']=$aux->typevalue;
             // pra humanos
             $tem['comentario']=$aux->comentario;

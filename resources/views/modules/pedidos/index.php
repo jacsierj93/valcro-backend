@@ -558,12 +558,12 @@
                     </md-chips>
                     <input  ng-model="email.asunto" placeholder="Asunto" style="border-top: 0; border-left: 0; border-right:0 ;">
                     <div flex layout="column" style="padding: 2px;">
-                    <md-content   >
-                        <div contenteditable
-                             ng-model="emailText"
-                             strip-br="true"
-                             required style="min-height: 20px; width: 100%;"></div>
-                    </md-content>
+                        <md-content   >
+                            <div contenteditable
+                                 ng-model="emailText"
+                                 strip-br="true"
+                                 required style="min-height: 20px; width: 100%;"></div>
+                        </md-content>
                         <div></div>
                     </div>
 
@@ -808,7 +808,9 @@
 
                                     >
                                 </md-input-container>
-                                <div style="width: 24px;" ng-click="openAdj('Factura')">%%</div>
+                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')">
+                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
+                                </div>
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
@@ -818,8 +820,9 @@
 
                                     >
                                 </md-input-container>
-                                <div style="width: 24px;" ng-click="openAdj('proforma')" >%%</div>
-                            </div>
+                                <div layout="column" layout-align="center center" ng-click="openAdj('Proforma')">
+                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
+                                </div>                            </div>
                             <div   ng-show="( gridView != 4 )"  layout="row" >
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
@@ -1923,7 +1926,7 @@
 
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
-            <md-content  layout="row" flex class="sideNavContent">
+            <md-content  layout="row" flex class="sideNavContent" >
                 <div layout="column" flex="30">
                     <form></form><!-- solucion angular se como el form-->
                     <form layout="row" >
@@ -1938,28 +1941,30 @@
                                  class="rowRsm" style="margin-right: 8px;" layout="row"  >
                                 <div layout="row" class="rowRsmTitle">
                                     <div > ID: </div>
-                                    <div flex> {{finalDoc.id.v}} </div>
+                                    <div flex> {{document.id}} </div>
                                 </div>
                                 <div layout="row" class="rms" flex="" ng-show="document.version > 1">
                                     <div > Version: </div>
-                                    <div flex> {{document.version.v}} </div>
+                                    <div flex> {{document.version}} </div>
                                 </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div class="rowRsmTitle"> Creado: </div>
-                                <div class="rms" > {{finalDoc.emision.v | date:'dd/MM/yyyy' }}
+                                <div class="rms" >
+                                    <div>{{document.emision | date:'dd/MM/yyyy' }}</div>
                                     <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
                                          class="emit{{document.diasEmit}}"></div>
                                 </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
-                                <div layout="column" ng-show="finalDoc.titulo.action == 'new'" layout-align="center center">
+                                <div layout="column" ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                     layout-align="center center">
                                     <span class="icon-Agregar" style="font-size: 16px"></span>
                                 </div>
-                                <div layout="column" ng-show="finalDoc.titulo.action == 'upd'" layout-align="center center" >
+                                <div layout="column" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
                                     <span class="icon-Actualizar" style="font-size: 16px"></span>
                                 </div>
-                                <div layout="column" ng-show="finalDoc.titulo.action == 'del'" layout-align="center center" >
+                                <div layout="column" ng-show="finalDoc.titulo.estado == 'del'" layout-align="center center" >
                                     <span class="icon-Eliminar" style="font-size: 16px"></span>
                                 </div>
                                 <div class="rowRsmTitle"> Titulo </div>
@@ -1967,10 +1972,11 @@
                                 </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
-                                <div layout="column" ng-show="finalDoc.ult_revision.action == 'new'" layout-align="center center" ng-click="menuAgregar()">
+                                <div layout="column" ng-show="finalDoc.ult_revision.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                     layout-align="center center" >
                                     <span class="icon-Agregar" style="font-size: 16px"></span>
                                 </div>
-                                <div layout="column" ng-show="finalDoc.ult_revision.action == 'upd'" layout-align="center center" ng-click="menuAgregar()">
+                                <div layout="column" ng-show="finalDoc.ult_revision.estado == 'upd'" layout-align="center center">
                                     <span class="icon-Actualizar" style="font-size: 16px"></span>
                                 </div>
                                 <div class="rowRsmTitle"> Revisado </div>
@@ -2021,11 +2027,11 @@
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.productos.todos.length > 0  && gridViewFinalDoc == 1)">
                                 <div class="rowRsmTitle"> Productos: </div>
-                                <div class="rms"> {{finalDoc.productos.todos.length}} </div>
+                                <div class="rms"> {{document.productos.todos.length}} </div>
                             </div>
                         </div>
                     </form>
-                    <form   layout="row" >
+                    <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 2">
@@ -2033,11 +2039,42 @@
                                     ContraPedido
                                 </div>
                             </div>
+                            <div flex ng-show="gridViewFinalDoc == 2">
+                                <md-content>
 
+                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contraPedido" >
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'new' && finalDoc.titulo.trace.length > 0" layout-align="center center">
+                                            <span class="icon-Agregar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'upd'" layout-align="center center" >
+                                            <span class="icon-Actualizar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
+                                            <span class="icon-Eliminar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid">{{item.id.v}}</div>
+                                        <div class="cellGrid" flex>{{item.titulo.v}}</div>
+                                    </div>
+                                </md-content>
+                            </div>
+<!---
+<div layout="row" class="cellGridHolder" ng-repeat="item in formData.kitchenBox">
+                                    <div class="cellGrid" flex="5">
+                                        <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(formBlock)"></md-switch>
+                                    </div>
+                                    <div flex="5" class="cellGrid"  ng-click="selecKitchenBox(item)"> {{item.id}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.num_proforma}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.img_proforma}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.monto}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.precio}}</div>
+                                    <div flex class="cellGrid"> {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
+                                </div>
+--->
                         </div>
 
                     </form>
-                    <form   layout="row" >
+                    <form   layout="row" ng-show="document.productos.kitchenBox.length > 0" >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 3">
@@ -2045,10 +2082,27 @@
                                     KitchenBox
                                 </div>
                             </div>
+                            <div flex ng-show="gridViewFinalDoc == 3">
+                                <md-content >
+                                    <div layout="row" class="cellGridHolder" ng-repeat=" item in finalDoc.kitchenBox">
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'new' && finalDoc.titulo.trace.length > 0" layout-align="center center">
+                                            <span class="icon-Agregar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'upd'" layout-align="center center" >
+                                            <span class="icon-Actualizar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
+                                            <span class="icon-Eliminar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid">{{item.id.v}}</div>
+                                        <div class="cellGrid" flex>{{item.titulo.v}}</div>
+                                    </div>
+                                </md-content>
+                            </div>
 
                         </div>
                     </form>
-                    <form   layout="row" >
+                    <form   layout="row" ng-show="document.productos.pedidoSusti.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 4">
@@ -2056,18 +2110,37 @@
                                     {{formMode.name}} Sustitutos
                                 </div>
                             </div>
+                            <div flex ng-show="gridViewFinalDoc == 4">
+                                <md-content>
+                                    <div layout="row" class="cellGridHolder" ng-repeat=" item in finalDoc.pedidoSusti">
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'new' && finalDoc.titulo.trace.length > 0" layout-align="center center">
+                                            <span class="icon-Agregar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'upd'" layout-align="center center" >
+                                            <span class="icon-Actualizar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid" layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
+                                            <span class="icon-Eliminar" style="font-size: 16px"></span>
+                                        </div>
+                                        <div class="cellGrid">{{item.id.v}}</div>
+                                        <div flex class="cellGrid">{{item.titulo.v}}</div>
+                                    </div>
+                                </md-content>
+                            </div>
 
                         </div>
                     </form>
                 </div>
+
                 <div flex >
                     <div layout="column">
                         <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
                             <div>
-                               Productos
+                                Productos
                             </div>
                         </div>
                         <div flex>
+
                             <div layout="row" class="headGridHolder">
                                 <div flex="20" class="headGrid"> Codigo </div>
                                 <div flex="20" class="headGrid"> Cod. Fabrica </div>
@@ -2077,7 +2150,7 @@
 
                             <div class="gridContent"  >
                                 <div  flex >
-                                    <div  ng-repeat="item in finalDoc.productos "
+                                    <div  ng-repeat="item in finalDoc.productos ">
 
                                         <div layout="row" class="cellGridHolder" >
                                             <div flex="20" class="cellGrid" > {{item.codigo}}</div>
@@ -2086,8 +2159,8 @@
                                             <div flex="15" class="cellGrid">{{item.cantidad}}</div>
                                         </div>
                                     </div>
-
                                 </div>
+
                             </div>
 
                         </div>
@@ -2097,6 +2170,8 @@
 
                 </div>
                 <div flex="20" ng-show="false"></div>
+                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+
             </md-content>
         </md-sidenav>
 

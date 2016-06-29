@@ -73,8 +73,9 @@
 
 .rms{
     text-overflow: ellipsis;
-    height: 16px;
+    height: 28px;
     overflow: hidden;
+    white-space: nowrap
 }
 
 .cntLayerHolder{

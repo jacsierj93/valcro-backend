@@ -111,6 +111,7 @@ $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSust
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///lista de todos los pedidos que se úeden sustituir
 $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); ///lista de todos los pedidos que se úeden sustituir
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes
+$app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///lista de todos las solicitudes
 
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
