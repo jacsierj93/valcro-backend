@@ -593,8 +593,11 @@
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex style="height: 39px; min-height: 39px;">
-                                <div style="height: 39px; width: 39px;" ng-click="openImport()"
-                                     ng-show="document.doc_parent_id == 'null' || !document.doc_parent_id">IMG</div>
+                                <div layout="column"
+                                     ng-show="document.doc_parent_id == 'null' || !document.doc_parent_id"
+                                     layout-align="center center" ng-click="openImport()">
+                                    <span class="icon-Importar" style="font-size: 24px"></span>
+                                </div>
                                 <div class="titulo_formulario" layout="column" layout-align="start start"  ng-click=" gridView = -1">
                                     <div>
                                         Datos de {{formMode.name}}
@@ -1937,97 +1940,175 @@
                                     {{formMode.name}}
                                 </div>
                             </div>
-                            <div style="overflow-y:auto; overflow-x: hidden " ng-show="gridViewFinalDoc == 1"
-                                 class="rowRsm" style="margin-right: 8px;" layout="row"  >
-                                <div layout="row" class="rowRsmTitle">
+                            <div  flex style="overflow-y:auto; overflow-x: hidden " ng-show="gridViewFinalDoc == 1"
+                                 class="rowRsm"  layout="row"  >
+                                <div layout="row" class="rowRsmTitle" flex="40" >
                                     <div > ID: </div>
                                     <div flex> {{document.id}} </div>
                                 </div>
-                                <div layout="row" class="rms" flex="" ng-show="document.version > 1">
+                                <div layout="row" class="rms" flex ng-show="document.version > 1">
                                     <div > Version: </div>
                                     <div flex> {{document.version}} </div>
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
-                                <div class="rowRsmTitle"> Creado: </div>
-                                <div class="rms" >
+                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1">
+                                <div class="rowRsmTitle" flex="40"> Creado: </div>
+
+                                <div class="rms" flex  layout="row" layout-align="space-between center">
                                     <div>{{document.emision | date:'dd/MM/yyyy' }}</div>
                                     <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
                                          class="emit{{document.diasEmit}}"></div>
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
-                                <div layout="column" ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
-                                     layout-align="center center">
-                                    <span class="icon-Agregar" style="font-size: 16px"></span>
+                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
+
+                                <div layout="row" flex="40">
+                                    <div layout="column" class="divIconRsm"
+                                         ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                         layout-align="center center">
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div layout="column"  class="divIconRsm" ng-show="finalDoc.titulo.estado == 'del'" layout-align="center center" >
+                                        <span class="icon-Eliminar"></span>
+                                    </div>
+                                    <div class="rowRsmTitle">Titulo</div>
                                 </div>
-                                <div layout="column" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
-                                    <span class="icon-Actualizar" style="font-size: 16px"></span>
-                                </div>
-                                <div layout="column" ng-show="finalDoc.titulo.estado == 'del'" layout-align="center center" >
-                                    <span class="icon-Eliminar" style="font-size: 16px"></span>
-                                </div>
-                                <div class="rowRsmTitle"> Titulo </div>
-                                <div class="rms" > {{finalDoc.titulo.v | date:'dd/MM/yyyy' }} (demo)
-                                </div>
+                                <div class="rms" > {{finalDoc.titulo.v | date:'dd/MM/yyyy' }}</div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
-                                <div layout="column" ng-show="finalDoc.ult_revision.estado == 'new' && finalDoc.titulo.trace.length > 0"
-                                     layout-align="center center" >
-                                    <span class="icon-Agregar" style="font-size: 16px"></span>
+                            <div layout="row" flex  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
+
+                                <div layout="row" flex="40">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.ult_revision.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.ult_revision.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Revisado </div>
                                 </div>
-                                <div layout="column" ng-show="finalDoc.ult_revision.estado == 'upd'" layout-align="center center">
-                                    <span class="icon-Actualizar" style="font-size: 16px"></span>
-                                </div>
-                                <div class="rowRsmTitle"> Revisado </div>
-                                <div class="rms" > {{finalDoc.ult_revision.v | date:'dd/MM/yyyy' }} (demo)
-                                </div>
+                                 <div  class="rms" > {{finalDoc.ult_revision.v | date:'dd/MM/yyyy' }}</div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
-                                <div class="rowRsmTitle"> Estado</div>
-                                <div class="rms" > {{finalDoc.estado.v }}</div>
+                                <div layout="row" flex="40">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'new' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Estado </div>
+                                </div>
+                                <div class="rms" flex> {{document.estado }}</div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.prioridad && gridViewFinalDoc == 1 )">
-                                <div class=" rms rowRsmTitle"> Prioridad: </div>
-                                <div class="rms" > {{finalDoc.prioridad.v}} </div>
+                                <div layout="row" flex="40">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'new'"
+                                        layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle" flex> Prioridad </div>
+                                </div>
+                                <div class="rms" > {{document.prioridad}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div class="rowRsmTitle"> Proveedor: </div>
-                                <div  class="rms" > {{finalDoc.proveedor.v}} </div>
+                                <div  class="rms" > {{document.proveedor}} </div>
                             </div>
-                            <div layout="row" class="rowRsm" ng-show="(document.pais && gridViewFinalDoc == 1)" >
-                                <div class="rowRsmTitle" >
-                                    Pais:
+                            <div layout="row" class="rowRsm" ng-show="(document.pais_id && gridViewFinalDoc == 1)" >
+                                <div layout="row" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'new' && finalDoc.pais_id.trace.length"
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Pais </div>
                                 </div>
-                                <div class="rms" > {{finalDoc.pais.v}} </div>
+                                <div class="rms" > {{document.pais}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
-                                <div class="rowRsmTitle" > Almacen: </div>
-                                <div class="rms" > {{finalDoc.almacen.v}} </div>
+                                <div layout="row" flex="40" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'new'"
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Almacen </div>
+                                </div>
+                                <div class="rms" flex> {{document.almacen}} </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="(motivo_pedido_id  && gridViewFinalDoc == 1)">
-                                <div class="rowRsmTitle"> Motivo: </div>
-                                <div class="rms" > {{finalDoc.motivo.v}} </div>
+                            <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1)" >
+                                <div layout="row" flex="40"  >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'new' && finalDoc.nro_proforma.trace.length > 0 "
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle" flex> Proforma </div>
+                                </div>
+                                <div class="rms" flex  layout="row" layout-align="space-between center">
+                                    <div>{{finalDoc.nro_proforma}}</div>
+                                    <div class="circle">{{finalDoc.adjProforma.length}}</div>
+                                </div>
                             </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.nro_proforma && gridViewFinalDoc == 1)">
-                                <div class="rowRsmTitle"> N° Proforma: </div>
-                                <div class="rms"> {{finalDoc.nro_proforma}} </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.nro_factura &&  gridViewFinalDoc == 1)">
-                                <div class="rowRsmTitle"> N° Factura: </div>
-                                <div class="rms" > {{finalDoc.nro_factura.v}} </div>
+                            <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1)">
+                                <div layout="row" flex="40" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'new'"
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Factura </div>
+                                </div>
+                                <div class="rms" flex  layout="row" layout-align="space-between center">
+                                    <div>{{document.nro_factura}}</div>
+                                    <div class="circle">{{finalDoc.adjFactura.length}}</div>
+
+                                </div>
                             </div>
                             <div layout="row"  class="rowRsm"  ng-show="( document.monto && gridViewFinalDoc == 1) ">
-                                <div class="rowRsmTitle"> Monto: </div>
-                                <div class="rms" > {{finalDoc.monto.v}} </div>
+                                <div layout="row" flex="40" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.monto.estado == 'new' && finalDoc.monto.trace.length > 0 "
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Monto </div>
+                                </div>
+                                <div class="rms" flex> {{document.monto}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.moneda_prov_id && gridViewFinalDoc == 1 ) ">
-                                <div class="rowRsmTitle"> Moneda: </div>
-                                <div class="rms"> {{finalDoc.moneda.v}} </div>
+                                <div layout="row" flex="40" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'new' && finalDoc.prov_moneda_id.trace.length > 0 "
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle" flex> Moneda </div>
+                                </div>
+                                <div class="rms"> {{document.moneda}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.productos.todos.length > 0  && gridViewFinalDoc == 1)">
-                                <div class="rowRsmTitle"> Productos: </div>
-                                <div class="rms"> {{document.productos.todos.length}} </div>
+                                <div class="rowRsmTitle" flex="40"> Productos: </div>
+                                <div class="rms" flex> {{document.productos.todos.length}} </div>
                             </div>
                         </div>
                     </form>

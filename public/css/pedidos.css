@@ -67,8 +67,11 @@
  }
 
 .rowRsmTitle{
-    width: 125px;
-    min-width: 125px
+}
+
+.divIconRsm{
+    height: 24px;
+    font-size: 16px
 }
 
 .rms{

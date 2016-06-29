@@ -383,6 +383,7 @@ class OrderController extends BaseController
         $model= Solicitude::findOrFail($req->id);
         $provProd = Product::where('prov_id',$model->prov_id)->get();
         $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $atts =$model->attachments()->get();
         foreach($items as $aux){
             $temp= array();
             $p= $provProd->get($aux->producto_id);
@@ -395,6 +396,9 @@ class OrderController extends BaseController
         }
 
 
+        $data['productos']= $prod;
+        $data['adjProforma']= $atts->where('documento', 'PROFORMA');
+        $data['adjFactura']= $atts->where('documento', 'FACTURA');
         $data['productos']= $prod;
         return $data;
     }
@@ -1837,6 +1841,10 @@ class OrderController extends BaseController
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['estado_id']=$aux->estado_id;
             $tem['final_id']=$aux->final_id;
+            $tem['nro_proforma']=$aux->nro_proforma;
+            $tem['nro_factura']=$aux->nro_factura;
+            $tem['tasa']=$aux->tasa;
+            $tem['ult_revision']=$aux->ult_revision;
             // $tem['tipo_value']=$aux->typevalue;
             // pra humanos
             $tem['comentario']=$aux->comentario;
@@ -1849,7 +1857,6 @@ class OrderController extends BaseController
             $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
             $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
             $tem['img_aprob'] =$aux->fecha_aprob_compra ;
-
 
             if($aux->motivo_id){
                 $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;

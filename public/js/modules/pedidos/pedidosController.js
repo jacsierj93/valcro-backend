@@ -338,6 +338,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
     $scope.printTrace = function(){
         console.log(" final ", $scope.buildfinalDoc());
+        $scope.moduleAccion({open:{name:"agrPedPend"}});
+
     };
 
     $scope.buildfinalDoc = function(){
@@ -563,7 +565,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         $scope.finalDoc = $scope.buildfinalDoc();
                   Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
                             console.log("data", response);
-                            $scope.finalDoc.productos= response.productos;
+                      $scope.finalDoc.productos= response.productos;
+                      $scope.finalDoc.adjProforma= response.adjProforma;
+                      $scope.finalDoc.adjFactura= response.adjFactura;
                         });
                     }
                 }});
