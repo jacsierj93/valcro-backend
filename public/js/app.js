@@ -85,9 +85,10 @@ MyApp.directive('decimal', function () {
         require: 'ngModel',
         link: function (scope, elem, attrs,ctrl) {
             ctrl.$validators.decimal = function(modelValue, viewValue) {
-                if(viewValue === undefined || viewValue==""){
+                if(viewValue === undefined || viewValue=="" || viewValue==null){
                     return true;
                 }
+                console.log(viewValue)
                 elem[0].value = viewValue.replace(/([a-z]|[A-Z]| )+/,"")
 
                 var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);

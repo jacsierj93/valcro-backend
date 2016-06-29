@@ -492,8 +492,8 @@
 
                         </div>
                         <div class="row" layout="row">
-                            <md-chips flex  info="email de contacto ej. fulano@valcro.co" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" minlength="10" maxlength="100" required ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChip($chip,provContactosForm.emailCont.$error)" md-on-remove="rmContEmail(this,$chip)">
-                                <md-chip-template>
+                            <md-chips flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmContEmail(this,$chip)">
+                                <md-chip-template ng-click="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
                                     </span>

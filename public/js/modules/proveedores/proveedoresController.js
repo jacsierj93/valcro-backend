@@ -1172,7 +1172,7 @@ MyApp.controller('nomValAssign', function ($scope,setGetProv,valcroNameDetail,$m
     }
 });
 
-MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout) {
+MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout,$q) {
     $scope.id = "contactProv";
     $scope.prov = setGetProv.getProv();
     $scope.cnt = setGetContac.getContact();
@@ -1192,6 +1192,20 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         setGetProv.setComplete("contact",nvo);
     });
 
+    var emailCont = {};
+    $scope.editChip = function(chip,event){
+        emailCont = chip;
+        var input = angular.element(event.currentTarget).parents("md-chips-wrap").find(".md-chip-input-container").detach();
+        var x = angular.element(event.currentTarget).parents("md-chip").replaceWith(input)
+        $timeout(function(){
+
+            angular.element(input).val("dasd")
+            angular.element(input).focus()
+            console.log(angular.element(input).val())
+        },100)
+
+    }
+    /*funcion que transforma el texto ingresado en el mdchips en un objeto */
     $scope.transformChip = function(chip,erro){
         if (angular.isObject(chip)) {
             return chip;
@@ -1203,59 +1217,77 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             ],{autohidden:3000});
             return null ;
         }
-        var chip = { id:false,valor:chip,campo:"email"};
-        /*$http({
-            method: 'POST',
-            url: "provider/saveValcroName",
-            data: chip,
-        }).then(function successCallback(response) {
-            $scope.valcroName[$scope.valcroName.length-1].id = response.data.id;
-        }, function errorCallback(response) {
-            console.log("error=>", response)
-        });*/
-        // Otherwise, create a new o
-        console.log(erro);
-        return chip;
+
+        if($filter("customFind")($scope.allContact,chip,function(val,compare){return val.email == compare;}).length>0){
+            setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
+            ],{autohidden:3000});
+            if(!$scope.cnt.id){
+                $mdSidenav("contactBook").open();
+            }
+            return null;
+        }
+        if(Object(emailCont).length==0){
+            var chip = { id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+        }else{
+            var chip = { id:emailCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+        };
+
+        emailCont = {};
+        if(chip.cont_id){
+            providers.put({type: 'saveContactProvEmail'},chip, function (data) {
+                console.log(data);
+                chip.id = data.id;
+            });
+            console.log(chip)
+            return chip;
+        }else{
+            return chip;
+        }
+
     };
-    var contact = {};
+
+    var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
+
+    var saveContact = function(){
+        providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
+            $scope.cnt.id = data.id;
+
+            contact.id = $scope.cnt.id;
+            contact.nombre = $scope.cnt.nombreCont;
+            //contact.email = $scope.cnt.emailCont.valor;
+            //contact.telefono = $scope.cnt.contTelf.valor;
+            contact.pais_id = $scope.cnt.pais;
+            contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
+            contact.responsabilidades =  $scope.cnt.responsability;
+            //contact.direccion = $scope.cnt.dirOff.valor;
+            contact.agente = $scope.cnt.isAgent;
+            contact.prov_id = $scope.cnt.prov_id;
+            contact.languages = $scope.cnt.languaje;
+            contact.cargos = $scope.cnt.cargo;
+            if (data.action == "new" || nuevo[2]) {
+                $scope.cnt.autoSave = false;
+                $scope.contacts.unshift(contact);
+                setGetContac.addUpd(contact,angular.copy($scope.prov));
+                setNotif.addNotif("ok", "contacto añadido", [
+                ],{autohidden:3000});
+            };
+            setGetProv.addChng($scope.cnt,data.action,"contProv");
+        });
+    };
+
+
     /*escuha el estatus del formulario y guarda cuando este valido*/
     $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave","cnt.cargo.length"], function(nuevo,old) {
-        if(((nuevo[0] && !nuevo[1])) || nuevo[2] || (nuevo[3]!=old[3])) {
-
-            if(!$scope.cnt.id && $filter("customFind")($scope.allContact,$scope.cnt.emailCont,function(val,compare){return val.email == compare;}).length>0){
-                setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
-                ],{autohidden:3000});
-                $mdSidenav("contactBook").open();
-            }else {
-                providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
-                    $scope.cnt.id = data.id;
-                    $scope.provContactosForm.$setPristine();
-                    contact.id = $scope.cnt.id;
-                    contact.nombre = $scope.cnt.nombreCont;
-                    contact.email = $scope.cnt.emailCont.valor;
-                    contact.telefono = $scope.cnt.contTelf.valor;
-                    contact.pais_id = $scope.cnt.pais;
-                    contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
-                    contact.responsabilidades =  $scope.cnt.responsability;
-                    contact.direccion = $scope.cnt.dirOff.valor;
-                    contact.agente = $scope.cnt.isAgent;
-                    contact.prov_id = $scope.cnt.prov_id;
-                    contact.languages = $scope.cnt.languaje;
-                    contact.cargos = $scope.cnt.cargo;
-                    if (data.action == "new" || nuevo[2]) {
-                        $scope.cnt.autoSave = false;
-                        $scope.contacts.unshift(contact);
-                        setGetContac.addUpd(contact,angular.copy($scope.prov));
-                        setNotif.addNotif("ok", "contacto añadido", [
-                        ],{autohidden:3000});
-                    };
-                    setGetProv.addChng($scope.cnt,data.action,"contProv");
-
-                });
-            }
+        var fieldFocus = angular.element(":focus");
+        var valid = (fieldFocus.parents("md-chips").length<=0);
+        if(((nuevo[0] && !nuevo[1] && $scope.cnt.emailCont.length>0 && valid)) || nuevo[2] || (nuevo[3]!=old[3])) {
+            saveContact();
         }
+        $scope.provContactosForm.$setPristine();
+        /*}*/
     });
 
+    /*seteado de Cargos para el contacto (tipo departamento nombre valcro*/
     $scope.setCargo = function(elem){
         var cargo = elem.id;
         var k = $scope.cnt.cargo.indexOf(cargo);
@@ -1266,6 +1298,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         }
     };
 
+    /*borra el contacto seleccioado, esta funcion es llamada directo desde el icono de borrado*/
     $scope.rmContact = function(elem){
         setNotif.addNotif("alert", "desea desvincular este Contacto del proveedor?", [
             {
@@ -1292,8 +1325,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         ]);
     };
 
+    /*setea el contacto del grid para edicion en el formulario
+    en el caso de contactos lo setea mediante el servicio "setGetContact"*/
+    $scope.toEdit = function(element){
+        contact = element.cont;
+        contact.prov_id = $scope.prov.id;
+        setGetContac.setContact(contact);
+        setGetProv.addToRllBck($scope.cnt,"contProv")
+    };
 
-
+    /*muestra u oculta la franaj de ver mas en los form, en el click y clickout (focus,focusout)*/
     $scope.showGrid = function(elem,event){
         if((jQuery(event.toElement).parents("#contactBook").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
             $scope.isShow = elem;
@@ -1309,21 +1350,18 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         }
     };
 
+    /*muestra u oculta los grid y pide el colapsado de los demas form */
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
-        $scope.$parent.expand =(sel)?"contactProv":false;
+        $scope.$parent.expand =(sel)?"contactProv":false; // setea en "expand" del $scope padre (AppController) con el "$scope.id" asignado a este controller, los demas forma collapsan autoamtico
     };
 
+    /*abre el sidenav de contactos creados*/
     $scope.book=function(){
         $mdSidenav("contactBook").open();
     };
 
-    $scope.toEdit = function(element){
-        contact = element.cont;
-        contact.prov_id = $scope.prov.id;
-        setGetContac.setContact(contact);
-        setGetProv.addToRllBck($scope.cnt,"contProv")
-    };
+
 });
 
 MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetContac,setGetProv,$filter,setNotif) {
