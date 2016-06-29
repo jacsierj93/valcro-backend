@@ -18,6 +18,9 @@ $app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir');
 $app->post("provider/saveValcroName",'Providers\ProvidersController@saveValcroName'); ///obtener listado de direcciones
 $app->post("provider/delValcroName",'Providers\ProvidersController@delValcroName'); //elimina un nombre Valcro
 $app->post("provider/saveContactProv",'Providers\ProvidersController@saveContact'); //guarda informacion de contacto
+$app->post("provider/saveContactProvEmail",'Providers\ProvidersController@contactEmail'); //guarda informacion de contacto
+$app->post("provider/saveContactProvPhone",'Providers\ProvidersController@contactPhone'); //guarda informacion de contacto
+$app->post("provider/saveContactProvAddress",'Providers\ProvidersController@contactEmail'); //guarda informacion de contacto
 $app->post("provider/saveBank",'Providers\ProvidersController@saveInfoBank');//guarda la informacion bancaria de un proveedor
 $app->post("provider/saveCoin",'Providers\ProvidersController@saveCoin');//guarda relacion con una moneda
 $app->post("provider/delCoin",'Providers\ProvidersController@delCoin');//elimina la relacion con una moneda
