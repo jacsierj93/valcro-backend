@@ -396,9 +396,9 @@ class OrderController extends BaseController
         }
 
 
-        $data['productos']= $prod;
         $data['adjProforma']= $atts->where('documento', 'PROFORMA');
         $data['adjFactura']= $atts->where('documento', 'FACTURA');
+        //$data['adj']= $atts;
         $data['productos']= $prod;
         return $data;
     }
@@ -2527,62 +2527,44 @@ class OrderController extends BaseController
 
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
-       // $coins= Monedas::get();
-        $impors= $doc->items()->where('tipo_origen_id', $req->tipo)->get();
+        $docIts = $doc->items()->get();
+        $remplace= $docIts->where('tipo_origen_id', $req->tipo);
+        $imports= array();
+        if($req->tipo == 22){
+            $imports = $docIts->where('tipo_origen_id','21');
+        }
+        if($req->tipo == 23){
+            $imports = $docIts->where('tipo_origen_id','22');
 
-
+        }
         foreach($items as $aux){
+            $auxIts = $aux->CustomOrderItem()->get();
             $paso=true;
-            $tem['asignado'] =false;
-
+            $tem['asignado'] = false;
             $asigOtro=array();
 
-            if(sizeof($aux->CustomOrderItem()->get()->sum('saldo'))>0){
+            // fue aasignado
+            if(sizeof($docIts->where('doc_origen_id', $aux->id))>0){
+                $tem['asignado'] = true;
+            }
 
+            // vino de otro docuemento igual?
+            if(sizeof($remplace->where('doc_origen_id', $aux->id))>0){
+                $tem['asignado'] = true;
+            }
 
-                if(sizeof($purchaIts->where('doc_origen_id',$aux->id)) > 0){
-                    if($req->tipo ==23){
-
-                        if(sizeof($purchaIts->where('doc_id',$req->doc_id)) > 0){
-                            $tem['asignado'] = true;
-                        }
-
-                    }
+            // fue importado
+            foreach($imports as $imps){
+                $first= $this->getFirstProducto($imps);
+                if($first->tipo_origen_id == 2 && $first->doc_origen_id == $aux->id){
+                    $tem['asignado'] = true;
+                    $tem['import'] = $imps;
                 }
-                if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
-                    if($req->tipo ==22){
-                        if(sizeof($orderIts->where('doc_id',$req->doc_id)) > 0){
-                            $tem['asignado'] = true;
-                        }
+            }
 
-                    }
-                }
-
-
-                if(sizeof($solIts->where('doc_origen_id',$aux->id)) > 0){
-                    if($req->tipo ==21){
-                        if(sizeof($solIts->where('doc_id',$req->doc_id)) > 0){
-                            $tem['asignado'] = true;
-                        }
-
-                    }
-                }
-                /*** importados*/
-                //$tem['ex']= $impors;
-                foreach($impors as $imps){
-                    $first= $this->getFirstProducto($imps);
-                    //$tem['exf']=$first->tipo_origen_id;
-                    if($first->tipo_origen_id == 2){
-                       // $tem['exf2']=$first->tipo_origen_id;
-
-                        if($first->doc_origen_id == $aux->id){
-                            $tem['asignado'] = true;
-                            $tem['import'] = $imps;
-                        }
-                    }
-
-                }
-
+            if(!$tem['asignado'] && sizeof($auxIts->sum('saldo')) == 0){
+                $paso= false;
+            }else{
 
                 switch ($req->tipo){
                     case  21:
@@ -2621,6 +2603,7 @@ class OrderController extends BaseController
                         }
                         ;break;
                 }
+            }
 
                 if($paso){
                     $tem['id'] =$aux->id;
@@ -2645,7 +2628,7 @@ class OrderController extends BaseController
                     $tem['asignadoOtro'] =$asigOtro;
                     $data[]=$tem;
                 }
-            }
+           // }
         }
         return $data;
     }
@@ -3313,22 +3296,22 @@ class OrderController extends BaseController
 
         /** importados */
         foreach($items->where('tipo_origen_id', ''.$order->getTipoId()) as $aux){
-                $first= $this->getFirstProducto($aux);
-             switch($first->tipo_origen_id){
-                 case 2:
-                     $tem= CustomOrder::findOrFail($first->doc_origen_id);
-                     $tem['sustitute'] = $aux->doc_origen_id;
-                     $contra->push($tem);
-                     break;
-                 case 3:
-                     $kitchen->push($aux);
-                     $tem= KitchenBox::findOrFail($first->doc_origen_id);
-                     $tem['sustituto'] = $aux->doc_origen_id;
-                     break;
-             }
-             if(!$pediSus->contains($aux->doc_origen_id)){
-                 $pediSus[]=$order::find($aux->doc_origen_id);
-             }
+            $first= $this->getFirstProducto($aux);
+            switch($first->tipo_origen_id){
+                case 2:
+                    $tem= CustomOrder::findOrFail($first->doc_origen_id);
+                    $tem['sustitute'] = $aux->doc_origen_id;
+                    $contra->push($tem);
+                    break;
+                case 3:
+                    $kitchen->push($aux);
+                    $tem= KitchenBox::findOrFail($first->doc_origen_id);
+                    $tem['sustituto'] = $aux->doc_origen_id;
+                    break;
+            }
+            if(!$pediSus->contains($aux->doc_origen_id)){
+                $pediSus[]=$order::find($aux->doc_origen_id);
+            }
 
         }
 
@@ -3498,8 +3481,8 @@ class OrderController extends BaseController
     public function getInvoiceAddressCountry(Request $req){
         $data =ProviderAddress::where('prov_id', $req->prov_id)->where(
             function ($query){
-            $query->where('tipo_dir',1)->orWhere('tipo_dir',3);
-        })->get();
+                $query->where('tipo_dir',1)->orWhere('tipo_dir',3);
+            })->get();
         if($req->has('pais_id')){
             $data = $data->where('pais_id', $req->pais_id);
         }
