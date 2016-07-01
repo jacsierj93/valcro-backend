@@ -167,6 +167,7 @@
                         </md-virtual-repeat-container>
             -->
         </div>
+
         <div layout="column"flex class="md-whiteframe-1dp">
 
             <div class="botonera" layout="row" layout-align="start center">
@@ -409,7 +410,7 @@
                     </div>
                     <div style="overflow-y:auto; overflow-x: hidden "
                          class="rowRsm" style="margin-right: 8px;" layout="row"  >
-                        <div layout="row" class="rowRsmTitle">
+                        <div layout="row" class="rowRsmTitle" flex="40">
                             <div > ID: </div>
                             <div flex> {{document.id}} </div>
                         </div>
@@ -435,31 +436,27 @@
                         <div class="rowRsmTitle" flex="40"> Estado</div>
                         <div class="rms" flex> {{document.estado }}</div>
                     </div>
-                    <div layout="row"  class="rowRsm">
+                    <div layout="row"  class="rowRsm" ng-show="document.prioridad">
                         <div class="rowRsmTitle" flex="40"> Prioridad: </div>
                         <div class="rms" flex> {{document.prioridad}} </div>
                     </div>
                     <div layout="row"  class="rowRsm">
                         <div class="rowRsmTitle" flex="40"> Proveedor: </div>
-                        <div flex> {{document.proveedor}} </div>
+                        <div flex class="rms"> {{document.proveedor}} </div>
                     </div>
-                    <div layout="row" class="rowRsm">
+                    <div layout="row" class="rowRsm"  ng-show="document.pais_id">
                         <div class="rowRsmTitle" flex="40"> Pais: </div>
                         <div class="rms" flex > {{document.pais}} </div>
                     </div>
-                    <div layout="row"  class="rowRsm">
-                        <div class="rowRsmTitle" flex="40"> Almacen: </div>
+                    <div layout="row"  class="rowRsm"  ng-show="document.direccion_almacen_id">
+                        <div class="rowRsmTitle" flex="40" > Almacen: </div>
                         <div class="rms"flex > {{document.almacen}} </div>
                     </div>
-                    <div layout="row"  class="rowRsm">
-                        <div class="rowRsmTitle" flex="40"> Motivo: </div>
-                        <div class="rms" flex > {{document.motivo}} </div>
-                    </div>
-                    <div layout="row"  class="rowRsm">
+                    <div layout="row"  class="rowRsm" ng-show="document.document.nro_proforma">
                         <div class="rowRsmTitle" flex="40"> N° Proforma: </div>
                         <div class="rms" flex> {{document.nro_proforma}} </div>
                     </div>
-                    <div layout="row"  class="rowRsm">
+                    <div layout="row"  class="rowRsm" ng-show="document.nro_factura">
                         <div class="rowRsmTitle" flex="40"> N° Factura: </div>
                         <div class="rms" flex> {{document.nro_factura}} </div>
                     </div>
@@ -471,8 +468,8 @@
                         <div class="rowRsmTitle" flex="40"> Moneda: </div>
                         <div class="rms" flex> {{document.moneda}} </div>
                     </div>
-                    <div layout="row"  class="rowRsm">
-                        <div class="rowRsmTitle" flex="40"> Productos: </div>
+                    <div layout="row"  class="rowRsm" ng-show="document.productos.todos.length > 0">
+                        <div class="rowRsmTitle" flex="40" > Productos: </div>
                         <div class="rms" flex> {{document.productos.todos.length}} </div>
                     </div>
                 </div>
@@ -646,7 +643,7 @@
                                 <md-input-container class="md-block" flex="30">
                                     <label>Pais</label>
                                     <md-select ng-model="document.pais_id" md-no-ink
-                                               ng-disabled="( formBlock )"
+                                               ng-disabled="( formBlock || !provSelec.id )"
                                                ng-change="toEditHead('pais_id', document.pais_id)"
 
 
@@ -729,7 +726,7 @@
 
                                 <md-input-container class="md-block" flex="">
                                     <label>Condicion de pago</label>
-                                    <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock)"
+                                    <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock  || !provSelec.id)"
                                                ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                md-no-ink
                                                ng-required ="(formMode.value == 23)"
@@ -952,29 +949,7 @@
                         </div>
                     </form>
                 </div>
-                <div   class="md-whiteframe-2dp" id="adjuntoProforma" style="width: 0px; display:none; padding: 4px;  height: 100%;" >
-                    <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
-                        <div layout="row">
-                            <div layout="column" layout-align="center center" ng-click="closeAdj()" >
-                                <span class="icon-Inactivo" style="font-size: 24px; margin-right: 8px; color: black;"></span>
-                            </div>
-                            <div ng-click="">
-                                {{folder}} Adjuntos
-                            </div>
-                        </div>
-                    </div>
-                    <div ngf-drop ngf-select="upload($files)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                         ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
-                        insertar archivo
-                    </div>
-                    <md-content flex>
-                        <div class="imgItem" ng-repeat="item in imagenes | filter:folder">
-                            <img ng-src="images/thumbs/{{item.thumb}}"/></div>
-
-                    </md-content>
-
-
-                </div>
+                <div   id="expand"></div>
 
                 <div style="width: 16px;"  ng-show="!openAdjDtPedido"  ng-mouseover="showNext(true)"  > </div>
             </md-content>
@@ -2023,7 +1998,7 @@
                                     <div class="rowRsmTitle" flex> Proforma </div>
                                 </div>
                                 <div class="rms" flex  layout="row" layout-align="space-between center">
-                                    <div>{{finalDoc.nro_proforma}}</div>
+                                    <div>{{document.nro_proforma}}</div>
                                     <div class="circle">{{finalDoc.adjProforma.length}}</div>
                                 </div>
                             </div>
@@ -2262,6 +2237,7 @@
 
         <!------------------------------------------- Alertas ------------------------------------------------>
         <div ng-controller="notificaciones" ng-include="template"></div>
+        <div ng-controller="FilesController" ng-include="template"></div>
 
     </div>
 </div>

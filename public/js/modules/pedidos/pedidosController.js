@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,providers,Upload,Layers,setGetOrder, DateParse) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,providers,Upload,Layers,setGetOrder, DateParse, filesService) {
 
     // var historia = [15];
     var autohidden= 2000;
@@ -16,12 +16,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.providerProds= new Array();
     $scope.docsSustitos= new Array();
     $scope.estadosDoc= new Array();
-    $scope.gridViewCp= 1;
-    $scope.gridViewSus= 1;
-    $scope.gridViewFinalDoc= 1;
     $scope.formGlobal = "new";
     $scope.tasa_fija= true;
-
+    filesService.setFolder('orders');
     $scope.forModeAvilable={
         solicitud: {
             name: "Solicitud",
@@ -54,7 +51,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     };
-    $scope.imagenes = new Array();
+    //$scope.imagenes = new Array();
     $scope.imgKey=0;
 
     var timePreview;
@@ -78,7 +75,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.selecPed=false;
     $scope.preview=true;
     $scope.mouseProview= false;
-    $scope.gridView=4;
+    $scope.gridView =-1;
+    $scope.gridViewCp= 1;
+    $scope.gridViewSus= 1;
+    $scope.gridViewFinalDoc= 1;
     $scope.productTexto="";
     // $scope.layer ="";
     $scope.openAdjDtPedido= false;
@@ -106,9 +106,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.selecKitchenBox = selecKitchenBox;
     $scope.moduleAccion = Layers.setAccion;
 
-    $timeout(function(){
-        //review();
-    },0);
+
     $timeout(function(){
         init();
     },0);
@@ -120,23 +118,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         $scope.filterData.tipoDepago = masters.query({type: 'getPaymentType'});
         $scope.estadosDoc = masters.query({type: 'getOrderStatus'});
 
-       // $scope.formData.condicionPedido = masters.query({type: 'getOrderCondition'});
+        // $scope.formData.condicionPedido = masters.query({type: 'getOrderCondition'});
     }
 
-    function review(){
-        $http.get("Order/UnClosetDoc").success(function (response) {
-            $scope.tempDoc = response;
-            console.log("data ",$scope.tempDoc);
-        });
-    }
 
     /********************************************GUI ********************************************/
     $scope.FilterListPed = function(){
-        if($scope.showFilterPed){
-            $scope.showFilterPed=false;
-        }else{
-            $scope.showFilterPed=true;
-        }
+        $scope.showFilterPed = ($scope.showFilterPed) ? false : true;
+        /*        if($scope.showFilterPed){
+         $scope.showFilterPed=false;
+         }else{
+         $scope.showFilterPed=true;
+         }*/
     };
 
     $scope.FilterLateral = function(){
@@ -158,11 +151,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.filtOpen= function(){
-        if($scope.isOpen){
-            $scope.isOpen=false;
-        }else {
-            $scope.isOpen=true;
-        }
+        $scope.isOpen = ($scope.isOpen) ? false : true;
     };
 
     $scope.mouseEnterProd = function(prod){
@@ -181,8 +170,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.verificExit = function(){
         var paso= true;
-        if(setGetOrder.getState() != 'new' && setGetOrder.getInternalState() != 'new'){
-            $scope.NotifAction("alert"," "+$scope.formMode.name,[
+        if(setGetOrder.getInternalState() != 'new'){
+            $scope.NotifAction("alert","Se han realizado cambio en la "+$scope.formMode.name+ " ¿esta seguro de salir sin culminar?",[
                 {
                     name:"No",
                     action: function(){
@@ -192,7 +181,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 {
                     name:"Si",
                     action: function(){
-                        $scope.tasa_fija=false;
                     }
                 }
 
@@ -229,47 +217,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         ],{block:true});
     };
+    /*
 
-    $scope.$watchGroup(
-        ['cola.total',
-            'cola.respuesta.length'], function(newVal){
-            if(newVal[0] >0 ){
+     $scope.$watchGroup(
+     ['cola.total',
+     'cola.respuesta.length'], function(newVal){
+     if(newVal[0] >0 ){
 
-                if(newVal[0] == newVal[1]){
-                    Order.postMod({type:$scope.formMode.mod, mod:"AddAdjuntos"},
-                        {id:$scope.document.id,adjuntos: $scope.imagenes}, function(response){
-                            $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-                        });
-                }
-            }
-        });
+     if(newVal[0] == newVal[1]){
+     Order.postMod({type:$scope.formMode.mod, mod:"AddAdjuntos"},
+     {id:$scope.document.id,adjuntos: $scope.cola.respuesta}, function(response){
+     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+     $scope.cola ={total:0,respuesta: new Array(),};
+     });
+     }
+     }
+     });
 
-    $scope.cola ={
-        total:0,
-        respuesta: new Array(),
-    };
-    $scope.upload = function (files) {
-        console.log("sdfadsfa");
-        $scope.cola.total= files.length;
+     $scope.cola ={
+     total:0,
+     respuesta: new Array(),
+     };
+     $scope.upload = function (files) {
 
-        if (files && files.length) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                Upload.upload({
-                    url: 'Order/UpLoad',
-                    file: file
-                }).progress(function (evt) {
-                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                    uploadNow = progressPercentage;
-                }).success(function (data, status, headers, config) {
-                    var data ={id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
-                    $scope.imagenes.push(data);
-                    $scope.cola.respuesta.push(data);
-
-                });
-            }
-        }
-    };
+     };
+     */
 
 
 
@@ -380,8 +352,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return false;
     };
     $scope.printTrace = function(){
-        console.log(" final ", $scope.buildfinalDoc());
-        $scope.moduleAccion({open:{name:"finalDoc"}});
+        /* console.log(" final ", $scope.buildfinalDoc());
+         $scope.moduleAccion({open:{name:"finalDoc"}});*/
+        console.log(" printrace ")
+
 
     };
 
@@ -436,15 +410,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** APERTURA DE LAYERS ********************************************/
 
     $scope.openAdj = function(folder){
-        $scope.folder = folder;
-        var adjPane =angular.element("#adjuntoProforma");
-        if(!$scope.openAdjDtPedido){
-            $scope.openAdjDtPedido= true;
-            adjPane.css({display:"block"});
-            adjPane.animate({width:"360px"},400, function(){
+        filesService.open();
+        /* $scope.folder = folder;
+         var adjPane =angular.element("#adjuntoProforma");
+         if(!$scope.openAdjDtPedido){
+         $scope.openAdjDtPedido= true;
+         adjPane.css({display:"block"});
+         adjPane.animate({width:"360px"},400, function(){
 
-            });
-        }
+         });
+         }*/
 
     };
 
@@ -515,7 +490,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         $scope.moduleAccion({open:{name:"detalleDoc"}});
         $scope.formBlock=false;
-    }
+    };
 
     /*************** conversores **********/
 
@@ -613,8 +588,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
                             console.log("data", response);
                             $scope.finalDoc.productos= response.productos;
-                            $scope.finalDoc.adjProforma= response.adjProforma;
-                            $scope.finalDoc.adjFactura= response.adjFactura;
+                            $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
+                            $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
+
                         });
                     }
                 }});
@@ -1602,7 +1578,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
         if(newVal[0] == 0 || newVal[0] == 1){
             restore('document');// inializa el pedido
-            $scope.gridView=4;
+            $scope.gridView=-1;
             $scope.FormHeadDocument.$setUntouched();
             $scope.imagenes = new Array();
             setGetOrder.restore();
@@ -1688,27 +1664,39 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
             }
             if(response.adjuntos.length >0 ){
+                var items = new Array();
                 angular.forEach(response.adjuntos,function(v,k){
-                    $scope.imagenes.push(v.file);
+                    items.push(v.file);
                 });
+                filesService.setFiles(items);
             }
         });
     };
+
+    /****** ************************** GUARDADOS ***************************************/
+
+    var timeSave ;
     $scope.$watchGroup(['FormHeadDocument.$valid', 'FormHeadDocument.$pristine'], function (nuevo) {
+
+        console.log(" form head ", nuevo);
 
         if (nuevo[0] && !nuevo[1]) {
 
-            $timeout(function(){
+            if(timeSave){
+                $timeout.cancel(timeSave);
+            }
+            timeSave =$timeout(function(){
                 $scope.document.prov_id = angular.copy($scope.provSelec.id);
                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
                     if (response.success) {
                         $scope.document.id = response.id;
-                        $scope.FormHeadDocument.$pristine;
+                        $scope.FormHeadDocument.$setPristine();
                         if(response['action'] == 'new'){
                             $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
                             setGetOrder.addForm('document',$scope.document);
                             setGetOrder.setState('load');
                         }
+                        console.log(" save");
 
                     }
                 });
@@ -2179,6 +2167,105 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     }
 });
 
+
+
+
+MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','Upload','filesService','Layers', function($filter, $scope,$mdSidenav,Upload ,filesService, Layers){
+
+    $scope.template = "modules/home/files";
+
+    $scope.accion= filesService.getAccion();
+    $scope.isOpen = filesService.isOpen();
+    $scope.titulo = filesService.getTitle();
+    $scope.pitures = filesService.getFiles();
+    $scope.isUploading = filesService.isUploading();
+    $scope.module = Layers.getModule();
+    $scope.moduleKey = Layers.getModuleKey();
+
+
+
+    $scope.cola = {
+        total : 0,
+        subidos : new Array()
+    };
+
+
+    $scope.$watchGroup(['cola.total',
+            'cola.subidos.length'], function(newVal){
+            if(newVal[0] >0 ){
+                if(newVal[0] == newVal[1]){
+                    $scope.isUploading =false;
+                    console.log("subidos", $scope.cola);
+                    $scope.cola = {total : 0,subidos : new Array()};
+
+                }
+            }
+        });
+
+    $scope.close = function(){
+        filesService.close();
+    };
+
+    $scope.upload = function(files){
+        $scope.cola.total = files.length;
+        $scope.isUploading = false;
+        console.log("folder",filesService.getFolder() );
+
+        if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                Upload.upload({
+                    url: 'master/files/upload',
+                    data :{ folder:filesService.getFolder(),file: file}
+                }).progress(function (evt) {
+                    // var progressPercentage = ;
+                    uploadNow = parseInt(100.0 * evt.loaded / evt.total);
+                }).success(function (data, status, headers, config) {
+                    $scope.pitures.push(data);
+                    $scope.cola.subidos.push(data);
+                });
+            }
+        }
+    };
+
+    $scope.$watch("accion.estado", function(newval){
+
+        if(newval){
+            var exp = angular.element(document).find("#"+Layers.getModule().layer).find("#expand");
+            if($scope.accion.data.open){
+                var sn = angular.element(document).find("#sideFiles");
+                sn.css('z-index',String(Layers.getModule().index + 60));
+                if(exp.length > 0){
+                    exp.animate({width:"360px"},600);
+                }
+                $mdSidenav("sideFiles").open().then(function(){
+                    $scope.isOpen= true;
+                });
+                $scope.accion.estado=false;
+            }else  if($scope.accion.data.close){
+                if(exp.length > 0){
+                    exp.animate({width:"0px"},600);
+
+                }
+                $mdSidenav("sideFiles").close().then(function(){$scope.isOpen= false;});
+
+                $scope.accion.estado=false;
+
+            }
+
+        }
+    });
+
+    $scope.$watchGroup(['module.layer',
+        'moduleKey'], function(newVal){
+            if($scope.isOpen){
+                $scope.close();
+            }
+    });
+
+
+}]);
+
 MyApp.service('setGetOrder', function() {
 
     var forms ={};
@@ -2238,10 +2325,10 @@ MyApp.service('setGetOrder', function() {
                     forms[form][fiel].v= value;
                 }
             }/*else if(typeof (value) == 'object'){
-                forms[form][fiel].v=value[fiel];
-                forms[form][fiel].estado='new';
-                forms[form][fiel].trace=value[fiel];
-            }*/
+             forms[form][fiel].v=value[fiel];
+             forms[form][fiel].estado='new';
+             forms[form][fiel].trace=value[fiel];
+             }*/
             else{
                 forms[form][fiel].estado='del';
                 forms[form][fiel].trace.push();
@@ -2272,49 +2359,6 @@ MyApp.service('setGetOrder', function() {
 
 
     };
-    /*var trace = {};
-     var changes ={};
-     var globalAction= "new";
-
-     var forms ={FormHeadDocument:{action:"new"},productosDoc:{action:"new"}};
-     angular.forEach(forms, function (v, k) {
-     trace[k]={};
-     changes[k]={};
-     });
-     this.addTrace = function(val,form){
-     if(trace[form][val.id] === undefined){
-     trace[form][val.id] = angular.copy(val);
-     }
-     };
-
-     this.addChange = function(val,action,form){
-     if((changes[form][val.id]===undefined) || !angular.equals(val,trace[form][val.id])){
-     if(changes[form][val.id]){
-     changes[form][val.id].datos = angular.copy(val);
-     if(!(changes[form][val.id].action=="new" && action=="upd")){
-     changes[form][val.id].action = action;
-     }
-     }else{
-     changes[form][val.id] = {
-     datos:angular.copy(val),
-     action:action
-     }
-     }
-     }else{
-     delete changes[form][val.id];
-     }
-     }
-
-     this.getChanges= function(){return changes; }
-     this.setGlobalAction= function(action){globalAction=action; };
-     this.getGlobagAction= function(){ return globalAction};
-
-     this.setFormAction = function(key, action){
-     forms[key].action=action;
-     }
-     this.setFormAction = function(key){
-     return forms[key].action;
-     }*/
 });
 
 MyApp.service('Layers' , function(){
@@ -2322,13 +2366,8 @@ MyApp.service('Layers' , function(){
     var modules ={};
     var accion ={estado:false,data:{}};
     var modulekey="";
-    var layer = "";
-    var index= 0;
-
-
     return {
         setModule: function (name){
-            console.log("set moduel", name);
             if(!modules[name]){
                 modules[name]={historia: new Array(),layers:new Array(),index: 0,layer:"",blockBack:false};
 
@@ -2362,10 +2401,58 @@ MyApp.service('Layers' , function(){
         },
         getIndex : function (){
             return  modules[modulekey].layer;
-        }
+        },
+        getModuleKey : function(){ return modulekey;}
     }
 
 
+});
+
+MyApp.service('filesService' ,function(){
+    var all = new Array();
+    var accion ={estado:false,data:{}};
+    var isOpen= false;
+    var titulo ="Adjuntos";
+    var folder ="";
+    var Uploading = false;
+    return {
+        setFiles: function(data){
+            all = data;
+        },
+        getFiles: function(){
+            return all;
+        },
+        getAccion : function(){
+            return accion;
+        },
+        open : function(){
+            accion.data ={open:true};
+            accion.estado=true;
+
+        },
+        close : function(){
+            accion.data ={close:true};
+            accion.estado=true;
+        },
+        isOpen : function(){
+            return isOpen;
+        },
+        getTitle: function(){
+            return titulo;
+        },
+        setTitle : function(value){
+            titulo =value;
+        },
+        setFolder: function(value){
+            folder = value;
+        },
+        getFolder : function (){
+            return folder;
+        },
+        isUploading : function(){
+            return Uploading;
+        }
+    };
 });
 
 MyApp.factory('Order', ['$resource',
@@ -2382,4 +2469,7 @@ MyApp.factory('Order', ['$resource',
         });
     }
 ]);
+
+
+
 /******************************** trash ***********************************/
