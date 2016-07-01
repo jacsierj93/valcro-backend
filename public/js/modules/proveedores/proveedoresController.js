@@ -1195,16 +1195,19 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var emailCont = {};
     $scope.editChip = function(chip,event){
         emailCont = chip;
+        //
         var input = angular.element(event.currentTarget).parents("md-chips-wrap").find(".md-chip-input-container").detach();
+
         var x = angular.element(event.currentTarget).parents("md-chip").replaceWith(input)
         $timeout(function(){
 
-            angular.element(input).val("dasd")
-            angular.element(input).focus()
-            console.log(angular.element(input).val())
+            angular.element(input).find("input").val(emailCont.valor);
+            angular.element(input).find("input").focus()
+            //console.log(angular.element(input).val())
         },100)
+        //console.log($scope.cnt.emailCont)
 
-    }
+    };
     /*funcion que transforma el texto ingresado en el mdchips en un objeto */
     $scope.transformChip = function(chip,erro){
         if (angular.isObject(chip)) {
@@ -1226,19 +1229,20 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             }
             return null;
         }
-        if(Object(emailCont).length==0){
-            var chip = { id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+        console.log(Object.keys(emailCont).length);
+        if(Object.keys(emailCont).length==0){
+            var chip = {id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
         }else{
-            var chip = { id:emailCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+            $scope.cnt.emailCont.splice($scope.cnt.emailCont.indexOf($filter("customFind")($scope.cnt.emailCont,emailCont.$$hashKey,function(e,c){return e.$$hashKey == c})[0]),1);
+            var chip = {  id:emailCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+            //return null;
         };
 
         emailCont = {};
         if(chip.cont_id){
             providers.put({type: 'saveContactProvEmail'},chip, function (data) {
-                console.log(data);
                 chip.id = data.id;
             });
-            console.log(chip)
             return chip;
         }else{
             return chip;
@@ -1246,6 +1250,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     };
 
+    /*$scope.order = function(v){
+        var fav = 0;
+        angular.forEach(v.departments,function(v,k){
+            if(fav==0){
+                fav = parseInt(v.pivot.fav);
+            }
+        });
+        return fav;
+    };
+*/
     var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
 
     var saveContact = function(){
