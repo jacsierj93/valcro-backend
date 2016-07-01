@@ -386,19 +386,18 @@ class OrderController extends BaseController
         $atts =$model->attachments()->get();
         foreach($items as $aux){
             $temp= array();
-            $p= $provProd->get($aux->producto_id);
+            $p= $provProd->where('id',$aux->producto_id)->first();
             $temp['id']=$aux->id;
+            $temp['producto_id']=$aux->producto_id;
             $temp['codigo']=$p->codigo;
             $temp['codigo_fabrica']=$p->codigo_fabrica;
             $temp['descripcion']=$aux->descripcion;
             $temp['cantidad']=$aux->cant;
+            $temp['extra']= $p;
             $prod[]= $temp;
         }
 
-
-        $data['adjProforma']= $atts->where('documento', 'PROFORMA');
-        $data['adjFactura']= $atts->where('documento', 'FACTURA');
-        //$data['adj']= $atts;
+        $data['adjuntos']= $atts;
         $data['productos']= $prod;
         return $data;
     }
@@ -1214,7 +1213,7 @@ class OrderController extends BaseController
             $temp['saldo'] =0;
             $temp['stock'] = $i;
             $temp['tipo_producto_id'] = $aux->tipo_producto_id;
-            $temp['tipo_producto'] = $types->get($aux->tipo_producto_id)->descripcion;
+            $temp['tipo_producto'] = $types->where('id',$aux->tipo_producto_id)->first()->descripcion;
             $temp['asignado'] = false;
             $i++;
             if($aux->descripcion == null){
@@ -2410,7 +2409,7 @@ class OrderController extends BaseController
             }
 
             if($paso){
-                $prd = $prodsProv->get($aux->producto_id);
+                $prd = $prodsProv->where('id',$aux->producto_id)->first();
                 $tem['id'] = $aux->id;
                 $tem['tipo_origen_id'] = $aux->tipo_origen_id;
                 $tem['doc_origen_id'] = $aux->doc_origen_id;
