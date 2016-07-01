@@ -499,7 +499,6 @@ MyApp.service("setGetProv",function($http,providers,$q){
             }else{
                 delete changes[form][parseInt(val.id)];
             }
-            console.log(changes)
         },
         getChng : function(){
             return changes;
@@ -834,10 +833,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             icon:"icon-TransTerrestre"
         }
     ];
-
-    $scope.test = function(){
-        alert("FOCUSSSSSSSSSSSSSS");
-    }
     var valcroName = {};
     $scope.$watch('prov.id',function(nvo){
         $scope.valcroName = (nvo)?providers.query({type: "provNomValList", id_prov: $scope.prov.id || 0}):[];
@@ -862,23 +857,36 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         }
     };
 
+    var currentDeps = Object();
     $scope.over = function(nomVal){
         if (nomVal) {
+            if(!$scope.overId){
+                currentDeps = $scope.valName.departments
+            }
             $scope.overId = nomVal.name.id;
             $scope.valName.departments = Object();
-            nomVal.name.departments.forEach(function (v, k) {
+            //console.log(typeOf());
+            angular.forEach(nomVal.name.departments, function (v, k) {
+
+                var fav = {"fav": v.pivot.fav};
+                $scope.valName.departments[v.id] = fav;
+            });
+           /* nomVal.name.departments.forEach(function (v, k) {
                 var fav = {"fav": v.pivot.fav};
                 $scope.valName.departments[v.id] = fav;
 
-            })
+            })*/
         } else {
-            $scope.overId = false;
-            if($scope.valName.id){
-                //$scope.valName.departments = Object();
-                $scope.over({name:$filter("customFind")($scope.valcroName,$scope.valName.id,function(current,compare){return current.id==compare})[0]});
+            //$scope.overId = false;
+            console.log(currentDeps);
+            $scope.over({name:{departaments:angular.clone(currentDeps)}});
+           /* if($scope.valName.id){
+
+                $scope.overId = false;
+                //$scope.over({name:$filter("customFind")($scope.valcroName,$scope.valName.id,function(current,compare){return current.id==compare})[0]});
             }else{
                 $scope.valName.departments = Object();
-            }
+            }*/
 
         }
 
@@ -900,15 +908,22 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     $scope.$watch('valcroName.length',function(nvo){
         setGetProv.setComplete("valcroName",nvo);
     });
-    $scope.$watchGroup(['nomvalcroForm.$valid','nomvalcroForm.$pristine'], function(nuevo) {
+   /* $scope.$watchGroup(['nomvalcroForm.$valid','nomvalcroForm.$pristine'], function(nuevo) {
+        console.log($scope.nomvalcroForm)
         if(nuevo[0] && !nuevo[1]) {
             if($filter("customFind")($scope.valcroName,$scope.valName.name,function(current,compare){return current.name==compare}).length>1){
-                setNotif.addNotif("alert","este nombre Vacro ya existe",[{name:"aceptar",action:function(){console.log("ok")}},{name:"cancelar",action:function(){console.log("error")}}]);
+                setNotif.addNotif("alert","este nombre Vacro ya existe",[]);
+            }else{
+                setNotif.hideByContent("alert","este nombre Vacro ya existe");
             }
-            saveValcroname();
+            //saveValcroname();
         }
-    });
-    function saveValcroname(preFav){
+    });*/
+    function saveValcroname(preFav,onSuccess){
+        if(!$scope.nomvalcroForm.$valid){
+            onSuccess();
+            return false;
+        }
         if(preFav){
             $scope.valName.preFav = preFav;
         }else{
@@ -942,6 +957,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
             $scope.valcroName = $filter('orderBy')( $scope.valcroName, "departments.fav");
             setGetProv.addChng( $scope.valName,data.action,"valName");
+            onSuccess();
 
         });
     };
@@ -988,15 +1004,19 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             if(jQuery(a.toElement).parents("#lyrAlert").length==0 && jQuery(a.toElement).parents("#nomValLyr").length==0){
 
                 if($scope.valName.id && Object.keys($scope.valName.departments).length<=0){
+                    console.log("cond1");
+                    /*CLICK EN UN FUERA DEL FORMULARIO, CON DATOS EN INPUT, VERIFICA Y RESETEA EL FORMUALRIO Y SALE DEL FOCUS*/
                     setNotif.addNotif("alert","el nombre valcro no fue asignado a ningun departamento, desea finalizar",[
                         {
                             name:"SI",
                             action:function(){
+                                saveValcroname(false,function(){
+                                    $scope.isShow = elem;
+                                    $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                                    valcroName = {};
+                                    $scope.nomvalcroForm.$setUntouched();
+                                });
 
-                                $scope.isShow = elem;
-                                $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
-                                valcroName = {};
-                                $scope.nomvalcroForm.$setUntouched();
                             },
                             default:3
                         },
@@ -1008,6 +1028,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         }
                     ],{block:true});
                 }else{
+                    /*CLICK EN UN FUERA DEL FORMULARIO, RESETEA EL FORMULARIO Y SALE DEL FOCUS*/
+                    console.log("cond2");
                     $scope.isShow = elem;
                     $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
                     valcroName = {};
@@ -1017,11 +1039,17 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             }
 
         }else{
+            /*CLICK EN UN LUGAR DEL FORMULARIO, VACIA EL INPUT Y DEVUELVE EL FOCUS*/
+            //console.log("cond2");
             if(!(angular.element(a.toElement).is("[chip],#transition") || angular.element(a.toElement).parents("#valNameContainer").length>0)){
-                $scope.nomvalcroForm.$setUntouched();
-                $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
-                valcroName = {};
-                document.getElementsByName("name")[0].focus();
+                console.log("cond3");
+                saveValcroname(false,function(){
+                    $scope.nomvalcroForm.$setUntouched();
+                    $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                    valcroName = {};
+                    document.getElementsByName("name")[0].focus();
+                });
+
             }
             $scope.isShow = elem;
         }
@@ -1044,7 +1072,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     var setFav = function(dep){
 
-        if(!$scope.valName.id){
+        if(!$scope.nomvalcroForm.$valid){
             return false;
         }
         var temp = $filter("customFind")($scope.valcroName,{id: dep.id,pivot:{fav:1}},function(current,compare){return $filter("customFind")(current.departments,compare,function(x,e){ return (parseInt(x.id) == parseInt(e.id)) && (parseInt(x.pivot.fav)== parseInt(e.pivot.fav))}).length>0});
@@ -1061,7 +1089,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                             var fav = {fav:1};
                             $scope.valName.departments[dep.id]=fav;
                         }
-                        saveValcroname({"id":temp[0].id,"dep":dep.id});
+                        //saveValcroname({"id":temp[0].id,"dep":dep.id});
                     }
                 },
                 {
@@ -1074,23 +1102,23 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         }else{
             var fav = {fav:1};
             $scope.valName.departments[dep.id]=fav;
-            saveValcroname();
+            //saveValcroname();
         }
 
 
     };
     var unsetFav = function(dep){
-        if(!$scope.valName.id){
+        if(!$scope.nomvalcroForm.$valid){
             return false;
         }
         $scope.valName.departments[dep.id].fav=0;
-        saveValcroname();
+        //saveValcroname();
         setNotif.addNotif("ok", "favorito quitado", [
         ],{autohidden:3000});
     };
 
     $scope.setDepa = function(dep){
-        if(!$scope.valName.id){
+        if(!$scope.nomvalcroForm.$valid){
             return false;
         }
         if($scope.valName.departments[dep.dep.id]){
@@ -1125,7 +1153,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                             }
                             i++;
                         });
-                        saveValcroname();
+                        //saveValcroname();
                         setNotif.addNotif("ok", "departamento desvinculado", [
                         ],{autohidden:3000});
                     }
@@ -1139,7 +1167,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         }else{
             var fav = {fav:0};
             $scope.valName.departments[dep.dep.id]=fav;
-            saveValcroname();
+            //saveValcroname();
             setNotif.addNotif("ok", "departamento añadido", [
             ],{autohidden:3000});
         }

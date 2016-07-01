@@ -343,7 +343,7 @@
                             <div layout="row" id="valNameContainer">
                                 <md-input-container flex id="valcroName">
                                     <label>Nombre...</label>
-                                    <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" field="nombre" ng-minlength="3" required name="name" ng-model="valName.name" ng-disabled="$parent.enabled">
+                                    <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" duplicateMsg="este nombre Vacro ya existe" field="nombre" ng-minlength="3" required name="name" id="name" ng-model="valName.name" ng-disabled="$parent.enabled">
                                 </md-input-container>
                                 <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
                                 <div class="iconValName">
@@ -500,12 +500,18 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-input-container class="md-block" flex="20">
+                            <md-input-container class="md-block" flex>
                                 <label>Telefono</label>
                                 <input ng-pattern="/^[\d\-+]+$/" number info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf.valor" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
                             </md-input-container>
 
 
+
+
+
+                        </div>
+
+                        <div class="row" layout="row">
                             <md-input-container class="md-block" flex="30">
                                 <label>Responsabilidades</label>
                                 <input info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
@@ -514,11 +520,11 @@
                             <div layout="column" style="width:{{(cargos.length*32)}}px;">
                                 <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
                                 <div flex>
-                                     <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center;" ng-click="((cnt.id===false)  || $parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
-                                        <md-tooltip>
-                                            {{cargo.cargo}}
-                                        </md-tooltip>
-                                    </span>
+                                 <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center;" ng-click="((cnt.id===false)  || $parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
+                                    <md-tooltip>
+                                        {{cargo.cargo}}
+                                    </md-tooltip>
+                                </span>
                                 </div>
 
                                 <!--<md-input-container flex>
@@ -528,9 +534,8 @@
                                     </md-select>
                                 </md-input-container>-->
                             </div>
-
-
                         </div>
+
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>

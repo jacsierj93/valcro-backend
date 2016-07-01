@@ -58,7 +58,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         angular.forEach(newValues, function(v, k) {
             /*escucha nuevas notificaciones e invoca los parametros*/
             if(old[k]<v){
-                console.log("nueva")
+                //console.log("nueva")
                 $scope.invoiceParams($scope.alerts[names[k]][v-1]);
             }
             if(v > 0 ){
@@ -126,7 +126,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
             },1000);
 
         }
-        console.log(def);
+        //console.log(def);
     };
     $scope.shakeOnBlock = function(){
         console.log("shake");

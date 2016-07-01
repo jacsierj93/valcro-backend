@@ -271,7 +271,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                                 }else{
                                     angular.element(nextFrm[0]).focus();
                                 }
-                            },50)
+                            },50);
 
 
                             if(scope.showGrid){
@@ -284,14 +284,14 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
-                    }else if(e.which=="40"){
+                    }/*else if(e.which=="40"){
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){
                             if(angular.element("#lyrAlert").find(".alertTextOpcs:visible").length > 0){
                                var focus =angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first();
                                 angular.element(focus).focus();
                             };
                         }
-                    }
+                    }*/
                 });
             }
             $compile(element[0])(scope);
@@ -354,7 +354,7 @@ MyApp.directive('info', function($timeout,setNotif) {
     }
 });
 
-MyApp.directive('duplicate', function($filter,$q,$timeout) {
+MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 
     return {
         require: 'ngModel',
@@ -376,8 +376,11 @@ MyApp.directive('duplicate', function($filter,$q,$timeout) {
 
                     if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].toUpperCase() == compare.toUpperCase() && (scope.localId !=current.id)}).length<1) {
                         // it is valid
+                        setNotif.hideByContent("alert","este nombre Vacro ya existe");
                         def.resolve();
                     }else{
+                        setNotif.addNotif("alert","este nombre Vacro ya existe",[]);
+
                         def.reject();
                     }
                 }, 50);
