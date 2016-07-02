@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Masters;
 
 
 use App\Libs\Utils\Files;
+use App\Models\Sistema\FileModel;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
@@ -35,4 +36,12 @@ class FilesController extends BaseController
 		return $fil;
 	}
 
+
+    public function getFileId(Request $req){
+        $file = FileModel::findOrFail($req->id);
+        $archivo = new Files($file->module);
+
+        //return $archivo->getFile($file->archivo);
+
+    }
 }

@@ -618,7 +618,6 @@ MyApp.service('DateParse', function() {
         var aux= text;
         if(text.length >= 10){
             aux=text.substring(0, 10);
-            console.log(aux);
         }
         return new Date(Date.parse(aux));
     }
