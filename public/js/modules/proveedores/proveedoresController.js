@@ -111,7 +111,7 @@ MyApp.filter('filterSelect', function() {
 MyApp.filter('filterSearch', function() {
      return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
          return arr1.filter(function(val) {
-             return arr2.indexOf(val.id) !== -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+             return (arr2.indexOf(""+val.id) !== -1 || arr2.indexOf(val.id) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
          });
      }
  });
@@ -678,6 +678,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         setGetProv.setComplete("address",nvo);
     });
     $scope.$watch('dir.pais',function(nvo,old){
+        console.log($filter("filterSearch")($scope.paises,[nvo])[0],nvo);
         var prev = (old != 0) ? $filter("filterSearch")($scope.paises, [old])[0].area_code.phone : "";
         $scope.dir.provTelf = (nvo != 0 && $scope.dir.provTelf=="") ? $scope.dir.provTelf.replace(prev, $filter("filterSearch")($scope.paises, [nvo])[0].area_code.phone) : $scope.dir.provTelf;
     });
@@ -688,12 +689,12 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 setNotif.addNotif("alert","el codigo de area indicado no coincide con el pais seleccionado", [
                     {
                         name: "corregir",
-                        acion: function () {
+                        action: function () {
                             document.getElementsByName("dirprovTelf")[0].focus();
                         }
                     },{
                         name: "esta bien",
-                        acion: function () {
+                        action: function () {
 
                         },
                         default:5
@@ -707,6 +708,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         return ports.pais_id == pais;
     };
 
+    var currentOrig = {};
+
     $scope.toEdit = function(addrs){
         dirSel = addrs.add;
         $scope.dir.id = dirSel.id;
@@ -716,34 +719,62 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.pais = dirSel.pais_id;
         $scope.dir.provTelf = dirSel.telefono;
         $scope.dir.ports = dirSel.ports;
-        $scope.dir.zipCode = dirSel.codigo_postal;
+        $scope.dir.zipCode = parseInt(dirSel.codigo_postal);
+        currentOrig = angular.copy($scope.dir);
         setGetProv.addToRllBck($scope.dir,"dirProv");
     };
 
-    /*escuah el estatus del formulario y guarda cuando este valido*/
+   /* /!*escuah el estatus del formulario y guarda cuando este valido*!/
     $scope.$watchGroup(['direccionesForm.$valid','direccionesForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
-            providers.put({type:"saveProvAddr"},$scope.dir,function(data){
-                $scope.dir.id = data.id;
-                setGetProv.addChng($scope.dir,data.action,"dirProv");
-                $scope.direccionesForm.$setPristine();
-                dirSel.id = $scope.dir.id;
-                dirSel.direccion =  $scope.dir.direccProv;
-                dirSel.tipo_dir=$scope.dir.tipo;
-                dirSel.tipo=$filter("filterSearch")($scope.tipos,[$scope.dir.tipo])[0];
-                dirSel.pais_id=$scope.dir.pais;
-                dirSel.pais=$filter("filterSearch")($scope.paises,[$scope.dir.pais])[0];
-                dirSel.telefono = $scope.dir.provTelf;
-                dirSel.ports = $scope.dir.ports;
-                dirSel.codigo_postal = $scope.dir.zipCode;
-                if(data.action=="new"){
-                    $scope.address.unshift(dirSel);
-                    setNotif.addNotif("ok", "Nueva Direccion!", [
-                    ],{autohidden:3000});
-                }
-            });
+
         }
-    });
+    });*/
+
+    var saveAddress = function(onSuccess){
+
+        if(angular.equals(currentOrig,$scope.dir) || angular.equals(currentOrig,{})){
+            return false;
+        }
+
+        if(!$scope.direccionesForm.$valid){
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onSuccess();
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    console.log($scope.direccionesForm);
+                }
+            }]);
+
+        }else{
+            console.log("trueeeee")
+        }
+
+        providers.put({type:"saveProvAddr"},$scope.dir,function(data){
+            $scope.dir.id = data.id;
+            setGetProv.addChng($scope.dir,data.action,"dirProv");
+            $scope.direccionesForm.$setPristine();
+            dirSel.id = $scope.dir.id;
+            dirSel.direccion =  $scope.dir.direccProv;
+            dirSel.tipo_dir=$scope.dir.tipo;
+            dirSel.tipo=$filter("filterSearch")($scope.tipos,[$scope.dir.tipo])[0];
+            dirSel.pais_id=$scope.dir.pais;
+            dirSel.pais=$filter("filterSearch")($scope.paises,[$scope.dir.pais])[0];
+            dirSel.telefono = $scope.dir.provTelf;
+            dirSel.ports = $scope.dir.ports;
+            dirSel.codigo_postal = $scope.dir.zipCode;
+            if(data.action=="new"){
+                $scope.address.unshift(dirSel);
+                setNotif.addNotif("ok", "Nueva Direccion!", [
+                ],{autohidden:3000});
+            }
+            onSuccess();
+        });
+    }
 
     $scope.rmAddres = function(elem){
         setNotif.addNotif("alert", "desea borrar esta direccion?", [
@@ -795,13 +826,19 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                     }
                 }
 
+
+
 */
-                $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
-                $scope.direccionesForm.$setUntouched();
-                if($scope.$parent.expand==$scope.id){
-                    $scope.isShowMore = elem;
-                    $scope.$parent.expand = false;
-                }
+                saveAddress(function(){
+                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
+                    currentOrig = {};
+                    $scope.direccionesForm.$setUntouched();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                });
+
 
             }
         }
@@ -836,7 +873,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     var valcroName = {};
     $scope.$watch('prov.id',function(nvo){
         $scope.valcroName = (nvo)?providers.query({type: "provNomValList", id_prov: $scope.prov.id || 0}):[];
-        $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+        $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
     });
 
     $scope.order = function(v){
@@ -860,11 +897,12 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     var currentDeps = Object();
     $scope.over = function(nomVal){
         if (nomVal) {
-            if(!$scope.overId){
+            console.log($scope.valName.departments)
+            if($scope.valName.departments[0] == "current"){
                 currentDeps = $scope.valName.departments
             }
             $scope.overId = nomVal.name.id;
-            $scope.valName.departments = Object();
+            $scope.valName.departments = {0:"over"};
             //console.log(typeOf());
             angular.forEach(nomVal.name.departments, function (v, k) {
 
@@ -879,7 +917,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         } else {
             //$scope.overId = false;
             console.log(currentDeps);
-            $scope.over({name:{departaments:angular.clone(currentDeps)}});
+            $scope.valName.departments = angular.copy(currentDeps);
+            //$scope.over({name:{departments:angular.copy(currentDeps)}});
            /* if($scope.valName.id){
 
                 $scope.overId = false;
@@ -897,7 +936,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         $scope.valName.prov_id = $scope.prov.id;
         $scope.valName.fav = valcroName.fav;
         $scope.valName.name = valcroName.name;
-        $scope.valName.departments = {};
+        $scope.valName.departments = {0:"current"};
         angular.forEach(valcroName.departments,function(v,k){
             var fav = {"fav":v.pivot.fav};
             $scope.valName.departments[v.id] = fav;
@@ -939,17 +978,20 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             var temp = [];
             var i = 0;
             angular.forEach($scope.valName.departments,function(k,v){
-                if(k!=1){
-                    temp.push({id: v,pivot:{fav:k.fav}});
+                if(v>0){
+                    if(k!=1){
+                        temp.push({id: v,pivot:{fav:k.fav}});
+                    }
+                    if(i==Object.keys($scope.valName.departments).length-1){
+                        valcroName.departments = temp;
+                    }
                 }
-                if(i==Object.keys($scope.valName.departments).length-1){
-                    valcroName.departments = temp;
-                }
+
                 i++;
             });
             if (data.action == "new") {
                 valcroName.departments = {};
-                $scope.valName.departments = {};
+                $scope.valName.departments = {0:"current"};
                 $scope.valcroName.unshift(valcroName);
                 setNotif.addNotif("ok", "Nuevo Nombre Valcro", [
                 ],{autohidden:3000});
@@ -978,7 +1020,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         $scope.valcroName.splice($scope.valcroName.indexOf($filter("filterSearch")($scope.valcroName,[chip.id])[0]),1);
                         //console.log($scope.valcroName);
                         setGetProv.addChng( $scope.valName,response.data.action,"valName");
-                        $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                        $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                         valcroName = {};
                         $scope.nomvalcroForm.$setUntouched();
                         setNotif.addNotif("ok", "Nombre valcro borrado", [
@@ -1012,7 +1054,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                             action:function(){
                                 saveValcroname(false,function(){
                                     $scope.isShow = elem;
-                                    $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                                    $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                                     valcroName = {};
                                     $scope.nomvalcroForm.$setUntouched();
                                 });
@@ -1031,7 +1073,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                     /*CLICK EN UN FUERA DEL FORMULARIO, RESETEA EL FORMULARIO Y SALE DEL FOCUS*/
                     console.log("cond2");
                     $scope.isShow = elem;
-                    $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                    $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                     valcroName = {};
                     $scope.nomvalcroForm.$setUntouched();
                 }
@@ -1045,7 +1087,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                 console.log("cond3");
                 saveValcroname(false,function(){
                     $scope.nomvalcroForm.$setUntouched();
-                    $scope.valName={id:false,name:"",departments:Object(),fav:"",prov_id:$scope.prov.id || 0};
+                    $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                     valcroName = {};
                     document.getElementsByName("name")[0].focus();
                 });
@@ -1145,12 +1187,15 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         var temp = {};
                         var i = 0;
                         angular.forEach($scope.valName.departments, function (k, v) {
-                            if (parseInt(v) != parseInt(dep.dep.id)) {
-                                temp[v] = k;
+                            if(v>0){
+                                if (parseInt(v) != parseInt(dep.dep.id)) {
+                                    temp[v] = k;
+                                }
+                                if (i == Object.keys($scope.valName.departments).length - 1) {
+                                    $scope.valName.departments = temp;
+                                }
                             }
-                            if (i == Object.keys($scope.valName.departments).length - 1) {
-                                $scope.valName.departments = temp;
-                            }
+
                             i++;
                         });
                         //saveValcroname();
@@ -2337,6 +2382,7 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
 
 
      $scope.getDato = function(id,find,field){
+
          return $filter("filterSearch")(foraneos[find],[id])[0][field];
      };
 

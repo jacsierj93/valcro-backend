@@ -1536,7 +1536,7 @@
                             insertar archivo
                         </div>
                        <md-content flex>
-                           <div class="imgItem"><img src="images/thumbs/{{pic.archivo}}"/></div>
+                           <!--<div class="imgItem"><img src="images/thumbs/{{pic.archivo}}"/></div>-->
                        </md-content>
                 </div>
             </md-content>

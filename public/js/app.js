@@ -214,12 +214,12 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     }
                 },50)
             },0);
-            if(scope.showGrid){
+            /*if(scope.showGrid){
                 scope.showGrid(false,{toElement:element});
             }else{
                 scope.isShow=false;
                 scope.projectForm.$setUntouched();
-            }
+            }*/
 
         }
     };
@@ -274,12 +274,12 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                             },50);
 
 
-                            if(scope.showGrid){
+                            /*if(scope.showGrid){
                                 scope.showGrid(false,{toElement:element});
                             }else{
                                 scope.isShow=false;
                                 scope.projectForm.$setUntouched();
-                            }
+                            }*/
                         }
 
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
