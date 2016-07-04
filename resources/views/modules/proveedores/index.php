@@ -279,8 +279,8 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
-                                <md-select skip-tab info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
-                                    <md-option ng-repeat="type in types" value="{{type.id}}">
+                                <md-select  info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                    <md-option ng-repeat="type in types" value="{{type.id}}" skip-tab>
                                         {{type.nombre}}
                                     </md-option>
                                 </md-select>
@@ -473,7 +473,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Pais de Residencia</label>
-                                <md-select info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                <md-select skip-tab info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="$parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
@@ -483,7 +483,7 @@
                             <div layout="row" flex="30">
                                 <md-input-container flex>
                                     <label>Idiomas</label>
-                                    <md-select info="marque cada idioma que hable este contacto"  ng-model="cnt.languaje" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                    <md-select skip-tab info="marque cada idioma que hable este contacto"  ng-model="cnt.languaje" multiple="" ng-disabled=" $parent.enabled || cnt.isAgent==1" md-no-ink>
                                         <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
 
                                     </md-select>
@@ -492,35 +492,38 @@
 
                         </div>
                         <div class="row" layout="row">
-                            <md-chips flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChip($chip)" md-on-remove="rmContEmail(this,$chip)">
-                                <md-chip-template ng-click="editChip($chip,$event)">
+                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
+                                <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
                                     </span>
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-input-container class="md-block" flex>
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)" name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" placeholder="Telefono" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[32]">
+                                <md-chip-template ng-dblclick="editChip($chip,$event)">
+                                    <span>
+                                      <strong>{{$chip.valor}}</strong>
+                                    </span>
+                                </md-chip-template>
+                            </md-chips>
+
+                            <!--<md-input-container class="md-block" flex>
                                 <label>Telefono</label>
-                                <input ng-pattern="/^[\d\-+]+$/" number info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf.valor" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" />
-                            </md-input-container>
-
-
-
-
-
+                                <input ng-pattern="/^[\d\-+]+$/" number info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf.valor" ng-disabled=" $parent.enabled || cnt.isAgent==1" />
+                            </md-input-container>-->
                         </div>
 
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex="30">
                                 <label>Responsabilidades</label>
-                                <input info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                                <input skip-tab info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled=" $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
 
                             <div layout="column" style="width:{{(cargos.length*32)}}px;">
                                 <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
                                 <div flex>
-                                 <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center;" ng-click="((cnt.id===false)  || $parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
+                                 <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center;" ng-click="($parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
                                     <md-tooltip>
                                         {{cargo.cargo}}
                                     </md-tooltip>
@@ -539,7 +542,7 @@
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>
-                                <input info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff.valor" ng-minlength="3" ng-disabled="(cnt.id===false)  || $parent.enabled || cnt.isAgent==1">
+                                <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff[0].valor" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">

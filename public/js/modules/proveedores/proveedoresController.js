@@ -678,7 +678,6 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         setGetProv.setComplete("address",nvo);
     });
     $scope.$watch('dir.pais',function(nvo,old){
-        console.log($filter("filterSearch")($scope.paises,[nvo])[0],nvo);
         var prev = (old != 0) ? $filter("filterSearch")($scope.paises, [old])[0].area_code.phone : "";
         $scope.dir.provTelf = (nvo != 0 && $scope.dir.provTelf=="") ? $scope.dir.provTelf.replace(prev, $filter("filterSearch")($scope.paises, [nvo])[0].area_code.phone) : $scope.dir.provTelf;
     });
@@ -733,7 +732,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
     var saveAddress = function(onSuccess){
 
-        if(angular.equals(currentOrig,$scope.dir) || angular.equals(currentOrig,{})){
+        if((angular.equals(currentOrig,$scope.dir) && $scope.dir ) || ($scope.direccionesForm.$pristine )){
+            onSuccess();
             return false;
         }
 
@@ -750,8 +750,6 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 }
             }]);
 
-        }else{
-            console.log("trueeeee")
         }
 
         providers.put({type:"saveProvAddr"},$scope.dir,function(data){
@@ -771,10 +769,14 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 $scope.address.unshift(dirSel);
                 setNotif.addNotif("ok", "Nueva Direccion!", [
                 ],{autohidden:3000});
+            }else{
+                //$scope.address.unshift(dirSel);
+                setNotif.addNotif("ok", "Datos Actualizados", [
+                ],{autohidden:3000});
             }
             onSuccess();
         });
-    }
+    };
 
     $scope.rmAddres = function(elem){
         setNotif.addNotif("alert", "desea borrar esta direccion?", [
@@ -897,7 +899,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     var currentDeps = Object();
     $scope.over = function(nomVal){
         if (nomVal) {
-            console.log($scope.valName.departments)
             if($scope.valName.departments[0] == "current"){
                 currentDeps = $scope.valName.departments
             }
@@ -1000,7 +1001,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             $scope.valcroName = $filter('orderBy')( $scope.valcroName, "departments.fav");
             setGetProv.addChng( $scope.valName,data.action,"valName");
             onSuccess();
-
         });
     };
 
@@ -1265,16 +1265,15 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         setGetProv.setComplete("contact",nvo);
     });
 
-    var emailCont = {};
+    var chipCont = {};
     $scope.editChip = function(chip,event){
-        emailCont = chip;
+        chipCont = chip;
         //
         var input = angular.element(event.currentTarget).parents("md-chips-wrap").find(".md-chip-input-container").detach();
 
         var x = angular.element(event.currentTarget).parents("md-chip").replaceWith(input)
         $timeout(function(){
-
-            angular.element(input).find("input").val(emailCont.valor);
+            angular.element(input).find("input").val(chipCont.valor);
             angular.element(input).find("input").focus()
             //console.log(angular.element(input).val())
         },100)
@@ -1282,7 +1281,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     };
     /*funcion que transforma el texto ingresado en el mdchips en un objeto */
-    $scope.transformChip = function(chip,erro){
+    $scope.transformChipEmail = function(chip,erro){
+        console.log(erro)
         if (angular.isObject(chip)) {
             return chip;
         }
@@ -1302,37 +1302,47 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             }
             return null;
         }
-        console.log(Object.keys(emailCont).length);
-        if(Object.keys(emailCont).length==0){
+        if(Object.keys(chipCont).length==0){
             var chip = {id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
         }else{
-            $scope.cnt.emailCont.splice($scope.cnt.emailCont.indexOf($filter("customFind")($scope.cnt.emailCont,emailCont.$$hashKey,function(e,c){return e.$$hashKey == c})[0]),1);
-            var chip = {  id:emailCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+            $scope.cnt.emailCont.splice($scope.cnt.emailCont.indexOf($filter("customFind")($scope.cnt.emailCont,chipCont.$$hashKey,function(e,c){return e.$$hashKey == c})[0]),1);
+            var chip = {  id:chipCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
             //return null;
         };
 
-        emailCont = {};
-        if(chip.cont_id){
-            providers.put({type: 'saveContactProvEmail'},chip, function (data) {
-                chip.id = data.id;
-            });
-            return chip;
-        }else{
+        chipCont = {};
+
+        return chip;
+
+
+    };
+
+    $scope.transformChipTlf = function(chip){
+        console.log(chip);
+        if (angular.isObject(chip)) {
             return chip;
         }
+       /* var reg = new RegExp("^[\d\-+]+$");
 
-    };
-
-    /*$scope.order = function(v){
-        var fav = 0;
-        angular.forEach(v.departments,function(v,k){
-            if(fav==0){
-                fav = parseInt(v.pivot.fav);
-            }
-        });
-        return fav;
-    };
+        if(!reg.test(chip)){
+            setNotif.addNotif("error", "telefono no tiene un formato adecuado", [
+            ],{autohidden:3000});
+            return null ;
+        }
 */
+        if(Object.keys(chipCont).length==0){
+            var chip = {id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+        }else{
+            $scope.cnt.contTelf.splice($scope.cnt.contTelf.indexOf($filter("customFind")($scope.cnt.contTelf,chipCont.$$hashKey,function(e,c){return e.$$hashKey == c})[0]),1);
+            var chip = {  id:chipCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+            //return null;
+        };
+
+        chipCont = {};
+        return chip;
+
+    }
+
     var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
 
     var saveContact = function(){
@@ -1368,7 +1378,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         var fieldFocus = angular.element(":focus");
         var valid = (fieldFocus.parents("md-chips").length<=0);
         if(((nuevo[0] && !nuevo[1] && $scope.cnt.emailCont.length>0 && valid)) || nuevo[2] || (nuevo[3]!=old[3])) {
-            saveContact();
+            //saveContact();
         }
         $scope.provContactosForm.$setPristine();
         /*}*/
@@ -1426,13 +1436,15 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if((jQuery(event.toElement).parents("#contactBook").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
             $scope.isShow = elem;
             if(!elem){
-                contact = {};
+                console.log($scope.cnt)
+              /*  contact = {};
                 setGetContac.setContact(false);
                 $scope.provContactosForm.$setUntouched();
                 if($scope.$parent.expand==$scope.id){
                     $scope.isShowMore = elem;
                     $scope.$parent.expand = false;
-                }
+                }*/
+
             }
         }
     };
@@ -1490,7 +1502,7 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
 });
 
 MyApp.service("setGetContac",function(providers,setGetProv,$filter){
-    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:{campo:"telefono",valor:""},pais:"",languaje:[],cargo:[],responsability:"",dirOff:{campo:"direccion",valor:""},prov_id:false, isAgent:0,autoSave:false};
+    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:[],pais:"",languaje:[],cargo:[],responsability:"",dirOff:{campo:"direccion",valor:""},prov_id:false, isAgent:0,autoSave:false};
     var listCont = [];
     return {
         setContact : function(cont){
@@ -1604,9 +1616,39 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
     var account = {};
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
-    $scope.$watchGroup(['bankInfoForm.$valid','bankInfoForm.$pristine'], function(nuevo) {
+   /* $scope.$watchGroup(['bankInfoForm.$valid','bankInfoForm.$pristine'], function(nuevo) {
 
         if(nuevo[0] && !nuevo[1]) {
+
+
+        }
+    });*/
+
+
+
+    var saveBank = function(onSuccess){
+        if((angular.equals(currentOrig,$scope.bnk) && $scope.bnk.id) || ($scope.bankInfoForm.$pristine )){
+            console.log("blanco")
+            onSuccess();
+            return false;
+        }
+
+        if(!$scope.bankInfoForm.$valid){
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onSuccess();
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    console.log($scope.bankInfoForm);
+                }
+            }]);
+
+        }
+
+        if($scope.bankInfoForm.$valid){
             providers.put({type:"saveBank"},$scope.bnk,function(data){
                 $scope.bnk.id = data.id;
                 $scope.bankInfoForm.$setPristine();
@@ -1623,12 +1665,18 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
                     $scope.accounts.unshift(account);
                     setNotif.addNotif("ok", "nueva info bancaria", [
                     ],{autohidden:3000});
+                }else{
+                    setNotif.addNotif("ok", "Datos Actualizados", [
+                    ],{autohidden:3000});
                 }
                 setGetProv.addChng($scope.bnk,data.action,"infoBank");
+                onSuccess()
             });
-
+        }else{
+            console.log("invalid")
         }
-    });
+
+    };
 
     $scope.rmBank = function(elem){
         setNotif.addNotif("alert", "desea eliminar esta informacion bancaria", [
@@ -1655,6 +1703,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         ]);
     };
 
+    var currentOrig = {};
     $scope.toEdit = function(acc){
         account = acc.account;
         $scope.bnk.id = account.id;
@@ -1668,7 +1717,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         $scope.bnk.pais = account.pais.id;
         $scope.bnk.est = account.estado.id;
         $scope.bnk.ciudad = account.ciudad_id;
-
+        currentOrig = angular.copy($scope.bnk);
         setGetProv.addToRllBck($scope.bnk,"infoBank")
     };
 
@@ -1677,13 +1726,18 @@ MyApp.controller('bankInfoController', function ($scope,masters,providers,setGet
         if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
             $scope.isShow = elem;
             if(!elem) {
-                $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
-                account={};
-                $scope.bankInfoForm.$setUntouched();
-                if($scope.$parent.expand==$scope.id){
-                    $scope.isShowMore = elem;
-                    $scope.$parent.expand = false;
-                }
+
+                saveBank(function(){
+                    $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                    account={};
+                    currentOrig = {};
+                    $scope.bankInfoForm.$setUntouched();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                })
+
             }
         }
     };

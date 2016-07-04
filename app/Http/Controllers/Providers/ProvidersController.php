@@ -175,19 +175,15 @@ class ProvidersController extends BaseController
         }
         $valName->prov_id = $req->prov_id;
         $valName->nombre = $req->name;
-        //$valName->fav = $req->fav;
         $valName->save();
-        /*foreach($req->departments as $k=>$v){
-            if(!$v){
-                unset($req->departments[$k]);
-            }
-        }*/
         if($req->preFav){
             $temp = NombreValcro::find($req->preFav["id"]);
             $temp->departamento()->updateExistingPivot($req->preFav["dep"],array("fav"=>0));
             $temp->save();
         }
-        $valName->departamento()->sync($req->departments);
+        $departamentos = $req->departments;
+        unset($departamentos[0]);
+        $valName->departamento()->sync($departamentos);
 
         $result['id']=$valName->id;
         return $result;
