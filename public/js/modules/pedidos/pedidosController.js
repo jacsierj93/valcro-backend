@@ -86,6 +86,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     // $scope.layer ="";
     $scope.openAdjDtPedido= false;
 
+    $scope.currenSide = null;
+
 
 
     restore('provSelec');// inializa el proveedor
@@ -172,8 +174,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.verificExit = function(){
-        var paso= true;
+        var paso = true;
+        console.log(' internasl', setGetOrder.getInternalState());
         if(setGetOrder.getInternalState() != 'new'){
+
             $scope.NotifAction("alert","Se han realizado cambio en la "+$scope.formMode.name+ " ¿esta seguro de salir sin culminar?",[
                 {
                     name:"No",
@@ -184,13 +188,45 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 {
                     name:"Si",
                     action: function(){
+                        $scope.moduleAccion({close:{first:true}});
+
                     }
                 }
 
             ],{block:true});
+            paso =false;
+        }
+
+        return paso;
+    };
+
+    $scope.verificBackExit = function(){
+        var paso = true;
+        if(setGetOrder.getInternalState() != 'new'){
+
+            $scope.NotifAction("alert","Se han realizado cambio en la "+$scope.formMode.name+ " ¿esta seguro de salir sin culminar?",[
+                {
+                    name:"No",
+                    action: function(){
+
+                    }
+                },
+                {
+                    name:"Si",
+                    action: function(){
+                        $scope.LayersAction({close:{init:true}});
+                    }
+                }
+
+            ],{block:true});
+            return false;
+        }
+        if(!paso){
+
         }
         return paso;
     };
+
     /********************************************EVENTOS ********************************************/
 
     $scope.editTasa= function(){
@@ -265,18 +301,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 {id:$scope.document.id,adjuntos: data}, function(response){
                     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                     $scope.reloadDoc();
-                   });
-           // $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                });
+            // $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
 
         }
 
     });
 
+    $scope.allowEdit = function(){
+        if($scope.formBlock){
+            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder modificar",[],{autohidden:autohidden});
 
-
-
-
-
+        }
+    };
 
     $scope.hoverpedido= function(document){
         document.isNew=false;
@@ -287,13 +324,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.document=document;
                 if($scope.module.layer !='resumenPedido' ){
                     $scope.moduleAccion({open:{name:"resumenPedido"}});
-                    //$scope.formAction="upd";
-
                 }
             }
         }, 1000);
-        /*
-         }*/
     };
 
     $scope.hoverLeave= function( val){
@@ -306,7 +339,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         timePreview= $timeout(function(){
             if($scope.preview && $scope.module.layer== 'resumenPedido' && !$scope.mouseProview){
                 $scope.moduleAccion({close:true});
-
                 $scope.hoverPreview(true);
             }
         }, 1000);
@@ -465,19 +497,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     };
-
-    $scope.closeAdj = function(){
-        var adjPane =angular.element("#adjuntoProforma");
-        adjPane.animate({width:"0px"},400, function(){
-            adjPane.css({display:"none"});
-
-        });
-        $timeout(function(){
-            $scope.openAdjDtPedido= false;
-        },399);
-
-
-    };
     $scope.openDocSusti = function(){
         $scope.docsSustitos = new Array();
         $scope.moduleAccion({open:{name:"agrPedPend", before: function(){
@@ -498,7 +517,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         });
         if($scope.formBlock ){
-            console.log("mode", $scope.formMode);
             $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
         }else{
             if($scope.formMode.value == 21){
@@ -612,49 +630,33 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }}});
     };
 
-    /** al pulsar la flecha siguiente**/
+    /** al pulsar la flecha siguiente
+     *  working
+     * **/
     $scope.next = function () {
+        console.log("curren", $scope.module.layer);
+        $scope.nextSide = null;
         switch($scope.module.layer){
-            case "resumenPedido":
-                $scope.moduleAccion({open:{name:"detalleDoc"}});
+            case 'resumenPedido':
+                $scope.nextSide = 'detalleDoc' ;
                 break;
-            case "detalleDoc":
-                $scope.moduleAccion({open:{name:"listProducProv"}})
-                ;break;
-            case "listProducProv":
-                $scope.moduleAccion({open:{name:"agrPed"}});
+            case 'detalleDoc':
+                $scope.nextSide = 'listProducProv' ;
                 break;
-            case "agrPed":
-                $scope.moduleAccion({open:{name:"finalDoc",
-                    after: function(){
-                        $scope.finalDoc = $scope.buildfinalDoc();
-                        Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
-                            console.log("data", response);
-                            $scope.finalDoc.productos= response.productos;
-                            $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
-                            $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
+            case 'listProducProv':
+                $scope.nextSide = 'agrPed' ;
+                break;
+            case 'agrPed':
+                $scope.nextSide = 'finalDoc' ;
+                break;
+            case 'finalDoc':
+                $scope.nextSide = 'close';
 
-                        });
-                    }
-                }});
-                break;
-            case "finalDoc":
-                if(setGetOrder.getInternalState() == 'new' && setGetOrder.getState() == 'new'){
-                    $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
-                }else {
-                    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-
-                        if (response.success) {
-                            $scope.NotifAction("ok","Finalizado",[
-                                {name:"Ok", action: function(){
-                                    $scope.moduleAccion({close:{first:true}});
-                                }}
-                            ],{block:true});
-                        }});
-                }
+              /* */
 
         }
-        //docsSustitos
+        console.log("next",  $scope.nextSide);
+
         $scope.showNext(false);
     };
 
@@ -762,6 +764,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.changeProducto = function (item){
         var paso = true;
         if(item.asignado && item.saldo > 0){
+
+
             item.prov_id =$scope.provSelec.id;
             item.doc_id =$scope.document.id;
             Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
@@ -772,6 +776,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     var prod= angular.copy(response);
                     prod.cantidad = parseFloat(prod.cantidad);
                     $scope.providerProds.push(prod);
+                    setGetOrder.change('producto'+item.id,'id',item);
+
                 }
                 item.reng_id=response.reng_id;
             });
@@ -785,6 +791,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                 $scope.NotifAction("info",
                                     "Removido"
                                     ,[],{autohidden:autohidden});
+                                setGetOrder.change('producto'+item.id,'id',undefined);
                             });
                         }
                     },{name: 'Cancel',
@@ -1046,20 +1053,38 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.module.index == 0){
 
             $scope.provSelec = prov;
-            $scope.LayersAction({open:{name:"listPedido", before: function(){
-                loadPedidosProvedor($scope.provSelec.id);
-
-            }}});
-            //Layers.setAccion({open:{name:"listPedido"}});
+           $scope.nextSide="listPedido";
         }else{
             if($scope.module.layer == "listPedido" ){
                 $scope.provSelec = prov;
             }else{
-
+                $scope.alowExit();
             }
         }
 
     }
+
+    $scope.closeSide = function(){
+        var paso= true;
+        if($scope.document.id){
+            if($scope.layer == 'resumenPedido'  && setGetOrder.getInternalState() != 'new'){
+                paso = false;
+            }
+
+            if($scope.layer == 'detalleDoc' && $scope.module.historia.indexOf('resumenPedido') == -1 && setGetOrder.getInternalState() != 'new'){
+                paso = false;
+            }
+        }
+
+        if(!paso){
+            $scope.verificExit();
+        }else {
+            $scope.nextSide=null;
+            $scope.LayersAction({close:true});
+
+        }
+
+    };
 
     function DtPedido(doc) {
 
@@ -1094,7 +1119,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 });
                 setGetOrder.setState('select');
                 $scope.formGlobal ="upd";
-                $scope.moduleAccion({open:{name:"resumenPedido"}});
+                $scope.nextSide ="resumenPedido"
                 // setGetOrder.setIni(doc);
             }
             else {
@@ -1578,10 +1603,134 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             }
         }
     });
+
+    // working
+    $scope.$watch('nextSide', function (newVal, oldVal) {
+        console.log("nextSide", newVal);
+        if (newVal != '' && typeof(newVal) !== 'undefined' && newVal != null){
+
+            // particulares
+            switch (newVal){
+                case 'resumenPedido':
+                    $scope.moduleAccion({search:{name:"detalleDoc",
+                        before: function(){
+                            $scope.FormHeadDocument.$setUntouched();
+                            $scope.FormEstatusDoc.$setUntouched();
+                            $scope.FormAprobCompras.$setUntouched();
+                            $scope.FormCancelDoc.$setUntouched();
+                        }
+                    }});
+
+                    break;
+                case 'listPedido' :
+                    $scope.moduleAccion({search:{name:"listPedido",
+                        before: function(){
+                            loadPedidosProvedor($scope.provSelec.id);
+                            $scope.hoverPreview(true);
+                        }
+                    }});
+                    break;
+                case 'agrContPed':
+                    $scope.moduleAccion({search:{name:"agrContPed",
+                        before: function(){
+                            loadContraPedidosProveedor($scope.provSelec.id);;
+                        }
+                    }});
+
+                    break;
+                case 'agrKitBoxs':
+                    $scope.moduleAccion({search:{name:"agrContPed",
+                        before: function(){
+                            loadContraPedidosProveedor($scope.provSelec.id);;
+                        }
+                    }});
+                    break;
+                case 'listProducProv':
+
+                    $scope.moduleAccion({search:{name:"listProducProv",
+                        before: function(){
+                            Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
+                                var data = new Array();
+                                var aux ={};
+                                angular.forEach(response , function(v,k){
+                                    aux ={};
+                                    aux = v;
+                                    aux.saldo=parseFloat(v.saldo);
+                                    data.push(aux);
+                                });
+                                $scope.providerProds= data;
+                            });
+                        }
+                    }});
+                    console.log(" entro listProducProv" );
+
+                    ;break;
+                case 'listImpor':
+                    $scope.moduleAccion({search:{name:"listImpor",
+                        before: function(){
+                            if($scope.formMode.value !=21){
+                                var url='';
+                                switch ($scope.formMode.value){
+                                    case  22: url = "SolicitudeToImport";break;
+                                    case  23: url = "OrderToImport";break;
+                                }
+                                $scope.docImports = Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id});
+                            }
+                        }
+                    }});
+
+
+                    break;
+                case 'agrPed':
+                    $scope.moduleAccion({search:{name:"agrPed",
+                        before: function(){
+
+                        }
+                    }});
+                    break;
+                case 'finalDoc':
+                    $scope.moduleAccion({search:{name:"finalDoc",
+                        before: function(){
+                            $scope.finalDoc = $scope.buildfinalDoc();
+                            Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
+                                console.log("data", response);
+                                $scope.finalDoc.productos= response.productos;
+                                $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
+                                $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
+
+                            });
+                        }
+                    }});
+                    break;
+                case  'close':
+                    if(setGetOrder.getInternalState() == 'new' ){
+                        $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
+                    }else {
+                        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+
+                            if (response.success) {
+                                $scope.NotifAction("ok","Finalizado",[
+                                    {name:"Ok", action: function(){
+                                        $scope.moduleAccion({close:{first:true}});
+                                    }}
+                                ],{block:true});
+                            }});
+                    }
+                    break;
+
+            }
+
+            /***   multiples */
+            if(newVal == "agrPed" || newVal == "newVal" || newVal == "finalDoc"){
+                if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
+                    $scope.reloadDoc();
+                }
+            }
+        }
+    });
     $scope.$watch('document.direccion_almacen_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
             if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
-                setGetOrder.addChange({id:"direccion_almacen_id",value:newVal,text:"Almacen"},$scope.formAction,"FormHeadDocument");
             }
             $http.get("Order/AdrressPorts",{params:{id:newVal}})
                 .success(function(response){$scope.formData.puertos=response;});
@@ -1609,79 +1758,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
 
-    /**layers*/
-    $scope.$watchGroup(['module.index','module.layer'], function(newVal){
+    /**layers
+      working
+     * */
+    $scope.$watchGroup(['module.index','module.layer'], function(newVal, oldVal){
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
+        // va para atras
 
-        if(newVal[0] == 0 ){
-            restore('provSelec');// inializa el proveedor
+        if(newVal[0]  == 0 ){
+            $scope.provSelec={id:'',razon_social:'',save:false, pedidos: new Array() };
         }
+
         if(newVal[0] == 0 || newVal[0] == 1){
             restore('document');// inializa el pedido
             $scope.gridView=-1;
-            $scope.FormHeadDocument.$setUntouched();
             $scope.imagenes = new Array();
             setGetOrder.restore();
+            $scope.formBlock;
         }
+
         if (newVal[1] != '' && typeof(newVal[1]) !== 'undefined') {
             var layer= newVal[1];
             if($scope.provSelec.id != ''){
-                if(layer == "listPedido" ){
-                    loadPedidosProvedor($scope.provSelec.id);
-                }
-                if(layer == "agrContPed" ){
-                    loadContraPedidosProveedor($scope.provSelec.id);
-                }
-                if(layer == "agrKitBoxs" ){
-                    loadkitchenBoxProveedor($scope.provSelec.id);
-                }
-                if(layer == "listPedido" ){
-                    loadPedidosProvedor($scope.provSelec.id);
-                }
-                if(layer == "listProducProv" ){
-                    $timeout(function(){$scope.reloadDoc();},1000);
-                    $http.get("Order/ProviderProds",
-                        {params:{id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id}}).success(function (response) {
-                        var data = new Array();
-                        var aux ={};
-                        angular.forEach(response , function(v,k){
-                            aux ={};
-                            aux = v;
-                            aux.saldo=parseFloat(v.saldo);
-                            data.push(aux);
-                        });
-                        $scope.providerProds= data;
-
-                    });
-                }
-                if(layer == "listImport"){
-                    if($scope.formMode.value ==21 ){
-
-                    }else {
-                        var url ="";
-                        switch ($scope.formMode.value){
-                            case  22: url = "SolicitudeToImport";break;
-                            case  23: url = "OrderToImport";break;
-                        }
-                        $scope.docImports = Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id});
-                    }
-
-
-
-                }
-
-
-
-                if(layer == "agrPed" || layer == "detalleDoc" || layer == "agrPed" || layer == "finalDoc"
-                ){
-                    if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
-                        $scope.reloadDoc();
-                    }
-                }
-
-
-
             }
 
         }
@@ -1689,8 +1788,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     $scope.reloadDoc = function(){
-        $scope.imagenes= new Array();
-
         Order.get({type:"Document", id:$scope.document.id,tipo:$scope.formMode.value}, {},function(response){
             $scope.document= response;
 
@@ -1704,6 +1801,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if(response.ult_revision =! null && response.ult_revision ){
                 $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
             }
+            setGetOrder.setState("load");
 
         });
     };
@@ -1847,7 +1945,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     function loadPedidosProvedor(id){
         $scope.provSelec.pedidos= new Array();
-        $http.get("Order/OrderProvOrder",{params:{id:id}}).success(function (response) {
+        Order.query({type:"OrderProvOrder", id:id}, {},function(response){
             var items= new Array();
 
             angular.forEach(response, function (v, k) {
@@ -1897,12 +1995,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         });
     }
     function loadContraPedidosProveedor(id){
-        $http.get("Order/CustomOrders",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
+        $scope.formData.contraPedido = Order.query({type:"CustomOrders",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
+       /* $http.get("Order/CustomOrders",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}})
+            .success(function (response) {
             $scope.formData.contraPedido= response;
-        });
+        });*/
     }
 
-    /**@deprecated*/
     function loadkitchenBoxProveedor(id){
 
         $http.get("Order/KitchenBoxs",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
@@ -2010,7 +2109,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
     function close(arg, module){
         if(module.index>0 && !module.blockBack){
-            console.log("close dentro block");
 
             var paso=true;
             if(arg.before){
@@ -2122,15 +2220,15 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
      *  cuando olVal =='loading' && newVal == 'finished' se acaba de subir los archivos
      * ***/
     $scope.$watchGroup(['cola.total',
-            'cola.terminados.length','cola.estado'], function(newVal){
-            if(newVal[0]> 0 && newVal[2] == 'wait'){/// si entra en modo de espera
-                $scope.cola.estado='loading';
+        'cola.terminados.length','cola.estado'], function(newVal){
+        if(newVal[0]> 0 && newVal[2] == 'wait'){/// si entra en modo de espera
+            $scope.cola.estado='loading';
 
-            }
-            if(newVal[0] == newVal[1] && newVal[2] == 'loading'){
-                    $scope.cola.estado='finished';
-            }
-        });
+        }
+        if(newVal[0] == newVal[1] && newVal[2] == 'loading'){
+            $scope.cola.estado='finished';
+        }
+    });
 
     /** cerrado de la grilla en modo small**/
     $scope.closeSide = function(){
@@ -2155,7 +2253,6 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
             }});
         }
-       // $scope.imgSelec = "images/thumbs/"+img.thumb;
 
         $scope.imgSelec =$scope.resource.get({id: img.id},{});
 
@@ -2179,11 +2276,11 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                     uploadNow = parseInt(100.0 * evt.loaded / evt.total);
                 }).success(function (data, status, headers, config) {
                     /*newFile.id= data.id;
-                    newFile.file= data.file;
-                    newFile.thumb= data.thumb;
-                    newFile.tipo= data.tipo;
-                    newFile.file= data.file;
-                    newFile.folder= data.folder;*/
+                     newFile.file= data.file;
+                     newFile.thumb= data.thumb;
+                     newFile.tipo= data.tipo;
+                     newFile.file= data.file;
+                     newFile.folder= data.folder;*/
                     //$scope.pitures.pop();
                     $scope.pitures.push(data);
                     $scope.cola.terminados.push(data);
@@ -2228,12 +2325,12 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
     $scope.$watchGroup(['module.layer',
         'moduleKey'], function(newVal){
-            if($scope.isOpen  && newVal[0] != "sideFiles"){
-                filesService.close();
-                $scope.expand=false;
-                $scope.expand=false;
+        if($scope.isOpen  && newVal[0] != "sideFiles"){
+            filesService.close();
+            $scope.expand=false;
+            $scope.expand=false;
 
-            }
+        }
     });
 
 }]);

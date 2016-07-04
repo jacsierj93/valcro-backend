@@ -1201,7 +1201,7 @@ class OrderController extends BaseController
 
         $model= $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->doc_id);
-        $modelIts= $model->items()->get();
+        $modelIts= $model->items()->where('tipo_origen_id', '1')->get();
         foreach($items as $aux){
             $temp= array();
             $temp['id'] = $aux->id;
@@ -1246,8 +1246,10 @@ class OrderController extends BaseController
         $temp['codigo'] = "(demo".")";
         $temp['codigo_fabrica'] =$prodTemp->codigo_fabrica;
         $temp['puntoCompra'] = false;
-        $temp['cantidad'] =$req->cantidad;
-        $temp['saldo'] =$req->cantidad;
+        $temp['cantidad'] = 0;
+        $temp['saldo'] = 0;
+
+
         $temp['stock'] = 0;
         $temp['tipo_producto_id'] = $prodTemp->tipo_producto_id;
         $temp['tipo_producto'] = ProductType::findOrFail($prodTemp->tipo_producto_id)->descripcion;
@@ -1255,6 +1257,13 @@ class OrderController extends BaseController
         if($prodTemp->descripcion == null){
             $temp['descripcion'] = "Profit ".$prodTemp->descripcion_profit;
         }
+        if($req->has('cantidad')){
+            $temp['cantidad'] = $req->cantidad;
+            $temp['saldo'] = $req->cantidad;
+        }
+
+
+
 
         return $temp;
     }
@@ -2773,7 +2782,7 @@ class OrderController extends BaseController
                 $item->descripcion = $aux->descripcion;
                 $item->producto_id = $aux->producto_id;
                 $item->doc_origen_id = $aux->contra_pedido_id;
-                $aux->saldo=0;
+                //$aux->saldo=0;
                 $oldItems[]=$aux;
                 $newItems[]=$item;
             }
@@ -3403,31 +3412,6 @@ class OrderController extends BaseController
         }
         return $model;
     }
-    /*
-        public function addPurchaseOrder(Request $req){
-
-            $odc= PurchaseOrder::findOrFail($req->id);
-
-            foreach(  $odc->PurchaseOrderItem()->get() as $aux){
-                $item = new OrderItem();
-                $item->pedido_id=$req->pedido_id;
-                $item->producto_id=$aux->id;
-                $item->pedido_tipo_origen_id='1';
-                $item->origen_id=$req->id;
-                $item->save();
-            }
-
-        }
-
-        public function RemovePurchaseOrder(Request $req){
-            $model = OrderItem::where('origen_id', $req->id)
-                ->where('pedido_id',$req->pedido_id)
-                ->get();
-            foreach(  $model as $aux){
-                $aux->destroy($aux->id);
-            }
-        }*/
-
 
     /**
      * Obtiene la orden de compra
