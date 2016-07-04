@@ -932,11 +932,13 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .imgItem{
+
     width: 72px;
     height: 72px;
-    margin: 0px 8px 8px 0px;
+    margin: 0px 2px 4px 2px;
     float: left;
     border: 1px dashed #ccc;
+    overflow: hidden;
 }
 
 div.activeleft{
