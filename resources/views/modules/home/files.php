@@ -6,7 +6,7 @@
                  ng-click="closeSide()" ng-class="{'white': ('detalleDoc'!=layer)}"  style="" ng-show="expand"></div>-->
             <div layout="column" style="width: 326px;">
                 <div layout="row" style="min-height: 36px;">
-                    <div layout="column" layout-align="center center" ng-click="close()" ng-show="!expand">
+                    <div layout="column" layout-align="center center" ng-click="closeSide()" ng-show="!expand">
                         <span class="icon-Inactivo" style="font-size: 24px;color: black;"></span>
                     </div>
                     <div class="titulo_formulario" layout="column" flex layout-align="start start" style="heigth:39px;">
@@ -33,7 +33,7 @@
                 <div layout="column" flex style="padding:16px;">
                     <div style="overflow: auto;">
                     <div style="width: 100%; height: 100%;">
-                        <img width="100%"  height="100%" ng-src="{{imgSelec}}" >
+                        <img width="100%"  height="100%" data-ng-src="data:image/png;base64,{{imgSelec}}" >
                     </div>
                     </div>
                 </div>

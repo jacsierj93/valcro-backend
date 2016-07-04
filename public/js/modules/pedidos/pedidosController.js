@@ -264,6 +264,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             Order.postMod({type:$scope.formMode.mod, mod:"AddAdjuntos"},
                 {id:$scope.document.id,adjuntos: data}, function(response){
                     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                    $scope.reloadDoc();
                    });
            // $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
 
@@ -442,19 +443,25 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** APERTURA DE LAYERS ********************************************/
 
     $scope.openAdj = function(folder){
-        filesService.open();
-        var items = new Array();
-        $scope.folder = folder;
-        filesService.setTitle(folder);
-        var data= $filter("customFind")($scope.document.adjuntos,folder.toUpperCase(),function(current,compare){return current.documento==compare});
+        if($scope.document.id){
+            filesService.open();
+            var items = new Array();
+            $scope.folder = folder;
+            filesService.setTitle(folder);
+            var data= $filter("customFind")($scope.document.adjuntos,folder.toUpperCase(),function(current,compare){return current.documento==compare});
 
-        if($scope.document.adjuntos.length >0 ){
-            angular.forEach(data,function(v,k){
+            if($scope.document.adjuntos.length >0 ){
+                angular.forEach(data,function(v,k){
                     items.push(v.file);
-            });
+                });
+
+            }
+            filesService.setFiles(items);
+        }else {
+            $scope.NotifAction("error","Debe completar los campos obligatorios para realizar esta accion",[],{autohidden:autohidden});
 
         }
-        filesService.setFiles(items);
+
 
 
     };
@@ -1563,7 +1570,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /** formulario  head*/
     $scope.$watch('document.pais_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
-            $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:newVal, pais_id:newVal});
+            $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal});
 
             if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
 
@@ -1912,98 +1919,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /*********************************  peticiones  guardado $http ********************* ************/
 
-    function addOrdenCompra(id, pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/AddPurchaseOrder',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-            alert('Asignado');
-        }, function errorCallback(response) {
-        });
-    }
-    function removeOrdenCompra(id,pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/RemovePurchaseOrder',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-            alert('des Asignado');
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-
-    function addkitchenBox(id, pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/AddkitchenBox',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-    function removekitchenBox(id, pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/RemovekitchenBox',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-            alert(' Removido ');
-            loadDoc($scope.document.id);
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-
-    function addContraPedido(id, pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/AddCustomOrder',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-            alert('asignado');
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-    function removeContraPedido(id, pedido_id){
-
-        ORDER.post({type:'RemoveCustomOrder'},{ id:id, pedido_id:pedido_id}, function(data){
-            alert(' Removido ');
-            loadDoc($scope.document.id);
-        });
-
-    }
-
-    /**@deprecated
-     * **/
-    function addPedidoSustituto(id, pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/AddOrderSubstitute',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-
-    function removePedidoSustituto(id, pedido_id){
-        $http({
-            method: 'POST',
-            url: 'Order/RemoveOrderSubstitute',
-            data:{ id:id, pedido_id:pedido_id}
-        }).then(function successCallback(response) {
-
-        }, function errorCallback(response) {
-            console.log("errorrr");
-        });
-    }
-
     function segurity(key){
         return true;
     }
@@ -2090,30 +2005,15 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
             }else {
                 console.log("error parametro no implemtnado")
             }
-            //if(arg.back){
-            //    close(true, module);
-            //}
-            //if(arg.backTo){
-            //    close(true, module);
-            //}
-
         }
-
-
-
-
-
-
     });
 
     function close(arg, module){
-        console.log("close dentro");
         if(module.index>0 && !module.blockBack){
             console.log("close dentro block");
 
             var paso=true;
             if(arg.before){
-                console.log("respuesta ",res);
                 var res=arg.before();
 
                 if(res == false){
@@ -2144,7 +2044,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
                 for(var i=0; i<close;i++){
                     var l = module.historia[current];
-                    console.log("cerrando",l);
                     $mdSidenav(l).close().then(function(){
                         if(arg.after){
                             arg.after();
@@ -2212,7 +2111,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.imgSelec = null;
     $scope.resource = $resource('master/files/:type', {}, {
         query: {method: 'GET',params: {type: "getFiles"}, isArray: true},
-        get: {method: 'GET',params: {type:"getFile"}, isArray: false},
+        get: {method: 'GET',params: {type:"getFile"}, headers: {'Content-Type': 'image/png'},isArray: false},
 
     });
 
@@ -2256,10 +2155,9 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
             }});
         }
-        $scope.imgSelec = "images/thumbs/"+img.thumb;
+       // $scope.imgSelec = "images/thumbs/"+img.thumb;
 
-        console.log('imge',img)
-        $scope.resource.get({id: img.id},{});
+        $scope.imgSelec =$scope.resource.get({id: img.id},{});
 
 
     };
@@ -2473,10 +2371,6 @@ MyApp.service('Layers' , function(){
 
             accion.data=arg;
             accion.estado=true;
-            console.log("accc", arg);
-        },
-        getLayer : function (){
-            return  modules[modulekey].index;
         },
         getIndex : function (){
             return  modules[modulekey].layer;

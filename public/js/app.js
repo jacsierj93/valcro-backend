@@ -39,6 +39,46 @@ window.addEventListener("drop",function(e){
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
 
+MyApp.config(function ($provide, $httpProvider) {
+
+    // Intercept http calls.
+    $provide.factory('MyHttpInterceptor', function ($q) {
+        return {
+            // On request success
+            request: function (config) {
+                // console.log(config); // Contains the data about the request before it is sent.
+                return config || $q.when(config);
+            },
+
+            // On request failure
+            requestError: function (rejection) {
+                // console.log(rejection); // Contains the data about the error on the request.
+          //      console.log("request ", rejection);
+                // Return the promise rejection.
+                return $q.reject(rejection);
+            },
+
+            // On response success
+            response: function (response)
+            {
+                // Return the response or promise.
+                return response || $q.when(response);
+            },
+
+            // On response failture
+            responseError: function (rejection) {
+                // console.log(rejection); // Contains the data about the error.
+              //  console.log("reposnse error", rejection)
+                // Return the promise rejection.
+                return $q.reject(rejection);
+            }
+        };
+    });
+
+    // Add the interceptor to the $httpProvider.
+    $httpProvider.interceptors.push('MyHttpInterceptor');
+
+});
 
 //###########################################################################################3
 //##############################REST service (factory)#############################################3
@@ -88,7 +128,6 @@ MyApp.directive('decimal', function () {
                 if(viewValue === undefined || viewValue=="" || viewValue==null){
                     return true;
                 }
-                console.log(viewValue)
                 elem[0].value = viewValue.replace(/([a-z]|[A-Z]| )+/,"")
 
                 var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
@@ -616,10 +655,13 @@ function DemoCtrl1 ($timeout, $q, $log) {
 MyApp.service('DateParse', function() {
     this.toDate = function (text) {
         var aux= text;
-        if(text.length >= 10){
-            aux=text.substring(0, 10);
+        if(typeof (text) != 'undefined'){
+            if(text.length >= 10){
+                aux=text.substring(0, 10);
+            }
+            return new Date(Date.parse(aux));
         }
-        return new Date(Date.parse(aux));
+
     }
 });
 

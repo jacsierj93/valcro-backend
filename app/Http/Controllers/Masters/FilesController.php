@@ -39,9 +39,9 @@ class FilesController extends BaseController
 
     public function getFileId(Request $req){
         $file = FileModel::findOrFail($req->id);
-        $archivo = new Files($file->module);
+        $archivo = new Files($file->modulo);
 
-        //return $archivo->getFile($file->archivo);
+        return $archivo->getFile("images"."/".$file->archivo);
 
     }
 }
