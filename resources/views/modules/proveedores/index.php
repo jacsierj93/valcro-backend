@@ -500,7 +500,8 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)" name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" placeholder="Telefono" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[32]">
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)" ng-pattern="/^\(\+[\d\-]{1,7}\)[\d\-]{10}$/" name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[32]">
+                                <input phone placeholder="Telefonos Contacto">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
@@ -508,10 +509,6 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <!--<md-input-container class="md-block" flex>
-                                <label>Telefono</label>
-                                <input ng-pattern="/^[\d\-+]+$/" number info="telefono de contacto (en formato internacional)" autocomplete="off" name="contTelf" md-no-asterisk ng-model="cnt.contTelf.valor" ng-disabled=" $parent.enabled || cnt.isAgent==1" />
-                            </md-input-container>-->
                         </div>
 
                         <div class="row" layout="row">

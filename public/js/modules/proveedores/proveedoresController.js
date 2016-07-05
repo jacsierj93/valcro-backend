@@ -1258,8 +1258,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         $scope.cnt.prov_id=$scope.prov.id
     });
     $scope.$watch('cnt.pais',function(nvo,old){
-        var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
-        $scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
+        //var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
+        var preVal = angular.element("#contTelf").find("input").val();
+        console.log(preVal)
+        if(preVal!=""){
+            angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
+        }else{
+            angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+        }
+
+        //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
     $scope.$watch('contacts.length',function(nvo){
         setGetProv.setComplete("contact",nvo);
@@ -1318,18 +1326,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     };
 
     $scope.transformChipTlf = function(chip){
-        console.log(chip);
         if (angular.isObject(chip)) {
             return chip;
         }
-       /* var reg = new RegExp("^[\d\-+]+$");
-
-        if(!reg.test(chip)){
-            setNotif.addNotif("error", "telefono no tiene un formato adecuado", [
-            ],{autohidden:3000});
-            return null ;
-        }
-*/
         if(Object.keys(chipCont).length==0){
             var chip = {id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
         }else{

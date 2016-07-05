@@ -106,7 +106,6 @@ MyApp.directive('global', function (Layers, setNotif) {
 
 MyApp.directive('number', function () {
     return {
-        require: 'ngModel',
         link: function (scope, elem, attrs,ctrl) {
 
             elem[0].addEventListener('input', function(){
@@ -119,6 +118,26 @@ MyApp.directive('number', function () {
         }
     };
 });
+
+MyApp.directive('phone', function (setNotif) {
+    return {
+        link: function (scope, elem, attrs,ctrl) {
+
+            elem[0].addEventListener('input', function(){
+                var  num = this.value.match(/^[\d\-+\.\(\)]+$/);
+                if (num === null && this.value!="") {
+                    setNotif.addNotif("error","no se permiten estos valores",[]);
+                    this.value = this.value.substr(0, this.value.length - 1);
+                }else{
+                    setNotif.hideByContent("error","no se permiten estos valores");
+                }
+            },false);
+
+        }
+    };
+});
+
+
 
 MyApp.directive('decimal', function () {
     return {
@@ -253,12 +272,6 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     }
                 },50)
             },0);
-            /*if(scope.showGrid){
-                scope.showGrid(false,{toElement:element});
-            }else{
-                scope.isShow=false;
-                scope.projectForm.$setUntouched();
-            }*/
 
         }
     };

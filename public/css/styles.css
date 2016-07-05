@@ -323,9 +323,9 @@ md-chips .md-chips.md-focused {
     line-height: 20px !important;
 }
 
-.md-chips .md-chip-input-container:not(:first-child) {
+.md-chips .md-chip-input-container {
     /*margin: 6px 0px 2px 0 !important;*/
-    margin: 0px !important;
+    margin: 2px !important;
 }
 
 .md-chips .md-chip-input-container input:not([type]) {
