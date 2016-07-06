@@ -408,7 +408,7 @@
                             </md-input-container>
 
                         </div>
-                        <md-input-container class="md-block"ng-show="dir.tipo==2">
+                        <md-input-container class="md-block"ng-show="dir.tipo==2 || dir.tipo==3">
                             <label>puertos</label>
                             <md-select skip-tab id="dirPort" ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
@@ -914,7 +914,7 @@
         </md-sidenav>
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController" style="margin-left:24px">
                 <div class="titulo_formulario" layout="column" layout-align="start start" ng-click="closeCondition()">
                     <div>
                         {{head.title}} <i>({{head.line}})</i>
@@ -998,7 +998,7 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select ng-model="conv.line" ng-disabled="$parent.enabled" required md-no-ink>
+                                    <md-select ng-model="conv.line" ng-disabled="$parent.enabled"ñ md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
