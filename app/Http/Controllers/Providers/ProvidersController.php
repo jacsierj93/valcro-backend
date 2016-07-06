@@ -219,7 +219,10 @@ class ProvidersController extends BaseController
             $contacts = Provider::find($id)->contacts()->get();
             foreach($contacts as $contact){
                 $contact->languages=$contact->idiomas()->lists("languaje_id");
-                $contact->cargos=$contact->cargos()->lists("cargo_id");
+                $contact->emails=$contact->campos()->where("prov_id",$id)->where("campo","email")->get();
+                $contact->phones=$contact->campos()->where("prov_id",$id)->where("campo","telefono")->get();
+                //$contact->cargos=$contact->cargos()->lists("cargo_id");
+
             }
             return ($contacts)?$contacts:[];
         }
@@ -255,6 +258,8 @@ class ProvidersController extends BaseController
             Provider::find($req->prov_id)->contacts()->attach($contact->id);
         }
 
+        $result['mails'] = $this->contactEmail($req->emailCont,$contact->id,$req->prov_id);
+        $result['phones'] = $this->contactPhone($req->contTelf,$contact->id,$req->prov_id);
 
         /*$contact->campos()->create([
             'campo' => 'telefono',
@@ -272,43 +277,60 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-    public function contactEmail(request $req){
-        $result = array("success" => true, "action" => "new","id"=>"");
-        if($req->id){
-            $result['action'] = "updt";
-            $email = Contactos::find($req->cont_id)->campos()->find($req->id);
-        }else{
-            $email = new ContactField();
+    private function contactEmail($reqs,$cont_id,$prov_id){
+        //dd($reqs);
+        $result = array();
+        $exists = Contactos::find($cont_id)->campos()->where("prov_id",$prov_id)->where("campo","email")->get();
+       // dd($exists->except(["45","43"]));
+        $ids = [];
+        foreach($reqs as $req){
+            if($exists->contains($req["id"])){
+                $ids[]=$req["id"];
+                $email = Contactos::find($cont_id)->campos()->find($req["id"]);
+            }else{
+                $email = new ContactField();
+            }
+            $email->campo = "email";
+            $email->cont_id = $cont_id;
+            $email->prov_id = $req["prov_id"];
+            $email->valor = $req["valor"];
+            if($email->save()){
+                $result[] = $email->id;
+            }else{
+                $result['success'] = false;
+            }
         }
-        $email->campo = "email";
-        $email->cont_id = $req->cont_id;
-        $email->prov_id = $req->prov_id;
-        $email->valor = $req->valor;
-        if($email->save()){
-            $result['id'] = $email->id;
-        }else{
-            $result['success'] = false;
-        }
+
+        foreach($exists->except($ids) as $k){
+            ContactField::destroy($k->id);
+        };
+
+
+
         return $result;
     }
-    public function contactPhone(request $req){
-        if($req->id){
-            $phone = Contactos::find($req->cont_id)->campos()->find($req->id);
-        }else{
-            $phone = new ContactField();
+    private function contactPhone($reqs,$cont_id){
+        $result = array();
+        foreach($reqs as $req){
+            if($req["id"]){
+                $phone = Contactos::find($cont_id)->campos()->find($req["id"]);
+            }else{
+                $phone = new ContactField();
+            }
+            $phone->campo = "telefono";
+            $phone->cont_id = $cont_id;
+            $phone->prov_id = $req["prov_id"];
+            $phone->valor = $req["valor"];
+            if($phone->save()){
+                $result[] = $phone->id;
+            }else{
+                $result['success'] = false;
+            }
         }
-        $phone->campo = "direccion";
-        $phone->cont_id = $req->cont_id;
-        $phone->prov_id = $req->prov_id;
-        $phone->valor = $req->valor;
-        if($phone->save()){
-            $result['id'] = $phone->id;
-        }else{
-            $result['success'] = false;
-        }
+
         return $result;
     }
-    public function contactAddress(request $req){
+    private function contactAddress(request $req){
         if($req->id){
             $addr = Contactos::find($req->cont_id)->campos()->find($req->id);
         }else{

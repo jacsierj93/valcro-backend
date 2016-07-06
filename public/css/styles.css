@@ -89,8 +89,11 @@ md-input-container,md-autocomplete {
 
 /*==================================================*/
 /*==================== INPUT =======================*/
-md-autocomplete .md-input, md-input-container .md-input, .md-select-value {
-    border-color: transparent !important;
+form.focused md-autocomplete:not([required],.md-input-invalid) .md-input,form.focused md-input-container .md-input:not([required],.md-input-invalid),form.focused  .md-select-value:not([required],.md-input-invalid) {
+    border-color: #ccc !important;
+}
+form:not(.focused) md-autocomplete .md-input, form:not(.focused) md-input-container .md-input, form:not(.focused) .md-select-value {
+    border-color: transparent;
 }
 
 md-input-container.md-input-focused:not(.md-input-invalid)  .md-input {
@@ -114,8 +117,19 @@ md-input-container:not(.md-input-invalid).md-input-focused label {
     border-bottom: 1px solid #febd33 !important;
 }
 
+
+.focused md-input-container:not(.md-input-invalid) .md-input:not([disabled="disabled"]),
+.focused md-input-container:not(.md-input-focused) .md-input:not([disabled="disabled"]){
+    border-bottom: 1px solid rgba(0,0,0,0.22) ;
+}
+
 .focused md-input-container:not(.md-input-focused) md-select[required]:not([disabled="disabled"]).ng-untouched.ng-empty .md-select-value{
     border-bottom: 1px solid #febd33 !important;
+}
+
+.focused md-input-container:not(.md-input-focused) md-select:not([disabled="disabled"]) .md-select-value,
+.focused md-input-container:not(.md-input-invalid) md-select:not([disabled="disabled"]) .md-select-value{
+    border-bottom: 1px solid rgba(0,0,0,0.22) !important;
 }
 
 md-input-container.md-default-theme.md-input-invalid .md-input, md-input-container.md-input-invalid .md-input{

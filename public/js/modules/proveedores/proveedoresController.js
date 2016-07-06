@@ -1340,18 +1340,35 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         chipCont = {};
         return chip;
 
-    }
+    };
 
     var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
+    var currentOrig = {};
+    var saveContact = function(onSuccess){
+        if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt ) || ($scope.provContactosForm.$pristine )){
+            onSuccess();
+            return false;
+        }
 
-    var saveContact = function(){
+        if(!$scope.provContactosForm.$valid){
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onSuccess();
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    console.log($scope.provContactosForm);
+                }
+            }]);
+
+        }
         providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
             $scope.cnt.id = data.id;
 
             contact.id = $scope.cnt.id;
             contact.nombre = $scope.cnt.nombreCont;
-            //contact.email = $scope.cnt.emailCont.valor;
-            //contact.telefono = $scope.cnt.contTelf.valor;
             contact.pais_id = $scope.cnt.pais;
             contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
             contact.responsabilidades =  $scope.cnt.responsability;
@@ -1360,13 +1377,18 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             contact.prov_id = $scope.cnt.prov_id;
             contact.languages = $scope.cnt.languaje;
             contact.cargos = $scope.cnt.cargo;
+
             if (data.action == "new" || nuevo[2]) {
                 $scope.cnt.autoSave = false;
                 $scope.contacts.unshift(contact);
                 setGetContac.addUpd(contact,angular.copy($scope.prov));
                 setNotif.addNotif("ok", "contacto añadido", [
                 ],{autohidden:3000});
+            }else{
+                setNotif.addNotif("ok", "contacto Actualizado", [
+                ],{autohidden:3000});
             };
+            onSuccess();
             setGetProv.addChng($scope.cnt,data.action,"contProv");
         });
     };
@@ -1427,6 +1449,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         contact = element.cont;
         contact.prov_id = $scope.prov.id;
         setGetContac.setContact(contact);
+        currentOrig = angular.copy($scope.cnt);
         setGetProv.addToRllBck($scope.cnt,"contProv")
     };
 
@@ -1436,13 +1459,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             $scope.isShow = elem;
             if(!elem){
                 console.log($scope.cnt)
-              /*  contact = {};
-                setGetContac.setContact(false);
-                $scope.provContactosForm.$setUntouched();
-                if($scope.$parent.expand==$scope.id){
-                    $scope.isShowMore = elem;
-                    $scope.$parent.expand = false;
-                }*/
+                saveContact(function(){
+                    contact = {};
+                    setGetContac.setContact(false);
+                    $scope.provContactosForm.$setUntouched();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                });
+
 
             }
         }
@@ -1508,9 +1534,9 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
                 var prov = setGetProv.getProv();
                 contact.id = cont.id||false;
                 contact.nombreCont = cont.nombre||"";
-                contact.emailCont.valor = cont.email||"";
-                contact.contTelf.valor = cont.telefono||"";
-                contact.pais = cont.pais_id||"";
+                contact.emailCont = cont.emails||[];
+                contact.contTelf = cont.phones||[];
+                contact.pais = cont.pais_id||"  ";
                 contact.responsability = cont.responsabilidades||"";
                 contact.dirOff.valor = cont.direccion||"";
                 contact.isAgent = cont.agente || 0;
@@ -1523,7 +1549,6 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
             return contact;
         },
         addUpd : function(cont,prov){
-
             var contact = $filter("customFind")(listCont,cont.id,function(val,compare){return  val.id == compare;});
             if(contact.length>0){
                 var provs = $filter("customFind")(contact[0].provs,prov.id,function(val,compare){return  val.prov_id == compare;});
@@ -1761,32 +1786,58 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     });
     var credit = {};
     /*escuha el estatus del formulario y guarda cuando este valido*/
-    $scope.$watchGroup(['provCred.$valid','provCred.$pristine'], function(nuevo) {
+   /* $scope.$watchGroup(['provCred.$valid','provCred.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
-            providers.put({type:"saveLim"},$scope.cred,function(data){
-                $scope.cred.id = data.id;
-                $scope.provCred.$setPristine();
-                credit.moneda_id = $scope.cred.coin;
-                credit.moneda = $filter("filterSearch")($scope.coins,[$scope.cred.coin])[0];
-                credit.limite = $scope.cred.amount;
-                credit.linea_id = $scope.cred.line;
-                credit.line = $filter("filterSearch")($scope.lines,[$scope.cred.line])[0];
-                if($scope.cred.amount >= $scope.prov.limCred){
-                    $scope.prov.limCred = $scope.cred.amount;
-                    setGetProv.updateItem($scope.prov);
-                }
 
-                if(data.action=="new"){
-                    credit.id= $scope.cred.id;
-                    $scope.limits.unshift(credit);
-                    setNotif.addNotif("ok", "nuevo limite de credito", [
-                    ],{autohidden:3000});
-                }
-                setGetProv.addChng($scope.cred,data.action,"limCred");
-            });
 
         }
-    });
+    });*/
+    var currentOrig = {};
+    var saveCredit = function(onSuccess){
+        if((angular.equals(currentOrig,$scope.cred) && $scope.cred ) || ($scope.provCred.$pristine )){
+            onSuccess();
+            return false;
+        }
+
+        if(!$scope.provCred.$valid){
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onSuccess();
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    console.log($scope.provCred);
+                }
+            }]);
+
+        }
+
+        providers.put({type:"saveLim"},$scope.cred,function(data){
+            $scope.cred.id = data.id;
+            $scope.provCred.$setPristine();
+            credit.moneda_id = $scope.cred.coin;
+            credit.moneda = $filter("filterSearch")($scope.coins,[$scope.cred.coin])[0];
+            credit.limite = $scope.cred.amount;
+            credit.linea_id = $scope.cred.line;
+            credit.line = $filter("filterSearch")($scope.lines,[$scope.cred.line])[0];
+            if($scope.cred.amount >= $scope.prov.limCred){
+                $scope.prov.limCred = $scope.cred.amount;
+                setGetProv.updateItem($scope.prov);
+            }
+
+            if(data.action=="new"){
+                credit.id= $scope.cred.id;
+                $scope.limits.unshift(credit);
+                setNotif.addNotif("ok", "nuevo limite de credito", [
+                ],{autohidden:3000});
+            }else{
+
+            }
+            setGetProv.addChng($scope.cred,data.action,"limCred");
+        });
+    }
 
     $scope.rmCredit = function(elem){
         setNotif.addNotif("alert", "desea eliminar este limite de Credito", [
@@ -1820,6 +1871,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         $scope.cred.coin = credit.moneda_id;
         $scope.cred.amount = credit.limite;
         $scope.cred.line = credit.linea_id;
+        currentOrig = angular.copy($scope.bnk);
         setGetProv.addToRllBck($scope.bnk,"limCred");
     };
 
@@ -1827,12 +1879,16 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         if(jQuery(event.toElement).parents("#lyrAlert").length==0) {
             $scope.isShow = elem;
             if(!elem) {
-                if(($scope.provCred.$dirty || $scope.cred.id) && $filter("customFind")($scope.limits,null,function(c,x){return c==x;}).length<=0){
+                //console.log($scope.limits)
+                if(($scope.provCred.$dirty || $scope.cred.id) && $filter("customFind")($scope.limits,"",function(c,x){return c==x;}).length<=0){
                     setNotif.addNotif("alert", "no a definido un limite de credito general (sin linea), desea continuar de todas maneras", [
                         {
                             name: "SI",
                             action: function () {
-                                clearForm(elem);
+                                saveCredit(function(){
+                                    clearForm(elem);
+                                })
+
                             }
                         },
                         {
@@ -1842,7 +1898,9 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
                             }
                         }]);
                 }else{
-                    clearForm(elem)
+                    saveCredit(function(){
+                        clearForm(elem);
+                    })
                 }
 
 
@@ -1854,6 +1912,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     var clearForm = function(elem){
         $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
         credit = {};
+        currentOrig = {};
         $scope.provCred.$setUntouched();
         if($scope.$parent.expand==$scope.id){
             $scope.isShowMore = elem;
