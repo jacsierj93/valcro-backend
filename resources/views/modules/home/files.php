@@ -6,7 +6,7 @@
                  ng-click="closeSide()" ng-class="{'white': ('detalleDoc'!=layer)}"  style="" ng-show="expand"></div>-->
             <div layout="column" style="width: 326px;">
                 <div layout="row" style="min-height: 36px;">
-                    <div layout="column" layout-align="center center" ng-click="closeSide()" ng-show="!expand">
+                    <div layout="column" layout-align="center center" ng-click="closeSideFile()" ng-show="!expand">
                         <span class="icon-Inactivo" style="font-size: 24px;color: black;"></span>
                     </div>
                     <div class="titulo_formulario" layout="column" flex layout-align="start start" style="heigth:39px;">
@@ -18,7 +18,7 @@
 
                 <div style="padding: 2px;; min-height: 56px;" layout="row">
                     <div ngf-drop ngf-select="upload($files)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                         ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
+                         ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf"  ng-show="allowUp">
                         insertar archivo
                     </div>
                 </div>
