@@ -455,12 +455,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** APERTURA DE LAYERS ********************************************/
 
     $scope.openAdj = function(folder){
-        console.log("form block", $scope.formBlock);
-        if(!$scope.formBlock){
-            filesService.setallowUpLoad(true);
-        }else {
-            filesService.setallowUpLoad(false);
-        }
         if($scope.document.id){
             filesService.open();
             var items = new Array();
@@ -1065,9 +1059,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.verificExit();
         }else {
             var back= angular.copy($scope.module.historia[$scope.index -1]);
-            console.log("layer ", $scope.module.layer);
             if($scope.module.layer == "sideFiles"){
                 $scope.LayersAction({close:true});
+                filesService.close();
             }else
             if(back){
                 console.log("back ", back)
@@ -1590,9 +1584,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /****** **************************listener ***************************************/
 
     $scope.$watch("formBlock",function(newVal){
-        if(newVal){
+        console.log("is block", newVal);
+        if(newVal == true){
             filesService.setallowUpLoad(false);
-        }else{
+        }else if( newVal == false){
             filesService.setallowUpLoad(true);
         }
 
@@ -1786,7 +1781,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.gridView=-1;
             $scope.imagenes = new Array();
             setGetOrder.restore();
-            $scope.formBlock;
+            $scope.formBlock = true;
         }
 
         if (newVal[1] != '' && typeof(newVal[1]) !== 'undefined') {
@@ -2209,7 +2204,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
     }
 });
 
-MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,filesService, Layers,setNotif){
+MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){
 
     $scope.template = "modules/home/files";
     $scope.accion= filesService.getAccion();
@@ -2219,15 +2214,20 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.module = Layers.getModule();
     $scope.moduleAccion = Layers.getAccion();
     $scope.cola = filesService.getProcess();
+    $scope.allowUpload = filesService.allowUpLoad();
+    filesService.setallowUpLoad(false);
     $scope.inLayer = "";
     $scope.expand=false;
     $scope.imgSelec = null;
+    console.log(" en layer controler"  )
     $scope.resource = $resource('master/files/:type', {}, {
         query: {method: 'GET',params: {type: "getFiles"}, isArray: true},
         get: {method: 'GET',params: {type:"getFile"}, headers: {'Content-Type': 'image/png'},isArray: false},
 
     });
-    $scope.allowUp= filesService.allowUpLoad();
+    $scope.$watch('allowUpload.val', function(newVal){
+        console.log(" cambio el permiso de subido a " ,newVal )
+    });
 
     /***
      * indicador de progreso
@@ -2252,14 +2252,19 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     };
 
     /*****/
-    $scope.selectImg= function(img){
-        console.log("expand ", $scope.expand);
+    $scope.selectImg= function(doc){
+        console.log("upload ", $scope.allowUpload);
         Layers.setAccion({open:{name:'sideFiles',before:
             function(){$scope.expand=true;}
         }});
 
-
-         $scope.imgSelec =$scope.resource.get({id: img.id},{});
+        if(doc.tipo.startsWith("image")){
+            $scope.imgSelec =SYSTEM.PATHAPP +"master/files/getFile?id="+doc.id;
+            $scope.pdfSelec= undefined;
+        }else {
+            $scope.imgSelec =undefined;
+            $scope.pdfSelec= undefined;
+        }
 
 
     };
@@ -2268,38 +2273,38 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.upload = function(files){
         console.log("allowUpLoad", filesService.allowUpLoad());
         //if( filesService.allowUpLoad() == true){
-            $scope.isUploading = false;
-            $scope.cola.total = files.length;
-            if (files && files.length) {
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    //$scope.pitures.push({thumb:'ImageDefect.jpg'});*/
-                    Upload.upload({
-                        url: 'master/files/upload',
-                        data :{ folder:filesService.getFolder(),file: file}
-                    }).progress(function (evt) {
-                        // var progressPercentage = ;
-                        uploadNow = parseInt(100.0 * evt.loaded / evt.total);
-                    }).success(function (data, status, headers, config) {
-                        /*newFile.id= data.id;
-                         newFile.file= data.file;
-                         newFile.thumb= data.thumb;
-                         newFile.tipo= data.tipo;
-                         newFile.file= data.file;
-                         newFile.folder= data.folder;*/
-                        //$scope.pitures.pop();
-                        $scope.pitures.push(data);
-                        $scope.cola.terminados.push(data);
+        $scope.isUploading = false;
+        $scope.cola.total = files.length;
+        if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                //$scope.pitures.push({thumb:'ImageDefect.jpg'});*/
+                Upload.upload({
+                    url: 'master/files/upload',
+                    data :{ folder:filesService.getFolder(),file: file}
+                }).progress(function (evt) {
+                    // var progressPercentage = ;
+                    uploadNow = parseInt(100.0 * evt.loaded / evt.total);
+                }).success(function (data, status, headers, config) {
+                    /*newFile.id= data.id;
+                     newFile.file= data.file;
+                     newFile.thumb= data.thumb;
+                     newFile.tipo= data.tipo;
+                     newFile.file= data.file;
+                     newFile.folder= data.folder;*/
+                    //$scope.pitures.pop();
+                    $scope.pitures.push(data);
+                    $scope.cola.terminados.push(data);
 
-                    }).error(function(){
-                        $scope.cola.estado = "error";
-                        //setNotif.addNotif('error', "No se pudieron subir algunos archivos");
-                    });
-                }
+                }).error(function(){
+                    $scope.cola.estado = "error";
+                    //setNotif.addNotif('error', "No se pudieron subir algunos archivos");
+                });
             }
-       /* }else{
+        }
+        /* }else{
 
-        }*/
+         }*/
     };
 
     $scope.$watch("accion.estado", function(newval){
@@ -2522,7 +2527,7 @@ MyApp.service('filesService' ,function(){
         terminados: new Array(),
         estado:'wait'
     };
-    var allowUpload = true;
+    var allowUpload = {val:false};
     return {
         setFiles: function(data){
             all.splice(0,all.length);
@@ -2573,8 +2578,9 @@ MyApp.service('filesService' ,function(){
             return data;
         },
         allowUpLoad : function(){return allowUpload;},
-        setallowUpLoad : function(value){ allowUpload = value;
-        console.log("trace3 se value", value)
+        setallowUpLoad : function(value){
+            allowUpload.val= value;
+            console.log("trace3 se value", value)
         }
 
 
@@ -2597,5 +2603,10 @@ MyApp.factory('Order', ['$resource',
 ]);
 
 
+MyApp.constant('SYSTEM',{
+    ROOT:"http://"+window.location.hostname,
+    BASE:"/"+window.location.pathname.split("/")[1]+"/",
+    PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/"
 
+});
 /******************************** trash ***********************************/

@@ -2739,10 +2739,11 @@ class OrderController extends BaseController
             $att['doc_id'] = $aux->doc_id;
             $att['documento'] = $aux->documento;
             $att['comentario'] = $aux->comentario;
+
             $auxFile['id']=$file->id;
             $auxFile['thumb']=$file->getThumbName();
             $auxFile['tipo']=$file->tipo;
-            $auxFile['documento'] = $aux->documento;
+            $auxFile['file'] = $file->archivo;
             $att['file'] = $auxFile;
             $atts[]= $att;
 

@@ -16,9 +16,9 @@
                     </div>
                 </div>
 
-                <div style="padding: 2px;; min-height: 56px;" layout="row">
+                <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="allowUpload.val">
                     <div ngf-drop ngf-select="upload($files)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                         ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf"  ng-show="allowUp">
+                         ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf"  >
                         insertar archivo
                     </div>
                 </div>
@@ -33,7 +33,10 @@
                 <div layout="column" flex style="padding:16px;">
                     <div style="overflow: auto;">
                     <div style="width: 100%; height: 100%;">
-                        <img width="100%"  height="100%" data-ng-src="data:image/png;base64,{{imgSelec}}" >
+                        <img style="width: 100%; height: 100%;" ng-src="{{imgSelec}}" ng-show="imgSelec" >
+                        <iframe style="width: 100%; height: 100%;"  ng-src="{{pdfSelec}}" ng-show="pdfSelec">
+
+                        </iframe>
                     </div>
                     </div>
                 </div>
