@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,providers,Upload,Layers,setGetOrder, DateParse, filesService) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,providers,Upload,Layers,setGetOrder, DateParse, Accion,filesService) {
 
     // var historia = [15];
     var autohidden= 2000;
@@ -18,6 +18,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.estadosDoc= new Array();
     $scope.formGlobal = "new";
     $scope.tasa_fija= true;
+    $scope.navCtrl = Accion.create();
 
     filesService.setFolder('orders');
 
@@ -172,6 +173,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
 
+
+
     $scope.verificExit = function(){
         var paso = true;
         console.log(' internasl', setGetOrder.getInternalState());
@@ -265,17 +268,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
      *  para obtener los archivos recien subidos!! y resetear el servicio de subida
      * ***/
     $scope.$watch('filesProcess.estado', function(newVal, oldVal){
-        console.log("estado pr", newVal);
         if(newVal == 'finished' && oldVal == 'loading' ){
             var items = filesService.getRecentUpload();
             var data = new Array();
             angular.forEach(items, function(v){
                 data.push({id: v.id, documento:$scope.folder});
+                setGetOrder.change("adjunto"+ v.id,'id', v.id);
             });
             Order.postMod({type:$scope.formMode.mod, mod:"AddAdjuntos"},
                 {id:$scope.document.id,adjuntos: data}, function(response){
                     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                     $scope.reloadDoc();
+
                 });
             $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
             //$scope.NotifAction
@@ -454,6 +458,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     /******************************************** APERTURA DE LAYERS ********************************************/
 
+    $scope.openSide = function(name){
+     $scope.navCtrl.value = name;
+        $scope.navCtrl.estado=true;
+    };
     $scope.openAdj = function(folder){
         if($scope.document.id){
             filesService.open();
@@ -477,6 +485,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     };
+    /*
     $scope.openDocSusti = function(){
         $scope.docsSustitos = new Array();
         $scope.moduleAccion({open:{name:"agrPedPend", before: function(){
@@ -487,7 +496,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }}});
 
 
-    };
+    };*/
     $scope.openImport = function(){
         $scope.document.prov_id = $scope.provSelec.id;
         Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
@@ -499,6 +508,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.formBlock ){
             $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
         }else{
+
             if($scope.formMode.value == 21){
                 $scope.moduleAccion({open:{name:"listEmailsImport"}});
             }else  if($scope.formMode.value == 22 || $scope.formMode.value ==23 ){
@@ -507,6 +517,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
     };
+
     $scope.menuAgregar= function(){
         $scope.moduleAccion({close:"all"});
         $scope.moduleAccion({open:{name:"menuAgr"}});
@@ -522,14 +533,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.newDoc= function(formMode){
 
-        // openLayer("finalDoc");
         $scope.formMode=formMode;
-        restore("document");
+        $scope.formGlobal="new";
+        $scope.document = {};
         if($scope.provSelec.id){
-            //$scope.document.prov_id=$scope.provSelec.id;
+            $scope.document.prov_id=$scope.provSelec.id;
         }
-
-        $scope.moduleAccion({open:{name:"detalleDoc"}});
+        $scope.navCtrl.value="detalleDoc";
+        $scope.navCtrl.estado= true;
         $scope.formBlock=false;
     };
 
@@ -614,26 +625,65 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
      *  working
      * **/
     $scope.next = function () {
-        console.log("curren", $scope.module.layer);
-        $scope.nextSide = null;
+
         switch($scope.module.layer){
             case "resumenPedido":
-                $scope.nextSide = "detalleDoc" ;
+                $scope.navCtrl.value = "detalleDoc" ;
+                $scope.navCtrl.estado= true;
                 break;
             case "detalleDoc":
-                $scope.nextSide = "listProducProv" ;
+                $scope.navCtrl.value = "listProducProv" ;
+                $scope.navCtrl.estado= true;
                 break;
             case "listProducProv":
-                $scope.nextSide = "agrPed" ;
+                $scope.navCtrl.value = "agrPed" ;
+                $scope.navCtrl.estado= true;
                 break;
             case "agrPed":
-                $scope.nextSide = "finalDoc" ;
+                if($scope.document.productos.kitchenBox.length == 0
+                    && $scope.document.productos.contraPedido.length == 0
+                    && $scope.document.productos.kitchenBox.length  == 0
+                    && setGetOrder.getInternalState() != "new"
+                )
+                {
+                    $scope.NotifAction("alert",
+                        "No se a selecionado ningun documento para la "+$scope.formMode.name+ "¿desea continuar de todas formas? "
+                        ,[
+                            {name:"Cancelar", action: function(){}}
+                            ,{name:"Continuar",action: function(){
+                                $scope.navCtrl.value = "finalDoc" ;
+                                $scope.navCtrl.estado= true;
+
+                            }}
+                        ],{block:true});
+                }
+
+                else{
+                    $scope.navCtrl.value = "finalDoc" ;
+                    $scope.navCtrl.estado= true;
+                }
+
                 break;
             case "finalDoc":
-                $scope.nextSide = "close";
+                if($scope.document.productos.todos.length == 0 && setGetOrder.getInternalState() != "new")
+                {
+                    $scope.NotifAction("alert",
+                        "No se ha cargado ningun articulo para la "+$scope.formMode.name+ "¿desea continuar? "
+                        ,[
+                            {name:"Cancelar", action: function(){}}
+                            ,{name:"Continuar",action: function(){
+                                $scope.navCtrl.value = "close" ;
+                                $scope.navCtrl.estado= true;
+
+                            }}
+                        ],{block:true});
+                }else{
+                    $scope.navCtrl.value = "close";
+                    $scope.navCtrl.estado= true;
+                }
+
 
         }
-        console.log("next",  $scope.nextSide);
 
         $scope.showNext(false);
     };
@@ -655,6 +705,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
     }
 
+    $scope.reloadSide = function(){
+
+    };
     /*********************************************** EVENTOS CHANGE ***********************************************/
 
     $scope.onchangePeditem=  function (item){
@@ -664,7 +717,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                 });
         }
-    }
+    };
     /* /!**@deprecated
      * *!/
      $scope.change = function (odc) {
@@ -685,12 +738,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             paso= false;
 
         }
-        /*  if(item.asignado){
-         setGetOrder.change('contraPedido'+item.id,'sustitute', true);
-         }else {
-         setGetOrder.change('contraPedido'+item.id,'sustitute',undefined);
-         }*/
-
         if(paso){
             item.doc_id=$scope.document.id;
             if(item.asignado){
@@ -742,8 +789,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.changeProducto = function (item){
         var paso = true;
         if(item.asignado && item.saldo > 0){
-
-
             item.prov_id =$scope.provSelec.id;
             item.doc_id =$scope.document.id;
             Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
@@ -784,24 +829,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItem"},item, function(response){
             if(response.accion == "del"){
                 $scope.NotifAction("alert","Eliminado",[],{autohidden:autohidden});
+                setGetOrder.change('producto'+item.id,'id',undefined);
+
+
             } else if(response.accion == "new"){
                 $scope.NotifAction("alert","Agregado",[],{autohidden:autohidden});
                 item.id=response.id;
+                setGetOrder.change('producto'+item.id,'id',item);
+
             }
         });
     };
 
+    /**
+     * @review
+     * */
     $scope.changeItem = function(item){
         Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
-            if(response.accion == "del"){
-                $scope.NotifAction("alert","Eliminado",[],{autohidden:autohidden});
-            } else if(response.accion == "new"){
-                $scope.NotifAction("alert","Agregado",[],{autohidden:autohidden});
-                item.id=response.id;
-            }
+            setGetOrder.change('producto'+item.id,'id',item);
         });
     };
 
+
+/**
+ * @review
+ * */
     $scope.addRemoveCpItem = function(item){
         console.log(" item ",item);
         var aux = {
@@ -899,6 +951,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                         mod: "AddkitchenBox"
                                     }, item, function (response) {
                                         $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                                        setGetOrder.change('kitchenBox'+item.id,'id',item);
                                     });
                                 }
                             }, {
@@ -911,6 +964,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 } else {
                     Order.postMod({type: $scope.formMode.mod, mod: "AddkitchenBox"}, item, function (response) {
                         $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                        setGetOrder.change('kitchenBox'+item.id,'id',item);
                     });
                 }
 
@@ -926,6 +980,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                     type: $scope.formMode.mod,
                                     mod: "RemovekitchenBox"
                                 }, item, function (response) {
+                                    setGetOrder.change('kitchenBox'+item.id,'id',undefined);
                                     $scope.NotifAction("ok", "Removido", [], {autohidden: autohidden});
                                 });
                             }
@@ -948,17 +1003,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
                 $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                 $scope.document.id = response.id;
+                setGetOrder.change('pedidoSusti'+item.id,'id',item);
+
             });
-            // addPedidoSustituto(item.id, $scope.document.id);
         } else {
             Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
                 $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
                 $scope.document.id = response.id;
+                setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
+                $scope.reloadDoc();
+
             });
         }
 
     };
 
+    /**
+     * @deprecated**/
     $scope.changePedidoSustitutoItem = function (item) {
         item.pedido_id = $scope.document.id;
         if(item.asignado){
@@ -1014,16 +1075,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 ]);
         }
 
-    }
-    /*********************************************** EVENTOS FOCUS LOST ***********************************************/
-
-    $scope.focusLostCpitm = function (item) {
-        item.pedido_id = $scope.document.id;
-        if (!$scope.FormResumenContra.$valid) {
-            alert('warnin\n Monto Excedido no se asignara el valor');
-            item.saldo = item.cantidad;
-        }
     };
+    /*********************************************** EVENTOS FOCUS LOST ***********************************************/
 
 
     function setProvedor(prov) {
@@ -1031,10 +1084,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.module.index == 0){
 
             $scope.provSelec = prov;
-            $scope.nextSide="listPedido";
+            $scope.navCtrl.value="listPedido";
+            $scope.navCtrl.estado=true;
         }else{
             if($scope.module.layer == "listPedido" ){
                 $scope.provSelec = prov;
+                loadPedidosProvedor(prov.id);
             }else{
 
             }
@@ -1044,7 +1099,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.closeSide = function(){
         var paso= true;
-        console.log("close in pedido controller")
         if($scope.document.id){
             if($scope.layer == 'resumenPedido'  && setGetOrder.getInternalState() != 'new'){
                 paso = false;
@@ -1059,21 +1113,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.verificExit();
         }else {
             var back= angular.copy($scope.module.historia[$scope.index -1]);
+
             if($scope.module.layer == "sideFiles"){
                 $scope.LayersAction({close:true});
                 filesService.close();
-            }else
-            if(back){
-                console.log("back ", back)
-
-                $scope.nextSide=back;
             }else{
-                $scope.nextSide="";
-                $scope.LayersAction({close:true});
+                if(back){
+                    console.log("back ",back);
+                    $scope.navCtrl.value=back;
+                    $scope.navCtrl.estado = true;
+
+                   // $scope.nextSide=back;
+                }else{
+                    $scope.nextSide="";
+                    $scope.LayersAction({close:true});
+                }
             }
-
-
-
         }
 
     };
@@ -1089,35 +1144,58 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if (segurity('editPedido')) {
                 document.isNew=false;
                 $scope.document=aux;
+
+                $scope.buildDocChange(doc);
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
                 $scope.preview=false;
-                setGetOrder.addForm('document',doc);
-                angular.forEach(doc.productos.contraPedido, function(v,k){
-                    setGetOrder.addForm('contraPedido'+ v.id,v);
-
-                });
-                angular.forEach(doc.productos.kitchenBox, function(v,k){
-                    setGetOrder.addForm('kitchenBox'+ v.id,v);
-
-                });
-                angular.forEach(doc.productos.kitchenBox, function(v,k){
-                    setGetOrder.addForm('kitchenBox'+ v.id,v);
-
-                });
-                angular.forEach(doc.productos.pedidoSusti, function(v,k){
-                    setGetOrder.addForm('pedidoSusti'+ v.id,v);
-
-                });
                 setGetOrder.setState('select');
                 $scope.formGlobal ="upd";
-                $scope.nextSide = "detalleDoc";
-                setGetOrder.setState("select");
+                $scope.navCtrl.value="detalleDoc"
+                $scope.navCtrl.estado=true;
             }
             else {
                 alert('No tiene suficientes permiso para ejecutar esta accion');
             }
         }
     }
+
+    $scope.buildDocChange  = function(doc){
+
+        setGetOrder.addForm('document',doc);
+        angular.forEach(doc.productos.contraPedido, function(v,k){
+            setGetOrder.addForm('contraPedido'+ v.id,v);
+
+        });
+        angular.forEach(doc.productos.kitchenBox, function(v,k){
+            setGetOrder.addForm('kitchenBox'+ v.id,v);
+
+        });
+        angular.forEach(doc.productos.kitchenBox, function(v,k){
+            setGetOrder.addForm('kitchenBox'+ v.id,v);
+
+        });
+        angular.forEach(doc.productos.pedidoSusti, function(v,k){
+            setGetOrder.addForm('pedidoSusti'+ v.id,v);
+
+        });
+
+    };
+
+
+    $scope.saveFinal = function(){
+        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+
+            if (response.success) {
+                $scope.NotifAction("ok","Finalizado",[
+                    {name:"Ok", action: function(){
+                        $scope.navCtrl.value=angular.copy($scope.module.historia[1]);
+                        $scope.navCtrl.estado=true;
+                    }}
+                ],{block:true});
+            }});
+    };
+
+
 
     $scope.docImport = function (doc){
 
@@ -1604,136 +1682,138 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
     });
 
-    // working
-    $scope.$watch('nextSide', function (newVal, oldVal) {
-        if (newVal != '' && typeof(newVal) !== 'undefined' && newVal != null){
+    $scope.$watch('navCtrl.estado', function (newState) {
+        if(newState){
+            var newVal  = $scope.navCtrl.value;
 
-            // particulares
-            switch (newVal){
-                case "detalleDoc":
-                    $scope.moduleAccion({search:{name:"detalleDoc",
-                        before: function(){
-                            $scope.FormHeadDocument.$setUntouched();
-                            $scope.FormEstatusDoc.$setUntouched();
-                            $scope.FormAprobCompras.$setUntouched();
-                            $scope.FormCancelDoc.$setUntouched();
-                        }
-                    }})
-                    ;break;
-                case "resumenPedido":
-                    $scope.moduleAccion({search:{name:"resumenPedido",
-                        before: function(){
+            if (newVal != '' && typeof(newVal) !== 'undefined' && newVal != null){
+                switch (newVal){
+                    case "detalleDoc":
+                        $scope.moduleAccion({search:{name:"detalleDoc",
+                            before: function(){
+                                $scope.FormHeadDocument.$setUntouched();
+                                $scope.FormEstatusDoc.$setUntouched();
+                                $scope.FormAprobCompras.$setUntouched();
+                                $scope.FormCancelDoc.$setUntouched();
+                            }
+                        }})
+                        ;break;
+                    case "resumenPedido":
+                        $scope.moduleAccion({search:{name:"resumenPedido",
+                            before: function(){
 
-                        }
-                    }});
-
-                    break;
-                case "listPedido" :
-                    $scope.moduleAccion({search:{name:"listPedido",
-                        before: function(){
-                            loadPedidosProvedor($scope.provSelec.id);
-                            $scope.hoverPreview(true);
-                        }
-                    }});
-                    break;
-                case "agrContPed":
-                    $scope.moduleAccion({search:{name:"agrContPed",
-                        before: function(){
-                            loadContraPedidosProveedor($scope.provSelec.id);;
-                        }
-                    }});
-
-                    break;
-                case "agrKitBoxs":
-                    $scope.moduleAccion({search:{name:"agrContPed",
-                        before: function(){
-                            loadContraPedidosProveedor($scope.provSelec.id);
-                        }
-                    }});
-                    break;
-                case "listProducProv":
-                    console.log("lo intenta buscar");
-                    $scope.moduleAccion({search:{name:"listProducProv",
-                        before: function(){
-                            Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
-                                var data = new Array();
-                                var aux ={};
-                                angular.forEach(response , function(v,k){
-                                    aux ={};
-                                    aux = v;
-                                    aux.saldo=parseFloat(v.saldo);
-                                    data.push(aux);
+                            }
+                        }});
+                        break;
+                    case "listPedido" :
+                        $scope.moduleAccion({search:{name:"listPedido",
+                            before: function(){
+                                loadPedidosProvedor($scope.provSelec.id);
+                                $scope.hoverPreview(true);
+                            }
+                        }});
+                        break;
+                    case "agrContPed":
+                        $scope.moduleAccion({search:{name:"agrContPed",
+                            before: function(){
+                                loadContraPedidosProveedor($scope.provSelec.id);;
+                            }
+                        }});
+                        break;
+                    case "agrKitBoxs":
+                        $scope.moduleAccion({search:{name:"agrKitBoxs",
+                            before: function(){
+                                loadContraPedidosProveedor($scope.provSelec.id);
+                            }
+                        }});
+                        break;
+                    case "listProducProv":
+                        $scope.moduleAccion({search:{name:"listProducProv",
+                            before: function(){
+                                Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
+                                    var data = new Array();
+                                    var aux ={};
+                                    angular.forEach(response , function(v,k){
+                                        aux ={};
+                                        aux = v;
+                                        aux.saldo=parseFloat(v.saldo);
+                                        data.push(aux);
+                                    });
+                                    $scope.providerProds= data;
                                 });
-                                $scope.providerProds= data;
-                            });
-                        }
-                    }});
-
-                    break;
-                case "listImpor":
-                    $scope.moduleAccion({search:{name:"listImpor",
-                        before: function(){
-                            if($scope.formMode.value !=21){
-                                var url='';
-                                switch ($scope.formMode.value){
-                                    case  22: url = "SolicitudeToImport";break;
-                                    case  23: url = "OrderToImport";break;
+                            }
+                        }});
+                        break;
+                    case "listImpor":
+                        $scope.moduleAccion({search:{name:"listImpor",
+                            before: function(){
+                                if($scope.formMode.value !=21){
+                                    var url='';
+                                    switch ($scope.formMode.value){
+                                        case  22: url = "SolicitudeToImport";break;
+                                        case  23: url = "OrderToImport";break;
+                                    }
+                                    $scope.docImports = Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id});
                                 }
-                                $scope.docImports = Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id});
                             }
-                        }
-                    }});
-                    break;
-                case "agrPed":
-                    $scope.moduleAccion({search:{name:"agrPed",
-                        before: function(){
+                        }});
+                        break;
+                    case "agrPed":
+                        $scope.moduleAccion({search:{name:"agrPed",
+                            before: function(){
 
-                        }
-                    }});
-                    break;
-                case "finalDoc":
-                    console.log("entro final dod");
-                    $scope.moduleAccion({search:{name:"finalDoc",
-                        before: function(){
-                            if(oldVal != 'sideFiles'){
-                                $scope.finalDoc = $scope.buildfinalDoc();
-                                Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
-                                    $scope.finalDoc.productos= response.productos;
-                                    $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
-                                    $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
-
-                                });
                             }
+                        }});
+                        break;
+                    case "finalDoc":
+                        $scope.moduleAccion({search:{name:"finalDoc",
+                            before: function(){
 
+                                if(  setGetOrder.getState() != "built"){
+
+                                        $scope.finalDoc = $scope.buildfinalDoc();
+                                        Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
+                                            $scope.finalDoc.productos= response.productos;
+                                            $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
+                                            $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
+
+                                        });
+                                        setGetOrder.setState("built")
+                                    }
+                            }
+                        }});
+                        break;
+                    case "agrPedPend":
+                        $scope.moduleAccion({search:{name:"agrPedPend",
+                            before: function(){
+                                $scope.docsSustitos = Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id});
+                            }
+                        }});
+                        break;
+                    case  "close":
+                        if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal!='new'){
+                            $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
+                        }else {
+
+                            $scope.saveFinal();
                         }
-                    }});
-                    break;
-                case  "close":
-                    if(setGetOrder.getInternalState() == 'new' ){
-                        $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
-                    }else {
-                        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                        break;
 
-                            if (response.success) {
-                                $scope.NotifAction("ok","Finalizado",[
-                                    {name:"Ok", action: function(){
-                                        $scope.moduleAccion({close:{first:true}});
-                                    }}
-                                ],{block:true});
-                            }});
+                }
+
+                /***   multiples */
+                if(newVal == "agrPed" || newVal == "newVal" || newVal == "finalDoc" || newVal == "detalleDoc"){
+                    if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
+                        $scope.reloadDoc();
                     }
-                    break;
-
-            }
-
-            /***   multiples */
-            if(newVal == "agrPed" || newVal == "newVal" || newVal == "finalDoc" || "detalleDoc"){
-                if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
-                    $scope.reloadDoc();
                 }
             }
         }
+        $scope.navCtrl.estado=false;
     });
+
+
+
     $scope.$watch('document.direccion_almacen_id', function (newVal) {
         if (newVal != '' && typeof(newVal) !== 'undefined') {
             if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
@@ -1834,6 +1914,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
                             setGetOrder.addForm('document',$scope.document);
                             setGetOrder.setState('load');
+                            $scope.reloadDoc();
                         }
                         console.log(" save");
 
@@ -2131,14 +2212,12 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 var current= module.index;
                 if(arg.name){
                     var aux = module.historia.indexOf(arg.name);
-                    console.log("aux index", aux)
                     if(aux!= -1){
                         close= current - aux;
                     }else{
 
                         close=0;
                     }
-                    console.log("close", close)
                 }
                 else if(arg.to){
                     close = arg.to;
@@ -2219,15 +2298,14 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.inLayer = "";
     $scope.expand=false;
     $scope.imgSelec = null;
-    console.log(" en layer controler"  )
     $scope.resource = $resource('master/files/:type', {}, {
         query: {method: 'GET',params: {type: "getFiles"}, isArray: true},
         get: {method: 'GET',params: {type:"getFile"}, headers: {'Content-Type': 'image/png'},isArray: false},
 
     });
-    $scope.$watch('allowUpload.val', function(newVal){
-        console.log(" cambio el permiso de subido a " ,newVal )
-    });
+    /*    $scope.$watch('allowUpload.val', function(newVal){
+     console.log(" cambio el permiso de subido a " ,newVal )
+     });*/
 
     /***
      * indicador de progreso
@@ -2580,7 +2658,6 @@ MyApp.service('filesService' ,function(){
         allowUpLoad : function(){return allowUpload;},
         setallowUpLoad : function(value){
             allowUpload.val= value;
-            console.log("trace3 se value", value)
         }
 
 
@@ -2602,6 +2679,21 @@ MyApp.factory('Order', ['$resource',
     }
 ]);
 
+MyApp.factory('Accion', function(){
+    function  Accion (){
+        return {
+            estado:true,
+            value: ''
+
+        }
+    }
+    return {
+        create : function(){
+            return new Accion();
+        }
+    };
+
+});
 
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,

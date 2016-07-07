@@ -1289,6 +1289,7 @@ class OrderController extends BaseController
             $item->cantidad = $req->cantidad;
             $item->saldo = $req->saldo;
             $item->producto_id = $req->id;
+            $item->descripcion = $req->descripcion;
             $item->save();
             $res['reng_id'] = $item->id;
             $res['items'] = $item;
@@ -1320,8 +1321,10 @@ class OrderController extends BaseController
             $item->tipo_origen_id=1;
             $item->doc_id=$req->doc_id;
             $item->origen_item_id=$req->id;
-            $item->cantidad = $req->cantidad;
-            $item->saldo = $req->cantidad;
+           // $item->cantidad = $req->cantidad;
+            $item->saldo = $req->saldo;
+            $item->descripcion = $req->descripcion;
+
             $item->producto_id = $req->id;
             $item->save();
             $res['reng_id'] = $item->id;
@@ -1353,7 +1356,8 @@ class OrderController extends BaseController
             $item->doc_id=$req->doc_id;
             $item->origen_item_id=$req->id;
             $item->cantidad = $req->cantidad;
-            $item->saldo = $req->cantidad;
+            $item->saldo = $req->saldo;
+            $item->descripcion = $req->descripcion;
             $item->producto_id = $req->id;
             $item->save();
             $res['reng_id'] = $item->id;
