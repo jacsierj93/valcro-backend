@@ -1289,6 +1289,7 @@ class OrderController extends BaseController
             $item->cantidad = $req->cantidad;
             $item->saldo = $req->saldo;
             $item->producto_id = $req->id;
+            $item->descripcion = $req->descripcion;
             $item->save();
             $res['reng_id'] = $item->id;
             $res['items'] = $item;
@@ -1320,8 +1321,10 @@ class OrderController extends BaseController
             $item->tipo_origen_id=1;
             $item->doc_id=$req->doc_id;
             $item->origen_item_id=$req->id;
-            $item->cantidad = $req->cantidad;
-            $item->saldo = $req->cantidad;
+           // $item->cantidad = $req->cantidad;
+            $item->saldo = $req->saldo;
+            $item->descripcion = $req->descripcion;
+
             $item->producto_id = $req->id;
             $item->save();
             $res['reng_id'] = $item->id;
@@ -1353,7 +1356,8 @@ class OrderController extends BaseController
             $item->doc_id=$req->doc_id;
             $item->origen_item_id=$req->id;
             $item->cantidad = $req->cantidad;
-            $item->saldo = $req->cantidad;
+            $item->saldo = $req->saldo;
+            $item->descripcion = $req->descripcion;
             $item->producto_id = $req->id;
             $item->save();
             $res['reng_id'] = $item->id;
@@ -2739,10 +2743,11 @@ class OrderController extends BaseController
             $att['doc_id'] = $aux->doc_id;
             $att['documento'] = $aux->documento;
             $att['comentario'] = $aux->comentario;
+
             $auxFile['id']=$file->id;
             $auxFile['thumb']=$file->getThumbName();
             $auxFile['tipo']=$file->tipo;
-            $auxFile['documento'] = $aux->documento;
+            $auxFile['file'] = $file->archivo;
             $att['file'] = $auxFile;
             $atts[]= $att;
 

@@ -6,6 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Log;
 
 final class FileModel extends Model
 {
@@ -27,19 +28,24 @@ final class FileModel extends Model
     public function getThumbName()
     {
 
-        if ($this->isImage()) { ///es una imagen
+        try {
+            if ($this->isImage()) { ///es una imagen
 
-            $name = explode('.', $this->archivo);
-            $thumbName = $name[0] . '_thumb.' . $name[1];
+                $name = explode('.', $this->archivo);
+                $thumbName = $name[0] . '_thumb.' . $name[1];
 
-        } else {
+            } else {
 
-            if (in_array($this->getType(), $this->types)) ////si es un tipo conocido
-                $thumbName = $this->docsTypes[$this->getType()];
-            else
-                $thumbName = 'ImageDefect.jpg';
+                if (in_array($this->getType(), $this->types)) ////si es un tipo conocido
+                    $thumbName = $this->docsTypes[$this->getType()];
+                else
+                    $thumbName = 'ImageDefect.jpg';
 
+            }
+        } catch (\Exception $e) {
+            Log::error("no se puede obtener el nombre");
         }
+
 
         return $thumbName;
 

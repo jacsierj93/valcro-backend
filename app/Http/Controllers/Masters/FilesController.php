@@ -27,12 +27,13 @@ class FilesController extends BaseController
 		$archivo->upload("file"); ///probando
 		$resul['accion']= "upLoad";
 
-		$fil['id']= $archivo->getCurrentFileId();
-		$fil['file']= $archivo->getCurrentFileName();
-		$fil['thumb']= $archivo->getCurrentFileThumbName();
-		$fil['tipo']= $archivo->getCurrentFileType();
-		$resul['file']= $fil;
-		$resul['folder']= $req->folder;
+		$fl = FileModel::findOrFail($archivo->getCurrentFileId());
+
+		$fil['id']= $fl->id;
+		$fil['file']= $fl->archivo;
+		$fil['thumb']= $fl->getThumbName();
+		$fil['tipo']= $fl->tipo;
+
 		return $fil;
 	}
 
@@ -41,7 +42,7 @@ class FilesController extends BaseController
         $file = FileModel::findOrFail($req->id);
         $archivo = new Files($file->modulo);
 
-        return $archivo->getFile("images"."/".$file->archivo);
+        return $archivo->getFile($file->tipo.$file->archivo);
 
     }
 }

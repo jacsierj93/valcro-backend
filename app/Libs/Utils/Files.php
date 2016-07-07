@@ -78,19 +78,27 @@ class Files
             ////regla para el nombre
             $fileName = $archivo->id . '-' . str_random(13) . '-' . $dataUser["id"] . '-' . date("Y-m-d_h_i_s");
 
+
             ////en caso de ser una imagen hacer el redimensionado para obtener el thumbnail
 
 
-            if ($type == "images/") {
+          /*  if ($type == "images/") {
                 Log::info("guardando imagen $fileName en thumb ");
                 Image::make(File::get($file))->resize($this->imageThumbWidth, null, function ($constraint) {
                     $constraint->aspectRatio();
 
                 })->save($this->imagePathThumb . $fileName . '_thumb' . '.' . $extension); ///guardando imagenes
+            }*/
+
+
+            if ($type == "images/") {
+                Log::info("guardando imagen $fileName en thumb ");
+                Image::make(File::get($file))->resize($this->imageThumbWidth, $this->imageThumbWidth)->save($this->imagePathThumb . $fileName . '_thumb' . '.' . $extension); ///guardando imagenes
             }
 
-            $this->currentFileThumbName = $fileName . '_thumb' . '.' . $extension;
 
+            $this->currentFileThumbName =  $fileName . '_thumb' . '.' . $extension;
+            Log::info("nombre del thumb $this->currentFileThumbName");
 
             $fileName = $fileName . "." . $extension; ///extension
             /////subiendo archivo
@@ -152,10 +160,24 @@ class Files
     public function getFile($name)
     {
 
-        return response()->make($this->fileSystem->get($name), 200, [
-            'Content-Type' => $this->fileSystem->mimeType($name),
-            'Content-Disposition' => 'inline; ' . $name,
-        ]);
+        try {
+
+            Log::info("buscando archivo");
+
+            $archivo = response()->make($this->fileSystem->get($name), 200, [
+                'Content-Type' => $this->fileSystem->mimeType($name),
+                'Content-Disposition' => 'inline; ' . $name,
+            ]);
+
+        } catch (\Exception $e) {
+
+            Log::error("no se  encontro el archivo $name");
+            $archivo = null;
+
+        }
+
+        return $archivo;
+
 
     }
 
@@ -190,9 +212,6 @@ class Files
     {
         return $this->currentFileThumbName;
     }
-
-
-
 
 
 }
