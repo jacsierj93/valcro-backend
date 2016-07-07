@@ -500,7 +500,7 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)" ng-pattern="/^\(\+[\d\-]{1,7}\)[\d\-]{10}$/" name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[32]">
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[32]">
                                 <input phone placeholder="Telefonos Contacto">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -512,20 +512,21 @@
                         </div>
 
                         <div class="row" layout="row">
-                            <md-input-container class="md-block" flex="30">
+                            <md-input-container class="md-block" flex>
                                 <label>Responsabilidades</label>
                                 <input skip-tab info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled=" $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
 
-                            <div layout="column" style="width:{{(cargos.length*32)}}px;">
+                            <div layout="column" style="width:{{(cargos.length*40)}}px;">
                                 <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
-                                <div flex>
-                                 <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center;" ng-click="($parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
-                                    <md-tooltip>
-                                        {{cargo.cargo}}
-                                    </md-tooltip>
-                                </span>
+                                <div>
+                                 <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
+                                        <md-tooltip>
+                                            {{cargo.cargo}}
+                                        </md-tooltip>
+                                 </span>
                                 </div>
+
 
                                 <!--<md-input-container flex>
                                     <label>cargos</label>

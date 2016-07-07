@@ -736,8 +736,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             onSuccess();
             return false;
         }
-
-        if(!$scope.direccionesForm.$valid){
+        if(!$scope.direccionesForm.$valid && !$scope.direccionesForm.$pristine){
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
@@ -749,7 +748,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                     console.log($scope.direccionesForm);
                 }
             }]);
-
+            return false;
         }
 
         providers.put({type:"saveProvAddr"},$scope.dir,function(data){
@@ -834,6 +833,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 saveAddress(function(){
                     $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
                     currentOrig = {};
+                    $scope.direccionesForm.$setPristine();
                     $scope.direccionesForm.$setUntouched();
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
@@ -1071,7 +1071,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                     ],{block:true});
                 }else{
                     /*CLICK EN UN FUERA DEL FORMULARIO, RESETEA EL FORMULARIO Y SALE DEL FOCUS*/
-                    console.log("cond2");
                     $scope.isShow = elem;
                     $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                     valcroName = {};
@@ -1260,12 +1259,14 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.$watch('cnt.pais',function(nvo,old){
         //var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
         var preVal = angular.element("#contTelf").find("input").val();
-        console.log(preVal)
-        if(preVal!=""){
-            angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
-        }else{
-            angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+        if(preVal){
+            if(preVal!=""){
+                angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
+            }else{
+                angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+            }
         }
+
 
         //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
@@ -1344,13 +1345,17 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
     var currentOrig = {};
+
     var saveContact = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt ) || ($scope.provContactosForm.$pristine )){
+
+        console.log(angular.equals(currentOrig,$scope.cnt),$scope.cnt.id,$scope.provContactosForm.$pristine)
+        if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
+            console.log("falseeeeeeeee")
             onSuccess();
             return false;
         }
 
-        if(!$scope.provContactosForm.$valid){
+        if(!$scope.provContactosForm.$valid && !$scope.provContactosForm.$pristine){
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
@@ -1362,7 +1367,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     console.log($scope.provContactosForm);
                 }
             }]);
-
+            return false;
         }
         providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
             $scope.cnt.id = data.id;
@@ -1401,7 +1406,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if(((nuevo[0] && !nuevo[1] && $scope.cnt.emailCont.length>0 && valid)) || nuevo[2] || (nuevo[3]!=old[3])) {
             //saveContact();
         }
-        $scope.provContactosForm.$setPristine();
+       //$scope.provContactosForm.$setPristine();
         /*}*/
     });
 
@@ -1463,6 +1468,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     contact = {};
                     setGetContac.setContact(false);
                     $scope.provContactosForm.$setUntouched();
+                    $scope.provContactosForm.$setPristine()
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
@@ -1499,7 +1505,6 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
             {
                 name:"si",
                 action:function(){
-                    console.log("entro")
                     var contact2 = element.cont;
                     contact2.agente = 1;
                     contact2.autoSave =true;
@@ -1527,10 +1532,11 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
 });
 
 MyApp.service("setGetContac",function(providers,setGetProv,$filter){
-    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:[],pais:"",languaje:[],cargo:[],responsability:"",dirOff:{campo:"direccion",valor:""},prov_id:false, isAgent:0,autoSave:false};
+    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:[],pais:"",languaje:[],cargo:[],responsability:"",dirOff:"",prov_id:false, isAgent:0,autoSave:false};
     var listCont = [];
     return {
         setContact : function(cont){
+            console.log(cont)
                 var prov = setGetProv.getProv();
                 contact.id = cont.id||false;
                 contact.nombreCont = cont.nombre||"";
@@ -1538,7 +1544,7 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
                 contact.contTelf = cont.phones||[];
                 contact.pais = cont.pais_id||"  ";
                 contact.responsability = cont.responsabilidades||"";
-                contact.dirOff.valor = cont.direccion||"";
+                contact.dirOff = cont.direccion||"";
                 contact.isAgent = cont.agente || 0;
                 contact.autoSave = cont.autoSave || false;
                 contact.prov_id = cont.prov_id||prov.id;
