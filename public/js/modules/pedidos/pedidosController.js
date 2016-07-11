@@ -191,6 +191,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     name:"Si",
                     action: function(){
                         $scope.moduleAccion({close:{first:true}});
+                        filesService.close();
 
                     }
                 }
@@ -799,10 +800,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     var prod= angular.copy(response);
                     prod.cantidad = parseFloat(prod.cantidad);
                     $scope.providerProds.push(prod);
-                    setGetOrder.change('producto'+item.id,'id',item);
+
 
                 }
                 item.reng_id=response.reng_id;
+                setGetOrder.change('producto'+item.id,'id',item);
             });
         }else if(!item.asignado && item.reng_id){
             $scope.NotifAction("alert",

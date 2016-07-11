@@ -74,7 +74,10 @@ $app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra e
 $app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
 $app->post("Order/Order/AddSustitute",'Orders\OrderController@addSustituteOrder'); // add un solicitud vieja a un anueva
 $app->post("Order/Order/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
+$app->post("Order/Order/AddAdjuntos",'Orders\OrderController@addAttachmentsOrder'); ///agrega adjuntos al pedido
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos las solicitudes
+$app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); ///lista de todos las solicitudes
+
 
 //Orden de compra
 $app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda el pedido
@@ -91,7 +94,10 @@ $app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // ci
 $app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
 $app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addSustitutOrder'); // add un solicitud vieja a un anueva
 $app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
+$app->post("Order/Purchase/AddAdjuntos",'Orders\OrderController@addAttachmentsPurchase'); ///agrega adjuntos a la orden de compra
+
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes
+$app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///lista de todos las solicitudes
 
 
 // solicitudes

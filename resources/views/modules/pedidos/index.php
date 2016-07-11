@@ -1701,7 +1701,7 @@
                                 </div>
                                 <div flex="15" class="headGrid"> Codigo </div>
                                 <div flex="15" class="headGrid"> Cod. Fabrica </div>
-                                <div flex class="headGrid"> Tipo</div>
+                                <div flex class="headGrid"> Origen</div>
                                 <div flex class="headGrid"> Descripción.</div>
                                 <div flex="10" class="headGrid"> Cantidad</div>
                                 <div flex class="headGrid"> Comentario</div>
@@ -1714,7 +1714,7 @@
                                         </div>
                                         <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                         <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
-                                        <div flex class="cellGrid"> {{item.tipo}}</div>
+                                        <div flex class="cellGrid"> {{item.documento}}</div>
                                         <div flex class="cellGrid">  {{item.descripcion}}</div>
                                         <div flex="10" class="cellGrid">{{item.saldo}}</div>
                                         <div flex class="cellGrid">  {{item.comentario}}</div>

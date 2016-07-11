@@ -8,6 +8,7 @@ use App\Libs\Utils\Files;
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\FileModel;
+use App\Models\Sistema\Order\OrderAttachment;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
 use App\Models\Sistema\CustomOrders\CustomOrderReason;
@@ -29,6 +30,7 @@ use App\Models\Sistema\ProviderAddress;
 use App\Models\Sistema\ProviderCondPayItem;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Purchase\Purchase;
+use App\Models\Sistema\Purchase\PurchaseAttachment;
 use App\Models\Sistema\Purchase\PurchaseItem;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Solicitude\Solicitude;
@@ -377,6 +379,9 @@ class OrderController extends BaseController
 
     /*********************** SUMMARY ************************/
 
+    /**
+     * contrulle el resumen preliminar de la solicitud
+    */
     public function getSolicitudeSummary(Request $req){
         $data = array();
         $prod = array();
@@ -401,6 +406,64 @@ class OrderController extends BaseController
         $data['productos']= $prod;
         return $data;
     }
+
+
+    /**
+     * construye el resumen preliminar del pedido
+    */
+    public function getOrderSummary(Request $req){
+        $data = array();
+        $prod = array();
+        $model= Order::findOrFail($req->id);
+        $provProd = Product::where('prov_id',$model->prov_id)->get();
+        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $atts =$model->attachments()->get();
+        foreach($items as $aux){
+            $temp= array();
+            $p= $provProd->where('id',$aux->producto_id)->first();
+            $temp['id']=$aux->id;
+            $temp['producto_id']=$aux->producto_id;
+            $temp['codigo']=$p->codigo;
+            $temp['codigo_fabrica']=$p->codigo_fabrica;
+            $temp['descripcion']=$aux->descripcion;
+            $temp['cantidad']=$aux->cant;
+            $temp['extra']= $p;
+            $prod[]= $temp;
+        }
+
+        $data['adjuntos']= $atts;
+        $data['productos']= $prod;
+        return $data;
+    }
+
+    /**
+     * construye el resumen preliminar del pedido
+     */
+    public function getPurchaseSummary(Request $req){
+        $data = array();
+        $prod = array();
+        $model= Purchase::findOrFail($req->id);
+        $provProd = Product::where('prov_id',$model->prov_id)->get();
+        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $atts =$model->attachments()->get();
+        foreach($items as $aux){
+            $temp= array();
+            $p= $provProd->where('id',$aux->producto_id)->first();
+            $temp['id']=$aux->id;
+            $temp['producto_id']=$aux->producto_id;
+            $temp['codigo']=$p->codigo;
+            $temp['codigo_fabrica']=$p->codigo_fabrica;
+            $temp['descripcion']=$aux->descripcion;
+            $temp['cantidad']=$aux->cant;
+            $temp['extra']= $p;
+            $prod[]= $temp;
+        }
+
+        $data['adjuntos']= $atts;
+        $data['productos']= $prod;
+        return $data;
+    }
+
     /*********************** SUSTITUTE ************************/
 
     /**
@@ -954,6 +1017,9 @@ class OrderController extends BaseController
 
     /*********************** Attachments ************************/
 
+    /***
+     * adjuntos para la solicitud
+    **/
     public function addAttachmentsSolicitude (Request $req){
         $resul= array();
         $model = Solicitude::findOrFail($req->id);
@@ -971,6 +1037,46 @@ class OrderController extends BaseController
         return $resul;
     }
 
+    /**
+     * adjuntos para el pedido
+    **/
+    public function addAttachmentsOrder(Request $req){
+        $resul= array();
+        $model = Order::findOrFail($req->id);
+        $attacs= array();
+        foreach($req->adjuntos  as $aux){
+            $attac=  new OrderAttachment();
+            $attac->archivo_id = $aux['id'];
+            $attac->doc_id = $model->id;
+            $attac->documento = strtoupper($aux['documento']);
+            $attacs[]= $attac;
+        }
+        $resul['accion']= "new";
+        $resul['items']= $attacs;
+        $resul['response']= $model->attachments()->saveMany($attacs);
+        return $resul;
+    }
+
+
+    /**
+     * adjuntos para la ordern de compra
+     **/
+    public function addAttachmentsPurchase(Request $req){
+        $resul= array();
+        $model = Purchase::findOrFail($req->id);
+        $attacs= array();
+        foreach($req->adjuntos  as $aux){
+            $attac=  new PurchaseAttachment();
+            $attac->archivo_id = $aux['id'];
+            $attac->doc_id = $model->id;
+            $attac->documento = strtoupper($aux['documento']);
+            $attacs[]= $attac;
+        }
+        $resul['accion']= "new";
+        $resul['items']= $attacs;
+        $resul['response']= $model->attachments()->saveMany($attacs);
+        return $resul;
+    }
 
     /*********************** COMPARE ************************/
     /**
@@ -3294,6 +3400,7 @@ class OrderController extends BaseController
         $kitchen= Collection::make(Array());
         $pediSus= Collection::make(Array());
         $all= Collection::make(Array());
+        $prod_prov = Product::where('prov_id', $order->prov_id)->get();
 
         /** contra pedido*/
         foreach($items->where('tipo_origen_id', '2') as $aux){
@@ -3341,6 +3448,7 @@ class OrderController extends BaseController
             $tem['doc_id']= $aux->doc_id;
             $tem['producto_id']= $aux->producto_id;
             $tem['cod_producto']= $aux->id;
+            $tem['codigo_fabrica']=$prod_prov->where('id',''.$aux->producto_id)->first()->codigo_fabrica;
             $tem['documento']=  $origen->where('id', $aux->tipo_origen_id)->first()->descripcion;
 
             $tem['asignado']= true;
