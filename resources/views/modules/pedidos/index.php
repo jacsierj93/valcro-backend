@@ -191,7 +191,7 @@
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras    )"
-                         ng-click="test('Copi doc')">
+                         ng-click="copyDoc()">
                         <span style="font-size: 24px"> CP</span>
                     </div>
 
@@ -578,7 +578,7 @@
 
             <md-content  layout="row" flex class="sideNavContent">
                 <div  layout="column" flex="" >
-                    <form name="FormHeadDocument" layout="row" ng-click="allowEdit()">
+                    <form name="FormHeadDocument" layout="row" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex style="height: 39px; min-height: 39px;">
@@ -595,7 +595,7 @@
                             </div>
                             <!--<div ng-show="( gridView != 4 )" >-->
                             <div   ng-show="( gridView != 4 )"  layout="row"  >
-                                <md-input-container class="md-block" flex="50" >
+                                <md-input-container class="md-block" flex="50" ng-click="allowEdit()" >
                                     <label>Proveedor</label>
                                     <md-select ng-model="provSelec.id"
                                                md-no-ink
@@ -613,13 +613,13 @@
                                         </md-option>-->
                                     </md-select>
                                 </md-input-container>
-                                <md-input-container class="md-block" flex="15">
+                                <md-input-container class="md-block" flex="15" ng-click="allowEdit()">
                                     <label>N° de Pedido</label>
                                     <input  ng-model="document.id"
                                             ng-disabled="true"
                                     >
                                 </md-input-container>
-                                <div layout="column" flex="15" style="margin-top: 8px;">
+                                <div layout="column" flex="15" style="margin-top: 8px;" ng-click="allowEdit()">
                                     <md-datepicker ng-model="document.emision"
                                                    md-placeholder="Fecha"
                                                    ng-disabled="(true)"
@@ -627,7 +627,7 @@
                                 </div>
                             </div>
 
-                            <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex>
+                            <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex ng-click="allowEdit()" >
                                 <label>Titulo</label>
                                 <input  ng-model="document.titulo"
                                         ng-disabled="( formBlock )"
@@ -637,9 +637,9 @@
                                 >
                             </md-input-container>
 
-                            <div  ng-show="( gridView != 4 )"  layout="row" >
+                            <div  ng-show="( gridView != 4 )"  layout="row"  >
 
-                                <md-input-container class="md-block" flex="30">
+                                <md-input-container class="md-block" flex="30" ng-click="allowEdit()">
                                     <label>Pais</label>
                                     <md-select ng-model="document.pais_id" md-no-ink
                                                ng-disabled="( formBlock || !provSelec.id )"
@@ -652,7 +652,7 @@
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
-                                <md-input-container class="md-block"  flex>
+                                <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                     <label>Direccion Facturacion</label>
                                     <md-select ng-model="document.direccion_facturacion_id"
                                                md-no-ink
@@ -671,7 +671,7 @@
 
                             <div   ng-show="( gridView != 4 )" layout="row" >
 
-                                <md-input-container class="md-block"  flex>
+                                <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                     <label>Direccion almacen</label>
                                     <md-select ng-model="document.direccion_almacen_id"
                                                md-no-ink
@@ -687,7 +687,7 @@
                                 </md-input-container>
                             </div>
                             <div   ng-show="( gridView != 4 )"  layout="row" >
-                                <md-input-container class="md-block" flex="15">
+                                <md-input-container class="md-block" flex="15" ng-click="allowEdit()">
                                     <label>Monto</label>
                                     <input  ng-model="document.monto"
                                             decimal
@@ -698,7 +698,7 @@
                                     >
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="10">
+                                <md-input-container class="md-block" flex="10" ng-click="allowEdit()">
                                     <label>Moneda</label>
                                     <md-select ng-model="document.prov_moneda_id" md-no-ink
                                                ng-disabled="( formBlock)"
@@ -712,7 +712,7 @@
                                     </md-select>
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="10" ng-dblclick="editTasa()" >
+                                <md-input-container class="md-block" flex="10" ng-dblclick="editTasa()"  ng-click="allowEdit()">
                                     <label>Tasa</label>
                                     <input  ng-model="document.tasa"
                                             type="number"
@@ -723,7 +723,7 @@
                                     >
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="">
+                                <md-input-container class="md-block" flex="" ng-click="allowEdit()">
                                     <label>Condicion de pago</label>
                                     <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock  || !provSelec.id)"
                                                ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
@@ -738,9 +738,9 @@
                                 </md-input-container>
 
                             </div>
-                            <div   ng-show="( gridView != 4 )"  layout="row">
+                            <div   ng-show="( gridView != 4 )"  layout="row" ng-click="allowEdit()">
 
-                                <md-input-container class="md-block" flex >
+                                <md-input-container class="md-block" flex  >
                                     <label>N° Factura:</label>
                                     <input ng-model="document.nro_factura"  ng-disabled="( formBlock)"
                                            ng-change="toEditHead('nro_factura', document.nro_factura)"
@@ -788,7 +788,7 @@
                             </div>
 
 
-                            <div   ng-show="( gridView != 4 )"  layout="row" >
+                            <div   ng-show="( gridView != 4 )"  layout="row" ng-click="allowEdit()">
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
                                     <input ng-model="document.comentario"  ng-disabled="( formBlock)"
@@ -799,7 +799,7 @@
                             </div>
                         </div>
                     </form>
-                    <div ng-show="document.final_id != null ">
+                    <div ng-show="document.final_id != null || document.version > 0">
                         <form name="FormEstatusDoc" layout="row" ng-click="allowEdit()">
                             <div active-left></div>
                             <div></div>
@@ -812,7 +812,7 @@
                                     </div>
                                 </div>
 
-                                <div layout="row" ng-show="( gridView == 1 )" >
+                                <div layout="row" ng-show="( gridView == 1 )" ng-click="allowEdit()">
 
                                     <md-input-container class="md-block" flex="">
                                         <label>Estatus</label>
@@ -830,7 +830,7 @@
                             </div>
 
                         </form>
-                        <form name="FormAprobCompras" layout="row" ng-click="allowEdit()">
+                        <form name="FormAprobCompras" layout="row" >
                             <div active-left></div>
                             <div layout="column" flex>
                                 <div layout="row" flex style="height: 39px; min-height: 39px;">
@@ -841,7 +841,7 @@
                                     </div>
                                 </div>
 
-                                <div layout="row"  ng-show="( gridView == 2 )" >
+                                <div layout="row"  ng-show="( gridView == 2 )" ng-click="allowEdit()">
 
                                     <div  style="height: 30px;margin-top: 9px;  color: #999999;" >
                                         Fecha de Aprobación
@@ -879,7 +879,7 @@
                                 </div>
                             </div>
                         </form>
-                        <form name="FormCancelDoc" layout="row" ng-click="allowEdit()">
+                        <form name="FormCancelDoc" layout="row" >
                             <div active-left></div>
                             <div layout="column" flex>
                                 <div layout="row" flex style="height: 39px; min-height: 39px;">
@@ -891,7 +891,7 @@
                                     </div>
                                 </div>
 
-                                <md-input-container class="md-block" flex  ng-show="( gridView == 3 )" >
+                                <md-input-container class="md-block" flex  ng-show="( gridView == 3 )" ng-click="allowEdit()">
                                     <label>Motivo de cancelacion </label>
                                     <input  ng-model="document.comentario_cancelacion"
                                             ng-disabled="(formBlock)"
@@ -904,7 +904,7 @@
                             </div>
                         </form>
                     </div>
-                    <form name="productos" layout="row" ng-click="allowEdit()" >
+                    <form name="productos" layout="row" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 4">
@@ -924,7 +924,7 @@
                                     <div flex="10" class="headGrid"> Cantidad</div>
 
                                 </div>
-                                <div flex class="gridContent">
+                                <div flex class="gridContent"  ng-click="allowEdit()"openImport()>
                                     <div >
                                         <div ng-repeat="item in document.productos.todos">
                                             <div layout="row" class="cellGridHolder" >

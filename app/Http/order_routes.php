@@ -17,7 +17,6 @@ $app->post("Order/UpLoad",'Orders\OrderController@UpLoadFiles'); ///trae tod el 
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
 $app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///trae tod el detalle de contraPedido
 $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); ///trae tod el detalle de contraPedido
-//$app->post("Order/Copy",'Orders\OrderController@copyDoc'); ///trae tod el detalle de contraPedido
 
 //otros modulos
 $app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountry'); ///obtiene las direcciones de facturacion
@@ -57,7 +56,6 @@ $app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrd
 
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
 //$app->get("Order/DocumentsImport",'Orders\OrderController@getDocumentsToImport'); ///obtiene el documento
-$app->post("Order/DocumentCopy",'Orders\OrderController@copyDoc'); ///guarda el pedido
 
 //pedidos
 $app->post("Order/Order/Save",'Orders\OrderController@saveOrder'); ///guarda la solicitud
@@ -75,6 +73,9 @@ $app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // 
 $app->post("Order/Order/AddSustitute",'Orders\OrderController@addSustituteOrder'); // add un solicitud vieja a un anueva
 $app->post("Order/Order/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
 $app->post("Order/Order/AddAdjuntos",'Orders\OrderController@addAttachmentsOrder'); ///agrega adjuntos al pedido
+$app->post("Order/Order/Update",'Orders\OrderController@UpdateOrder'); ///retira el final id y notifica que se actualizara el documento
+$app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); ///lista de todos los pedidos que se úeden sustituir
+
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); ///lista de todos las solicitudes
 
@@ -91,10 +92,12 @@ $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubsti
 $app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
 $app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
-$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
+$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // cierra el documento y notifica por correo
 $app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addSustitutOrder'); // add un solicitud vieja a un anueva
 $app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
 $app->post("Order/Purchase/AddAdjuntos",'Orders\OrderController@addAttachmentsPurchase'); ///agrega adjuntos a la orden de compra
+$app->post("Order/Purchase/Update",'Orders\OrderController@PurchaseUpdate'); ///agrega adjuntos a la orden de compra
+$app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///lista de todos las solicitudes
@@ -118,12 +121,9 @@ $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///
 $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); ///lista de todos los pedidos que se úeden sustituir
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///lista de todos las solicitudes
-
+$app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); ////retira el final id y notifica que se actualizara el documento
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
-
-
-
 
 // contra pedidos
 $app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae los motivos de contrapedido

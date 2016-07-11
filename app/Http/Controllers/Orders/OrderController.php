@@ -180,6 +180,32 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /*********************** UPDATE ************************/
+
+    public  function UpdateOrder(Request $req){
+        $resul['action']="upd";
+        $model  = Order::findOrFail($req->id);
+        $model->final_id = null;
+        $model->save();
+        return $resul;
+    }
+
+    public  function PurchaseUpdate(Request $req){
+        $resul['action']="upd";
+        $model  = Purchase::findOrFail($req->id);
+        $model->final_id = null;
+        $model->save();
+        return $resul;
+    }
+
+    public  function SolicitudeUpdate(Request $req){
+        $resul['action']="upd";
+        $model  = Solicitude::findOrFail($req->id);
+        $model->final_id = null;
+        $model->save();
+        return $resul;
+    }
+
     /*********************** IMPORT ************************/
 
     /**
@@ -187,9 +213,9 @@ class OrderController extends BaseController
      */
     public  function getOrderToImport(Request $req){
         $data = array();
-        $items = Order::where('aprob_compras' ,1)
+        $items = Order::where('id', "<>" ,$req->id)
+            //  ->where('aprob_compras' ,1)
             //  ->where("aprob_gerencia", 1)
-            //   ->where('id', "<>" ,$req->id)
             ->whereNull("comentario_cancelacion");
 
         $type = OrderType::get();
@@ -222,6 +248,7 @@ class OrderController extends BaseController
                 // $tem['tipo_value']=$aux->typevalue;
                 // pra humanos
                 $tem['comentario']=$aux->comentario;
+                $tem['titulo']=$aux->titulo;
                 $tem['tasa']=$aux->tasa;
                 $tem['proveedor']=$prov->razon_social;
                 $tem['documento']= $aux->getTipo();
@@ -324,6 +351,7 @@ class OrderController extends BaseController
                 $tem['comentario']=$aux->comentario;
                 $tem['tasa']=$aux->tasa;
                 $tem['proveedor']=$prov->razon_social;
+                $tem['titulo']=$aux->titulo;
                 $tem['documento']= $aux->getTipo();
                 $tem['diasEmit']=$aux->daysCreate();
                 $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
@@ -1270,15 +1298,16 @@ class OrderController extends BaseController
                 }
             }
         }
-        $data['error'] = $error;
-        $data['asignado'] = $asigna;
+
 
         $solItms= $import->items()->get();
         if(sizeof($solItms) > 0 ){
             $prods=  array();
         }
 
-
+        $data['error'] = $error;
+        $data['asignado'] = $asigna;
+        $data['items']= $solItms;
         return $data;
     }
 
@@ -1293,6 +1322,119 @@ class OrderController extends BaseController
         }
 
         return $data;
+    }
+
+    /*********************** COPY ************************/
+
+    /**
+     * crea una copia del documento
+     * @param id del documento a copiar
+     * @param tipo de documento
+     */
+    public  function copySolicitude(Request $req){
+        $resul["action"] ="copy";
+        $newItems= array();
+        $newAtt= array();
+        $newModel= new Solicitude();
+        $oldModel= Solicitude::findOrFail($req->id);
+
+        $newModel = $this->transferDataDoc($oldModel,$newModel);
+        $newModel->parent_id=$oldModel->id;
+        $newModel->version=$oldModel->version+1;
+        $newModel->save();
+        $oldModel->cancelacion= Carbon::now();
+        $oldModel->comentario_cancelacion= "#sistema: copiado por new id#".$newModel->id;
+        $oldModel->save();
+
+        foreach($oldModel->items() as $aux){
+            $it=$newModel->newItem();
+            $it= $this->transferItem($aux, $it);
+            $it->doc_id=$newModel->id;
+            $newItems[]=$it;
+
+        }
+
+        $newModel->items()->saveMany($newItems);
+        $resul['id']= $newModel->id;
+        /*        $resul['doc']= $newModel;
+                $resul['adjs']= $newAtt;
+                $resul['items']= $newItems;*/
+        return $resul;
+
+    }
+
+    /**
+     * crea una copia del documento
+     * @param id del documento a copiar
+     * @param tipo de documento
+     */
+    public  function copyOrder(Request $req){
+        $resul["action"] ="copy";
+        $newItems= array();
+        $newAtt= array();
+        $newModel= new Order();
+        $oldModel= Order::findOrFail($req->id);
+
+        $newModel = $this->transferDataDoc($oldModel,$newModel);
+        $newModel->parent_id=$oldModel->id;
+        $newModel->version=$oldModel->version+1;
+        $newModel->save();
+        $oldModel->cancelacion= Carbon::now();
+        $oldModel->comentario_cancelacion= "#sistema: copiado por new id#".$newModel->id;
+        $oldModel->save();
+
+        foreach($oldModel->items() as $aux){
+            $it=$newModel->newItem();
+            $it= $this->transferItem($aux, $it);
+            $it->doc_id=$newModel->id;
+            $newItems[]=$it;
+
+        }
+
+        $newModel->items()->saveMany($newItems);
+        $resul['id']= $newModel->id;
+        /*        $resul['doc']= $newModel;
+                $resul['adjs']= $newAtt;
+                $resul['items']= $newItems;*/
+        return $resul;
+
+    }
+
+    /**
+     * crea una copia del documento
+     * @param id del documento a copiar
+     * @param tipo de documento
+     */
+    public  function copyPurchase(Request $req){
+        $resul["action"] ="copy";
+        $newItems= array();
+        $newAtt= array();
+        $newModel= new Purchase();
+        $oldModel= Purchase::findOrFail($req->id);
+
+        $newModel = $this->transferDataDoc($oldModel,$newModel);
+        $newModel->parent_id=$oldModel->id;
+        $newModel->version=$oldModel->version+1;
+        $newModel->save();
+        $oldModel->cancelacion= Carbon::now();
+        $oldModel->comentario_cancelacion= "#sistema: copiado por new id#".$newModel->id;
+        $oldModel->save();
+
+        foreach($oldModel->items() as $aux){
+            $it=$newModel->newItem();
+            $it= $this->transferItem($aux, $it);
+            $it->doc_id=$newModel->id;
+            $newItems[]=$it;
+
+        }
+
+        $newModel->items()->saveMany($newItems);
+        $resul['id']= $newModel->id;
+        /*        $resul['doc']= $newModel;
+                $resul['adjs']= $newAtt;
+                $resul['items']= $newItems;*/
+        return $resul;
+
     }
 
     /*********************** PRODUCTOS ************************/
@@ -1373,6 +1515,7 @@ class OrderController extends BaseController
 
         return $temp;
     }
+
 
     /*********************** SOLICITUD ************************/
 
@@ -1585,7 +1728,7 @@ class OrderController extends BaseController
                 $item->doc_id = $req->doc_id;
                 $item->origen_item_id= $aux->origen_item_id;
                 $item->doc_origen_id= $aux->doc_origen_id;
-                $item->cantidad= $aux->cantidad;
+                $item->cantidad= $aux->saldo;
                 $item->saldo= $aux->saldo;
                 $item->producto_id= $aux->producto_id;
                 $item->descripcion= $aux->descripcion;
@@ -1816,51 +1959,8 @@ class OrderController extends BaseController
         return $data;
     }
 
-    /**
-     * crea una copia del documento
-     * @param id del documento a copiar
-     * @param tipo de documento
-     */
-    public  function copySolicitude(Request $req){
-        $resul["action"] ="copy";
-        $newItems= array();
-        $newAtt= array();
-        $newModel= new Solicitude();
-        $oldModel= Solicitude::findOrFaild($req>-id);
 
-        $newModel = $this->transferDataDoc($oldModel,$newModel);
-        $newModel->parent_id=$oldModel->id;
-        $newModel->version=$oldModel->version+1;
-        $newModel->save();
-        $oldModel->cancelacion= Carbon::now();
-        $oldModel->comentario_cancelacion= "#sistema: copiado por traza  new id#".$newModel->id;
-        $oldModel->save();
 
-        foreach($oldModel->items() as $aux){
-            $it=$newModel->newItem();
-            $it= $this->transferItem($aux, $it);
-            $it->doc_id=$newModel->id;
-            $newItems[]=$it;
-
-        }
-
-        foreach($oldModel->attachments() as $aux){
-            $it=$newModel->newAttachment();
-            $it= $this->transferAttachments($aux, $it);
-            $it->doc_id=$newModel->id;
-            $newAtt[]=$it;
-
-        }
-
-        $newModel->items()->saveMany($newItems);
-        $newModel->attachments()->saveMany($newAtt);
-        $resul['id']= $newModel->id;
-        /*        $resul['doc']= $newModel;
-                $resul['adjs']= $newAtt;
-                $resul['items']= $newItems;*/
-        return $resul;
-
-    }
     /**
      * prueba para metodos
      * @deprecated
@@ -1937,7 +2037,7 @@ class OrderController extends BaseController
     {
         $data=Array();
         $prov= Provider::findOrFail($req->id);
-        $items = $prov->getOrderDocuments()->where('fecha_sustitucion',null);
+        $items = $prov->getOrderDocuments()->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);
 //        $items =$items->where('final_id','!=', null)->all();
         $type = OrderType::get();
         $coin = Monedas::get();
