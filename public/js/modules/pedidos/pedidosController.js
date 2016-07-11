@@ -117,7 +117,27 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     },0);
 
     $scope.todos = Order.query({type:"OrderProvList"});
-    $scope.tempDoc = Order.query({type:"UnClosetDoc"});
+    Order.query({type:"UnClosetDoc"},{}, function(response){
+        console.log(" unclose", response);
+        $scope.NotifAction("alert","Existen "+response.length + " ",[
+            {
+                name:"No",
+                action: function(){
+
+                }
+            },
+            {
+                name:"Si",
+                action: function(){
+                    $scope.moduleAccion({close:{first:true}});
+                    filesService.close();
+
+                }
+            }
+
+        ],{});
+
+    });
     function init() {
         $scope.filterData.motivoPedido = masters.query({type: 'getOrderReason'});
         $scope.filterData.tipoDepago = masters.query({type: 'getPaymentType'});
@@ -1868,6 +1888,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $scope.saveFinal();
                         }
                         break;
+                    default : $scope.moduleAccion({close:true});
+
 
                 }
 

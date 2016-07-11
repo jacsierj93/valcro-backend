@@ -578,7 +578,7 @@
 
             <md-content  layout="row" flex class="sideNavContent">
                 <div  layout="column" flex="" >
-                    <form name="FormHeadDocument" layout="row" >
+                    <form name="FormHeadDocument" layout="row" class="focused" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex style="height: 39px; min-height: 39px;">
@@ -605,7 +605,7 @@
                                                ng-click="toEditHead('prov_id', provSelect.id)"
 
                                     >
-                                        <md-option ng-repeat="prov in todos" value="{{prov.id}}">
+                                        <md-option ng-repeat="prov in todos" value="{{prov.id}}" skip-tab>
                                             {{prov.razon_social}}
                                         </md-option>
                                         <!--<md-option  value="-1">
@@ -617,12 +617,14 @@
                                     <label>N° de Pedido</label>
                                     <input  ng-model="document.id"
                                             ng-disabled="true"
+                                            skip-tab
                                     >
                                 </md-input-container>
                                 <div layout="column" flex="15" style="margin-top: 8px;" ng-click="allowEdit()">
                                     <md-datepicker ng-model="document.emision"
                                                    md-placeholder="Fecha"
                                                    ng-disabled="(true)"
+                                                   skip-tab
                                     ></md-datepicker>
                                 </div>
                             </div>
@@ -633,6 +635,9 @@
                                         ng-disabled="( formBlock )"
                                         required
                                         ng-change="toEditHead('titulo', document.titulo)"
+                                        info="Escriba un titulo para facilitar identificacion del documento"
+                                        skip-tab
+
 
                                 >
                             </md-input-container>
@@ -644,7 +649,8 @@
                                     <md-select ng-model="document.pais_id" md-no-ink
                                                ng-disabled="( formBlock || !provSelec.id )"
                                                ng-change="toEditHead('pais_id', document.pais_id)"
-
+                                               info="Selecione el pais de origen de los productos"
+                                               skip-tab
 
                                     >
                                         <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
@@ -658,10 +664,13 @@
                                                md-no-ink
                                                ng-disabled="( formBlock || provSelec.id == '' )"
                                                ng-change="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
+                                               info="Selecione la direccion que debe especificarse en la factura"
+
+
 
 
                                     >
-                                        <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}">
+                                        <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}" skip-tab>
                                             {{dir.direccion}}
                                         </md-option>
                                     </md-select>
@@ -677,10 +686,13 @@
                                                md-no-ink
                                                ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
                                                ng-change="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
+                                               info="Seleccione la direccion desde donde se depachara la mercancia"
+
+
 
 
                                     >
-                                        <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}">
+                                        <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}" skip-tab>
                                             {{dir.direccion}}
                                         </md-option>
                                     </md-select>
@@ -694,6 +706,9 @@
                                             ng-disabled="( formBlock )"
                                             required
                                             ng-change="toEditHead('monto', document.monto)"
+                                            info="Monto aproximado a pagar"
+                                            skip-tab
+
 
                                     >
                                 </md-input-container>
@@ -704,9 +719,12 @@
                                                ng-disabled="( formBlock)"
                                                required
                                                ng-change="toEditHead('prov_moneda_id', document.prov_moneda_id)"
+                                               info="Seleccione la moneda en la que se realizara el pago"
+
+
 
                                     >
-                                        <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" >
+                                        <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" skip-tab >
                                             {{moneda.nombre}}
                                         </md-option>
                                     </md-select>
@@ -719,6 +737,9 @@
                                             ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
                                             ng-readonly="tasa_fija"
                                             required
+                                            info="Tasa segun la moneda selecionada"
+                                            skip-tab
+
 
                                     >
                                 </md-input-container>
@@ -729,9 +750,12 @@
                                                ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                md-no-ink
                                                ng-required ="(formMode.value == 23)"
+                                               info="Seleccione una condicion para la realizacion del pago"
+
+
 
                                     >
-                                        <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}">
+                                        <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}" skip-tab>
                                             {{conPago.titulo}}
                                         </md-option>
                                     </md-select>
@@ -744,11 +768,17 @@
                                     <label>N° Factura:</label>
                                     <input ng-model="document.nro_factura"  ng-disabled="( formBlock)"
                                            ng-change="toEditHead('nro_factura', document.nro_factura)"
+                                           info="Introducir Nro de factura en caso de tenerla"
+                                           skip-tab
+
 
 
                                     >
                                 </md-input-container>
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')">
+                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
+                                     info=" Cargar adjuntos de la factura "
+                                     skip-tab
+                                >
                                     <span class="icon-Adjuntar" style="font-size: 24px"></span>
                                 </div>
 
@@ -757,10 +787,15 @@
                                     <input ng-model="document.nro_proforma"  ng-disabled="( formBlock)"
                                            ng-required ="(formMode.value == 22 || formMode.value == 23 )"
                                            ng-change="toEditHead('nro_proforma', document.nro_proforma)"
+                                           info="Introducir Nro de proforma en caso de tenerla"
+                                           skip-tab
 
                                     >
                                 </md-input-container>
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Proforma')">
+                                <div layout="column" layout-align="center center" ng-click="openAdj('Proforma')"
+                                     info="Cargar adjuntos de la proforma "
+                                     skip-tab
+                                >
                                     <span class="icon-Adjuntar" style="font-size: 24px"></span>
                                 </div>
                             </div>
@@ -772,6 +807,8 @@
                                            ng-model="number" decimal
                                            ng-disabled="( formBlock)"
                                            ng-change="toEditHead('mt3', document.mt3)"
+                                           info="Metros cubicos"
+                                           skip-tab
                                     >
                                 </md-input-container>
 
@@ -780,6 +817,8 @@
                                     <input ng-model="document.peso" name="peso" decimal
                                            ng-disabled="( formBlock)"
                                            ng-change="toEditHead('peso', document.peso)"
+                                           info="Sumatoria de los pesos de productos"
+                                           skip-tab
 
                                     >
                                 </md-input-container>
@@ -793,6 +832,8 @@
                                     <label>Comentario</label>
                                     <input ng-model="document.comentario"  ng-disabled="( formBlock)"
                                            ng-change="toEditHead('nro_proforma', document.nro_proforma)"
+                                           info="Algun texto adicional referente al documento"
+                                           skip-tab
 
                                     >
                                 </md-input-container>
@@ -800,7 +841,7 @@
                         </div>
                     </form>
                     <div ng-show="document.final_id != null || document.version > 0">
-                        <form name="FormEstatusDoc" layout="row" ng-click="allowEdit()">
+                        <form name="FormEstatusDoc" class="focused" layout="row" ng-click="allowEdit()">
                             <div active-left></div>
                             <div></div>
                             <div layout="column" flex >
@@ -820,7 +861,7 @@
                                                    ng-change="toEditHead('estado_id', document.estado_id)"
 
                                         >
-                                            <md-option ng-repeat="item in estadosDoc" value="{{item.id}}">
+                                            <md-option ng-repeat="item in estadosDoc" value="{{item.id}}" skip-tab>
                                                 {{item.estado}}
                                             </md-option>
                                         </md-select>
@@ -830,7 +871,7 @@
                             </div>
 
                         </form>
-                        <form name="FormAprobCompras" layout="row" >
+                        <form name="FormAprobCompras" class="focused" layout="row" >
                             <div active-left></div>
                             <div layout="column" flex>
                                 <div layout="row" flex style="height: 39px; min-height: 39px;">
@@ -852,34 +893,27 @@
                                                        ng-disabled="(formBlock)"
                                                        ng-change="toEditHead('fecha_aprob_compra', document.fecha_aprob_compra)"
 
-                                        ></md-datepicker>
+                                        ></md-datepicker skip-tab>
                                     </div>
 
                                     <md-input-container class="md-block" flex="20">
                                         <label>N° Documento</label>
                                         <input ng-model="document.nro_doc"  ng-disabled="(formBlock)"
                                                ng-click="toEditHead('nro_doc', document.nro_doc)"
+                                               required
 
                                         >
                                     </md-input-container>
 
-                                    <div flex layout="row" flex ng-click="test()">
-                                        <md-input-container class="md-block"  flex>
-                                            <label>Adjunto</label>
-                                            <input ng-model="document.adj" name="peso"  ng-model="number" ui-number-mask
-                                                   ng-disabled="true"
-                                            >
-                                        </md-input-container>
-
-                                        <div layout="column" layout-align="center center">
-                                            <span class="icon-Agregar" style="font-size: 24px"></span>
-                                        </div>
+                                    <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
+                                         info=" Cargar adjuntos de la aprobacion " >
+                                        <span class="icon-Adjuntar" style="font-size: 24px"></span>
                                     </div>
 
                                 </div>
                             </div>
                         </form>
-                        <form name="FormCancelDoc" layout="row" >
+                        <form name="FormCancelDoc" class="focused" layout="row" >
                             <div active-left></div>
                             <div layout="column" flex>
                                 <div layout="row" flex style="height: 39px; min-height: 39px;">
