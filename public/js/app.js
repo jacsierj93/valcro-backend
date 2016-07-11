@@ -248,9 +248,10 @@ MyApp.directive('contenteditable', function() {
 
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
+        console.log(jqObject)
         var elem = angular.element("#"+jqObject);
         var list = angular.element(elem).parents("form").first().find("[step]:visible")
-        console.log(list)
+        console.log(elem,angular.element(elem).parents("form").first())
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
@@ -284,6 +285,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             element.removeAttr("skip-tab");
             element.attr("step","");
             if(angular.element(element).is("md-switch")){
+
                 element.attr("ng-change","skip('"+element.attr("id")+"',this)");
                 if(!("skip" in  scope)){
                     scope.skip = skip;
@@ -296,6 +298,9 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }else{
                 element.bind("keydown",function(e){
                     var elem =this;
+                    if(angular.element(elem).is("div")){
+                        angular.element(elem).attr("tab-index","-1");
+                    }
                     if(e.which == "13"){
                         e.stopPropagation();
                         var list = angular.element(elem).parents("form").first().find("[step]:visible");
