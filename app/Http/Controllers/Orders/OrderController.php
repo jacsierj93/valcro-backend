@@ -57,24 +57,46 @@ class OrderController extends BaseController
      * trae los documentos que no fueron fnalizados
      */
     public function getUnClosetDocument(){
+        $docsUnclose = array();
         $data = array();
-        $data['23'] = Purchase::whereNull("final_id")
-            ->where('aprob_compras',0)
-            ->where('aprob_gerencia',0)
-            ->whereNull('cancelacion')
-            ->get();
-        $data['21'] = Solicitude::whereNull("final_id")
-            ->where('aprob_compras',0)
-            ->where('aprob_gerencia',0)
-            ->whereNull('cancelacion')
+        $monedas = Monedas::get();
 
-            ->get();
-        $data['22'] = Order::whereNull("final_id")
-            ->where('aprob_compras',0)
-            ->where('aprob_gerencia',0)
+
+        $docsUnclose[0] = Solicitude::whereNull("final_id")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
             ->whereNull('cancelacion')
             ->get();
-        return array();
+
+        $docsUnclose[1] = Order::whereNull("final_id")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+            ->get();
+        $docsUnclose[2] = Purchase::whereNull("final_id")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+//            ->whereNull('cancelacion')
+            ->get();
+        foreach($docsUnclose as $docs){
+            foreach($docs  as $aux){
+                $temp= array();
+                $temp['id']=$aux->id;
+                $temp['documento'] = $aux->getTipo();
+                $temp['titulo'] = $aux->titulo;
+                $temp['monto'] = $aux->monto;
+                $temp['symbol'] = $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                $temp['emision'] = $aux->emision;
+                $temp['comentario'] = $aux->comentario;
+                $temp['prov_id'] = $aux->prov_id;
+                $temp['productos'] = $this->getProductoItem($aux);
+
+                $data[] = $temp;
+
+
+            }
+        }
+        return $data;
     }
 
     public function UpLoadFiles(Request $req){
