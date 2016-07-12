@@ -540,7 +540,7 @@
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>
-                                <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff[0].valor" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1">
+                                <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">
