@@ -226,6 +226,14 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /**
+     * cuentas los provedores que pueden hacer pedidos
+    */
+
+    public function countProvider(){
+        return Provider::count();
+    }
+
     /***
      * obtiene todos los documentos que pueden ser importado por una solictud
      */

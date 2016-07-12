@@ -53,9 +53,9 @@
 
             </div>
 
-            <div  style="overflow-y:auto;" flex>
+            <!--<div  style="overflow-y:auto;" flex>-->
 
-                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"
+<!--                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
 
                 >
@@ -140,8 +140,14 @@
                     </div>
 
                 </div>
+-->
 
-            </div>
+                <md-virtual-repeat-container id="vertical-container" flex>
+                    <div md-virtual-repeat="item in infiniteItems" md-on-demand="" class="repeated-item" flex="">
+                        {{item.id}}
+                    </div>
+                </md-virtual-repeat-container>
+            <!--</div>-->
 
 
             <!--
