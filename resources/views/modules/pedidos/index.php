@@ -55,11 +55,46 @@
 
             <div  style="overflow-y:auto;" flex>
 
-                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
+                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"
+                     ng-class="{'listSel' : (item.id == provSelec.id)}"
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
+                >
 
-                    <div layout="row" style="height: 40px;">
+                    <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
+
+                    <div layout="row" class="dotRow">
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open100" >
+                                {{item.review100}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open90" >
+                                {{item.review90}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open60">
+                                {{item.review60}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open30" >
+                                {{item.review30}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open7" >
+                                {{item.review7}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open0">
+                                {{item.review0}}
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row" class="dotRow">
                         <div flex layout layout-align="center center">
                             <div layout layout-align="center center" class="dot-item emit100" >
                                 {{item.emit100}}
@@ -2093,30 +2128,42 @@
             </md-content>
         </md-sidenav>
 
-        <!--
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px; z-index:66;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true"
-                    md-component-id="adjuntoProforma" id="adjuntoProforma"
-        >
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
-                <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
-                    <div ng-click="">
-                        Adjuntos
+        <!-- ########################################## LAYER LISTA DE DOCUMENTOS SIN FINALIZAR ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="unclosetDoc" id="unclosetDoc">
+            <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
+            <md-content  layout="row" flex class="sideNavContent" >
+                <div active-left  before="verificExit" ></div>
+                <div  layout="column" flex="" class="layerColumn">
+                    <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
+                        <div>
+                            Documentos sin finalizar
+                        </div>
                     </div>
-                </div>
-                <div flex layout="column">
-                    <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                         ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
-                        insertar archivo
+                    <div layout="row" class="headGridHolder">
+                        <div flex="5" class="headGrid"> N° </div>
+                        <div flex="15" class="headGrid"> Documento</div>
+                        <div flex class="headGrid"> Titulo</div>
+                        <div flex="10" class="headGrid"> Fecha</div>
+                        <div flex class="headGrid"> Monto</div>
+                        <div flex class="headGrid"> Comentario</div>
+                    </div>
+                    <div class="gridContent"  >
+                        <div   ng-repeat="item in unclosetDoc" ng-click="openTempDoc(item)">
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="5" class="cellGrid" > {{item.id}}</div>
+                                <div flex="15" class="cellGrid"> {{item.documento}}</div>
+                                <div flex class="cellGrid" > {{item.titulo}}</div>
+                                <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" > {{item.monto | currency :item.symbol :2}}</div>
+                                <div flex class="cellGrid" >{{item.comentario}}</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <md-content flex>
-
-                        <div class="imgItem" ng-repeat="pic in imgs"><img height="149px" width="149px" src="images/prueba/pagos/{{pic}}"/></div>
-                    </md-content>
                 </div>
             </md-content>
         </md-sidenav>
-    -->
+
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
