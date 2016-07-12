@@ -141,6 +141,31 @@ class Order extends Model
     }
 
     /**
+     * Metodo que calcula la categoria de llegada del pedido
+     * @return categoria de llegada
+     */
+    public function catLastReview(){
+        if($this->ult_revision  == null ){
+          return   $this->daysCreate();
+        }
+        $estatus = 100;
+        $auxDate= date_create($this->ult_revision);
+        $auxEmit= Carbon::createFromDate($auxDate->format("Y"),$auxDate->format("m"),$auxDate->format("d"));
+        $dias=Carbon::now()->diffInDays($auxEmit);
+        if ($dias <= 0) {
+            $estatus = 0;
+        } else if ($dias <= 7) {
+            $estatus = 7;
+        } else if ($dias > 7 && $dias <= 30) {
+            $estatus = 30;
+        } else if ($dias > 30 && $dias <= 60) {
+            $estatus = 60;
+        } else if ($dias > 60 && $dias <= 90) {
+            $estatus = 90;
+        }
+        return $estatus;//->format("d");
+    }
+    /**
      * @deprecated */
     private function dateDiff($dateIni, $dateEnd)
     {

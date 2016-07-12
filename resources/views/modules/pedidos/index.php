@@ -55,11 +55,46 @@
 
             <div  style="overflow-y:auto;" flex>
 
-                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
+                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"
+                     ng-class="{'listSel' : (item.id == provSelec.id)}"
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
+                >
 
-                    <div layout="row" style="height: 40px;">
+                    <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
+
+                    <div layout="row" class="dotRow">
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open100" >
+                                {{item.review100}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open90" >
+                                {{item.review90}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open60">
+                                {{item.review60}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open30" >
+                                {{item.review30}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open7" >
+                                {{item.review7}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="dot-empty doc-Open0">
+                                {{item.review0}}
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row" class="dotRow">
                         <div flex layout layout-align="center center">
                             <div layout layout-align="center center" class="dot-item emit100" >
                                 {{item.emit100}}
@@ -2097,7 +2132,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="unclosetDoc" id="unclosetDoc">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" >
-                <div active-left ></div>
+                <div active-left  before="verificExit" ></div>
                 <div  layout="column" flex="" class="layerColumn">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
                         <div>

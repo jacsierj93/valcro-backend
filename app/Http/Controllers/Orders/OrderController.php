@@ -156,8 +156,16 @@ class OrderController extends BaseController
                 $nE90=0;
                 $nE100=0;
 
+                $nR0=0;
+                $nR7=0;
+                $nR30=0;
+                $nR60=0;
+                $nR90=0;
+                $nR100=0;
+
                 foreach($peds as $ped){
                     $arrival=$ped->daysCreate();
+
                     if ($arrival == 0) {
                         $nE0++;
                     } else if ($arrival == 7) {
@@ -171,6 +179,23 @@ class OrderController extends BaseController
                     } else if($arrival == 100 ){
                         $nE100++;
                     }
+                    if($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 &&   $ped->aprob_gerencia == 0){
+                        $review=$ped->catLastReview();
+                        if ($review == 0) {
+                            $nR0++;
+                        } else if ($review == 7) {
+                            $nR7++;
+                        } else if ($review == 30) {
+                            $nR30++;
+                        } else if ($review == 60) {
+                            $nR60++;
+                        } else if ($arrival == 90) {
+                            $nR90++;
+                        } else if($review == 100 ){
+                            $nR100++;
+                        }
+                    }
+
                     if($ped->getTipoId() == 23){
                         $nCp +=$ped->getNumItem(2);
                     }
@@ -183,6 +208,15 @@ class OrderController extends BaseController
                 $temp['emit60']=$nE60;
                 $temp['emit90']=$nE90;
                 $temp['emit100']=$nE100;
+
+                $temp['review0']=$nE0;
+                $temp['review7']=$nE7;
+                $temp['review30']=$nE30;
+                $temp['review60']=$nE60;
+                $temp['review90']=$nE90;
+                $temp['review100']=$nE100;
+
+
                 $temp['contraPedido']= $nCp;
                 $data[] =$temp;
             }
@@ -431,7 +465,7 @@ class OrderController extends BaseController
 
     /**
      * contrulle el resumen preliminar de la solicitud
-    */
+     */
     public function getSolicitudeSummary(Request $req){
         $data = array();
         $prod = array();
@@ -460,7 +494,7 @@ class OrderController extends BaseController
 
     /**
      * construye el resumen preliminar del pedido
-    */
+     */
     public function getOrderSummary(Request $req){
         $data = array();
         $prod = array();
@@ -1069,7 +1103,7 @@ class OrderController extends BaseController
 
     /***
      * adjuntos para la solicitud
-    **/
+     **/
     public function addAttachmentsSolicitude (Request $req){
         $resul= array();
         $model = Solicitude::findOrFail($req->id);
@@ -1089,7 +1123,7 @@ class OrderController extends BaseController
 
     /**
      * adjuntos para el pedido
-    **/
+     **/
     public function addAttachmentsOrder(Request $req){
         $resul= array();
         $model = Order::findOrFail($req->id);
@@ -1592,7 +1626,7 @@ class OrderController extends BaseController
             $item->tipo_origen_id=1;
             $item->doc_id=$req->doc_id;
             $item->origen_item_id=$req->id;
-           // $item->cantidad = $req->cantidad;
+            // $item->cantidad = $req->cantidad;
             $item->saldo = $req->saldo;
             $item->descripcion = $req->descripcion;
 
@@ -2845,30 +2879,30 @@ class OrderController extends BaseController
                 }
             }
 
-                if($paso){
-                    $tem['id'] =$aux->id;
-                    $tem['fecha'] =$aux->fecha;
-                    $tem['motivo_contrapedido_id'] =$aux->motivo_contrapedido_id;
-                    $tem['tipo_envio_id'] =$aux->tipo_envio_id;
-                    $tem['prioridad_id'] =$aux->prioridad_id;
-                    $tem['comentario'] =$aux->comentario;
-                    $tem['prov_id'] =$aux->prov_id;
-                    $tem['fecha_ref_profit'] =$aux->fecha_ref_profit;
-                    $tem['cod_ref_profit'] =$aux->cod_ref_profit;
-                    $tem['img_ref_profit'] =$aux->img_ref_profit;
-                    $tem['fecha_aprox_entrega'] =$aux->fecha_aprox_entrega;
-                    $tem['monto'] =$aux->monto;
-                    $tem['moneda_id'] =$aux->moneda_id;
-                    $tem['abono'] =$aux->abono;
-                    $tem['img_abono'] =$aux->img_abono;
-                    $tem['fecha_abono'] =$aux->fecha_abono;
-                    $tem['tipo_pago_contrapedido_id'] =$aux->tipo_pago_contrapedido_id;
-                    $tem['aprobada'] =$aux->aprobada;
-                    $tem['titulo'] =$aux->titulo;
-                    $tem['asignadoOtro'] =$asigOtro;
-                    $data[]=$tem;
-                }
-           // }
+            if($paso){
+                $tem['id'] =$aux->id;
+                $tem['fecha'] =$aux->fecha;
+                $tem['motivo_contrapedido_id'] =$aux->motivo_contrapedido_id;
+                $tem['tipo_envio_id'] =$aux->tipo_envio_id;
+                $tem['prioridad_id'] =$aux->prioridad_id;
+                $tem['comentario'] =$aux->comentario;
+                $tem['prov_id'] =$aux->prov_id;
+                $tem['fecha_ref_profit'] =$aux->fecha_ref_profit;
+                $tem['cod_ref_profit'] =$aux->cod_ref_profit;
+                $tem['img_ref_profit'] =$aux->img_ref_profit;
+                $tem['fecha_aprox_entrega'] =$aux->fecha_aprox_entrega;
+                $tem['monto'] =$aux->monto;
+                $tem['moneda_id'] =$aux->moneda_id;
+                $tem['abono'] =$aux->abono;
+                $tem['img_abono'] =$aux->img_abono;
+                $tem['fecha_abono'] =$aux->fecha_abono;
+                $tem['tipo_pago_contrapedido_id'] =$aux->tipo_pago_contrapedido_id;
+                $tem['aprobada'] =$aux->aprobada;
+                $tem['titulo'] =$aux->titulo;
+                $tem['asignadoOtro'] =$asigOtro;
+                $data[]=$tem;
+            }
+            // }
         }
         return $data;
     }
@@ -4009,7 +4043,7 @@ class OrderController extends BaseController
      * setea toda la data del modelo
      **/
     private function setDocItem($model, Request $req){
-
+        $model->ult_revision = Carbon::now();
         if($req->has('monto')){
             $model->monto = $req->monto;
         }
