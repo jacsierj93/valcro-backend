@@ -27,7 +27,7 @@
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div flex ng-controller="ListProv" style="overflow-y:auto;">
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
+                <div class="boxList" layout="column" flex ng-repeat="item in todos" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'0' | number:2}}</div>
                     <div style="height:40px;">
@@ -473,7 +473,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Pais de Residencia</label>
-                                <md-select skip-tab info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="$parent.enabled || cnt.isAgent==1" md-no-ink>
+                                <md-select id="paisCont" skip-tab info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="$parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
@@ -483,7 +483,7 @@
                             <div layout="row" flex="30">
                                 <md-input-container flex>
                                     <label>Idiomas</label>
-                                    <md-select skip-tab info="marque cada idioma que hable este contacto"  ng-model="cnt.languaje" multiple="" ng-disabled=" $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                    <md-select id="langCont" skip-tab info="marque cada idioma que hable este contacto"  ng-model="cnt.languaje" multiple="" ng-disabled=" $parent.enabled || cnt.isAgent==1" md-no-ink>
                                         <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
 
                                     </md-select>
@@ -759,7 +759,7 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
-                                    <md-select ng-model="cn.coin" name="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink>
+                                    <md-select id="selCoin" ng-model="cn.coin" name="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink>
                                         <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
@@ -793,12 +793,12 @@
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex="30">
                                 <label>Limite de Credito</label>
-                                <input number autocomplete="off" ng-disabled="$parent.enabled || coins.length<1" ng-model="cred.amount" required>
+                                <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length<1" ng-model="cred.amount" required>
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Moneda</label>
-                                <md-select ng-model="cred.coin" name="state" ng-disabled="$parent.enabled || coins.length<1" ng-controller="provCoins" required md-no-ink>
+                                <md-select id="credCoin" skip-tab ng-model="cred.coin" name="state" ng-disabled="$parent.enabled || coins.length<1" ng-controller="provCoins" required md-no-ink>
                                     <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                         {{coin.nombre}}
                                     </md-option>
@@ -807,7 +807,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Linea</label>
-                                <md-select ng-disabled="$parent.enabled" ng-model="cred.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
+                                <md-select id="credLine" skip-tab ng-disabled="$parent.enabled" ng-model="cred.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
                                     <md-option ng-repeat="line in lines" value="{{line.id}}">
                                         {{line.linea}}
                                     </md-option>
@@ -863,11 +863,11 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="60">
                                     <label>Titulo</label>
-                                    <input autocomplete="off" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                    <input skip-tab autocomplete="off" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select ng-model="condHead.line" ng-disabled="$parent.enabled" md-no-ink>
+                                    <md-select id="conLine" skip-tab ng-model="condHead.line" ng-disabled="$parent.enabled" md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
@@ -967,31 +967,31 @@
                             <div>
                                 Factor de Conversión
                             </div>
-                            <div style="width:24px">
+                            <!--<div style="width:24px">
                                 <span class="icon-Agregar"></span>
-                            </div>
+                            </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand">
                             <div layout="row">
                                 <md-input-container class="md-block" flex="10">
                                     <label>% Flete</label>
-                                    <input number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10">
                                     <label>% Gastos</label>
-                                    <input number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.expens">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.expens">
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10">
                                     <label>% Ganancia</label>
-                                    <input number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.gain">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.gain">
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10">
                                     <label>% Descuento</label>
-                                    <input number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.disc">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.disc">
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                                     <label>Moneda</label>
-                                    <md-select ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.coin" name="state" required md-no-ink>
+                                    <md-select id="convCoin" skip-tab ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.coin" name="state" required md-no-ink>
                                         <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
@@ -999,7 +999,7 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select ng-model="conv.line" ng-disabled="$parent.enabled"ñ md-no-ink>
+                                    <md-select id="convLine" skip-tab ng-model="conv.line" ng-disabled="$parent.enabled"ñ md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
@@ -1044,19 +1044,19 @@
                             <div>
                                 Puntos
                             </div>
-                            <div style="width:24px">
+                            <!--<div style="width:24px">
                                 <span class="icon-Agregar"></span>
-                            </div>
+                            </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand">
                             <div layout="row">
                                 <md-input-container class="md-block" flex="30">
                                     <label>Costo del punto</label>
-                                    <input number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.cost" required>
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.cost" required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                                     <label>Moneda</label>
-                                    <md-select ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.coin" required md-no-ink>
+                                    <md-select id="pointCoin" skip-tab ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.coin" required md-no-ink>
                                         <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
@@ -1064,7 +1064,7 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select ng-model="pnt.line" ng-disabled="$parent.enabled" required md-no-ink>
+                                    <md-select id="pointLine" skip-tab ng-model="pnt.line" ng-disabled="$parent.enabled" required md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
@@ -1111,16 +1111,16 @@
                         <div layout="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>De (Dias)</label>
-                                <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.from" required>
+                                <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.from" required>
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>A (Dias)</label>
-                                <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.to" required>
+                                <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.to" required>
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="20">
+                            <md-input-container class="md-block" flex   >
                                 <label>Linea</label>
-                                <md-select ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
+                                <md-select id="timePLine" skip-tab ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
                                     <md-option ng-repeat="line in lines" value="{{line.id}}">
                                         {{line.linea}}
                                     </md-option>
@@ -1164,16 +1164,16 @@
                             <div layout="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>De (Dias)</label>
-                                    <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20">
                                     <label>A (Dias)</label>
-                                    <input type="number" autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="20">
+                                <md-input-container class="md-block" flex>
                                     <label>Pais</label>
-                                    <md-select ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
+                                    <md-select id="paistimeP" skip-tab ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
                                         <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
                                             {{country.pais.short_name}}
                                         </md-option>
@@ -1212,7 +1212,7 @@
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand">
                         <div layout="row">
-                            <md-input-container class="md-block" flex="40">
+                            <md-input-container skip-tab class="md-block" flex="40">
                                 <label>Referencia</label>
                                 <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
                             </md-input-container>
@@ -1247,10 +1247,11 @@
 
             </div>
         </md-sidenav>
-
+        <!-- ########################################## LAYER (5) RESUMEN FINAL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5" id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="row" flex="grow" ng-controller="resumenProvFinal">
+                <div active-left></div>
                 <div flex layout="column">
                     <div>
                         <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-click="has()">
