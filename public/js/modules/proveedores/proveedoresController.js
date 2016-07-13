@@ -1380,13 +1380,13 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             contact.pais_id = $scope.cnt.pais;
             contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
             contact.responsabilidades =  $scope.cnt.responsability;
-            //contact.direccion = $scope.cnt.dirOff.valor;
+            contact.direccion = $scope.cnt.dirOff;
             contact.agente = $scope.cnt.isAgent;
             contact.prov_id = $scope.cnt.prov_id;
             contact.languages = $scope.cnt.languaje;
             contact.cargos = $scope.cnt.cargo;
 
-            if (data.action == "new" || nuevo[2]) {
+            if (data.action == "new") {
                 $scope.cnt.autoSave = false;
                 $scope.contacts.unshift(contact);
                 setGetContac.addUpd(contact,angular.copy($scope.prov));
@@ -1396,8 +1396,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 setNotif.addNotif("ok", "contacto Actualizado", [
                 ],{autohidden:3000});
             };
-            onSuccess();
             setGetProv.addChng($scope.cnt,data.action,"contProv");
+            onSuccess();
+
         });
     };
 
@@ -1455,6 +1456,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
     $scope.toEdit = function(element){
         contact = element.cont;
+console.log(contact)
         contact.prov_id = $scope.prov.id;
         setGetContac.setContact(contact);
         currentOrig = angular.copy($scope.cnt);
@@ -1466,7 +1468,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if((jQuery(event.toElement).parents("#contactBook").length==0) && (jQuery(event.toElement).parents("#lyrAlert").length==0)){
             $scope.isShow = elem;
             if(!elem){
-                console.log($scope.cnt)
                 saveContact(function(){
                     contact = {};
                     setGetContac.setContact(false);
@@ -1539,7 +1540,6 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
     var listCont = [];
     return {
         setContact : function(cont){
-            console.log(cont)
                 var prov = setGetProv.getProv();
                 contact.id = cont.id||false;
                 contact.nombreCont = cont.nombre||"";
@@ -2163,9 +2163,16 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
                 $scope.points.unshift(point);
                 setNotif.addNotif("ok", "nuevo valor del punto guardado", [
                 ],{autohidden:3000});
-                setGetProv.addChng($scope.pnt,data.action,"point");
+
+            }else{
+                setNotif.addNotif("ok", "Punto Actualizado", [
+                ],{autohidden:3000});
             }
+            currentOrig = {};
+            setGetProv.addChng($scope.pnt,data.action,"point");
+            onSuccess();
         });
+
     }
 
     $scope.rmPoint = function(elem){
@@ -2302,6 +2309,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
                 setNotif.addNotif("ok", "tiempo de produccion actualizado", [
                 ],{autohidden:3000});
             }
+            setGetProv.addChng($scope.tp,data.action,"timeProd");
             onSuccess();
         });
     }
@@ -2417,6 +2425,8 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
                 setNotif.addNotif("ok", "se ha actualizado el Tiempo de Transito", [
                 ],{autohidden:3000});
             }
+            setGetProv.addChng($scope.ttr,data.action,"timeTrans");
+            onSuccess();
 
         });
     }

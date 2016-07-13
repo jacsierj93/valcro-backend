@@ -221,8 +221,8 @@ class ProvidersController extends BaseController
                 $contact->languages=$contact->idiomas()->lists("languaje_id");
                 $contact->emails=$contact->campos()->where("prov_id",$id)->where("campo","email")->get();
                 $contact->phones=$contact->campos()->where("prov_id",$id)->where("campo","telefono")->get();
-                //$contact->cargos=$contact->cargos()->lists("cargo_id");
-
+                $dir = $contact->campos()->where("prov_id",$id)->where("campo","direccion")->first();
+                $contact->direccion=($dir)?$dir->valor:"";
             }
             return ($contacts)?$contacts:[];
         }
@@ -247,12 +247,12 @@ class ProvidersController extends BaseController
             $contact = new Contactos();
         }
 
-        if(!$contact->id){
+        //if(!$contact->id){
             $contact->nombre = $req->nombreCont;
             $contact->pais_id = ($req->pais)?$req->pais:NULL;
             $contact->save();
             $contact->idiomas()->sync($req->languaje);
-        }
+       // }
         //dd(array($contact->id=>$req->emailCont,$contact->id=>$req->contTelf,$contact->id=>$req->dirOff));
         if(!Provider::find($req->prov_id)->contacts()->find($contact->id)){
             Provider::find($req->prov_id)->contacts()->attach($contact->id);
@@ -260,7 +260,9 @@ class ProvidersController extends BaseController
 
         $result['mails'] = $this->contactEmail($req->emailCont,$contact->id,$req->prov_id);
         $result['phones'] = $this->contactPhone($req->contTelf,$contact->id,$req->prov_id);
-
+        $this->contactCampos("direccion",$req->dirOff,$contact->id,$req->prov_id);
+        $this->contactCampos("responsabilidad",$req->responsability,$contact->id,$req->prov_id);
+        //$this->contactCampos("responsabilidad",$req->responsability,$contact->id,$req->prov_id);
         /*$contact->campos()->create([
             'campo' => 'telefono',
             "valor" => $req->contTelf["valor"],
@@ -330,16 +332,17 @@ class ProvidersController extends BaseController
 
         return $result;
     }
-    private function contactAddress(request $req){
-        if($req->id){
-            $addr = Contactos::find($req->cont_id)->campos()->find($req->id);
-        }else{
+    private function contactCampos($field,$valor,$cont_id,$prov){
+        $addr = Contactos::find($cont_id)->campos()->where("prov_id",$prov)->firstOrFail();
+        if(!$addr){
             $addr = new ContactField();
-        }
-        $addr->campo = "email";
-        $addr->cont_id = $req->cont_id;
-        $addr->prov_id = $req->prov_id;
-        $addr->valor = $req->valor;
+        }/*else{
+            $addr = new ContactField();
+        }*/
+        $addr->campo = $field;
+        $addr->cont_id = $cont_id;
+        $addr->prov_id = $prov;
+        $addr->valor = $valor;
         if($addr->save()){
             $result['id'] = $addr->id;
         }else{
