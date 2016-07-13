@@ -4,6 +4,20 @@
 //###########################################################################################3
 //##############################REST service (factory)#############################################3
 //###########################################################################################3
+ MyApp.directive('scrollIf', function () {
+     return function (scope, element, attributes) {
+         setTimeout(function () {
+             console.log(element[0].offsetTop,angular.element(element[0]).parents().first())
+
+             if (scope.$eval(attributes.scrollIf)) {
+                 console.log("entorooo")
+                 angular.element(element[0]).parents().first().scrollTo(0, element[0].offsetTop);
+                 //window.scrollTo(0, element[0].offsetTop - 100*45)
+             }
+         });
+     }
+ });
+
 MyApp.factory('masters', ['$resource',
     function ($resource) {
         return $resource('master/:type/:id', {}, {
@@ -228,8 +242,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     $scope.data = {
         cb1: true
     };
-
     $scope.setProv = function(prov,indx){
+        //angular.element(element[0]).parents().first().scrollTo(0, element[0].offsetTop);
+
         endProvider(chngProv,null,prov);
         /*if(setGetProv.haveChang()){
             openLayer("layer5");
@@ -266,9 +281,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };
 
-    $scope.showAlert = function(){
-        console.log(setGetProv.getChng());
-    };
 
 
     $scope.addProv = function(){
@@ -400,9 +412,24 @@ MyApp.controller('ListHerramientas', function ($scope) {
  $route.reload();
  }]);*/
 
-MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers) {
+MyApp.controller('ListProv', function ($scope,$http,setGetProv,providers, $location, $anchorScroll) {
     setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
     $scope.prov = setGetProv.getProv();
+
+    $scope.$watch('prov.id',function(nvo){
+        newHash ='prov' + nvo;
+        if ($location.hash() !== newHash) {
+            // set the $location.hash to `newHash` and
+            // $anchorScroll will automatically scroll to it
+            $location.hash(newHash);
+        } else {
+            // call $anchorScroll() explicitly,
+            // since $location.hash hasn't changed
+            $anchorScroll();
+        }
+    });
+
+
 });
 
 //###########################################################################################3
