@@ -159,7 +159,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $http.get("Order/OrderProvs",{params:{skit:$scope.providers.length, take:10}}).success(function (response) {
                                 console.log("response ", response);
 
-                                angular.forEach(response.provs, function(v){
+                                angular.forEach(response, function(v){
                                     $scope.providers.push(v);
 
                                 });

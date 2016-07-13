@@ -250,7 +250,98 @@ class OrderController extends BaseController
 
 
         get();
-        $data['provs']= $provs;
+        $data = array();
+        //  $auxCp= Collection::make(array());
+
+        foreach($provs as $prv){
+            $paso= true;
+            if(sizeof($prv->getCountry())>0){
+                $paso= true;
+            }
+            if($paso){
+                $temp["id"] = $prv->id;
+                $temp["razon_social"] = $prv->razon_social;
+                $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
+                //  $temp['productos']= $prv->proveedor_product()->get();
+                $temp['paises'] = $prv->getCountry();
+                $peds=$prv->getOrderDocuments();
+
+
+                $nCp=0;
+                $nE0=0;
+                $nE7=0;
+                $nE30=0;
+                $nE60=0;
+                $nE90=0;
+                $nE100=0;
+
+                $nR0=0;
+                $nR7=0;
+                $nR30=0;
+                $nR60=0;
+                $nR90=0;
+                $nR100=0;
+
+                foreach($peds as $ped){
+                    $arrival=$ped->daysCreate();
+
+                    if ($arrival == 0) {
+                        $nE0++;
+                    } else if ($arrival == 7) {
+                        $nE7++;
+                    } else if ($arrival == 30) {
+                        $nE30++;
+                    } else if ($arrival == 60) {
+                        $nE60++;
+                    } else if ($arrival == 90) {
+                        $nE90++;
+                    } else if($arrival == 100 ){
+                        $nE100++;
+                    }
+                    if($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 &&   $ped->aprob_gerencia == 0){
+                        $review=$ped->catLastReview();
+                        if ($review == 0) {
+                            $nR0++;
+                        } else if ($review == 7) {
+                            $nR7++;
+                        } else if ($review == 30) {
+                            $nR30++;
+                        } else if ($review == 60) {
+                            $nR60++;
+                        } else if ($arrival == 90) {
+                            $nR90++;
+                        } else if($review == 100 ){
+                            $nR100++;
+                        }
+                    }
+
+                    if($ped->getTipoId() == 23){
+                        $nCp +=$ped->getNumItem(2);
+                    }
+
+
+                }
+                $temp['emit0']=$nE0;
+                $temp['emit7']=$nE7;
+                $temp['emit30']=$nE30;
+                $temp['emit60']=$nE60;
+                $temp['emit90']=$nE90;
+                $temp['emit100']=$nE100;
+
+                $temp['review0']=$nE0;
+                $temp['review7']=$nE7;
+                $temp['review30']=$nE30;
+                $temp['review60']=$nE60;
+                $temp['review90']=$nE90;
+                $temp['review100']=$nE100;
+
+
+                $temp['contraPedido']= $nCp;
+                $data[] =$temp;
+            }
+
+        }
+
         return $data;
     }
 
