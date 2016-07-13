@@ -123,13 +123,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.loadProviders = function(){
 
+        // 1) se estable el numero de provedores que se desea cargar
         Order.get({type:"OrderProvCount"}, {},function(response){
             $scope.providers = new Array();
-            $scope.band= false;
             $scope.infiniteItems = {
                 toLoad_: 0,
-                isSearch :false,
-                // Required.
                 getItemAtIndex: function(index) {
                     console.log(" index " + index +"numLoaded_ "+ $scope.providers.length )
 
@@ -139,43 +137,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     }
                     return $scope.providers[index];
                 },
-                // Required.
-                // For infinite scroll behavior, we always return a slightly higher
-                // number than the previously loaded items.
                 getLength: function() {
-                    return parseInt(response.value);
+                    return parseInt(response.value);// 2) se asigna le asigna como valor maximo
                 },
                 fetchMoreItems_: function(index) {
-                    // For demo purposes, we simulate loading more items with a timed
-                    // promise. In real code, this function would likely contain an
-                    // $http request.
-                    console.log(" index q", index);
-                    console.log("  is erarc", $scope.band);
-
                     if (this.toLoad_ < index ) {
-                        this.isSearch= true;
-                        $scope.band= true;
-                        this.toLoad_ +=10;
-                            $http.get("Order/OrderProvs",{params:{skit:$scope.providers.length, take:10}}).success(function (response) {
-                                console.log("response ", response);
-
-                                angular.forEach(response, function(v){
-                                    $scope.providers.push(v);
-
-                                });
-                                $scope.band= false;
-                                console.log("$scope.providers ", $scope.providers);
-
-
+                        this.toLoad_ +=10;// se estable cuantos intes se va intentar buscar
+                        //3) se bucn los items
+                        Order.query({type:"OrderProvs", skit:$scope.providers.length, take:10},{}, function(response){
+                            angular.forEach(response, function(v){
+                                $scope.providers.push(v);
                             });
-
-
-
-                        /*for(var i=0;i<10; i++){
-                            $scope.providers.push({id:index});
-                        }
-                        this.numLoaded_ = $scope.providers.length;*/
-
+                        });
                     }
                 }
             };
@@ -187,28 +160,28 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     $scope.reviewDoc = function(){
-       /* $scope.unclosetDoc = [];
-            Order.query({type:"UnClosetDoc"},{}, function(response){
-                $scope.unclosetDoc = response;
-                if(response.length > 0){
-                    $scope.NotifAction("alert","Existen "+response.length + " documentos sin finalizar ",[
-                        {
-                            name:"Revisar luego",
-                            action:function(){
+        /* $scope.unclosetDoc = [];
+         Order.query({type:"UnClosetDoc"},{}, function(response){
+         $scope.unclosetDoc = response;
+         if(response.length > 0){
+         $scope.NotifAction("alert","Existen "+response.length + " documentos sin finalizar ",[
+         {
+         name:"Revisar luego",
+         action:function(){
 
-                            }
-                        }, {
-                            name:"Ver",
-                            action: function(){
-                                $scope.navCtrl.value="unclosetDoc";
-                                $scope.navCtrl.estado=true;
-                            }
-                        }
-                    ],{block:true});
-                }
+         }
+         }, {
+         name:"Ver",
+         action: function(){
+         $scope.navCtrl.value="unclosetDoc";
+         $scope.navCtrl.estado=true;
+         }
+         }
+         ],{block:true});
+         }
 
 
-            });*/
+         });*/
 
 
 
@@ -1284,19 +1257,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         $scope.gridView=-1;
         //init();
         var aux= angular.copy(doc);
-            if (segurity('editPedido')) {
-                $scope.document.isNew=false;
-                $scope.document.id=aux.id;
-                $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-                setGetOrder.setState('select');
-                $scope.formGlobal ="upd";
-                $scope.navCtrl.value="detalleDoc";
-                $scope.navCtrl.estado=true;
-                $scope.provSelec.id= aux.prov_id;
-            }
-            else {
-                alert('No tiene suficientes permiso para ejecutar esta accion');
-            }
+        if (segurity('editPedido')) {
+            $scope.document.isNew=false;
+            $scope.document.id=aux.id;
+            $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
+            setGetOrder.setState('select');
+            $scope.formGlobal ="upd";
+            $scope.navCtrl.value="detalleDoc";
+            $scope.navCtrl.estado=true;
+            $scope.provSelec.id= aux.prov_id;
+        }
+        else {
+            alert('No tiene suficientes permiso para ejecutar esta accion');
+        }
 
 
     };
