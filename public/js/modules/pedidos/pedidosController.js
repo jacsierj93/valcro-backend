@@ -2108,7 +2108,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         });
     };
 
-    /****** ************************** GUARDADOS ***************************************/
+    /******************************** GUARDADOS ***************************************/
 
     var timeSave ;
     $scope.$watchGroup(['FormHeadDocument.$valid', 'FormHeadDocument.$pristine'], function (nuevo) {
