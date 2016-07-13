@@ -146,6 +146,91 @@
                     <div md-virtual-repeat="item in infiniteItems" md-on-demand="" class="repeated-item" flex="">
                         {{item.id}}
                     </div>
+                    <div class="boxList" layout="column" flex md-virtual-repeat="item in infiniteItems" md-on-demand="" class="repeated-item" ng-click="setProvedor(item)"
+                         ng-class="{'listSel' : (item.id == provSelec.id)}"
+
+                    >
+
+                        <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
+
+                        <div layout="row" class="dotRow">
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-empty doc-Open100" >
+                                    {{item.review100}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-empty doc-Open90" >
+                                    {{item.review90}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-empty doc-Open60">
+                                    {{item.review60}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-empty doc-Open30" >
+                                    {{item.review30}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-empty doc-Open7" >
+                                    {{item.review7}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-empty doc-Open0">
+                                    {{item.review0}}
+                                </div>
+                            </div>
+                        </div>
+                        <div layout="row" class="dotRow">
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-item emit100" >
+                                    {{item.emit100}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-item emit90" >
+                                    {{item.emit90}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-item emit60">
+                                    {{item.emit60}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-item emit30" >
+                                    {{item.emit30}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-item emit7" >
+                                    {{item.emit7}}
+                                </div>
+                            </div>
+                            <div flex layout layout-align="center center">
+                                <div layout layout-align="center center" class="dot-item emit0">
+                                    {{item.emit0}}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:40px;" layout="row" layout-align="space-between center">
+                            <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
+
+                            <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
+                                <div >{{item.puntoCompra}}</div>
+                                <img  style="float: left;" src="images/punto_compra.png"/>
+                            </div>
+                            <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contraPedido > 0" >
+                                <div >{{item.contraPedido}}</div>
+                                <img  style="float: left;" src="images/contra_pedido.png"/>
+                            </div>
+                        </div>
+
+                    </div>
                 </md-virtual-repeat-container>
             <!--</div>-->
 

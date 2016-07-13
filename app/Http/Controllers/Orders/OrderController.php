@@ -231,10 +231,31 @@ class OrderController extends BaseController
     */
 
     public function countProvider(){
-        return Provider::count();
+        //$data =Provider::selectRaw("count('id')")->get()->get(0)[0];
+        $data['value'] =Provider::selectRaw("count('id')")->get()->get(0)[0];
+
+        return $data;
     }
 
-    /***
+    /**
+     * traue a los provedores
+     */
+
+    public function getProviders(Request $req){
+        $data = array();
+        $provs = Provider::
+        //   where('id', 2)->
+           Orderby('razon_social')->
+          skip($req->skit)->take($req->take)->
+
+
+        get();
+        $data['provs']= $provs;
+        return $data;
+    }
+
+
+        /***
      * obtiene todos los documentos que pueden ser importado por una solictud
      */
 

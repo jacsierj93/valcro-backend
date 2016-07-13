@@ -122,51 +122,68 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /*********************** prueba lazy load ************************/
 
     $scope.loadProviders = function(){
-        Order.get({type:"OrderProvCount"});
 
+        Order.get({type:"OrderProvCount"}, {},function(response){
+            $scope.providers = new Array();
+            $scope.band= false;
+            $scope.infiniteItems = {
+                toLoad_: 0,
+                isSearch :false,
+                // Required.
+                getItemAtIndex: function(index) {
+                    console.log(" index " + index +"numLoaded_ "+ $scope.providers.length )
+
+                    if (index > $scope.providers.length ) {
+                        this.fetchMoreItems_(index);
+                        return null;
+                    }
+                    return $scope.providers[index];
+                },
+                // Required.
+                // For infinite scroll behavior, we always return a slightly higher
+                // number than the previously loaded items.
+                getLength: function() {
+                    return parseInt(response.value);
+                },
+                fetchMoreItems_: function(index) {
+                    // For demo purposes, we simulate loading more items with a timed
+                    // promise. In real code, this function would likely contain an
+                    // $http request.
+                    console.log(" index q", index);
+                    console.log("  is erarc", $scope.band);
+
+                    if (this.toLoad_ < index ) {
+                        this.isSearch= true;
+                        $scope.band= true;
+                        this.toLoad_ +=10;
+                            $http.get("Order/OrderProvs",{params:{skit:$scope.providers.length, take:10}}).success(function (response) {
+                                console.log("response ", response);
+
+                                angular.forEach(response.provs, function(v){
+                                    $scope.providers.push(v);
+
+                                });
+                                $scope.band= false;
+                                console.log("$scope.providers ", $scope.providers);
+
+
+                            });
+
+
+
+                        /*for(var i=0;i<10; i++){
+                            $scope.providers.push({id:index});
+                        }
+                        this.numLoaded_ = $scope.providers.length;*/
+
+                    }
+                }
+            };
+        });
     };
-    $scope.infiniteItems = {
-        numLoaded_: 0,
-        toLoad_: 0,
-        max:50,
-        each:5,
 
-        // Required.
-        getItemAtIndex: function(index) {
-            if (index > this.numLoaded_ && this.toLoad_ <= this.max -1) {
-                this.fetchMoreItems_(index);
-                return null;
-            }
+    $scope.loadProviders();
 
-            return {id:'d'+index};
-        },
-
-        // Required.
-        // For infinite scroll behavior, we always return a slightly higher
-        // number than the previously loaded items.
-        getLength: function() {
-            /*if(this.max < (this.numLoaded_ + this.each)){
-                return this.numLoaded_ + this.each;
-            }else{
-                return this.max - this.numLoaded_;
-            }*/
-            return this.numLoaded_ + 1;
-
-        },
-
-        fetchMoreItems_: function(index) {
-            // For demo purposes, we simulate loading more items with a timed
-            // promise. In real code, this function would likely contain an
-            // $http request.
-
-            if (this.toLoad_ < this.max -1) {
-                this.toLoad_ += 9;
-                $timeout(angular.noop, 300).then(angular.bind(this, function() {
-                    this.numLoaded_ = this.toLoad_;
-                }));
-            }
-        }
-    };
 
 
     $scope.reviewDoc = function(){
