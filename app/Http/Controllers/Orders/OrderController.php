@@ -228,7 +228,7 @@ class OrderController extends BaseController
 
     /**
      * cuentas los provedores que pueden hacer pedidos
-    */
+     */
 
     public function countProvider(){
         //$data =Provider::selectRaw("count('id')")->get()->get(0)[0];
@@ -245,8 +245,8 @@ class OrderController extends BaseController
         $data = array();
         $provs = Provider::
         //   where('id', 2)->
-           Orderby('razon_social')->
-          skip($req->skit)->take($req->take)->
+        Orderby('razon_social')->
+        skip($req->skit)->take($req->take)->
 
 
         get();
@@ -258,6 +258,15 @@ class OrderController extends BaseController
             if(sizeof($prv->getCountry())>0){
                 $paso= true;
             }
+           /* if($req->has('skitProv')){
+                $exclu = json_decode($req->skitProv);
+               foreach($req->skitProv as $aux){
+                   if($aux['id'] == $prv->id ){
+                       $paso= false;
+                       break;
+                   }
+               }
+            }*/
             if($paso){
                 $temp["id"] = $prv->id;
                 $temp["razon_social"] = $prv->razon_social;
@@ -346,7 +355,89 @@ class OrderController extends BaseController
     }
 
 
-        /***
+
+    /**
+     * traue a los provedores
+     */
+
+    public function getProvider(Request $req){
+        $prv = Provider::findOrFail($req->id);
+        $temp["id"] = $prv->id;
+        $temp["razon_social"] = $prv->razon_social;
+        $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
+        $temp['paises'] = $prv->getCountry();
+        $peds=$prv->getOrderDocuments();
+        $nCp=0;
+        $nE0=0;
+        $nE7=0;
+        $nE30=0;
+        $nE60=0;
+        $nE90=0;
+        $nE100=0;
+        $nR0=0;
+        $nR7=0;
+        $nR30=0;
+        $nR60=0;
+        $nR90=0;
+        $nR100=0;
+
+        foreach($peds as $ped){
+            $arrival=$ped->daysCreate();
+            if ($arrival == 0) {
+                $nE0++;
+            } else if ($arrival == 7) {
+                $nE7++;
+            } else if ($arrival == 30) {
+                $nE30++;
+            } else if ($arrival == 60) {
+                $nE60++;
+            } else if ($arrival == 90) {
+                $nE90++;
+            } else if($arrival == 100 ){
+                $nE100++;
+            }
+            if($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 &&   $ped->aprob_gerencia == 0){
+                $review=$ped->catLastReview();
+                if ($review == 0) {
+                    $nR0++;
+                } else if ($review == 7) {
+                    $nR7++;
+                } else if ($review == 30) {
+                    $nR30++;
+                } else if ($review == 60) {
+                    $nR60++;
+                } else if ($arrival == 90) {
+                    $nR90++;
+                } else if($review == 100 ){
+                    $nR100++;
+                }
+            }
+
+            if($ped->getTipoId() == 23){
+                $nCp +=$ped->getNumItem(2);
+            }
+        }
+        $temp['emit0']=$nE0;
+        $temp['emit7']=$nE7;
+        $temp['emit30']=$nE30;
+        $temp['emit60']=$nE60;
+        $temp['emit90']=$nE90;
+        $temp['emit100']=$nE100;
+        $temp['review0']=$nE0;
+        $temp['review7']=$nE7;
+        $temp['review30']=$nE30;
+        $temp['review60']=$nE60;
+        $temp['review90']=$nE90;
+        $temp['review100']=$nE100;
+        $temp['contraPedido']= $nCp;
+
+
+
+
+        return $temp;
+    }
+
+    /***
      * obtiene todos los documentos que pueden ser importado por una solictud
      */
 

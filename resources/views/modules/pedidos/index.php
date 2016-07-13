@@ -142,12 +142,11 @@
                 </div>
 -->
 
-                <md-virtual-repeat-container id="vertical-container" flex>
-                    <div md-virtual-repeat="item in infiniteItems" md-on-demand="" class="repeated-item" flex="">
-                        {{item.id}}
-                    </div>
-                    <div class="boxList" layout="column" flex md-virtual-repeat="item in infiniteItems" md-on-demand="" class="repeated-item" ng-click="setProvedor(item)"
+                <md-virtual-repeat-container id="vertical-container" flex id="providers">
+
+                    <div class="boxList" layout="column" flex md-virtual-repeat="item in infiniteItems " md-on-demand="" class="repeated-item" ng-click="setProvedor(item, this)"
                          ng-class="{'listSel' : (item.id == provSelec.id)}"
+                         id="prov{{item.id}}"
 
                     >
 

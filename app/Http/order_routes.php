@@ -26,6 +26,7 @@ $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry');
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///trae tod el detalle de pedido
 $app->get("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
 $app->get("Order/OrderProvs",'Orders\OrderController@getProviders'); ///lista de todos los proveedores
+$app->get("Order/Provider",'Orders\OrderController@getProvider'); ///lista de todos los proveedores
 $app->get("Order/OrderProvCount",'Orders\OrderController@countProvider'); ///lista de todos los proveedores
 $app->get("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///llenado de filtros a proveedores
 $app->get("Order/OrderProvOrder",'Orders\OrderController@getProviderListOrder'); ///lista de todos los pedidos de un proveedor segun su id
