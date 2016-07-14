@@ -150,7 +150,7 @@
 
                     >
 
-                        <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
+                        <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.id}}-{{item.razon_social}}</div>
 
                         <div layout="row" class="dotRow">
                             <div flex layout layout-align="center center">

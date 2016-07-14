@@ -136,13 +136,13 @@ class OrderController extends BaseController
 
         foreach($provs as $prv){
             $paso= true;
-            if(sizeof($prv->getCountry())>0){
+            /*if(sizeof($prv->getCountry())>0){
                 $paso= true;
-            }
+            }*/
             if($paso){
                 $temp["id"] = $prv->id;
                 $temp["razon_social"] = $prv->razon_social;
-                $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
+               /* $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
                 //  $temp['productos']= $prv->proveedor_product()->get();
                 $temp['paises'] = $prv->getCountry();
                 $peds=$prv->getOrderDocuments();
@@ -217,7 +217,7 @@ class OrderController extends BaseController
                 $temp['review100']=$nE100;
 
 
-                $temp['contraPedido']= $nCp;
+                $temp['contraPedido']= $nCp;*/
                 $data[] =$temp;
             }
 
