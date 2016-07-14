@@ -27,7 +27,7 @@
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div id="listado" flex ng-controller="ListProv" style="overflow-y:auto;" ng-click="showAlert(45)">
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" flex ng-repeat="item in todos" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'0' | number:2}}</div>
                     <div style="height:40px;">
@@ -87,6 +87,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0" id="layer0">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-progress-linear ng-show="isSetting.setting"></md-progress-linear>
+            <input type="hidden" md-autofocus>
             <div layout="row" flex>
                 <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
                     <div style="width:24px"></div>
@@ -264,7 +265,7 @@
 
             <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
-
+                <input type="hidden" md-autofocus>
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
                 <form name="projectForm" layout="row" ng-controller="DataProvController" global ng-class="{'focused':isShow}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
                     <div active-left></div>
@@ -404,7 +405,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
-                                <input skip-tab name="dirPhone" ng-pattern="/^[\d\-+]+$/" number info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                <input skip-tab name="dirPhone" ng-pattern="/^[\d\-+]+$/" phone info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>
@@ -584,6 +585,7 @@
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="nomValAssign">
+                <input type="hidden" md-autofocus>
                 <div layout="column" flex style="overflow-x: hidden;">
                     <div class="titulo_formulario" layout="column" layout-align="start start">
                         <div ng-click="closeNomValLyr()">
@@ -605,6 +607,7 @@
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
+                <input type="hidden" md-autofocus>
                 <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
                     <div ng-click="closeContackBook()">
                         Contactos Existentes
@@ -627,7 +630,7 @@
         <!-- ########################################## LAYER (3) INFORMACION FINANCIERA ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
-
+                <input type="hidden" md-autofocus>
                 <!-- ########################################## FORMULARIO INFO BANCARIA ########################################## -->
                 <form ng-controller="bankInfoController" global layout="row" name="bankInfoForm" ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
@@ -916,6 +919,7 @@
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController" style="margin-left:24px">
+                <input type="hidden" md-autofocus>
                 <div class="titulo_formulario" layout="column" layout-align="start start" ng-click="closeCondition()">
                     <div>
                         {{head.title}} <i>({{head.line}})</i>
@@ -960,6 +964,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <!-- ########################################## FORMULARIO FACTOR CONVERSION ########################################## -->
+                <input type="hidden" md-autofocus>
                 <form name="provConv" layout="row" ng-controller="convController" global  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex>
@@ -1251,6 +1256,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5" id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
             <md-content class="cntLayerHolder" layout="row" flex="grow" ng-controller="resumenProvFinal">
+                <input type="hidden" md-autofocus>
                 <div active-left></div>
                 <div flex layout="column">
                     <div>

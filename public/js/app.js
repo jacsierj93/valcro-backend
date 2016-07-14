@@ -104,6 +104,30 @@ MyApp.directive('global', function (Layers, setNotif) {
     };
 });
 
+MyApp.directive('listBox', function ($timeout) {
+    return {
+        link: function (scope, elem, attrs,ctrl) {
+            elem.bind("keydown",function(e){
+                if(e.which=="40"){
+                    var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
+                    scope.scrollTo(next[0].id);
+                    next[0].focus();
+                }else if(e.which=="38"){
+                    var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
+                    scope.scrollTo(prev[0].id);
+                    prev[0].focus();
+                }else if(e.which=="13"){
+                    $timeout(function(){
+                        angular.element(elem).click();
+                    },0)
+                }
+
+            })
+
+        }
+    };
+});
+
 MyApp.directive('number', function () {
     return {
         link: function (scope, elem, attrs,ctrl) {
@@ -124,7 +148,7 @@ MyApp.directive('phone', function (setNotif) {
         link: function (scope, elem, attrs,ctrl) {
 
             elem[0].addEventListener('input', function(){
-                var  num = this.value.match(/^[\d\-+\.\(\)]+$/);
+                var  num = this.value.match(/^[\d\-\+\.\(\)]+$/);
                 if (num === null && this.value!="") {
                     setNotif.addNotif("error","no se permiten estos valores",[]);
                     this.value = this.value.substr(0, this.value.length - 1);
@@ -251,7 +275,6 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         console.log(jqObject)
         var elem = angular.element("#"+jqObject);
         var list = angular.element(elem).parents("form").first().find("[step]:visible")
-        console.log(elem,angular.element(elem).parents("form").first())
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
@@ -342,14 +365,14 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
-                    }/*else if(e.which=="40"){
+                    }else if(e.which=="40"){
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){
                             if(angular.element("#lyrAlert").find(".alertTextOpcs:visible").length > 0){
                                var focus =angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first();
                                 angular.element(focus).focus();
                             };
                         }
-                    }*/
+                    }
                 });
             }
             $compile(element[0])(scope);
@@ -357,25 +380,34 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     };
 });
 
-MyApp.directive('notifButtom', function($compile,$timeout) {
-
+/*MyApp.directive('skipNotif', function ($compile,$timeout) {
     return {
         priority: 1001,
-        terminal: true,
+        terminal:true,
         link: function (scope, element, attrs) {
-            element.removeAttr("notif-buttom");
-            element.attr("notOpc","");
             element.bind("keydown",function(e){
-                if(e.which == "39"){
-                    element.next().focus();
-                }else if(e.which == "37"){
-                    element.prev().focus();
+                if(e.which=="39"){
+                    x = element.next();
+                    if(x.length>0){
+                        x.focus();
+                    }else{
+                        element.parent().find("[skip-notif]").first().focus();
+                    }
+                }else if(e.which=="37"){
+                    x = element.prev();
+                    if(x.length>0){
+                        x.focus();
+                    }else{
+                        element.parent().find("[skip-notif]").last().focus();
+                    }
+                }else if(e.which=="13"){
+                    $timeout(function(){element.click()},0);
                 }
-
             })
+            $compile(element[0])(scope)
         }
     }
-});
+})*/
 
 
 

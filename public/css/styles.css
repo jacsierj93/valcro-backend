@@ -815,11 +815,19 @@ md-pagination-wrapper {
 ****CLASES QUE MARCA ELEMENTO SELECCIONADO EN EL GRID Y LISTADO DE PROVEEDORES***
 ********************************************************************************/
 .listSel {
-    border-left: 2px solid rgb(84, 180, 234);
+    border-left: 2px solid rgb(84, 180, 234) !important;
 }
 
 .listSelTemp {
-    border-left: 2px solid #febd33;
+    border-left: 2px solid #febd33 !important;
+}
+
+/*.listFocus {
+    border-left: 2px solid #555555;
+}*/
+
+.boxList:focus{
+    border-left: 2px solid #999;
 }
 
 .iconInactive {

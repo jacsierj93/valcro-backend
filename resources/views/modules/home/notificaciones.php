@@ -20,7 +20,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('ok');ok(this)" >
+                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('ok');ok(this)" skip-notif>
                         {{opc.name}}
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex layout="row" ng-repeat="opc in tab.opcs" autotrigger="{{opc.$$hashKey}}" tabindex="0" ng-click="closeThis('alert');ok(this)">
+                    <div flex layout="row" ng-repeat="opc in tab.opcs" autotrigger="{{opc.$$hashKey}}" tabindex="0" ng-click="closeThis('alert');ok(this)" skip-notif>
                         <div style="width:32px" ng-show="opc.default"><span class="icon-Tiempo" >{{opc.count}}</span></div>
                         <div flex>{{opc.name}}</div>
                     </div>
@@ -59,7 +59,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('error');ok(this)">
+                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('error');ok(this)" skip-notif>
                         {{opc.name}}
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('info');ok(this)" >
+                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('info');ok(this)" skip-notif>
                         {{opc.name}}
                     </div>
                 </div>
