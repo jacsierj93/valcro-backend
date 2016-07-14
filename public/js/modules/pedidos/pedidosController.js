@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,Order,masters,providers,Upload,Layers,setGetOrder, DateParse, Accion,filesService) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,$location, $anchorScroll,Order,masters,providers,Upload,Layers,setGetOrder, DateParse, Accion,filesService) {
 
     // var historia = [15];
     var autohidden= 2000;
@@ -10,7 +10,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.email.destinos = new Array();
     $scope.email.content = new Array();
     $scope.formMode = null;
-    $scope.tempDoc= new Array();
+    $scope.tempDoc= {};
     $scope.emails = new Array();
     $scope.docImports= new Array();
     $scope.providerProds= new Array();
@@ -117,86 +117,33 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         init();
     },0);
 
-    //$scope.todos = Order.query({type:"OrderProvList"});
-
-
-    /*********************** prueba lazy load ************************/
-
-    $scope.loadProviders = function(){
-
-        // 1) se estable el numero de provedores que se desea cargar
-        Order.get({type:"OrderProvCount"}, {},function(response){
-            $scope.providers = new Array();
-            $scope.infiniteItems = {
-                toLoad_: 0,
-                getItemAtIndex: function(index) {
-                    if (index > $scope.todos.length ) {
-                        this.fetchMoreItems_(index);
-                        return null;
-                    }
-                    return $scope.todos[index];
-                },
-                getLength: function() {
-                    return parseInt(response.value);// 2) se asigna le asigna como valor maximo
-                },
-                fetchMoreItems_: function(index) {
-                    if (this.toLoad_ < index ) {
-                        this.toLoad_ =$scope.todos.length + 10;// se estable cuantos intes se va intentar buscar
-                        //3) se bucn los items
-                        /*var data= new Array();
-                        if($scope.skiPro.length > 0){
-                            angular.forEach($scope.skiPro, function(v){
-                                data.push(v);
-                            });
-                        }*/
-
-                        Order.query({type:"OrderProvs", skit:$scope.todos.length, take:10},{}, function(response){
-                            /*console.log(" response ", response);
-                            console.log(" skkit ", $scope.skiPro);
-                            var pro= $filter("filterSelect")(response,$scope.skiPro);*/
-                            angular.forEach(response, function(v){
-                                /*var pro= $filter("customFind")($scope.todos, v.id,function(current,compare){return current.id==compare});
-                                if(pro.length == 0){
-
-                                }*/
-                                $scope.todos.push(v);
-
-                            });
-
-                        });
-                    }
-                }
-            };
-        });
-    };
-
-    $scope.loadProviders();
+    $scope.todos = Order.query({type:"OrderProvList"});
 
 
 
     $scope.reviewDoc = function(){
-         $scope.unclosetDoc = [];
-         Order.query({type:"UnClosetDoc"},{}, function(response){
-         $scope.unclosetDoc = response;
-         if(response.length > 0){
-         $scope.NotifAction("alert","Existen "+response.length + " documentos sin finalizar ",[
-         {
-         name:"Revisar luego",
-         action:function(){
+        $scope.unclosetDoc = [];
+        Order.query({type:"UnClosetDoc"},{}, function(response){
+            $scope.unclosetDoc = response;
+            if(response.length > 0){
+                $scope.NotifAction("alert","Existen "+response.length + " documentos sin finalizar ",[
+                    {
+                        name:"Revisar luego",
+                        action:function(){
 
-         }
-         }, {
-         name:"Ver",
-         action: function(){
-         $scope.navCtrl.value="unclosetDoc";
-         $scope.navCtrl.estado=true;
-         }
-         }
-         ],{block:true});
-         }
+                        }
+                    }, {
+                        name:"Ver",
+                        action: function(){
+                            $scope.navCtrl.value="unclosetDoc";
+                            $scope.navCtrl.estado=true;
+                        }
+                    }
+                ],{block:true});
+            }
 
 
-         });
+        });
 
 
 
@@ -237,6 +184,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }else {
             jQuery("#menu").animate({height:"48px"},400);
             $scope.showLateralFilter=false;
+            $scope.showLateralFilterCpl=false;
+
+
         }
     };
 
@@ -428,14 +378,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         Order.postMod({type:$scope.formMode.mod,mod:"Update"},{id: $scope.document.id});
         setGetOrder.change("document","final_id", undefined);
     };
-    $scope.showProduc= function () {
-        if($scope.showGripro){
-            $scope.showGripro=false;
-        }else {
-            $scope.showGripro=true;
-        }
+    /***@deprecated **/
+    /*    $scope.showProduc= function () {
+     $scope.showGripro = $scope.showGripro ? false : true;
+     if($scope.showGripro){
+     $scope.showGripro=false;
+     }else {
+     $scope.showGripro=true;
+     }
 
-    };
+     };*/
 
     $scope.closeTo = function(layer){
         $scope.moduleAccion({close:layer});
@@ -553,6 +505,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.searchEmails= function(){
         return $scope.email.contactos;
     };
+
+    $scope.provShow = function(item){
+        /* if(item!= null){
+         if($scope.provdiderFilter.$valid){
+         console.log(" filtro valido", item);
+         if(item.razon_social.includes($scope.fRazSocial)){
+         return true;
+         }
+         return false;
+         }
+         }
+         */
+        return true;
+
+    };
+
+    /*    var timeFilter ;
+     $scope.$watchGroup(['provdiderFilter.$valid', 'provdiderFilter.$pristine'], function (nuevo) {
+
+     if (nuevo[0] && !nuevo[1]) {
+     $scope.provdiderFilter.$setPristine();
+
+     }
+
+     });*/
 
 
 
@@ -1191,21 +1168,25 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     function setProvedor(prov, p) {
 
-        console.log(" prov this ", p)
         $scope.provIndex= angular.copy(p.$index);
-        if($scope.module.index == 0){
 
+        if($scope.module.layer == "listPedido" ){
             $scope.provSelec = prov;
+            loadPedidosProvedor(prov.id);
+        }else if($scope.module.layer != "listPedido" && $scope.module.index == 0 ){
             $scope.navCtrl.value="listPedido";
             $scope.navCtrl.estado=true;
+            $scope.provSelec = prov;
         }else{
-            if($scope.module.layer == "listPedido" ){
+            if(!$scope.document.id){
                 $scope.provSelec = prov;
-                loadPedidosProvedor(prov.id);
-            }else{
 
+            }else {
+                $scope.verificExit();
             }
         }
+
+
 
     }
 
@@ -1280,36 +1261,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
             setGetOrder.setState('select');
             $scope.formGlobal ="upd";
-
             //$scope.provSelec.id= aux.prov_id;
-            var pro= $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare});
-            console.log("find  pro",pro);
-            if(pro.length > 0){
-                $scope.provSelec = pro[0];
-                $scope.navCtrl.value="detalleDoc";
-                $scope.navCtrl.estado=true;
-            }else{
-               /* Order.get({type:"Provider",id:aux.prov_id},{},function(response){
-                    $scope.todos.push(response);
-                    $scope.provSelec = response;
-                    $scope.navCtrl.value="detalleDoc";
-                    $scope.navCtrl.estado=true;
-                    $scope.skiPro.push(aux.id);
-
-
-
-
-
-                });*/
-
-            }
-
-
-
-
+            $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare})[0];
+            $scope.navCtrl.value="detalleDoc";
+            $scope.navCtrl.estado=true;
         }
         else {
-            alert('No tiene suficientes permiso para ejecutar esta accion');
+
         }
 
 
@@ -1838,6 +1796,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
     /****** **************************listener ***************************************/
 
+    $scope.$watch('provSelec.id',function(nvo){
+
+        var newHash ='prov' + nvo;
+        if ($location.hash() !== newHash) {
+            $location.hash(newHash);
+        } else {
+
+            $anchorScroll();
+        }
+    });
+
+
     $scope.$watch("formBlock",function(newVal){
         if(newVal == true){
             filesService.setallowUpLoad(false);
@@ -2003,6 +1973,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         $scope.moduleAccion({search:{name:"unclosetDoc",
                             before: function(){
                                 $scope.unclosetDoc =Order.query({type:"UnClosetDoc"});
+                                $scope.tempDoc= {};
+
                             }
                         }});
                         break;
@@ -2064,9 +2036,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         // va para atras
 
         if(newVal[0]  == 0 ){
-            $scope.provSelec={id:'',razon_social:'',save:false, pedidos: new Array() };
+            $scope.provSelec ={id:'',razon_social:'',save:false, pedidos: new Array() };
             $timeout(function(){$scope.reviewDoc()},1000);
             $scope.provIndex = null;
+            $scope.tempDoc= {};
+
         }
 
         if(newVal[0] == 0 || newVal[0] == 1){
@@ -2328,7 +2302,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     function  restore(key){
         switch (key){
             case 'provSelec':
-                $scope.provSelec={id:'',razon_social:'',save:false, pedidos: new Array() };
+                $scope.provSelec ={id:'',razon_social:'',save:false, pedidos: new Array() };
                 break;
             case 'document':
                 $scope.document={ pais_id:'', id:'',estado_id:'1',

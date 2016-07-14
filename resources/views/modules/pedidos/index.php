@@ -19,10 +19,11 @@
                 </div>
 
                 <div layout="column" flex="" >
+                    <form name="provdiderFilter">
                     <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start">
                         <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
                             <label>Razon  Social</label>
-                            <input  type="text" ng-model="fRazSocial" >
+                            <input  type="text" ng-model="fRazSocial" ng-minlength="2" required>
                         </md-input-container>
                         <!--
                                                 <md-autocomplete
@@ -42,6 +43,7 @@
 
 
                     </div>
+                    </form>
                     <div id="expand2" flex >
 
                     </div>
@@ -50,13 +52,14 @@
                         <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
-
             </div>
 
-            <!--<div  style="overflow-y:auto;" flex>-->
+            <md-virtual-repeat-container id="vertical-container" flex id="providers">
 
-<!--                <div class="boxList" layout="column" flex  ng-repeat="item in  search()" ng-click="setProvedor(item)"
+                <div class="boxList" layout="column" flex ng-repeat="item in todos " md-on-demand="" class="repeated-item" ng-click="setProvedor(item, this)"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
+                     id="prov{{item.id}}"
+                     ng-show="provShow(item)"
 
                 >
 
@@ -140,157 +143,7 @@
                     </div>
 
                 </div>
--->
-
-                <md-virtual-repeat-container id="vertical-container" flex id="providers">
-
-                    <div class="boxList" layout="column" flex md-virtual-repeat="item in infiniteItems " md-on-demand="" class="repeated-item" ng-click="setProvedor(item, this)"
-                         ng-class="{'listSel' : (item.id == provSelec.id)}"
-                         id="prov{{item.id}}"
-
-                    >
-
-                        <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
-
-                        <div layout="row" class="dotRow">
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-empty doc-Open100" >
-                                    {{item.review100}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-empty doc-Open90" >
-                                    {{item.review90}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-empty doc-Open60">
-                                    {{item.review60}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-empty doc-Open30" >
-                                    {{item.review30}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-empty doc-Open7" >
-                                    {{item.review7}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-empty doc-Open0">
-                                    {{item.review0}}
-                                </div>
-                            </div>
-                        </div>
-                        <div layout="row" class="dotRow">
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-item emit100" >
-                                    {{item.emit100}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-item emit90" >
-                                    {{item.emit90}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-item emit60">
-                                    {{item.emit60}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-item emit30" >
-                                    {{item.emit30}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-item emit7" >
-                                    {{item.emit7}}
-                                </div>
-                            </div>
-                            <div flex layout layout-align="center center">
-                                <div layout layout-align="center center" class="dot-item emit0">
-                                    {{item.emit0}}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="height:40px;" layout="row" layout-align="space-between center">
-                            <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
-
-                            <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
-                                <div >{{item.puntoCompra}}</div>
-                                <img  style="float: left;" src="images/punto_compra.png"/>
-                            </div>
-                            <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contraPedido > 0" >
-                                <div >{{item.contraPedido}}</div>
-                                <img  style="float: left;" src="images/contra_pedido.png"/>
-                            </div>
-                        </div>
-
-                    </div>
-                </md-virtual-repeat-container>
-            <!--</div>-->
-
-
-            <!--
-
-                        <md-virtual-repeat-container  flex>
-
-                            <div   class="boxList" layout="column" flex  md-virtual-repeat="item in  provList " md-on-demand ng-click="setProvedor(item)"  ng-class="{'listSel' : (item.id == provSelec.id)}">
-
-                                <div  style="overflow: hidden; text-overflow: ellipsis; height: 80px;">{{item.razon_social}}</div>
-
-                                <div layout="row" style="height: 40px;">
-                                    <div flex layout layout-align="center center">
-                                        <div layout layout-align="center center" class="dot-item emit100" >
-                                            {{item.emit100}}
-                                        </div>
-                                    </div>
-                                    <div flex layout layout-align="center center">
-                                        <div layout layout-align="center center" class="dot-item emit90" >
-                                            {{item.emit90}}
-                                        </div>
-                                    </div>
-                                    <div flex layout layout-align="center center">
-                                        <div layout layout-align="center center" class="dot-item emit60">
-                                            {{item.emit60}}
-                                        </div>
-                                    </div>
-                                    <div flex layout layout-align="center center">
-                                        <div layout layout-align="center center" class="dot-item emit30" >
-                                            {{item.emit30}}
-                                        </div>
-                                    </div>
-                                    <div flex layout layout-align="center center">
-                                        <div layout layout-align="center center" class="dot-item emit7" >
-                                            {{item.emit7}}
-                                        </div>
-                                    </div>
-                                    <div flex layout layout-align="center center">
-                                        <div layout layout-align="center center" class="dot-item emit0">
-                                            {{item.emit0}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="height:40px;" layout="row" layout-align="space-between center">
-                                    <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
-
-                                    <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
-                                        <div >{{item.puntoCompra}}</div>
-                                        <img  style="float: left;" src="images/punto_compra.png"/>
-                                    </div>
-                                    <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contraPedido > 0" >
-                                        <div >{{item.contraPedido}}</div>
-                                        <img  style="float: left;" src="images/contra_pedido.png"/>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </md-virtual-repeat-container>
-            -->
+            </md-virtual-repeat-container>
         </div>
 
         <div layout="column"flex class="md-whiteframe-1dp">
@@ -319,11 +172,11 @@
                          ng-click="copyDoc()">
                         <span style="font-size: 24px"> CP</span>
                     </div>
-
+<!--
                     <div layout="column" layout-align="center center"
                          ng-click="printTrace()">
                         <span style="font-size: 24px"> TEST</span>
-                    </div>
+                    </div>-->
                     <div layout="column" layout-align="center center"></div>
 
                 </div>
@@ -726,7 +579,7 @@
                                                md-no-ink
                                                info="Seleccione un proveedor para el documento"
                                                required
-                                               ng-disabled="( formBlock || formGlobal == 'upd')"
+                                               ng-disabled="( formBlock || formGlobal == 'upd' || document.id || document.id !='')"
                                                ng-click="toEditHead('prov_id', provSelect.id)"
 
                                     >
@@ -2068,10 +1921,10 @@
                                 </div>
                                 <div class="rms"> {{document.moneda}} </div>
                             </div>
-                           <!-- <div layout="row"  class="rowRsm" ng-show="(document.productos.todos.length > 0  && gridViewFinalDoc == 1)">
-                                <div class="rowRsmTitle" flex="40"> Productos: </div>
-                                <div class="rms" flex> {{document.productos.todos.length}} </div>
-                            </div>-->
+                            <!-- <div layout="row"  class="rowRsm" ng-show="(document.productos.todos.length > 0  && gridViewFinalDoc == 1)">
+                                 <div class="rowRsmTitle" flex="40"> Productos: </div>
+                                 <div class="rms" flex> {{document.productos.todos.length}} </div>
+                             </div>-->
                         </div>
                     </form>
                     <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
@@ -2192,17 +2045,17 @@
                         </div>
 
                         <div flex class="gridContent">
-                                <div   >
-                                    <div  ng-repeat="item in finalDoc.productos ">
+                            <div   >
+                                <div  ng-repeat="item in finalDoc.productos ">
 
-                                        <div layout="row" class="cellGridHolder" >
-                                            <div flex="20" class="cellGrid" > {{item.codigo}}</div>
-                                            <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
-                                            <div flex class="cellGrid" > {{item.descripcion}}</div>
-                                            <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
-                                        </div>
+                                    <div layout="row" class="cellGridHolder" >
+                                        <div flex="20" class="cellGrid" > {{item.codigo}}</div>
+                                        <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
+                                        <div flex class="cellGrid" > {{item.descripcion}}</div>
+                                        <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
                                     </div>
                                 </div>
+                            </div>
 
                         </div>
 

@@ -124,25 +124,41 @@ class OrderController extends BaseController
     public function getProviderList(Request $req)
     {
 
-        $provs = Provider::
-        //   where('id', 2)->
-        /*     Orderby('razon_social')->
-          skip($req->skit)->take($req->take)->*/
+        $rawn = "id, razon_social ,(select sum(monto)
+         from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
+         where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
+
+        $rawn .= " , (".$this->generateProviderQuery("emision","<=0").") as emit0 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 1 and  7 ").") as emit7 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 7 and  30 ").") as emit30 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 31 and  60 ").") as emit60 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 61 and  90 ").") as emit90 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," > 90 ").") as emit100 ";
+
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision","<=0").") as review0 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 1 and  7 ").") as review7 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 7 and  30 ").") as review30 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 31 and  60 ").") as review60 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 61 and  90 ").") as review90 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
+       // echo $rawn;
 
 
-        get();
+
+        $provs = Provider::selectRaw($rawn)->get();
+        //dd($provs);
         $data = array();
         //  $auxCp= Collection::make(array());
 
         foreach($provs as $prv){
             $paso= true;
-            if(sizeof($prv->getCountry())>0){
+            /*if(sizeof($prv->getCountry())>0){
                 $paso= true;
-            }
+            }*/
             if($paso){
                 $temp["id"] = $prv->id;
                 $temp["razon_social"] = $prv->razon_social;
-                $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
+               /* $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
                 //  $temp['productos']= $prv->proveedor_product()->get();
                 $temp['paises'] = $prv->getCountry();
                 $peds=$prv->getOrderDocuments();
@@ -217,13 +233,13 @@ class OrderController extends BaseController
                 $temp['review100']=$nE100;
 
 
-                $temp['contraPedido']= $nCp;
+                $temp['contraPedido']= $nCp;*/
                 $data[] =$temp;
             }
 
         }
 
-        return $data;
+        return $provs;
     }
 
     /**
@@ -4420,6 +4436,20 @@ class OrderController extends BaseController
     private function getFinalId($model){
         return  "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
         ."-a".sizeof($model->attachments()->get());
+    }
+
+    private function generateProviderQuery($campo, $condicion){
+        $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_compra_orden where tbl_proveedor.id= prov_id and tbl_compra_orden.final_id <> null),0) "
+            ." + "
+            ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_pedido where tbl_proveedor.id= prov_id and tbl_pedido.final_id <> null),0) "
+             ." + "
+             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+             ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.final_id <> null),0) "
+             .""
+        ;
+        return $q;
     }
 
 
