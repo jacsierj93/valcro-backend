@@ -505,8 +505,17 @@
 
                 <div  layout="column" flex="" >
                     <div style="background-color: #0a0a0a; width: 100%; height: 36px; min-height: 36px;">
-                        <div style="margin: 8px;">Mensaje Nuevo</div>
+                        <div style="margin: 8px; color: white;">Mensaje Nuevo</div>
                     </div>
+                    <!--<md-contact-chips ng-model="email.destinarios "
+                                      md-contacts="ContactosSearch($query)"
+                                      md-contact-name="name"
+                                      md-contact-image="image"
+                                      md-contact-email="email"
+                                       md-require-match="false"
+                                      md-transform-chip="transformChip($chip)"
+                                      md-highlight-flags="i" filter-selected="true" placeholder="Para">
+                    </md-contact-chips>-->
                     <md-chips ng-model="email.destinos"
                               md-transform-chip="transformChip($chip)"
                               style="  height: 48px;">
