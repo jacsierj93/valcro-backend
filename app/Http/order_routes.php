@@ -25,7 +25,7 @@ $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry');
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///trae tod el detalle de pedido
 $app->get("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
-$app->get("Order/OrderProvs",'Orders\OrderController@getProviders'); ///lista de todos los proveedores
+//$app->get("Order/OrderProvs",'Orders\OrderController@getProviders'); ///lista de todos los proveedores
 $app->get("Order/Provider",'Orders\OrderController@getProvider'); ///lista de todos los proveedores
 $app->get("Order/OrderProvCount",'Orders\OrderController@countProvider'); ///lista de todos los proveedores
 $app->get("Order/OrderFilterData",'Orders\OrderController@getFilterData'); ///llenado de filtros a proveedores
@@ -156,6 +156,7 @@ $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///
 $app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
 $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
+$app->get("Order/mail",'Orders\OrderController@getMail'); ///elimina el pedido
 
 
 

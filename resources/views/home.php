@@ -26,6 +26,7 @@
     <?= HTML::script("components/angular-material/angular-material.js") ?>
     <?= HTML::script("components/angular-clickout/angular-clickout.min.js") ?>
     <?= HTML::script("components/angular-ui-mask/dist/mask.js") ?>
+    <?= HTML::script("components/angular-sanitize/angular-sanitize.min.js") ?>
     <?= HTML::script("components/angular-input-masks/angular-input-masks-standalone.min.js") ?>
 
     <!--    demo file upload-->

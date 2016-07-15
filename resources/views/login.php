@@ -23,6 +23,7 @@
     <?= HTML::script("components/angular-clickout/angular-clickout.min.js") ?>
     <?= HTML::script("components/angular-ui-mask/dist/mask.js") ?>
     <?= HTML::script("components/angular-input-masks/angular-input-masks-standalone.min.js") ?>
+    <?= HTML::script("components/angular-sanitize/angular-sanitize.min.js") ?>
 
     <!--    demo file upload-->
     <?= HTML::script("components/ng-file-upload/ng-file-upload.min.js") ?>
