@@ -156,12 +156,12 @@
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras )" ng-click="updateForm()">
+                         ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras && document.id )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
-                    <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
+                   <!-- <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
                         <span class="icon-Filtro" style="font-size: 24px"></span>
-                    </div>
+                    </div>-->
                     <div layout="column" layout-align="center center"
                          ng-show="(module.index > 1 && document.estado_id != 3 && document.id)"
                          ng-click="cancelDoc()">
@@ -172,11 +172,11 @@
                          ng-click="copyDoc()">
                         <span style="font-size: 24px"> CP</span>
                     </div>
-<!--
+
                     <div layout="column" layout-align="center center"
                          ng-click="printTrace()">
                         <span style="font-size: 24px"> TEST</span>
-                    </div>-->
+                    </div>
                     <div layout="column" layout-align="center center"></div>
 
                 </div>
@@ -818,7 +818,7 @@
                             </div>
                         </div>
                     </form>
-                    <div ng-show="document.final_id != null || document.version > 0">
+                    <div ng-show="document.final_id != null || document.version > 1">
                         <form name="FormEstatusDoc" class="focused" layout="row" ng-click="allowEdit()">
                             <div active-left></div>
                             <div></div>
@@ -2107,6 +2107,23 @@
             </md-content>
         </md-sidenav>
 
+
+        <!-- ########################################## LAYER LISTA DE PREVIEW HYML ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="htmlViewer" id="htmlViewer">
+            <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
+            <md-content  layout="row" flex class="sideNavContent" >
+                <div active-left   ></div>
+
+                <div  layout="column" flex="" class="layerColumn">
+                    <div contenteditable ng-model="previewHtmltext " flex="20"></div>
+
+                    <md-content >
+                        <div ng-bind-html="previewHtmlDoc" flex="">
+                        </div>
+                    </md-content>
+                </div>
+            </md-content>
+        </md-sidenav>
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav

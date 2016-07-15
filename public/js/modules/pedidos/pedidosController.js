@@ -20,6 +20,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.tasa_fija= true;
     $scope.skiPro = new Array();
     $scope.navCtrl = Accion.create();
+    $scope.previewHtmltext ="";
+    $scope.previewHtmlDoc ="";
 
     filesService.setFolder('orders');
 
@@ -454,9 +456,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return false;
     };
     $scope.printTrace = function(){
-        /* console.log(" final ", $scope.buildfinalDoc());
-         $scope.moduleAccion({open:{name:"finalDoc"}});*/
-        console.log(" printrace ")
+        $scope.previewHtmltext ="";
+        $scope.previewHtmlDoc ="";
+        $http.get("Order/test").success(function (response) { $scope.previewHtmlDoc = response;});
+
+               $scope.LayersAction({open:{name:"htmlViewer"}});
 
 
     };
@@ -1300,6 +1304,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
 
             if (response.success) {
+                $scope.updateProv();
                 $scope.NotifAction("ok","Finalizado",[
                     {name:"Ok", action: function(){
                         $scope.navCtrl.value=angular.copy($scope.module.historia[1]);
@@ -1307,8 +1312,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     }}
                 ],{block:true});
             }});
+
+
     };
 
+    $scope.updateProv= function(){
+        Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
+            var prov = $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0];
+            console.log('original prov', prov);
+            console.log("response data", response);
+            angular.forEach(prov,function(v,k){
+                prov[k] = response[k];
+            });
+            console.log(" final ", $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0]);
+             //$scope.provSelec = response;
+        });
+    };
     /****** **************************import  ***************************************/
 
 
@@ -1962,6 +1981,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case  "close":
+
+
                         if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal!='new' && $scope.document.final_id){
                             $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
                         }else {
@@ -2871,6 +2892,7 @@ MyApp.factory('Order', ['$resource',
         return $resource('Order/:type/:mod', {}, {
             query: {method: 'GET',params: {type: ""}, isArray: true},
             get: {method: 'GET',params: {type:""}, isArray: false},
+            html: {method: 'GET',params: {type:""},isArray: false ,headers: { 'Content-Type': 'text/html' }},
             post: {method: 'POST',params: {type:" "}, isArray: false},
             postMod: {method: 'POST',params: {type:" ",mod:""}, isArray: false},
             getMod: {method: 'GET',params: {type:"",mod:""}, isArray: false},
@@ -2880,6 +2902,7 @@ MyApp.factory('Order', ['$resource',
         });
     }
 ]);
+//
 
 MyApp.factory('Accion', function(){
     function  Accion (){
@@ -2896,7 +2919,11 @@ MyApp.factory('Accion', function(){
     };
 
 });
-
+MyApp.filter("sanitize", ['$sce', function($sce) {
+    return function(htmlCode){
+        return $sce.trustAsHtml(htmlCode);
+    }
+}]);
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",

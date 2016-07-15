@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Masters\MasterProductController;
-use App\Libs\Utils\Files;
 
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
@@ -121,12 +120,16 @@ class OrderController extends BaseController
     /**
      * obtiene la lista de proveedores
      */
-    public function getProviderList(Request $req)
+    public function getProviderList()
     {
 
         $rawn = "id, razon_social ,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
          where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
+        $rawn .=" ,(select count(id) from tbl_compra_orden where prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null
+         and final_id is null and fecha_sustitucion is null and fecha_aprob_compra != null
+         and fecha_aprob_gerencia != null and estado_id != 3
+         ) as contraPedido ";
 
         $rawn .= " , (".$this->generateProviderQuery("emision","<=0").") as emit0 ";
         $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 1 and  7 ").") as emit7 ";
@@ -141,104 +144,8 @@ class OrderController extends BaseController
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 31 and  60 ").") as review60 ";
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 61 and  90 ").") as review90 ";
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
-       // echo $rawn;
 
-
-
-        $provs = Provider::selectRaw($rawn)->get();
-        //dd($provs);
-        $data = array();
-        //  $auxCp= Collection::make(array());
-
-        foreach($provs as $prv){
-            $paso= true;
-            /*if(sizeof($prv->getCountry())>0){
-                $paso= true;
-            }*/
-            if($paso){
-                $temp["id"] = $prv->id;
-                $temp["razon_social"] = $prv->razon_social;
-               /* $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
-                //  $temp['productos']= $prv->proveedor_product()->get();
-                $temp['paises'] = $prv->getCountry();
-                $peds=$prv->getOrderDocuments();
-
-
-                $nCp=0;
-                $nE0=0;
-                $nE7=0;
-                $nE30=0;
-                $nE60=0;
-                $nE90=0;
-                $nE100=0;
-
-                $nR0=0;
-                $nR7=0;
-                $nR30=0;
-                $nR60=0;
-                $nR90=0;
-                $nR100=0;
-
-                foreach($peds as $ped){
-                    $arrival=$ped->daysCreate();
-
-                    if ($arrival == 0) {
-                        $nE0++;
-                    } else if ($arrival == 7) {
-                        $nE7++;
-                    } else if ($arrival == 30) {
-                        $nE30++;
-                    } else if ($arrival == 60) {
-                        $nE60++;
-                    } else if ($arrival == 90) {
-                        $nE90++;
-                    } else if($arrival == 100 ){
-                        $nE100++;
-                    }
-                    if($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 &&   $ped->aprob_gerencia == 0){
-                        $review=$ped->catLastReview();
-                        if ($review == 0) {
-                            $nR0++;
-                        } else if ($review == 7) {
-                            $nR7++;
-                        } else if ($review == 30) {
-                            $nR30++;
-                        } else if ($review == 60) {
-                            $nR60++;
-                        } else if ($arrival == 90) {
-                            $nR90++;
-                        } else if($review == 100 ){
-                            $nR100++;
-                        }
-                    }
-
-                    if($ped->getTipoId() == 23){
-                        $nCp +=$ped->getNumItem(2);
-                    }
-
-
-                }
-                $temp['emit0']=$nE0;
-                $temp['emit7']=$nE7;
-                $temp['emit30']=$nE30;
-                $temp['emit60']=$nE60;
-                $temp['emit90']=$nE90;
-                $temp['emit100']=$nE100;
-
-                $temp['review0']=$nE0;
-                $temp['review7']=$nE7;
-                $temp['review30']=$nE30;
-                $temp['review60']=$nE60;
-                $temp['review90']=$nE90;
-                $temp['review100']=$nE100;
-
-
-                $temp['contraPedido']= $nCp;*/
-                $data[] =$temp;
-            }
-
-        }
-
+        $provs = Provider::selectRaw($rawn)->whereRaw("(select count(id) from tbl_prov_moneda where prov_id = tbl_proveedor.id) > 0 ")->get();
         return $provs;
     }
 
@@ -377,80 +284,28 @@ class OrderController extends BaseController
      */
 
     public function getProvider(Request $req){
-        $prv = Provider::findOrFail($req->id);
-        $temp["id"] = $prv->id;
-        $temp["razon_social"] = $prv->razon_social;
-        $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
-        $temp['paises'] = $prv->getCountry();
-        $peds=$prv->getOrderDocuments();
-        $nCp=0;
-        $nE0=0;
-        $nE7=0;
-        $nE30=0;
-        $nE60=0;
-        $nE90=0;
-        $nE100=0;
-        $nR0=0;
-        $nR7=0;
-        $nR30=0;
-        $nR60=0;
-        $nR90=0;
-        $nR100=0;
+        $rawn = "id, razon_social ,(select sum(monto)
+         from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
+         where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
 
-        foreach($peds as $ped){
-            $arrival=$ped->daysCreate();
-            if ($arrival == 0) {
-                $nE0++;
-            } else if ($arrival == 7) {
-                $nE7++;
-            } else if ($arrival == 30) {
-                $nE30++;
-            } else if ($arrival == 60) {
-                $nE60++;
-            } else if ($arrival == 90) {
-                $nE90++;
-            } else if($arrival == 100 ){
-                $nE100++;
-            }
-            if($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 &&   $ped->aprob_gerencia == 0){
-                $review=$ped->catLastReview();
-                if ($review == 0) {
-                    $nR0++;
-                } else if ($review == 7) {
-                    $nR7++;
-                } else if ($review == 30) {
-                    $nR30++;
-                } else if ($review == 60) {
-                    $nR60++;
-                } else if ($arrival == 90) {
-                    $nR90++;
-                } else if($review == 100 ){
-                    $nR100++;
-                }
-            }
+        $rawn .= " , (".$this->generateProviderQuery("emision","<=0").") as emit0 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 1 and  7 ").") as emit7 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 7 and  30 ").") as emit30 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 31 and  60 ").") as emit60 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 61 and  90 ").") as emit90 ";
+        $rawn .= " , (".$this->generateProviderQuery("emision"," > 90 ").") as emit100 ";
 
-            if($ped->getTipoId() == 23){
-                $nCp +=$ped->getNumItem(2);
-            }
-        }
-        $temp['emit0']=$nE0;
-        $temp['emit7']=$nE7;
-        $temp['emit30']=$nE30;
-        $temp['emit60']=$nE60;
-        $temp['emit90']=$nE90;
-        $temp['emit100']=$nE100;
-        $temp['review0']=$nE0;
-        $temp['review7']=$nE7;
-        $temp['review30']=$nE30;
-        $temp['review60']=$nE60;
-        $temp['review90']=$nE90;
-        $temp['review100']=$nE100;
-        $temp['contraPedido']= $nCp;
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision","<=0").") as review0 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 1 and  7 ").") as review7 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 7 and  30 ").") as review30 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 31 and  60 ").") as review60 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 61 and  90 ").") as review90 ";
+        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
+        $prov = Provider::selectRaw($rawn)->where('id',$req->id)->first();
 
 
 
-
-        return $temp;
+        return $prov;
     }
 
     /***
@@ -2249,20 +2104,7 @@ class OrderController extends BaseController
      * @deprecated
      */
     function test(Request $req){
-        $model = Provider::findOrFail(1);
-        $pedidos =$model->Order()
-            ->get();
-        $llds=array();
-        foreach ($pedidos as $aux){
-            $tem['id']=$aux->id;
-            $tem['llega']=$aux->arrival();
-            $llds[]= $tem;
-        }
-
-        $data['provedor']=$model;
-        $data['pedidos']=$llds;
-
-        return $data;
+        return view("emails.OrderDocument", array('name' => "demo "));
     }
     /**
      * Remuevo todos lo item de un pedido segun el documento de origen
@@ -3990,7 +3832,7 @@ class OrderController extends BaseController
      * Condiciones de pago de un proveedor
      **/
     public function getProviderPaymentCondition(Request $req){
-        $auxCond=Provider::findOrFail($req->id)->first()->getPaymentCondition()->get();
+        $auxCond=Provider::findOrFail($req->id)->getPaymentCondition()->get();
         $cond= Array();
         $i=0;
         $text='';
@@ -4006,46 +3848,6 @@ class OrderController extends BaseController
         return $cond;
     }
 
-    /************************************* REEMPLACE **************************************/
-    /**
-     * importa todos lo items a una nueva solictud y cancel ala anterior
-     * @param  doc_id el ducumento donde se importara los items
-     * @param id el id anterior
-     * @return items modificados sin id
-     **/
-    /*public function reemplaceSolicitude(Request $req){
-        $origen = Solicitude::findOrFail($req->id);
-        $destino = Solicitude::findOrFail($req->doc_id);
-        $newIts= array();
-        $oldIts = array();
-        $result = array();
-
-        foreach($origen->items()->get() as $oldItem){
-            $newItem = new SolicitudeItem();
-            $newItem->tipo_origen_id =21;
-            $newItem->doc_id =$destino->id;
-            $newItem->origen_item_id =$oldItem->id;
-            $newItem->doc_origen_id =$req->id;
-            $newItem->cantidad =$oldItem->saldo;
-            $newItem->saldo =$oldItem->saldo;
-            $newItem->producto_id =$oldItem->producto_id;
-            $newItem->descripcion =$oldItem->descripcion;
-            $oldItem->saldo=0;
-
-            $newIts[]= $newItem;
-            $oldIts[]= $oldItem;
-        }
-        $result['action']="inport";
-        $result['newitems']=$newIts;
-        $result['olditems']=$oldIts;
-
-        $destino->saveMay($newIts);
-        $origen->saveMany($oldIts);
-        $origen->comentario_cancelacion = "&system reemplazdo por ".$destino->id;
-        $origen->save();
-        return $result;
-
-    }*/
 
     /*************************************** SAVE *****************************************/
 
@@ -4440,13 +4242,16 @@ class OrderController extends BaseController
 
     private function generateProviderQuery($campo, $condicion){
         $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
-            ." tbl_compra_orden where tbl_proveedor.id= prov_id and tbl_compra_orden.final_id <> null),0) "
+            ." tbl_compra_orden where tbl_proveedor.id= prov_id and tbl_compra_orden.deleted_at is null
+             and tbl_compra_orden.fecha_aprob_gerencia is null and tbl_compra_orden.fecha_aprob_compra is null ),0) "
             ." + "
             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
-            ." tbl_pedido where tbl_proveedor.id= prov_id and tbl_pedido.final_id <> null),0) "
+            ." tbl_pedido where tbl_proveedor.id= prov_id  and tbl_pedido.deleted_at is null
+             and tbl_pedido.fecha_aprob_gerencia is null and tbl_pedido.fecha_aprob_compra is null  ),0) "
              ." + "
              ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
-             ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.final_id <> null),0) "
+             ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.deleted_at is null
+             and tbl_solicitud.fecha_aprob_gerencia is null and tbl_solicitud.fecha_aprob_compra is null ),0) "
              .""
         ;
         return $q;
