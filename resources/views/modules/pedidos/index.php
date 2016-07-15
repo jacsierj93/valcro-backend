@@ -2114,13 +2114,12 @@
             <md-content  layout="row" flex class="sideNavContent" >
                 <div active-left   ></div>
 
-                <div  layout="column" flex="" class="layerColumn">
-                    <div contenteditable ng-model="previewHtmltext " flex="20"></div>
+                <div  layout="column" flex="" class="layerColumn" style="padding: ">
+                        <div contenteditable ng-model="previewHtmltext " style="min-height: 48px" > Texto adicional </div>
 
-                    <md-content >
+
                         <div ng-bind-html="previewHtmlDoc" flex="">
                         </div>
-                    </md-content>
                 </div>
             </md-content>
         </md-sidenav>

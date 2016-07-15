@@ -70,7 +70,9 @@ MyApp.config(function ($provide, $httpProvider, $routeProvider) {
             // On response failture
             responseError: function (rejection) {
                 // console.log(rejection); // Contains the data about the error.
-
+                    if(rejection.status == 401){
+                        location.replace(PATHAPP +'#home');
+                    }
                 // Return the promise rejection.
                 return $q.reject(rejection);
             }

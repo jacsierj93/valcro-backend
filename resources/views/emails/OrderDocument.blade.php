@@ -2,7 +2,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Contrapedido</title>
 </head>
 
 <body style="width: 100%; height: 100%; margin: 0; padding: 0px;">

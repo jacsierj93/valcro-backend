@@ -20,7 +20,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.tasa_fija= true;
     $scope.skiPro = new Array();
     $scope.navCtrl = Accion.create();
-    $scope.previewHtmltext ="";
+    $scope.previewHtmltext = "Introdusca texto ";
     $scope.previewHtmlDoc ="";
 
     filesService.setFolder('orders');
@@ -456,7 +456,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return false;
     };
     $scope.printTrace = function(){
-        $scope.previewHtmltext ="";
+        if($scope.previewHtmltext == "Introdusca texto "){
+            $scope.previewHtmltext="";
+        }
+
         $scope.previewHtmlDoc ="";
         $http.get("Order/test").success(function (response) { $scope.previewHtmlDoc = response;});
 
