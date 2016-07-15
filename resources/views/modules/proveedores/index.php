@@ -264,7 +264,7 @@
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="layer1">
 
             <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="AppCtrl">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <input type="hidden" md-autofocus>
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
                 <form name="projectForm" layout="row" ng-controller="DataProvController" global ng-class="{'focused':isShow}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
@@ -405,7 +405,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
-                                <input skip-tab name="dirPhone" ng-pattern="/^[\d\-+]+$/" phone info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                <input skip-tab id="dirPhone" phone info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>

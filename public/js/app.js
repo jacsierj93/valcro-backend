@@ -39,9 +39,11 @@ window.addEventListener("drop",function(e){
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
 
-MyApp.config(function ($provide, $httpProvider) {
+MyApp.config(function ($provide, $httpProvider, $routeProvider) {
 
+    $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
     // Intercept http calls.
+
     $provide.factory('MyHttpInterceptor', function ($q) {
         return {
             // On request success
@@ -68,7 +70,7 @@ MyApp.config(function ($provide, $httpProvider) {
             // On response failture
             responseError: function (rejection) {
                 // console.log(rejection); // Contains the data about the error.
-              //  console.log("reposnse error", rejection)
+
                 // Return the promise rejection.
                 return $q.reject(rejection);
             }
@@ -91,6 +93,31 @@ MyApp.factory('masters', ['$resource',
     }
 ]);
 
+/*filtro para filtrar los option de los selects basandose en un array */
+MyApp.filter('filterSelect', function() {
+    return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return arr1.filter(function(val) {
+            return arr2.indexOf(val.id) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+        });
+    }
+});
+
+
+MyApp.filter('filterSearch', function() {
+    return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return arr1.filter(function(val) {
+            return (arr2.indexOf(""+val.id) !== -1 || arr2.indexOf(val.id) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+        });
+    }
+});
+
+MyApp.filter('customFind', function() {
+    return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return arr1.filter(function(val) {
+            return func(val,arr2);
+        });
+    }
+});
 
 
 MyApp.directive('global', function (Layers, setNotif) {
@@ -160,8 +187,6 @@ MyApp.directive('phone', function (setNotif) {
         }
     };
 });
-
-
 
 MyApp.directive('decimal', function () {
     return {
@@ -269,10 +294,9 @@ MyApp.directive('contenteditable', function() {
     };
 });
 
-
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
-        console.log(jqObject)
+
         var elem = angular.element("#"+jqObject);
         var list = angular.element(elem).parents("form").first().find("[step]:visible")
         if(list.index(elem)<list.length-1){
@@ -343,10 +367,11 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
                             }
                         }else{
+                            //var elem = angular.element(this);
+                            var nextFrm = angular.element(elem).parents("form").first().next().find("[step]").first();
 
-                            var nextFrm = angular.element(this).parents("form").first().next().find("[step]").first();
-                            angular.element(this).parents("form").first().next().click();
                             $timeout(function(){
+                                angular.element(elem).parents("form").first().next().click();
                                 if(angular.element(nextFrm[0]).is("md-select")){
                                     angular.element(nextFrm[0]).focus().click();
                                 }else{
@@ -482,10 +507,6 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
     };
 });
 
-MyApp.directive('2valName', function() {
-    console.log("entor en la direcytiva")
-
-});
 
 
 
@@ -564,14 +585,14 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv, Layers
     //###########################################################################################3
     //$scope.toggleLeft = buildToggler('left');
 
-    $scope.toggleRight = buildToggler('right');
+   /* $scope.toggleRight = buildToggler('right');
     $scope.toggleOtro = buildToggler('otro');
     function buildToggler(navID) {
         return function() {
             // Component lookup should always be available since we are not using `ng-if`
             $mdSidenav(navID).toggle();
         }
-    }
+    }*/
     //###########################################################################################3
     //###########################################################################################3
     //###########################################################################################3
@@ -616,6 +637,7 @@ MyApp.controller('ListHerramientas', function ($scope) {
  $route.reload();
  }]);*/
 
+/*
 MyApp.controller('ListProv', function ($scope,$http) {
     $http({
         method: 'POST',
@@ -627,11 +649,12 @@ MyApp.controller('ListProv', function ($scope,$http) {
     });
 
 });
+*/
 
 
 
 
-function DemoCtrl1 ($timeout, $q, $log) {
+/*function DemoCtrl1 ($timeout, $q, $log) {
     var self = this;
     self.simulateQuery = false;
     self.isDisabled    = false;
@@ -647,10 +670,10 @@ function DemoCtrl1 ($timeout, $q, $log) {
     // ******************************
     // Internal methods
     // ******************************
-    /**
+    /!**
      * Search for states... use $timeout to simulate
      * remote dataservice call.
-     */
+     *!/
     function querySearch (query) {
         var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
             deferred;
@@ -668,9 +691,9 @@ function DemoCtrl1 ($timeout, $q, $log) {
     function selectedItemChange(item) {
         $log.info('Item changed to ' + JSON.stringify(item));
     }
-    /**
+    /!**
      * Build `states` list of key/value pairs
-     */
+     *!/
     function loadAll() {
         var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
               Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana,\
@@ -686,16 +709,16 @@ function DemoCtrl1 ($timeout, $q, $log) {
             };
         });
     }
-    /**
+    /!**
      * Create filter function for a query string
-     */
+     *!/
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(state) {
             return (state.value.indexOf(lowercaseQuery) === 0);
         };
     }
-}
+}*/
 
 /******************* Agregado por miguel, convertidor de date de la base de datos  *******************/
 /** obj date javascrip

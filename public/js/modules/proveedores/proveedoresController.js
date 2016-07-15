@@ -100,31 +100,6 @@ MyApp.service("listCoins",function(providers) {
     }
 });
 
-/*filtro para filtrar los option de los selects basandose en un array */
-MyApp.filter('filterSelect', function() {
-    return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
-        return arr1.filter(function(val) {
-            return arr2.indexOf(val.id) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
-        });
-    }
-});
-
-
-MyApp.filter('filterSearch', function() {
-     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
-         return arr1.filter(function(val) {
-             return (arr2.indexOf(""+val.id) !== -1 || arr2.indexOf(val.id) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
-         });
-     }
- });
-
-MyApp.filter('customFind', function() {
-    return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
-        return arr1.filter(function(val) {
-            return func(val,arr2);
-        });
-    }
-});
 
 MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers) {
     $scope.expand = false;
@@ -372,29 +347,7 @@ MyApp.controller('provCoins', function ($scope,listCoins,setGetProv) {
 
 });
 
-/*
-MyApp.controller('ListPaises', function ($scope,masterLists) {
-    $scope.paises = masterLists.getCountries();
-});
-*/
 
-
-MyApp.controller('ListHerramientas', function ($scope) {
-    $scope.tools = [
-        {
-            tool: 'Calculadora',
-            url: '/inicio'
-        }, {
-            tool: 'Extensiones',
-            url: '/proveedores'
-        }, {
-            tool: 'Hora Mundial',
-            url: '/productos'
-        }, {
-            secc: 'Factor',
-            url: '/pagos'
-        }];
-});
 
 /*MyApp.run(['$route', function($route)  {
  $route.reload();
@@ -704,9 +657,27 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.$watch('address.length',function(nvo){
         setGetProv.setComplete("address",nvo);
     });
-    $scope.$watch('dir.pais',function(nvo,old){
+  /*  $scope.$watch('dir.pais',function(nvo,old){
         var prev = (old != 0) ? $filter("filterSearch")($scope.paises, [old])[0].area_code.phone : "";
         $scope.dir.provTelf = (nvo != 0 && $scope.dir.provTelf=="") ? $scope.dir.provTelf.replace(prev, $filter("filterSearch")($scope.paises, [nvo])[0].area_code.phone) : $scope.dir.provTelf;
+    });*/
+
+    $scope.$watch('dir.pais',function(nvo,old){
+        //var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
+        var preVal = angular.element("#dirPhone").val();
+        console.log(preVal)
+        if(preVal){
+            console.log("false")
+            if(preVal!=""){
+                angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
+            }else{
+                console.log($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+                angular.element("#dirPhone").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+            }
+        }
+
+
+        //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
 
     $scope.checkCode = function(){
@@ -1480,7 +1451,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
     $scope.toEdit = function(element){
         contact = element.cont;
-console.log(contact)
         contact.prov_id = $scope.prov.id;
         setGetContac.setContact(contact);
         currentOrig = angular.copy($scope.cnt);
@@ -1635,10 +1605,10 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
 
 });
 
-MyApp.controller('bankInfoController', function ($scope,masters,providers,setGetProv,setNotif,$filter,$timeout,$q) {
+MyApp.controller('bankInfoController', function ($scope,masters,masterLists,providers,setGetProv,setNotif,$filter,$timeout,$q) {
     $scope.id = "bankInfoController";
     $scope.prov = setGetProv.getProv();
-    $scope.countries = masters.query({ type:"getCountries"});
+    $scope.countries = masterLists.getCountries();
     /*$scope.cities = masters.query({ type:"getCities"});*/
     $scope.$watch('prov.id',function(nvo){
         $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
