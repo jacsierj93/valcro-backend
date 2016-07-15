@@ -665,19 +665,11 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.$watch('dir.pais',function(nvo,old){
         //var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
         var preVal = angular.element("#dirPhone").val();
-        console.log(preVal)
         if(preVal){
-            console.log("false")
-            if(preVal!=""){
-                angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
-            }else{
-                console.log($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
-                angular.element("#dirPhone").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
-            }
+            angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
+        }else{
+            angular.element("#dirPhone").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
         }
-
-
-        //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
 
     $scope.checkCode = function(){
