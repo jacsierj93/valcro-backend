@@ -39,10 +39,11 @@ window.addEventListener("drop",function(e){
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
 
-MyApp.config(function ($provide, $httpProvider, $routeProvider) {
+MyApp.config(function ($provide, $httpProvider) {
 
     $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
     // Intercept http calls.
+    var path= "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/";
 
     $provide.factory('MyHttpInterceptor', function ($q) {
         return {
@@ -71,7 +72,7 @@ MyApp.config(function ($provide, $httpProvider, $routeProvider) {
             responseError: function (rejection) {
                 // console.log(rejection); // Contains the data about the error.
                     if(rejection.status == 401){
-                        location.replace(PATHAPP +'#home');
+                        location.replace(path +'login');
                     }
                 // Return the promise rejection.
                 return $q.reject(rejection);
@@ -128,7 +129,6 @@ MyApp.directive('global', function (Layers, setNotif) {
             scope.module= Layers.getModule();
             scope.LayersAction = Layers.setAccion;
             scope.NotifAction = setNotif.addNotif;
-            scope.index = Layers.getIndex();
         }
     };
 });

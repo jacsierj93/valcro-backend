@@ -340,7 +340,7 @@
                         <div flex class="headGrid"> Comentario</div>
                     </div>
                     <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                        <div   ng-repeat="item in provSelec.pedidos" ng-click="DtPedido(item)">
+                        <div   ng-repeat="item in provDocs" ng-click="DtPedido(item)">
                             <div layout="row" class="cellGridHolder" >
                                 <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
