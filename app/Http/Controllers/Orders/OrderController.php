@@ -88,6 +88,7 @@ class OrderController extends BaseController
                 $temp['emision'] = $aux->emision;
                 $temp['comentario'] = $aux->comentario;
                 $temp['prov_id'] = $aux->prov_id;
+                $temp['proveedor'] = Provider::findOrFail($aux->prov_id)->razon_social;
                 $temp['productos'] = $this->getProductoItem($aux);
 
                 $data[] = $temp;
@@ -1951,10 +1952,11 @@ class OrderController extends BaseController
      */
     public function setStatusSolicitude(Request $req){
         $resul = array();
-        $model = Solicitude::finOrFail($req->id);
+        $model = Solicitude::findOrFail($req->id);
         $status = OrderStatus::findOrfail($req->estado_id);
-        $model->estado->id = $status->id;
+        $model->estado_id = $req->estado_id;
         $model->save();
+        $resul['success']='Estado actualizado';
         $resul['accion']='upd';
         $resul['item'] = $status;
         return $resul;
@@ -2004,8 +2006,9 @@ class OrderController extends BaseController
         $resul = array();
         $model = Order::findOrFail($req->id);
         $status = OrderStatus::findOrfail($req->estado_id);
-        $model->estado_id = $status->id;
+        $model->estado->id = $req->estado_id;
         $model->save();
+        $resul['success']='Estado actualizado';
         $resul['accion']='upd';
         $resul['item'] = $status;
         return $resul;
@@ -2020,6 +2023,7 @@ class OrderController extends BaseController
         $model->estado->id =$req->estado_id;
         $model->save();
         $resul['accion']='upd';
+        $resul['success']='Estado actualizado';
         $resul['item'] = $status;
         return $resul;
     }

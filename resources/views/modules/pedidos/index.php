@@ -56,10 +56,12 @@
 
             <md-virtual-repeat-container id="vertical-container" flex id="providers">
 
-                <div class="boxList" layout="column" flex ng-repeat="item in todos " md-on-demand="" class="repeated-item" ng-click="setProvedor(item, this)"
+                <div class="boxList"  layout="column" flex ng-repeat="item in todos " ng-click="setProvedor(item, this)"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      ng-show="provShow(item)"
+
+                     class="boxList"
 
                 >
 
@@ -340,7 +342,7 @@
                         <div flex class="headGrid"> Comentario</div>
                     </div>
                     <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                        <div   ng-repeat="item in provDocs" ng-click="DtPedido(item)">
+                        <div   ng-repeat="item in provDocs" ng-click="DtPedido(item)"  tabindex="{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
@@ -1817,7 +1819,7 @@
                                     </div>
                                     <div class="rowRsmTitle">Titulo</div>
                                 </div>
-                                <div class="rms" flex> {{finalDoc.titulo.v  }}</div>
+                                <div class="rms" flex> {{document.titulo  }}</div>
                             </div>
                             <div layout="row" flex  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
 
@@ -2111,16 +2113,18 @@
                     <div layout="row" class="headGridHolder">
                         <div flex="5" class="headGrid"> N° </div>
                         <div flex="15" class="headGrid"> Documento</div>
+                        <div flex class="headGrid"> proveedor</div>
                         <div flex class="headGrid"> Titulo</div>
                         <div flex="10" class="headGrid"> Fecha</div>
                         <div flex class="headGrid"> Monto</div>
                         <div flex class="headGrid"> Comentario</div>
                     </div>
                     <div class="gridContent"  >
-                        <div   ng-repeat="item in unclosetDoc" ng-click="openTempDoc(item)">
+                        <div   ng-repeat="item in unclosetDoc" ng-click="openTempDoc(item)" tabindex="{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div flex="5" class="cellGrid" > {{item.id}}</div>
                                 <div flex="15" class="cellGrid"> {{item.documento}}</div>
+                                <div flex class="cellGrid"> {{item.proveedor}}</div>
                                 <div flex class="cellGrid" > {{item.titulo}}</div>
                                 <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" > {{item.monto | currency :item.symbol :2}}</div>
