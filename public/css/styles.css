@@ -769,6 +769,8 @@ form.focused .titulo_formulario{
     margin-top: 10px;
     margin-bottom: 9px;
     padding-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     border-bottom: 1px dashed #999999;

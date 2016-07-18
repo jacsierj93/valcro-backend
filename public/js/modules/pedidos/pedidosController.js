@@ -364,7 +364,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.cancelDoc = function(){
 
         $scope.formBlock= false;
-        $scope.moduleAccion({search:{name:"detalleDoc", after: function(){
+        $scope.moduleAccion({search:{name:"detalleDoc", before: function(){
             $scope.document.estado_id=3;// se cambia el estado a cancelado
             $scope.gridView =3;
             var mo= jQuery("#mtvCancelacion");
@@ -1205,16 +1205,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         //init();
         var aux= angular.copy(doc);
         if (segurity('editPedido')) {
+            $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare})[0];
             $scope.document.isNew=false;
             $scope.document.id=aux.id;
             $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-            setGetOrder.setState('select');
+
+            setGetOrder.setState("select");
             $scope.formGlobal ="upd";
             //$scope.provSelec.id= aux.prov_id;
-            $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare})[0];
+            //$scope.reloadDoc();
             $scope.navCtrl.value="detalleDoc";
             $scope.navCtrl.estado=true;
-            $scope.buildDocChange(doc);
+
+            //$scope.buildDocChange(doc);
         }
         else {
 
@@ -2008,10 +2011,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal});
             $scope.formData.paises= Order.query({type:"ProviderCountry",id:newVal});
             $scope.formData.condicionPago= Order.query({type:"ProviderPaymentCondition", id:newVal});
-            if($scope.layer != "detalleDoc" && $scope.document.id){
+           /* if($scope.layer != "detalleDoc" && $scope.document.id && $scope.layer != "detalleDoc" ){
                 setGetOrder.restore();
                 $scope.document={};
-            }
+            }*/
         }
 
     });
@@ -2045,12 +2048,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         }
 
-        if (newVal[1] != '' && typeof(newVal[1]) !== 'undefined') {
-            var layer= newVal[1];
-            if($scope.provSelec.id != ''){
-            }
-
-        }
+       if(newVal[1] == "unclosetDoc"){
+           setGetOrder.restore();
+           $scope.document={};
+       }
     });
 
     $scope.reloadDoc = function(){
@@ -2067,11 +2068,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if(response.ult_revision =! null && response.ult_revision ){
                 $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
             }
+            console.log("anted de build", $scope.document);
+            console.log("setGetOrder.getState()", setGetOrder.getState())
             if(setGetOrder.getState() =="select"){
-                $scope.buildDocChange($scope.document);
-                setGetOrder.setState("load");
-            }
+                console.log("select", $scope.document);
 
+                $scope.buildDocChange($scope.document);
+
+            }
+            setGetOrder.setState("load");
 
 
         });
@@ -2122,6 +2127,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 if (response.success) {
                     setGetOrder.change("document","estado",response.item.estado);
                     $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+                    $scope.FormEstatusDoc.$setPristine();
+
                 }
 
             });
@@ -2619,7 +2626,7 @@ MyApp.service('setGetOrder', function() {
                 });
                 value= angular.copy(value[fiel]);
             }
-            if(typeof (value) != 'undefined'){
+            if(typeof (value) != 'undefined' && forms[form][fiel].estado !='created'){
                 if(forms[form][fiel].original != value  ){
                     forms[form][fiel].v= value;
                     forms[form][fiel].trace.push(value);
