@@ -177,9 +177,12 @@ class ProvidersController extends BaseController
         $valName->nombre = $req->name;
         $valName->save();
         if($req->preFav){
-            $temp = NombreValcro::find($req->preFav["id"]);
-            $temp->departamento()->updateExistingPivot($req->preFav["dep"],array("fav"=>0));
-            $temp->save();
+            foreach($req->preFav as $prev){
+                $temp = NombreValcro::find($prev["id"]);
+                $temp->departamento()->updateExistingPivot($prev["dep"],array("fav"=>0));
+                $temp->save();
+            }
+
         }
         $departamentos = $req->departments;
         unset($departamentos[0]);
@@ -221,8 +224,11 @@ class ProvidersController extends BaseController
                 $contact->languages=$contact->idiomas()->lists("languaje_id");
                 $contact->emails=$contact->campos()->where("prov_id",$id)->where("campo","email")->get();
                 $contact->phones=$contact->campos()->where("prov_id",$id)->where("campo","telefono")->get();
+                $contact->cargos=$contact->campos()->where("prov_id",$id)->where("campo","cargos")->lists("valor");
                 $dir = $contact->campos()->where("prov_id",$id)->where("campo","direccion")->first();
                 $contact->direccion=($dir)?$dir->valor:"";
+                $rep = $contact->campos()->where("prov_id",$id)->where("campo","responsabilidad")->first();
+                $contact->responsabilidades=($rep)?$rep->valor:"";
             }
             return ($contacts)?$contacts:[];
         }
@@ -260,20 +266,9 @@ class ProvidersController extends BaseController
 
         $result['mails'] = $this->contactEmail($req->emailCont,$contact->id,$req->prov_id);
         $result['phones'] = $this->contactPhone($req->contTelf,$contact->id,$req->prov_id);
+        $result['cargos'] = $this->contactCargos($req->cargo,$contact->id,$req->prov_id);
         $this->contactCampos("direccion",$req->dirOff,$contact->id,$req->prov_id);
         $this->contactCampos("responsabilidad",$req->responsability,$contact->id,$req->prov_id);
-        //$this->contactCampos("responsabilidad",$req->responsability,$contact->id,$req->prov_id);
-        /*$contact->campos()->create([
-            'campo' => 'telefono',
-            "valor" => $req->contTelf["valor"],
-            "prov_id" => $req->prov_id
-        ]);
-        $contact->campos()->create([
-            'campo' => 'direccion',
-            "valor" => $req->dirOff["valor"],
-            "prov_id" => $req->prov_id
-        ]);
-        dd(Provider::find($req->prov_id)->contacts()->find($contact->id)->first()->campos()->get());*/
 
         $result['id']=$contact->id;
         return $result;
@@ -311,10 +306,15 @@ class ProvidersController extends BaseController
 
         return $result;
     }
-    private function contactPhone($reqs,$cont_id){
+    private function contactPhone($reqs,$cont_id,$prov_id){
+        //dd($reqs);
         $result = array();
+        $exists = Contactos::find($cont_id)->campos()->where("prov_id",$prov_id)->where("campo","telefono")->get();
+        // dd($exists->except(["45","43"]));
+        $ids = [];
         foreach($reqs as $req){
-            if($req["id"]){
+            if($exists->contains($req["id"])){
+                $ids[]=$req["id"];
                 $phone = Contactos::find($cont_id)->campos()->find($req["id"]);
             }else{
                 $phone = new ContactField();
@@ -330,24 +330,58 @@ class ProvidersController extends BaseController
             }
         }
 
+        foreach($exists->except($ids) as $k){
+            ContactField::destroy($k->id);
+        };
+
+
+
         return $result;
     }
     private function contactCampos($field,$valor,$cont_id,$prov){
-        $addr = Contactos::find($cont_id)->campos()->where("prov_id",$prov)->firstOrFail();
-        if(!$addr){
-            $addr = new ContactField();
-        }/*else{
-            $addr = new ContactField();
-        }*/
-        $addr->campo = $field;
-        $addr->cont_id = $cont_id;
-        $addr->prov_id = $prov;
-        $addr->valor = $valor;
-        if($addr->save()){
-            $result['id'] = $addr->id;
+        $campo = Contactos::find($cont_id)->campos()->where("prov_id",$prov)->where("campo",$field)->first();
+        if(!$campo){
+            $campo = new ContactField();
+        }
+        $campo->campo = $field;
+        $campo->cont_id = $cont_id;
+        $campo->prov_id = $prov;
+        $campo->valor = $valor;
+        if($campo->save()){
+            $result['id'] = $campo->id;
         }else{
             $result['success'] = false;
         }
+        return $result;
+    }
+    private function contactCargos($reqs,$cont_id,$prov_id){
+        //dd($reqs);
+        $result = array();
+        $exists = Contactos::find($cont_id)->campos()->where("prov_id",$prov_id)->where("campo","cargos")->delete();
+        // dd($exists->except(["45","43"]));
+        $ids = [];
+        foreach($reqs as $req){
+           /* if($exists->contains($req["id"])){
+                $ids[]=$req["id"];
+                $carg = Contactos::find($cont_id)->campos()->find($req["id"]);
+            }else{*/
+            $carg = new ContactField();
+            //}
+            $carg->campo = "cargos";
+            $carg->cont_id = $cont_id;
+            $carg->prov_id = $prov_id;
+            $carg->valor = $req;
+            if($carg->save()){
+                $result[] = $carg->id;
+            }else{
+                $result['success'] = false;
+            }
+        }
+
+       /* foreach($exists->except($ids) as $k){
+            ContactField::destroy($k->id);
+        };*/
+
         return $result;
     }
 

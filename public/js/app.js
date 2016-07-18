@@ -141,18 +141,27 @@ MyApp.directive('listBox', function ($timeout) {
     return {
         link: function (scope, elem, attrs,ctrl) {
             elem.bind("keydown",function(e){
-                if(e.which=="40"){
-                    var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
-                    scope.scrollTo(next[0].id);
-                    next[0].focus();
-                }else if(e.which=="38"){
-                    var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
-                    scope.scrollTo(prev[0].id);
-                    prev[0].focus();
-                }else if(e.which=="13"){
-                    $timeout(function(){
-                        angular.element(elem).click();
-                    },0)
+                if(angular.element(elem).is("#launchList")){
+                    if(e.which=="40"){
+                        $timeout(function(){
+                            angular.element('#listado').find(".boxList").first().focus();
+                        },50)
+                    }
+                }else{
+                    if(e.which=="40"){
+                        var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
+                        scope.scrollTo(next[0].id);
+                        next[0].focus();
+                    }else if(e.which=="38"){
+                        var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
+                        scope.scrollTo(prev[0].id);
+                        prev[0].focus();
+                    }else if(e.which=="13"){
+                        $timeout(function(){
+                            angular.element(elem).click();
+                        },0)
+                    }
+
                 }
 
             })
@@ -302,7 +311,6 @@ MyApp.directive('contenteditable', function() {
 
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
-
         var elem = angular.element("#"+jqObject);
         var list = angular.element(elem).parents("form").first().find("[step]:visible")
         if(list.index(elem)<list.length-1){
@@ -364,7 +372,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                             }else{
 
                                 $timeout(function(){
-                                    console.log(elem, angular.element(list[list.index(elem)+1]).focus())
+                                    elem, angular.element(list[list.index(elem)+1]).focus();
                                     /*var elem = angular.element(list[list.index(this)+1])
 
                                     angular.element(elem[0]).focus()*/
@@ -378,12 +386,15 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
                             $timeout(function(){
                                 angular.element(elem).parents("form").first().next().click();
-                                if(angular.element(nextFrm[0]).is("md-select")){
-                                    angular.element(nextFrm[0]).focus().click();
-                                }else{
-                                    angular.element(nextFrm[0]).focus();
-                                }
-                            },50);
+                                $timeout(function(){
+                                    if(angular.element(nextFrm[0]).is("md-select")){
+                                        angular.element(nextFrm[0]).focus().click();
+                                    }else{
+                                        angular.element(nextFrm[0]).focus();
+                                    }
+                                },50);
+
+                            },0);
 
 
                             /*if(scope.showGrid){

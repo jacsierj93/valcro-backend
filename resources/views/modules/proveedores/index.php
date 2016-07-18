@@ -12,7 +12,7 @@
     <div class="contentHolder" layout="row" flex>
 
         <div class="barraLateral" layout="column">
-            <div id="menu" layout="row" flex="none" class="menuBarHolder md-whiteframe-1dp" style="height: 48px">
+            <div id="menu" layout="row" flex="none" class="menuBarHolder md-whiteframe-1dp" style="height: 48px" >
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div layout="row" layout-align="start center" class="menu" style="height: 48px;">
                     <div flex layout-align="center center" ng-click="showAlert()">
@@ -25,7 +25,8 @@
             </div>
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
-            <div id="listado" flex ng-controller="ListProv" style="overflow-y:auto;" ng-click="showAlert(45)">
+            <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
+            <div id="listado" flex ng-controller="ListProv" style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
                 <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
@@ -275,7 +276,7 @@
                                 Datos Proveedor
                             </div>
                         </div>
-                        <div flex layout="column" ng-hide="$parent.expand && id!=$parent.expand"     class="area-form">
+                        <div flex layout="column" ng-hide="$parent.expand && id!=$parent.expand" class="area-form">
                             <div class="row" layout="row">
 
                             <md-input-container class="md-block" flex="15">
@@ -493,7 +494,7 @@
 
                         </div>
                         <div class="row" layout="row">
-                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
+                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>

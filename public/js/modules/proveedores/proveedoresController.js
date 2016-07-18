@@ -198,9 +198,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     $scope.openLayer = openLayer;
     $scope.closeLayer = closeLayer;
 
-    $scope.types = masterLists.getTypeProv();
 
-    $scope.envios =masterLists.getSendTypeProv();
 
     $scope.data = {
         cb1: true
@@ -362,7 +360,8 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
     $scope.$watch('todos.$promise.$$state.status',function(nvo){
         if(nvo==1){
             $timeout(function(){
-                angular.element("#listado").find(".boxList").first().focus();
+                angular.element("#listado").focus();
+
             },0)
 
         }
@@ -513,7 +512,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
 //###########################################################################################3
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
-MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers,$filter,setNotif) {
+MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers,$filter,setNotif,masterLists) {
     $scope.id="DataProvController";
     $scope.inputSta = function(inp){
         $scope.toCheck = true;
@@ -524,6 +523,8 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         /*var list = angular.element(this).parents("form").first().find("[info]:visible");
         angular.element(list[list.index(this)+1]).focus().click();*/
     };
+    $scope.types = masterLists.getTypeProv();
+    $scope.envios =masterLists.getSendTypeProv();
 
     $scope.prov = setGetProv.getProv();
     $scope.list = setGetProv.seeList();
@@ -907,8 +908,11 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             })*/
         } else {
             //$scope.overId = false;
-            console.log(currentDeps);
-            $scope.valName.departments = angular.copy(currentDeps);
+            console.log($scope.valName.departments)
+            if($scope.valName.departments[0] != "current"){
+                $scope.valName.departments = angular.copy(currentDeps);
+            }
+
             //$scope.over({name:{departments:angular.copy(currentDeps)}});
            /* if($scope.valName.id){
 
@@ -950,11 +954,12 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         }
     });*/
     function saveValcroname(preFav,onSuccess){
+        console.log(preFav)
         if(!$scope.nomvalcroForm.$valid){
             onSuccess();
             return false;
         }
-        if(preFav){
+        if(preFav.length>0){
             $scope.valName.preFav = preFav;
         }else{
             $scope.valName.preFav = false;
@@ -986,10 +991,14 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                 $scope.valcroName.unshift(valcroName);
                 setNotif.addNotif("ok", "Nuevo Nombre Valcro", [
                 ],{autohidden:3000});
+            }else{
+                setNotif.addNotif("ok", "Actualizé el Nombre Valcro", [
+                ],{autohidden:3000});
             };
 
             $scope.valcroName = $filter('orderBy')( $scope.valcroName, "departments.fav");
             setGetProv.addChng( $scope.valName,data.action,"valName");
+            preFav = [];
             onSuccess();
         });
     };
@@ -1033,8 +1042,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     $scope.showGrid = function(elem,a){
         if(!elem){
-            if(jQuery(a.toElement).parents("#lyrAlert").length==0 && jQuery(a.toElement).parents("#nomValLyr").length==0){
-
+            if(jQuery(a.target).parents("#lyrAlert").length==0 && jQuery(a.toElement).parents("#nomValLyr").length==0){
                 if($scope.valName.id && Object.keys($scope.valName.departments).length<=0){
                     console.log("cond1");
                     /*CLICK EN UN FUERA DEL FORMULARIO, CON DATOS EN INPUT, VERIFICA Y RESETEA EL FORMUALRIO Y SALE DEL FOCUS*/
@@ -1042,7 +1050,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                         {
                             name:"SI",
                             action:function(){
-                                saveValcroname(false,function(){
+                                saveValcroname(preFav,function(){
                                     $scope.isShow = elem;
                                     $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                                     valcroName = {};
@@ -1073,8 +1081,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             /*CLICK EN UN LUGAR DEL FORMULARIO, VACIA EL INPUT Y DEVUELVE EL FOCUS*/
             //console.log("cond2");
             if(!(angular.element(a.toElement).is("[chip],#transition") || angular.element(a.toElement).parents("#valNameContainer").length>0)){
-                console.log("cond3");
-                saveValcroname(false,function(){
+                saveValcroname(preFav,function(){
                     $scope.nomvalcroForm.$setUntouched();
                     $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                     valcroName = {};
@@ -1101,6 +1108,8 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         $mdSidenav("nomValLyr").open();
     };
 
+
+    var preFav = [];
     var setFav = function(dep){
 
         if(!$scope.nomvalcroForm.$valid){
@@ -1120,6 +1129,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                             var fav = {fav:1};
                             $scope.valName.departments[dep.id]=fav;
                         }
+                        preFav.push({"id":temp[0].id,"dep":dep.id});
                         //saveValcroname({"id":temp[0].id,"dep":dep.id});
                     }
                 },
@@ -1338,7 +1348,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     var saveContact = function(onSuccess){
 
-        console.log(angular.equals(currentOrig,$scope.cnt),$scope.cnt.id,$scope.provContactosForm.$pristine)
         if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
             console.log("falseeeeeeeee")
             onSuccess();
@@ -1410,6 +1419,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         }else{
             $scope.cnt.cargo.push(""+cargo);
         }
+        console.log($scope.provContactosForm)
+        $scope.provContactosForm.$setDirty();
+
     };
 
     /*borra el contacto seleccioado, esta funcion es llamada directo desde el icono de borrado*/
@@ -1458,7 +1470,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     contact = {};
                     setGetContac.setContact(false);
                     $scope.provContactosForm.$setUntouched();
-                    $scope.provContactosForm.$setPristine()
+                    $scope.provContactosForm.$setPristine();
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;

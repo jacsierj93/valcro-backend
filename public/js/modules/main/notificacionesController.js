@@ -115,9 +115,9 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
                 if(def.count<=0){
                     $interval.cancel(def.end);
                     $timeout(function(){
-                        angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
+                        //angular.element("[autotrigger='"+def.$$hashKey+"']").focus();
                         $timeout(function(){
-                            angular.element("[autotrigger='"+def.$$hashKey+"']").click();
+                            angular.element("[autotrigger='"+def.$$hashKey+"']").trigger("click");
                         },100)
 
                     },0);
