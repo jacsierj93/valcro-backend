@@ -2015,9 +2015,9 @@ class OrderController extends BaseController
      */
     public function setStatusPurchase(Request $req){
         $resul = array();
-        $model = Purchase::finOrFail($req->id);
+        $model = Purchase::findOrFail($req->id);
         $status = OrderStatus::findOrfail($req->estado_id);
-        $model->estado->id = $status->id;
+        $model->estado->id =$req->estado_id;
         $model->save();
         $resul['accion']='upd';
         $resul['item'] = $status;
@@ -2371,6 +2371,7 @@ class OrderController extends BaseController
     public function getSolicitudeSubstitutes(Request $req){
         $data = array();
         $items = Solicitude::where('id','<>', $req->doc_id)
+            ->where('prov_id', $req->prov_id)
             ->whereNotNull('final_id')
             ->get();
         $type = OrderType::get();
@@ -2408,6 +2409,8 @@ class OrderController extends BaseController
                 $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
                 $tem['prov_moneda_id']=$aux->prov_moneda_id;
                 $tem['estado_id']=$aux->estado_id;
+                $tem['prov_id']=$aux->prov_id;
+
                 // $tem['tipo_value']=$aux->typevalue;
                 // pra humanos
                 $tem['comentario']=$aux->comentario;
@@ -2472,6 +2475,7 @@ class OrderController extends BaseController
     public function getPurchaseSubstitutes(Request $req){
         $data = array();
         $items = Purchase::where('id','<>', $req->doc_id)
+            ->where('prov_id', $req->prov_id)
             ->whereNotNull('final_id')
             ->get();
         $type = OrderType::get();
@@ -2494,6 +2498,8 @@ class OrderController extends BaseController
             $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['estado_id']=$aux->estado_id;
+            $tem['prov_id']=$aux->prov_id;
+
             // $tem['tipo_value']=$aux->typevalue;
             // pra humanos
             $tem['comentario']=$aux->comentario;
@@ -2554,6 +2560,7 @@ class OrderController extends BaseController
     public function getOrderSubstitutes(Request $req){
         $data = array();
         $items = Order::where('id','<>', $req->doc_id)
+            ->where('prov_id', $req->prov_id)
             ->whereNotNull('final_id')
 
             ->get();
@@ -2577,6 +2584,7 @@ class OrderController extends BaseController
             $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
             $tem['prov_moneda_id']=$aux->prov_moneda_id;
             $tem['estado_id']=$aux->estado_id;
+            $tem['prov_id']=$aux->prov_id;
             // $tem['tipo_value']=$aux->typevalue;
             // pra humanos
             $tem['comentario']=$aux->comentario;

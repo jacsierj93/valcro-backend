@@ -39,13 +39,15 @@ window.addEventListener("drop",function(e){
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
 
-MyApp.config(function ($provide, $httpProvider) {
+MyApp.config(function ($provide, $httpProvider, $locationProvider) {
 
     $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
     // Intercept http calls.
     var path= "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/";
 
     $provide.factory('MyHttpInterceptor', function ($q) {
+
         return {
             // On request success
             request: function (config) {
@@ -82,6 +84,8 @@ MyApp.config(function ($provide, $httpProvider) {
 
     // Add the interceptor to the $httpProvider.
     $httpProvider.interceptors.push('MyHttpInterceptor');
+   // $locationProvider.html5Mode(true);
+
 
 });
 

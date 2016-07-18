@@ -18,31 +18,31 @@
                     </div>
                 </div>
 
-                <div layout="column" flex="" >
-                    <form name="provdiderFilter">
-                    <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start">
-                        <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
-                            <label>Razon  Social</label>
-                            <input  type="text" ng-model="fRazSocial" ng-minlength="2" required>
-                        </md-input-container>
-                        <!--
-                                                <md-autocomplete
-                                                    md-selected-item="fpaisSelec"
-                                                    md-search-text="texto"
-                                                    md-items="item in filterData.paises | customFind : texto : searchCountry "
-                                                    md-item-text="item.short_name "
-                                                    placeholder="Pais">
-                                                    <md-item-template>
-                                                        <span >{{item.short_name}}</span>
-                                                    </md-item-template>
-                                                    <md-not-found>
-                                                        No hay resultados "{{ctrl.searchText}}"
-                                                    </md-not-found>
-                                                </md-autocomplete>
-                        -->
+                <div layout="column" flex="" tabindex="-1" >
+                    <form name="provdiderFilter" tabindex="-1">
+                        <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start" tabindex="-1">
+                            <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                                <label>Razon  Social</label>
+                                <input  type="text" ng-model="fRazSocial" ng-minlength="2" required tabindex="-1" >
+                            </md-input-container>
+                            <!--
+                                                    <md-autocomplete
+                                                        md-selected-item="fpaisSelec"
+                                                        md-search-text="texto"
+                                                        md-items="item in filterData.paises | customFind : texto : searchCountry "
+                                                        md-item-text="item.short_name "
+                                                        placeholder="Pais">
+                                                        <md-item-template>
+                                                            <span >{{item.short_name}}</span>
+                                                        </md-item-template>
+                                                        <md-not-found>
+                                                            No hay resultados "{{ctrl.searchText}}"
+                                                        </md-not-found>
+                                                    </md-autocomplete>
+                            -->
 
 
-                    </div>
+                        </div>
                     </form>
                     <div id="expand2" flex >
 
@@ -159,9 +159,9 @@
                          ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras && document.id )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
-                   <!-- <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
-                        <span class="icon-Filtro" style="font-size: 24px"></span>
-                    </div>-->
+                    <!-- <div layout="column" layout-align="center center"  ng-show="layer == 'listPedido' " ng-click="FilterListPed()">
+                         <span class="icon-Filtro" style="font-size: 24px"></span>
+                     </div>-->
                     <div layout="column" layout-align="center center"
                          ng-show="(module.index > 1 && document.estado_id != 3 && document.id)"
                          ng-click="cancelDoc()">
@@ -323,7 +323,7 @@
                 <div  layout="column" flex="" class="layerColumn">
                     <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
                         <div>
-                            Pedidos : <span style="color: #000;">{{provSelec.razon_social}}</span>
+                            <span style="color: #000;">{{provSelec.razon_social}}</span>
                         </div>
                     </div>
                     <div layout="row" class="headGridHolder">
@@ -580,7 +580,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!--<div ng-show="( gridView != 4 )" >-->
                             <div   ng-show="( gridView != 4 )"  layout="row"  >
                                 <md-input-container class="md-block" flex="50" ng-click="allowEdit()" >
                                     <label>Proveedor</label>
@@ -588,8 +587,10 @@
                                                md-no-ink
                                                info="Seleccione un proveedor para el documento"
                                                required
-                                               ng-disabled="( formBlock || formGlobal == 'upd' || document.id || document.id !='')"
+                                               ng-disabled="( document.id )"
                                                ng-click="toEditHead('prov_id', provSelect.id)"
+                                               id="prov_id"
+                                               skip-tab
 
                                     >
                                         <md-option ng-repeat="prov in todos" value="{{prov.id}}" skip-tab>
@@ -616,18 +617,20 @@
                                 </div>
                             </div>
 
-                            <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex ng-click="allowEdit()" >
-                                <label>Titulo</label>
-                                <input  ng-model="document.titulo"
-                                        ng-disabled="( formBlock )"
-                                        required
-                                        ng-change="toEditHead('titulo', document.titulo)"
-                                        info="Escriba un titulo para facilitar identificacion del documento"
-                                        skip-tab
+                            <div layout="row">
+                                <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex ng-click="allowEdit()" >
+                                    <label>Titulo</label>
+                                    <input  ng-model="document.titulo"
+                                            ng-disabled="( formBlock )"
+                                            required
+                                            ng-change="toEditHead('titulo', document.titulo)"
+                                            info="Escriba un titulo para facilitar identificacion del documento"
+                                            skip-tab
 
 
-                                >
-                            </md-input-container>
+                                    >
+                                </md-input-container>
+                            </div>
 
                             <div  ng-show="( gridView != 4 )"  layout="row"  >
 
@@ -638,6 +641,7 @@
                                                ng-change="toEditHead('pais_id', document.pais_id)"
                                                info="Selecione el pais de origen de los productos"
                                                skip-tab
+                                               id="pais_id"
 
                                     >
                                         <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
@@ -652,7 +656,9 @@
                                                ng-disabled="( formBlock || provSelec.id == '' )"
                                                ng-change="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
                                                info="Selecione la direccion que debe especificarse en la factura"
-
+                                               id="direccion_facturacion_id"
+                                               skip-tab
+                                               id="direccion_facturacion_id"
 
 
 
@@ -664,7 +670,6 @@
                                 </md-input-container>
 
                             </div>
-
                             <div   ng-show="( gridView != 4 )" layout="row" >
 
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()">
@@ -674,6 +679,9 @@
                                                ng-disabled="( formBlock || provSelec.id == '' || document.pais_id == ''  )"
                                                ng-change="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
                                                info="Seleccione la direccion desde donde se depachara la mercancia"
+                                               id="direccion_almacen_id"
+                                               skip-tab
+                                               id="direccion_almacen_id"
 
 
 
@@ -707,8 +715,9 @@
                                                required
                                                ng-change="toEditHead('prov_moneda_id', document.prov_moneda_id)"
                                                info="Seleccione la moneda en la que se realizara el pago"
-
-
+                                               id="direccion_almacen_id"
+                                               id="prov_moneda_id"
+                                               skip-tab
 
                                     >
                                         <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" skip-tab >
@@ -726,6 +735,7 @@
                                             required
                                             info="Tasa segun la moneda selecionada"
                                             skip-tab
+                                            id="tasa"
 
 
                                     >
@@ -738,6 +748,8 @@
                                                md-no-ink
                                                ng-required ="(formMode.value == 23)"
                                                info="Seleccione una condicion para la realizacion del pago"
+                                               skip-tab
+                                               id="condicion_pago_id"
 
 
 
@@ -846,6 +858,8 @@
                                         <label>Estatus</label>
                                         <md-select ng-model="document.estado_id"  ng-disabled="formBlock"
                                                    ng-change="toEditHead('estado_id', document.estado_id)"
+                                                   skip-tab
+                                                   id="condicion_pago_id"
 
                                         >
                                             <md-option ng-repeat="item in estadosDoc" value="{{item.id}}" skip-tab>
@@ -930,7 +944,8 @@
                         <div layout="column" flex>
                             <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 4">
                                 <div>
-                                    <span style="color: #1f1f1f" ng-show="(document.productos.todos && document.productos.todos >0 )">({{document.productos.todos.length}})</span>
+                                    <span style="color: #1f1f1f" ng-show="(document.productos.todos.length > 0 )">
+                                        ({{document.productos.todos.length}})</span>
                                     Productos
                                 </div>
 
@@ -1374,7 +1389,9 @@
 
                                 <md-input-container class="md-block" flex="40">
                                     <label>Fabrica</label>
-                                    <md-select ng-model="provSelec.id"ng-disabled="true">
+                                    <md-select ng-model="provSelec.id"ng-disabled="true"
+
+                                    >
                                         <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                             {{prov.razon_social}}
                                         </md-option>
@@ -1800,7 +1817,7 @@
                                     </div>
                                     <div class="rowRsmTitle">Titulo</div>
                                 </div>
-                                <div class="rms" > {{finalDoc.titulo.v | date:'dd/MM/yyyy' }}</div>
+                                <div class="rms" flex> {{finalDoc.titulo.v  }}</div>
                             </div>
                             <div layout="row" flex  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
 
@@ -1814,11 +1831,11 @@
                                     </div>
                                     <div class="rowRsmTitle"> Revisado </div>
                                 </div>
-                                <div  class="rms" > {{finalDoc.ult_revision.v | date:'dd/MM/yyyy' }}</div>
+                                <div  class="rms" > {{finalDoc.ult_revision | date:'dd/MM/yyyy' }}</div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'new' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
                                     <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
@@ -1826,11 +1843,11 @@
                                     </div>
                                     <div class="rowRsmTitle"> Estado </div>
                                 </div>
-                                <div class="rms" flex> {{document.estado }}</div>
+                                <div class="rms" flex> {{finalDoc.estado.v }}</div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.prioridad && gridViewFinalDoc == 1 )">
                                 <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'new'"
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'created'"
                                          layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
@@ -1847,7 +1864,7 @@
                             </div>
                             <div layout="row" class="rowRsm" ng-show="(document.pais_id && gridViewFinalDoc == 1)" >
                                 <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'new' && finalDoc.pais_id.trace.length"
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'created' && finalDoc.pais_id.trace.length"
                                          layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
@@ -1860,7 +1877,7 @@
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
                                 <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'new'"
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'created'"
                                          layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
@@ -1889,7 +1906,7 @@
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura || finalDoc.adjFactura.length > 0) )">
                                 <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'new'"
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'created'"
                                          layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
@@ -2124,11 +2141,11 @@
                 <div active-left   ></div>
 
                 <div  layout="column" flex="" class="layerColumn" style="padding: ">
-                        <div contenteditable ng-model="previewHtmltext " style="min-height: 48px" > Texto adicional </div>
+                    <div contenteditable ng-model="previewHtmltext " style="min-height: 48px" > Texto adicional </div>
 
 
-                        <div ng-bind-html="previewHtmlDoc" flex="">
-                        </div>
+                    <div ng-bind-html="previewHtmlDoc" flex="">
+                    </div>
                 </div>
             </md-content>
         </md-sidenav>

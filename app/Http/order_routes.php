@@ -38,7 +38,7 @@ $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obt
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
-$app->post("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
+/*$app->post("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido*/
 
 
 // import
