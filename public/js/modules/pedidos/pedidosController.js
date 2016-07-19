@@ -93,7 +93,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.contraPedSelec ={};
     $scope.pedidoSusPedSelec={};
 
-    $scope.moduleAccion = Layers.setAccion;
 
     $scope.todos = Order.query({type:"OrderProvList"});
 
@@ -193,7 +192,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 {
                     name:"Si",
                     action: function(){
-                        $scope.moduleAccion({close:{first:true, search:true}});
+                        $scope.LayersAction({close:{first:true, search:true}});
                         filesService.close();
 
                     }
@@ -256,7 +255,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             {
                 name:"ok",
                 action: function(){
-                    $scope.moduleAccion({close:true});
+                    $scope.LayersAction({close:true});
                 }
             }
         ],{block:true});
@@ -310,7 +309,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.formMode=$scope.forModeAvilable.getXValue(document.tipo_value);
                 $scope.document=document;
                 if($scope.module.layer !='resumenPedido' ){
-                    $scope.moduleAccion({open:{name:"resumenPedido"}});
+                    $scope.LayersAction({open:{name:"resumenPedido"}});
                 }
             }
         }, 1000);
@@ -325,7 +324,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         timePreview= $timeout(function(){
             if($scope.preview && $scope.module.layer== 'resumenPedido' && !$scope.mouseProview){
-                $scope.moduleAccion({close:true});
+                $scope.LayersAction({close:true});
                 $scope.hoverPreview(true);
             }
         }, 1000);
@@ -357,14 +356,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
      };*/
 
     $scope.closeTo = function(layer){
-        $scope.moduleAccion({close:layer});
+        $scope.LayersAction({close:layer});
 
     };
 
     $scope.cancelDoc = function(){
 
         $scope.formBlock= false;
-        $scope.moduleAccion({search:{name:"detalleDoc", before: function(){
+        $scope.LayersAction({search:{name:"detalleDoc", before: function(){
             $scope.document.estado_id=3;// se cambia el estado a cancelado
             $scope.gridView =3;
             var mo= jQuery("#mtvCancelacion");
@@ -577,15 +576,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.menuAgregar= function(){
-        $scope.moduleAccion({close:"all"});
-        $scope.moduleAccion({open:{name:"menuAgr"}});
+        $scope.LayersAction({close:"all"});
+        $scope.LayersAction({open:{name:"menuAgr"}});
         $scope.gridView=-1;
         $scope.preview =false;
 
     };
 
     $scope.openEmail= function(){
-        $scope.moduleAccion({open:{name:"email"}});
+        $scope.LayersAction({open:{name:"email"}});
         $http.get("Email/ProviderEmails").success(function (response) { $scope.email.contactos = response});
     };
 
@@ -616,7 +615,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.selecContraP = function (item) {
         $scope.contraPedSelec ={};
-        $scope.moduleAccion({open:{name:"resumenContraPedido", before: function(){
+        $scope.LayersAction({open:{name:"resumenContraPedido", before: function(){
 
             Order.get({type:"CustomOrder", id: item.id, doc_id: $scope.document.id, tipo: $scope.formMode.value}, {},
                 function(response){
@@ -644,7 +643,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.selecPedidoSust =function (item) {
         $scope.pedidoSusPedSelec ={};
-        $scope.moduleAccion({open:{name:"resumenPedidoSus", before: function(){
+        $scope.LayersAction({open:{name:"resumenPedidoSus", before: function(){
             Order.get({type:"Document", id:item.id,tipo:$scope.formMode.value}, {},function(response){
                 console.log("sustitu", response);
                 $scope.pedidoSusPedSelec = response;
@@ -656,7 +655,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.selecKitchenBox=  function(item) {
 
-        $scope.moduleAccion({open:{name:"resumenKitchenbox", before: function(){
+        $scope.LayersAction({open:{name:"resumenKitchenbox", before: function(){
 
             Order.get({type:"KitchenBox", id: item.id, doc_id: $scope.document.id, tipo: $scope.formMode.value}, {},
                 function(response){
@@ -1257,7 +1256,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.updateProv();
                 $scope.NotifAction("ok","Finalizado",[
                     {name:"Ok", action: function(){
-                        $scope.moduleAccion({close:{first:true, search:true}});
+                        $scope.LayersAction({close:{first:true, search:true}});
                         filesService.close();
 
                     }}
@@ -1342,7 +1341,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                         Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
                                         $scope.NotifAction("ok","Realizado",[
                                             {name:"Ok",default:2, action: function(){
-                                                $scope.moduleAccion({close:true});}} ] ,{block:true});
+                                                $scope.LayersAction({close:true});}} ] ,{block:true});
                                     }
                                 });
                             }
@@ -1374,7 +1373,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                         });
                                         Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                         Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
                                     }
                                 });
                             }
@@ -1396,7 +1395,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                 $scope.document.prov_id=$scope.provSelec.id;
                                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                 Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
                             }
                         },
                         {name: "Cancelar",
@@ -1421,7 +1420,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             $scope.document.prov_id=$scope.provSelec.id;
                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
                         }
                     }
                     ,{name:"Dejarme elegir ",
@@ -1456,7 +1455,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
                                         }
                                     }
                                     ,{name:"Usar proforma",
@@ -1488,7 +1487,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
                                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.moduleAccion({close:true});}} ] ,{block:true});
+                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
                                         }
                                     },
                                     {name:"Preguntarme en cada caso("+Object.keys(errors).length+")",action:function(){
@@ -1805,8 +1804,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if (newVal != '' && typeof(newVal) !== 'undefined' && newVal != null){
                 switch (newVal){
                     case "detalleDoc":
-                        $scope.moduleAccion({search:{name:"detalleDoc",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"detalleDoc",
+                            after: function(){
                                 $scope.FormHeadDocument.$setUntouched();
                                 $scope.FormEstatusDoc.$setUntouched();
                                 $scope.FormAprobCompras.$setUntouched();
@@ -1815,23 +1814,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }})
                         ;break;
                     case "resumenPedido":
-                        $scope.moduleAccion({search:{name:"resumenPedido",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"resumenPedido",
+                            after: function(){
 
                             }
                         }});
                         break;
                     case "listPedido" :
-                        $scope.moduleAccion({search:{name:"listPedido",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"listPedido",
+                            after: function(){
                                 loadPedidosProvedor($scope.provSelec.id);
                                 $scope.hoverPreview(true);
                             }
                         }});
                         break;
                     case "agrContPed":
-                        $scope.moduleAccion({search:{name:"agrContPed",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"agrContPed",
+                            after: function(){
                                 $scope.formData.contraPedido = Order.query({type:"CustomOrders",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
 
                             }
@@ -1839,15 +1838,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         break;
                     case "agrKitBoxs":
 
-                        $scope.moduleAccion({search:{name:"agrKitBoxs",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"agrKitBoxs",
+                            after: function(){
                                 $scope.formData.kitchenBox = Order.query({type:"KitchenBoxs",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
                             }
                         }});
                         break;
                     case "listProducProv":
-                        $scope.moduleAccion({search:{name:"listProducProv",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"listProducProv",
+                            after: function(){
                                 Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
                                     var data =[];
                                     var aux ={};
@@ -1863,8 +1862,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case "listImport":
-                        $scope.moduleAccion({search:{name:"listImport",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"listImport",
+                            after: function(){
                                 if($scope.formMode.value !=21){
                                     var url='';
                                     switch ($scope.formMode.value){
@@ -1895,22 +1894,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case "listEmailsImport":
-                        $scope.moduleAccion({search:{name:"listEmailsImport",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"listEmailsImport",
+                            after: function(){
 
                             }
                         }});
                         break;
                     case "agrPed":
-                        $scope.moduleAccion({search:{name:"agrPed",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"agrPed",
+                            after: function(){
 
                             }
                         }});
                         break;
                     case "finalDoc":
-                        $scope.moduleAccion({search:{name:"finalDoc",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"finalDoc",
+                            after: function(){
 
                                 if(  setGetOrder.getState() != "built"){
 
@@ -1927,8 +1926,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case "agrPedPend":
-                        $scope.moduleAccion({search:{name:"agrPedPend",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"agrPedPend",
+                            after: function(){
                                 $scope.docsSustitos = Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id});
                             }
                         }});
@@ -1944,8 +1943,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }
                         break;
                     case "unclosetDoc":
-                        $scope.moduleAccion({search:{name:"unclosetDoc",
-                            before: function(){
+                        $scope.LayersAction({search:{name:"unclosetDoc",
+                            after: function(){
                                 $scope.unclosetDoc =[];
                                 Order.query({type:"UnClosetDoc"},{},function(response){
 
@@ -1954,7 +1953,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                         $scope.unclosetDoc.push(v);
                                     });
                                     if($scope.unclosetDoc.length == 0){
-                                        $scope.moduleAccion({close:{search:true}});
+                                        $scope.LayersAction({close:{search:true}});
                                     }
 
                                    // $scope.unclosetDoc =
@@ -1965,7 +1964,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             }
                         }});
                         break;
-                    default : $scope.moduleAccion({close:true});
+                    default : $scope.LayersAction({close:true});
 
 
                 }
@@ -2367,27 +2366,43 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 var current= module.index;
 
 
-                var l = angular.copy(module.historia[current]);
-                for(var i=0; i<close;i++){
-                    l = module.historia[current];
+                var  l;
+                for( var i=0; i<close -1;i++){
+                   l = module.historia[current];
                     $mdSidenav(l).close().then(function(){
+/*
 
                         if(arg.after){
                             arg.after();
                         }
+*/
 
                     });
-                    module.historia[current]=null;
+                    module.historia.splice(-1);
                     current--;
+
                 }
+                var  l = module.historia[current];
+                $mdSidenav(l).close().then(function(){
+
+                    if(arg.after){
+                        arg.after();
+                    }
+
+                });
+                module.historia.splice(-1);
+                current--;
+
+
+
 
                 module.index= current;
                 module.layer = module.historia[module.index];
                 module.block= false;
                 if(arg.search){
                     if(module.layer){
-                        if(module.layers[module.layer].before){
-                            callfn(module.layers[module.layer].before);
+                        if(module.layers[module.layer].after){
+                            callfn(module.layers[module.layer].after);
                         }
 
                     }
@@ -2577,7 +2592,6 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     });
 
 }]);
-
 
 /**************  SERVICIOS   ***********************/
 
