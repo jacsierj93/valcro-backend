@@ -117,11 +117,18 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };*/
 
-    historia= [15];
-    $scope.index = index=0;
-    var base =264;
+    //historia= [15]
+    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
+        $scope.index = nvo[1];
+        $scope.layerIndex = nvo[0];
+        /*if(nvo[1]>0 && $scope.prov.id){
+            $scope.showNext(true);
+        }*/
+    })
+    console.log($scope)
+/*    var base =264;
     function openLayer(layr){
-        $scope.showNext(false);
+
         var layer = layr||$scope.nextLyr;
         if(historia.indexOf(layer)==-1 && layer!="END"){
 
@@ -137,7 +144,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
             if(setGetProv.haveChang()){
                 openLayer("layer5");
-
             }else {
                 closeLayer(true);
                 $scope.layer = "";
@@ -146,57 +152,14 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
         }
 
-    }
+    }*/
 
     $scope.checkLayer = function(compare){
         console.log(compare);
         //return compare != $scope.layer;
     };
 
-    function closeLayer(all){
-        if(all){
-            while($scope.index!=0){
-                var layer=historia[$scope.index];
-                historia[$scope.index]=null;
-                $scope.index--;
-                $mdSidenav(layer).close();
-                $scope.layer = "";
-            }
-        }else{
-            var layer=historia[$scope.index];
-            historia[$scope.index]=null;
-            $scope.index--;
-            $mdSidenav(layer).close();
-            $scope.layer = historia[$scope.index];
-        }
-        /*if($scope.index==0){
-            if(setGetProv.haveChang()){
-                openLayer("layer5");
-                setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
-                    {
-                        name: "SI",
-                        action: function () {
-                            $mdSidenav("layer5").close();
-                            setGetProv.cancelNew();
-                            setGetProv.setProv(false);
-                        }
-                    },
-                    {
-                        name: "NO",
-                        action: function () {
-                        }
-                    }
-                ]);
-            }else{
-                setGetProv.cancelNew();
-                setGetProv.setProv(false);
-            }
 
-        }*/
-
-    }
-    $scope.openLayer = openLayer;
-    $scope.closeLayer = closeLayer;
 
 
 
@@ -232,14 +195,19 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };
 
+    $scope.nextLayer = function(to){
+        $scope.LayersAction({open:{name:to}});
+        $scope.showNext(true);
+    };
+
     var chngProv = function(prov){
-        closeLayer(true);
+        $scope.LayersAction({close:{all:true}});
         setGetProv.cancelNew();
         $scope.edit = false;
         $scope.enabled = true;
         setGetProv.setProv(prov.item);
-        openLayer("layer0");//modificado para mostrar resumen proveedor
-
+        $scope.LayersAction({open:{name:"layer0"}});
+        //openLayer("layer0");//modificado para mostrar resumen proveedor
     };
 
 
@@ -294,10 +262,12 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     var newProv = function(){
         setGetProv.setProv(false);
-        closeLayer(true);
+        $scope.LayersAction({close:{all:true}});
+        //closeLayer(true);
         $scope.edit = false;
         $scope.enabled = true;
-        $scope.openLayer("layer1","first");
+        $scope.LayersAction({open:{name:"layer1"}});
+       // $scope.openLayer("layer1","first");
         setGetProv.addToList({
             razon_social: "Nuevo Proveedor  ",
             contrapedido: 0,
@@ -306,17 +276,20 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             siglas:""
         });
     };
+
     $scope.editProv = function(){
         $scope.edit = true;
         $scope.enabled =false;
-        openLayer('layer1');
+        $scope.LayersAction({open:{name:"layer1"}});
     };
 
     $scope.showNext = function(status,to){
+        console.log("next",status,to);
         if(status){
+            console.log($mdSidenav("NEXT").open())
             $scope.nextLyr = to;
             //if($scope.prov.id && to!="layer1") //excepcion creada apra layer1 desde resumen
-                $mdSidenav("NEXT").open()
+            $mdSidenav("NEXT").open()
         }else{
             $mdSidenav("NEXT").close()
         }
@@ -523,6 +496,11 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         /*var list = angular.element(this).parents("form").first().find("[info]:visible");
         angular.element(list[list.index(this)+1]).focus().click();*/
     };
+
+    $scope.togglecheck = function(){
+        $scope.dtaPrv.contraped = !$scope.dtaPrv.contraped;
+        $scope.projectForm.$setDirty();
+    }
     $scope.types = masterLists.getTypeProv();
     $scope.envios =masterLists.getSendTypeProv();
 

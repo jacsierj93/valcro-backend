@@ -1,5 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="AppCtrl">
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="AppCtrl" global>
 
     <!-- 2) ########################################## AREA DEL MENU ########################################## -->
     <!--<div layout="row" flex="none" class="menuBarHolder">
@@ -70,7 +70,7 @@
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
                 <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"closeLayer()","ng-show"=>"(index>0)")) ?>
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"LayersAction({close:true});","ng-show"=>"(index>0)")) ?>
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
@@ -87,7 +87,7 @@
         <!-- 10) ########################################## LAYER (1) RESUMEN DEL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0" id="layer0">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
-            <md-progress-linear ng-show="isSetting.setting"></md-progress-linear>
+
             <input type="hidden" md-autofocus>
             <div layout="row" flex>
                 <md-content class="cntLayerHolder" layout="row" flex ng-controller="resumenProv">
@@ -302,7 +302,7 @@
 
                             <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                                 <label>Siglas</label>
-                                <input skip-tab info="minimo 3 letras maximo 4" autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
+                                <input skip-tab info="minimo 3 letras maximo 4" alpha autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
 
                             </md-input-container>
 
@@ -316,10 +316,12 @@
 
                             </md-input-container>
 
-                            <md-input-container class="md-block">
-                                <md-switch skip-tab info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" name="provContraped" ng-disabled="$parent.enabled && prov.id">
+                            <md-input-container class="md-block" style="margin-top:4px !important">
+                                <span class="icon-Contrapedidos" ng-click="togglecheck()" ng-class="{'iconActive':dtaPrv.contraped,'iconInactive':!dtaPrv.contraped}" style="font-size:23px;margin-rigth:8px"></span>
+                                <!--<div class="circle"></div>-->
+                               <!-- <md-switch skip-tab info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" name="provContraped" ng-disabled="$parent.enabled && prov.id">
                                     Contrapedidos?
-                                </md-switch>
+                                </md-switch>-->
                             </md-input-container>
 
 
@@ -1529,8 +1531,8 @@
             </md-content>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
-            <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"openLayer()")) ?>
+        <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
+            <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr)")) ?>
         </md-sidenav>
 
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="adjuntoLyr" id="adjuntoLyr">

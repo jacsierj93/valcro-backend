@@ -185,6 +185,21 @@ MyApp.directive('number', function () {
     };
 });
 
+MyApp.directive('alpha', function () {
+    return {
+        link: function (scope, elem, attrs,ctrl) {
+
+            elem[0].addEventListener('input', function(){
+                var  num = this.value.match(/^[A-Z a-z]+$/);
+                if (num === null) {
+                    this.value = this.value.substr(0, this.value.length - 1);
+                }
+            },false);
+
+        }
+    };
+});
+
 MyApp.directive('phone', function (setNotif) {
     return {
         link: function (scope, elem, attrs,ctrl) {
