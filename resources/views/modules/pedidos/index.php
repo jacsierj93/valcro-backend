@@ -989,7 +989,7 @@
                 </div>
                 <div   id="expand"></div>
 
-                <div style="width: 16px;"  ng-show="!openAdjDtPedido"  ng-mouseover="showNext(true)"  > </div>
+                <div style="width: 16px;"   ng-mouseover="showNext(true)"  > </div>
             </md-content>
 
 
@@ -1207,7 +1207,7 @@
                                     </div>
                                     <div flex="15" class="cellGrid">
                                         <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
-                                                type="number" min="1" id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) "/>
+                                                type="number" range="{{item.asignado}}" minVal="1" id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) " />
                                     </div>
 
 

@@ -307,6 +307,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         $timeout(function(){
             if(document &&  $scope.mouseProview){
                 $scope.formMode=$scope.forModeAvilable.getXValue(document.tipo_value);
+                console.log("hover doc", document);
                 $scope.document=document;
                 if($scope.module.layer !='resumenPedido' ){
                     $scope.LayersAction({open:{name:"resumenPedido"}});
@@ -367,7 +368,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.document.estado_id=3;// se cambia el estado a cancelado
             $scope.gridView =3;
             var mo= jQuery("#mtvCancelacion");
-            mo[0].autofocus = true;
+            mo[0].focus();
         }}});
 
 
@@ -538,18 +539,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     };
-    /*
-     $scope.openDocSusti = function(){
-     $scope.docsSustitos = new Array();
-     $scope.moduleAccion({open:{name:"agrPedPend", before: function(){
-
-     Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id},function(response){
-     $scope.docsSustitos =response;
-     });
-     }}});
-
-
-     };*/
     $scope.openImport = function(){
         $scope.document.prov_id = $scope.provSelec.id;
         Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
@@ -681,15 +670,38 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.formMode= $scope.forModeAvilable.getXname($scope.document.documento);
                 $scope.navCtrl.value = "detalleDoc" ;
                 $scope.navCtrl.estado= true;
-
+                return;
                 break;
             case "detalleDoc":
-                $scope.navCtrl.value = "listProducProv" ;
-                $scope.navCtrl.estado= true;
+                $scope.LayersAction({search:{name:"listProducProv",
+                    before:function(){
+
+                    },
+                    after: function(){
+                        Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
+                            var data =[];
+                            var aux ={};
+                            angular.forEach(response , function(v,k){
+                                aux ={};
+                                aux = v;
+                                aux.saldo=parseFloat(v.saldo);
+                                data.push(aux);
+                            });
+                            $scope.providerProds= data;
+                        });
+                    }
+                }});
+              /*  $scope.navCtrl.value = "listProducProv" ;
+                $scope.navCtrl.estado= true;*/
                 break;
             case "listProducProv":
-                $scope.navCtrl.value = "agrPed" ;
-                $scope.navCtrl.estado= true;
+                $scope.LayersAction({search:{name:"agrPed",
+                    before: function(){
+
+
+                    }
+                }});
+
                 break;
             case "agrPed":
                 if($scope.document.productos.kitchenBox.length == 0
@@ -749,6 +761,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     "Existen campos pendientes por completar, por favor verifica que información le falta."
                     ,[],{autohidden:autohidden});
 
+            }  if (!$scope.listProductoItems.$valid && $scope.module.layer== 'listProducProv') {
+
+                $scope.NotifAction("error",
+                    "No se pueden asignar productos sin asignarle una cantidad verifique que todos los productos tienen cantidad correctas"
+                    ,[],{autohidden:autohidden});
+
             } else {
                 $mdSidenav("NEXT").open();
             }
@@ -757,7 +775,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         } else {
             $mdSidenav("NEXT").close()
         }
-    }
+
+    };
 
     $scope.reloadSide = function(){
 
@@ -842,6 +861,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.changeProducto = function (item){
         var paso = true;
+        if(item.asignado){
+
+
+            $timeout(function(){
+                var mo= jQuery("#p"+item.id);
+                mo[0].focus();
+
+                console.log("prov focus", mo);
+            },100);
+
+        }
         if(item.asignado && item.saldo > 0){
             item.prov_id =$scope.provSelec.id;
             item.doc_id =$scope.document.id;
@@ -1244,7 +1274,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             setGetOrder.addForm('pedidoSusti'+ v.id,v);
 
         });
-        console.log("doc ", doc);
 
     };
 
@@ -1845,21 +1874,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case "listProducProv":
-                        $scope.LayersAction({search:{name:"listProducProv",
-                            after: function(){
-                                Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
-                                    var data =[];
-                                    var aux ={};
-                                    angular.forEach(response , function(v,k){
-                                        aux ={};
-                                        aux = v;
-                                        aux.saldo=parseFloat(v.saldo);
-                                        data.push(aux);
-                                    });
-                                    $scope.providerProds= data;
-                                });
-                            }
-                        }});
+
                         break;
                     case "listImport":
                         $scope.LayersAction({search:{name:"listImport",
@@ -1901,11 +1916,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case "agrPed":
-                        $scope.LayersAction({search:{name:"agrPed",
-                            after: function(){
 
-                            }
-                        }});
                         break;
                     case "finalDoc":
                         $scope.LayersAction({search:{name:"finalDoc",
@@ -1935,7 +1946,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     case  "close":
 
 
-                        if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal!='new' && $scope.document.final_id){
+                        if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal !='new' && $scope.document.final_id){
                             $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
                         }else {
 
@@ -2067,10 +2078,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if(response.ult_revision =! null && response.ult_revision ){
                 $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
             }
-            console.log("anted de build", $scope.document);
-            console.log("setGetOrder.getState()", setGetOrder.getState())
+
             if(setGetOrder.getState() =="select"){
-                console.log("select", $scope.document);
 
                 $scope.buildDocChange($scope.document);
 
@@ -2201,7 +2210,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 v.monto= parseFloat(v.monto);
                 v.tasa= parseFloat(v.tasa);
                 if(v.ult_revision){
-                    v.emision= DateParse.toDate(v.ult_revision);
+                    v.ult_revision= DateParse.toDate(v.ult_revision);
                 }
                // v.isNew=false;
                 $scope.provDocs.push(v);
@@ -2418,11 +2427,8 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
         var paso= true;
         if (module.historia.indexOf(arg.name) == -1) {
             if(arg.before){
-                if(!arg.validate){
-                    arg.before();
-                }else{
-                    paso=arg.before();
-                }
+                paso= callfn(arg.before);
+
             }
             if(paso){
                 var l = angular.element(document).find("#" + arg.name);
@@ -2844,6 +2850,67 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
         return $sce.trustAsHtml(htmlCode);
     }
 }]);
+
+MyApp.directive('range', function () {
+    return  {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, elem, attrs, ctrl) {
+            console.log("atttr", attrs);
+            var validate = false;
+            attrs.$observe('range', function(range){
+
+                ctrl.$validators.state = function(modelValue, viewValue) {
+                    if(range === undefined || range=="" || range==null){
+                        validate = false;
+
+                    }else {
+                        validate= range;
+                    }
+                    return false;
+                };
+
+
+
+            });
+            function valid (){
+
+
+            }
+            ctrl.$validators.range = function(modelValue, viewValue) {
+
+
+                if(!validate){
+                    return true;
+                }
+                if(viewValue === undefined || viewValue=="" || viewValue==null){
+                    return true;
+                }
+                if(attrs.minval){
+                    return parseInt(attrs.minval ) <= parseInt(viewValue);
+                }
+                if(attrs.maxval){
+                    return parseInt(attrs.maxval ) <= parseInt(viewValue);
+                }
+
+                return true;
+            };
+/*            var minValidator = function (value) {
+                var min = scope.$eval(attr.ngMin) || 0;
+                if (!isEmpty(value) && value < min) {
+                    ctrl.$setValidity('ngMin', false);
+                    return undefined;
+                } else {
+                    ctrl.$setValidity('ngMin', true);
+                    return value;
+                }
+            };
+
+            ctrl.$parsers.push(minValidator);
+            ctrl.$formatters.push(minValidator);*/
+        }
+    };
+});
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",

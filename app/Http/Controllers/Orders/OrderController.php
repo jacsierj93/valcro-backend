@@ -568,9 +568,13 @@ class OrderController extends BaseController
             $temp['extra']= $p;
             $prod[]= $temp;
         }
+        if($model->prov_id != null){
+            $data['proveedor'] ;
+        }
 
         $data['adjuntos']= $atts;
         $data['productos']= $prod;
+
         return $data;
     }
 
