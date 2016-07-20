@@ -829,6 +829,10 @@ md-pagination-wrapper {
     border-left: 2px solid #999;
 }
 
+.iconInput:focus{
+    background: #f1f1f1;
+}
+
 .iconInactive {
     color: #d1d1d1 !important;
 }

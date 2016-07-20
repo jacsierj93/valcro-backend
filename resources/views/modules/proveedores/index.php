@@ -36,7 +36,7 @@
 
                        <!-- <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />-->
 
-                        <span ng-show="(item.contrapedido==1)" class=" icon-contrapedidos" style="font-size: 23px"></span>
+                        <span ng-show="(item.contrapedido==1)" class=" icon-Contrapedidos" style="font-size: 23px"></span>
                         <span ng-show="(item.tipo_envio_id==1 || item.tipo_envio_id==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
                         <span ng-show="(item.tipo_envio_id==2 || item.tipo_envio_id==3)" style="font-size: 23px" class="icon-Barco" /></span>
                     </div>
@@ -317,7 +317,7 @@
                             </md-input-container>
 
                             <md-input-container class="md-block" style="margin-top:4px !important">
-                                <span class="icon-Contrapedidos" ng-click="togglecheck()" ng-class="{'iconActive':dtaPrv.contraped,'iconInactive':!dtaPrv.contraped}" style="font-size:23px;margin-rigth:8px"></span>
+                                <span class="icon-Contrapedidos iconInput" tab-index="-1" skip-tab info="el proveedor acepta contrapedidos?" ng-click="togglecheck()" ng-class="{'iconActive':dtaPrv.contraped,'iconInactive':!dtaPrv.contraped}" style="font-size:23px;margin-rigth:8px"></span>
                                 <!--<div class="circle"></div>-->
                                <!-- <md-switch skip-tab info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" name="provContraped" ng-disabled="$parent.enabled && prov.id">
                                     Contrapedidos?

@@ -498,6 +498,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     };
 
     $scope.togglecheck = function(){
+        console.log("toggle on")
         $scope.dtaPrv.contraped = !$scope.dtaPrv.contraped;
         $scope.projectForm.$setDirty();
     }

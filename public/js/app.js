@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','ngSanitize','clickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages'/*,'ngSanitize'*/,'clickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
 var MyApp = angular.module('MyApp', dependency, function() {
 
 });
@@ -380,7 +380,6 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     if(e.which == "13"){
                         e.stopPropagation();
                         var list = angular.element(elem).parents("form").first().find("[step]:visible");
-                       //console.log(list)
                         if(list.index(elem)<list.length-1){
                             if(angular.element(list[list.index(elem)+1]).is("md-select")){
                                 angular.element(list[list.index(elem)+1]).focus().click();
@@ -388,15 +387,9 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
                                 $timeout(function(){
                                     elem, angular.element(list[list.index(elem)+1]).focus();
-                                    /*var elem = angular.element(list[list.index(this)+1])
-
-                                    angular.element(elem[0]).focus()*/
-                                },0)
-
-
+                                },0);
                             }
                         }else{
-                            //var elem = angular.element(this);
                             var nextFrm = angular.element(elem).parents("form").first().next().find("[step]").first();
 
                             $timeout(function(){
@@ -410,17 +403,15 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                                 },50);
 
                             },0);
-
-
-                            /*if(scope.showGrid){
-                                scope.showGrid(false,{toElement:element});
-                            }else{
-                                scope.isShow=false;
-                                scope.projectForm.$setUntouched();
-                            }*/
                         }
 
-                    }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
+                    }else if(e.which == "32" && angular.element(elem).is(".iconInput")){
+                        $timeout(function(){
+                            elem.click();
+                        },50);
+
+
+                    } else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
                     }else if(e.which=="40"){
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){
