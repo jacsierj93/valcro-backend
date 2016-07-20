@@ -357,7 +357,7 @@ function save(){
         if($("#id").length>0){
             data.id=$("#id").val();
         }
-        if($("#tasa_fija")[0].checked){
+        if($("#isTasaFija")[0].checked){
             data.tasa=$("#tasa").val();
         }
         if(itemsDel.length>0){

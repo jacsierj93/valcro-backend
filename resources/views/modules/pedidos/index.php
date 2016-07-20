@@ -55,6 +55,7 @@
             </div>
 
             <md-virtual-repeat-container id="vertical-container" flex id="providers">
+                <div style="width:0px; height: 0px;"  id="init" tabindex="1"></div>
 
                 <div class="boxList"  layout="column" flex ng-repeat="item in todos " ng-click="setProvedor(item, this)"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
@@ -69,63 +70,63 @@
 
                     <div layout="row" class="dotRow">
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open100" >
+                            <div layout layout-align="center center" class="dot-empty doc-Open100" ng-show ="item.Showreview100" >
                                 {{item.review100}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open90" >
+                            <div layout layout-align="center center" class="dot-empty doc-Open90" ng-show ="item.Showreview90" >
                                 {{item.review90}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open60">
+                            <div layout layout-align="center center" class="dot-empty doc-Open60" ng-show ="item.Showreview60">
                                 {{item.review60}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open30" >
+                            <div layout layout-align="center center" class="dot-empty doc-Open30" ng-show ="item.Showreview30" >
                                 {{item.review30}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open7" >
+                            <div layout layout-align="center center" class="dot-empty doc-Open7" ng-show ="item.Showreview7">
                                 {{item.review7}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open0">
+                            <div layout layout-align="center center" class="dot-empty doc-Open0" ng-show ="item.Showreview0">
                                 {{item.review0}}
                             </div>
                         </div>
                     </div>
                     <div layout="row" class="dotRow">
-                        <div flex layout layout-align="center center">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="item.Showreview100 = false " ng-mouseenter = "item.Showreview100 = true ">
                             <div layout layout-align="center center" class="dot-item emit100" >
                                 {{item.emit100}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center">
+                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview90 = false " ng-mouseenter = "item.Showreview90 = true ">
                             <div layout layout-align="center center" class="dot-item emit90" >
                                 {{item.emit90}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center">
+                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview60 = false " ng-mouseenter = "item.Showreview60 = true ">
                             <div layout layout-align="center center" class="dot-item emit60">
                                 {{item.emit60}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center">
+                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview30 = false " ng-mouseenter = "item.Showreview30 = true ">
                             <div layout layout-align="center center" class="dot-item emit30" >
                                 {{item.emit30}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center">
+                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview7 = false " ng-mouseenter = "item.Showreview7 = true ">
                             <div layout layout-align="center center" class="dot-item emit7" >
                                 {{item.emit7}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center">
+                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview0 = false " ng-mouseenter = "item.Showreview0 = true ">
                             <div layout layout-align="center center" class="dot-item emit0">
                                 {{item.emit0}}
                             </div>
@@ -252,7 +253,7 @@
                             <div flex class="headGrid"> Comentario</div>
                         </div>
                         <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                            <div   ng-repeat="item in docImports" >
+                            <div   ng-repeat="item in docImports" tabindex="1" >
                                 <div layout="row" class="cellGridHolder" ng-click="docImport(item)" >
                                     <!--                                    <div  class=" cellGrid cellEmpty"  > </div>
                                     -->                                    <div flex="5" class="cellGrid" ng-click="docImport(item)" > {{item.tipo}}</div>
@@ -328,21 +329,21 @@
                             <span style="color: #000;">{{provSelec.razon_social}}</span>
                         </div>
                     </div>
-                    <div layout="row" class="headGridHolder">
+                    <div layout="row" class="headGridHolder" ng-init=" docOrder = 'id'">
                         <div class="headGrid cellEmpty"> </div>
-                        <div flex="5" class="headGrid"> N° </div>
-                        <div flex="15" class="headGrid"> Documento</div>
-                        <div flex class="headGrid"> Titulo</div>
-                        <div flex="10" class="headGrid"> N° Proforma</div>
-                        <div flex="10" class="headGrid"> Fecha</div>
-                        <div flex="5" class="headGrid"> </div>
-                        <div flex="10" class="headGrid"> Transporte</div>
-                        <div flex="10" class="headGrid"> N° Factura</div>
-                        <div flex class="headGrid"> Monto</div>
-                        <div flex class="headGrid"> Comentario</div>
+                        <div flex="5" class="headGrid" ng-click="docOrder = (docOrder == 'id') ? '-id' : 'id' " > N° </div>
+                        <div flex="15" class="headGrid" ng-click="docOrder = (docOrder == 'documento') ? '-documento' : 'documento'  "> Documento</div>
+                        <div flex class="headGrid" ng-click="docOrder = (docOrder == 'titulo') ? '-titulo' : 'titulo'  "> Titulo</div>
+                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'nro_proforma') ? '-nro_proforma' : 'nro_proforma'  "> N° Proforma</div>
+                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'emision') ? '-emision' : 'emision'  "> Fecha</div>
+                        <div flex="5" class="headGrid" ng-click="docOrder = (docOrder == 'diasEmit') ? '-diasEmit' : 'diasEmit'  "> </div>
+<!--                        <div flex="10" class="headGrid" > Transporte</div>
+-->                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'nro_factura') ? '-nro_factura' : 'nro_factura'  "> N° Factura</div>
+                        <div flex class="headGrid" ng-click="docOrder = (docOrder == 'monto') ? '-monto' : 'monto'  "> Monto</div>
+                        <div flex class="headGrid" ng-click="docOrder = (docOrder == 'comentario') ? '-comentario' : 'comentario'  "> Comentario</div>
                     </div>
                     <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                        <div   ng-repeat="item in provDocs" ng-click="DtPedido(item)"  tabindex="{{$index}}">
+                        <div   ng-repeat="item in provDocs | orderBy :docOrder " ng-click="DtPedido(item)"  tabindex="1" id="doc{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
@@ -354,13 +355,13 @@
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
                                          class="emit{{item.diasEmit}}"></div>
                                 </div>
-                                <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;">
+              <!--                  <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;">
                                     <div  ng-show="item.aero == 1 " style="margin-right: 8px;">
                                         <span class="icon-Aereo" style="font-size: 24px"></span>
 
                                     </div>
-                                    <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
-                                </div>
+                                    <div  ng-show="item.maritimo == 1 " ><?/*= HTML::image("images/maritimo.png") */?></div>
+                                </div>-->
                                 <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
                                 <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.monto | currency :item.symbol :2}}</div>
                                 <div flex class="cellGrid" ng-mouseover="hoverPreview(true)">{{item.comentario}}</div>
@@ -733,7 +734,7 @@
                                     <input  ng-model="document.tasa"
                                             type="number"
                                             ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
-                                            ng-readonly="tasa_fija"
+                                            ng-readonly="isTasaFija"
                                             required
                                             info="Tasa segun la moneda selecionada"
                                             skip-tab
@@ -1197,7 +1198,7 @@
                                    ng-mouseenter = "mouseEnterProd(item) ">
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellGrid">
-                                        <md-switch class="md-primary"  ng-change=" changeProducto(item) " ng-disabled="(formBlock)" ng-model="item.asignado"></md-switch>
+                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(formBlock)" ng-model="item.asignado"></md-switch>
                                     </div>
                                     <div flex="20" class="cellGrid" > {{item.codigo}}</div>
                                     <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
@@ -1207,7 +1208,7 @@
                                     </div>
                                     <div flex="15" class="cellGrid">
                                         <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
-                                                type="number" range="{{item.asignado}}" minVal="1" id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) " />
+                                                type="number" range="{{item.asignado}}" minVal="1" maxVal="6"id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) " />
                                     </div>
 
 
@@ -1845,7 +1846,7 @@
                                     </div>
                                     <div class="rowRsmTitle"> Estado </div>
                                 </div>
-                                <div class="rms" flex> {{finalDoc.estado.v }}</div>
+                                <div class="rms" flex> {{document.estado }}</div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="(document.prioridad && gridViewFinalDoc == 1 )">
                                 <div layout="row" flex="40">
