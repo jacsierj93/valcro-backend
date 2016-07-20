@@ -374,6 +374,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }else{
                 element.bind("keydown",function(e){
                     var elem =this;
+                    console.log("keypress==",e.which);
                     if(angular.element(elem).is("div")){
                         angular.element(elem).attr("tab-index","-1");
                     }
@@ -405,13 +406,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                             },0);
                         }
 
-                    }else if(e.which == "32" && angular.element(elem).is(".iconInput")){
-                        $timeout(function(){
-                            elem.click();
-                        },50);
-
-
-                    } else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
+                    }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
                     }else if(e.which=="40"){
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){

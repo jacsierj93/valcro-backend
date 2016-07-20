@@ -497,10 +497,12 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         angular.element(list[list.index(this)+1]).focus().click();*/
     };
 
-    $scope.togglecheck = function(){
-        console.log("toggle on")
-        $scope.dtaPrv.contraped = !$scope.dtaPrv.contraped;
-        $scope.projectForm.$setDirty();
+    $scope.togglecheck = function(e){
+        if(e.keyCode==32 || e.type=="click"){
+            $scope.dtaPrv.contraped = !$scope.dtaPrv.contraped;
+        }
+
+        //$scope.projectForm.$setDirty();
     }
     $scope.types = masterLists.getTypeProv();
     $scope.envios =masterLists.getSendTypeProv();

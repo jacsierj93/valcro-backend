@@ -317,7 +317,7 @@
                             </md-input-container>
 
                             <md-input-container class="md-block" style="margin-top:4px !important">
-                                <span class="icon-Contrapedidos iconInput" tab-index="-1" skip-tab info="el proveedor acepta contrapedidos?" ng-click="togglecheck()" ng-class="{'iconActive':dtaPrv.contraped,'iconInactive':!dtaPrv.contraped}" style="font-size:23px;margin-rigth:8px"></span>
+                                <span class="icon-Contrapedidos iconInput" tab-index="-1" skip-tab info="el proveedor acepta contrapedidos?" ng-click="togglecheck($event)" ng-class="{'iconActive':dtaPrv.contraped,'iconInactive':!dtaPrv.contraped}" style="font-size:23px;margin-rigth:8px"></span>
                                 <!--<div class="circle"></div>-->
                                <!-- <md-switch skip-tab info="puede hacer contrapedidos a este proveedor" class="md-primary" ng-model="dtaPrv.contraped" aria-label="Contrapedidos" name="provContraped" ng-disabled="$parent.enabled && prov.id">
                                     Contrapedidos?
