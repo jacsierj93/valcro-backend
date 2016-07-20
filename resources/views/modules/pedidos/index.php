@@ -1207,7 +1207,7 @@
                                     </div>
                                     <div flex="15" class="cellGrid">
                                         <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
-                                                type="number" range="{{item.asignado}}" minVal="1" id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) " />
+                                                type="number" range="{{item.asignado}}" minVal="1" maxVal="6"id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) " />
                                     </div>
 
 

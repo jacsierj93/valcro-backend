@@ -101,7 +101,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.reviewDoc = function(){
         $scope.unclosetDoc = [];
         Order.query({type:"UnClosetDoc"},{}, function(response){
-            $scope.unclosetDoc = response;
+           // $scope.unclosetDoc = response;
             if(response.length > 0){
                 $scope.NotifAction("alert","Existen "+response.length + " documentos sin finalizar ",[
                     {
@@ -867,8 +867,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $timeout(function(){
                 var mo= jQuery("#p"+item.id);
                 mo[0].focus();
-
-                console.log("prov focus", mo);
             },100);
 
         }
@@ -2283,8 +2281,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 });
 
-
-
 MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
 
     $scope.accion= Layers.getAccion();
@@ -2349,7 +2345,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 paso= callfn(arg.before);
                 close = paso ? 1 : 0;
             }
-            console.log("before resul", paso);
             if(paso){
                 if(arg.name){
                     var aux = module.historia.indexOf(arg.name);
@@ -2845,6 +2840,7 @@ MyApp.factory('Accion', function(){
     };
 
 });
+
 MyApp.filter("sanitize", ['$sce', function($sce) {
     return function(htmlCode){
         return $sce.trustAsHtml(htmlCode);
@@ -2852,65 +2848,65 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
 }]);
 
 MyApp.directive('range', function () {
+    function validateRange(viewValue,min,max){
+        if(viewValue === undefined || viewValue=="" || viewValue==null){
+            console.log('view value', viewValue);
+            return false;
+        }
+        if(min){
+            return parseInt(min ) <= parseInt(viewValue);
+        }
+        if(max){
+            return parseInt(max) <= parseInt(viewValue);
+        }
+    }
+
     return  {
         restrict: 'A',
         require: 'ngModel',
         link: function (scope, elem, attrs, ctrl) {
             console.log("atttr", attrs);
+            console.log("atttr", elem);
+            console.log("escope", scope);
+            console.log("ctrol", ctrl);
             var validate = false;
             attrs.$observe('range', function(range){
-
-                ctrl.$validators.state = function(modelValue, viewValue) {
-                    if(range === undefined || range=="" || range==null){
-                        validate = false;
-
-                    }else {
-                        validate= range;
+                if(range == "true" ){
+                    validate= true;
+                    if(ctrl.$viewValue == "0"){
+                        ctrl.$render();
+                        ctrl.$setViewValue("");
+                        ctrl.$render();
                     }
-                    return false;
-                };
+                }else{
+                    validate= false;
+                    if(ctrl.$viewValue != "0"){
+                        ctrl.$render();
+                        ctrl.$setViewValue("0");
+                        ctrl.$render();
 
 
+                    }
+                }
 
             });
-            function valid (){
 
 
-            }
             ctrl.$validators.range = function(modelValue, viewValue) {
-
-
-                if(!validate){
-                    return true;
+                if(validate == true){
+                    var paso= validateRange(viewValue,attrs.minval,attrs.maxval);
+                    if(!paso){
+                        elem[0].focus();
+                    }
+                    return paso;
                 }
-                if(viewValue === undefined || viewValue=="" || viewValue==null){
-                    return true;
-                }
-                if(attrs.minval){
-                    return parseInt(attrs.minval ) <= parseInt(viewValue);
-                }
-                if(attrs.maxval){
-                    return parseInt(attrs.maxval ) <= parseInt(viewValue);
-                }
-
                 return true;
             };
-/*            var minValidator = function (value) {
-                var min = scope.$eval(attr.ngMin) || 0;
-                if (!isEmpty(value) && value < min) {
-                    ctrl.$setValidity('ngMin', false);
-                    return undefined;
-                } else {
-                    ctrl.$setValidity('ngMin', true);
-                    return value;
-                }
-            };
 
-            ctrl.$parsers.push(minValidator);
-            ctrl.$formatters.push(minValidator);*/
         }
     };
 });
+
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
