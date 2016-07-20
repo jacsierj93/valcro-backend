@@ -329,21 +329,21 @@
                             <span style="color: #000;">{{provSelec.razon_social}}</span>
                         </div>
                     </div>
-                    <div layout="row" class="headGridHolder">
+                    <div layout="row" class="headGridHolder" ng-init=" docOrder = 'id'">
                         <div class="headGrid cellEmpty"> </div>
-                        <div flex="5" class="headGrid"> N° </div>
-                        <div flex="15" class="headGrid"> Documento</div>
-                        <div flex class="headGrid"> Titulo</div>
-                        <div flex="10" class="headGrid"> N° Proforma</div>
-                        <div flex="10" class="headGrid"> Fecha</div>
-                        <div flex="5" class="headGrid"> </div>
-                        <div flex="10" class="headGrid"> Transporte</div>
-                        <div flex="10" class="headGrid"> N° Factura</div>
-                        <div flex class="headGrid"> Monto</div>
-                        <div flex class="headGrid"> Comentario</div>
+                        <div flex="5" class="headGrid" ng-click="docOrder = (docOrder == 'id') ? '-id' : 'id' " > N° </div>
+                        <div flex="15" class="headGrid" ng-click="docOrder = (docOrder == 'documento') ? '-documento' : 'documento'  "> Documento</div>
+                        <div flex class="headGrid" ng-click="docOrder = (docOrder == 'titulo') ? '-titulo' : 'titulo'  "> Titulo</div>
+                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'nro_proforma') ? '-nro_proforma' : 'nro_proforma'  "> N° Proforma</div>
+                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'emision') ? '-emision' : 'emision'  "> Fecha</div>
+                        <div flex="5" class="headGrid" ng-click="docOrder = (docOrder == 'diasEmit') ? '-diasEmit' : 'diasEmit'  "> </div>
+<!--                        <div flex="10" class="headGrid" > Transporte</div>
+-->                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'nro_factura') ? '-nro_factura' : 'nro_factura'  "> N° Factura</div>
+                        <div flex class="headGrid" ng-click="docOrder = (docOrder == 'monto') ? '-monto' : 'monto'  "> Monto</div>
+                        <div flex class="headGrid" ng-click="docOrder = (docOrder == 'comentario') ? '-comentario' : 'comentario'  "> Comentario</div>
                     </div>
                     <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                        <div   ng-repeat="item in provDocs" ng-click="DtPedido(item)"  tabindex="1" id="doc{{$index}}">
+                        <div   ng-repeat="item in provDocs | orderBy :docOrder " ng-click="DtPedido(item)"  tabindex="1" id="doc{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
                                 <div flex="5" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.id}}</div>
@@ -355,13 +355,13 @@
                                     <div style="width: 16px; height: 16px; border-radius: 50%"
                                          class="emit{{item.diasEmit}}"></div>
                                 </div>
-                                <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;">
+              <!--                  <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;">
                                     <div  ng-show="item.aero == 1 " style="margin-right: 8px;">
                                         <span class="icon-Aereo" style="font-size: 24px"></span>
 
                                     </div>
-                                    <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
-                                </div>
+                                    <div  ng-show="item.maritimo == 1 " ><?/*= HTML::image("images/maritimo.png") */?></div>
+                                </div>-->
                                 <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_factura}}</div>
                                 <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.monto | currency :item.symbol :2}}</div>
                                 <div flex class="cellGrid" ng-mouseover="hoverPreview(true)">{{item.comentario}}</div>

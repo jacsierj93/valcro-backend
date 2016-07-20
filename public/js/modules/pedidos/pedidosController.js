@@ -1865,8 +1865,17 @@ $scope.$watch('navCtrl.estado', function (newState) {
                     $scope.LayersAction({search:{name:"listPedido",
                         before: function(){ $scope.provDocs = [];},
                         after: function(){
-                            loadPedidosProvedor($scope.provSelec.id);
+                            loadPedidosProvedor($scope.provSelec.id, function(){
+
+                                if($scope.provDocs.length > 0){
+                                    var mo= jQuery("#doc0");
+                                    console.log("q prov", mo);
+                                    mo[0].focus();
+                                }
+
+                            });
                             $scope.hoverPreview(true);
+
 
                         }
                     }});
@@ -2217,7 +2226,7 @@ $scope.removeList= function(item){
 };
 
 
-function loadPedidosProvedor(id){
+function loadPedidosProvedor(id, callback){
     $scope.provDocs = [];
     Order.query({type:"OrderProvOrder", id:id}, {},function(response){
 
@@ -2232,8 +2241,10 @@ function loadPedidosProvedor(id){
             $scope.provDocs.push(v);
 
         });
-        var mo= jQuery("#doc1");
-        mo[0].focus();
+        if(callback){
+            callback();
+        }
+
         // $scope.provSelec.pedidos=items;
     });
 }
