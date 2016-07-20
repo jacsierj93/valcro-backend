@@ -493,7 +493,6 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
-
                         </div>
                         <div class="row" layout="row">
                             <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
@@ -504,7 +503,7 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[32]">
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[13,32]">
                                 <input phone placeholder="Telefonos Contacto">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -523,15 +522,12 @@
 
                             <div layout="column" style="width:{{(cargos.length*40)}}px;">
                                 <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
-                                <div>
-                                 <span style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled || cnt.isAgent==1) || setCargo(cargo)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
-                                        <md-tooltip>
-                                            {{cargo.cargo}}
-                                        </md-tooltip>
-                                 </span>
-                                </div>
+                                <vlc-group skip-tab>
 
+                                     <span info="{{cargo.cargo}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled || cnt.isAgent==1) || setCargo(cargo,$event)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
 
+                                     </span>
+                                </vlc-group>
                                 <!--<md-input-container flex>
                                     <label>cargos</label>
                                     <md-select info="el cargo que desempeña el contacto en el proveedor"  ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>

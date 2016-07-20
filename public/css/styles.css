@@ -830,8 +830,19 @@ md-pagination-wrapper {
 }
 
 .iconInput:focus{
-    background: #f1f1f1;
+    border-bottom:1px solid rgb(84, 180, 234);
 }
+.iconInput.iconCircle:focus{
+    /*background-color: rgb(84, 180, 234);
+    color:white;*/
+    border-color:rgb(84, 180, 234) !important;
+}
+
+/*.iconInput.iconCircle.iconActive:focus{
+    background-color: white;
+    color:rgb(84, 180, 234);
+    border-color:rgb(84, 180, 234) !important;
+}*/
 
 .iconInactive {
     color: #d1d1d1 !important;

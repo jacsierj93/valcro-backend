@@ -384,10 +384,13 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         if(list.index(elem)<list.length-1){
                             if(angular.element(list[list.index(elem)+1]).is("md-select")){
                                 angular.element(list[list.index(elem)+1]).focus().click();
-                            }else{
-
+                            }else if(angular.element(list[list.index(elem)+1]).is("vlc-group")) {
                                 $timeout(function(){
-                                    elem, angular.element(list[list.index(elem)+1]).focus();
+                                    angular.element(list[list.index(elem)+1]).find("span").first().focus();
+                                },0);
+                            }else{
+                                $timeout(function(){
+                                    angular.element(list[list.index(elem)+1]).focus();
                                 },0);
                             }
                         }else{

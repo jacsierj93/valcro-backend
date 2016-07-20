@@ -5,6 +5,24 @@
 //##############################REST service (factory)#############################################3
 //###########################################################################################3
 
+ MyApp.directive('iconGroup', function ($timeout) {
+     return {
+         link: function (scope, elem, attrs,ctrl) {
+             elem.attr("tab-index","-1");
+             elem.bind("keydown",function(e){
+                 if(e.which=="39"){
+                     var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
+                     next[0].focus();
+                 }else if(e.which=="37"){
+                     var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
+                     prev[0].focus();
+                 }
+             });
+
+
+         }
+     };
+ });
 
 MyApp.factory('masters', ['$resource',
     function ($resource) {
@@ -101,7 +119,7 @@ MyApp.service("listCoins",function(providers) {
 });
 
 
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout) {
     $scope.expand = false;
     $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
@@ -275,6 +293,10 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             id: false,
             siglas:""
         });
+        $timeout(function(){
+            angular.element("#provType").focus().click();
+        },50)
+
     };
 
     $scope.editProv = function(){
@@ -1272,11 +1294,10 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     };
     /*funcion que transforma el texto ingresado en el mdchips en un objeto */
     $scope.transformChipEmail = function(chip,erro){
-        console.log(erro)
         if (angular.isObject(chip)) {
             return chip;
         }
-        var reg = new RegExp("^.+@.+\..+$");
+        var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}$");
 
         if(!reg.test(chip)){
             setNotif.addNotif("error", "el email no tiene un formato adecuado", [
@@ -1311,14 +1332,19 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if (angular.isObject(chip)) {
             return chip;
         }
+        var reg = new RegExp("^\\(?\\+[0-9]{1,3}\\-?[0-9]{0,3}[\\)\\-\\s]{1}[0-9\\-]{10}$");
+        if(!reg.test(chip)){
+            setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
+            ],{autohidden:3000});
+            return null ;
+        }
         if(Object.keys(chipCont).length==0){
             var chip = {id:false,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
         }else{
             $scope.cnt.contTelf.splice($scope.cnt.contTelf.indexOf($filter("customFind")($scope.cnt.contTelf,chipCont.$$hashKey,function(e,c){return e.$$hashKey == c})[0]),1);
-            var chip = {  id:chipCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
+            var chip = {id:chipCont.id,valor:chip,cont_id:$scope.cnt.id,prov_id:$scope.prov.id};
             //return null;
         };
-
         chipCont = {};
         return chip;
 
@@ -1392,16 +1418,19 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     });
 
     /*seteado de Cargos para el contacto (tipo departamento nombre valcro*/
-    $scope.setCargo = function(elem){
-        var cargo = elem.id;
-        var k = $scope.cnt.cargo.indexOf(cargo);
-        if(k!=-1){
-            $scope.cnt.cargo.splice(k,1);
-        }else{
-            $scope.cnt.cargo.push(""+cargo);
+    $scope.setCargo = function(elem,e){
+        if(e.keyCode==32 || e.type=="click"){
+            var cargo = elem.id;
+            var k = $scope.cnt.cargo.indexOf(cargo);
+            if(k!=-1){
+                $scope.cnt.cargo.splice(k,1);
+            }else{
+                $scope.cnt.cargo.push(""+cargo);
+            }
+            console.log($scope.provContactosForm)
+            $scope.provContactosForm.$setDirty();
         }
-        console.log($scope.provContactosForm)
-        $scope.provContactosForm.$setDirty();
+
 
     };
 
