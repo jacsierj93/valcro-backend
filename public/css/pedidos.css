@@ -16,6 +16,9 @@
 .doc-Open7{ border: 1px solid #00e10b;color: #00e10b;}/** llegada en <=0 */
 .doc-Open0{ border: 1px solid #00ff00;color: #00ff00;}/** llegada en <=0 */
 
+.not-focus{
+    border: 0px;
+}
 /**celda que contenga imagenes*/
 .cellGridImg{
     align-self: flex-end;
@@ -28,6 +31,12 @@
     width: 24px;
     margin: 0px;
     border: 0px;
+}
+/* para grilla selecionada**/
+.cellSelect:focus{
+    height: 36px;
+    border-right: 1px solid #ccc;
+    margin-top: -7px;
 }
 /**contenedor de la grilla*/
 .gridContent{

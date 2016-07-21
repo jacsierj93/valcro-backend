@@ -569,7 +569,7 @@ class OrderController extends BaseController
             $prod[]= $temp;
         }
         if($model->prov_id != null){
-            $data['proveedor'] ;
+           // $data['proveedor'] ;
         }
 
         $data['adjuntos']= $atts;
@@ -3830,10 +3830,11 @@ class OrderController extends BaseController
         $data =ProviderAddress::where('prov_id', $req->prov_id)->where(
             function ($query){
                 $query->where('tipo_dir',2)->orWhere('tipo_dir',3);
-            })->get();        if($req->has('pais_id')){
-            $data = $data->where('pais_id', $req->pais_id);
+            });
+        if($req->has('pais_id')){
+            $data->where('pais_id', $req->pais_id);
         }
-        return $data;
+        return $data->get();
     }
 
     /**
@@ -3872,10 +3873,7 @@ class OrderController extends BaseController
 
         //////////validation
         $validator = Validator::make($req->all(), [
-            'prov_id' => 'required',
-            'monto' => 'required',
-            'tasa' => 'required',
-            'prov_moneda_id'=> 'required'
+
         ]);
         if ($validator->fails()) { ///ups... erorres
 
@@ -4096,12 +4094,12 @@ class OrderController extends BaseController
             $model->tasa = $req->tasa;
         }
         if($req->has('direccion_facturacion_id')){
-            $model->direccion_facturacion_id = $req->tasa;
+            $model->direccion_facturacion_id = ($req->direccion_facturacion_id."" == "-1") ? null: $req->direccion_facturacion_id ;
         }
 
 
         if($req->has('prov_id')){
-            $model->prov_id = $req->prov_id;
+            $model->prov_id = ($req->prov_id."" == "-1") ? null: $req->prov_id;
         }
         if($req->has('monto')){
             $model->monto = $req->monto;
@@ -4110,13 +4108,13 @@ class OrderController extends BaseController
             $model->tasa = $req->tasa;
         }
         if($req->has('pais_id')){
-            $model->pais_id = $req->pais_id;
+            $model->pais_id = ($req->pais_id."" == "-1") ? null:$req->pais_id;
         }
         if($req->has('condicion_pago_id')){
-            $model->condicion_pago_id = $req->condicion_pago_id;
+            $model->condicion_pago_id = ($req->condicion_pago_id."" == "-1") ? null : $req->condicion_pago_id ;
         }
         if($req->has('prov_moneda_id')){
-            $model->prov_moneda_id = $req->prov_moneda_id;
+            $model->prov_moneda_id = ($req->prov_moneda_id."" == "-1") ? null: $req->prov_moneda_id ;
         }
         if($req->has('nro_proforma')){
             $model->nro_proforma = $req->nro_proforma;
@@ -4131,11 +4129,11 @@ class OrderController extends BaseController
             $model->estado_id = $req->estado_id;
         }
         if($req->has('direccion_almacen_id')){
-            $model->direccion_almacen_id = $req->direccion_almacen_id;
+            $model->direccion_almacen_id = ($req->direccion_almacen_id."" == "-1") ? null :$req->direccion_almacen_id;
         }
-        if($req->has('condicion_id')){
+ /*       if($req->has('condicion_id')){
             $model->condicion_id = $req->condicion_id;
-        }
+        }*/
         if($req->has('mt3')){
             $model->mt3 = $req->mt3;
         }
@@ -4143,7 +4141,7 @@ class OrderController extends BaseController
             $model->peso = $req->peso;
         }
         if($req->has('puerto_id')){
-            $model->puerto_id = $req->puerto_id;
+            $model->puerto_id = ($req->puerto_id."" == "-1") ? null : $req->puerto_id;
         }
         if($req->has('nro_doc')){
             $model->nro_doc = $req->nro_doc;

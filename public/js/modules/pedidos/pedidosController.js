@@ -7,7 +7,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.email= {};
     $scope.email.destinos =[];
     $scope.email.content =[];
-    $scope.formMode = null;
+    $scope.formMode ={};
     $scope.tempDoc= {};
     $scope.emails = [];
     $scope.docImports= [];
@@ -88,7 +88,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.unclosetDoc = [];
     $scope.provDocs = [];
     $scope.provSelec ={};
-    $scope.document  ={};
+    $scope.document  = {};
     $scope.contraPedSelec ={};
     $scope.pedidoSusPedSelec={};
 
@@ -134,6 +134,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         $scope.estadosDoc = masters.query({type: 'getOrderStatus'});
     };
 
+    $scope.redirect = function(data){
+        // ng-click="redirect()"
+        alert("redirect " +data.field);
+        console.log("data sen", data);
+    };
+
+    $scope.calbackPais = function(key){
+        // $scope.formData.paises= Order.query({type:"ProviderCountry",id:});
+
+    };
+
 
     /********************************************GUI ********************************************/
     $scope.FilterListPed = function(){
@@ -172,13 +183,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** ROLLBACK SETTER **/
 
     $scope.toEditHead= function(id,val){
-       // console.log("gloabel", $scope.formGlobal);
+        // console.log("gloabel", $scope.formGlobal);
         if($scope.formGlobal != 'new'){
             setGetOrder.change('document',id,val);
         }
 
     };
-
 
 
     $scope.verificExit = function(){
@@ -317,6 +327,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $scope.formMode=$scope.forModeAvilable.getXValue(document.tipo_value);
                 console.log("hover doc", document);
                 $scope.document=document;
+
                 if($scope.module.layer !='resumenPedido' ){
                     $scope.LayersAction({open:{name:"resumenPedido"}});
                 }
@@ -350,7 +361,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.updateForm = function () {
         $scope.formBlock = false;
-        Order.postMod({type:$scope.formMode.mod,mod:"Update"},{id: $scope.document.id});
+        Order.postMod({type:$scope.formMode.mod,mod:"Update"},{id: $scope.document.id},function(){
+            $scope.isTasaFija=false;
+            var mo= jQuery("#"+$scope.layer).find("md-content");
+            console.log("mo", mo)
+            mo[0].focus();
+        });
         setGetOrder.change("document","final_id", undefined);
     };
     /***@deprecated **/
@@ -574,7 +590,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.menuAgregar= function(){
         $scope.LayersAction({close:"all"});
-        $scope.LayersAction({open:{name:"menuAgr"}});
+        $scope.LayersAction({open:{name:"menuAgr", before: function(){
+            $scope.document = {};
+        }}});
         $scope.gridView=-1;
         $scope.preview =false;
 
@@ -891,1424 +909,1457 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         }
 
 
-};
-
-$scope.addRemoveProd = function (item){
-    if(item.asignado){
-        $timeout(function(){
-            var mo= jQuery("#p"+item.id);
-            mo[0].focus();
-        },100);
-
-    }else if(!item.asignado && item.reng_id){
-        $scope.NotifAction("alert",
-            "Se eliminara el producto del documento ¿Deseas continuar?"
-            ,[
-                {name: 'Ok',
-                    action:function(){
-                        Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
-                            $scope.NotifAction("info",
-                                "Removido"
-                                ,[],{autohidden:autohidden});
-                            setGetOrder.change('producto'+item.id,'id',undefined);
-                        });
-                    }
-                },{name: 'Cancel',
-                    action:function(){item.asignado=true;}
-                }
-            ]);
-    }
-
-};
-
-
-$scope.addRemoveItem = function(item){
-    Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItem"},item, function(response){
-        if(response.accion == "del"){
-            $scope.NotifAction("alert","Eliminado",[],{autohidden:autohidden});
-            setGetOrder.change('producto'+item.id,'id',undefined);
-
-
-        } else if(response.accion == "new"){
-            $scope.NotifAction("alert","Agregado",[],{autohidden:autohidden});
-            item.id=response.id;
-            setGetOrder.change('producto'+item.id,'id',item);
-
-        }
-    });
-};
-
-/**
- * @review
- * */
-$scope.changeItem = function(item){
-    Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
-        setGetOrder.change('producto'+item.id,'id',item);
-    });
-};
-
-
-/**
- * @review
- * */
-$scope.addRemoveCpItem = function(item){
-    console.log(" item ",item);
-    var aux = {
-        asignado:item.asignado,
-        tipo_origen_id: 2,
-        doc_origen_id: item.contra_pedido_id,
-        doc_id: $scope.document.id,
-        cantidad:  item.cantidad,
-        saldo:  item.cantidad,
-        producto_id:  item.producto_id,
-        descripcion:  item.descripcion,
-        id:item.id
-
     };
-    if(item.asignado){
-        if(item.asignadoOtro.length == 0){
-            Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-                if(response.accion == "new"){
-                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-                    item.renglon_id= response.renglon_id;
-                }
 
-            });
-        }else{
-            var text="Este item se encuentra agregado a ";
-            angular.forEach(item.asignadoOtro, function(v,k){
-                text += v[0] +" " + v[1].length +" veces ";
-            });
-            $scope.NotifAction("alert",text,[
-                {name:'Cancelar',default: 2,
-                    action: function(){
+    $scope.addRemoveProd = function (item){
+        if(item.asignado){
+            $timeout(function(){
+                var mo= jQuery("#p"+item.id);
+                mo[0].focus();
+            },100);
 
-                    }
-                },
-                {name:'Continuar de todas formas',
-                    action: function(){
-                        Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-                            if(response.accion == "new"){
-                                $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-                                item.renglon_id= response.renglon_id;
-                            }
-
-                        });
-                    }
-                }
-            ]);
-        }
-    }else if(!item.asignado && item.renglon_id){
-        $scope.NotifAction("alert","Se Removera el articulo",[
-            {name:'Cancelar',default:2,
-                action: function(){
-
-                }
-            },
-            {name:'Continuar',
-                action: function(){
-                    Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-                        if(response.accion == "new"){
-                            $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-                            item.renglon_id= response.renglon_id;
-                        }
-                    });
-
-                }
-            }
-        ]);
-    }
-
-
-
-};
-
-$scope.changeKitchenBox = function (item) {
-    var paso = true;
-    if (item.import) {
-        $scope.NotifAction("error",
-            "Este KitchenBox fue agregado a partir de otra solicitud "
-            , [], {autohidden: autohidden});
-        item.asignado = true;
-        paso = false;
-
-    }
-    if (paso) {
-        item.doc_id = $scope.document.id;
-        if (item.asignado) {
-            if (item.asignadoOtro.length > 0) {
-                $scope.NotifAction("alert",
-                    "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
-                    , [
-                        {
-                            name: 'Si',
-                            action: function () {
-                                Order.postMod({
-                                    type: $scope.formMode.mod,
-                                    mod: "AddkitchenBox"
-                                }, item, function (response) {
-                                    $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
-                                    setGetOrder.change('kitchenBox'+item.id,'id',item);
-                                });
-                            }
-                        }, {
-                            name: 'No',
-                            action: function () {
-                                item.asignado = false;
-                            }
-                        }
-                    ]);
-            } else {
-                Order.postMod({type: $scope.formMode.mod, mod: "AddkitchenBox"}, item, function (response) {
-                    $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
-                    setGetOrder.change('kitchenBox'+item.id,'id',item);
-                });
-            }
-
-        }
-        else {
+        }else if(!item.asignado && item.reng_id){
             $scope.NotifAction("alert",
-                "Se eliminara el KitchenBox ¿Desea continuar?"
-                , [
-                    {
-                        name: 'Ok',
-                        action: function () {
-                            Order.postMod({
-                                type: $scope.formMode.mod,
-                                mod: "RemovekitchenBox"
-                            }, item, function (response) {
-                                setGetOrder.change('kitchenBox'+item.id,'id',undefined);
-                                $scope.NotifAction("ok", "Removido", [], {autohidden: autohidden});
+                "Se eliminara el producto del documento ¿Deseas continuar?"
+                ,[
+                    {name: 'Ok',
+                        action:function(){
+                            Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
+                                $scope.NotifAction("info",
+                                    "Removido"
+                                    ,[],{autohidden:autohidden});
+                                setGetOrder.change('producto'+item.id,'id',undefined);
                             });
                         }
-                    }, {
-                        name: 'Cancel',
-                        action: function () {
-                            item.asignado = true;
-                        }
+                    },{name: 'Cancel',
+                        action:function(){item.asignado=true;}
                     }
                 ]);
         }
 
     };
 
-};
 
-$scope.changePedidoSustituto = function (item) {
+    $scope.addRemoveItem = function(item){
+        Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItem"},item, function(response){
+            if(response.accion == "del"){
+                $scope.NotifAction("alert","Eliminado",[],{autohidden:autohidden});
+                setGetOrder.change('producto'+item.id,'id',undefined);
 
-    if (item.asignado) {
-        Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
-            $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-            $scope.document.id = response.id;
-            setGetOrder.change('pedidoSusti'+item.id,'id',item);
 
+            } else if(response.accion == "new"){
+                $scope.NotifAction("alert","Agregado",[],{autohidden:autohidden});
+                item.id=response.id;
+                setGetOrder.change('producto'+item.id,'id',item);
+
+            }
         });
-    } else {
-        Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
-            $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-            $scope.document.id = response.id;
-            setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
-            $scope.reloadDoc();
+    };
 
+    /**
+     * @review
+     * */
+    $scope.changeItem = function(item){
+        Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
+            setGetOrder.change('producto'+item.id,'id',item);
         });
-    }
+    };
 
-};
 
-/**
- * @deprecated**/
-$scope.changePedidoSustitutoItem = function (item) {
-    item.pedido_id = $scope.document.id;
-    if(item.asignado){
-        if ($scope.FormPedidoSusProduc.$valid) {
-            $http.post("Order/AddOrderSubstituteItem", item)
-                .success(function (response) {
-                    if (item.renglon_id == null) {
-                        $scope.NotifAction("info",
-                            "Asignado"
-                            ,[
-                                {name: 'Ok',
-                                    action:function(){}
+    /**
+     * @review
+     * */
+    $scope.addRemoveCpItem = function(item){
+        console.log(" item ",item);
+        var aux = {
+            asignado:item.asignado,
+            tipo_origen_id: 2,
+            doc_origen_id: item.contra_pedido_id,
+            doc_id: $scope.document.id,
+            cantidad:  item.cantidad,
+            saldo:  item.cantidad,
+            producto_id:  item.producto_id,
+            descripcion:  item.descripcion,
+            id:item.id
+
+        };
+        if(item.asignado){
+            if(item.asignadoOtro.length == 0){
+                Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                    if(response.accion == "new"){
+                        $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                        item.renglon_id= response.renglon_id;
+                    }
+
+                });
+            }else{
+                var text="Este item se encuentra agregado a ";
+                angular.forEach(item.asignadoOtro, function(v,k){
+                    text += v[0] +" " + v[1].length +" veces ";
+                });
+                $scope.NotifAction("alert",text,[
+                    {name:'Cancelar',default: 2,
+                        action: function(){
+
+                        }
+                    },
+                    {name:'Continuar de todas formas',
+                        action: function(){
+                            Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                                if(response.accion == "new"){
+                                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                                    item.renglon_id= response.renglon_id;
                                 }
-                            ],{autohidden:2000});
-                    }
-                    item.renglon_id= response.renglon_id;
-                });
-        }else
-        // if(item.renglon_id == null)
-        {
-            $scope.NotifAction("warn",
-                "El saldo anterior supera la cantidad inicial "
-                ,[
-                    {name: 'Ok',
-                        action:function(){}
-                    }
-                ],{autohidden:2000});
-            $http.post("Order/AddOrderSubstituteItem", item)
-                .success(function (response) {
-                    item.renglon_id= response.renglon_id;
-                });
-        }
-    }else {
-        $scope.NotifAction("alert",
-            "Se eliminara el Pedido a sustituir ¿Desea continuar?"
-            ,[
-                {name: 'Ok',
-                    action:function(){
-                        $http.post("Order/RemoveOrdenItem", {id: item.renglon_id,pedido_id:$scope.document.id})
-                            .success(function (response) {
-                                $scope.NotifAction("info",
-                                    "Removido"
-                                    ,[
-                                        {name: 'Ok',
-                                            action:function(){}
-                                        }
-                                    ],{autohidden:2000});
+
                             });
+                        }
                     }
-                },{name: 'Cancel',
-                    action:function(){}
+                ]);
+            }
+        }else if(!item.asignado && item.renglon_id){
+            $scope.NotifAction("alert","Se Removera el articulo",[
+                {name:'Cancelar',default:2,
+                    action: function(){
+
+                    }
+                },
+                {name:'Continuar',
+                    action: function(){
+                        Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                            if(response.accion == "new"){
+                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+                                item.renglon_id= response.renglon_id;
+                            }
+                        });
+
+                    }
                 }
             ]);
-    }
-
-};
-/*********************************************** EVENTOS FOCUS LOST ***********************************************/
+        }
 
 
-$scope.setProvedor =function(prov, p) {
 
-    $scope.provIndex= angular.copy(p.$index);
+    };
 
-    if($scope.module.layer == "listPedido" ){
-        $scope.provSelec = prov;
-        loadPedidosProvedor(prov.id);
-    }else if($scope.module.layer != "listPedido" && $scope.module.index == 0 ){
-        $scope.navCtrl.value="listPedido";
-        $scope.navCtrl.estado=true;
-        $scope.provSelec = prov;
-    }else{
-        if(!$scope.document.id){
+    $scope.changeKitchenBox = function (item) {
+        var paso = true;
+        if (item.import) {
+            $scope.NotifAction("error",
+                "Este KitchenBox fue agregado a partir de otra solicitud "
+                , [], {autohidden: autohidden});
+            item.asignado = true;
+            paso = false;
+
+        }
+        if (paso) {
+            item.doc_id = $scope.document.id;
+            if (item.asignado) {
+                if (item.asignadoOtro.length > 0) {
+                    $scope.NotifAction("alert",
+                        "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
+                        , [
+                            {
+                                name: 'Si',
+                                action: function () {
+                                    Order.postMod({
+                                        type: $scope.formMode.mod,
+                                        mod: "AddkitchenBox"
+                                    }, item, function (response) {
+                                        $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                                        setGetOrder.change('kitchenBox'+item.id,'id',item);
+                                    });
+                                }
+                            }, {
+                                name: 'No',
+                                action: function () {
+                                    item.asignado = false;
+                                }
+                            }
+                        ]);
+                } else {
+                    Order.postMod({type: $scope.formMode.mod, mod: "AddkitchenBox"}, item, function (response) {
+                        $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                        setGetOrder.change('kitchenBox'+item.id,'id',item);
+                    });
+                }
+
+            }
+            else {
+                $scope.NotifAction("alert",
+                    "Se eliminara el KitchenBox ¿Desea continuar?"
+                    , [
+                        {
+                            name: 'Ok',
+                            action: function () {
+                                Order.postMod({
+                                    type: $scope.formMode.mod,
+                                    mod: "RemovekitchenBox"
+                                }, item, function (response) {
+                                    setGetOrder.change('kitchenBox'+item.id,'id',undefined);
+                                    $scope.NotifAction("ok", "Removido", [], {autohidden: autohidden});
+                                });
+                            }
+                        }, {
+                            name: 'Cancel',
+                            action: function () {
+                                item.asignado = true;
+                            }
+                        }
+                    ]);
+            }
+
+        };
+
+    };
+
+    $scope.changePedidoSustituto = function (item) {
+
+        if (item.asignado) {
+            Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+                $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                $scope.document.id = response.id;
+                setGetOrder.change('pedidoSusti'+item.id,'id',item);
+
+            });
+        } else {
+            Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+                $scope.document.id = response.id;
+                setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
+                $scope.reloadDoc();
+
+            });
+        }
+
+    };
+
+    /**
+     * @deprecated**/
+    $scope.changePedidoSustitutoItem = function (item) {
+        item.pedido_id = $scope.document.id;
+        if(item.asignado){
+            if ($scope.FormPedidoSusProduc.$valid) {
+                $http.post("Order/AddOrderSubstituteItem", item)
+                    .success(function (response) {
+                        if (item.renglon_id == null) {
+                            $scope.NotifAction("info",
+                                "Asignado"
+                                ,[
+                                    {name: 'Ok',
+                                        action:function(){}
+                                    }
+                                ],{autohidden:2000});
+                        }
+                        item.renglon_id= response.renglon_id;
+                    });
+            }else
+            // if(item.renglon_id == null)
+            {
+                $scope.NotifAction("warn",
+                    "El saldo anterior supera la cantidad inicial "
+                    ,[
+                        {name: 'Ok',
+                            action:function(){}
+                        }
+                    ],{autohidden:2000});
+                $http.post("Order/AddOrderSubstituteItem", item)
+                    .success(function (response) {
+                        item.renglon_id= response.renglon_id;
+                    });
+            }
+        }else {
+            $scope.NotifAction("alert",
+                "Se eliminara el Pedido a sustituir ¿Desea continuar?"
+                ,[
+                    {name: 'Ok',
+                        action:function(){
+                            $http.post("Order/RemoveOrdenItem", {id: item.renglon_id,pedido_id:$scope.document.id})
+                                .success(function (response) {
+                                    $scope.NotifAction("info",
+                                        "Removido"
+                                        ,[
+                                            {name: 'Ok',
+                                                action:function(){}
+                                            }
+                                        ],{autohidden:2000});
+                                });
+                        }
+                    },{name: 'Cancel',
+                        action:function(){}
+                    }
+                ]);
+        }
+
+    };
+    /*********************************************** EVENTOS FOCUS LOST ***********************************************/
+
+
+    $scope.setProvedor =function(prov, p) {
+
+        $scope.provIndex= angular.copy(p.$index);
+
+        if($scope.module.layer == "listPedido" ){
             $scope.provSelec = prov;
+            loadPedidosProvedor(prov.id);
+        }else if($scope.module.layer != "listPedido" && $scope.module.index == 0 ){
+            $scope.navCtrl.value="listPedido";
+            $scope.navCtrl.estado=true;
+            $scope.provSelec = prov;
+        }else if($scope.module.index > 0 && !$scope.document.id){
+            $scope.NotifAction("alert", "¿Esta seguro de cambiar de proveedor?",
+                [
+                    {name:"No", action: function(){}},
+                    {name: "Si", default :2, action: function(){$scope.provSelec = prov;}}
+                ]);
+            /*if(){
+             $scope.provSelec = prov;
 
+             }else {
+             $scope.verificExit();
+             }*/
         }else {
             $scope.verificExit();
         }
-    }
 
 
 
-};
+    };
 
-$scope.closeSide = function(){
-    var paso= true;
-    if($scope.document.id){
-        if($scope.layer == 'resumenPedido'  && setGetOrder.getInternalState() != 'new'){
-            paso = false;
+    $scope.closeSide = function(){
+        var paso= true;
+        if($scope.document.id){
+            if($scope.layer == 'resumenPedido'  && setGetOrder.getInternalState() != 'new'){
+                paso = false;
+            }
+
+            if($scope.layer == 'detalleDoc' && $scope.module.historia.indexOf('resumenPedido') == -1 && setGetOrder.getInternalState() != 'new'){
+                paso = false;
+            }
         }
 
-        if($scope.layer == 'detalleDoc' && $scope.module.historia.indexOf('resumenPedido') == -1 && setGetOrder.getInternalState() != 'new'){
-            paso = false;
+        if(!paso){
+            $scope.verificExit();
+        }else {
+            $scope.LayersAction({close:{ search:true}});
         }
-    }
 
-    if(!paso){
-        $scope.verificExit();
-    }else {
-        $scope.LayersAction({close:{ search:true}});
-    }
+    };
 
-};
+    $scope.DtPedido = function (doc) {
+        $scope.document= {};
+        $scope.gridView=-1;
+        var aux= angular.copy(doc);
+        if(doc && $scope.module.index <2){
+            if (segurity('editPedido')) {
+                $scope.document.id=aux.id;
+                $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
+                $scope.preview=false;
+                setGetOrder.setState('select');
+                $scope.formGlobal ="upd";
+                $scope.navCtrl.value="detalleDoc";
+                $scope.navCtrl.estado=true;
+                //$scope.reloadDoc();
+            }
+            else {
+                alert('No tiene suficientes permiso para ejecutar esta accion');
+            }
+        }
+    };
 
-$scope.DtPedido = function (doc) {
-    $scope.document= {};
-    $scope.gridView=-1;
-    var aux= angular.copy(doc);
-    if(doc && $scope.module.index <2){
+    $scope.openTempDoc = function(doc){
+        $scope.gridView=-1;
+        //init();
+        var aux= angular.copy(doc);
         if (segurity('editPedido')) {
+            $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare})[0];
             $scope.document.id=aux.id;
             $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-            $scope.preview=false;
-            setGetOrder.setState('select');
+
+            setGetOrder.setState("select");
             $scope.formGlobal ="upd";
+            $scope.provSelec.id= aux.prov_id;
+            $scope.reloadDoc();
             $scope.navCtrl.value="detalleDoc";
             $scope.navCtrl.estado=true;
-            $scope.reloadDoc();
+
+            //$scope.buildDocChange(doc);
         }
         else {
-            alert('No tiene suficientes permiso para ejecutar esta accion');
+
         }
-    }
-};
-
-$scope.openTempDoc = function(doc){
-    $scope.gridView=-1;
-    //init();
-    var aux= angular.copy(doc);
-    if (segurity('editPedido')) {
-        $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare})[0];
-        $scope.document.isNew=false;
-        $scope.document.id=aux.id;
-        $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-
-        setGetOrder.setState("select");
-        $scope.formGlobal ="upd";
-        //$scope.provSelec.id= aux.prov_id;
-        //$scope.reloadDoc();
-        $scope.navCtrl.value="detalleDoc";
-        $scope.navCtrl.estado=true;
-
-        //$scope.buildDocChange(doc);
-    }
-    else {
-
-    }
 
 
-};
+    };
 
-$scope.buildDocChange  = function(doc){
+    $scope.buildDocChange  = function(doc){
 
-    setGetOrder.addForm('document',doc);
-    angular.forEach(doc.productos.contraPedido, function(v,k){
-        setGetOrder.addForm('contraPedido'+ v.id,v);
+        setGetOrder.addForm('document',doc);
+        angular.forEach(doc.productos.contraPedido, function(v,k){
+            setGetOrder.addForm('contraPedido'+ v.id,v);
 
-    });
-    angular.forEach(doc.productos.kitchenBox, function(v,k){
-        setGetOrder.addForm('kitchenBox'+ v.id,v);
-
-    });
-    angular.forEach(doc.productos.kitchenBox, function(v,k){
-        setGetOrder.addForm('kitchenBox'+ v.id,v);
-
-    });
-    angular.forEach(doc.productos.pedidoSusti, function(v,k){
-        setGetOrder.addForm('pedidoSusti'+ v.id,v);
-
-    });
-
-};
-
-
-$scope.saveFinal = function(){
-    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-
-        if (response.success) {
-            $scope.updateProv();
-            $scope.NotifAction("ok","Finalizado",[
-                {name:"Ok", action: function(){
-                    $scope.LayersAction({close:{first:true, search:true}});
-                    filesService.close();
-
-                }}
-            ],{block:true});
-        }});
-
-
-};
-
-$scope.updateProv= function(){
-    Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
-        var prov = $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0];
-        /*            console.log('original prov', prov);
-         console.log("response data", response);*/
-        angular.forEach(prov,function(v,k){
-            prov[k] = response[k];
         });
-        //  console.log(" final ", $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0]);
-        //$scope.provSelec = response;
-    });
-};
-/****** **************************import  ***************************************/
+        angular.forEach(doc.productos.kitchenBox, function(v,k){
+            setGetOrder.addForm('kitchenBox'+ v.id,v);
+
+        });
+        angular.forEach(doc.productos.kitchenBox, function(v,k){
+            setGetOrder.addForm('kitchenBox'+ v.id,v);
+
+        });
+        angular.forEach(doc.productos.pedidoSusti, function(v,k){
+            setGetOrder.addForm('pedidoSusti'+ v.id,v);
+
+        });
+
+    };
 
 
-$scope.docImport = function (doc){
+    $scope.saveFinal = function(){
+        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
 
-    var url="";
+            if (response.success) {
+                $scope.updateProv();
+                $scope.NotifAction("ok","Finalizado",[
+                    {name:"Ok", action: function(){
+                        $scope.LayersAction({close:{first:true, search:true}});
+                        filesService.close();
 
-    if($scope.formMode.value == 22){
-        url="BetweenOrderToSolicitud";
-    }
-    else{
-        url="BetweenOrderToPurchase";
-    }
-    Order.get({type:url, princ_id:$scope.document.id,impor_id: doc.id}, {},function(response){
-        var errors = response.error;
+                    }}
+                ],{block:true});
+            }});
 
-        if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length == 0 &&  Object.keys(response.items).length == 0 ){
-            $scope.NotifAction("alert"," Sin cambios, ¿Desea que se asigne  la "+$scope.formMode.name+" como origen del nuevo?",
-                [
-                    {name: "Si", default:2,
-                        action:function(){
-                            $scope.document.prov_id=$scope.provSelec.id;
-                            setGetOrder.change("document","doc_parent_id",doc.id);
-                            setGetOrder.setState("upd");
-                            Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                            $scope.NotifAction("ok","Realizado",[
-                                {
-                                    name:"Ok",default:2,
-                                    action: function(){
-                                        $scope.navCtrl.value="detalleDoc";
-                                        $scope.navCtrl.estado=true;
+
+    };
+
+    $scope.updateProv= function(){
+        Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
+           // var prov = $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0];
+            /*            console.log('original prov', prov);
+             console.log("response data", response);*/
+            angular.forEach($scope.provSelec,function(v,k){
+                $scope.provSelec[k] = response[k];
+            });
+           // $scope.provSelec = {};
+            //  console.log(" final ", $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0]);
+            //$scope.provSelec = response;
+        });
+    };
+    /****** **************************import  ***************************************/
+
+
+    $scope.docImport = function (doc){
+
+        var url="";
+
+        if($scope.formMode.value == 22){
+            url="BetweenOrderToSolicitud";
+        }
+        else{
+            url="BetweenOrderToPurchase";
+        }
+        Order.get({type:url, princ_id:$scope.document.id,impor_id: doc.id}, {},function(response){
+            var errors = response.error;
+
+            if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length == 0 &&  Object.keys(response.items).length == 0 ){
+                $scope.NotifAction("alert"," Sin cambios, ¿Desea que se asigne  la "+$scope.formMode.name+" como origen del nuevo?",
+                    [
+                        {name: "Si", default:2,
+                            action:function(){
+                                $scope.document.prov_id=$scope.provSelec.id;
+                                setGetOrder.change("document","doc_parent_id",doc.id);
+                                setGetOrder.setState("upd");
+                                Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                $scope.NotifAction("ok","Realizado",[
+                                    {
+                                        name:"Ok",default:2,
+                                        action: function(){
+                                            $scope.navCtrl.value="detalleDoc";
+                                            $scope.navCtrl.estado=true;
+                                        }
                                     }
-                                }
-                            ] ,{block:true});
+                                ] ,{block:true});
 
-                        }
-                    },
-                    {name: "Cancelar",
-                        action:function(){
+                            }
+                        },
+                        {name: "Cancelar",
+                            action:function(){
 
+                            }
                         }
-                    }
-                ],{block:true});
-        }else if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length == 0 &&  Object.keys(response.items).length > 0 ){
-            $scope.NotifAction("alert"," Se Agregaran " +Object.keys(response.items).length+" productos ",
-                [
-                    {name: "Si", default:2,
+                    ],{block:true});
+            }else if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length == 0 &&  Object.keys(response.items).length > 0 ){
+                $scope.NotifAction("alert"," Se Agregaran " +Object.keys(response.items).length+" productos ",
+                    [
+                        {name: "Si", default:2,
+                            action:function(){
+                                $scope.document.prov_id=$scope.provSelec.id;
+                                var data=  {
+                                    doc_id : $scope.document.id,
+                                    asignado:true,
+                                    items: response.items
+                                };
+                                Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
+                                    if (response.success) {
+                                        $scope.document.productos.todos.push(response.new);
+                                        angular.forEach(response.asignado, function(v,k){
+                                            $scope.document[k]=v;
+                                        });
+                                        Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                        $scope.NotifAction("ok","Realizado",[
+                                            {name:"Ok",default:2, action: function(){
+                                                $scope.LayersAction({close:true});}} ] ,{block:true});
+                                    }
+                                });
+                            }
+                        },
+                        {name: "Cancelar",
+                            action:function(){
+
+                            }
+                        }
+                    ],{block:true});
+            }else
+            if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length > 0 &&  Object.keys(response.items).length > 0){
+
+                $scope.NotifAction("alert"," Se asignaran " +Object.keys(response.items).length+" productos  y se modificaran " +Object.keys(response.asignado).length ,
+                    [
+                        {name: "Si", default:2,
+                            action:function(){
+                                $scope.document.prov_id=$scope.provSelec.id;
+                                var data=  {
+                                    doc_id : $scope.document.id,
+                                    asignado:true,
+                                    items: response.items
+                                };
+                                Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
+                                    if (response.success) {
+                                        $scope.document.productos.todos.push(response.new);
+                                        angular.forEach(response.asignado, function(v,k){
+                                            $scope.document[k]=v;
+                                        });
+                                        Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
+                                        Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
+                                    }
+                                });
+                            }
+                        },
+                        {name: "Cancelar",
+                            action:function(){
+
+                            }
+                        }
+                    ],{block:true});
+
+
+            }else   if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length > 0 &&  Object.keys(response.items).length == 0){
+
+                $scope.NotifAction("alert"," Se modificaran " +Object.keys(response.asignado).length,
+                    [
+                        {name: "Si", default:2,
+                            action:function(){
+                                $scope.document.prov_id=$scope.provSelec.id;
+                                Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
+                                Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
+                            }
+                        },
+                        {name: "Cancelar",
+                            action:function(){
+
+                            }
+                        }
+                    ],{block:true});
+
+
+            }else {
+
+                $scope.NotifAction("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
+                    "\n¿ Que desea hacer ?",[
+                    {name:" Omitir diferencias ",
                         action:function(){
                             $scope.document.prov_id=$scope.provSelec.id;
-                            var data=  {
-                                doc_id : $scope.document.id,
-                                asignado:true,
-                                items: response.items
-                            };
-                            Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
-                                if (response.success) {
-                                    $scope.document.productos.todos.push(response.new);
-                                    angular.forEach(response.asignado, function(v,k){
-                                        $scope.document[k]=v;
-                                    });
-                                    Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                    $scope.NotifAction("ok","Realizado",[
-                                        {name:"Ok",default:2, action: function(){
-                                            $scope.LayersAction({close:true});}} ] ,{block:true});
-                                }
+
+                            angular.forEach(response.asignado, function(v,k){
+                                $scope.document[k]=v;
                             });
-                        }
-                    },
-                    {name: "Cancelar",
-                        action:function(){
-
-                        }
-                    }
-                ],{block:true});
-        }else
-        if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length > 0 &&  Object.keys(response.items).length > 0){
-
-            $scope.NotifAction("alert"," Se asignaran " +Object.keys(response.items).length+" productos  y se modificaran " +Object.keys(response.asignado).length ,
-                [
-                    {name: "Si", default:2,
-                        action:function(){
-                            $scope.document.prov_id=$scope.provSelec.id;
-                            var data=  {
-                                doc_id : $scope.document.id,
-                                asignado:true,
-                                items: response.items
-                            };
-                            Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
-                                if (response.success) {
-                                    $scope.document.productos.todos.push(response.new);
-                                    angular.forEach(response.asignado, function(v,k){
-                                        $scope.document[k]=v;
-                                    });
-                                    Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
-                                    Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                    $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
-                                }
-                            });
-                        }
-                    },
-                    {name: "Cancelar",
-                        action:function(){
-
-                        }
-                    }
-                ],{block:true});
-
-
-        }else   if(Object.keys(errors).length == 0 && Object.keys(response.asignado).length > 0 &&  Object.keys(response.items).length == 0){
-
-            $scope.NotifAction("alert"," Se modificaran " +Object.keys(response.asignado).length,
-                [
-                    {name: "Si", default:2,
-                        action:function(){
                             $scope.document.prov_id=$scope.provSelec.id;
                             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
                             $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
                         }
-                    },
-                    {name: "Cancelar",
+                    }
+                    ,{name:"Dejarme elegir ",
                         action:function(){
-
-                        }
-                    }
-                ],{block:true});
-
-
-        }else {
-
-            $scope.NotifAction("error"," El documento a utilizar posee algunas diferecias que deben revisarse antes de poder importar " +
-                "\n¿ Que desea hacer ?",[
-                {name:" Omitir diferencias ",
-                    action:function(){
-                        $scope.document.prov_id=$scope.provSelec.id;
-
-                        angular.forEach(response.asignado, function(v,k){
-                            $scope.document[k]=v;
-                        });
-                        $scope.document.prov_id=$scope.provSelec.id;
-                        Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
-                        Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
-                    }
-                }
-                ,{name:"Dejarme elegir ",
-                    action:function(){
-                        $scope.NotifAction("error"," ¿Que desea hacer? "
-                            ,[
-                                {name:" Usar solicitud ",
-                                    action:function(){
-                                        $scope.document.prov_id=$scope.provSelec.id;
-                                        angular.forEach(response.asignado, function(v,k){
-                                            $scope.document[k]=v;
-                                        });
-                                        angular.forEach(response.error, function(v,k){
-                                            $scope.document[k]= v[0].key;
-                                        });
-                                        if(response.items.length > 0){
-                                            var data=  {
-                                                doc_id : $scope.document.id,
-                                                asignado:true,
-                                                items: response.items
-                                            };
-                                            Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
-                                                if (response.success) {
-                                                    $scope.document.productos.todos.push(response.new);
-                                                    angular.forEach(response.asignado, function(v,k){
-                                                        $scope.document[k]=v;
-                                                    });
-
-                                                }
+                            $scope.NotifAction("error"," ¿Que desea hacer? "
+                                ,[
+                                    {name:" Usar solicitud ",
+                                        action:function(){
+                                            $scope.document.prov_id=$scope.provSelec.id;
+                                            angular.forEach(response.asignado, function(v,k){
+                                                $scope.document[k]=v;
                                             });
-                                        }
-
-                                        Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
-                                        Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
-                                    }
-                                }
-                                ,{name:"Usar proforma",
-                                    action:function(){
-                                        $scope.document.prov_id=$scope.provSelec.id;
-
-                                        angular.forEach(response.asignado, function(v,k){
-                                            $scope.document[k]=v;
-                                        });
-                                        angular.forEach(response.error, function(v,k){
-                                            $scope.document[k]= v[1].key;
-                                        });
-                                        if(response.items.length > 0){
-                                            var data=  {
-                                                doc_id : $scope.document.id,
-                                                asignado:true,
-                                                items: response.items
-                                            };
-                                            Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
-                                                if (response.success) {
-                                                    $scope.document.productos.todos.push(response.new);
-                                                    angular.forEach(response.asignado, function(v,k){
-                                                        $scope.document[k]=v;
-                                                    });
-
-                                                }
+                                            angular.forEach(response.error, function(v,k){
+                                                $scope.document[k]= v[0].key;
                                             });
-                                        }
+                                            if(response.items.length > 0){
+                                                var data=  {
+                                                    doc_id : $scope.document.id,
+                                                    asignado:true,
+                                                    items: response.items
+                                                };
+                                                Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
+                                                    if (response.success) {
+                                                        $scope.document.productos.todos.push(response.new);
+                                                        angular.forEach(response.asignado, function(v,k){
+                                                            $scope.document[k]=v;
+                                                        });
 
-                                        Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
-                                        Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                        $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
-                                    }
-                                },
-                                {name:"Preguntarme en cada caso("+Object.keys(errors).length+")",action:function(){
-                                    $scope.document.prov_id=$scope.provSelec.id;
-                                    var tasa;
-                                    if(errors.prov_moneda_id){
-                                        var tasa = angular.copy(errors.tasa);
-                                        delete  errors.tasa;
-                                    }
-                                    var direccion_almacen_id = angular.copy(errors.direccion_almacen_id);
-                                    delete  errors.direccion_almacen_id;
-                                    $scope.accions = {
-                                        cancel:false,
-                                        total:Object.keys(errors).length,
-                                        data : new Array()
-                                    };
-                                    $scope.$watchGroup(
-                                        ['accions.cancel',
-                                            'accions.total','accions.data.length'], function(newVal){
-                                            if(newVal[0]){
-                                                $scope.NotifAction("error", "Cancelado",[],{autohidden:autohidden});
-                                                delete $scope.accions;
-                                            }else{
-                                                if(newVal[1] == newVal[2]){
-                                                    angular.forEach($scope.accions.data, function(v,k){
-                                                        $scope.document[v.k]= v.v;
-                                                        setGetOrder.change("document", v.k, v.v);
-                                                    });
-                                                    if(response.items.length > 0){
-                                                        var aux ={}
-                                                        var items = new Array();
-                                                        angular.forEach(response.items ,function (v,k){
-                                                            aux.tipo_origen_id = $scope.forModeAvilable.getXValue($scope.formMode.value - 1 );
-                                                            aux.origen_item_id = v.id;
-                                                            aux.doc_origen_id = doc.id;
-                                                            aux.cantidad = v.saldo;
-                                                            aux.saldo = v.saldo;
-                                                            aux.producto_id = v.producto_id;
-                                                            aux.descripcion = v.descripcion;
-                                                            items.push(aux);
-                                                        });
-                                                        var data=  {
-                                                            doc_id : $scope.document.id,
-                                                            asignado:true,
-                                                            items: items
-                                                        };
-                                                        Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
-                                                            $scope.reloadDoc();
-                                                        });
                                                     }
+                                                });
+                                            }
 
-                                                    Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
-                                                    Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
-                                                    $scope.NotifAction("ok","Realizado",[
-                                                        {name:"Ok",default:2,
-                                                            action: function(){
-                                                                setGetOrder.setState("upd");
-                                                                $scope.navCtrl.value="detalleDoc";
-                                                                $scope.navCtrl.estado = true;
+                                            Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
+                                            Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
+                                        }
+                                    }
+                                    ,{name:"Usar proforma",
+                                        action:function(){
+                                            $scope.document.prov_id=$scope.provSelec.id;
+
+                                            angular.forEach(response.asignado, function(v,k){
+                                                $scope.document[k]=v;
+                                            });
+                                            angular.forEach(response.error, function(v,k){
+                                                $scope.document[k]= v[1].key;
+                                            });
+                                            if(response.items.length > 0){
+                                                var data=  {
+                                                    doc_id : $scope.document.id,
+                                                    asignado:true,
+                                                    items: response.items
+                                                };
+                                                Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
+                                                    if (response.success) {
+                                                        $scope.document.productos.todos.push(response.new);
+                                                        angular.forEach(response.asignado, function(v,k){
+                                                            $scope.document[k]=v;
+                                                        });
+
+                                                    }
+                                                });
+                                            }
+
+                                            Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
+                                            Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                            $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){$scope.LayersAction({close:true});}} ] ,{block:true});
+                                        }
+                                    },
+                                    {name:"Preguntarme en cada caso("+Object.keys(errors).length+")",action:function(){
+                                        $scope.document.prov_id=$scope.provSelec.id;
+                                        var tasa;
+                                        if(errors.prov_moneda_id){
+                                            var tasa = angular.copy(errors.tasa);
+                                            delete  errors.tasa;
+                                        }
+                                        var direccion_almacen_id = angular.copy(errors.direccion_almacen_id);
+                                        delete  errors.direccion_almacen_id;
+                                        $scope.accions = {
+                                            cancel:false,
+                                            total:Object.keys(errors).length,
+                                            data : new Array()
+                                        };
+                                        $scope.$watchGroup(
+                                            ['accions.cancel',
+                                                'accions.total','accions.data.length'], function(newVal){
+                                                if(newVal[0]){
+                                                    $scope.NotifAction("error", "Cancelado",[],{autohidden:autohidden});
+                                                    delete $scope.accions;
+                                                }else{
+                                                    if(newVal[1] == newVal[2]){
+                                                        angular.forEach($scope.accions.data, function(v,k){
+                                                            $scope.document[v.k]= v.v;
+                                                            setGetOrder.change("document", v.k, v.v);
+                                                        });
+                                                        if(response.items.length > 0){
+                                                            var aux ={}
+                                                            var items = new Array();
+                                                            angular.forEach(response.items ,function (v,k){
+                                                                aux.tipo_origen_id = $scope.forModeAvilable.getXValue($scope.formMode.value - 1 );
+                                                                aux.origen_item_id = v.id;
+                                                                aux.doc_origen_id = doc.id;
+                                                                aux.cantidad = v.saldo;
+                                                                aux.saldo = v.saldo;
+                                                                aux.producto_id = v.producto_id;
+                                                                aux.descripcion = v.descripcion;
+                                                                items.push(aux);
+                                                            });
+                                                            var data=  {
+                                                                doc_id : $scope.document.id,
+                                                                asignado:true,
+                                                                items: items
+                                                            };
+                                                            Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
+                                                                $scope.reloadDoc();
+                                                            });
+                                                        }
+
+                                                        Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document);
+                                                        Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
+                                                        $scope.NotifAction("ok","Realizado",[
+                                                            {name:"Ok",default:2,
+                                                                action: function(){
+                                                                    setGetOrder.setState("upd");
+                                                                    $scope.navCtrl.value="detalleDoc";
+                                                                    $scope.navCtrl.estado = true;
+                                                                }
+                                                            }
+                                                        ] ,{block:true});
+                                                    }
+                                                }
+                                            });
+
+                                        if(errors.prov_moneda_id){
+                                            $scope.NotifAction("alert", "Selecione moneda a usar",[
+                                                {name:errors.prov_moneda_id[0].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'prov_moneda_id', v:errors.prov_moneda_id[0].key});
+                                                        if(tasa) {
+                                                            $scope.accions.data.push({k:'tasa', v:parseFloat(tasa[0].key)});
+                                                        }
+                                                        $scope.accions.finish++;
+
+                                                    }
+                                                },
+                                                {name:errors.prov_moneda_id[1].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'prov_moneda_id', v:errors.prov_moneda_id[1].key});
+                                                        if(tasa) {
+                                                            $scope.accions.data.push({k:'tasa', v:parseFloat(tasa[1].key)});
+                                                        }
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.titulo){
+                                            $scope.NotifAction("alert", "Selecione titulo a usar",[
+                                                {name:errors.titulo[0].key,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'titulo', v:errors.titulo[0].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {name:errors.titulo[1].key,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'titulo', v:errors.titulo[1].key});
+                                                        $scope.accions.finish++;
+
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.comentario){
+                                            $scope.NotifAction("alert", "Selecione comentario a usar",[
+                                                {name:errors.comentario[0].key,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'comentario', v:errors.comentario[0].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {name:errors.comentario[1].key,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'comentario', v:errors.comentario[1].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.pais_id){
+                                            $scope.NotifAction("alert", "Selecione pais a usar",[
+                                                {name:errors.pais_id[0].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'pais_id', v:errors.pais_id[0].key});
+                                                        if(direccion_almacen_id){
+                                                            if(direccion_almacen_id){
+                                                                $scope.accions.data.push({k:'direccion_almacen_id', v:errors.direccion_almacen_id[0].key});
                                                             }
                                                         }
-                                                    ] ,{block:true});
-                                                }
-                                            }
-                                        });
-
-                                    if(errors.prov_moneda_id){
-                                        $scope.NotifAction("alert", "Selecione moneda a usar",[
-                                            {name:errors.prov_moneda_id[0].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'prov_moneda_id', v:errors.prov_moneda_id[0].key});
-                                                    if(tasa) {
-                                                        $scope.accions.data.push({k:'tasa', v:parseFloat(tasa[0].key)});
+                                                        $scope.accions.finish++;
                                                     }
-                                                    $scope.accions.finish++;
-
-                                                }
-                                            },
-                                            {name:errors.prov_moneda_id[1].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'prov_moneda_id', v:errors.prov_moneda_id[1].key});
-                                                    if(tasa) {
-                                                        $scope.accions.data.push({k:'tasa', v:parseFloat(tasa[1].key)});
-                                                    }
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-                                    if(errors.titulo){
-                                        $scope.NotifAction("alert", "Selecione titulo a usar",[
-                                            {name:errors.titulo[0].key,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'titulo', v:errors.titulo[0].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {name:errors.titulo[1].key,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'titulo', v:errors.titulo[1].key});
-                                                    $scope.accions.finish++;
-
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-                                    if(errors.comentario){
-                                        $scope.NotifAction("alert", "Selecione comentario a usar",[
-                                            {name:errors.comentario[0].key,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'comentario', v:errors.comentario[0].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {name:errors.comentario[1].key,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'comentario', v:errors.comentario[1].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-
-                                            }
-                                        ]);
-                                    }
-                                    if(errors.pais_id){
-                                        $scope.NotifAction("alert", "Selecione pais a usar",[
-                                            {name:errors.pais_id[0].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'pais_id', v:errors.pais_id[0].key});
-                                                    if(direccion_almacen_id){
+                                                },
+                                                {name:errors.pais_id[1].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'pais_id', v:errors.pais_id[1].key});
                                                         if(direccion_almacen_id){
-                                                            $scope.accions.data.push({k:'direccion_almacen_id', v:errors.direccion_almacen_id[0].key});
+                                                            if(direccion_almacen_id){
+                                                                $scope.accions.data.push({k:'direccion_almacen_id', v:errors.direccion_almacen_id[1].key});
+                                                            }
                                                         }
+                                                        $scope.accions.finish++;
                                                     }
-                                                    $scope.accions.finish++;
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
                                                 }
-                                            },
-                                            {name:errors.pais_id[1].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'pais_id', v:errors.pais_id[1].key});
-                                                    if(direccion_almacen_id){
-                                                        if(direccion_almacen_id){
-                                                            $scope.accions.data.push({k:'direccion_almacen_id', v:errors.direccion_almacen_id[1].key});
-                                                        }
+                                            ]);
+                                        }
+                                        if(errors.condicion_pago_id){
+                                            $scope.NotifAction("alert", "Selecione la condicon de pago a usar",[
+                                                {name:errors.condicion_pago_id[0].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'condicion_pago_id', v:errors.condicion_pago_id[0].key});
+                                                        $scope.accions.finish++;
                                                     }
-                                                    $scope.accions.finish++;
+                                                },
+                                                {name:errors.condicion_pago_id[1].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'condicion_pago_id', v:errors.condicion_pago_id[1].key});
+                                                        $scope.accions.finish++
+
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
                                                 }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-                                    if(errors.condicion_pago_id){
-                                        $scope.NotifAction("alert", "Selecione la condicon de pago a usar",[
-                                            {name:errors.condicion_pago_id[0].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'condicion_pago_id', v:errors.condicion_pago_id[0].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {name:errors.condicion_pago_id[1].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'condicion_pago_id', v:errors.condicion_pago_id[1].key});
-                                                    $scope.accions.finish++
-
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-
-                                    if(errors.direccion_facturacion_id){
-                                        $scope.NotifAction("alert", "Selecione la direcion de facturacion a usar",[
-                                            {name:errors.direccion_facturacion_id[0].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'direccion_facturacion_id', v:errors.direccion_facturacion_id[0].key});
-                                                    $scope.accions.finish++;
-
-                                                }
-                                            },
-                                            {name:errors.direccion_facturacion_id[1].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'direccion_facturacion_id', v:errors.direccion_facturacion_id[1].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-
-                                        ]);
-                                    }
-                                    if(errors.puerto_id){
-                                        $scope.NotifAction("alert", "Selecione el puerto a usar",[
-                                            {name:errors.puerto_id[0].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'puerto_id', v:errors.puerto_id[0].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {name:errors.puerto_id[1].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'puerto_id', v:errors.puerto_id[1].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-                                    if(errors.condicion_id){
-                                        $scope.NotifAction("alert", "Selecione la condicion a usar",[
-                                            {name:errors.condicion_id[0].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'condicion_id', v:errors.condicion_id[0].key});
-                                                    $scope.accions.finish++;
-
-                                                }
-                                            },
-                                            {name:errors.condicion_id[1].text,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'condicion_id', v:errors.condicion_id[1].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-                                    if(errors.tasa){
-                                        $scope.NotifAction("alert", "Selecione la tasa a usar",[
-                                            {name:errors.tasa[0].key,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'tasa', v:errors.tasa[0].key});
-                                                    $scope.accions.finish++;
-
-                                                }
-                                            },
-                                            {name:errors.tasa[1].key,
-                                                action: function(){
-                                                    $scope.accions.data.push({k:'tasa', v:errors.tasa[0].key});
-                                                    $scope.accions.finish++;
-                                                }
-                                            },
-                                            {
-                                                name:"Cancelar",action : function(){$scope.accions.cancel = true;}
-                                            }
-                                        ]);
-                                    }
-                                }
-                                },
-                                {name:"Cancelar",action:function(){}}
-                            ]);
-                    }
-                },
-                {name:"Cancelar",action:function(){}}
-            ]);
-
-        }
-
-    });
-};
-/****** **************************listener ***************************************/
-
-$scope.$watch('provSelec.id',function(nvo){
-
-    var newHash ='prov' + nvo;
-    if ($location.hash() !== newHash) {
-        $location.hash(newHash);
-    } else {
-
-        $anchorScroll();
-    }
-});
-
-
-$scope.$watch("formBlock",function(newVal){
-    if(newVal == true){
-        filesService.setallowUpLoad(false);
-    }else if( newVal == false){
-        filesService.setallowUpLoad(true);
-    }
-
-});
-/** formulario  head*/
-$scope.$watch('document.pais_id', function (newVal) {
-    if(newVal){
-        $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal});
-        /*
-         if($scope.FormHeadDocument.$valid && !$scope.FormHeadDocument.$pristine){
-
-         setGetOrder.addChange({id:"pais_id",value:newVal,text:"Pais"},$scope.formAction,"FormHeadDocument");
-         }*/
-    }
-});
-
-$scope.$watch('navCtrl.estado', function (newState) {
-    if(newState){
-        var newVal  = $scope.navCtrl.value;
-
-        if (newVal != '' && typeof(newVal) !== 'undefined' && newVal != null){
-            switch (newVal){
-                case "detalleDoc":
-                    $scope.LayersAction({search:{name:"detalleDoc",
-                        after: function(){
-                            $scope.FormHeadDocument.$setUntouched();
-                            $scope.FormEstatusDoc.$setUntouched();
-                            $scope.FormAprobCompras.$setUntouched();
-                            $scope.FormCancelDoc.$setUntouched();
-                        }
-                    }})
-                    ;break;
-                case "resumenPedido":
-                    $scope.LayersAction({search:{name:"resumenPedido",
-                        after: function(){
-
-                        }
-                    }});
-                    break;
-                case "listPedido" :
-                    $scope.LayersAction({search:{name:"listPedido",
-                        before: function(){ $scope.provDocs = [];},
-                        after: function(){
-                            loadPedidosProvedor($scope.provSelec.id, function(){
-
-                                if($scope.provDocs.length > 0){
-                                    var mo= jQuery("#doc0");
-                                    console.log("q prov", mo);
-                                    mo[0].focus();
-                                }
-
-                            });
-                            $scope.hoverPreview(true);
-
-
-                        }
-                    }});
-                    break;
-                case "agrContPed":
-                    $scope.LayersAction({search:{name:"agrContPed",
-                        after: function(){
-                            $scope.formData.contraPedido = Order.query({type:"CustomOrders",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
-
-                        }
-                    }});
-                    break;
-                case "agrKitBoxs":
-
-                    $scope.LayersAction({search:{name:"agrKitBoxs",
-                        after: function(){
-                            $scope.formData.kitchenBox = Order.query({type:"KitchenBoxs",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
-                        }
-                    }});
-                    break;
-                case "listProducProv":
-
-                    break;
-                case "listImport":
-                    $scope.LayersAction({search:{name:"listImport",
-                        after: function(){
-                            if($scope.formMode.value !=21){
-                                var url='';
-                                switch ($scope.formMode.value){
-                                    case  22: url = "SolicitudeToImport";break;
-                                    case  23: url = "OrderToImport";break;
-                                }
-                                Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id},{},function(response){
-                                    var data = new Array();
-                                    var aux ={};
-                                    angular.forEach(response,function(v,k){
-                                        aux = v;
-                                        if(v.fecha_aprob_compra =! null && v.fecha_aprob_compra ){
-                                            aux.fecha_aprob_compra= DateParse.toDate(v.fecha_aprob_compra);
+                                            ]);
                                         }
 
-                                        if(v.ult_revision =! null && v.ult_revision ){
-                                            aux.ult_revision= DateParse.toDate(v.ult_revision);
+                                        if(errors.direccion_facturacion_id){
+                                            $scope.NotifAction("alert", "Selecione la direcion de facturacion a usar",[
+                                                {name:errors.direccion_facturacion_id[0].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'direccion_facturacion_id', v:errors.direccion_facturacion_id[0].key});
+                                                        $scope.accions.finish++;
+
+                                                    }
+                                                },
+                                                {name:errors.direccion_facturacion_id[1].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'direccion_facturacion_id', v:errors.direccion_facturacion_id[1].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+                                                }
+
+                                            ]);
                                         }
-                                        if(v.emision =! null && v.emision ){
-                                            aux.emision= DateParse.toDate(v.emision);
+                                        if(errors.puerto_id){
+                                            $scope.NotifAction("alert", "Selecione el puerto a usar",[
+                                                {name:errors.puerto_id[0].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'puerto_id', v:errors.puerto_id[0].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {name:errors.puerto_id[1].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'puerto_id', v:errors.puerto_id[1].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+                                                }
+                                            ]);
                                         }
-                                        data.push(aux);
-                                    });
-                                    $scope.docImports = data;
-                                });
-                            }
+                                        if(errors.condicion_id){
+                                            $scope.NotifAction("alert", "Selecione la condicion a usar",[
+                                                {name:errors.condicion_id[0].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'condicion_id', v:errors.condicion_id[0].key});
+                                                        $scope.accions.finish++;
+
+                                                    }
+                                                },
+                                                {name:errors.condicion_id[1].text,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'condicion_id', v:errors.condicion_id[1].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+                                                }
+                                            ]);
+                                        }
+                                        if(errors.tasa){
+                                            $scope.NotifAction("alert", "Selecione la tasa a usar",[
+                                                {name:errors.tasa[0].key,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'tasa', v:errors.tasa[0].key});
+                                                        $scope.accions.finish++;
+
+                                                    }
+                                                },
+                                                {name:errors.tasa[1].key,
+                                                    action: function(){
+                                                        $scope.accions.data.push({k:'tasa', v:errors.tasa[0].key});
+                                                        $scope.accions.finish++;
+                                                    }
+                                                },
+                                                {
+                                                    name:"Cancelar",action : function(){$scope.accions.cancel = true;}
+                                                }
+                                            ]);
+                                        }
+                                    }
+                                    },
+                                    {name:"Cancelar",action:function(){}}
+                                ]);
                         }
-                    }});
-                    break;
-                case "listEmailsImport":
-                    $scope.LayersAction({search:{name:"listEmailsImport",
-                        after: function(){
-
-                        }
-                    }});
-                    break;
-                case "agrPed":
-
-                    break;
-                case "finalDoc":
-                    $scope.LayersAction({search:{name:"finalDoc",
-                        after: function(){
-
-                            if(  setGetOrder.getState() != "built"){
-
-                                $scope.finalDoc = $scope.buildfinalDoc();
-                                Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
-                                    $scope.finalDoc.productos= response.productos;
-                                    $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
-                                    $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
-
-                                });
-                                setGetOrder.setState("built")
-                            }
-                        },
-                        before: function(){
-                            $scope.reloadDoc();
-                        }
-                    }});
-                    break;
-                case "agrPedPend":
-                    $scope.LayersAction({search:{name:"agrPedPend",
-                        after: function(){
-                            $scope.docsSustitos = Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id});
-                        }
-                    }});
-                    break;
-                case  "close":
-                    if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal !='new' && $scope.document.final_id){
-                        $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
-                    }else {
-
-                        $scope.saveFinal();
-                    }
-                    break;
-                case "unclosetDoc":
-                    $scope.LayersAction({search:{name:"unclosetDoc",
-                        after: function(){
-                            $scope.unclosetDoc =[];
-                            Order.query({type:"UnClosetDoc"},{},function(response){
-
-                                angular.forEach(response, function(v){
-                                    v.emision= DateParse.toDate(v.emision);
-                                    $scope.unclosetDoc.push(v);
-                                });
-                                if($scope.unclosetDoc.length == 0){
-                                    $scope.LayersAction({close:{search:true}});
-                                }
-
-                                // $scope.unclosetDoc =
-
-                            });
-                            $scope.tempDoc= {};
-
-                        }
-                    }});
-                    break;
-                default : $scope.LayersAction({close:true});
-
+                    },
+                    {name:"Cancelar",action:function(){}}
+                ]);
 
             }
 
-            /***   multiples */
-            if(newVal == "agrPed" || newVal == "newVal" || newVal == "finalDoc" || newVal == "detalleDoc"){
-                if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
-                    $scope.reloadDoc();
-                }
-            }
-
-        }
-    }
-    $scope.navCtrl.estado=false;
-});
-
-$scope.$watch('document.direccion_almacen_id', function (newVal) {
-    if(newVal){
-        $scope.formData.puertos =  Order.get({type:"AdrressPorts"});
-    }
-});
-
-$scope.$watch('document.prov_moneda_id', function (newVal) {
-    if(newVal){
-        masters.get({type:'getCoin',id:newVal},{}, function(response){
-            var tasa = parseFloat(response.precio_usd);
-            if(!$scope.document.tasa || $scope.formGlobal == "new"){
-                $scope.document.tasa = tasa;
-            }else {
-                if(tasa != $scope.document.tasa  && !$scope.formBlock){
-                    $scope.NotifAction("alert","La tasa fue cambiada segun moneda selecionada ",[],{autohidden:autohidden});
-                    $scope.document.tasa = tasa;
-                    $scope.isTasaFija= true;
-                }
-            }
         });
-    }
-});
+    };
+    /****** **************************listener ***************************************/
 
+    $scope.$watch('provSelec.id',function(nvo){
 
-$scope.$watch('provSelec.id', function (newVal) {
-    if(newVal){
-        $scope.formData.direccionesFact= Order.query({type:"InvoiceAddress", prov_id:newVal});
-        $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal});
-        $scope.formData.paises= Order.query({type:"ProviderCountry",id:newVal});
-        $scope.formData.condicionPago= Order.query({type:"ProviderPaymentCondition", id:newVal});
-        /* if($scope.layer != "detalleDoc" && $scope.document.id && $scope.layer != "detalleDoc" ){
-         setGetOrder.restore();
-         $scope.document={};
-         }*/
-    }
+        if(nvo && nvo != "-1" && $scope.layer!= "detalleDoc"){
+            var newHash ='prov' + nvo;
+            if ($location.hash() !== newHash) {
+                $location.hash(newHash);
+            } else {
 
-});
-
-/**layers
- working
- * */
-$scope.$watchGroup(['module.index','module.layer'], function(newVal, oldVal){
-    $scope.layer= newVal[1];
-    $scope.index= newVal[0];
-
-    if(newVal[0]  == 0 ){
-        $scope.provSelec ={};
-        $scope.reviewDoc();
-
-        //        $timeout(function(){$scope.reviewDoc()},1000);
-        $scope.provIndex = null;
-        $scope.tempDoc= {};
-    }
-
-    if(newVal[0] == 0 || newVal[0] == 1){
-
-
-        if($scope.layer != "detalleDoc"){
-            $scope.gridView=-1;
-            $scope.imagenes = [];
-            $scope.formBlock = true;
-            $scope.isTasaFija= true;
-            setGetOrder.restore();
+                $anchorScroll();
+            }
+        }else if(nvo == "-1"){
+            $scope.redirect({module:'proveedor', field:'proveedor', origen:$scope.document, response:$scope.calbackPais});
         }
-
-    }
-
-    if(newVal[1] == "unclosetDoc"){
-        setGetOrder.restore();
-        $scope.document={};
-    }
-});
-
-$scope.reloadDoc = function(){
-    Order.get({type:"Document", id:$scope.document.id,tipo:$scope.formMode.value}, {},function(response){
-        $scope.document= response;
-
-        $scope.document.emision=DateParse.toDate(response.emision);
-        $scope.document.monto=parseFloat(response.monto);
-        $scope.document.tasa=parseFloat(response.tasa);
-        if(response.fecha_aprob_compra =! null && response.fecha_aprob_compra ){
-            $scope.document.fecha_aprob_compra= DateParse.toDate(response.fecha_aprob_compra);
-        }
-
-        if(response.ult_revision =! null && response.ult_revision ){
-            $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
-        }
-
-        if(setGetOrder.getState() =="select"){
-
-            $scope.buildDocChange($scope.document);
-
-        }
-        setGetOrder.setState("load");
-
 
     });
-};
 
-/******************************** GUARDADOS ***************************************/
+    $scope.$watch('provSelec.id', function (newVal) {
+        if(newVal){
+            $scope.formData.direccionesFact= Order.query({type:"InvoiceAddress", prov_id:newVal});
+            $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal});
+            $scope.formData.paises= Order.query({type:"ProviderCountry",id:newVal});
+            $scope.formData.condicionPago= Order.query({type:"ProviderPaymentCondition", id:newVal});
+            /* if($scope.layer != "detalleDoc" && $scope.document.id && $scope.layer != "detalleDoc" ){
+             setGetOrder.restore();
+             $scope.document={};
+             }*/
+        }
 
-var timeSave ;
-$scope.$watchGroup(['FormHeadDocument.$valid', 'FormHeadDocument.$pristine'], function (nuevo) {
+    });
+
+    $scope.$watch('document.pais_id', function (newVal) {
+        if(newVal && newVal != "-1"){
+            $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal});
+
+        }else if(newVal == "-1"){
+            $scope.redirect({module:'proveedor', field:'pais', origen:$scope.document, response:$scope.calbackPais});
+        }
+    });
+
+    $scope.$watch('document.direccion_almacen_id', function (newVal) {
+        if(newVal && newVal != "-1"){
+            $scope.formData.puertos =  Order.query({type:"AdrressPorts", id: newVal});
+        }
+        else if(newVal == "-1"){
+            $scope.redirect({module:'proveedor', field:'almacen', origen:$scope.document, response:$scope.calbackPais});
+        }
+    });
+
+    $scope.$watch('document.direccion_facturacion_id', function (newVal) {
+         if(newVal == "-1"){
+            $scope.redirect({module:'proveedor', field:'direccion_facturacion', origen:$scope.document, response:$scope.calbackPais});
+        }
+    });
+
+    $scope.$watch('document.prov_moneda_id', function (newVal) {
+        if(newVal && newVal != "-1"){
+            masters.get({type:'getCoin',id:newVal},{}, function(response){
+                var tasa = parseFloat(response.precio_usd);
+                if(!$scope.document.tasa || $scope.formGlobal == "new"){
+                    $scope.document.tasa = tasa;
+                }else {
+                    if(tasa != $scope.document.tasa  && !$scope.formBlock){
+                        $scope.NotifAction("alert","La tasa fue cambiada segun moneda selecionada ",[],{autohidden:autohidden});
+                        $scope.document.tasa = tasa;
+                        $scope.isTasaFija= true;
+                    }
+                }
+            });
+        }else if(newVal == "-1"){
+            $scope.redirect({module:'proveedor', field:'moneda', origen:$scope.document, response:$scope.calbackPais});
+        }
+    });
+
+    $scope.$watch('document.condicion_pago_id', function (newVal) {
+        if(newVal == "-1"){
+            $scope.redirect({module:'proveedor', field:'condicion_pago', origen:$scope.document, response:$scope.calbackPais});
+        }
+    });
+
+
+    $scope.$watch('navCtrl.estado', function (newState) {
+        if(newState){
+            var newVal  = $scope.navCtrl.value;
+
+            if (newVal != '' && typeof(newVal) !== 'undefined' && newVal != null){
+                switch (newVal){
+                    case "detalleDoc":
+                        $scope.LayersAction({search:{name:"detalleDoc",
+                            before: function(){
+                                $scope.FormHeadDocument.$setUntouched();
+                                $scope.FormEstatusDoc.$setUntouched();
+                                $scope.FormAprobCompras.$setUntouched();
+                                $scope.FormCancelDoc.$setUntouched();
+                            },
+                            after: function(){
+                                $scope.isTasaFija=true;
+                                var mo= jQuery("#prov_id");
+                                console.log("proveedor ", mo);
+                                mo[0].focus();
+                            }
+                        }})
+                        ;break;
+                    case "resumenPedido":
+                        $scope.LayersAction({search:{name:"resumenPedido",
+                            after: function(){
+
+                            }
+                        }});
+                        break;
+                    case "listPedido" :
+                        $scope.LayersAction({search:{name:"listPedido",
+                            before: function(){ $scope.provDocs = [];},
+                            after: function(){
+                                loadPedidosProvedor($scope.provSelec.id, function(){
+
+                                    if($scope.provDocs.length > 0){
+                                        // var mo= jQuery("#doc0");
+                                        //mo[0].focus();
+                                    }
+
+                                });
+                                $scope.hoverPreview(true);
+
+
+                            }
+                        }});
+                        break;
+                    case "agrContPed":
+                        $scope.LayersAction({search:{name:"agrContPed",
+                            after: function(){
+                                $scope.formData.contraPedido = Order.query({type:"CustomOrders",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
+
+                            }
+                        }});
+                        break;
+                    case "agrKitBoxs":
+
+                        $scope.LayersAction({search:{name:"agrKitBoxs",
+                            after: function(){
+                                $scope.formData.kitchenBox = Order.query({type:"KitchenBoxs",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
+                            }
+                        }});
+                        break;
+                    case "listProducProv":
+
+                        break;
+                    case "listImport":
+                        $scope.LayersAction({search:{name:"listImport",
+                            after: function(){
+                                if($scope.formMode.value !=21){
+                                    var url='';
+                                    switch ($scope.formMode.value){
+                                        case  22: url = "SolicitudeToImport";break;
+                                        case  23: url = "OrderToImport";break;
+                                    }
+                                    Order.query({type: url, id:$scope.document.id,tipo:$scope.formMode.value, prov_id:$scope.provSelec.id},{},function(response){
+                                        var data = new Array();
+                                        var aux ={};
+                                        angular.forEach(response,function(v,k){
+                                            aux = v;
+                                            if(v.fecha_aprob_compra =! null && v.fecha_aprob_compra ){
+                                                aux.fecha_aprob_compra= DateParse.toDate(v.fecha_aprob_compra);
+                                            }
+
+                                            if(v.ult_revision =! null && v.ult_revision ){
+                                                aux.ult_revision= DateParse.toDate(v.ult_revision);
+                                            }
+                                            if(v.emision =! null && v.emision ){
+                                                aux.emision= DateParse.toDate(v.emision);
+                                            }
+                                            data.push(aux);
+                                        });
+                                        $scope.docImports = data;
+                                    });
+                                }
+                            }
+                        }});
+                        break;
+                    case "listEmailsImport":
+                        $scope.LayersAction({search:{name:"listEmailsImport",
+                            after: function(){
+
+                            }
+                        }});
+                        break;
+                    case "agrPed":
+
+                        break;
+                    case "finalDoc":
+                        $scope.LayersAction({search:{name:"finalDoc",
+                            after: function(){
+
+                                if(  setGetOrder.getState() != "built"){
+
+                                    $scope.finalDoc = $scope.buildfinalDoc();
+                                    Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
+                                        $scope.finalDoc.productos= response.productos;
+                                        $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
+                                        $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
+
+                                    });
+                                    setGetOrder.setState("built")
+                                }
+                            },
+                            before: function(){
+                                $scope.reloadDoc();
+                            }
+                        }});
+                        break;
+                    case "agrPedPend":
+                        $scope.LayersAction({search:{name:"agrPedPend",
+                            after: function(){
+                                $scope.docsSustitos = Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id});
+                            }
+                        }});
+                        break;
+                    case  "close":
+                        if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal !='new' && $scope.document.final_id){
+                            $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
+                        }else {
+
+                            $scope.saveFinal();
+                        }
+                        break;
+                    case "unclosetDoc":
+                        $scope.LayersAction({search:{name:"unclosetDoc",
+                            after: function(){
+                                $scope.unclosetDoc =[];
+                                Order.query({type:"UnClosetDoc"},{},function(response){
+
+                                    angular.forEach(response, function(v){
+                                        v.emision= DateParse.toDate(v.emision);
+                                        $scope.unclosetDoc.push(v);
+                                    });
+                                    if($scope.unclosetDoc.length == 0){
+                                        $scope.LayersAction({close:{search:true}});
+                                    }
+
+                                    // $scope.unclosetDoc =
+
+                                });
+                                $scope.tempDoc= {};
+
+                            }
+                        }});
+                        break;
+                    default : $scope.LayersAction({close:true});
+
+
+                }
+
+                /***   multiples */
+                if(newVal == "agrPed" || newVal == "newVal" || newVal == "finalDoc" || newVal == "detalleDoc"){
+                    if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
+                        $scope.reloadDoc();
+                    }
+                }
+
+            }
+        }
+        $scope.navCtrl.estado=false;
+    });
+
+    $scope.$watch("formBlock",function(newVal){
+        if(newVal == true){
+            filesService.setallowUpLoad(false);
+        }else if( newVal == false){
+            filesService.setallowUpLoad(true);
+        }
+
+    });
+
+    /**layers
+     working
+     * */
+    $scope.$watchGroup(['module.index','module.layer'], function(newVal, oldVal){
+        $scope.layer= newVal[1];
+        $scope.index= newVal[0];
+
+        if(newVal[0]  == 0 ){
+            $scope.provSelec ={};
+            $scope.reviewDoc();
+
+            //        $timeout(function(){$scope.reviewDoc()},1000);
+            $scope.provIndex = null;
+            $scope.tempDoc= {};
+        }
+
+        if(newVal[0] == 0 || newVal[0] == 1){
+
+
+            if($scope.layer != "detalleDoc"){
+                $scope.gridView=-1;
+                $scope.imagenes = [];
+                $scope.formBlock = true;
+                $scope.isTasaFija= true;
+                setGetOrder.restore();
+            }
+
+        }
+
+        if(newVal[1] == "unclosetDoc"){
+            setGetOrder.restore();
+            $scope.document={};
+        }
+    });
+
+
+    $scope.reloadDoc = function(){
+        Order.get({type:"Document", id:$scope.document.id,tipo:$scope.formMode.value}, {},function(response){
+            $scope.document= response;
+
+            $scope.document.emision=DateParse.toDate(response.emision);
+            $scope.document.monto=parseFloat(response.monto);
+            $scope.document.tasa=parseFloat(response.tasa);
+            if(response.fecha_aprob_compra =! null && response.fecha_aprob_compra ){
+                $scope.document.fecha_aprob_compra= DateParse.toDate(response.fecha_aprob_compra);
+            }
+
+            if(response.ult_revision =! null && response.ult_revision ){
+                $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
+            }
+
+            if(setGetOrder.getState() =="select"){
+
+                $scope.buildDocChange($scope.document);
+
+            }
+            setGetOrder.setState("load");
+            setGetOrder.setOrder(angular.copy( $scope.document));
+
+
+        });
+    };
+
+    /******************************** GUARDADOS ***************************************/
+
+    var timeSave ;
+    $scope.$watchGroup(['FormHeadDocument.$valid', 'FormHeadDocument.$pristine'], function (nuevo) {
 
 //        console.log(" form head ", nuevo);
 
-    if (nuevo[0] && !nuevo[1]) {
+        if (nuevo[0] && !nuevo[1]) {
 
-        if(timeSave){
-            $timeout.cancel(timeSave);
-        }
-        timeSave =$timeout(function(){
-            $scope.document.prov_id = angular.copy($scope.provSelec.id);
-            Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
-                if (response.success) {
-                    $scope.document.id = response.id;
-                    $scope.FormHeadDocument.$setPristine();
-                    if(response['action'] == 'new'){
-                        $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
-                        setGetOrder.addForm('document',$scope.document);
-                        setGetOrder.setState('load');
-                        $scope.reloadDoc();
+            if(timeSave){
+                $timeout.cancel(timeSave);
+            }
+            timeSave =$timeout(function(){
+                $scope.document.prov_id = angular.copy($scope.provSelec.id);
+                Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(response){
+                    if (response.success) {
+                        $scope.document.id = response.id;
+                        $scope.FormHeadDocument.$setPristine();
+                        if(response['action'] == 'new'){
+                            $scope.NotifAction("ok","Creado, Puede continuar",[],{autohidden:autohidden});
+                            setGetOrder.addForm('document',$scope.document);
+                            setGetOrder.setState('load');
+                            $scope.reloadDoc();
+                        }
+                        console.log(" save");
+
                     }
-                    console.log(" save");
+                });
+            },500);
+
+        }
+
+    });
+
+
+    $scope.$watchGroup(['FormEstatusDoc.$valid', 'FormEstatusDoc.$pristine'], function (nuevo) {
+
+        if (nuevo[0] && !nuevo[1]) {
+
+            $scope.document.prov_id = $scope.provSelec.id;
+            //{id:$scope.document.id, estado_id:$scope.document.estado_id}
+            Order.postMod({type:$scope.formMode.mod, mod:"SetStatus"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
+                if (response.success) {
+                    setGetOrder.change("document","estado",response.item.estado);
+                    $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+                    $scope.FormEstatusDoc.$setPristine();
 
                 }
-            });
-        },500);
 
+            });
+        }
+    });
+
+
+
+    $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
+
+        if (nuevo[0] && !nuevo[1]) {
+
+            /* $scope.document.prov_id = $scope.provSelec.id;
+             //{id:$scope.document.id, estado_id:$scope.document.estado_id}
+             Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
+             if (response.success) {
+             $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+             }
+
+             });*/
+        }
+
+
+    });
+
+
+
+    /**************************** Conversiones ****************/
+    $scope.odcEstatus = function (odc) {
+        if (odc.aprobada == '1') {
+            return 'Aprobada';
+        } else {
+            return 'No Aprobada';
+        }
     }
 
-});
+
+    /*********************************  peticiones  carga $http ********************* ************/
+
+    $scope.removeList= function(item){
+
+        $scope.NotifAction("alert",
+            "Se removera todos los productos asociados ¿Desea continuar?"
+            ,[
+                {name: 'Ok',
+                    action:function(){
+                        /*  var url="RemoveToOrden";
+                         var id=item.id;
+                         if(item.tipo_origen_id == 4){
+                         url="RemoveOrdenItem";
+                         id=item.renglon_id;
+                         }
+                         $http.post("Order/"+url, {id: id, pedido_id: $scope.document.id})
+                         .success(function (response) {
+                         $scope.NotifAction("alert","Removido",[],{autohidden:autohidden});
+                         loadPedido($scope.document.id);
+                         });*/
+                    }
+                },{name: 'Cancel',action:function(){}}
+            ]);
+
+    };
 
 
-$scope.$watchGroup(['FormEstatusDoc.$valid', 'FormEstatusDoc.$pristine'], function (nuevo) {
+    function loadPedidosProvedor(id, callback){
+        $scope.provDocs = [];
+        Order.query({type:"OrderProvOrder", id:id}, {},function(response){
 
-    if (nuevo[0] && !nuevo[1]) {
+            angular.forEach(response, function (v, k) {
+                v.emision= DateParse.toDate(v.emision);
+                v.monto= parseFloat(v.monto);
+                v.tasa= parseFloat(v.tasa);
+                if(v.ult_revision){
+                    v.ult_revision= DateParse.toDate(v.ult_revision);
+                }
+                // v.isNew=false;
+                $scope.provDocs.push(v);
 
-        $scope.document.prov_id = $scope.provSelec.id;
-        //{id:$scope.document.id, estado_id:$scope.document.estado_id}
-        Order.postMod({type:$scope.formMode.mod, mod:"SetStatus"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
-            if (response.success) {
-                setGetOrder.change("document","estado",response.item.estado);
-                $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
-                $scope.FormEstatusDoc.$setPristine();
-
+            });
+            if(callback){
+                callback();
             }
 
+            // $scope.provSelec.pedidos=items;
         });
     }
-});
 
+    /*@deprecated*/
+    function  loadOrdenesDeCompraProveedor(id){
 
+        $http({
+            method: 'POST',
+            url: 'Order/ProviderOrder',
+            data:{prov_id:id, pedido_id: $scope.document.id}
+        }).then(function successCallback(response) {
+            var odcs= new Array();
+            for(var i=0;i<response.data.length;i++){
+                var odc=response.data[i];
+                odc.asig=false;
+                if(odc.asignado != 0){
+                    odc.asig=true;
+                }
+                odcs.push(odc);
+            }
+            $scope.formData.odc=odcs;
+        }, function errorCallback(response) {
+        })
+    }
 
-$scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
+    /**@deprecated*/
+    function loadOdc(id){
 
-    if (nuevo[0] && !nuevo[1]) {
-
-        /* $scope.document.prov_id = $scope.provSelec.id;
-         //{id:$scope.document.id, estado_id:$scope.document.estado_id}
-         Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
-         if (response.success) {
-         $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
-         }
-
+        $http({
+            method: 'POST',
+            url: 'Order/PurchaseOrder',
+            data:{id:id}
+        }).then(function successCallback(response) {
+            $scope.odcSelec= response.data;
+        }, function errorCallback(response) {
+        });
+    }
+    function loadContraPedidosProveedor(id){
+        /* $http.get("Order/CustomOrders",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}})
+         .success(function (response) {
+         $scope.formData.contraPedido= response;
          });*/
     }
 
+    function loadkitchenBoxProveedor(id){
 
-});
-
-
-
-/**************************** Conversiones ****************/
-$scope.odcEstatus = function (odc) {
-    if (odc.aprobada == '1') {
-        return 'Aprobada';
-    } else {
-        return 'No Aprobada';
+        $http.get("Order/KitchenBoxs",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
+            $scope.formData.kitchenBox= response;
+            $scope.formData.kitchenBox.fecha = Date.parse(response.fecha);        });
     }
-}
+    /*
+     function loadPedidosASustituir(id){
+     $http.get("Order/OrderSubstitutes",{params:{prov_id:id, pedido_id: $scope.document.id}}).success(function (response) {
+     $scope.formData.pedidoSust= response;
 
+     });
+     }*/
 
-/*********************************  peticiones  carga $http ********************* ************/
+    /*********************************  peticiones  guardado $http ********************* ************/
 
-$scope.removeList= function(item){
-
-    $scope.NotifAction("alert",
-        "Se removera todos los productos asociados ¿Desea continuar?"
-        ,[
-            {name: 'Ok',
-                action:function(){
-                    /*  var url="RemoveToOrden";
-                     var id=item.id;
-                     if(item.tipo_origen_id == 4){
-                     url="RemoveOrdenItem";
-                     id=item.renglon_id;
-                     }
-                     $http.post("Order/"+url, {id: id, pedido_id: $scope.document.id})
-                     .success(function (response) {
-                     $scope.NotifAction("alert","Removido",[],{autohidden:autohidden});
-                     loadPedido($scope.document.id);
-                     });*/
-                }
-            },{name: 'Cancel',action:function(){}}
-        ]);
-
-};
-
-
-function loadPedidosProvedor(id, callback){
-    $scope.provDocs = [];
-    Order.query({type:"OrderProvOrder", id:id}, {},function(response){
-
-        angular.forEach(response, function (v, k) {
-            v.emision= DateParse.toDate(v.emision);
-            v.monto= parseFloat(v.monto);
-            v.tasa= parseFloat(v.tasa);
-            if(v.ult_revision){
-                v.ult_revision= DateParse.toDate(v.ult_revision);
-            }
-            // v.isNew=false;
-            $scope.provDocs.push(v);
-
-        });
-        if(callback){
-            callback();
-        }
-
-        // $scope.provSelec.pedidos=items;
-    });
-}
-
-/*@deprecated*/
-function  loadOrdenesDeCompraProveedor(id){
-
-    $http({
-        method: 'POST',
-        url: 'Order/ProviderOrder',
-        data:{prov_id:id, pedido_id: $scope.document.id}
-    }).then(function successCallback(response) {
-        var odcs= new Array();
-        for(var i=0;i<response.data.length;i++){
-            var odc=response.data[i];
-            odc.asig=false;
-            if(odc.asignado != 0){
-                odc.asig=true;
-            }
-            odcs.push(odc);
-        }
-        $scope.formData.odc=odcs;
-    }, function errorCallback(response) {
-    })
-}
-
-/**@deprecated*/
-function loadOdc(id){
-
-    $http({
-        method: 'POST',
-        url: 'Order/PurchaseOrder',
-        data:{id:id}
-    }).then(function successCallback(response) {
-        $scope.odcSelec= response.data;
-    }, function errorCallback(response) {
-    });
-}
-function loadContraPedidosProveedor(id){
-    /* $http.get("Order/CustomOrders",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}})
-     .success(function (response) {
-     $scope.formData.contraPedido= response;
-     });*/
-}
-
-function loadkitchenBoxProveedor(id){
-
-    $http.get("Order/KitchenBoxs",{params:{ prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value}}).success(function (response) {
-        $scope.formData.kitchenBox= response;
-        $scope.formData.kitchenBox.fecha = Date.parse(response.fecha);        });
-}
-/*
- function loadPedidosASustituir(id){
- $http.get("Order/OrderSubstitutes",{params:{prov_id:id, pedido_id: $scope.document.id}}).success(function (response) {
- $scope.formData.pedidoSust= response;
-
- });
- }*/
-
-/*********************************  peticiones  guardado $http ********************* ************/
-
-function segurity(key){
-    return true;
-}
+    function segurity(key){
+        return true;
+    }
 
 });
 
@@ -2570,13 +2621,17 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
             if($scope.accion.data.open ){
                 $scope.inLayer = angular.copy($scope.module.layer);
-                var exp = angular.element(document).find("#"+$scope.inLayer).find("#expand");
+                if($scope.inLayer){
+                    var exp = angular.element(document).find("#"+$scope.inLayer).find("#expand");
+                    if(exp.length > 0){
+                        exp.animate({width:"336px"},400);
+                    }
+                }
+
                 var sn = angular.element(document).find("#sideFiles");
                 sn.css('width','336px');
                 sn.css('z-index',String(Layers.getModule().index + 60));
-                if(exp.length > 0){
-                    exp.animate({width:"336px"},400);
-                }
+
                 $mdSidenav("sideFiles").open().then(function(){
 
 
@@ -2584,11 +2639,14 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                 $scope.isOpen= true;
                 $scope.accion.estado=false;
             }else  if($scope.accion.data.close ){
-                var exp = angular.element(document).find("#"+$scope.inLayer).find("#expand");
-                if(exp.length > 0){
-                    exp.animate({width:"0px"},400);
+                if($scope.inLayer){
+                    var exp = angular.element(document).find("#"+$scope.inLayer).find("#expand");
+                    if(exp.length > 0){
+                        exp.animate({width:"0px"},400);
 
+                    }
                 }
+
                 if(!$scope.expand){
                     console.log("cerrado")
                     $mdSidenav("sideFiles").close().then(function(){
@@ -2627,11 +2685,13 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
 /**************  SERVICIOS   ***********************/
 
-MyApp.service('setGetOrder', function() {
+MyApp.service('setGetOrder', function(DateParse, Order) {
 
     var forms ={};
     var interno= 'new';
     var externo= 'new';
+    var order={};
+    var formMode = {};
     return {
 
         addForm: function(k, field){
@@ -2706,6 +2766,7 @@ MyApp.service('setGetOrder', function() {
             forms={};
             interno='new';
             externo= 'new';
+            order ={};
         },
         setState : function(val){
             externo= val;
@@ -2715,6 +2776,12 @@ MyApp.service('setGetOrder', function() {
         },
         getInternalState: function(){
             return interno;
+        },
+        setOrder : function(data){
+            order= data;
+        },
+        getOrder : function(){
+            return order;
         }
 
 
@@ -2726,8 +2793,6 @@ MyApp.service('Layers' , function(){
     var modules ={};
     var accion ={estado:false,data:{}};
     var modulekey="";
-
-
     return {
         setModule: function (name){
             if(!modules[name]){
@@ -2765,8 +2830,6 @@ MyApp.service('Layers' , function(){
          },
          getModuleKey : function(){ return modulekey;}*/
     }
-
-
 });
 
 MyApp.service('filesService' ,function(){
@@ -2896,10 +2959,10 @@ MyApp.directive('range', function () {
         restrict: 'A',
         require: 'ngModel',
         link: function (scope, elem, attrs, ctrl) {
-            console.log("atttr", attrs);
-            console.log("atttr", elem);
-            console.log("escope", scope);
-            console.log("ctrol", ctrl);
+            /*        console.log("atttr", attrs);
+             console.log("atttr", elem);
+             console.log("escope", scope);
+             console.log("ctrol", ctrl);*/
             var validate = false;
             attrs.$observe('range', function(range){
                 if(range == "true" ){
@@ -2938,7 +3001,10 @@ MyApp.directive('range', function () {
     };
 });
 
-MyApp.directive('gridRow', function ($timeout) {
+
+
+
+/*MyApp.directive('gridRow', function ($timeout) {
     return {
         link: function (scope, elem, attrs,ctrl) {
             elem.bind("keydown",function(e){
@@ -2969,7 +3035,7 @@ MyApp.directive('gridRow', function ($timeout) {
 
         }
     };
-});
+});*/
 
 
 MyApp.constant('SYSTEM',{
