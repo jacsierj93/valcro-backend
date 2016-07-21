@@ -52,6 +52,7 @@ MyApp.service("masterLists",function(masters) {
     var provTypeSend = [];
     var prodLines = [];
     var ports = [];
+    var commonCountry = [{"id" : 11,"cant" : 1},{"id" : 48,"cant" : 21},{"id" : 55,"cant" : 1},{"id" : 56,"cant" : 2},{"id" : 58,"cant" : 1},{"id" : 64,"cant" : 2},{"id" : 67,"cant" : 13},{"id" : 74,"cant" : 2},{"id" : 88,"cant" : 2},{"id" : 94,"cant" : 1},{"id" : 107,"cant" : 1},{"id" : 109,"cant" : 42},{"id" : 172,"cant" : 5},{"id" : 183,"cant" : 2},{"id" : 222,"cant" : 5},{"id" : 230,"cant" : 5},{"id" : 235,"cant" : 2}];
     return {
         setMain:function(){
             countries = masters.query({ type:"getCountries"});
@@ -86,6 +87,9 @@ MyApp.service("masterLists",function(masters) {
         },
         getPorts : function(){
             return ports;
+        },
+        getCommonCountry : function(){
+            return commonCountry;
         }
     }
 });
@@ -667,13 +671,32 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     });*/
 
     $scope.$watch('dir.pais',function(nvo,old){
-        //var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
+        console.log("prueba",nvo)
+
+        if((nvo) && $filter("filterSearch")(masterLists.getCommonCountry(),[nvo]).length <= 0){
+            setNotif.addNotif("alert","al parecer este pais no es muy comun, esta seguro que esta correcto?", [
+                {
+                    name: "corregir",
+                    action: function () {
+                        document.getElementsByName("dirPais")[0].focus();
+                    }
+                },{
+                    name: "esta bien",
+                    action: function () {
+
+                    },
+                    default:10
+                }
+            ])
+        }
+
         var preVal = angular.element("#dirPhone").val();
         if(preVal){
             angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
         }else{
             angular.element("#dirPhone").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
         }
+
     });
 
     $scope.checkCode = function(){
@@ -725,12 +748,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     });*/
 
     var saveAddress = function(onSuccess){
-
+console.log(angular.element("[name='"+$scope.direccionesForm.name+"']"))
         if((angular.equals(currentOrig,$scope.dir) && $scope.dir ) || ($scope.direccionesForm.$pristine )){
             onSuccess();
             return false;
         }
         if(!$scope.direccionesForm.$valid && !$scope.direccionesForm.$pristine){
+            angular.element("[name='"+$scope.direccionesForm.name+"']").click();
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){

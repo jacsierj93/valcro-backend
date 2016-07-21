@@ -327,23 +327,32 @@ MyApp.directive('contenteditable', function() {
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = angular.element("#"+jqObject);
-        var list = angular.element(elem).parents("form").first().find("[step]:visible")
+        var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
                     angular.element(list[list.index(elem)+1]).focus().click();
+                }else if(angular.element(list[list.index(elem)+1]).is("vlc-group")) {
+                    $timeout(function(){
+                        angular.element(list[list.index(elem)+1]).find("span").first().focus();
+                    },0);
                 }else{
                     angular.element(list[list.index(elem)+1]).focus();
                 }
 
             },50);
         }else{
-            var nextFrm = angular.element(elem).parents("form").first().next().find("[step]").first();
+            var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]):visible)").first();
+            var nextFrm = angular.element(next).find("[step]:not([disabled]):visible").first();
             $timeout(function(){
-                angular.element(elem).parents("form").first().next().click();
+                angular.element(next).click();
                 $timeout(function(){
                     if(angular.element(nextFrm[0]).is("md-select")){
                         angular.element(nextFrm[0]).focus().click();
+                    }else if(angular.element(nextFrm[0]).is("vlc-group")) {
+                        $timeout(function(){
+                            angular.element(nextFrm[0]).find("span").first().focus();
+                        },0);
                     }else
                     {
                         angular.element(nextFrm[0]).focus();
@@ -374,13 +383,12 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }else{
                 element.bind("keydown",function(e){
                     var elem =this;
-                    console.log("keypress==",e.which);
                     if(angular.element(elem).is("div")){
                         angular.element(elem).attr("tab-index","-1");
                     }
                     if(e.which == "13"){
                         e.stopPropagation();
-                        var list = angular.element(elem).parents("form").first().find("[step]:visible");
+                        var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
                         if(list.index(elem)<list.length-1){
                             if(angular.element(list[list.index(elem)+1]).is("md-select")){
                                 angular.element(list[list.index(elem)+1]).focus().click();
@@ -394,19 +402,23 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                                 },0);
                             }
                         }else{
-                            var nextFrm = angular.element(elem).parents("form").first().next().find("[step]").first();
-
+                            var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]):visible)").first();
+                            var nextFrm = angular.element(next).find("[step]:not([disabled]):visible").first();
                             $timeout(function(){
-                                angular.element(elem).parents("form").first().next().click();
+                                angular.element(next).click();
                                 $timeout(function(){
                                     if(angular.element(nextFrm[0]).is("md-select")){
                                         angular.element(nextFrm[0]).focus().click();
+                                    }else if(angular.element(nextFrm[0]).is("vlc-group")) {
+                                        $timeout(function(){
+                                            angular.element(nextFrm[0]).find("span").first().focus();
+                                        },0);
                                     }else{
                                         angular.element(nextFrm[0]).focus();
                                     }
                                 },50);
 
-                            },0);
+                            },50);
                         }
 
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
