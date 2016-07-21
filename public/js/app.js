@@ -326,7 +326,7 @@ MyApp.directive('contenteditable', function() {
 
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
-        var elem = angular.element("#"+jqObject);
+        var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
         if(list.index(elem)<list.length-1){
             $timeout(function(){
@@ -387,8 +387,8 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         angular.element(elem).attr("tab-index","-1");
                     }
                     if(e.which == "13"){
-                        e.stopPropagation();
-                        var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
+                        skip(elem)
+                        /*var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
                         if(list.index(elem)<list.length-1){
                             if(angular.element(list[list.index(elem)+1]).is("md-select")){
                                 angular.element(list[list.index(elem)+1]).focus().click();
@@ -419,7 +419,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                                 },50);
 
                             },50);
-                        }
+                        }*/
 
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
