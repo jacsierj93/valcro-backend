@@ -51,6 +51,7 @@ $app->get("provider/payConditions/{id}",'Providers\ProvidersController@getCondit
 $app->post("provider/delAddr",'Providers\ProvidersController@delProvDir');//elimina una direccion de proveedor
 $app->post("provider/delContac",'Providers\ProvidersController@delProvContact');//desvicula un contacto de un proveedor
 $app->post("provider/delBank",'Providers\ProvidersController@delInfoBank');//desvicula un contacto de un proveedor
+$app->post("provider/delCoin",'Providers\ProvidersController@delCoin');//desvicula un contacto de un proveedor
 $app->post("provider/delLimCred",'Providers\ProvidersController@delLimCred');//desvicula un contacto de un proveedor
 $app->post("provider/delFactor",'Providers\ProvidersController@delConvFact');//desvicula un contacto de un proveedor
 $app->post("provider/delCondition",'Providers\ProvidersController@delHeadCondition');//desvicula un contacto de un proveedor

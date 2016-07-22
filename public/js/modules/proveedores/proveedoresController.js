@@ -133,38 +133,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
-        /*if(nvo[1]>0 && $scope.prov.id){
-            $scope.showNext(true);
-        }*/
+
     })
-    console.log($scope)
-/*    var base =264;
-    function openLayer(layr){
 
-        var layer = layr||$scope.nextLyr;
-        if(historia.indexOf(layer)==-1 && layer!="END"){
-
-            var l=angular.element("#"+layer);
-            $scope.index++;
-            var w= base+(24*$scope.index);
-            l.css('width','calc(100% - '+w+'px)');
-            $mdSidenav(layer).open();
-            historia[$scope.index]=layer;
-            $scope.layer = layer;
-            return true;
-        }else if(historia.indexOf(layer)==-1 && layer=="END"){
-
-            if(setGetProv.haveChang()){
-                openLayer("layer5");
-            }else {
-                closeLayer(true);
-                $scope.layer = "";
-            }
-        }else{
-
-        }
-
-    }*/
 
     $scope.checkLayer = function(compare){
         console.log(compare);
@@ -179,32 +150,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         cb1: true
     };
     $scope.setProv = function(prov,indx){
-        //angular.element(element[0]).parents().first().scrollTo(0, element[0].offsetTop);
-
         endProvider(chngProv,null,prov);
-        /*if(setGetProv.haveChang()){
-            openLayer("layer5");
-            setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
-                {
-                    name: "SI",
-                    action: function () {
-                        $mdSidenav("layer5").close();
-                        chngProv(prov);
-                    },
-                    default:10
-                },
-                {
-                    name: "NO",
-                    action: function () {
-                    }
-                }
-            ]);
-        }else{
-            chngProv(prov);
-        }*/
-
-        //}
-
     };
 
     $scope.nextLayer = function(to){
@@ -226,37 +172,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     $scope.addProv = function(){
         endProvider(newProv,null);
-        /*        if(setGetProv.haveChang()){
-         openLayer("layer5");
-         setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
-         {
-         name: "SI",
-         action: function () {
-         $mdSidenav("layer5").close();
-         newProv();
-         }
-         },
-         {
-         name: "NO",
-         action: function () {
-         }
-         }
-         ]);
-         }else{
-         newProv();
-         }*/
-
     };
 
     var endProvider = function(yes,not,id){
         console.log(setGetProv.haveChang())
         if(setGetProv.haveChang()){
-            openLayer("layer5");
+            $scope.LayersAction({open:{name:"layer5"}});
             setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
                 {
                     name: "SI",
                     action: function () {
-                        $mdSidenav("layer5").close();
+                        $scope.LayersAction({close:true})
                         yes(id);
                     },
                     default:10
@@ -374,8 +300,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{}};
-    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{}};
+    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{}};
+    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{}};
     var onSet = {setting:false};
     return {
         getProv: function () {
@@ -383,8 +309,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
         },
         setProv: function(index) {
             onSet.setting = true;
-            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{}};
-            changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};
+            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{}};
+            changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};changes.timeProd={};changes.timeTrans={};changes.provCoin={};
             if (index){
                 itemsel = index;
                 id = itemsel.id;
@@ -441,6 +367,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
             return fullProv;
         },
         addToRllBck : function(val,form){
+            console.log(val)
             if(rollBack[form][parseInt(val.id)] === undefined){
                 rollBack[form][parseInt(val.id)] = angular.copy(val);
             }
@@ -479,6 +406,18 @@ MyApp.service("setGetProv",function($http,providers,$q){
         },
         getNomVal : function(){
             return fullProv.nomValc || [];
+        },
+        getAddress : function(){
+            return fullProv.direcciones || [];
+        },
+        getContacts : function(){
+            return fullProv.contacts || [];
+        },
+        getBanks : function(){
+            return fullProv.banks || [];
+        },
+        getLimits : function(){
+            return fullProv.limites || [];
         }
 
     };
@@ -644,7 +583,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     /*escucha cambios en el proveedor seleccionado y carga las direcciones correspondiente*/
     $scope.$watch('prov.id',function(nvo){
         $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
-        $scope.address = (nvo)?providers.query({type: "dirList", id_prov: $scope.prov.id || 0}):[];
+        $scope.address = setGetProv.getAddress()//(nvo)?providers.query({type: "dirList", id_prov: $scope.prov.id || 0}):[];
         $scope.isShow = false;
     });
     $scope.$watch('address.length',function(nvo){
@@ -1273,7 +1212,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.allContact = setGetContac.getList();
     $scope.cargos = masters.query({type:"cargoContact"});
     $scope.$watch('prov.id',function(nvo){
-        $scope.contacts = (nvo)?providers.query({type: "contactProv", id_prov: $scope.prov.id || 0}):[];
+        $scope.contacts = setGetProv.getContacts();//(nvo)?providers.query({type: "contactProv", id_prov: $scope.prov.id || 0}):[];
         $scope.cnt.prov_id=$scope.prov.id
     });
     $scope.$watch('cnt.pais',function(nvo,old){
@@ -1561,7 +1500,7 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
 });
 
 MyApp.service("setGetContac",function(providers,setGetProv,$filter){
-    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:[],pais:"",languaje:[],cargo:[],responsability:"",dirOff:"",prov_id:false, isAgent:0,autoSave:false};
+    var contact = {id:false,nombreCont:"",emailCont:[],contTelf:[],pais:"",languaje:[],cargo:[],responsability:"",notes:"",dirOff:"",prov_id:false, isAgent:0,autoSave:false};
     var listCont = [];
     return {
         setContact : function(cont){
@@ -1572,6 +1511,7 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
                 contact.contTelf = cont.phones||[];
                 contact.pais = cont.pais_id||"  ";
                 contact.responsability = cont.responsabilidades||"";
+                contact.notes = cont.notas||"";
                 contact.dirOff = cont.direccion||"";
                 contact.isAgent = cont.agente || 0;
                 contact.autoSave = cont.autoSave || false;
@@ -1614,7 +1554,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         }
 
         $scope.coinAssign = listCoins.getCoins();
-        $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
+        $scope.cn = {id:"",coin:"",prov_id:$scope.prov.id||0};
         $scope.filt = listCoins.getIdCoins();
     });
     $scope.$watch('coinAssign.length',function(nvo){
@@ -1624,15 +1564,55 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         if(nuevo[0] && !nuevo[1]) {
             providers.put({type: "saveCoin"}, $scope.cn, function (data) {
                 $scope.provMoneda.$setPristine();
-                listCoins.addCoin($filter("filterSearch")($scope.coins,[$scope.cn.coin])[0]);
+                var newCoin = $filter("filterSearch")($scope.coins,[$scope.cn.coin])[0];
+                newCoin.pivot = {prov_id:$scope.cn.prov_id};
+                listCoins.addCoin(newCoin);
                 $scope.coinAssign = listCoins.getCoins();
                 $scope.filt = listCoins.getIdCoins();
                 setNotif.addNotif("ok", "Moneda cargada", [
                 ],{autohidden:3000});
-                //setGetProv.addChng($scope.cn,data.action,"provCoin");
+                setGetProv.addChng($scope.cn,data.action,"provCoin");
             })
         }
-    })
+    });
+    var coin = {};
+    var currentOrig = {};
+    $scope.prueba=function(){
+        alert()
+    }
+    $scope.toEdit = function(coin){
+        console.log("entro",coin)
+        coin = coin.coinSel;
+        $scope.cn.id=coin.id;
+        $scope.cn.coin=coin.id;
+        $scope.cn.coin=$scope.prov.id;
+        currentOrig = angular.copy($scope.cn);
+        setGetProv.addToRllBck($scope.cn,"provCoin")
+    };
+
+    $scope.rmCoin = function(elem){
+        setNotif.addNotif("alert", "desea eliminar esta Moneda", [
+            {
+                name: "SI",
+                action: function () {
+                    coin = elem.coinSel;
+                    providers.put({type:"delCoin"},coin,function(data){
+                        setGetProv.addChng($scope.cn,data.action,"provCoin");
+                        $scope.coinAssign.splice(elem.$index,1);
+                        $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
+                        $scope.provMoneda.$setUntouched();
+                        setNotif.addNotif("ok", "Moneda Eliminada", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
 
 });
 
@@ -1643,7 +1623,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
     /*$scope.cities = masters.query({ type:"getCities"});*/
     $scope.$watch('prov.id',function(nvo){
         $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
-        $scope.accounts = (nvo)?providers.query({type:"getBankAccount",id_prov:$scope.prov.id||0}):[];
+        $scope.accounts = setGetProv.getBanks();
     });
     $scope.$watch('accounts.length',function(nvo){
         setGetProv.setComplete("bank",nvo);
@@ -1813,7 +1793,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     $scope.lines = masterLists.getLines();
     $scope.$watch('prov.id',function(nvo){
         $scope.cred = {id:false,coin:"",amount:"",line:"",id_prov: $scope.prov.id||0};
-        $scope.limits =  (nvo)?providers.query({type:"provLimits",id_prov:$scope.prov.id||0}):0;
+        $scope.limits =  setGetProv.getLimits();
         $scope.coins = (nvo)?listCoins.getCoins():[];
     });
     $scope.$watch('limits.length',function(nvo){
@@ -2383,7 +2363,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     var paises = masterLists.getCountries();
     $scope.$watch('prov.id',function(nvo){
         $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
-        $scope.provCountries = (nvo)?providers.query({type:"provCountries",id_prov:$scope.prov.id||0}):[];
+        $scope.provCountries =(nvo)?providers.query({type:"provCountries",id_prov:$scope.prov.id||0}):[];
         $scope.timesT =  (nvo)?providers.query({type:"transTimes",id_prov:$scope.prov.id||0}):[];
     });
     $scope.$watch('timesT.length',function(nvo){

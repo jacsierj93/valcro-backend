@@ -72,7 +72,10 @@ class ProvidersController extends BaseController
 
         $data->contraped = ($data->contraped == 1);
         $data->limCred =$data->limitCredit()->max("limite");
-        $data->nomValc = $data->nombres_valcro()->get();
+        $data->nomValc = $data->nombres_valcro()->select("id","nombre as name","fav")->get();
+        foreach($data->nomValc as $nom){
+            $nom->departments = $nom->departamento()->get();
+        };
         $data->tiemposP = $data->prodTime()->get();
         foreach ($data->tiemposP as $time){
             $time->lines;
@@ -83,19 +86,38 @@ class ProvidersController extends BaseController
         }
         $data->direcciones=$data->address()->get();
         foreach ($data->direcciones as $dir){
-            $dir->country;
+            $dir->pais = $dir->country()->first();
             $dir->tipo;
+            $dir->ports = $dir->ports()->lists("puerto_id");
         }
+
         $data->contacts = $data->contacts()->get();
-        foreach ($data->contacts as $cont){
-            $cont->cargos = $cont->cargos()->get();
+
+        foreach($data->contacts as $contact){
+            $contact->languages=$contact->idiomas()->lists("languaje_id");
+            $contact->emails=$contact->campos()->where("prov_id",$data->id)->where("campo","email")->get();
+            $contact->phones=$contact->campos()->where("prov_id",$data->id)->where("campo","telefono")->get();
+            $contact->cargos=$contact->campos()->where("prov_id",$data->id)->where("campo","cargos")->lists("valor");
+            $dir = $contact->campos()->where("prov_id",$data->id)->where("campo","direccion")->first();
+            $contact->direccion=($dir)?$dir->valor:"";
+            $rep = $contact->campos()->where("prov_id",$data->id)->where("campo","responsabilidad")->first();
+            $contact->responsabilidades=($rep)?$rep->valor:"";
+            $rep = $contact->campos()->where("prov_id",$data->id)->where("campo","notas")->first();
+            $contact->notas=($rep)?$rep->valor:"";
+        }
+        $data->banks = $data->bankAccount()->get();
+        foreach ($data->banks as $acc){
+            $acc["ciudad"]=$acc->ciudad()->first();
+            $acc["estado"] = $acc["ciudad"]->state()->first();
+            $acc["pais"] = $acc["estado"]->country()->first();
         }
         $data->monedas = $data->getProviderCoin()->get();
         $data->limites = $data->limitCredit()->get();
         foreach ($data->limites as $lim){
             $lim->moneda = Monedas::find($lim->moneda_id);
+            $lim->line = Line::find($lim->linea_id);
         }
-        $data->banks = $data->bankAccount()->get();
+
         return json_encode($data);
     }
 
@@ -229,6 +251,8 @@ class ProvidersController extends BaseController
                 $contact->direccion=($dir)?$dir->valor:"";
                 $rep = $contact->campos()->where("prov_id",$id)->where("campo","responsabilidad")->first();
                 $contact->responsabilidades=($rep)?$rep->valor:"";
+                $rep = $contact->campos()->where("prov_id",$id)->where("campo","notas")->first();
+                $contact->notas=($rep)?$rep->valor:"";
             }
             return ($contacts)?$contacts:[];
         }
@@ -269,6 +293,7 @@ class ProvidersController extends BaseController
         $result['cargos'] = $this->contactCargos($req->cargo,$contact->id,$req->prov_id);
         $this->contactCampos("direccion",$req->dirOff,$contact->id,$req->prov_id);
         $this->contactCampos("responsabilidad",$req->responsability,$contact->id,$req->prov_id);
+        $this->contactCampos("notas",$req->notes,$contact->id,$req->prov_id);
 
         $result['id']=$contact->id;
         return $result;
@@ -448,9 +473,12 @@ class ProvidersController extends BaseController
     }
 
     public function delCoin(request $req){
-        if(!Provider::find($req->prov_id)->getProviderCoin()->find($req->id)){
-            Provider::find($req->prov_id)->getProviderCoin()->detach($req->id);
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        if(Provider::find($req->pivot['prov_id'])->getProviderCoin()->find($req->id)){
+
+            Provider::find($req->pivot['prov_id'])->getProviderCoin()->detach($req->id);
         }
+        return $result;
     }
 
     public function assignCoin($id){
@@ -628,7 +656,7 @@ class ProvidersController extends BaseController
 
     public function provCountries($id){
         if((bool)$id) {
-            $countries = Provider::find($id)->address()->groupBy("pais_id")->get();
+            $countries = Provider::find($id)->address()->select("pais_id")->groupBy("pais_id")->get();
             foreach ($countries as $country) {
                 $country['pais'] = $country->country()->get()->first();
             }

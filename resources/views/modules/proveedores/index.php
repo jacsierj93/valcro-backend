@@ -543,6 +543,12 @@
                                 <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1">
                             </md-input-container>
                         </div>
+                        <div layout="row">
+                            <md-input-container class="md-block" flex>
+                                <label>Notas</label>
+                                <textarea style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1"></textarea>
+                            </md-input-container>
+                        </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
@@ -749,7 +755,7 @@
                 </form>
 
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda" layout="row"  ng-controller="coinController" global  ng-class="{'focused':isShow,'preNew':!prov.id}">
+                <form name="provMoneda" layout="row"  ng-controller="coinController"  ng-class="{'focused':isShow,'preNew':!prov.id}">
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" class="row" ng-class="{'onlyread' : (!$parent.edit)}">
@@ -770,7 +776,7 @@
                                 <!--<div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>-->
                                 <div flex layout="column">
                                     <div flex>
-                                        <div class="itemName" style="width:80px" ng-repeat="coinSel in coinAssign" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(coinSel.id==cn.id)}" layout="row"><div flex>{{coinSel.nombre}}</div> <div style="width:16px">{{coinSel.simbolo}}</div></div>
+                                        <div class="itemName" style="width:80px" ng-repeat="coinSel in coinAssign" ng-click="toEdit(this);" ng-class="{'gridSel':(coinSel.id==cn.id)}" layout="row"><span ng-class="{'rm' : (coinSel.id==cn.id)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmCoin(this)"></span><div flex>{{coinSel.nombre}}</div> <div style="width:16px">{{coinSel.simbolo}}</div></div>
                                     </div>
 
                                 </div>
@@ -865,7 +871,7 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="60">
                                     <label>Titulo</label>
-                                    <input skip-tab autocomplete="off" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                    <input autocomplete="off" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>

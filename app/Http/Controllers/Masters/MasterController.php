@@ -41,6 +41,11 @@ class MasterController extends BaseController
 		return json_encode($paises);
 	}
 
+	/*public function commonConuntries(){
+	basandose en los paises de proveedores registrado, busca los que ya se han creado mas de 2 veces
+
+	}*/
+
 	public function getCountriesHaveProvider()
 	{
 		$data = Collection::make(array());
