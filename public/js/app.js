@@ -604,8 +604,6 @@ MyApp.directive('range', function () {
 MyApp.directive('rowSelect', function ($timeout) {
     return {
         link: function (scope, elem, attrs,ctrl) {
-            console.log("hola cell select", elem)
-
             elem.bind("keydown",function(e){
                 if(e.which=="40"){
                     var next =angular.element(elem).next();
@@ -616,9 +614,9 @@ MyApp.directive('rowSelect', function ($timeout) {
                     var focus = angular.element(prev).find(".cellSelect");
                     focus[0].focus();
                 }else if(e.which=="13"){
-                    $timeout(function(){
+                   /* $timeout(function(){
                         angular.element(elem).click();
-                    },0)
+                    },0)*/
                 }
             })
 
@@ -728,6 +726,172 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,$filter,setGetProv
 
 });
 
+MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){
+
+    $scope.template = "modules/home/files";
+    $scope.accion= filesService.getAccion();
+    $scope.isOpen = filesService.isOpen();
+    $scope.titulo = filesService.getTitle();
+    $scope.pitures = filesService.getFiles();
+    $scope.module = Layers.getModule();
+    $scope.moduleAccion = Layers.getAccion();
+    $scope.cola = filesService.getProcess();
+    $scope.allowUpload = filesService.allowUpLoad();
+    filesService.setallowUpLoad(false);
+    $scope.inLayer = "";
+    $scope.expand=false;
+    $scope.imgSelec = null;
+    $scope.resource = $resource('master/files/:type', {}, {
+        query: {method: 'GET',params: {type: "getFiles"}, isArray: true},
+        get: {method: 'GET',params: {type:"getFile"}, headers: {'Content-Type': 'image/png'},isArray: false},
+
+    });
+
+    /***
+     * indicador de progreso
+     * usar $watch para saber si se terminaron de subir todos los archivos
+     *  filesService.getProcess().estado;
+     *  cuando olVal =='loading' && newVal == 'finished' se acaba de subir los archivos
+     * ***/
+    $scope.$watchGroup(['cola.total',
+        'cola.terminados.length','cola.estado'], function(newVal){
+        if(newVal[0]> 0 && newVal[2] == 'wait'){/// si entra en modo de espera
+            $scope.cola.estado='loading';
+
+        }
+        if(newVal[0] == newVal[1] && newVal[2] == 'loading'){
+            $scope.cola.estado='finished';
+        }
+    });
+
+    /** cerrado de la grilla en modo small**/
+    $scope.closeSideFile = function(){
+        filesService.close();
+    };
+
+    $scope.selectImg= function(doc){
+        console.log("upload ", $scope.allowUpload);
+        Layers.setAccion({open:{name:'sideFiles',before:
+            function(){$scope.expand=true;}
+        }});
+
+        if(doc.tipo.startsWith("image")){
+            $scope.imgSelec =SYSTEM.PATHAPP +"master/files/getFile?id="+doc.id;
+            $scope.pdfSelec= undefined;
+        }else {
+            $scope.imgSelec =undefined;
+            $scope.pdfSelec= SYSTEM.PATHAPP +"master/files/getFile?id="+doc.id;
+        }
+    };
+
+    /** subida de archivos  al servidor */
+    $scope.upload = function(files){
+        console.log("allowUpLoad", filesService.allowUpLoad());
+        $scope.isUploading = false;
+        $scope.cola.total = files.length;
+        if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                Upload.upload({
+                    url: 'master/files/upload',
+                    data :{ folder:filesService.getFolder(),file: file}
+                }).progress(function (evt) {
+                    uploadNow = parseInt(100.0 * evt.loaded / evt.total);
+                }).success(function (data, status, headers, config) {
+                    $scope.pitures.push(data);
+                    $scope.cola.terminados.push(data);
+                }).error(function(){
+                    $scope.cola.estado = "error";
+                });
+            }
+        }
+    };
+
+    $scope.$watch("accion.estado", function(newval){
+
+        if(newval){
+
+            if($scope.accion.data.open ){
+                $scope.inLayer = angular.copy($scope.module.layer);
+                if($scope.inLayer){
+                    var exp = angular.element(document).find("#"+$scope.inLayer).find("#expand");
+                    if(exp.length > 0){
+                        exp.animate({width:"336px"},400);
+                    }
+                }
+
+                var sn = angular.element(document).find("#sideFiles");
+                sn.css('width','336px');
+                sn.css('z-index',String(Layers.getModule().index + 60));
+
+                $mdSidenav("sideFiles").open().then(function(){
+
+
+                });
+                $scope.isOpen= true;
+                $scope.accion.estado=false;
+            }else  if($scope.accion.data.close ){
+                if($scope.inLayer){
+                    var exp = angular.element(document).find("#"+$scope.inLayer).find("#expand");
+                    if(exp.length > 0){
+                        exp.animate({width:"0px"},400);
+
+                    }
+                }
+
+                if(!$scope.expand){
+                    console.log("cerrado")
+                    $mdSidenav("sideFiles").close().then(function(){
+
+                        if($scope.expand){
+                            $scope.expand=false;
+                        }
+                        console.log("cerrado ");
+                        $scope.isOpen= false;
+                    });
+                }else{
+                    $scope.isOpen= false;
+                    console.log("cerrado ");
+                }
+                $scope.accion.estado=false;
+
+
+            }
+
+        }
+    });
+
+    $scope.$watch('module.layer', function(newVal){
+        if(newVal){
+            $timeout(function(){
+                if($scope.isOpen && newVal != "sideFiles" ){
+                    filesService.close();
+                }
+            },200);
+
+        }
+
+    });
+
+}]);
+
+
+MyApp.controller('ListHerramientas', function ($scope) {
+    $scope.tools = [
+        {
+            tool: 'Calculadora',
+            url: '/inicio'
+        }, {
+            tool: 'Extensiones',
+            url: '/proveedores'
+        }, {
+            tool: 'Hora Mundial',
+            url: '/productos'
+        }, {
+            secc: 'Factor',
+            url: '/pagos'
+        }];
+});
 
 MyApp.service('App' ,[function(){
 
@@ -750,6 +914,120 @@ MyApp.service('App' ,[function(){
 
 }]);
 
+MyApp.service('filesService' ,function(){
+    var all = new Array();
+    var accion ={estado:false,data:{}};
+    var isOpen= false;
+    var titulo ="Adjuntos";
+    var folder ="";
+    var process = {
+        total : 0 ,
+        terminados: new Array(),
+        estado:'wait'
+    };
+    var allowUpload = {val:false};
+    return {
+        setFiles: function(data){
+            all.splice(0,all.length);
+            angular.forEach(data, function(v){
+                all.push(v);
+            });
+            console.log();
+
+        },
+        getFiles: function(){
+            return all;
+        },
+        getAccion : function(){
+            return accion;
+        },
+        open : function(){
+            accion.data ={open:true};
+            accion.estado=true;
+
+        },
+        close : function(){
+            accion.data ={close:true};
+            accion.estado=true;
+        },
+        isOpen : function(){
+            return isOpen;
+        },
+        getTitle: function(){
+            return titulo;
+        },
+        setTitle : function(value){
+            titulo =value;
+        },
+        setFolder: function(value){
+            folder = value;
+        },
+        getFolder : function (){
+            return folder;
+        },
+        getProcess : function(){
+            return process;
+        },
+        getRecentUpload : function(){
+            var data = angular.copy(process.terminados);
+            process.terminados.splice(0,process.terminados.length);
+            process.total =0;
+            process.estado ='wait';
+            return data;
+        },
+        allowUpLoad : function(){return allowUpload;},
+        setallowUpLoad : function(value){
+            allowUpload.val= value;
+        }
+
+
+    };
+});
+
+MyApp.service('Layers' , function(){
+
+    var modules ={};
+    var accion ={estado:false,data:{}};
+    var modulekey="";
+    return {
+        setModule: function (name){
+            if(!modules[name]){
+                modules[name]={historia: [],layers:{},index: 0,layer:undefined,block:false};
+
+            }else{
+                modules[name].historia = [];
+                modules[name].layers = {};
+                modules[name].layer =undefined;
+                modules[name].index =0;
+                modules[name].block =false;
+
+            }
+            modulekey=name;
+            return modules[name];
+        }, getModule : function(name){
+            if(!name){
+                return modules[modulekey];
+            }else{
+                return modules[name];
+            }
+
+        },
+        getAccion : function(){
+            return accion;
+        },
+        setAccion: function(arg){
+
+            accion.data=arg;
+            accion.estado=true;
+        }
+        /*,
+         getIndex : function (){
+         return  modules[modulekey].layer;
+         },
+         getModuleKey : function(){ return modulekey;}*/
+    }
+});
+
 
 /*
  MyApp.controller('ListPaises', function ($scope,$http) {
@@ -765,22 +1043,6 @@ MyApp.service('App' ,[function(){
  */
 
 
-MyApp.controller('ListHerramientas', function ($scope) {
-    $scope.tools = [
-        {
-            tool: 'Calculadora',
-            url: '/inicio'
-        }, {
-            tool: 'Extensiones',
-            url: '/proveedores'
-        }, {
-            tool: 'Hora Mundial',
-            url: '/productos'
-        }, {
-            secc: 'Factor',
-            url: '/pagos'
-        }];
-});
 
 /*MyApp.run(['$route', function($route)  {
  $route.reload();
@@ -888,7 +1150,12 @@ MyApp.service('DateParse', function() {
     }
 });
 
+MyApp.constant('SYSTEM',{
+    ROOT:"http://"+window.location.hostname,
+    BASE:"/"+window.location.pathname.split("/")[1]+"/",
+    PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/"
 
+});
 
 
 
