@@ -541,7 +541,90 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 });
 
 
+MyApp.directive('range', function () {
+    function validateRange(viewValue,min,max){
+        if(viewValue === undefined || viewValue=="" || viewValue==null){
+            console.log('view value', viewValue);
+            return false;
+        }
+        if(min){
+            return parseInt(min ) <= parseInt(viewValue);
+        }
+        if(max){
+            return parseInt(max) <= parseInt(viewValue);
+        }
+    }
 
+    return  {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, elem, attrs, ctrl) {
+            /*        console.log("atttr", attrs);
+             console.log("atttr", elem);
+             console.log("escope", scope);
+             console.log("ctrol", ctrl);*/
+            var validate = false;
+            attrs.$observe('range', function(range){
+                if(range == "true" ){
+                    validate= true;
+                    if(ctrl.$viewValue == "0"){
+                        ctrl.$render();
+                        ctrl.$setViewValue("");
+                        ctrl.$render();
+                    }
+                }else{
+                    validate= false;
+                    if(ctrl.$viewValue != "0"){
+                        ctrl.$render();
+                        ctrl.$setViewValue("0");
+                        ctrl.$render();
+
+
+                    }
+                }
+
+            });
+
+
+            ctrl.$validators.range = function(modelValue, viewValue) {
+                if(validate == true){
+                    var paso= validateRange(viewValue,attrs.minval,attrs.maxval);
+                    if(!paso){
+                        elem[0].focus();
+                    }
+                    return paso;
+                }
+                return true;
+            };
+
+        }
+    };
+});
+
+MyApp.directive('rowSelect', function ($timeout) {
+    return {
+        link: function (scope, elem, attrs,ctrl) {
+            console.log("hola cell select", elem)
+
+            elem.bind("keydown",function(e){
+                if(e.which=="40"){
+                    var next =angular.element(elem).next();
+                    var focus = angular.element(next).find(".cellSelect");
+                    focus[0].focus();
+                }else if(e.which=="38"){
+                    var prev =angular.element(elem).prev();
+                    var focus = angular.element(prev).find(".cellSelect");
+                    focus[0].focus();
+                }else if(e.which=="13"){
+                    $timeout(function(){
+                        angular.element(elem).click();
+                    },0)
+                }
+            })
+
+        }
+    };
+});
 
 MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
     var usr = lgnForm.usr;

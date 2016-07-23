@@ -343,11 +343,11 @@
                             <div flex class="headGrid" ng-click="docOrder = (docOrder == 'monto') ? '-monto' : 'monto'  "> Monto</div>
                             <div flex class="headGrid" ng-click="docOrder = (docOrder == 'comentario') ? '-comentario' : 'comentario'  "> Comentario</div>
                         </div>
-                        <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                            <div   ng-repeat="item in provDocs | orderBy :docOrder " ng-click="DtPedido(item)"   id="doc{{$index}}">
+                        <div class="gridContent"  ng-mouseleave="hoverLeave(false)"  >
+                            <div   ng-repeat="item in provDocs | orderBy :docOrder " ng-click="DtPedido(item)"   id="doc{{$index}}" row-select>
                                 <div layout="row" class="cellGridHolder" >
                                     <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
-                                    <div flex="5" class="cellSelect" ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}"> <span>{{item.id}}</span> </div>
+                                    <div flex="5" class="cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}"> <span>{{item.id}}</span> </div>
                                     <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.documento}}</div>
                                     <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.titulo}}</div>
                                     <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>
@@ -980,7 +980,7 @@
                                     <div flex="10" class="headGrid"> Cantidad</div>
 
                                 </div>
-                                <div flex class="gridContent"  ng-click="allowEdit()"openImport()>
+                                <div flex class="gridContent"  ng-click="allowEdit()">
                                     <div >
                                         <div ng-repeat="item in document.productos.todos">
                                             <div layout="row" class="cellGridHolder" >

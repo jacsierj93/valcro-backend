@@ -1338,13 +1338,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.updateProv= function(){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
-           // var prov = $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0];
+            // var prov = $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0];
             /*            console.log('original prov', prov);
              console.log("response data", response);*/
             angular.forEach($scope.provSelec,function(v,k){
                 $scope.provSelec[k] = response[k];
             });
-           // $scope.provSelec = {};
+            // $scope.provSelec = {};
             //  console.log(" final ", $filter("customFind")($scope.todos, $scope.provSelec.id,function(current,compare){return current.id==compare})[0]);
             //$scope.provSelec = response;
         });
@@ -1885,7 +1885,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     });
 
     $scope.$watch('document.direccion_facturacion_id', function (newVal) {
-         if(newVal == "-1"){
+        if(newVal == "-1"){
             $scope.redirect({module:'proveedores',  calback:$scope.calbackPais});
         }
     });
@@ -1949,12 +1949,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             before: function(){ $scope.provDocs = [];},
                             after: function(){
                                 loadPedidosProvedor($scope.provSelec.id, function(){
-
-                                    if($scope.provDocs.length > 0){
-                                        // var mo= jQuery("#doc0");
-                                        //mo[0].focus();
-                                    }
-
+                                    $timeout(function(){
+                                        if($scope.provDocs.length > 0){
+                                            var mo= jQuery("#listPedido").find('.cellSelect')[0];
+                                            mo.focus();
+                                        }
+                                    }, 100);
                                 });
                                 $scope.hoverPreview(true);
 
@@ -2299,6 +2299,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             if(callback){
                 callback();
             }
+
+
 
             // $scope.provSelec.pedidos=items;
         });
@@ -2835,8 +2837,6 @@ MyApp.service('Layers' , function(){
     }
 });
 
-
-
 MyApp.service('filesService' ,function(){
     var all = new Array();
     var accion ={estado:false,data:{}};
@@ -2946,65 +2946,6 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
     }
 }]);
 
-MyApp.directive('range', function () {
-    function validateRange(viewValue,min,max){
-        if(viewValue === undefined || viewValue=="" || viewValue==null){
-            console.log('view value', viewValue);
-            return false;
-        }
-        if(min){
-            return parseInt(min ) <= parseInt(viewValue);
-        }
-        if(max){
-            return parseInt(max) <= parseInt(viewValue);
-        }
-    }
-
-    return  {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function (scope, elem, attrs, ctrl) {
-            /*        console.log("atttr", attrs);
-             console.log("atttr", elem);
-             console.log("escope", scope);
-             console.log("ctrol", ctrl);*/
-            var validate = false;
-            attrs.$observe('range', function(range){
-                if(range == "true" ){
-                    validate= true;
-                    if(ctrl.$viewValue == "0"){
-                        ctrl.$render();
-                        ctrl.$setViewValue("");
-                        ctrl.$render();
-                    }
-                }else{
-                    validate= false;
-                    if(ctrl.$viewValue != "0"){
-                        ctrl.$render();
-                        ctrl.$setViewValue("0");
-                        ctrl.$render();
-
-
-                    }
-                }
-
-            });
-
-
-            ctrl.$validators.range = function(modelValue, viewValue) {
-                if(validate == true){
-                    var paso= validateRange(viewValue,attrs.minval,attrs.maxval);
-                    if(!paso){
-                        elem[0].focus();
-                    }
-                    return paso;
-                }
-                return true;
-            };
-
-        }
-    };
-});
 
 
 MyApp.constant('SYSTEM',{
