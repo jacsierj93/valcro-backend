@@ -34,9 +34,20 @@
 }
 /* para grilla selecionada**/
 .cellSelect:focus{
-    height: 36px;
-    border-right: 1px solid #ccc;
-    margin-top: -7px;
+
+    border-left: 1px solid #ccc;
+}
+
+.cellSelect{
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    border-bottom: 1px dashed #999999;
+    color: #999999;
+    font-size: 15px;
+    font-weight: 400;
+    display: flex;
+    padding-top: 19px;
+    margin-top: -9px;
 }
 /**contenedor de la grilla*/
 .gridContent{

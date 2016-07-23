@@ -569,46 +569,58 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 }]);
 
 
-MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv, Layers) {
-    /*$scope.project = {
-     description: 'Nuclear Missile Defense System',
-     rate: 500
-     };*/
+MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,$filter,setGetProv, Layers,App) {
 
+    $scope.accion = App.getAccion();
     $scope.secciones = [
         {
             secc: 'Inicio',
+            key:'inicio',
             url: 'modules/home/index',
             selct: 'btnDot'
         }, {
             secc: 'Proveedores',
+            key:'proveedores',
             url: 'modules/proveedores/index',
             selct: 'btnDot'
         }, {
             secc: 'Embarques',
+            key:'embarques',
             url: 'modules/embarques/index',
             selct: 'btnDot'
         }, {
             secc: 'Pagos',
+            key: 'pagos',
             url: 'modules/pagos/index',
             selct: 'btnDot'
         }, {
             secc: 'Pedidos',
+            key:'pedidos',
             url: 'modules/pedidos/index',
             selct: 'btnDot'
         }];
     $scope.seccion = $scope.secciones[0];
-    $scope.seccLink = function (indx){
-        $scope.seccion = $scope.secciones[indx.$index];
-        Layers.setModule($scope.seccion.secc);
+    $scope.seccLink = function (item){
+        $scope.seccion = angular.copy(item);
+        Layers.setModule($scope.seccion.key);
         angular.forEach($scope.secciones, function(value, key) {
-            if(key == indx.$index){
+            if( $scope.seccion.key == value.key){
                 value.selct = 'btnLine';
             }else{
                 value.selct = 'btnDot';
             }
         });
     };
+    $scope.$watch('accion.estado', function (newval){
+        if(newval){
+            console.log("data", $scope.accion );
+            var data = $scope.accion.value;
+            if (data.module){
+                var mnew=  angular.copy($filter("customFind")($scope.secciones,data.module,function(current,compare){return current.key==compare})[0]);
+                $scope.seccLink(mnew);
+            }
+        }
+    });
 
 
 
@@ -633,6 +645,27 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,setGetProv, Layers
 
 });
 
+
+MyApp.service('App' ,[function(){
+
+    var accion ={estado :false,value:{}};
+    var msm ={};
+    return {
+
+        getAccion : function(){
+            return accion;
+        },
+        getMensage: function(){
+            return  msm;
+        },
+        changeModule : function( data){
+            accion.value = data;
+            accion.estado= true;
+        }
+    }
+
+
+}]);
 
 
 /*

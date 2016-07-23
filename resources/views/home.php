@@ -69,7 +69,7 @@
 <div class="pie" layout="row" layout-align="start center">
 
     <div layout="column" layout-align="center center" ng-repeat="item in secciones">
-        <div class="{{item.selct}}" ng-click="seccLink(this)" title="{{item.secc}}"></div>
+        <div class="{{item.selct}}" ng-click="seccLink(item)" title="{{item.secc}}"></div>
     </div>
     <div flex layout="row" layout-align="end center" style="font-size: 24px; font-weight: 100; color: #999999; padding-right: 24px;">
         {{seccion.secc}}

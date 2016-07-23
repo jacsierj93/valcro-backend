@@ -347,7 +347,7 @@
                             <div   ng-repeat="item in provDocs | orderBy :docOrder " ng-click="DtPedido(item)"   id="doc{{$index}}">
                                 <div layout="row" class="cellGridHolder" >
                                     <div  class=" cellGrid cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)" > </div>
-                                    <div flex="5" class="cellGrid cellSelect" ng-mouseover="hoverPreview(true)" tabindex="{{}}"> {{item.id}}</div>
+                                    <div flex="5" class="cellSelect" ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}"> <span>{{item.id}}</span> </div>
                                     <div flex="15" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.documento}}</div>
                                     <div flex class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.titulo}}</div>
                                     <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)"> {{item.nro_proforma}}</div>

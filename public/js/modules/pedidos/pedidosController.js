@@ -1,4 +1,4 @@
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,$location, $anchorScroll,Order,masters,providers,Upload,Layers,setGetOrder, DateParse, Accion,filesService) {
+MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$filter,$log,$location, $anchorScroll,App, Order,masters,providers,Upload,Layers,setGetOrder, DateParse, Accion,filesService) {
 
     var autohidden= 2000;
 
@@ -138,9 +138,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         // ng-click="redirect()"
         alert("redirect " +data.field);
         console.log("data sen", data);
+        setGetOrder.setOrder(angular.copy($scope.document));
+        App.changeModule(data);
     };
 
-    $scope.calbackPais = function(key){
+    $scope.calbackPais = function(response){
+        App.changeModule({module:"pedidos"});
+        console.log("response del cambio de modulo");
+
         // $scope.formData.paises= Order.query({type:"ProviderCountry",id:});
 
     };
@@ -1842,7 +1847,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 $anchorScroll();
             }
         }else if(nvo == "-1"){
-            $scope.redirect({module:'proveedor', field:'proveedor', origen:$scope.document, response:$scope.calbackPais});
+            $scope.redirect({module:'proveedores', action:'new',calback:$scope.calbackPais});
         }
 
     });
@@ -1866,7 +1871,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal});
 
         }else if(newVal == "-1"){
-            $scope.redirect({module:'proveedor', field:'pais', origen:$scope.document, response:$scope.calbackPais});
+            $scope.redirect({module:'proveedores', calback:$scope.calbackPais});
         }
     });
 
@@ -1875,13 +1880,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             $scope.formData.puertos =  Order.query({type:"AdrressPorts", id: newVal});
         }
         else if(newVal == "-1"){
-            $scope.redirect({module:'proveedor', field:'almacen', origen:$scope.document, response:$scope.calbackPais});
+            $scope.redirect({module:'proveedores', calback:$scope.calbackPais});
         }
     });
 
     $scope.$watch('document.direccion_facturacion_id', function (newVal) {
          if(newVal == "-1"){
-            $scope.redirect({module:'proveedor', field:'direccion_facturacion', origen:$scope.document, response:$scope.calbackPais});
+            $scope.redirect({module:'proveedores',  calback:$scope.calbackPais});
         }
     });
 
@@ -1900,13 +1905,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
             });
         }else if(newVal == "-1"){
-            $scope.redirect({module:'proveedor', field:'moneda', origen:$scope.document, response:$scope.calbackPais});
+            $scope.redirect({module:'proveedores', field:'moneda', origen:$scope.document, response:$scope.calbackPais});
         }
     });
 
     $scope.$watch('document.condicion_pago_id', function (newVal) {
         if(newVal == "-1"){
-            $scope.redirect({module:'proveedor', field:'condicion_pago', origen:$scope.document, response:$scope.calbackPais});
+            $scope.redirect({module:'proveedores', calback:$scope.calbackPais});
         }
     });
 
@@ -1928,7 +1933,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             after: function(){
                                 $scope.isTasaFija=true;
                                 var mo= jQuery("#prov_id");
-                                console.log("proveedor ", mo);
                                 mo[0].focus();
                             }
                         }})
@@ -2691,7 +2695,6 @@ MyApp.service('setGetOrder', function(DateParse, Order) {
     var interno= 'new';
     var externo= 'new';
     var order={};
-    var formMode = {};
     return {
 
         addForm: function(k, field){
@@ -2831,6 +2834,8 @@ MyApp.service('Layers' , function(){
          getModuleKey : function(){ return modulekey;}*/
     }
 });
+
+
 
 MyApp.service('filesService' ,function(){
     var all = new Array();
@@ -3000,42 +3005,6 @@ MyApp.directive('range', function () {
         }
     };
 });
-
-
-
-
-/*MyApp.directive('gridRow', function ($timeout) {
-    return {
-        link: function (scope, elem, attrs,ctrl) {
-            elem.bind("keydown",function(e){
-                if(angular.element(elem).is("#launchList")){
-                    if(e.which=="40"){
-                        $timeout(function(){
-                            angular.element('#listado').find(".boxList").first().focus();
-                        },50)
-                    }
-                }else{
-                    if(e.which=="40"){
-                        var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
-                        scope.scrollTo(next[0].id);
-                        next[0].focus();
-                    }else if(e.which=="38"){
-                        var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
-                        scope.scrollTo(prev[0].id);
-                        prev[0].focus();
-                    }else if(e.which=="13"){
-                        $timeout(function(){
-                            angular.element(elem).click();
-                        },0)
-                    }
-
-                }
-
-            })
-
-        }
-    };
-});*/
 
 
 MyApp.constant('SYSTEM',{
