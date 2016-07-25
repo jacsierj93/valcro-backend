@@ -143,7 +143,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.calbackPais = function(response){
-        App.changeModule({module:"pedidos"});
+       // App.changeModule({module:"pedidos"});
         console.log("response del cambio de modulo");
 
         // $scope.formData.paises= Order.query({type:"ProviderCountry",id:});
@@ -1251,7 +1251,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.DtPedido = function (doc) {
-        console.log("doc", doc);
         $scope.document= {};
         $scope.gridView=-1;
         var aux= angular.copy(doc);
@@ -2383,9 +2382,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 if(arg.name){
                     var aux = module.historia.indexOf(arg.name);
                     close = (aux != -1) ? ((module.historia.length -1)  - aux ) : 0;
-                    console.log("before resul", module.historia);
-
-                    console.log("before resul", close);
 
                 }
                 else if(arg.to){

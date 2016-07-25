@@ -601,7 +601,7 @@ MyApp.directive('range', function () {
     };
 });
 
-MyApp.directive('rowSelect', function ($timeout) {
+MyApp.directive('rowSelect', function () {
     return {
         link: function (scope, elem, attrs,ctrl) {
             elem.bind("keydown",function(e){
@@ -696,6 +696,11 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,$filter,setGetProv
         if(newval){
             console.log("data", $scope.accion );
             var data = $scope.accion.value;
+            if(data.msm){
+                var msm ={to:data.module,from:$scope.seccion.key,msm:data.msm}
+
+                App.setMsm(msm);
+            }
             if (data.module){
                 var mnew=  angular.copy($filter("customFind")($scope.secciones,data.module,function(current,compare){return current.key==compare})[0]);
                 $scope.seccLink(mnew);
@@ -902,12 +907,18 @@ MyApp.service('App' ,[function(){
         getAccion : function(){
             return accion;
         },
-        getMensage: function(){
-            return  msm;
-        },
         changeModule : function( data){
             accion.value = data;
             accion.estado= true;
+        },
+        setMsm: function(data){
+            msm =data;
+        },
+        getMsm: function(){
+        return  msm;
+        },
+        clearMsm : function(){
+            msm= {}
         }
     }
 
