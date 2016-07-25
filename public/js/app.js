@@ -133,11 +133,19 @@ MyApp.directive('global', function (Layers, setNotif) {
             scope.module= Layers.getModule();
             scope.LayersAction = Layers.setAccion;
             scope.NotifAction = setNotif.addNotif;
+           /* scope.scrollTo = function(newHash){
+                if ($location.hash() !== newHash) {
+                    $location.hash(newHash);
+                } else {
+                    $anchorScroll();
+                }
+            }*/
         }
     };
 });
 
 MyApp.directive('listBox', function ($timeout) {
+
     return {
         link: function (scope, elem, attrs,ctrl) {
             elem.bind("keydown",function(e){
@@ -150,11 +158,11 @@ MyApp.directive('listBox', function ($timeout) {
                 }else{
                     if(e.which=="40"){
                         var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
-                        scope.scrollTo(next[0].id);
+                        scope.$parent.scrollTo(next[0].id);
                         next[0].focus();
                     }else if(e.which=="38"){
                         var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
-                        scope.scrollTo(prev[0].id);
+                        scope.$parent.scrollTo(prev[0].id);
                         prev[0].focus();
                     }else if(e.which=="13"){
                         $timeout(function(){
@@ -283,7 +291,6 @@ MyApp.directive('activeLeft', function ($compile, Layers) {
             if(before){
                 jso +=",before:"+before
             }
-
             elem.addClass("activeleft");
             elem.attr("ng-click","LayersAction("+jso+"}})");
             elem.attr("ng-class","{'white': ('"+ly+"'!=layer)}");
@@ -1165,7 +1172,6 @@ MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
     PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/"
-
 });
 
 

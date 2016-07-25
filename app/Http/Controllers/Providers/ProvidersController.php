@@ -90,9 +90,7 @@ class ProvidersController extends BaseController
             $dir->tipo;
             $dir->ports = $dir->ports()->lists("puerto_id");
         }
-
         $data->contacts = $data->contacts()->get();
-
         foreach($data->contacts as $contact){
             $contact->languages=$contact->idiomas()->lists("languaje_id");
             $contact->emails=$contact->campos()->where("prov_id",$data->id)->where("campo","email")->get();
@@ -116,6 +114,29 @@ class ProvidersController extends BaseController
         foreach ($data->limites as $lim){
             $lim->moneda = Monedas::find($lim->moneda_id);
             $lim->line = Line::find($lim->linea_id);
+        }
+        $data->factors = $data->convertFact()->get();
+        foreach($data->factors as $fact){
+            $fact->moneda;
+            $fact->linea;
+        }
+        $data->points = $data->points()->get();
+        foreach($data->points as $pnt){
+            $pnt->moneda;
+            $pnt->linea;
+        }
+        $data->prodTime = $data->prodTime()->get();
+        foreach ($data->prodTime as $time) {
+            $time->lines;
+        }
+        $data->transTime = $data->transTime()->get();
+        foreach ($data->prodTime as $time) {
+            $time->country;
+        }
+        $data->payCondition = $data->getPaymentCondition()->get();
+        foreach ($data->payCondition as $cond) {
+            $cond['items'] = $cond->getItems()->get();
+            $cond->line;
         }
 
         return json_encode($data);
@@ -558,7 +579,6 @@ class ProvidersController extends BaseController
         return $result;
     }
 
-
     public function saveItemCond(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
@@ -588,7 +608,6 @@ class ProvidersController extends BaseController
             return ($factor)?$factor:false;
         }
     }
-
 
     public function saveFactorConvert(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
@@ -665,7 +684,6 @@ class ProvidersController extends BaseController
         }
     }
 
-
     public function getProdTime($id){
         if((bool)$id) {
             $times = Provider::find($id)->prodTime()->get();
@@ -678,7 +696,6 @@ class ProvidersController extends BaseController
             return [];
         }*/
     }
-
 
     public function saveProdTime(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");

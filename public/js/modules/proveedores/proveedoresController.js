@@ -125,11 +125,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             $scope.edit = true;
         }
     });
-/*    $scope.isNew = function(){
 
-    };*/
-
-    //historia= [15]
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
@@ -196,7 +192,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         }else{
             yes(id);
         }
-    }
+    };
 
     var newProv = function(){
         setGetProv.setProv(false);
@@ -284,7 +280,6 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
         } else {
             $anchorScroll();
         }
-
 
     }
 
@@ -418,6 +413,21 @@ MyApp.service("setGetProv",function($http,providers,$q){
         },
         getLimits : function(){
             return fullProv.limites || [];
+        },
+        getFactors : function(){
+            return fullProv.factors || [];
+        },
+        getPoints : function(){
+            return fullProv.points || [];
+        },
+        getProdTime : function(){
+            return fullProv.prodTime || [];
+        },
+        getTransTime : function(){
+            return fullProv.transTime || [];
+        },
+        getPayCond : function(){
+            return fullProv.payCondition || [];
         }
 
     };
@@ -693,7 +703,6 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    console.log($scope.direccionesForm)
                     angular.element("[name='"+$scope.direccionesForm.$name+"']").find(".ng-invalid").first().focus()
                 }
             }]);
@@ -1211,12 +1220,26 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.languaje = masterLists.getLanguaje();
     $scope.allContact = setGetContac.getList();
     $scope.cargos = masters.query({type:"cargoContact"});
+
     $scope.$watch('prov.id',function(nvo){
         $scope.contacts = setGetProv.getContacts();//(nvo)?providers.query({type: "contactProv", id_prov: $scope.prov.id || 0}):[];
+        $scope.dirAssign = setGetProv.getAddress();
         $scope.cnt.prov_id=$scope.prov.id
     });
     $scope.$watch('cnt.pais',function(nvo,old){
-        //var prev =(old!=0)?$filter("filterSearch")($scope.paises,[old])[0].area_code.phone:"";
+        if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length){
+            setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
+                name:"si",
+                action:function(){
+
+                }
+            },{
+                name:"no",
+                action:function(){
+                    console.log($scope.provContactosForm);
+                }
+            }]);
+        }
         var preVal = angular.element("#contTelf").find("input").val();
         if(preVal){
             if(preVal!=""){
@@ -1225,8 +1248,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
             }
         }
-
-
         //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
     $scope.$watch('contacts.length',function(nvo){
@@ -1243,9 +1264,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         $timeout(function(){
             angular.element(input).find("input").val(chipCont.valor);
             angular.element(input).find("input").focus()
-            //console.log(angular.element(input).val())
         },100)
-        //console.log($scope.cnt.emailCont)
 
     };
     /*funcion que transforma el texto ingresado en el mdchips en un objeto */
@@ -1302,8 +1321,11 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             //return null;
         };
         chipCont = {};
-        return chip;
+        $timeout(function(){
+            angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[$scope.cnt.pais])[0].area_code.phone);
+        },100)
 
+        return chip;
     };
 
     var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
@@ -1312,7 +1334,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var saveContact = function(onSuccess){
 
         if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
-            console.log("falseeeeeeeee")
             onSuccess();
             return false;
         }
@@ -1361,18 +1382,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         });
     };
 
-
-    /*escuha el estatus del formulario y guarda cuando este valido*/
-    $scope.$watchGroup(['provContactosForm.$valid','provContactosForm.$pristine',"cnt.autoSave","cnt.cargo.length"], function(nuevo,old) {
-        var fieldFocus = angular.element(":focus");
-        var valid = (fieldFocus.parents("md-chips").length<=0);
-        if(((nuevo[0] && !nuevo[1] && $scope.cnt.emailCont.length>0 && valid)) || nuevo[2] || (nuevo[3]!=old[3])) {
-            //saveContact();
-        }
-       //$scope.provContactosForm.$setPristine();
-        /*}*/
-    });
-
     /*seteado de Cargos para el contacto (tipo departamento nombre valcro*/
     $scope.setCargo = function(elem,e){
         if(e.keyCode==32 || e.type=="click"){
@@ -1383,7 +1392,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             }else{
                 $scope.cnt.cargo.push(""+cargo);
             }
-            console.log($scope.provContactosForm)
             $scope.provContactosForm.$setDirty();
         }
 
@@ -1430,7 +1438,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     /*muestra u oculta la franaj de ver mas en los form, en el click y clickout (focus,focusout)*/
     $scope.showGrid = function(elem,event){
         if((jQuery(event.target).parents("#contactBook").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
-            $scope.isShow = elem;
+
             if(!elem){
                 saveContact(function(){
                     contact = {};
@@ -1444,7 +1452,14 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 });
 
 
+            }else{
+                if($scope.dirAssign.length>0 && !$scope.isShow){
+                    var def = $scope.dirAssign[0];
+                    setGetContac.setContact({pais_id:def.pais_id});
+                    angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[def.pais_id])[0].area_code.phone);
+                }
             }
+            $scope.isShow = elem;
         }
     };
 
@@ -1953,7 +1968,7 @@ MyApp.controller('convController', function ($scope,providers,setGetProv,$filter
     $scope.$watch('prov.id',function(nvo){
         $scope.coins = (nvo)?listCoins.getCoins():[];
         $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id||0};
-        $scope.factors =  (nvo)?providers.query({type:"provFactors",id_prov:$scope.prov.id||0}):[];
+        $scope.factors =  setGetProv.getFactors();//(nvo)?providers.query({type:"provFactors",id_prov:$scope.prov.id||0}):[];
     });
     $scope.$watch('factors.length',function(nvo){
         setGetProv.setComplete("factors",nvo);
@@ -2107,7 +2122,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
     $scope.$watch('prov.id',function(nvo){
         $scope.coins = (nvo)?listCoins.getCoins():[];
         $scope.pnt = {id:false,cost:"",coin:"",line:"",id_prov: $scope.prov.id||0};
-        $scope.points =  (nvo)?providers.query({type:"provPoint",id_prov:$scope.prov.id||0}):[];
+        $scope.points =  setGetProv.getPoints()//(nvo)?providers.query({type:"provPoint",id_prov:$scope.prov.id||0}):[];
     });
     /*escuha el estatus del formulario y guarda cuando este valido*/
     /*$scope.$watchGroup(['provPoint.$valid','provPoint.$pristine'], function(nuevo) {
@@ -2248,7 +2263,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
     $scope.lines = masterLists.getLines();
     $scope.$watch('prov.id',function(nvo){
         $scope.tp = {id:false,from:"",to:"",line:"",id_prov: $scope.prov.id};
-        $scope.timesP =  (nvo)?providers.query({type:"prodTimes",id_prov:$scope.prov.id||0}):[];
+        $scope.timesP = setGetProv.getProdTime();//(nvo)?providers.query({type:"prodTimes",id_prov:$scope.prov.id||0}):[];
     });
     $scope.$watch('timesP.length',function(nvo){
         setGetProv.setComplete("timesP",nvo);
@@ -2364,7 +2379,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     $scope.$watch('prov.id',function(nvo){
         $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
         $scope.provCountries =(nvo)?providers.query({type:"provCountries",id_prov:$scope.prov.id||0}):[];
-        $scope.timesT =  (nvo)?providers.query({type:"transTimes",id_prov:$scope.prov.id||0}):[];
+        $scope.timesT =  setGetProv.getTransTime();
     });
     $scope.$watch('timesT.length',function(nvo){
         setGetProv.setComplete("timesT",nvo);
@@ -2495,7 +2510,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo) {
         $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
-        $scope.conditions = (nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
+        $scope.conditions = setGetProv.getPayCond();//(nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
     });
     $scope.openFormCond = function(){
         setgetCondition.setTitle(cond);
