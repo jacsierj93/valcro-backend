@@ -153,6 +153,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     /********************************************GUI ********************************************/
+
+    $scope.showDotData= function(item,emit,review){
+      if(emit && review){
+          item.emit= angular.copy(emit);
+          item.review= angular.copy(review);
+          item.show = true;
+      }else{
+          item.show = false;
+      }
+
+    };
+
     $scope.FilterListPed = function(){
         $scope.showFilterPed = ($scope.showFilterPed) ? false : true;
     };
@@ -364,6 +376,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.hoverPreview= function(val){
         $scope.preview=val;
     };
+
+
 
     $scope.updateForm = function () {
         $scope.formBlock = false;
@@ -1340,6 +1354,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
 
     };
+
+
 
     $scope.updateProv= function(){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){

@@ -68,7 +68,7 @@
 
                     <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
 
-                    <div layout="row" class="dotRow">
+<!--                    <div layout="row" class="dotRow">
                         <div flex layout layout-align="center center">
                             <div layout layout-align="center center" class="dot-empty doc-Open100" ng-show ="item.Showreview100" >
                                 {{item.review100}}
@@ -100,38 +100,53 @@
                             </div>
                         </div>
                     </div>
-                    <div layout="row" class="dotRow">
-                        <div flex layout layout-align="center center"  ng-mouseleave ="item.Showreview100 = false " ng-mouseenter = "item.Showreview100 = true ">
-                            <div layout layout-align="center center" class="dot-item emit100" >
-                                {{item.emit100}}
+
+-->
+                    <div layout="column" class="dot-text">
+                        <div id="dot-show{{item.id}}" layout="column" flex ng-show="item.show">
+                            <div layout="row">
+                                <div flex="70">Emitidos: </div>
+                                <div flex>{{item.emit}}</div>
                             </div>
-                        </div>
-                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview90 = false " ng-mouseenter = "item.Showreview90 = true ">
-                            <div layout layout-align="center center" class="dot-item emit90" >
-                                {{item.emit90}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview60 = false " ng-mouseenter = "item.Showreview60 = true ">
-                            <div layout layout-align="center center" class="dot-item emit60">
-                                {{item.emit60}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview30 = false " ng-mouseenter = "item.Showreview30 = true ">
-                            <div layout layout-align="center center" class="dot-item emit30" >
-                                {{item.emit30}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview7 = false " ng-mouseenter = "item.Showreview7 = true ">
-                            <div layout layout-align="center center" class="dot-item emit7" >
-                                {{item.emit7}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center" ng-mouseleave ="item.Showreview0 = false " ng-mouseenter = "item.Showreview0 = true ">
-                            <div layout layout-align="center center" class="dot-item emit0">
-                                {{item.emit0}}
+                            <div layout="row">
+                                <div flex="70">Revisados: </div>
+                                <div flex>{{item.review}}</div>
                             </div>
                         </div>
                     </div>
+                    <div layout="row" class="dotRow">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit100,item.review100)">
+                            <div layout layout-align="center center" class="dot-item emit100" >
+                               +
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit90,item.review90)">
+                            <div layout layout-align="center center" class="dot-item emit90" >
+                               90
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) "ng-mouseenter = "showDotData(item,item.emit60,item.review60)">
+                            <div layout layout-align="center center" class="dot-item emit60">
+                                60
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit30,item.review30)">
+                            <div layout layout-align="center center" class="dot-item emit30" >
+                                30
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit7,item.review7)">
+                            <div layout layout-align="center center" class="dot-item emit7" >
+                                7
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit0,item.review0)">
+                            <div layout layout-align="center center" class="dot-item emit0">
+                               0
+                            </div>
+                        </div>
+                    </div>
+
                     <div style="height:40px;" layout="row" layout-align="space-between center">
                         <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
 
