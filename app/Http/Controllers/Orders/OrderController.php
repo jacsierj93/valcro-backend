@@ -4017,6 +4017,7 @@ class OrderController extends BaseController
         $model->final_id=
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
+        $model->ult_revision = Carbon::now();
         $model->save();
         //  EmailController::sendEmail("emails.prueba", [],[]);
         $result['template'] = view("emails.prueba");
@@ -4036,6 +4037,8 @@ class OrderController extends BaseController
         $model->final_id=
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
+        $model->ult_revision = Carbon::now();
+
         $model->save();
         // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
 
@@ -4052,6 +4055,7 @@ class OrderController extends BaseController
         $model->final_id=
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
+        $model->ult_revision = Carbon::now();
         $model->save();
         // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
 

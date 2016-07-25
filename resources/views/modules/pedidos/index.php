@@ -602,7 +602,7 @@
                                             {{prov.razon_social}}
                                         </md-option>
                                         <md-option  value ="-1">
-                                           Nuevo Proveedor
+                                            Nuevo Proveedor
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
@@ -993,8 +993,8 @@
                                                 <md-input-container class="md-block" flex="10" >
                                                     <input  ng-model="item.saldo"
                                                             ng-change="changeItem(item)"
-                                                            ui-number-mask
-                                                            ng-disabled="(formBlock || !item.asignado )"
+                                                            decimal
+                                                            ng-disabled="(formBlock || !item.asignado  || item.tipo_origen_id != '1')"
                                                     />
                                                 </md-input-container>
                                             </div>
@@ -1443,7 +1443,7 @@
                                 <md-input-container class="md-block" flex="20">
                                     <label>Tipo Envio:</label>
                                     <md-select ng-model="contraPedSelec.tipo_envio_id" ng-disabled="true">
-                                        <md-option ng-repeat="item in filterData.tipoEnv" value="{{item.id}}">
+                                        <md-option ng-repeat="item in formDataContraP.tipoEnvio" value="{{item.id}}">
                                             {{item.nombre}}
                                         </md-option>
                                     </md-select>
@@ -1478,7 +1478,7 @@
                                 <md-input-container class="md-block" flex="20" >
                                     <label>Moneda</label>
                                     <md-select ng-model="contraPedSelec.moneda_id" ng-disabled="true">
-                                        <md-option ng-repeat="item in filterData.monedas" value="{{item.id}}">
+                                        <md-option ng-repeat="item in formData.monedas" value="{{item.id}}">
                                             {{item.nombre}}
                                         </md-option>
                                     </md-select>
@@ -1550,16 +1550,18 @@
             <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE  KICTCHEN BOX  ########################################## -->
 
             <md-content  layout="row" flex class="sideNavContent">
-                <div class="backDiv"  ng-click="closeLayer('resumenKitchenbox')"> </div>
-                <div  layout="column" flex class="layerColumn" >
-                    <div class="titulo_formulario" layout="Column" layout-align="start start">
-                        <div>
-                            Resumen de Kitchen Box
-                        </div>
-                    </div>
-                    <form name="resumenContraPed" >
 
-                        <div layout="row">
+
+
+                <form name="resumenContraPed" layout="row" flex>
+                    <div active-left> </div>
+                    <div  layout="column" flex class="layerColumn" >
+                        <div class="titulo_formulario" layout="Column" layout-align="start start">
+                            <div>
+                                Resumen de Kitchen Box
+                            </div>
+                        </div>
+                        <div layout="row" >
 
                             <md-input-container class="md-block" flex="10">
                                 <label>Nº</label>
@@ -1572,7 +1574,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Fabrica</label>
-                                <md-select ng-model="kitchenBoxSelec.prov_id"ng-disabled="true">
+                                <md-select ng-model="kitchenBoxSelec.prov_id" ng-disabled="true">
                                     <md-option ng-repeat="prov in todos" value="{{prov.id}}">
                                         {{prov.razon_social}}
                                     </md-option>
@@ -1616,13 +1618,12 @@
                                                ng-disabled="true"
                                 ></md-datepicker>
                             </div>
-                            <div flex="">
-                                <!-- imga maqueta -->
+                            <div style="width: 40px;">
                                 <?= HTML::image("images/adjunto.png",'null', array('id' => 'imgAdj')) ?>
 
                             </div>
 
-                            <md-input-container class="md-block" flex="40">
+                            <md-input-container class="md-block" flex>
                                 <label>Condciones de pago</label>
                                 <md-select ng-model="kitchenBoxSelec.condicion_pago_id" ng-disabled="true">
                                     <md-option >
@@ -1644,9 +1645,9 @@
                                 Adjuntos
                             </div>
                         </div>
+                    </div>
+                </form>
 
-                    </form>
-                </div>
             </md-content>
 
         </md-sidenav>
@@ -1755,28 +1756,26 @@
                             </div>
 
                             <div layout="row" class="headGridHolder">
-                                <div flex="5" class="cellGrid">
-                                </div>
+                                <div flex="5" class="headGrid"></div>
                                 <div flex="15" class="headGrid"> Codigo </div>
                                 <div flex="15" class="headGrid"> Cod. Fabrica </div>
                                 <div flex class="headGrid"> Origen</div>
                                 <div flex class="headGrid"> Descripción.</div>
                                 <div flex="10" class="headGrid"> Cantidad</div>
                                 <div flex class="headGrid"> Comentario</div>
-                                <div flex class="headGrid"> Adjunto</div>
+                                <!--<div flex class="headGrid"> Adjunto</div>-->
                             </div>
                             <div  class="gridContent">
                                 <div flex>
                                     <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos.todos">
-                                        <div flex="5" class="cellGrid">
-                                        </div>
+                                        <div flex="5" class="cellGrid" > </div>
                                         <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                         <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
                                         <div flex class="cellGrid"> {{item.documento}}</div>
                                         <div flex class="cellGrid">  {{item.descripcion}}</div>
                                         <div flex="10" class="cellGrid">{{item.saldo}}</div>
                                         <div flex class="cellGrid">  {{item.comentario}}</div>
-                                        <div flex class="cellGrid">  {{item.adjunto}}</div>
+                                       <!-- <div flex class="cellGrid">  {{item.adjunto}}</div>-->
                                     </div>
                                 </div>
                             </div>

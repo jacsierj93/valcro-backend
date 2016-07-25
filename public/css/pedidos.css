@@ -35,7 +35,7 @@
 /* para grilla selecionada**/
 .cellSelect:focus{
 
-    border-left: 1px solid #ccc;
+    border-left: 1px solid rgb(84, 180, 234);
 }
 
 .cellSelect{
@@ -58,6 +58,10 @@
 /**contenedor de la grilla*/
 .dotRow{
     height: 22px;
+}
+
+.dot-text{
+    height: 44px;
 }
 .dot-empty{
     width: 20px;
