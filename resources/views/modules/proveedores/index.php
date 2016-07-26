@@ -472,8 +472,9 @@
 
                             <md-input-container class="md-block" flex="30">
                                 <label>Nombre y Apellido</label>
-                                <input skip-tab info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" ng-dblclick="book()">
+                                <input skip-tab info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" >
                             </md-input-container>
+                            <div ng-click="book()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom"> A </div>
 
                             <md-input-container class="md-block" flex>
                                 <label>Pais de Residencia</label>
@@ -495,7 +496,7 @@
                             </div>
                         </div>
                         <div class="row" layout="row">
-                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
+                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
@@ -503,7 +504,7 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[13,32]">
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[13,32]">
                                 <input phone placeholder="Telefonos Contacto">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -517,14 +518,14 @@
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Responsabilidades</label>
-                                <input skip-tab info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled=" $parent.enabled || cnt.isAgent==1">
+                                <input skip-tab info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-model="cnt.responsability" ng-disabled=" $parent.enabled ">
                             </md-input-container>
 
                             <div layout="column" style="width:{{(cargos.length*40)}}px;">
                                 <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
                                 <vlc-group skip-tab>
 
-                                     <span info="{{cargo.cargo}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled || cnt.isAgent==1) || setCargo(cargo,$event)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
+                                     <span info="{{cargo.cargo}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled) || setCargo(cargo,$event)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0,1)}}
 
                                      </span>
                                 </vlc-group>
@@ -540,13 +541,13 @@
                         <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Direccion de Oficina</label>
-                                <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1">
+                                <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled=" $parent.enabled">
                             </md-input-container>
                         </div>
                         <div layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Notas</label>
-                                <textarea style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled || cnt.isAgent==1"></textarea>
+                                <textarea style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled "></textarea>
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">
@@ -588,7 +589,7 @@
 
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="nomValAssign">
                 <input type="hidden" md-autofocus>
                 <div layout="column" flex style="overflow-x: hidden;">
@@ -610,7 +611,7 @@
             </md-content>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
                 <input type="hidden" md-autofocus>
                 <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
@@ -922,7 +923,7 @@
             </div>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController" style="margin-left:24px">
                 <input type="hidden" md-autofocus>
                 <div class="titulo_formulario" layout="column" layout-align="start start" ng-click="closeCondition()">
@@ -1226,7 +1227,7 @@
                                 <label>Referencia</label>
                                 <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
                             </md-input-container>
-                            <md-input-container class="md-block" flex="20" ng-click="openSide()">
+                            <md-input-container class="md-block" flex="20" ng-click="openAdj()">
                                 <label>Archivo</label>
 
                                 <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
@@ -1537,25 +1538,10 @@
             <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr)")) ?>
         </md-sidenav>
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: 360px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="adjuntoLyr" id="adjuntoLyr">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="adjController">
-                <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
-                    <div ng-click="">
-                        Adjuntos
-                    </div>
-                </div>
-                <div flex layout="column">
-                        <div ngf-drop ngf-select ng-model="files" class="drop-box" ngf-drag-over-class="dragover" ngf-multiple="true" ngf-allow-dir="true" accept="image/*,application/pdf">
-                            insertar archivo
-                        </div>
-                       <md-content flex>
-                           <!--<div class="imgItem"><img src="images/thumbs/{{pic.archivo}}"/></div>-->
-                       </md-content>
-                </div>
-            </md-content>
-        </md-sidenav>
+
         <!-- 8) ########################################## BOTON Next ########################################## -->
         <div ng-controller="notificaciones" ng-include="template"></div>
+        <div ng-controller="FilesController" ng-include="template"></div>
 </div>
 
 

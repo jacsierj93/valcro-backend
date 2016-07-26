@@ -985,6 +985,34 @@ input[type=number]::-webkit-outer-spin-button {
     white-space:nowrap;
 }
 
+/*provisional botones styles*/
+.vlc-buttom{
+    width: 25px;
+    /* border: 1px solid rgb(84, 180, 234); */
+    height: 22px;
+    text-align: center;
+    padding-top: 3px;
+    color: white;
+    background: #ccc;
+    margin-top: 3px;
+    margin-right: 8px;
+    font-weight: bold !important;
+}
+.vlc-buttom.ng-disable{
+    pointer-events: none;
+    color:#f1f1f1;
+}
+.focused .vlc-buttom{
+    background: rgb(84, 180, 234);
+}
+
+.popUp{
+    z-index: 100;
+    margin-top:96px;
+    margin-bottom:48px;
+    width: 360px;
+}
+
 .imgItem{
 
     width: 72px;

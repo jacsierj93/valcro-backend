@@ -1226,8 +1226,25 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         $scope.dirAssign = setGetProv.getAddress();
         $scope.cnt.prov_id=$scope.prov.id
     });
-    $scope.$watch('cnt.pais',function(nvo,old){
-        if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length){
+
+/*    $scope.chkPais = function(){
+        if($filter("customFind")($scope.dirAssign,$scope.cnt.pais_id,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
+            setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
+                name:"si",
+                action:function(){
+
+                }
+            },{
+                name:"no",
+                action:function(){
+                    console.log($scope.provContactosForm);
+                }
+            }]);
+        }
+    }*/
+    $scope.$watch('cnt.pais',function(nvo,old)
+    {
+        if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
             setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
                 name:"si",
                 action:function(){
@@ -1445,6 +1462,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     setGetContac.setContact(false);
                     $scope.provContactosForm.$setUntouched();
                     $scope.provContactosForm.$setPristine();
+                    angular.element("#contTelf").find("input").val("");
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
@@ -1483,30 +1501,33 @@ MyApp.controller('addressBook', function($scope,providers,$mdSidenav,setGetConta
     $scope.filtByprov = function(a,b){
         return $filter("customFind")(a.provs,b,function(val,compare){return val.prov_id == compare}).length==0;
     };
+    function instance(contact2){
+
+        contact2.autoSave =true;
+        contact2.prov_id = $scope.prov.id;
+        setGetContac.setContact(contact2);
+        $mdSidenav("contactBook").close();
+    }
     $scope.toEdit = function(element){
-        setNotif.addNotif("alert", "añadir este contacto, lo convertira en Agente y no podra ser editado.. esta deacuerdo?", [
+        setNotif.addNotif("alert", "desea que este contacto se convierta en un agente?", [
             {
                 name:"si",
                 action:function(){
-                    var contact2 = element.cont;
-                    contact2.agente = 1;
-                    contact2.autoSave =true;
-                    contact2.prov_id = $scope.prov.id;
-                    setGetContac.setContact(contact2);
-                    $mdSidenav("contactBook").close();
+                    element.cont.agente = 1;
+                    instance(element.cont)
                 }
             },
             {
                 name:"no",
                 action:function(){
-
+                    instance(element.cont)
                 }
             }
         ]);
 
 
 
-    }
+    };
 
     $scope.closeContackBook = function(){
         $mdSidenav("contactBook").close();
@@ -1592,11 +1613,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     });
     var coin = {};
     var currentOrig = {};
-    $scope.prueba=function(){
-        alert()
-    }
     $scope.toEdit = function(coin){
-        console.log("entro",coin)
         coin = coin.coinSel;
         $scope.cn.id=coin.id;
         $scope.cn.coin=coin.id;
@@ -2386,28 +2403,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     });
     var time = {};
     var currentOrig = {};
-    /*escuha el estatus del formulario y guarda cuando este valido*/
-    /*$scope.$watchGroup(['timeTrans.$valid','timeTrans.$pristine'], function(nuevo) {
-        var sum = $scope.conv;
-        if(nuevo[0] && !nuevo[1]) {
-            providers.put({type:"saveTransTime"},$scope.ttr,function(data){
-                $scope.ttr.id = data.id;
-                $scope.timeTrans.$setPristine();
-                time.min_dias = $scope.ttr.from;
-                time.max_dias = $scope.ttr.to;
-                time.id_pais = $scope.ttr.country;
-                time.country =  $filter("filterSearch")(paises,[$scope.ttr.country])[0];
-                if(data.action=="new"){
-                    time.id = $scope.ttr.id;
-                    $scope.timesT.unshift(time);
-                    setNotif.addNotif("ok", "nuevo tiempo de Transito", [
-                    ],{autohidden:3000});
-                }
-            });
-
-        }
-    });*/
-
+    var exeption = false;
     var saveTimeTrans = function(onSuccess){
         if((angular.equals(currentOrig,$scope.ttr) && $scope.ttr ) || ($scope.timeTrans.$pristine )){
             onSuccess();
@@ -2424,6 +2420,25 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
                 name:"dejame Corregirlos",
                 action:function(){
                     console.log($scope.timeProd);
+                }
+            }]);
+            return false;
+        }
+
+        if($scope.ttr.from >= $scope.ttr.to && !exeption){
+            setNotif.addNotif("alert", "tal ves quisiste decir de:<b>"+$scope.ttr.to+"</b> a "+$scope.ttr.from+"</b>",[{
+                name:"si, cambialos",
+                action:function(){
+                    var aux = $scope.ttr.to;
+                    $scope.ttr.to = $scope.ttr.from;
+                    $scope.ttr.from = aux;
+                    saveTimeTrans();
+                }
+            },{
+                name:"No, esta bien asi",
+                action:function(){
+                    exeption = true;
+                    saveTimeTrans(onSuccess);
                 }
             }]);
             return false;
@@ -2449,7 +2464,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
             onSuccess();
 
         });
-    }
+    };
 
     $scope.toEdit = function(element){
         time = element.time;
@@ -2470,6 +2485,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
                     $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id};
                     time = {};
                     currentOrig = {};
+                    exeption = false;
                     $scope.timeTrans.$setUntouched();
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
@@ -2661,57 +2677,24 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
     }
 });
 
-MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers){
-    $scope.openSide = function(){
-        $mdSidenav('adjuntoLyr').open()
-    };
+MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService){
+    filesService.setFolder("prov");
+    $scope.openAdj = filesService.open;
 
+    $scope.fileProcces = filesService.getProcess();
 
-
-});
-
-MyApp.controller('adjController',function($scope,$mdSidenav,setGetProv,providers,Upload){
-    $scope.imgs = providers.query({type:"listFiles"});
-    $scope.callImg = function(name){
-        return providers.get({type:"getImg"},{name:name});
-    };
-
-    /********SUBIDA DE ARCHIVOS ********/
-    $scope.uploaded = [];
-    $scope.uploadNow = '';
-
-    $scope.$watch('files', function () {
-        $scope.upload($scope.files);
-    });
-    $scope.$watch('file', function () {
-        if ($scope.file != null) {
-            $scope.upload([$scope.file]);
-        }
+    $scope.$watch('fileProcces.estado', function () {
+        console.log($scope.fileProcces);
     });
 
 
-    $scope.upload = function (files) {
-        if (files && files.length) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                Upload.upload({
-                    url: 'provider/upload',
-                    file: file
-                }).progress(function (evt) {
-                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                    uploadNow = progressPercentage;
-
-                    console.log('subiendo: ' + progressPercentage + '% ' + evt.config.file.name);
-                }).success(function (data, status, headers, config) {
-                    console.log('archivo subido con exito ' + config.file.name + ' uploaded. Response: ' + data);
-                    $scope.uploadNow = data;
-                    //   $scope.getfiles();
-                });
-            }
-        }
-    };
+    $scope.$watch('$parent.enabled',function(nvo) {
+        filesService.setAllowUpload(!nvo);
+    });
 
 });
+
+
 
 MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists) {
      $scope.provider = setGetProv.getProv();
