@@ -748,8 +748,8 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.module = Layers.getModule();
     $scope.moduleAccion = Layers.getAccion();
     $scope.cola = filesService.getProcess();
-    $scope.allowUpload = filesService.allowUpLoad();
-    filesService.setallowUpLoad(false);
+    $scope.allowUpload = filesService.allowUpload();
+    filesService.setAllowUpload(false);
     $scope.inLayer = "";
     $scope.expand=false;
     $scope.imgSelec = null;
@@ -798,7 +798,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
     /** subida de archivos  al servidor */
     $scope.upload = function(files){
-        console.log("allowUpLoad", filesService.allowUpLoad());
+
         $scope.isUploading = false;
         $scope.cola.total = files.length;
         if (files && files.length) {
@@ -993,8 +993,8 @@ MyApp.service('filesService' ,function(){
             process.estado ='wait';
             return data;
         },
-        allowUpLoad : function(){return allowUpload;},
-        setallowUpLoad : function(value){
+        allowUpload : function(){return allowUpload;},
+        setAllowUpload : function(value){
             allowUpload.val= value;
         }
 

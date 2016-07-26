@@ -16,6 +16,32 @@
 .doc-Open7{ border: 1px solid #00e10b;color: #00e10b;}/** llegada en <=0 */
 .doc-Open0{ border: 1px solid #00ff00;color: #00ff00;}/** llegada en <=0 */
 
+.dot-filter100{ border: 1px solid #006837; color: #006837;}/** llegada en <=0 */
+.dot-filter90{ border: 1px solid #00862c;color: #00862c;}/** llegada en <=0 */
+.dot-filter60{ border: 1px solid #00a421;color: #00a421;}/** llegada en <=0 */
+.dot-filter30{ border: 1px solid #00c316;color: #00c316;}/** llegada en <=0 */
+.dot-filter7{ border: 1px solid #00e10b;color: #00e10b;}/** llegada en <=0 */
+.dot-filter0{ border: 1px solid #00ff00;color: #00ff00;}/** llegada en <=0 */
+
+.dot-filter100:hover{ border: 1px solid rgb(84, 180, 234); color: rgb(84, 180, 234);}/** llegada en <=0 */
+.dot-filter90:hover{ border: 1px solid rgb(84, 180, 234);color: rgb(84, 180, 234);}/** llegada en <=0 */
+.dot-filter60:hover{ border: 1px solid rgb(84, 180, 234);color: rgb(84, 180, 234);}/** llegada en <=0 */
+.dot-filter30:hover{ border: 1px solid rgb(84, 180, 234);color:rgb(84, 180, 234);}/** llegada en <=0 */
+.dot-filter7:hover{ border: 1px solid rgb(84, 180, 234);color: rgb(84, 180, 234);}/** llegada en <=0 */
+.dot-filter0:hover{ border: 1px solid rgb(84, 180, 234);color:rgb(84, 180, 234);}/** llegada en <=0 */
+
+.dot-select{
+    border: 1px solid rgb(84, 180, 234) !important;
+    color:rgb(84, 180, 234) !important;
+}
+
+.item-select{
+    color:rgb(84, 180, 234) !important;
+}
+
+.item-not-select{
+    color:#f1f1f1 !important;
+}
 .not-focus{
     border: 0px;
 }
@@ -76,7 +102,7 @@
 .menuFilter{
     width: 192px;
     background-color: #f1f1f1;
-    padding-left: 8px;
+
     color: #999999;
 }
 .btnMas{
@@ -174,4 +200,20 @@
 
 .resalt{
     background-color: #3cb0fd;
+}
+md-autocomplete{
+    min-width: 0 !important;
+}
+
+md-autocomplete > md-autocomplete-wrap{
+    box-shadow : none !important;
+}
+
+/*md-autocomplete input:not(.md-input) {
+    padding : 0 !important;
+    height: auto !important;
+}*/
+#autoFilter{
+    padding: 0 0 0 4px !important;
+    height: 24px;
 }
