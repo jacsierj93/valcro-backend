@@ -123,6 +123,8 @@ class OrderController extends BaseController
      */
     public function getProviderList()
     {
+        $data =[];
+        $cPaises =[];
 
         $rawn = "id, razon_social ,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
@@ -147,7 +149,23 @@ class OrderController extends BaseController
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
 
         $provs = Provider::selectRaw($rawn)->whereRaw("(select count(id) from tbl_prov_moneda where prov_id = tbl_proveedor.id) > 0 ")->get();
-        return $provs;
+        foreach($provs as $aux){
+            $paises= [];
+            foreach( $aux->getCountry() as $p){
+                $paises[] = $p->short_name;
+                if (in_array($p->short_name, $cPaises)) {
+                    $cPaises[] = $p->short_name;
+                }
+            }
+           $aux['paises'] =$paises ;
+           // $provs['paises'] =
+
+
+        }
+        $data['proveedores'] = $provs;
+        $data['paises'] = $cPaises;
+
+        return $data;
     }
 
     /**

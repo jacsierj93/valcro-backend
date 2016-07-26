@@ -18,29 +18,91 @@
                     </div>
                 </div>
 
-                <div layout="column" flex="" tabindex="-1" >
+                <div layout="column" flex="" tabindex="-1"  style="padding: 0px 4px 0px 4px;">
                     <form name="provdiderFilter" tabindex="-1">
-                        <div class="menuFilter" id="expand1" style="height: 167px;" layout-align="start start" tabindex="-1">
+                        <div class="menuFilter" id="expand1" style="height: 176px;" layout-align="start start" tabindex="-1">
                             <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
                                 <label>Razon  Social</label>
-                                <input  type="text" ng-model="fRazSocial" ng-minlength="2" required tabindex="-1" >
+                                <input  type="text" ng-model="filterProv.razon_social"  tabindex="-1" >
                             </md-input-container>
-                            <!--
-                                                    <md-autocomplete
-                                                        md-selected-item="fpaisSelec"
-                                                        md-search-text="texto"
-                                                        md-items="item in filterData.paises | customFind : texto : searchCountry "
-                                                        md-item-text="item.short_name "
-                                                        placeholder="Pais">
-                                                        <md-item-template>
-                                                            <span >{{item.short_name}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No hay resultados "{{ctrl.searchText}}"
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                            -->
 
+                            <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                                <label>Pais</label>
+                                <input  type="text" ng-model="filterProv.pais"  tabindex="-1" >
+                            </md-input-container>
+
+                            <!--<md-autocomplete style="background-color: transparent; margin-top: 0px !important;"
+                                             class="filter"
+                                             md-selected-item="filterProv.pais"
+                                             md-search-text="texto"
+                                             md-items="item in paises | filter : texto "
+                                             md-item-text="item"
+                                             md-no-asterisk
+                                             md-input-id ="autoFilter"
+
+                                             placeholder="Pais">
+                                <md-item-template>
+                                    <span >{{item}}</span>
+                                </md-item-template>
+                                <md-not-found>
+                                    No hay resultados
+                                </md-not-found>
+                            </md-autocomplete>-->
+
+                            <div layout="row" class="dotRow" style="height: 24px;">
+                                <div flex layout layout-align="center center" ng-click="filterProv.f100 = !filterProv.f100  ">
+                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f100 ,'dot-filter100':!filterProv.f100}" >
+                                        +
+                                    </div>
+                                </div>
+                                <div flex layout layout-align="center center"  ng-click="filterProv.f90 = !filterProv.f90  ">
+                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f90 ,'dot-filter90':!filterProv.f90}" >
+                                        90
+                                    </div>
+                                </div>
+                                <div flex layout layout-align="center center"  ng-click="filterProv.f60 = !filterProv.f60  ">
+                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f60 ,'dot-filter60':!filterProv.f60}">
+                                        60
+                                    </div>
+                                </div>
+                                <div flex layout layout-align="center center"  ng-click="filterProv.f30 = !filterProv.f30  " >
+                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f30 ,'dot-filter30':!filterProv.f30}">
+                                        30
+                                    </div>
+                                </div>
+                                <div flex layout layout-align="center center"  ng-click="filterProv.f7 = !filterProv.f7  " >
+                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f7 ,'dot-filter7':!filterProv.f7}" >
+                                        7
+                                    </div>
+                                </div>
+                                <div flex layout layout-align="center center"  ng-click="filterProv.f0 = !filterProv.f0  " >
+                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f0 ,'dot-filter0':!filterProv.f0}">
+                                        0
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="height:48px; padding-right: 16px;" layout="row" layout-align="space-between center">
+                                <div flex="" style="overflow: hidden;" layout="row" ng-init="filterProv.op = '+'">
+                                    <div  style="width: 16px;" layout="column" layout-align="center center" ng-click="filterProv.op = (filterProv.op == '+') ? '-' : '+' " >
+                                        <span  style="font-size: 24px"  >  {{filterProv.op }} </span>
+                                    </div>
+                                    <md-input-container class="md-block" flex >
+                                        <label>Monto</label>
+                                        <input  type="text" ng-model="filterProv.monto"   >
+                                    </md-input-container>
+                                </div>
+
+                                <div flex="20" layout="row"  layout-align="center center" ng-click="filterProv.pc = !filterProv.pc" >
+                                    <div layout="column" layout-align="center center" >
+                                        <span class="icon-PuntoCompra" style="font-size: 24px"  ng-class= "{'item-select' : filterProv.pc ,'item-no-select':!filterProv.pc}"></span>
+                                    </div>
+                                </div>
+                                <div flex="20" layout="row"  layout-align="center center" ng-click="filterProv.cp = !filterProv.cp" >
+                                    <div layout="column" layout-align="center center" >
+                                        <span class="icon-Contrapedidos" style="font-size: 24px"  ng-class= "{'item-select' : filterProv.cp ,'item-no-select':!filterProv.cp}"></span>
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
                     </form>
@@ -57,7 +119,7 @@
             <md-virtual-repeat-container id="vertical-container" flex id="providers">
                 <div style="width:0px; height: 0px;"  id="init" tabindex="1"></div>
 
-                <div class="boxList"  layout="column" flex ng-repeat="item in todos " ng-click="setProvedor(item, this)"
+                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' " ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      ng-show="provShow(item)"
@@ -68,40 +130,40 @@
 
                     <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
 
-<!--                    <div layout="row" class="dotRow">
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open100" ng-show ="item.Showreview100" >
-                                {{item.review100}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open90" ng-show ="item.Showreview90" >
-                                {{item.review90}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open60" ng-show ="item.Showreview60">
-                                {{item.review60}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open30" ng-show ="item.Showreview30" >
-                                {{item.review30}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open7" ng-show ="item.Showreview7">
-                                {{item.review7}}
-                            </div>
-                        </div>
-                        <div flex layout layout-align="center center">
-                            <div layout layout-align="center center" class="dot-empty doc-Open0" ng-show ="item.Showreview0">
-                                {{item.review0}}
-                            </div>
-                        </div>
-                    </div>
+                    <!--                    <div layout="row" class="dotRow">
+                                            <div flex layout layout-align="center center">
+                                                <div layout layout-align="center center" class="dot-empty doc-Open100" ng-show ="item.Showreview100" >
+                                                    {{item.review100}}
+                                                </div>
+                                            </div>
+                                            <div flex layout layout-align="center center">
+                                                <div layout layout-align="center center" class="dot-empty doc-Open90" ng-show ="item.Showreview90" >
+                                                    {{item.review90}}
+                                                </div>
+                                            </div>
+                                            <div flex layout layout-align="center center">
+                                                <div layout layout-align="center center" class="dot-empty doc-Open60" ng-show ="item.Showreview60">
+                                                    {{item.review60}}
+                                                </div>
+                                            </div>
+                                            <div flex layout layout-align="center center">
+                                                <div layout layout-align="center center" class="dot-empty doc-Open30" ng-show ="item.Showreview30" >
+                                                    {{item.review30}}
+                                                </div>
+                                            </div>
+                                            <div flex layout layout-align="center center">
+                                                <div layout layout-align="center center" class="dot-empty doc-Open7" ng-show ="item.Showreview7">
+                                                    {{item.review7}}
+                                                </div>
+                                            </div>
+                                            <div flex layout layout-align="center center">
+                                                <div layout layout-align="center center" class="dot-empty doc-Open0" ng-show ="item.Showreview0">
+                                                    {{item.review0}}
+                                                </div>
+                                            </div>
+                                        </div>
 
--->
+                    -->
                     <div layout="column" class="dot-text">
                         <div id="dot-show{{item.id}}" layout="column" flex ng-show="item.show">
                             <div layout="row">
@@ -117,12 +179,12 @@
                     <div layout="row" class="dotRow">
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit100,item.review100)">
                             <div layout layout-align="center center" class="dot-item emit100" >
-                               +
+                                +
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit90,item.review90)">
                             <div layout layout-align="center center" class="dot-item emit90" >
-                               90
+                                90
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) "ng-mouseenter = "showDotData(item,item.emit60,item.review60)">
@@ -142,7 +204,7 @@
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit0,item.review0)">
                             <div layout layout-align="center center" class="dot-item emit0">
-                               0
+                                0
                             </div>
                         </div>
                     </div>
@@ -1790,7 +1852,7 @@
                                         <div flex class="cellGrid">  {{item.descripcion}}</div>
                                         <div flex="10" class="cellGrid">{{item.saldo}}</div>
                                         <div flex class="cellGrid">  {{item.comentario}}</div>
-                                       <!-- <div flex class="cellGrid">  {{item.adjunto}}</div>-->
+                                        <!-- <div flex class="cellGrid">  {{item.adjunto}}</div>-->
                                     </div>
                                 </div>
                             </div>

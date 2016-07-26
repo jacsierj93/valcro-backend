@@ -22,10 +22,15 @@ class Country extends Model
     public function states(){
         return $this->hasMany('App\Models\Sistema\State', 'in_location');
     }
+
     public function areaCode(){
         return $this->hasOne('App\Models\Sistema\AreaCode', 'pais_id');
     }
     public function ports(){
         return $this->hasOne('App\Models\Sistema\Ports', 'pais_id');
+    }
+
+    public function providers_addres(){
+        return $this->hasMany('App\Models\Sistema\ProviderAddress', 'pais_id');
     }
 }

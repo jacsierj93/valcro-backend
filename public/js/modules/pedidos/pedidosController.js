@@ -64,6 +64,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     var timePreview;
     // filtros
+    $scope.filterProv ={
+
+    };
     $scope.fRazSocial="";
     $scope.fPais="";
     $scope.fpaisSelec="";
@@ -92,9 +95,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     $scope.document  = {};
     $scope.contraPedSelec ={};
     $scope.pedidoSusPedSelec={};
+    $scope.paises = {};
+    $scope.todos =[];
 
+    Order.get({type:"OrderProvList"},{},function(response){
+        $scope.todos = response.proveedores;
+        $scope.paises = response.paises;
+        /*$timeout(function(){
+         angular.forEach(response, function(v){
+         /!*angular.forEach(function(v.paises))*!/
+         });
 
-    $scope.todos = Order.query({type:"OrderProvList"});
+         }, 100);*/
+
+    });
 
     $timeout(function(){$scope.init();},0);
 
@@ -144,7 +158,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.calbackPais = function(response){
-       // App.changeModule({module:"pedidos"});
+        // App.changeModule({module:"pedidos"});
         console.log("response del cambio de modulo");
 
         // $scope.formData.paises= Order.query({type:"ProviderCountry",id:});
@@ -155,13 +169,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /********************************************GUI ********************************************/
 
     $scope.showDotData= function(item,emit,review){
-      if(emit && review){
-          item.emit= angular.copy(emit);
-          item.review= angular.copy(review);
-          item.show = true;
-      }else{
-          item.show = false;
-      }
+        if(emit && review){
+            item.emit= angular.copy(emit);
+            item.review= angular.copy(review);
+            item.show = true;
+        }else{
+            item.show = false;
+        }
 
     };
 
@@ -171,7 +185,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.FilterLateral = function(){
         if(!$scope.showLateralFilter){
-            jQuery("#menu").animate({height:"232px"},500);
+            jQuery("#menu").animate({height:"258px"},500);
             $scope.showLateralFilter=true;
         }
     };
@@ -519,7 +533,113 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     };
 
     $scope.search = function(){
-        return $scope.todos;
+        var data  =[];
+        if($scope.todos.length > 0){
+            data = $filter("customFind")($scope.todos,$scope.filterProv,
+                function(current,compare){
+                    var paso= true;
+                    current.prioridad = 0;
+                    if(compare.razon_social){
+                        if(current.razon_social.toLowerCase().indexOf(compare.razon_social.toLowerCase()) != -1){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else{
+                            paso = false;
+                        }
+                    }
+                    if(compare.pais){
+                       var i= $filter("customFind")(current.paises,compare.pais, function(c,cp){ return c.toLowerCase().indexOf(cp.toLowerCase()) == -1}).length;
+                        if(i>0){
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+
+                    if(compare.pc == true){
+                        if(current.puntoCompra > 0 ){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+
+                    if(compare.cp == true){
+                        if(current.contraPedido > 0 ){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+
+                    if(compare.monto){
+                        if(compare.op == '+'){
+                            if(parseFloat(current.deuda) < parseFloat(compare.monto)){
+                                paso=false;
+                            }
+                        }
+                        if(compare.op == '-'){
+                            if(parseFloat(current.deuda) > parseFloat(compare.monto)){
+                                paso=false;
+                            }
+                        }
+                    }
+
+                    if(compare.f0 == true){
+                        if(current.emit0 > 0  ||  current.review0 > 0){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+                    if(compare.f7 == true){
+                        if(current.emit7 > 0  ||  current.review7 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+                    if(compare.f30 == true){
+                        if(current.emit30 > 0  ||  current.review30 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+                    if(compare.f60 == true){
+                        if(current.emit60 > 0  ||  current.review60 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+                    if(compare.f90 == true){
+                        if(current.emit90 > 0  ||  current.review90 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }if(compare.f100 == true){
+                        if(current.emit100 > 0  ||  current.review100 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso= false;
+                        }
+                    }
+                    return paso;
+
+                });
+        }
+         return  data;
+        //  return data;
     };
 
     $scope.searchEmails= function(){
@@ -729,15 +849,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     },
                     after: function(){
                         Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
-                           // var data =[];
-                           // var aux ={};
+                            // var data =[];
+                            // var aux ={};
                             angular.forEach(response , function(v,k){
                                 //aux ={};
                                 //aux = v;
                                 v.saldo=parseFloat(v.saldo);
                                 $scope.providerProds.push(v);
                             });
-                           // $scope.providerProds= data;
+                            // $scope.providerProds= data;
                         });
                     }
                 }});
@@ -2121,9 +2241,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.$watch("formBlock",function(newVal){
         if(newVal == true){
-            filesService.setallowUpLoad(false);
+            filesService.setAllowUpload(false);
         }else if( newVal == false){
-            filesService.setallowUpLoad(true);
+            filesService.setAllowUpload(true);
         }
 
     });
