@@ -127,9 +127,10 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     });
 
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
+
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
-
+        $scope.layer = nvo[0];
     })
 
 
@@ -464,7 +465,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
             $scope.dtaPrv.contraped = !$scope.dtaPrv.contraped;
         }
 
-        //$scope.projectForm.$setDirty();
+        $scope.projectForm.$setDirty();
     };
     $scope.types = masterLists.getTypeProv();
     $scope.envios =masterLists.getSendTypeProv();
@@ -583,13 +584,14 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
 });
 //###########################################################################################3
-MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,masterLists,$filter,setNotif,$timeout) {
+MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,masterLists,$filter,setNotif,$timeout,$mdSidenav,asignPort) {
     $scope.id = "provAddrsControllers";
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
     var dirSel = {};
     $scope.tipos = masterLists.getTypeDir();
     $scope.paises = masterLists.getCountries();
     $scope.ports = masterLists.getPorts();
+    $scope.svPort = asignPort.getPorts();
     /*escucha cambios en el proveedor seleccionado y carga las direcciones correspondiente*/
     $scope.$watch('prov.id',function(nvo){
         $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
@@ -599,14 +601,25 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.$watch('address.length',function(nvo){
         setGetProv.setComplete("address",nvo);
     });
-  /*  $scope.$watch('dir.pais',function(nvo,old){
-        var prev = (old != 0) ? $filter("filterSearch")($scope.paises, [old])[0].area_code.phone : "";
-        $scope.dir.provTelf = (nvo != 0 && $scope.dir.provTelf=="") ? $scope.dir.provTelf.replace(prev, $filter("filterSearch")($scope.paises, [nvo])[0].area_code.phone) : $scope.dir.provTelf;
-    });*/
+
+    var preId = null;
+    $scope.$watch('dir.ports.length', function(nvo,old) {
+        console.log(preId,$scope.dir.id)
+        if(preId==$scope.dir.id){
+            //$scope.dir.ports = $scope.svPort.ports;
+            $scope.direccionesForm.$setDirty();
+        }else{
+            preId =$scope.dir.id;
+        }
+    });
+
+    $scope.openPorts = function(){
+      $mdSidenav("portsLyr").open();
+    };
 
     $scope.$watch('dir.pais',function(nvo,old){
-
-        if((nvo) && $filter("filterSearch")(masterLists.getCommonCountry(),[nvo]).length <= 0){
+        asignPort.setCountry(nvo);
+        if((nvo) && $filter("filterSearch")(masterLists.getCommonCountry(),[nvo]).length <= 0 && $scope.direccionesForm.$dirty){
             setNotif.addNotif("alert","al parecer este pais no es muy comun, esta seguro que esta correcto?", [
                 {
                     name: "corregir",
@@ -666,8 +679,10 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.direccProv = dirSel.direccion;
         $scope.dir.tipo = dirSel.tipo_dir;
         $scope.dir.pais = dirSel.pais_id;
+        asignPort.setCountry(dirSel.pais_id);
         $scope.dir.provTelf = dirSel.telefono;
         $scope.dir.ports = dirSel.ports;
+        asignPort.setPorts(dirSel.ports);
         $scope.dir.zipCode = parseInt(dirSel.codigo_postal);
         currentOrig = angular.copy($scope.dir);
         setGetProv.addToRllBck($scope.dir,"dirProv");
@@ -766,30 +781,12 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     };
 
     $scope.showGrid = function(elem,event){
-        if(jQuery(event.target).parents("#lyrAlert").length==0) {
+        if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
             $scope.isShow = elem;
             if(!elem) {
-
-/*
-                if($filter("customFind")($scope.address,"3",function(curr,val){ return curr.tipo_dir == val; }).length<=0){
-                    if($filter("customFind")($scope.address,"2",function(curr,val){ return curr.tipo_dir == val; }).length<=0 || $filter("customFind")($scope.address,"1",function(curr,val){ return curr.tipo_dir == val; }).length<=0){
-                        setNotif.addNotif("alert","deberias tener al menos una direccion de fabrica y otra de almacen",[
-                            {
-                                name:"aceptar",
-                                action:function(){
-
-                                },
-                                default:3
-                            }
-                        ]);
-                    }
-                }
-
-
-
-*/
                 saveAddress(function(){
-                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "", id: false, id_prov: $scope.prov.id};
+                    asignPort.setPorts(false);
+                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
                     currentOrig = {};
                     $scope.direccionesForm.$setPristine();
                     $scope.direccionesForm.$setUntouched();
@@ -798,9 +795,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                         $scope.$parent.expand = false;
                     }
                 });
-
-
+                if($mdSidenav("portsLyr").isOpen()){
+                    $mdSidenav("portsLyr").close();
+                }
             }
+            console.log($mdSidenav("portsLyr").isOpen())
+           /*
+*/
         }
     };
 
@@ -812,6 +813,51 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
 
 });
+
+MyApp.controller('portsControllers', function ($scope,masterLists,asignPort,setNotif) {
+    $scope.paises = masterLists.getCountries();
+    $scope.ports = masterLists.getPorts();
+    $scope.asignPorts = asignPort.getPorts();
+    $scope.country = asignPort.getCountry();
+    $scope.searchPort = function(ports,pais){
+        return ((ports.pais_id == pais) && $scope.asignPorts.ports.indexOf(ports.id)==-1);
+    };
+    $scope.searchAssig = function(ports,asign){
+        return asign.indexOf(ports.id)!=-1;
+    };
+
+    $scope.assign = function(port){
+        $scope.asignPorts.ports.push(port.id);
+        setNotif.addNotif("ok", "puerto añadido", [
+        ],{autohidden:3000});
+    }
+
+    /*$scope.remove = function(index){
+        $scope.asignPorts.ports.splice(index,1);
+        setNotif.addNotif("ok", "se removio el puerto", [
+        ],{autohidden:3000});
+    }*/
+});
+
+MyApp.service("asignPort",function(){
+    var assignPorts = {ports:[],aux:true};
+    var defaultCountry = {default:""};
+    return{
+        setPorts : function(ports){
+            assignPorts.ports = ports || [];
+            assignPorts.aux = !assignPorts.aux;
+        },
+        getPorts : function(){
+            return assignPorts;
+        },
+        setCountry : function(pais){
+            defaultCountry.default = pais;
+        },
+        getCountry : function(){
+            return defaultCountry;
+        }
+    }
+})
 
 MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers,$mdSidenav,$filter,valcroNameDetail,setNotif,$timeout) {
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual

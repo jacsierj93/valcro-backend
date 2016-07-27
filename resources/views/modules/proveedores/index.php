@@ -372,9 +372,9 @@
                             <div>
                                 Direcciones
                             </div>
-                            <div style="width:24px">
+                            <!--<div style="width:24px">
                                 <span class="icon-Agregar"></span>
-                            </div>
+                            </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand" flex layout="column" class="area-form">
                         <div layout="row" class="row">
@@ -402,7 +402,14 @@
 
                                 </div>-->
                             </md-input-container>
-                            <md-input-container class="md-block" flex="20">
+                            <div style="width:100px; padding: 3px;" ng-show="dir.tipo==2 || dir.tipo==3">
+                                <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">puertos</span>
+                                <div ng-click="openPorts()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
+                                    {{dir.ports.length || 0}}
+                                </div>
+                            </div>
+
+                            <md-input-container class="md-block" flex>
                                 <label>Codigo Postal</label>
                                 <input skip-tab id="disZipCode" type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
                             </md-input-container>
@@ -412,14 +419,14 @@
                             </md-input-container>
 
                         </div>
-                        <md-input-container class="md-block"ng-show="dir.tipo==2 || dir.tipo==3">
+                        <!--<md-input-container class="md-block"ng-show="dir.tipo==2 || dir.tipo==3">
                             <label>puertos</label>
                             <md-select skip-tab id="dirPort" ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
                                 <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
                                     {{port.Main_port_name}}
                                 </md-option>
                             </md-select>
-                        </md-input-container>
+                        </md-input-container>-->
                         <md-input-container class="md-block">
                             <label>Direccion</label>
                             <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
@@ -496,6 +503,18 @@
                             </div>
                         </div>
                         <div class="row" layout="row">
+                            <!--<div flex style="height: 100%; margin-top:6px" layout="row">
+                                <div style="max-width: calc(100% - 200px); overflow-x: auto; height:24px; margin-top:5px; border-bottom:1px solid #ccc">
+                                        <div ng-repeat="block in cnt.emailCont" style="overflow: hidden;height: 24px; width: 24px; background: #ccc; color:white; font-weight: bolder; float: left; margin-right: 8px;">
+                                            {{block.valor}}
+                                        </div>
+                                </div>
+                                <md-input-container class="md-block" flex>
+                                    <label>Email</label>
+                                    <input skip-tab info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-disabled=" $parent.enabled ">
+                                </md-input-container>
+
+                            </div>-->
                             <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -633,6 +652,71 @@
             </md-content>
         </md-sidenav>
 
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="portsLyr" id="portsLyr">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="portsControllers">
+                <input type="hidden" md-autofocus>
+                <div layout="column" flex style="overflow-x: hidden;">
+                    <div class="titulo_formulario" layout="column" layout-align="start start">
+                        <div ng-click="closeNomValLyr()">
+                            Puertos
+                        </div>
+                    </div>
+                    <div layout="column">
+                        <div>
+                            <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                                <div>
+                                    Puertos Disponibles
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <md-input-container class="md-block" flex>
+                                    <label>Pais</label>
+                                    <md-select info="" ng-model="country.default" md-no-ink ng-disabled="$parent.enabled">
+                                        <md-option ng-repeat="pais in paises" value="{{pais.id}}">
+                                            {{pais.short_name}}
+                                        </md-option>
+                                    </md-select>
+                                    <!--<div ng-messages="user.pais.$error">
+                                        <div ng-message="required">Campo Obligatorio.</div>
+
+                                    </div>-->
+                                </md-input-container>
+                            </div>
+                            <md-content flex style="max-height: 200px;">
+                                <div ng-repeat="port in ports | customFind : country.default : searchPort" style="border-bottom: 1px solid #f1f1f1; height: 32px;" ng-dblclick="assign(port)">
+                                    <div layout="column" >
+                                        <div layout="row" flex="grow">
+                                            <div flex>
+                                                {{port.Main_port_name}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </md-content>
+                        </div>
+                        <div>
+                            <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                                <div>
+                                    Puertos Asignados
+                                </div>
+                            </div>
+
+                            <md-content flex style="max-height: 200px;">
+                                <div ng-dblclick="remove($index)" ng-repeat="port in ports | customFind : asignPorts.ports : searchAssig" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
+                                    <div layout="column" >
+                                        <div layout="row" flex="grow">
+                                            <div flex>
+                                                {{port.Main_port_name}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </md-content>
+                        </div>
+                    </div>
+                </div>
+            </md-content>
+        </md-sidenav>
         <!-- ########################################## LAYER (3) INFORMACION FINANCIERA ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
