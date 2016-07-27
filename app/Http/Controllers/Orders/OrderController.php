@@ -126,13 +126,13 @@ class OrderController extends BaseController
         $data =[];
         $cPaises =[];
 
-        $rawn = "id, razon_social ,(select sum(monto)
+        $rawn = "id, razon_social ,contrapedido,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
          where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
         $rawn .=" ,(select count(id) from tbl_compra_orden where prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null
          and final_id is null and fecha_sustitucion is null and fecha_aprob_compra != null
          and fecha_aprob_gerencia != null and estado_id != 3
-         ) as contraPedido ";
+         ) as contraPedidos ";
 
         $rawn .= " , (".$this->generateProviderQuery("emision","<=0").") as emit0 ";
         $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 1 and  7 ").") as emit7 ";
@@ -157,8 +157,8 @@ class OrderController extends BaseController
                     $cPaises[] = $p->short_name;
                 }
             }
-           $aux['paises'] =$paises ;
-           // $provs['paises'] =
+            $aux['paises'] =$paises ;
+            // $provs['paises'] =
 
 
         }
@@ -200,15 +200,15 @@ class OrderController extends BaseController
             if(sizeof($prv->getCountry())>0){
                 $paso= true;
             }
-           /* if($req->has('skitProv')){
-                $exclu = json_decode($req->skitProv);
-               foreach($req->skitProv as $aux){
-                   if($aux['id'] == $prv->id ){
-                       $paso= false;
-                       break;
-                   }
-               }
-            }*/
+            /* if($req->has('skitProv')){
+                 $exclu = json_decode($req->skitProv);
+                foreach($req->skitProv as $aux){
+                    if($aux['id'] == $prv->id ){
+                        $paso= false;
+                        break;
+                    }
+                }
+             }*/
             if($paso){
                 $temp["id"] = $prv->id;
                 $temp["razon_social"] = $prv->razon_social;
@@ -587,7 +587,7 @@ class OrderController extends BaseController
             $prod[]= $temp;
         }
         if($model->prov_id != null){
-           // $data['proveedor'] ;
+            // $data['proveedor'] ;
         }
 
         $data['adjuntos']= $atts;
@@ -2700,6 +2700,86 @@ class OrderController extends BaseController
     /*********************************** CONTRAPEDIDOS ***********************************/
 
     /**
+    regresa el estado de un contra pedidos
+     * incluye informacion de si esta se ha utilizado en otros documentos
+     *
+     **/
+    public function  getCustomOrderReview (Request $req){
+        $data = [];
+        switch ($req->tipo){
+            case  21:
+                $solIt = SolicitudeItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Solicitud" ,$solIt );
+                }
+                $proIt = OrderItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Proforma" ,$proIt );
+                }
+                $odcIt = PurchaseItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Orden de compra" ,$odcIt );
+                }
+                break;
+            case  22:
+                $solIt = SolicitudeItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Solicitud" ,$solIt );
+                }
+                $proIt = OrderItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Proforma" ,$proIt );
+                }
+                $odcIt = PurchaseItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Orden de compra" ,$odcIt );
+                }
+                ;break;
+            case  23:
+                $solIt = SolicitudeItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Solicitud" ,$solIt );
+                }
+                $proIt = OrderItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Proforma" ,$proIt );
+                }
+                $odcIt = PurchaseItem::where('tipo_origen_id', 2)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Orden de compra" ,$odcIt );
+                }
+                ;break;
+        }
+
+        return $data;
+
+
+    }
+
+
+    /**
      *  obtiene los motivo de contra pedido
      */
     public function getCustomOrderResons()
@@ -2898,9 +2978,9 @@ class OrderController extends BaseController
         where('aprobada','1')
             ->where('prov_id',$req->prov_id)
             ->get();
-        $purchaIts=PurchaseItem::where('tipo_origen_id',2)->get();
+/*        $purchaIts=PurchaseItem::where('tipo_origen_id',2)->get();
         $orderIts=OrderItem::where('tipo_origen_id',2)->get();
-        $solIts=SolicitudeItem::where('tipo_origen_id',2)->get();
+        $solIts=SolicitudeItem::where('tipo_origen_id',2)->get();*/
 
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
@@ -2918,10 +2998,9 @@ class OrderController extends BaseController
             $auxIts = $aux->CustomOrderItem()->get();
             $paso=true;
             $tem['asignado'] = false;
-            $asigOtro=array();
 
-            // fue aasignado
-            if(sizeof($docIts->where('doc_origen_id', $aux->id))>0){
+            // fue asignado
+            if(sizeof($docIts->where('doc_origen_id', $aux->id)->where('tipo_origen_id','2'))>0){
                 $tem['asignado'] = true;
             }
 
@@ -2941,45 +3020,11 @@ class OrderController extends BaseController
 
             if(!$tem['asignado'] && sizeof($auxIts->sum('saldo')) == 0){
                 $paso= false;
-            }else{
+            }
 
-                switch ($req->tipo){
-                    case  21:
-                        if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
-                            $asigOtro[] = array("Proforma" ,$orderIts->where('doc_origen_id',$aux->id) );
-                        }
-                        if(sizeof($purchaIts->where('doc_origen_id',$aux->id)) > 0){
-                            $asigOtro[] = array("Orden de Compra" ,$purchaIts->where('doc_origen_id',$aux->id) );
-                        }
-                        if(sizeof($solIts->where('doc_origen_id',"<>",$aux->id)) > 0){
-                            $asigOtro[] = array("Solicitud" ,$solIts->where('doc_origen_id',$aux->id) );
-                        }
-                        ;break;
-                    case  22:
-                        if(sizeof($solIts->where('doc_origen_id',$aux->id)) > 0){
-                            $asigOtro[] = array("Solicitud" ,$solIts->where('doc_origen_id',$aux->id) );
-                        }
-                        if(sizeof($purchaIts->where('doc_origen_id',$aux->id)) > 0){
-                            $asigOtro[] = array("Orden de Compra" ,$purchaIts->where('doc_origen_id',$aux->id) );
-                        }
-                        if(sizeof($orderIts->where('doc_origen_id',"<>",$aux->id)) > 0){
-                            $asigOtro[] = array("Proforma" ,$orderIts->where('doc_origen_id',$aux->id) );
-                        }
+            else{
 
-                        ;break;
-                    case  23:
-                        $tem['extra'] =$solIts;
-                        if(sizeof($solIts->where('doc_origen_id',$aux->id)) > 0){
-                            $asigOtro[] = array("Solicitud" ,$solIts->where('doc_origen_id',$aux->id) );
-                        }
-                        if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
-                            $asigOtro[] = array("Proforma" ,$orderIts->where('doc_origen_id',$aux->id) );
-                        }
-                        if(sizeof($purchaIts->where('doc_origen_id',"<>",$aux->id)) > 0){
-                            $asigOtro[] = array("Orden de Compra" ,$purchaIts->where('doc_origen_id',$aux->id) );
-                        }
-                        ;break;
-                }
+
             }
 
             if($paso){
@@ -3002,7 +3047,6 @@ class OrderController extends BaseController
                 $tem['tipo_pago_contrapedido_id'] =$aux->tipo_pago_contrapedido_id;
                 $tem['aprobada'] =$aux->aprobada;
                 $tem['titulo'] =$aux->titulo;
-                $tem['asignadoOtro'] =$asigOtro;
                 $data[]=$tem;
             }
             // }
@@ -3303,6 +3347,84 @@ class OrderController extends BaseController
 
     /*********************************** kitchen box (cocinas)*********************************************/
 
+    /**
+    regresa el estado de un contra pedidos
+     * incluye informacion de si esta se ha utilizado en otros documentos
+     *
+     **/
+    public function  getKitchenBoxReview (Request $req){
+        $data = [];
+        switch ($req->tipo){
+            case  21:
+                $solIt = SolicitudeItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Solicitud" ,$solIt );
+                }
+                $proIt = OrderItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Proforma" ,$proIt );
+                }
+                $odcIt = PurchaseItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Orden de compra" ,$odcIt );
+                }
+                break;
+            case  22:
+                $solIt = SolicitudeItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Solicitud" ,$solIt );
+                }
+                $proIt = OrderItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Proforma" ,$proIt );
+                }
+                $odcIt = PurchaseItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Orden de compra" ,$odcIt );
+                }
+                ;break;
+            case  23:
+                $solIt = SolicitudeItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Solicitud" ,$solIt );
+                }
+                $proIt = OrderItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Proforma" ,$proIt );
+                }
+                $odcIt = PurchaseItem::where('tipo_origen_id', 3)
+                    ->where('doc_origen_id', $req->id)
+                    ->where('doc_id','<>',$req->doc_id)
+                    ->get();
+                if(sizeof($solIt) > 0){
+                    $data[]=  array("Orden de compra" ,$odcIt );
+                }
+                ;break;
+        }
+
+        return $data;
+
+
+    }
 
     public function getKitchenBox(Request $req){
         $model=KitchenBox:: findOrFail($req->id);
@@ -3321,100 +3443,41 @@ class OrderController extends BaseController
             ->whereNotNull('img_conf_gerente')
             ->whereNotNull('fecha_conf_gerente')
             ->get();
-        $purchaIts=PurchaseItem::where('tipo_origen_id',3)->get();
-        $orderIts=OrderItem::where('tipo_origen_id',3)->get();
-        $solIts=SolicitudeItem::where('tipo_origen_id',3)->get();
+
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
-        // $coins= Monedas::get();
-        $impors= $doc->items()->where('tipo_origen_id', $req->tipo)->get();
+        $docIts = $doc->items()->get();
+        $remplace= $docIts->where('tipo_origen_id', $req->tipo);
+        $imports= array();
+        if($req->tipo == 22){
+            $imports = $docIts->where('tipo_origen_id','21');
+        }
+        if($req->tipo == 23){
+            $imports = $docIts->where('tipo_origen_id','22');
 
+        }
         foreach($items as $aux){
             $paso=true;
             $tem['asignado'] =false;
 
-            $asigOtro=array();
-
-
-            if(sizeof($purchaIts->where('doc_origen_id',$aux->id)) > 0){
-                if($req->tipo ==23){
-
-                    if(sizeof($purchaIts->where('doc_id',$req->doc_id)) > 0){
-                        $tem['asignado'] = true;
-                    }
-
-                }
-            }
-            if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
-                if($req->tipo ==22){
-                    if(sizeof($orderIts->where('doc_id',$req->doc_id)) > 0){
-                        $tem['asignado'] = true;
-                    }
-
-                }
-            }
-            if(sizeof($solIts->where('doc_origen_id',$aux->id)) > 0){
-                if($req->tipo ==21){
-                    if(sizeof($solIts->where('doc_id',$req->doc_id)) > 0){
-                        $tem['asignado'] = true;
-                    }
-
-                }
+        // fue asignado
+            if(sizeof($docIts->where('doc_origen_id', $aux->id)->where('tipo_origen_id','3'))>0){
+                $tem['asignado'] = true;
             }
 
-            /*** importados*/
-            //$tem['ex']= $impors;
-            foreach($impors as $imps){
+            // vino de otro docuemento igual?
+            if(sizeof($remplace->where('doc_origen_id', $aux->id))>0){
+                $tem['asignado'] = true;
+            }
+
+            // fue importado
+            foreach($imports as $imps){
                 $first= $this->getFirstProducto($imps);
-                //$tem['exf']=$first->tipo_origen_id;
-                if($first->tipo_origen_id == 3){
-                    // $tem['exf2']=$first->tipo_origen_id;
-
-                    if($first->doc_origen_id == $aux->id){
-                        $tem['asignado'] = true;
-                        $tem['import'] = $imps;
-                    }
+                if($first->tipo_origen_id == 2 && $first->doc_origen_id == $aux->id){
+                    $tem['asignado'] = true;
+                    $tem['import'] = $imps;
                 }
-
             }
-            switch ($req->tipo){
-                case  21:
-                    if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
-                        $asigOtro[] = array("Proforma" ,$orderIts->where('doc_origen_id',$aux->id) );
-                    }
-                    if(sizeof($purchaIts->where('doc_origen_id',$aux->id)) > 0){
-                        $asigOtro[] = array("Orden de Compra" ,$purchaIts->where('doc_origen_id',$aux->id) );
-                    }
-                    if(sizeof($solIts->where('doc_origen_id',"<>",$aux->id)) > 0){
-                        $asigOtro[] = array("Solicitud" ,$solIts->where('doc_origen_id',$aux->id) );
-                    }
-                    ;break;
-                case  22:
-                    if(sizeof($solIts->where('doc_origen_id',$aux->id)) > 0){
-                        $asigOtro[] = array("Solicitud" ,$solIts->where('doc_origen_id',$aux->id) );
-                    }
-                    if(sizeof($purchaIts->where('doc_origen_id',$aux->id)) > 0){
-                        $asigOtro[] = array("Orden de Compra" ,$purchaIts->where('doc_origen_id',$aux->id) );
-                    }
-                    if(sizeof($orderIts->where('doc_origen_id',"<>",$aux->id)) > 0){
-                        $asigOtro[] = array("Proforma" ,$orderIts->where('doc_origen_id',$aux->id) );
-                    }
-
-                    ;break;
-                case  23:
-                    $tem['extra'] =$solIts;
-                    if(sizeof($solIts->where('doc_origen_id',$aux->id)) > 0){
-                        $asigOtro[] = array("Solicitud" ,$solIts->where('doc_origen_id',$aux->id) );
-                    }
-                    if(sizeof($orderIts->where('doc_origen_id',$aux->id)) > 0){
-                        $asigOtro[] = array("Proforma" ,$orderIts->where('doc_origen_id',$aux->id) );
-                    }
-                    if(sizeof($purchaIts->where('doc_origen_id',"<>",$aux->id)) > 0){
-                        $asigOtro[] = array("Orden de Compra" ,$purchaIts->where('doc_origen_id',$aux->id) );
-                    }
-                    ;break;
-            }
-
 
             if($paso){
                 $tem['id']=$aux->id;
@@ -3451,7 +3514,6 @@ class OrderController extends BaseController
                 $tem['origen_id']=$aux->origen_id;
                 $tem['img_evaluacion']=$aux->img_evaluacion;
                 $tem['usuario']=$aux->usuario;
-                $tem['asignadoOtro']=$asigOtro;
 
 
                 $data[]= $tem;
@@ -4153,9 +4215,9 @@ class OrderController extends BaseController
         if($req->has('direccion_almacen_id')){
             $model->direccion_almacen_id = ($req->direccion_almacen_id."" == "-1") ? null :$req->direccion_almacen_id;
         }
- /*       if($req->has('condicion_id')){
-            $model->condicion_id = $req->condicion_id;
-        }*/
+        /*       if($req->has('condicion_id')){
+                   $model->condicion_id = $req->condicion_id;
+               }*/
         if($req->has('mt3')){
             $model->mt3 = $req->mt3;
         }
@@ -4266,10 +4328,6 @@ class OrderController extends BaseController
         return $aux;
     }
 
-    private  function  transferAttachments($oldItem, $newItem){
-
-
-    }
 
     private function getFinalId($model){
         return  "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
@@ -4284,11 +4342,11 @@ class OrderController extends BaseController
             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_pedido where tbl_proveedor.id= prov_id  and tbl_pedido.deleted_at is null
              and tbl_pedido.fecha_aprob_gerencia is null and tbl_pedido.fecha_aprob_compra is null  ),0) "
-             ." + "
-             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
-             ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.deleted_at is null
+            ." + "
+            ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.deleted_at is null
              and tbl_solicitud.fecha_aprob_gerencia is null and tbl_solicitud.fecha_aprob_compra is null ),0) "
-             .""
+            .""
         ;
         return $q;
     }

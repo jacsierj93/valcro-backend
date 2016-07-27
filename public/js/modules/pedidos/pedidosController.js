@@ -537,22 +537,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.todos.length > 0){
             data = $filter("customFind")($scope.todos,$scope.filterProv,
                 function(current,compare){
-                    var paso= true;
                     current.prioridad = 0;
                     if(compare.razon_social){
                         if(current.razon_social.toLowerCase().indexOf(compare.razon_social.toLowerCase()) != -1){
-                            //paso = true;
                             current.prioridad ++;
                         }else{
-                            paso = false;
+                            return false;
                         }
                     }
                     if(compare.pais){
-                       var i= $filter("customFind")(current.paises,compare.pais, function(c,cp){ return c.toLowerCase().indexOf(cp.toLowerCase()) == -1}).length;
+                        var i= $filter("customFind")(current.paises,compare.pais, function(c,cp){ return c.toLowerCase().indexOf(cp.toLowerCase()) == -1}).length;
                         if(i>0){
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
 
@@ -561,28 +559,28 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
 
                     if(compare.cp == true){
-                        if(current.contraPedido > 0 ){
+                        if(current.contraPedidos > 0 ){
                             //paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
 
                     if(compare.monto){
                         if(compare.op == '+'){
                             if(parseFloat(current.deuda) < parseFloat(compare.monto)){
-                                paso=false;
+                                return false;
                             }
                         }
                         if(compare.op == '-'){
                             if(parseFloat(current.deuda) > parseFloat(compare.monto)){
-                                paso=false;
+                                return false;
                             }
                         }
                     }
@@ -592,7 +590,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
                     if(compare.f7 == true){
@@ -600,7 +598,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
                     if(compare.f30 == true){
@@ -608,7 +606,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
                     if(compare.f60 == true){
@@ -616,7 +614,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
                     if(compare.f90 == true){
@@ -624,21 +622,21 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }if(compare.f100 == true){
                         if(current.emit100 > 0  ||  current.review100 > 0){
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            paso= false;
+                            return false;
                         }
                     }
-                    return paso;
+                    return true;
 
                 });
         }
-         return  data;
+        return  data;
         //  return data;
     };
 
@@ -677,9 +675,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     /******************************************** APERTURA DE LAYERS ********************************************/
 
     $scope.openSide = function(name){
+
         $scope.navCtrl.value = name;
         $scope.navCtrl.estado=true;
+
     };
+
+
     $scope.openAdj = function(folder){
         if($scope.document.id){
             filesService.open();
@@ -810,7 +812,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         }}});
 
-    }
+    };
 
     $scope.selecKitchenBox=  function(item) {
 
@@ -973,19 +975,40 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
      };*/
     $scope.changeContraP = function (item) {
-        var paso=true;
         if(item.import){
             $scope.NotifAction("error",
                 "Este Contra pedido fue agregado a partir de otra solicitud "
                 ,[],{autohidden:autohidden});
             item.asignado=true;
-            paso= false;
 
+        }else
+        if($scope.provSelec.contrapedido != '1' && item.asignado){
+            $scope.NotifAction("alert","El proveedor "+ $scope.provSelec.razon_social +
+                " no admite contra pedidos ¿Esta seguro de asignarlo ?",
+                [
+                    {name:"No", action : function(){item.asignado = false;}},
+                    {name:"Si", action:
+                        function(){
+                            alert("abrir layer add contra pedido por excepcion");
+                        }
+                    }
+
+
+                ]
+                ,{});
+        }else {
+            $scope.addRemoveContraPe(item);
         }
-        if(paso){
-            item.doc_id=$scope.document.id;
-            if(item.asignado){
-                if(item.asignadoOtro.length >0){
+
+
+    };
+
+    $scope.addRemoveContraPe = function(item){
+        if(item.asignado){
+            Order.query({type:"CustomOrderReview", id: item.id, tipo: $scope.formMode.value, doc_id:$scope.document.id},{},function(response){
+                console.log("review contra pedido", response);
+                item.doc_id=$scope.document.id;
+                if(response.length > 0){
                     $scope.NotifAction("alert",
                         "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
                         ,[
@@ -994,40 +1017,61 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                                     Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
                                         $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                                         setGetOrder.change('contraPedido'+item.id,'id',item);
+                                        setGetOrder.setState("change");
                                     });
                                 }
                             },{name: 'No',
                                 action:function(){item.asignado=false;}
                             }
                         ]);
-                }else {
+                }else{
                     Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
                         $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                         setGetOrder.change('contraPedido'+item.id,'id',item);
 
+
                     });
                 }
 
-            }
-            else{
-                $scope.NotifAction("alert",
-                    "Se eliminara el contra pedido ¿Desea continuar?"
-                    ,[
-                        {name: 'Ok',
-                            action:function(){
-                                Order.postMod({type:$scope.formMode.mod,mod:"RemoveCustomOrder"},item,function(response){
-                                    $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-                                    setGetOrder.change('contraPedido'+item.id,'id',undefined);
 
-                                });
-                            }
-                        },{name: 'Cancel',
-                            action:function(){item.asignado=true;}
+
+            });
+        }else {
+            $scope.NotifAction("alert",
+                "Se eliminara el contra pedido ¿Desea continuar?"
+                ,[
+                    {name: 'Ok',
+                        action:function(){
+                            Order.postMod({type:$scope.formMode.mod,mod:"RemoveCustomOrder"},item,function(response){
+                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+                                setGetOrder.change('contraPedido'+item.id,'id',undefined);
+
+                            });
                         }
-                    ]);
-            }
+                    },{name: 'Cancel',
+                        action:function(){item.asignado=true;}
+                    }
+                ]);
         }
+        /*
 
+         if(item.asignado){
+         if(item.asignadoOtro.length >0){
+
+         }else {
+         Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
+         $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+         setGetOrder.change('contraPedido'+item.id,'id',item);
+
+
+         });
+         }
+
+         }
+         else{
+
+         }
+         */
     };
 
     $scope.changeProducto = function (item){
@@ -1109,6 +1153,63 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         });
     };
 
+    $scope.isEditItem = function(item) {
+        if (!$scope.formBlock) {
+            if (item.tipo_origen_id == 1 || !item.tipo_origen_id){
+                item.edit = true;
+                var mo= jQuery("#prodDtInp"+item.id);
+                mo[0].focus();
+            }else if ($scope.formMode.value == 21) {
+                if(! item.edit){
+                    $scope.NotifAction("alert","No suele ser usual modificar la cantidad de este tipo de articulos" +
+                        " ¿Esta seguro de editar esta cantidad?",
+                        [
+                            {name:"No", action: function(){}},
+                            {name: "Si", action: function(){
+                                item.edit = true;
+                                var mo= jQuery("#prodDtInp"+item.id);
+                                mo[0].focus();
+
+                            }}
+
+                        ],{block:true});
+                }
+
+            }else if ($scope.formMode.value == 22 || $scope.formMode.value == 23) {
+                if(!item.edit){
+                    if(item.tipo_origen_id == 2 || item.tipo_origen_id == 3){
+                        $scope.NotifAction("alert","No suele ser usual modificar la cantidad de este tipo de articulos" +
+                            " ¿Esta seguro de editar esta cantidad?",
+                            [
+                                {name:"No", action: function(){}},
+                                {name: "Si", action: function(){
+                                    item.edit = true;
+                                    var mo= jQuery("#prodDtInp"+item.id);
+                                    mo[0].focus();
+                                }}
+
+                            ],{block:true});
+                    }else{
+                        $scope.NotifAction("alert","Este articulo fue importado de otro documento" +
+                            " ¿Esta seguro de editar esta cantidad?",
+                            [
+                                {name:"No", action: function(){}},
+                                {name: "Si", action: function(){
+                                    alert("moificar cantidad por excepcion");
+                                    // item.edit = true;
+                                }}
+
+                            ],{block:true}
+                        );
+                    }
+                }
+
+            }
+
+        }
+
+
+    };
 
     /**
      * @review
@@ -1196,63 +1297,71 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
         }
         if (paso) {
-            item.doc_id = $scope.document.id;
-            if (item.asignado) {
-                if (item.asignadoOtro.length > 0) {
-                    $scope.NotifAction("alert",
-                        "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
-                        , [
-                            {
-                                name: 'Si',
-                                action: function () {
-                                    Order.postMod({
-                                        type: $scope.formMode.mod,
-                                        mod: "AddkitchenBox"
-                                    }, item, function (response) {
-                                        $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
-                                        setGetOrder.change('kitchenBox'+item.id,'id',item);
-                                    });
-                                }
-                            }, {
-                                name: 'No',
-                                action: function () {
-                                    item.asignado = false;
-                                }
-                            }
-                        ]);
-                } else {
-                    Order.postMod({type: $scope.formMode.mod, mod: "AddkitchenBox"}, item, function (response) {
-                        $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
-                        setGetOrder.change('kitchenBox'+item.id,'id',item);
-                    });
-                }
+            $scope.addRemoveKitchenBox(item);
+        }
 
-            }
-            else {
-                $scope.NotifAction("alert",
-                    "Se eliminara el KitchenBox ¿Desea continuar?"
-                    , [
-                        {
-                            name: 'Ok',
-                            action: function () {
-                                Order.postMod({
-                                    type: $scope.formMode.mod,
-                                    mod: "RemovekitchenBox"
-                                }, item, function (response) {
-                                    setGetOrder.change('kitchenBox'+item.id,'id',undefined);
-                                    $scope.NotifAction("ok", "Removido", [], {autohidden: autohidden});
-                                });
-                            }
-                        }, {
-                            name: 'Cancel',
-                            action: function () {
-                                item.asignado = true;
-                            }
+    };
+
+    $scope.addRemoveKitchenBox = function(item){
+
+        item.doc_id = $scope.document.id;
+        if (item.asignado) {
+            Order.query({type:"KitchenBoxReview", id: item.id, tipo: $scope.formMode.value, doc_id:$scope.document.id},{},
+                function(response){
+                    if(response.length > 0){
+                        $scope.NotifAction("alert",
+                            "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
+                            , [
+                                {
+                                    name: 'Si',
+                                    action: function () {
+                                        Order.postMod({
+                                            type: $scope.formMode.mod,
+                                            mod: "AddkitchenBox"
+                                        }, item, function (response) {
+                                            $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                                            setGetOrder.change('kitchenBox'+item.id,'id',item);
+                                        });
+                                    }
+                                }, {
+                                    name: 'No',
+                                    action: function () {
+                                        item.asignado = false;
+                                    }
+                                }
+                            ]);
+                    }else{
+                        Order.postMod({type: $scope.formMode.mod, mod: "AddkitchenBox"}, item, function (response) {
+                            $scope.NotifAction("ok", "Asignado", [], {autohidden: autohidden});
+                            setGetOrder.change('kitchenBox'+item.id,'id',item);
+                        });
+                    }
+
+                });
+        }
+        else {
+            $scope.NotifAction("alert",
+                "Se eliminara el KitchenBox ¿Desea continuar?"
+                , [
+                    {
+                        name: 'Ok',
+                        action: function () {
+                            Order.postMod({
+                                type: $scope.formMode.mod,
+                                mod: "RemovekitchenBox"
+                            }, item, function (response) {
+                                setGetOrder.change('kitchenBox'+item.id,'id',undefined);
+                                $scope.NotifAction("ok", "Removido", [], {autohidden: autohidden});
+                            });
                         }
-                    ]);
-            }
-
-        };
+                    }, {
+                        name: 'Cancel',
+                        action: function () {
+                            item.asignado = true;
+                        }
+                    }
+                ]);
+        }
 
     };
 
@@ -2114,7 +2223,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                     case "agrKitBoxs":
 
                         $scope.LayersAction({search:{name:"agrKitBoxs",
+                            before : function(){
+                                $scope.formData.kitchenBox=[]
+                            },
                             after: function(){
+
                                 $scope.formData.kitchenBox = Order.query({type:"KitchenBoxs",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
                             }
                         }});
@@ -2162,6 +2275,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         }});
                         break;
                     case "agrPed":
+
 
                         break;
                     case "finalDoc":
@@ -2228,11 +2342,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 }
 
                 /***   multiples */
-                if(newVal == "agrPed" || newVal == "newVal" || newVal == "finalDoc" || newVal == "detalleDoc"){
-                    if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
-                        $scope.reloadDoc();
-                    }
-                }
+
 
             }
         }
@@ -2275,6 +2385,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                 setGetOrder.restore();
             }
 
+        }
+        if(newVal[1] == "agrPed" || newVal[1] == "newVal" || newVal[1] == "finalDoc" || newVal[1] == "detalleDoc"){
+            if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
+                $scope.reloadDoc();
+            }
         }
 
         if(newVal[1] == "unclosetDoc"){
@@ -2404,17 +2519,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
             ,[
                 {name: 'Ok',
                     action:function(){
-                        /*  var url="RemoveToOrden";
-                         var id=item.id;
-                         if(item.tipo_origen_id == 4){
-                         url="RemoveOrdenItem";
-                         id=item.renglon_id;
-                         }
-                         $http.post("Order/"+url, {id: id, pedido_id: $scope.document.id})
-                         .success(function (response) {
-                         $scope.NotifAction("alert","Removido",[],{autohidden:autohidden});
-                         loadPedido($scope.document.id);
-                         });*/
+
                     }
                 },{name: 'Cancel',action:function(){}}
             ]);

@@ -216,7 +216,7 @@
                             <div >{{item.puntoCompra}}</div>
                             <img  style="float: left;" src="images/punto_compra.png"/>
                         </div>
-                        <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contraPedido > 0" >
+                        <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contrapedido ==  1 " >
                             <div >{{item.contraPedido}}</div>
                             <img  style="float: left;" src="images/contra_pedido.png"/>
                         </div>
@@ -1059,19 +1059,23 @@
                                 </div>
                                 <div flex class="gridContent"  ng-click="allowEdit()">
                                     <div >
-                                        <div ng-repeat="item in document.productos.todos">
+                                        <div ng-repeat="item in document.productos.todos" id="prodDt{{$index}}" row-select>
                                             <div layout="row" class="cellGridHolder" >
                                                 <div flex="5" class="cellGrid">
-                                                    <md-switch class="md-primary" ng-change="addRemoveItem(item)" ng-disabled="( formBlock )" ng-model="item.asignado"</md-switch>
+                                                    <md-switch class="md-primary" ng-change="addRemoveItem(item)"
+                                                               ng-disabled="( formBlock )" ng-model="item.asignado"> </md-switch>
                                                 </div>
-                                                <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
+                                                <div flex="15" class="cellSelect"> {{item.cod_producto}}</div>
                                                 <div flex class="cellGrid">  {{item.descripcion}}</div>
                                                 <div flex class="cellGrid"> {{item.documento}}</div>
                                                 <md-input-container class="md-block" flex="10" >
                                                     <input  ng-model="item.saldo"
                                                             ng-change="changeItem(item)"
                                                             decimal
-                                                            ng-disabled="(formBlock || !item.asignado  || item.tipo_origen_id != '1')"
+                                                            ng-disabled="(formBlock || !item.asignado )"
+                                                            ng-readonly = "!item.edit"
+                                                            ng-click="isEditItem(item)"
+                                                            id="prodDtInp{{item.id}}"
                                                     />
                                                 </md-input-container>
                                             </div>
@@ -1102,6 +1106,9 @@
                         <form>
                             <div class="titulo_formulario md-block"  layout="row"  >
 
+                               <!-- <div style="width: 24px;" layout-align="center center">
+                                    <div class="dot-empty dot-exception" ></div>
+                                </div>-->
                                 <div>
                                     Contrapedidos
                                 </div>
