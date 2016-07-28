@@ -537,12 +537,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         if($scope.todos.length > 0){
             data = $filter("customFind")($scope.todos,$scope.filterProv,
                 function(current,compare){
+                    var paso = true;
                     current.prioridad = 0;
                     if(compare.razon_social){
                         if(current.razon_social.toLowerCase().indexOf(compare.razon_social.toLowerCase()) != -1){
                             current.prioridad ++;
                         }else{
-                            return false;
+                            paso = false;
                         }
                     }
                     if(compare.pais){
@@ -550,7 +551,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                         if(i>0){
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
 
@@ -559,28 +560,28 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
 
                     if(compare.cp == true){
-                        if(current.contraPedidos > 0 ){
-                            //paso = true;
+                        if(current.contrapedido > 0 ){
+                            paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
 
                     if(compare.monto){
                         if(compare.op == '+'){
                             if(parseFloat(current.deuda) < parseFloat(compare.monto)){
-                                return false;
+                                paso = false;
                             }
                         }
                         if(compare.op == '-'){
                             if(parseFloat(current.deuda) > parseFloat(compare.monto)){
-                                return false;
+                                paso = false;
                             }
                         }
                     }
@@ -590,7 +591,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
                     if(compare.f7 == true){
@@ -598,7 +599,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
                     if(compare.f30 == true){
@@ -606,7 +607,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
                     if(compare.f60 == true){
@@ -614,7 +615,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
                     if(compare.f90 == true){
@@ -622,17 +623,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }if(compare.f100 == true){
                         if(current.emit100 > 0  ||  current.review100 > 0){
                             //  paso = true;
                             current.prioridad ++;
                         }else {
-                            return false;
+                            paso = false;
                         }
                     }
-                    return true;
+                    return paso;
 
                 });
         }
@@ -658,18 +659,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         return true;
 
     };
-
-    /*    var timeFilter ;
-     $scope.$watchGroup(['provdiderFilter.$valid', 'provdiderFilter.$pristine'], function (nuevo) {
-
-     if (nuevo[0] && !nuevo[1]) {
-     $scope.provdiderFilter.$setPristine();
-
-     }
-
-     });*/
-
-
 
 
     /******************************************** APERTURA DE LAYERS ********************************************/
@@ -804,10 +793,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     $scope.selecPedidoSust =function (item) {
         $scope.pedidoSusPedSelec ={};
-        $scope.LayersAction({open:{name:"resumenPedidoSus", before: function(){
-            Order.get({type:"Document", id:item.id,tipo:$scope.formMode.value}, {},function(response){
-                console.log("sustitu", response);
+        $scope.LayersAction({open:{name:"resumenPedidoSus",
+            after: function(){
+            Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.formMode.value,doc_id: $scope.document.id}, {},function(response){
                 $scope.pedidoSusPedSelec = response;
+                $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
             });
 
         }}});
@@ -1584,7 +1574,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
 
-
+    /******************     Excecioens       **********/
+    $scope.excepProdFinal = function(item){
+        $mdSidenav("excepAddCP").toggle();
+        $scope.finalProdSelec = angular.copy(item);
+    };
 
     $scope.updateProv= function(){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
@@ -2499,17 +2493,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
     });
 
 
-
-    /**************************** Conversiones ****************/
-    $scope.odcEstatus = function (odc) {
-        if (odc.aprobada == '1') {
-            return 'Aprobada';
-        } else {
-            return 'No Aprobada';
-        }
-    }
-
-
     /*********************************  peticiones  carga $http ********************* ************/
 
     $scope.removeList= function(item){
@@ -2727,8 +2710,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
         return false;
     }
 });
-
-
 
 /**************  SERVICIOS   ***********************/
 
