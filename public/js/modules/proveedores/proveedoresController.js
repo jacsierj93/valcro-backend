@@ -126,22 +126,18 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         }
     });
 
-    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
 
+    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
         $scope.layer = nvo[0];
-    })
+    });
 
 
     $scope.checkLayer = function(compare){
         console.log(compare);
         //return compare != $scope.layer;
     };
-
-
-
-
 
     $scope.data = {
         cb1: true
@@ -151,8 +147,22 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.nextLayer = function(to){
-        $scope.LayersAction({open:{name:to}});
-        $scope.showNext(true);
+        if(to!="END"){
+            $scope.LayersAction({open:{name:to}});
+        }else{
+            endProvider(noProv)
+        }
+
+        $scope.showNext(false);
+    };
+
+    $scope.prevLayer = function(){
+        if($scope.index==1){
+            endProvider(noProv);
+        }else{
+            $scope.LayersAction({close:true});
+        }
+
     };
 
     var chngProv = function(prov){
@@ -165,14 +175,21 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         //openLayer("layer0");//modificado para mostrar resumen proveedor
     };
 
-
+    var noProv = function(){
+        $scope.LayersAction({close:{all:true}});
+        setGetProv.cancelNew();
+        $scope.edit = false;
+        $scope.enabled = true;
+        setGetProv.setProv(false);
+    };
 
     $scope.addProv = function(){
         endProvider(newProv,null);
     };
 
     var endProvider = function(yes,not,id){
-        console.log(setGetProv.haveChang())
+        not = not||null;
+        id = id||null;
         if(setGetProv.haveChang()){
             $scope.LayersAction({open:{name:"layer5"}});
             setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
@@ -223,11 +240,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.showNext = function(status,to){
-        console.log("next",status,to);
         if(status){
-            console.log($mdSidenav("NEXT").open())
             $scope.nextLyr = to;
-            //if($scope.prov.id && to!="layer1") //excepcion creada apra layer1 desde resumen
             $mdSidenav("NEXT").open()
         }else{
             $mdSidenav("NEXT").close()
@@ -235,9 +249,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
     masterLists.setMain();
     setGetContac.setList();
-    $scope.menuExpand = function(){
-        jQuery("#menu").animate({height:"200px"},500);
-    };
 });
 MyApp.controller('resumenProv', function ($scope,setGetProv,providers) {
     $scope.provider = setGetProv.getProv();
@@ -259,6 +270,38 @@ MyApp.controller('provCoins', function ($scope,listCoins,setGetProv) {
  }]);*/
 
 MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $anchorScroll,$timeout) {
+    $scope.showLateralFilter = false;
+    $scope.filterProv = {razon_social:"",contraped:null,aereo:null,maritimo:null};
+    $scope.FilterLateral = function(){
+        if(!$scope.showLateralFilter){
+            jQuery("#menu").animate({height:"176px"},500);
+            $scope.showLateralFilter=true;
+        }else{
+            jQuery("#menu").animate({height:jQuery("#menu").height()-176+"px"},500);
+            $scope.showLateralFilter=false;
+        }
+    };
+    $scope.togglecheck = function(e,lmbModel){
+        if(e.keyCode==32 || e.type=="click"){
+            $scope.filterProv[lmbModel] = ($scope.filterProv[lmbModel]=="0")?"1":"0";
+        }
+    };
+    $scope.filterList = function(prov,filt){
+        var valid = prov.razon_social.toLowerCase().indexOf(filt.razon_social.toLowerCase())!=-1;
+        if(filt.contraped && valid){
+            valid = prov.contrapedido == filt.contraped;
+        }
+        if(filt.aereo && valid){
+            valid = prov.tipo_envio_id==1 || prov.tipo_envio_id==3
+            valid = (filt.aereo==0)?!valid:valid;
+        }
+        if(filt.maritimo && valid){
+            valid = prov.tipo_envio_id==2 || prov.tipo_envio_id==3
+            valid = (filt.maritimo==0)?!valid:valid;
+        }
+        return valid;
+    };
+
     setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
@@ -613,8 +656,11 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         }
     });
 
+    var lryOpen = false;
     $scope.openPorts = function(){
-      $mdSidenav("portsLyr").open();
+      $mdSidenav("portsLyr").open().then(function(){
+          lryOpen = true;
+      });
     };
 
     $scope.$watch('dir.pais',function(nvo,old){
@@ -795,13 +841,12 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                         $scope.$parent.expand = false;
                     }
                 });
-                if($mdSidenav("portsLyr").isOpen()){
-                    $mdSidenav("portsLyr").close();
-                }
             }
-            console.log($mdSidenav("portsLyr").isOpen())
-           /*
-*/
+            if(lryOpen){
+                $mdSidenav("portsLyr").close().then(function(){
+                    lryOpen = false;
+                });
+            }
         }
     };
 
@@ -814,7 +859,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
 });
 
-MyApp.controller('portsControllers', function ($scope,masterLists,asignPort,setNotif) {
+MyApp.controller('portsControllers', function ($scope,masterLists,asignPort,setNotif,$filter) {
     $scope.paises = masterLists.getCountries();
     $scope.ports = masterLists.getPorts();
     $scope.asignPorts = asignPort.getPorts();
@@ -822,6 +867,7 @@ MyApp.controller('portsControllers', function ($scope,masterLists,asignPort,setN
     $scope.searchPort = function(ports,pais){
         return ((ports.pais_id == pais) && $scope.asignPorts.ports.indexOf(ports.id)==-1);
     };
+
     $scope.searchAssig = function(ports,asign){
         return asign.indexOf(ports.id)!=-1;
     };
@@ -830,13 +876,13 @@ MyApp.controller('portsControllers', function ($scope,masterLists,asignPort,setN
         $scope.asignPorts.ports.push(port.id);
         setNotif.addNotif("ok", "puerto añadido", [
         ],{autohidden:3000});
-    }
+    };
 
-    /*$scope.remove = function(index){
-        $scope.asignPorts.ports.splice(index,1);
+    $scope.remove = function(index){
+        $scope.asignPorts.ports.splice($scope.asignPorts.ports.indexOf(index.id),1);
         setNotif.addNotif("ok", "se removio el puerto", [
         ],{autohidden:3000});
-    }*/
+    }
 });
 
 MyApp.service("asignPort",function(){
@@ -956,17 +1002,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     $scope.$watch('valcroName.length',function(nvo){
         setGetProv.setComplete("valcroName",nvo);
     });
-   /* $scope.$watchGroup(['nomvalcroForm.$valid','nomvalcroForm.$pristine'], function(nuevo) {
-        console.log($scope.nomvalcroForm)
-        if(nuevo[0] && !nuevo[1]) {
-            if($filter("customFind")($scope.valcroName,$scope.valName.name,function(current,compare){return current.name==compare}).length>1){
-                setNotif.addNotif("alert","este nombre Vacro ya existe",[]);
-            }else{
-                setNotif.hideByContent("alert","este nombre Vacro ya existe");
-            }
-            //saveValcroname();
-        }
-    });*/
+
     function saveValcroname(preFav,onSuccess){
         console.log(preFav)
         if(!$scope.nomvalcroForm.$valid){
@@ -1051,8 +1087,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         ]);
 
     };
-
-
 
     $scope.showGrid = function(elem,a){
         if(!elem){
@@ -1273,21 +1307,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         $scope.cnt.prov_id=$scope.prov.id
     });
 
-/*    $scope.chkPais = function(){
-        if($filter("customFind")($scope.dirAssign,$scope.cnt.pais_id,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
-            setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
-                name:"si",
-                action:function(){
 
-                }
-            },{
-                name:"no",
-                action:function(){
-                    console.log($scope.provContactosForm);
-                }
-            }]);
-        }
-    }*/
     $scope.$watch('cnt.pais',function(nvo,old)
     {
         if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
@@ -1840,7 +1860,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
 
     $scope.showGrid = function(elem,event){
         if(jQuery(event.target).parents("#lyrAlert").length==0) {
-            $scope.isShow = elem;
+
             if(!elem) {
 
                 saveBank(function(){
@@ -1855,7 +1875,12 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
                     }
                 })
 
+            }else{
+                if(!$scope.isShow){
+                    $scope.bnk.bankBenef = $scope.prov.description;
+                }
             }
+            $scope.isShow = elem;
         }
     };
     $scope.viewExtend = function(sel){
@@ -2737,6 +2762,45 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     $scope.$watch('$parent.enabled',function(nvo) {
         filesService.setAllowUpload(!nvo);
     });
+
+    var list = {};
+    var currentOrig = {};
+    $scope.toEdit = function(ls){
+        list
+        currentOrig = angular.copy($scope.bnk);
+        setGetProv.addToRllBck($scope.bnk,"infoBank")
+    };
+
+
+    $scope.showGrid = function(elem,event){
+        if(jQuery(event.target).parents("#lyrAlert").length==0) {
+
+            if(!elem) {
+
+                saveBank(function(){
+                    $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                    account={};
+                    currentOrig = {};
+                    $scope.bankInfoForm.$setPristine();
+                    $scope.bankInfoForm.$setUntouched();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                })
+
+            }else{
+                if(!$scope.isShow){
+                    $scope.bnk.bankBenef = $scope.prov.description;
+                }
+            }
+            $scope.isShow = elem;
+        }
+    };
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"bankInfoController":false;
+    };
 
 });
 

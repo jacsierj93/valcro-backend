@@ -11,24 +11,54 @@
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
 
-        <div class="barraLateral" layout="column">
-            <div id="menu" layout="row" flex="none" class="menuBarHolder md-whiteframe-1dp" style="height: 48px" >
+        <div class="barraLateral" layout="column" ng-controller="ListProv">
+            <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
                 <!-- 3) ########################################## MENU ########################################## -->
-                <div layout="row" layout-align="start center" class="menu" style="height: 48px;">
-                    <div flex layout-align="center center" ng-click="showAlert()">
+                <div class="menu" style="min-height: 48px; width: 100%;">
+                    <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
                         Menu
                     </div>
-                    <div layout="column" style="width: 48px; height: 48px;" layout-align="center center" ng-click="menuExpand()">
-                        <?= HTML::image("images/btn_nextArrow.png") ?>
+                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;"
+                         ng-click="FilterLateral()" ng-hide="showLateralFilter">
+                        <img ng-src="images/Down.png">
+                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
+                    </div>
+                </div>
+                <div layout="column" flex="" tabindex="-1"  style="padding: 0px 4px 0px 4px;">
+                    <form name="provdiderFilter" tabindex="-1">
+                        <div class="menuFilter" id="expand1" style="height: 176px;" layout-align="start start" tabindex="-1">
+                            <div>
+                                <span class="icon-Contrapedidos iconInput" tab-index="-1" ng-click="togglecheck($event,'contraped')" ng-class="{'iconActive':filterProv.contraped=='1','iconInactive':filterProv.contraped=='0'}" style="font-size:23px;margin-rigth:8px"></span>
+                                <span class="icon-Aereo" style="font-size: 23px" ng-click="togglecheck($event,'aereo')" ng-class="{'iconActive':filterProv.aereo=='1','iconInactive':filterProv.aereo=='0'}" ></span>
+                                <span class="icon-Barco" style="font-size: 23px" ng-click="togglecheck($event,'maritimo')" ng-class="{'iconActive':filterProv.maritimo=='1','iconInactive':filterProv.maritimo=='0'}" /></span>
+                            </div>
+                            <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                                <label>Razon  Social</label>
+                                <input  type="text" ng-model="filterProv.razon_social"  tabindex="-1" >
+                            </md-input-container>
+                            <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                                <label>Pais</label>
+                                <input  type="text" ng-model="filterProv.pais"  tabindex="-1" >
+                            </md-input-container>
+                        </div>
+                    </form>
+                    <div id="expand2" flex >
+
+                    </div>
+                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateral()">
+                       <!-- <img ng-src="{{imgLateralFilter}}">-->
+                        <span class="icon-Up" style="font-size: 24px; width: 24px; height: 24px; color:#ccc" ></span>
+                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
             </div>
+
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
-            <div id="listado" flex ng-controller="ListProv" style="overflow-y:auto;" ng-click="showAlert(45)" >
+            <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos | customFind : filterProv : filterList" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'0' | number:2}}</div>
                     <div style="height:40px;">
@@ -70,7 +100,7 @@
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
                 <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
                     <!--<i class="fa fa-angle-left" style="font-size: 48px; color: #999999;"></i>-->
-                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"LayersAction({close:true});","ng-show"=>"(index>0)")) ?>
+                    <?= HTML::image("images/btn_prevArrow.png","",array("ng-click"=>"prevLayer()","ng-show"=>"(index>0)")) ?>
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
@@ -702,7 +732,7 @@
                             </div>
 
                             <md-content flex style="max-height: 200px;">
-                                <div ng-dblclick="remove($index)" ng-repeat="port in ports | customFind : asignPorts.ports : searchAssig" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
+                                <div  ng-repeat="port in ports | customFind : asignPorts.ports : searchAssig" ng-dblclick="remove(port)" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
                                     <div layout="column" >
                                         <div layout="row" flex="grow">
                                             <div flex>
@@ -1311,11 +1341,17 @@
                                 <label>Referencia</label>
                                 <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
                             </md-input-container>
-                            <md-input-container class="md-block" flex="20" ng-click="openAdj()">
+                            <div style="width:100px; padding: 3px;">
+                                <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">listas</span>
+                                <div ng-click="openAdj()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
+                                    {{lp.file.length || 0}}
+                                </div>
+                            </div>
+                            <!--<md-input-container class="md-block" flex="20" ng-click="openAdj()">
                                 <label>Archivo</label>
 
                                 <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
-                            </md-input-container>
+                            </md-input-container>-->
                         </div>
                         <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
