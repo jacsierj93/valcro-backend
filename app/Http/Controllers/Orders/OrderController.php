@@ -754,8 +754,11 @@ class OrderController extends BaseController
 
         $princi->parent_id = $reemplaze->id;
         $princi->version = $reemplaze->version + 1;
+
         $model->version = $princi->version + 1;
         $model->parent_id = $princi->id;
+
+
         $princi->fecha_sustitucion= Carbon::now();
         $reemplaze->fecha_sustitucion= Carbon::now();
 
@@ -782,7 +785,7 @@ class OrderController extends BaseController
             $newItem->tipo_origen_id =21;
             $newItem->doc_id =$model->id;
             $newItem->origen_item_id =$oldItem->id;
-            $newItem->doc_origen_id =$reemplaze->id;
+            $newItem->doc_origen_id =$princi->id;
             $newItem->cantidad =$oldItem->cantidad;
             $newItem->saldo =$oldItem->saldo;
             $newItem->producto_id =$oldItem->producto_id;
@@ -2674,25 +2677,135 @@ class OrderController extends BaseController
      */
     public function getOrderSustitute(Request $req){
 
-        $model= Order::findOrFail($req->id);
-        $items= $model->OrderItem()->get();
-        $products= Array();
-        foreach($items as $aux){
+        $instace= $this->getDocumentIntance($req->tipo);
+        $model= $instace->findOrFail($req->id);
+        $docIts= $instace->findOrFail($req->doc_id)->items()->get();
 
-            // $aux['origen']=MasterOrderController::getTypeProduct($aux)['descripcion'];
-            $aux['asignado']=false;
-            $ordI= OrderItem::where('pedido_id', $req->pedido_id)
-                ->where('origen_item_id', $aux->id)
-                ->first();
-            if($ordI != null){
-                $aux['asignado']=true;
+        $prov= Provider::findOrFail($model->prov_id);
+        $mone=Monedas::findOrFail($model->prov_moneda_id);
+
+        //para maquinas
+        $tem = array();
+        $tem['id']=$model->id;
+        $tem['tipo_id']=$model->tipo_id;
+        $tem['pais_id']=$model->pais_id;
+        $tem['final_id']=$model->final_id;
+        $tem['direccion_almacen_id']=$model->direccion_almacen_id;
+        $tem['condicion_pago_id']=$model->condicion_pago_id;
+        $tem['motivo_pedido_id']=$model->motivo_pedido_id;
+        $tem['prioridad_id']=$model->prioridad_id;
+        $tem['condicion_pedido_id']=$model->condicion_pedido_id;
+        $tem['prov_moneda_id']=$model->prov_moneda_id;
+        $tem['estado_id']=$model->estado_id;
+        $tem['doc_parent_id']=$model->doc_parent_id;
+        $tem['doc_parent_origen_id']=$model->doc_parent_origen_id;
+        // pra humanos
+        $tem['comentario']=$model->comentario;
+        $tem['tasa']=$model->tasa;
+        $tem['proveedor']=$prov->razon_social;
+        $tem['documento']= $model->type;
+        $tem['titulo']= $model->titulo;
+        $tem['diasEmit']=$model->daysCreate();
+        $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
+        $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_compra ;
+        $tem['img_aprob'] =$model->fecha_aprob_compra ;
+
+
+        $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
+
+        if($model->motivo_id){
+            $tem['motivo']=OrderReason::findOrFail($model->motivo_id)->motivo;
+        }
+        if($model->pais_id){
+            $tem['pais']=Country::findOrFail($model->pais_id)->short_name;
+        }
+        if($model->prioridad_id){
+            $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
+        }
+        if($model->prov_moneda_id){
+            $tem['moneda']=$mone->nombre;
+        }
+        if($model->prov_moneda_id){
+            $tem['symbol']=$mone->simbolo;
+        }
+        if($model->tipo_id != null){
+            $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
+        }
+
+        $tem['nro_proforma']=$model->nro_proforma;
+        $tem['nro_factura']=$model->nro_factura;
+        $tem['img_proforma']=$model->img_proforma;
+        $tem['img_factura']=$model->img_factura;
+        $tem['mt3']=$model->mt3;
+        $tem['peso']=$model->peso;
+        $tem['emision']=$model->emision;
+        $tem['monto']=$model->monto;
+        $prods = [];
+        foreach($model->items()->get() as $item){
+            $prod = [];
+            $prod = $item;
+            $prod['asignado']= false;
+            if(sizeof($docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id))){
+                $prod['asignado']= true;
             }
 
-            $products[]=$aux;
-        }
-        $model['productos']= $products;
+            $prods[]=$prod;
 
-        return $model;
+        }
+        $tem['productos'] = $prods;
+
+        /**actualizar cuando este el final**/
+        $tem['almacen']="Desconocido";
+
+        // modificar cuando se sepa la logica
+        $tem['aero']=1;
+        $tem['version']=1;
+        $tem['maritimo']=1;
+        $atts = array();
+
+        foreach($model->attachments()->get() as $aux){
+            $auxFile= array();
+            $file= FileModel::findOrFail($aux->archivo_id);
+            $att['id'] = $aux->id;
+            $att['final_id'] = $aux->final_id;
+            $att['archivo_id'] = $aux->archivo_id;
+            $att['doc_id'] = $aux->doc_id;
+            $att['documento'] = $aux->documento;
+            $att['comentario'] = $aux->comentario;
+
+            $auxFile['id']=$file->id;
+            $auxFile['thumb']=$file->getThumbName();
+            $auxFile['tipo']=$file->tipo;
+            $auxFile['file'] = $file->archivo;
+            $att['file'] = $auxFile;
+            $atts[]= $att;
+
+
+
+        }
+        $tem['adjuntos'] = $atts;
+
+
+
+        /* $items= $model->items()->get();
+         $products= Array();
+         foreach($items as $aux){
+
+             // $aux['origen']=MasterOrderController::getTypeProduct($aux)['descripcion'];
+             $aux['asignado']=false;
+             $ordI= OrderItem::where('pedido_id', $req->pedido_id)
+                 ->where('origen_item_id', $aux->id)
+                 ->first();
+             if($ordI != null){
+                 $aux['asignado']=true;
+             }
+
+             $products[]=$aux;
+         }
+         $model['productos']= $products;
+
+         return $model;*/
+        return $tem;
     }
 
 
@@ -3055,17 +3168,8 @@ class OrderController extends BaseController
     }
 
     public function getDocument(Request $req){
-        switch($req->tipo){
-            case 21:
-                $model= Solicitude::findOrFail($req->id);
-                break;
-            case 22:
-                $model= Order::findOrFail($req->id);
-                break;
-            case 23:
-                $model= Purchase::findOrFail($req->id);
-                break;
-        }
+        $model = $this->getDocumentIntance($req->tipo);
+        $model = $model->findOrFail($req->id);
         $prov= Provider::findOrFail($model->prov_id);
         $mone=Monedas::findOrFail($model->prov_moneda_id);
         $adjs = array();
@@ -4351,5 +4455,112 @@ class OrderController extends BaseController
         return $q;
     }
 
+    /**
+        convierte el documento para humanos
+     **/
+
+    private function docForHumans($model){
+        $prov= Provider::findOrFail($model->prov_id);
+        $mone=Monedas::findOrFail($model->prov_moneda_id);
+        $adjs = array();
+        //para maquinas
+        $tem = array();
+        $tem['id']=$model->id;
+        $tem['tipo_id']=$model->tipo_id;
+        $tem['pais_id']=$model->pais_id;
+        $tem['final_id']=$model->final_id;
+        $tem['direccion_almacen_id']=$model->direccion_almacen_id;
+        $tem['condicion_pago_id']=$model->condicion_pago_id;
+        $tem['motivo_pedido_id']=$model->motivo_pedido_id;
+        $tem['prioridad_id']=$model->prioridad_id;
+        $tem['condicion_pedido_id']=$model->condicion_pedido_id;
+        $tem['prov_moneda_id']=$model->prov_moneda_id;
+        $tem['estado_id']=$model->estado_id;
+        $tem['doc_parent_id']=$model->doc_parent_id;
+        $tem['doc_parent_origen_id']=$model->doc_parent_origen_id;
+        // pra humanos
+        $tem['comentario']=$model->comentario;
+        $tem['tasa']=$model->tasa;
+        $tem['proveedor']=$prov->razon_social;
+        $tem['documento']= $model->type;
+        $tem['titulo']= $model->titulo;
+        $tem['diasEmit']=$model->daysCreate();
+        $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
+        $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_compra ;
+        $tem['img_aprob'] =$model->fecha_aprob_compra ;
+
+
+        $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
+
+        if($model->motivo_id){
+            $tem['motivo']=OrderReason::findOrFail($model->motivo_id)->motivo;
+        }
+        if($model->pais_id){
+            $tem['pais']=Country::findOrFail($model->pais_id)->short_name;
+        }
+        if($model->prioridad_id){
+            $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
+        }
+        if($model->prov_moneda_id){
+            $tem['moneda']=$mone->nombre;
+        }
+        if($model->prov_moneda_id){
+            $tem['symbol']=$mone->simbolo;
+        }
+        if($model->tipo_id != null){
+            $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
+        }
+
+        $tem['nro_proforma']=$model->nro_proforma;
+        $tem['nro_factura']=$model->nro_factura;
+        $tem['img_proforma']=$model->img_proforma;
+        $tem['img_factura']=$model->img_factura;
+        $tem['mt3']=$model->mt3;
+        $tem['peso']=$model->peso;
+        $tem['emision']=$model->emision;
+        $tem['monto']=$model->monto;
+        $tem['productos'] =$this->getProductoItem($model);
+
+        /*      foreach( as $aux){
+                  $at= array();
+                  $at['id']= $aux->id
+                  {id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
+              }*/
+
+        /**actualizar cuando este el final**/
+        $tem['almacen']="Desconocido";
+
+        // modificar cuando se sepa la logica
+        $tem['aero']=1;
+        $tem['version']=1;
+        $tem['maritimo']=1;
+        $atts = array();
+
+        foreach($model->attachments()->get() as $aux){
+            $auxFile= array();
+            $file= FileModel::findOrFail($aux->archivo_id);
+            $att['id'] = $aux->id;
+            $att['final_id'] = $aux->final_id;
+            $att['archivo_id'] = $aux->archivo_id;
+            $att['doc_id'] = $aux->doc_id;
+            $att['documento'] = $aux->documento;
+            $att['comentario'] = $aux->comentario;
+
+            $auxFile['id']=$file->id;
+            $auxFile['thumb']=$file->getThumbName();
+            $auxFile['tipo']=$file->tipo;
+            $auxFile['file'] = $file->archivo;
+            $att['file'] = $auxFile;
+            $atts[]= $att;
+
+
+
+        }
+        $tem['adjuntos'] = $atts;
+
+        return $tem;
+
+
+    }
 
 }

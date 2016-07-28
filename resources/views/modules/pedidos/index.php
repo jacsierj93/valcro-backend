@@ -1106,9 +1106,9 @@
                         <form>
                             <div class="titulo_formulario md-block"  layout="row"  >
 
-                               <!-- <div style="width: 24px;" layout-align="center center">
-                                    <div class="dot-empty dot-exception" ></div>
-                                </div>-->
+                                <!-- <div style="width: 24px;" layout-align="center center">
+                                     <div class="dot-empty dot-exception" ></div>
+                                 </div>-->
                                 <div>
                                     Contrapedidos
                                 </div>
@@ -1851,8 +1851,12 @@
                             </div>
                             <div  class="gridContent">
                                 <div flex>
-                                    <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos.todos">
-                                        <div flex="5" class="cellGrid" > </div>
+                                    <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos">
+                                        <div flex="5" class="cellGrid" >
+                                            <md-switch class="md-primary"
+                                                       ng-disabled="( formBlock )" ng-model="item.asignado">
+                                            </md-switch>
+                                        </div>
                                         <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                         <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
                                         <div flex class="cellGrid"> {{item.documento}}</div>
@@ -2175,7 +2179,7 @@
 
                         <div flex class="gridContent">
                             <div   >
-                                <div  ng-repeat="item in finalDoc.productos ">
+                                <div  ng-repeat="item in finalDoc.productos "  ng-click="excepProdFinal(item)">
 
                                     <div layout="row" class="cellGridHolder" >
                                         <div flex="20" class="cellGrid" > {{item.codigo}}</div>
@@ -2254,6 +2258,322 @@
                 </div>
             </md-content>
         </md-sidenav>
+
+
+        <!-- ########################################## LAYER LISTA DE PREVIEW HYML ########################################## -->
+
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="excepAddCP" id="excepAddCP">
+
+            <md-content   layout="row" flex class="sideNavContent" >
+                <div  layout="column" flex="" class="layerColumn">
+                <form layout="row" >
+                    <div class="activeleft "></div>
+                    <div layout="column" flex>
+                        <div class="titulo_formulario" >
+                            <div>
+                                Condicion de pago del Producto
+                            </div>
+                        </div>
+                        <div layout="row"  class="rowRsm"  >
+                            <div layout="row" flex="30" >
+
+                                <div class="rowRsmTitle"> Codigo </div>
+                            </div>
+                            <div class="rms" flex> {{finalProdSelec.codigo}} </div>
+                        </div>
+
+                        <div layout="row"  class="rowRsm"  >
+                            <div layout="row" flex="30" >
+
+                                <div class="rowRsmTitle"> Cod. Fabrica </div>
+                            </div>
+                            <div class="rms" flex> {{finalProdSelec.codigo_fabrica}} </div>
+                        </div>
+                        <div layout="row"  class="rowRsm"  >
+                            <div layout="row" flex="30" >
+
+                                <div class="rowRsmTitle"> Descripción </div>
+                            </div>
+                            <div class="rms" flex> {{finalProdSelec.descripcion}} </div>
+                        </div>
+                        <div layout="row"  class="rowRsm"  >
+                            <div layout="row" flex="30" >
+
+                                <div class="rowRsmTitle"> Cantidad </div>
+                            </div>
+                            <div class="rms" flex> {{finalProdSelec.cantidad | number: 2}} </div>
+                        </div>
+                    </div>
+                </form>
+                <form   layout="row">
+                    <div class="activeleft "></div>
+
+                    <md-input-container class="md-block" flex="35" >
+                        <label>Cantidad</label>
+                        <input ng-model="excepAddCP.cantidad"  decimal info="Cantidad de articúlos en la que se aplicara la condición de pago">
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex="33" >
+                        <label>Dias</label>
+                        <input ng-model="excepAddCP.dias"  decimal info="Numero de dias en que se debe realizar el pago" >
+                    </md-input-container>
+
+                    <md-input-container class="md-block" flex >
+                        <label>Monto</label>
+                        <input ng-model="excepAddCP.monto"  decimal info="Monto en que se debe pagar">
+                    </md-input-container>
+                </form>
+              <form layout="row" flex >
+                    <div class="activeleft"></div>
+                    <md-content flex >
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                    </md-content>
+
+                </form>
+
+
+<!--                <md-content layout="row"  >
+                    <div class="activeleft"></div>
+                    <div flex >
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                        <div >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="30" class="cellGrid" >00 </div>
+                                <div flex="30" class="cellGrid"> 00</div>
+                                <div flex class="cellGrid"> 0.000,00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </md-content>
+-->
+                </div>
+            </md-content>
+        </md-sidenav>
+
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
