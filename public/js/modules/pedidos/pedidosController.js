@@ -795,12 +795,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
         $scope.pedidoSusPedSelec ={};
         $scope.LayersAction({open:{name:"resumenPedidoSus",
             after: function(){
-            Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.formMode.value,doc_id: $scope.document.id}, {},function(response){
-                $scope.pedidoSusPedSelec = response;
-                $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
-            });
+                Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.formMode.value,doc_id: $scope.document.id}, {},function(response){
+                    $scope.pedidoSusPedSelec = response;
+                    $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
+                });
 
-        }}});
+            }}});
 
     };
 
@@ -1574,10 +1574,52 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout ,$fi
 
     };
 
-    /******************     Excecioens       **********/
+    /******************     excepciones       **********/
+
+    $scope.isOpenexcepAddCP = false;
+    $scope.closeExcep= function(){
+        if( $mdSidenav("excepAddCP").open()){
+            $mdSidenav("excepAddCP").close().then(function(){
+                $scope.isOpenexcepAddCP = false;
+            });
+
+            $scope.excepAddCP ={};
+            $scope.formExcepAddCP.$setUntouched();
+        }
+    };
+
     $scope.excepProdFinal = function(item){
-        $mdSidenav("excepAddCP").toggle();
-        $scope.finalProdSelec = angular.copy(item);
+            $timeout(function(){
+                $mdSidenav("excepAddCP").open().then(function(){
+                    $scope.isOpenexcepAddCP = true;
+                });
+                $scope.finalProdSelec = item;
+            },100);
+
+
+    };
+
+    $scope.addexcepProdFinal = function(){
+
+        if($scope.formExcepAddCP.$valid){
+            Order.postMod({type:$scope.formMode.mod, mod:"AddProdConditionPay"},
+                {id:$scope.finalProdSelec.id,
+                    doc_id:$scope.document.id,
+                    cantidad:$scope.excepAddCP.cantidad,
+                    dias:$scope.excepAddCP.dias,
+                    monto:$scope.excepAddCP.monto
+
+                }, function(response){
+                    console.log("response", response);
+                    $scope.finalProdSelec.condicion_pago.push(response.item);
+                    $scope.excepAddCP ={};
+                    $scope.formExcepAddCP.$setUntouched();
+
+
+                });
+        }
+
+
     };
 
     $scope.updateProv= function(){

@@ -31,6 +31,7 @@ use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Purchase\PurchaseAttachment;
 use App\Models\Sistema\Purchase\PurchaseItem;
+use App\Models\Sistema\Purchase\PurchaseItemCondition;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Solicitude\Solicitude;
 use App\Models\Sistema\Solicitude\SolicitudeAttachment;
@@ -645,6 +646,7 @@ class OrderController extends BaseController
             $temp['descripcion']=$aux->descripcion;
             $temp['cantidad']=$aux->cant;
             $temp['extra']= $p;
+            $temp['condicion_pago']= PurchaseItemCondition::where('item_id',$aux->id)->get();
             $prod[]= $temp;
         }
 
@@ -4269,6 +4271,43 @@ class OrderController extends BaseController
 
 
     }
+
+    /*************************************** EXCEPTIONS *****************************************/
+
+    /**
+     * agregar una condicon de pago adicional a un producto
+    */
+    public function addProdConditionPurchase(Request $req){
+       $resul = [];
+       $item = new PurchaseItemCondition();
+        $item->doc_id = $req->doc_id;
+        $item->item_id=$req->id;
+        $item->cantidad=$req->cantidad;
+        $item->dias=$req->dias;
+        $item->monto=$req->monto;
+        $item->save();
+        $resul['accion']= "new";
+
+        $resul['item']= $item;
+
+        return $resul;
+
+    }
+
+    /**
+     * eliminae una condicon de pago adicional de un producto
+     */
+    public function removeProdConditionPurchase(Request $req){
+        $resul = [];
+
+        PurchaseItemCondition::destroy($req->id);
+        $resul['accion']= "del";
+        return $resul;
+
+    }
+
+    /*************************************** private *****************************************/
+
 
     /**
      * setea toda la data del modelo

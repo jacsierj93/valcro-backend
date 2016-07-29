@@ -1878,7 +1878,7 @@
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
-                <div layout="column" flex="30">
+                <div layout="column"  ng-show="!isOpenexcepAddCP" >
                     <form></form><!-- solucion angular se como el form-->
                     <form layout="row" >
                         <div active-left> </div>
@@ -2161,44 +2161,52 @@
                         </div>
                     </form>
                 </div>
-
-                <div layout="column" flex>
-                    <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
-                        <div>
-                            Productos
+                <form layout="row" flex >
+                    <div active-left ng-show="isOpenexcepAddCP"> </div>
+                    <div layout="column" flex>
+                        <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
+                            <div>
+                                Productos
+                            </div>
                         </div>
-                    </div>
-                    <div flex layout="column">
+                        <div flex layout="column">
 
-                        <div layout="row" class="headGridHolder">
-                            <div flex="20" class="headGrid"> Codigo </div>
-                            <div flex="20" class="headGrid"> Cod. Fabrica </div>
-                            <div flex class="headGrid"> Descripcion</div>
-                            <div flex="15" class="headGrid"> Cantidad</div>
-                        </div>
+                            <div layout="row" class="headGridHolder">
+                                <div flex="20" class="headGrid"> Codigo </div>
+                                <div flex="20" class="headGrid"> Cod. Fabrica </div>
+                                <div flex class="headGrid"> Descripcion</div>
+                                <div flex="15" class="headGrid"> Cantidad</div>
+                                <div style="width: 80px;" class="headGrid " ng-show="formMode.value == 23"> Cond. Pago</div>
+                            </div>
 
-                        <div flex class="gridContent">
-                            <div   >
-                                <div  ng-repeat="item in finalDoc.productos "  ng-click="excepProdFinal(item)">
+                            <div flex class="gridContent">
+                                <div   >
+                                    <div  ng-repeat="item in finalDoc.productos "  >
 
-                                    <div layout="row" class="cellGridHolder" >
-                                        <div flex="20" class="cellGrid" > {{item.codigo}}</div>
-                                        <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
-                                        <div flex class="cellGrid" > {{item.descripcion}}</div>
-                                        <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
+                                        <div layout="row" class="cellGridHolder" >
+                                            <div flex="20" class="cellGrid" > {{item.codigo}}</div>
+                                            <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
+                                            <div flex class="cellGrid" > {{item.descripcion}}</div>
+                                            <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
+                                            <div style="width: 80px;"  class="cellEmpty " ng-show="formMode.value == 23"
+                                                 layout-align="center center" layout="column" ng-click="excepProdFinal(item)">
+                                                <div class="dot-empty dot-attachment "  layout-align="center center" >
+                                                    <div style=" margin-top: 2.5px;">   {{item.condicion_pago.length}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
 
                         </div>
 
+
                     </div>
+                </form>
 
-
-                </div>
-
-
-                <div flex="20" ng-show="false"></div>
+               <div  ng-show="isOpenexcepAddCP" style="width: 336px"></div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
 
             </md-content>
@@ -2264,312 +2272,99 @@
 
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
-                    md-disable-backdrop="true" md-component-id="excepAddCP" id="excepAddCP">
+                    md-disable-backdrop="true" md-component-id="excepAddCP" id="excepAddCP"
+                    click-out="closeExcep()"
+        >
 
             <md-content   layout="row" flex class="sideNavContent" >
-                <div  layout="column" flex="" class="layerColumn">
-                <form layout="row" >
-                    <div class="activeleft "></div>
-                    <div layout="column" flex>
-                        <div class="titulo_formulario" >
-                            <div>
-                                Condicion de pago del Producto
+                <div  layout="column" flex="" class="layerColumn" >
+                    <form layout="row" >
+                        <div class="activeleft "></div>
+                        <div layout="column" flex>
+                            <div class="titulo_formulario" >
+                                <div>
+                                    Condicion de pago del Producto
+                                </div>
                             </div>
-                        </div>
-                        <div layout="row"  class="rowRsm"  >
-                            <div layout="row" flex="30" >
+                            <div layout="row"  class="rowRsm"  >
+                                <div layout="row" flex="30" >
 
-                                <div class="rowRsmTitle"> Codigo </div>
+                                    <div class="rowRsmTitle"> Codigo </div>
+                                </div>
+                                <div class="rms" flex> {{finalProdSelec.codigo}} </div>
                             </div>
-                            <div class="rms" flex> {{finalProdSelec.codigo}} </div>
-                        </div>
 
-                        <div layout="row"  class="rowRsm"  >
-                            <div layout="row" flex="30" >
+                            <div layout="row"  class="rowRsm"  >
+                                <div layout="row" flex="30" >
 
-                                <div class="rowRsmTitle"> Cod. Fabrica </div>
+                                    <div class="rowRsmTitle"> Cod. Fabrica </div>
+                                </div>
+                                <div class="rms" flex> {{finalProdSelec.codigo_fabrica}} </div>
                             </div>
-                            <div class="rms" flex> {{finalProdSelec.codigo_fabrica}} </div>
-                        </div>
-                        <div layout="row"  class="rowRsm"  >
-                            <div layout="row" flex="30" >
+                            <div layout="row"  class="rowRsm"  >
+                                <div layout="row" flex="30" >
 
-                                <div class="rowRsmTitle"> Descripción </div>
+                                    <div class="rowRsmTitle"> Descripción </div>
+                                </div>
+                                <div class="rms" flex> {{finalProdSelec.descripcion}} </div>
                             </div>
-                            <div class="rms" flex> {{finalProdSelec.descripcion}} </div>
-                        </div>
-                        <div layout="row"  class="rowRsm"  >
-                            <div layout="row" flex="30" >
+                            <div layout="row"  class="rowRsm"  >
+                                <div layout="row" flex="30" >
 
-                                <div class="rowRsmTitle"> Cantidad </div>
+                                    <div class="rowRsmTitle"> Cantidad </div>
+                                </div>
+                                <div class="rms" flex> {{finalProdSelec.cantidad | number: 2}} </div>
                             </div>
-                            <div class="rms" flex> {{finalProdSelec.cantidad | number: 2}} </div>
                         </div>
-                    </div>
-                </form>
-                <form   layout="row">
-                    <div class="activeleft "></div>
+                    </form>
+                    <form name="formExcepAddCP" layout="row">
+                        <div class="activeleft "></div>
 
-                    <md-input-container class="md-block" flex="35" >
-                        <label>Cantidad</label>
-                        <input ng-model="excepAddCP.cantidad"  decimal info="Cantidad de articúlos en la que se aplicara la condición de pago">
-                    </md-input-container>
+                        <md-input-container class="md-block" flex="30" >
+                            <label>Cantidad</label>
+                            <input ng-model="excepAddCP.cantidad"
+                                   decimal
+                                   info="Cantidad de articúlos en la que se aplicara la condición de pago"
+                                   required
+                                   skip-tab
+                            >
+                        </md-input-container>
 
-                    <md-input-container class="md-block" flex="33" >
-                        <label>Dias</label>
-                        <input ng-model="excepAddCP.dias"  decimal info="Numero de dias en que se debe realizar el pago" >
-                    </md-input-container>
+                        <md-input-container class="md-block" flex="30" >
+                            <label>Dias</label>
+                            <input ng-model="excepAddCP.dias"
+                                   decimal
+                                   info="Numero de dias en que se debe realizar el pago"
+                                   required
+                                   skip-tab
+                            >
+                        </md-input-container>
 
-                    <md-input-container class="md-block" flex >
-                        <label>Monto</label>
-                        <input ng-model="excepAddCP.monto"  decimal info="Monto en que se debe pagar">
-                    </md-input-container>
-                </form>
-              <form layout="row" flex >
-                    <div class="activeleft"></div>
-                    <md-content flex >
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
+                        <md-input-container class="md-block" flex >
+                            <label>Monto</label>
+                            <input ng-model="excepAddCP.monto"
+                                   decimal info="Monto en que se debe pagar"
+                                   required
+                                   skip-tab
+                                   ng-keypress="($event.which === 13)? addexcepProdFinal(): 0 "
 
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
+                            >
+                        </md-input-container>
+                    </form>
+                    <form layout="row" flex >
+                        <div class="activeleft"></div>
+                        <md-content flex >
+                            <div ng-repeat="item in finalProdSelec.condicion_pago">
+                                <div layout="row" class="cellGridHolder" >
+                                    <div flex="35" class="cellGrid" >{{item.cantidad}} </div>
+                                    <div flex="33" class="cellGrid"> {{item.dias}}</div>
+                                    <div flex class="cellGrid"> {{item.monto}}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
 
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
+                        </md-content>
 
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                    </md-content>
-
-                </form>
-
-
-<!--                <md-content layout="row"  >
-                    <div class="activeleft"></div>
-                    <div flex >
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                        <div >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex="30" class="cellGrid" >00 </div>
-                                <div flex="30" class="cellGrid"> 00</div>
-                                <div flex class="cellGrid"> 0.000,00</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </md-content>
--->
+                    </form>
                 </div>
             </md-content>
         </md-sidenav>
