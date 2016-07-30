@@ -13,15 +13,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**@deprecate**/
 
-class PurchaseOrderItem extends Model
+class PurchaseItemCondition extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_compra_orden_item";
+    protected $table = "tbl_compra_orden_item_cond";
     protected $dates = ['deleted_at'];
 
-    public  function producto(){
-        return $this->belongsTo('App\Models\Sistema\Product', 'producto_id', 'id');
-
-    }
 
 }

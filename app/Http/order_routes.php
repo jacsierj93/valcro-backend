@@ -101,6 +101,8 @@ $app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removeSustit
 $app->post("Order/Purchase/AddAdjuntos",'Orders\OrderController@addAttachmentsPurchase'); ///agrega adjuntos a la orden de compra
 $app->post("Order/Purchase/Update",'Orders\OrderController@PurchaseUpdate'); ///agrega adjuntos a la orden de compra
 $app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Purchase/AddProdConditionPay",'Orders\OrderController@addProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
+$app->post("Order/Purchase/RemoveProdConditionPay",'Orders\OrderController@removeProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///lista de todos las solicitudes
