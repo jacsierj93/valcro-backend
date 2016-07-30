@@ -23,6 +23,7 @@ use App\Models\Sistema\ContactField;
 use App\Models\Sistema\Line;
 use App\Libs\Utils\Files;
 use App\Models\Sistema\FileModel;
+use App\Models\Sistema\ProviderListPrice;
 
 use Session;
 use Validator;
@@ -137,6 +138,14 @@ class ProvidersController extends BaseController
         foreach ($data->payCondition as $cond) {
             $cond['items'] = $cond->getItems()->get();
             $cond->line;
+        }
+        $data->listPrice = $data->listPrice()->get();
+        foreach ($data->listPrice as $list) {
+            $list->files = $list->adjuntos()->select("archivo as file","archivo","archivo_id as id","tipo")->get();
+            foreach ($list->files as $adj) {
+                //dd($adj->getThumbName());
+                $adj->thumb = $adj->getThumbName();
+            }
         }
 
         return json_encode($data);
@@ -743,6 +752,25 @@ class ProvidersController extends BaseController
 
         $time->save();
         $result['id']=$time->id;
+        return $result;
+    }
+
+    public function savePriceList(request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $list = ProviderListPrice::find($req->id);
+            $result['action']="upd";
+        }else{
+            $list = new ProviderListPrice();
+        }
+
+        $list->prov_id = $req->idProv;
+        $list->referencia = $req->ref;
+        $list->save();
+
+
+        $list->adjuntos()->sync($req->adjs);
+        $result['id']=$list->id;
         return $result;
     }
 

@@ -17,4 +17,8 @@ class ProviderListPrice extends Model
     use SoftDeletes;
     protected $table = "tbl_prov_lista_precio";
 
+    public function adjuntos(){
+        return $this->belongsToMany('App\Models\Sistema\FileModel', 'tbl_listaprecio_archivo', 'listaprecio_id', 'archivo_id');
+    }
+
 }

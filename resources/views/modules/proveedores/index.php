@@ -290,7 +290,6 @@
             </div>
         </md-sidenav>
 
-
         <!-- 15) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PROVEEDOR ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="layer1">
 
@@ -637,7 +636,6 @@
             </div>
 
         </md-sidenav>
-
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="nomValAssign">
                 <input type="hidden" md-autofocus>
@@ -659,7 +657,6 @@
                 </div>
             </md-content>
         </md-sidenav>
-
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
                 <input type="hidden" md-autofocus>
@@ -681,7 +678,6 @@
                 </div>
             </md-content>
         </md-sidenav>
-
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="portsLyr" id="portsLyr">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="portsControllers">
                 <input type="hidden" md-autofocus>
@@ -747,6 +743,7 @@
                 </div>
             </md-content>
         </md-sidenav>
+
         <!-- ########################################## LAYER (3) INFORMACION FINANCIERA ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -1036,7 +1033,6 @@
 
             </div>
         </md-sidenav>
-
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController" style="margin-left:24px">
                 <input type="hidden" md-autofocus>
@@ -1080,6 +1076,7 @@
                 </form>
             </md-content>
         </md-sidenav>
+
         <!-- ########################################## LAYER (4) TIEMPOS (PRODUCCION/TRANSITO) ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -1327,7 +1324,7 @@
                         </div>
                     </div>
                 </form>
-                <form name="provPrecList" layout="row" ng-controller="priceListController" global ng-class="{'focused':isShow,'preNew':!prov.id}">
+                <form name="provPrecList" layout="row" ng-controller="priceListController" global ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex>
                         <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
@@ -1344,7 +1341,7 @@
                             <div style="width:100px; padding: 3px;">
                                 <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">listas</span>
                                 <div ng-click="openAdj()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
-                                    {{lp.file.length || 0}}
+                                    {{lp.adjs.length || 0}}
                                 </div>
                             </div>
                             <!--<md-input-container class="md-block" flex="20" ng-click="openAdj()">
@@ -1353,8 +1350,8 @@
                                 <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
                             </md-input-container>-->
                         </div>
-                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                        <div layout="column" ng-show="(isShow && !isShowMore) && lists.length>0" class="row" ng-click="viewExtend(true)">
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
                         <div layout="column" ng-show="isShowMore" flex>
                         <div layout="row" class="headGridHolder">
@@ -1362,7 +1359,7 @@
                             <div flex="30" class="headGrid"> Archivo</div>
                         </div>
                         <div id="grid" style="overflow-y: auto; height: 120px">
-                            <div flex ng-repeat="add in [{ref:'dasdnl',file:'img.jpg'},{ref:'dasdnl',file:'img.jpg'},{ref:'dasdnl',file:'img.jpg'}]" ng-click="toEdit(this)">
+                            <div flex ng-repeat="add in lists" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
                                     <div flex="70" class="cellGrid"> {{add.ref}}</div>
                                     <div flex="30" class="headGrid"> {{add.file}}</div>
@@ -1378,6 +1375,7 @@
 
             </div>
         </md-sidenav>
+
         <!-- ########################################## LAYER (5) RESUMEN FINAL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5" id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->

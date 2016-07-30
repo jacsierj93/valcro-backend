@@ -99,7 +99,6 @@ MyApp.factory('masters', ['$resource',
         });
     }
 ]);
-
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -108,7 +107,6 @@ MyApp.filter('filterSelect', function() {
         });
     }
 });
-
 
 MyApp.filter('filterSearch', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -474,8 +472,6 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     }
 })*/
 
-
-
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
@@ -777,8 +773,12 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     });
 
     /** cerrado de la grilla en modo small**/
-    $scope.closeSideFile = function(){
-        filesService.close();
+    $scope.closeSideFile = function(e){
+        if(!angular.element(e.target).is("#ngf-fileInput")){
+            if($scope.isOpen){
+                filesService.close();
+            }
+        }
     };
 
     $scope.selectImg= function(doc){
@@ -837,10 +837,8 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                 sn.css('z-index',String(Layers.getModule().index + 60));
 
                 $mdSidenav("sideFiles").open().then(function(){
-
-
+                    $scope.isOpen= true;
                 });
-                $scope.isOpen= true;
                 $scope.accion.estado=false;
             }else  if($scope.accion.data.close ){
                 if($scope.inLayer){
@@ -853,16 +851,19 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
 
                 if(!$scope.expand){
                     console.log("cerrado")
-                    $mdSidenav("sideFiles").close().then(function(){
 
+                    $mdSidenav("sideFiles").close().then(function(){
                         if($scope.expand){
                             $scope.expand=false;
                         }
                         console.log("cerrado ");
                         $scope.isOpen= false;
                     });
+
+
                 }else{
                     $scope.isOpen= false;
+                    $scope.expand = false;
                     console.log("cerrado ");
                 }
                 $scope.accion.estado=false;

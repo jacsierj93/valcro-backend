@@ -31,6 +31,7 @@ $app->post("provider/saveTransTime",'Providers\ProvidersController@saveProdTrans
 $app->post("provider/savePoint",'Providers\ProvidersController@savePoint');//guarda el valor para un punto en proveedor
 $app->post("provider/saveHeadCond",'Providers\ProvidersController@saveHeadCond');//guarda el encabezado d euna condicion de pago
 $app->post("provider/saveItemCond",'Providers\ProvidersController@saveItemCond');//guarda el items de una condicion de pago
+$app->post("provider/savePriceList",'Providers\ProvidersController@savePriceList');//guarda una lista de precios
 
 $app->get("provider/provNomValList/{provId}",'Providers\ProvidersController@listValcroName'); ///obtener lista general de proveedores
 $app->get("provider/allValcroName",'Providers\ProvidersController@listAllValcroName');//obtener tiempos de transito

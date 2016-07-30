@@ -472,6 +472,9 @@ MyApp.service("setGetProv",function($http,providers,$q){
         },
         getPayCond : function(){
             return fullProv.payCondition || [];
+        },
+        getListPrice : function(){
+            return fullProv.listPrice || [];
         }
 
     };
@@ -2749,13 +2752,28 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
 });
 
 MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService){
+    $scope.id="priceListController";
     filesService.setFolder("prov");
     $scope.openAdj = filesService.open;
 
+    $scope.prov = setGetProv.getProv();
+    $scope.$watch('prov.id',function(nvo){
+        $scope.lp = {id:false,ref:"",idProv: $scope.prov.id||0,adjs:[]};
+        $scope.lists = setGetProv.getListPrice();
+    });
+
     $scope.fileProcces = filesService.getProcess();
 
-    $scope.$watch('fileProcces.estado', function () {
-        console.log($scope.fileProcces);
+    $scope.$watch('fileProcces.estado', function() {console.log($scope.fileProcces);
+        if($scope.fileProcces.estado=="finished"){
+            var aux = [];
+            angular.forEach($scope.fileProcces.terminados,function(v,k){
+                aux.push(v.id);
+            });
+            angular.merge($scope.lp.adjs,aux);
+            angular.merge(list.files,$scope.fileProcces.terminados);
+            $scope.provPrecList.$setDirty();
+        }
     });
 
 
@@ -2766,23 +2784,72 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     var list = {};
     var currentOrig = {};
     $scope.toEdit = function(ls){
-        list
-        currentOrig = angular.copy($scope.bnk);
-        setGetProv.addToRllBck($scope.bnk,"infoBank")
+        list = ls.add;
+        $scope.lp.id = list.id;
+        $scope.lp.ref = list.ref;
+        $scope.lp.adjs = [];
+        angular.forEach(list.files,function(v,k){
+            $scope.lp.adjs.push(v.id);
+        });
+        filesService.setFiles(list.files)
+        currentOrig = angular.copy($scope.lp);
+        //setGetProv.addToRllBck($scope.bnk,"infoBank")
+    };
+
+    var saveList = function(onSuccess){
+        if((angular.equals(currentOrig,$scope.lp) && $scope.lp ) || ($scope.provPrecList.$pristine )){
+            onSuccess();
+            return false;
+        }
+
+        if(!$scope.provPrecList.$valid && !$scope.provPrecList.$pristine){
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onSuccess();
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    console.log($scope.provPrecList);
+                }
+            }]);
+            return false;
+        }
+
+        providers.put({type:"savePriceList"},$scope.lp,function(data){
+            $scope.lp.id = data.id;
+            list.ref=$scope.lp.ref;
+            if(data.action=="new"){
+                list.id = $scope.lp.id;
+                $scope.lists.unshift(list);
+                setNotif.addNotif("ok", "lista de precios cargada", [
+                ],{autohidden:3000});
+            }else{
+                setNotif.addNotif("ok", "se modifico la lista d precios", [
+                ],{autohidden:3000});
+            }
+            /*setGetProv.addChng($scope.tp,data.action,"timeProd");*/
+            onSuccess();
+        });
     };
 
 
+
     $scope.showGrid = function(elem,event){
-        if(jQuery(event.target).parents("#lyrAlert").length==0) {
 
+        if((jQuery(event.target).parents("#lyrAlert").length==0) && (jQuery(event.target).parents(".popUp").length==0) && !jQuery(event.target).is("[type='file']")) {
             if(!elem) {
-
-                saveBank(function(){
-                    $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
-                    account={};
+               /* if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
+                }*/
+                saveList(function(){
+                    $scope.lp = {id:false,ref:"",idProv: $scope.prov.id||0,adjs:[]};
+                    list={};
                     currentOrig = {};
-                    $scope.bankInfoForm.$setPristine();
-                    $scope.bankInfoForm.$setUntouched();
+                    $scope.provPrecList.$setPristine();
+                    $scope.provPrecList.$setUntouched();
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
@@ -2790,16 +2857,16 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
                 })
 
             }else{
-                if(!$scope.isShow){
+                /*if(!$scope.isShow){
                     $scope.bnk.bankBenef = $scope.prov.description;
-                }
+                }*/
             }
             $scope.isShow = elem;
         }
     };
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
-        $scope.$parent.expand =(sel)?"bankInfoController":false;
+        $scope.$parent.expand =(sel)?"priceListController":false;
     };
 
 });

@@ -30,7 +30,6 @@ final class FileModel extends Model
 
         try {
             if ($this->isImage()) { ///es una imagen
-
                 $name = explode('.', $this->archivo);
                 $thumbName = $name[0] . '_thumb.' . $name[1];
 
@@ -45,7 +44,6 @@ final class FileModel extends Model
         } catch (\Exception $e) {
             Log::error("no se puede obtener el nombre");
         }
-
 
         return $thumbName;
 
