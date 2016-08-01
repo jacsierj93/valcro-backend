@@ -68,6 +68,11 @@
     border-left: 1px solid rgb(84, 180, 234);
 }
 
+.cellSelect-select{
+
+    border-left: 1px solid rgb(84, 180, 234);
+}
+
 .cellSelect{
     overflow: hidden !important;
     text-overflow: ellipsis !important;

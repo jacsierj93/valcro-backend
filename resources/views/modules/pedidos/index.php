@@ -1868,18 +1868,18 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div layout="column" ng-show="pedidoSusPedSelec.productos >0 && gridViewSus == 1 " class="showMoreDiv" style="height: 40px" ng-click=" gridViewSus = 2" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{contraPedSelec.productos.length}})</div>
-                        </div>
+                    </form>
+                    <div layout="column" ng-show="pedidoSusPedSelec.productos >0 && gridViewSus == 1 " class="showMoreDiv" style="height: 40px" ng-click=" gridViewSus = 2" >
+                        <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{contraPedSelec.productos.length}})</div>
+                    </div>
                 </div>
+            </md-content>
         </md-sidenav>
 
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
-                <div layout="column"  ng-show="!isOpenexcepAddCP" >
-                    <form></form><!-- solucion angular se como el form-->
+                <div layout="column" id="headFinalDoc"  ng-class="{preview: isOpenexcepAddCP }">
                     <form layout="row" >
                         <div active-left> </div>
                         <div layout="column" flex>
@@ -2179,12 +2179,12 @@
                                 <div style="width: 80px;" class="headGrid " ng-show="formMode.value == 23"> Cond. Pago</div>
                             </div>
 
-                            <div flex class="gridContent">
-                                <div   >
+                            <div flex class="gridContent" >
+                                <div  id="gridProdFinalDoc" >
                                     <div  ng-repeat="item in finalDoc.productos "  >
 
                                         <div layout="row" class="cellGridHolder" >
-                                            <div flex="20" class="cellGrid" > {{item.codigo}}</div>
+                                            <div flex="20" class="cellSelect" ng-class="{'cellGrid':( finalProdSelec.id  != item.id) ,'cellSelect-select':(finalProdSelec.id  == item.id )}" class="cellGrid" > {{item.codigo}}</div>
                                             <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
                                             <div flex class="cellGrid" > {{item.descripcion}}</div>
                                             <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
@@ -2206,7 +2206,7 @@
                     </div>
                 </form>
 
-               <div  ng-show="isOpenexcepAddCP" style="width: 336px"></div>
+                <div   id="expand"></div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
 
             </md-content>
@@ -2273,12 +2273,12 @@
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
                     md-disable-backdrop="true" md-component-id="excepAddCP" id="excepAddCP"
-                    click-out="closeExcep()"
+
         >
 
             <md-content   layout="row" flex class="sideNavContent" >
-                <div  layout="column" flex="" class="layerColumn" >
-                    <form layout="row" >
+                <div  layout="column" flex="" class="layerColumn"   click-out="closeExcep($event)">
+                   <form layout="row" >
                         <div class="activeleft "></div>
                         <div layout="column" flex>
                             <div class="titulo_formulario" >
@@ -2317,17 +2317,17 @@
                             </div>
                         </div>
                     </form>
-                    <form name="formExcepAddCP" layout="row">
+                    <form name="formExcepAddCP" layout="row" >
                         <div class="activeleft "></div>
 
                         <md-input-container class="md-block" flex="30" >
                             <label>Cantidad</label>
                             <input ng-model="excepAddCP.cantidad"
                                    decimal
-                                   info="Cantidad de articúlos en la que se aplicara la condición de pago"
+                                   info="Cantidad de articulos en la que se aplicara la condición de pago"
                                    required
                                    skip-tab
-                            >
+                            />
                         </md-input-container>
 
                         <md-input-container class="md-block" flex="30" >
@@ -2337,7 +2337,7 @@
                                    info="Numero de dias en que se debe realizar el pago"
                                    required
                                    skip-tab
-                            >
+                            />
                         </md-input-container>
 
                         <md-input-container class="md-block" flex >
@@ -2348,13 +2348,14 @@
                                    skip-tab
                                    ng-keypress="($event.which === 13)? addexcepProdFinal(): 0 "
 
-                            >
+                            />
                         </md-input-container>
                     </form>
-                    <form layout="row" flex >
+
+                    <form layout="row" name="gridExcepProdFinal"  >
                         <div class="activeleft"></div>
-                        <md-content flex >
-                            <div ng-repeat="item in finalProdSelec.condicion_pago">
+                        <md-content flex  >
+                            <div ng-repeat="item in finalProdSelec.condicion_pago" ng-click="removeExcepProdFinal(this)"  >
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="35" class="cellGrid" >{{item.cantidad}} </div>
                                     <div flex="33" class="cellGrid"> {{item.dias}}</div>
@@ -2366,6 +2367,8 @@
 
                     </form>
                 </div>
+
+
             </md-content>
         </md-sidenav>
 
