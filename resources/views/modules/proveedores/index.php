@@ -1361,8 +1361,8 @@
                         <div id="grid" style="overflow-y: auto; height: 120px">
                             <div flex ng-repeat="add in lists" ng-click="toEdit(this)">
                                 <div layout="row" layout-wrap class="cellGridHolder">
-                                    <div flex="70" class="cellGrid"> {{add.ref}}</div>
-                                    <div flex="30" class="headGrid"> {{add.file}}</div>
+                                    <div flex="70" class="cellGrid"> {{add.referencia}}</div>
+                                    <div flex="30" class="headGrid"> {{add.files.length}}</div>
                                 </div>
                             </div>
                         </div>

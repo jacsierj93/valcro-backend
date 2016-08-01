@@ -339,8 +339,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{}};
-    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{}};
+    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
+    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var onSet = {setting:false};
     return {
         getProv: function () {
@@ -348,8 +348,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
         },
         setProv: function(index) {
             onSet.setting = true;
-            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{}};
-            changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};changes.timeProd={};changes.timeTrans={};changes.provCoin={};
+            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
+            changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};changes.timeProd={};changes.timeTrans={};changes.provCoin={};changes.priceList={};
             if (index){
                 itemsel = index;
                 id = itemsel.id;
@@ -2751,7 +2751,7 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
     }
 });
 
-MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService){
+MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService,setNotif ){
     $scope.id="priceListController";
     filesService.setFolder("prov");
     $scope.openAdj = filesService.open;
@@ -2767,11 +2767,13 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     $scope.$watch('fileProcces.estado', function() {console.log($scope.fileProcces);
         if($scope.fileProcces.estado=="finished"){
             var aux = [];
-            angular.forEach($scope.fileProcces.terminados,function(v,k){
+            angular.forEach(filesService.getRecentUpload(),function(v,k){
                 aux.push(v.id);
+                list.files.push(v);
             });
-            angular.merge($scope.lp.adjs,aux);
-            angular.merge(list.files,$scope.fileProcces.terminados);
+
+            $scope.lp.adjs = $scope.lp.adjs.concat(aux);
+
             $scope.provPrecList.$setDirty();
         }
     });
@@ -2786,14 +2788,14 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     $scope.toEdit = function(ls){
         list = ls.add;
         $scope.lp.id = list.id;
-        $scope.lp.ref = list.ref;
+        $scope.lp.ref = list.referencia;
         $scope.lp.adjs = [];
         angular.forEach(list.files,function(v,k){
             $scope.lp.adjs.push(v.id);
         });
         filesService.setFiles(list.files)
         currentOrig = angular.copy($scope.lp);
-        //setGetProv.addToRllBck($scope.bnk,"infoBank")
+        setGetProv.addToRllBck($scope.lp,"priceList")
     };
 
     var saveList = function(onSuccess){
@@ -2829,7 +2831,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
                 setNotif.addNotif("ok", "se modifico la lista d precios", [
                 ],{autohidden:3000});
             }
-            /*setGetProv.addChng($scope.tp,data.action,"timeProd");*/
+            setGetProv.addChng($scope.lp,data.action,"priceList");
             onSuccess();
         });
     };
