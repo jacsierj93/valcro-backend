@@ -31,7 +31,7 @@
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>
 
-<body id="login" ng-app="MyApp" ng-cloak layout="column">
+<body id="login" ng-app="MyApp" ng-cloak layout="column"  >
 
 
     <div id="loginTop" flex layout layout-align="center center">
@@ -43,7 +43,7 @@
 
     </div>
 
-    <div id="loginBottom" layout="row">
+    <div id="loginBottom" layout="row" >
 
         <div class="logoHolder" layout layout-align="center center">
             <?= HTML::image("images/login_logo.png") ?>
@@ -53,11 +53,15 @@
         <form id="lgnForm" name="lgnForm" ng-controller="login" layout="row">
             <md-input-container>
                 <label style="color: #ffffff">Usuario</label>
-                <input ng-model="user.usr" name="usr" autocomplete="off" style="color: #ffffff">
+                <input ng-model="user.usr" name="usr" autocomplete="off" style="color: #ffffff"
+                      
+                >
             </md-input-container>
             <md-input-container>
                 <label style="color: #ffffff">Clave</label>
-                <input ng-model="user.pss" name="pss" type="password" style="color: #ffffff">
+                <input ng-model="user.pss" name="pss" type="password" style="color: #ffffff"
+                       ng-keypress="($event.which === 13)? lgn(): 0 "
+                >
             </md-input-container>
             <div class="btnHolder" layout layout-align="center center">
                 <i class="fa fa-angle-right" ng-click="lgn()"></i>

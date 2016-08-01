@@ -1172,7 +1172,8 @@ MyApp.service('DateParse', function() {
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
-    PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/"
+    PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/",
+    noti_autohidden :10000
 });
 
 
