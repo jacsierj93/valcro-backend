@@ -226,7 +226,7 @@
             </md-virtual-repeat-container>
         </div>
 
-        <div layout="column"flex class="md-whiteframe-1dp">
+        <div layout="column" flex class="md-whiteframe-1dp">
 
             <div class="botonera" layout="row" layout-align="start center">
                 <div style="width: 240px;" layout="row">
@@ -316,21 +316,21 @@
                                 {{forModeAvilable.getXValue(formMode.value -1 ).name}}
                             </div>
                         </div>
-                        <div layout="row" class="headGridHolder">
+                        <div layout="row" class="headGridHolder"  ng-init=" docImport = 'id'" table="tbl_listImport" >
                             <!--                            <div class="headGrid cellEmpty"> </div>
                             -->                            <div flex="5" class="headGrid"> - </div>
-                            <div flex="5" class="headGrid"> N° </div>
-                            <div flex="15" class="headGrid"> Titulo</div>
-                            <div flex="15" class="headGrid"> N° Proforma</div>
-                            <div flex="10" class="headGrid"> Fecha</div>
-                            <div flex="5" class="headGrid"> </div>
-                            <div flex="10" class="headGrid"> Transporte</div>
-                            <div flex="15" class="headGrid"> N° Factura</div>
-                            <div flex class="headGrid"> Monto</div>
-                            <div flex class="headGrid"> Comentario</div>
+                            <div flex="5" class="headGrid" orderBy="id"> N° </div>
+                            <div flex="15" class="headGrid" orderBy="titulo"> Titulo</div>
+                            <div flex="15" class="headGrid" orderBy="nro_proforma"> N° Proforma</div>
+                            <div flex="10" class="headGrid" orderBy="emision"> Fecha</div>
+                            <div flex="5" class="headGrid" orderBy="diasEmit"> </div>
+<!--                            <div flex="10" class="headGrid" > Transporte</div>
+-->                            <div flex="15" class="headGrid" orderBy="nro_factura"> N° Factura</div>
+                            <div flex class="headGrid" orderBy="monto"> Monto</div>
+                            <div flex class="headGrid" orderBy="comentario"> Comentario</div>
                         </div>
-                        <div class="gridContent"  ng-mouseleave="hoverLeave(false)" >
-                            <div   ng-repeat="item in docImports" tabindex="1" >
+                        <div class="gridContent"  ng-mouseleave="hoverLeave(false)"  >
+                            <div   ng-repeat="item in docImports | orderBy : tbl_listImport" tabindex="1" >
                                 <div layout="row" class="cellGridHolder" ng-click="docImport(item)" >
                                     <!--                                    <div  class=" cellGrid cellEmpty"  > </div>
                                     -->                                    <div flex="5" class="cellGrid" ng-click="docImport(item)" > {{item.tipo}}</div>
@@ -342,14 +342,14 @@
                                         <div style="width: 16px; height: 16px; border-radius: 50%"
                                              class="emit{{item.diasEmit}}"></div>
                                     </div>
-                                    <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;" ng-click="docImport(item)">
+<!--                                    <div flex="10" layout="row" class="cellGrid cellGridImg"  style="float: left;" ng-click="docImport(item)">
                                         <div  ng-show="item.aero == 1 " style="margin-right: 8px;">
                                             <span class="icon-Aereo" style="font-size: 24px"></span>
 
                                         </div>
-                                        <div  ng-show="item.maritimo == 1 " ><?= HTML::image("images/maritimo.png") ?></div>
+                                        <div  ng-show="item.maritimo == 1 " ><?/*= HTML::image("images/maritimo.png") */?></div>
                                     </div>
-                                    <div flex="15" class="cellGrid" ng-click="docImport(item)" > {{item.nro_factura}}</div>
+-->                                    <div flex="15" class="cellGrid" ng-click="docImport(item)" > {{item.nro_factura}}</div>
                                     <div flex class="cellGrid" ng-click="docImport(item)" > {{item.monto | currency :item.symbol :2}}</div>
                                     <div flex class="cellGrid" ng-click="docImport(item)" >{{item.comentario}}</div>
                                 </div>
@@ -406,19 +406,20 @@
                             <span style="color: #000;">{{provSelec.razon_social}}</span>
                         </div>
                     </div>
-                    <div flex>
+                    <div flex table="docOrder">
                         <div layout="row" class="headGridHolder" ng-init=" docOrder = 'id'" tabindex="1">
                             <div class="headGrid cellEmpty"> </div>
-                            <div flex="5" class="headGrid" ng-click="docOrder = (docOrder == 'id') ? '-id' : 'id' " > N° </div>
-                            <div flex="15" class="headGrid "  ng-click="docOrder = (docOrder == 'documento') ? '-documento' : 'documento'  "> Documento</div>
-                            <div flex class="headGrid" ng-click="docOrder = (docOrder == 'titulo') ? '-titulo' : 'titulo'  "> Titulo</div>
-                            <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'nro_proforma') ? '-nro_proforma' : 'nro_proforma'  "> N° Proforma</div>
-                            <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'emision') ? '-emision' : 'emision'  "> Fecha</div>
-                            <div flex="5" class="headGrid" ng-click="docOrder = (docOrder == 'diasEmit') ? '-diasEmit' : 'diasEmit'  "> </div>
+                            <div flex="5" class="headGrid" orderBy="id" > N° </div>
+                            <div flex="15" class="headGrid " orderBy="documento"> Documento</div>
+                            <div flex class="headGrid" orderBy="titulo"> Titulo</div>
+                            <div flex="10" class="headGrid" orderBy="nro_proforma"> N° Proforma</div>
+                            <div flex="10" class="headGrid"  orderBy="emision"> Fecha</div>
+                            <div flex="5" class="headGrid"  orderBy="diasEmit" > </div>
                             <!--                        <div flex="10" class="headGrid" > Transporte</div>
-                            -->                        <div flex="10" class="headGrid" ng-click="docOrder = (docOrder == 'nro_factura') ? '-nro_factura' : 'nro_factura'  "> N° Factura</div>
-                            <div flex class="headGrid" ng-click="docOrder = (docOrder == 'monto') ? '-monto' : 'monto'  "> Monto</div>
-                            <div flex class="headGrid" ng-click="docOrder = (docOrder == 'comentario') ? '-comentario' : 'comentario'  "> Comentario</div>
+                            -->
+                            <div flex="10" class="headGrid" orderBy="nro_factura" > N° Factura</div>
+                            <div flex class="headGrid" orderBy="monto" > Monto</div>
+                            <div flex class="headGrid" orderBy="comentario" > Comentario</div>
                         </div>
                         <div class="gridContent"  ng-mouseleave="hoverLeave(false)"  >
                             <div   ng-repeat="item in provDocs | orderBy :docOrder " ng-click="DtPedido(item)"   id="doc{{$index}}" row-select>
@@ -541,16 +542,16 @@
                         </div>
                     </div>
 
-                    <div layout="row" class="headGridHolder">
-                        <div flex="15" class="headGrid"> Cod. Producto</div>
-                        <div flex class="headGrid"> Descripción.</div>
-                        <div flex class="headGrid"> Documento</div>
-                        <div flex="10" class="headGrid"> Cantidad</div>
+                    <div layout="row" class="headGridHolder" table="tblResumenPe">
+                        <div flex="15" class="headGrid" orderBy="cod_producto"> Cod. Producto</div>
+                        <div flex class="headGrid"  orderBy="descripcion"> Descripción.</div>
+                        <div flex class="headGrid"  orderBy="documento"> Documento</div>
+                        <div flex="10" class="headGrid"  orderBy="saldo"> Cantidad</div>
                     </div>
                     <div flex class="gridContent">
                         <div >
                             <div flex>
-                                <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.todos">
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.todos | orderBy :tblResumenPe">
                                     <div flex="15" class="cellGrid"> {{item.cod_producto}}</div>
                                     <div flex class="cellGrid">  {{item.descripcion}}</div>
                                     <div flex class="cellGrid"> {{item.documento}}</div>
@@ -1047,19 +1048,17 @@
                                 </div>
 
                             </div>
-                            <div ng-show="gridView == 4" layout="column" flex>
+                            <div ng-show="gridView == 4" layout="column" flex table="tbl_dtDoc">
                                 <div layout="row" class="headGridHolder">
-
                                     <div flex="5" class="headGrid"></div>
-                                    <div flex="15" class="headGrid"> Cod. Producto</div>
-                                    <div flex class="headGrid"> Descripción.</div>
-                                    <div flex class="headGrid"> Doc. Origen</div>
-                                    <div flex="10" class="headGrid"> Cantidad</div>
-
+                                    <div flex="15" orderBy="cod_producto" class="headGrid"> Cod. Producto</div>
+                                    <div flex class="headGrid" orderBy="descripcion" > Descripción.</div>
+                                    <div flex class="headGrid" orderBy="documento" > Doc. Origen</div>
+                                    <div flex="10" class="headGrid" orderBy="saldo" > Cantidad</div>
                                 </div>
                                 <div flex class="gridContent"  ng-click="allowEdit()">
                                     <div >
-                                        <div ng-repeat="item in document.productos.todos" id="prodDt{{$index}}" row-select>
+                                        <div ng-repeat="item in document.productos.todos | orderBy :tbl_dtDoc" id="prodDt{{$index}}" row-select>
                                             <div layout="row" class="cellGridHolder" >
                                                 <div flex="5" class="cellGrid">
                                                     <md-switch class="md-primary" ng-change="addRemoveItem(item)"
@@ -1284,18 +1283,18 @@
                         </div>
                     </form>
                     <!--- fin filtros-->
-                    <div layout="row" class="headGridHolder">
-                        <div flex="5" class="headGrid"> - </div>
-                        <div flex="20" class="headGrid"> Cod. </div>
-                        <div flex="20" class="headGrid"> Cod. Fabrica </div>
-                        <div flex class="headGrid"> Descripcion</div>
-                        <div flex="10" class="headGrid"> P. Compra</div>
-                        <div flex="15" class="headGrid"> Cantidad</div>
+                    <div layout="row" class="headGridHolder" table="tbl_listProducProv">
+                        <div flex="5" class="headGrid" orderBy="asignado"> - </div>
+                        <div flex="20" class="headGrid" orderBy="codigo"> Cod. </div>
+                        <div flex="20" class="headGrid" orderBy="codigo_fabrica"> Cod. Fabrica </div>
+                        <div flex class="headGrid" orderBy="descripcion"> Descripcion</div>
+                        <div flex="10" class="headGrid" orderBy="puntoCompra"> P. Compra</div>
+                        <div flex="15" class="headGrid" orderBy="saldo"> Cantidad</div>
 
                     </div>
                     <form name="listProductoItems" class="gridContent"  >
                         <div  flex >
-                            <div   ng-repeat="item in providerProds | filter:productoSearch:strict as prodResult "
+                            <div   ng-repeat="item in providerProds | orderBy : tbl_listProducProv | filter:productoSearch:strict as prodResult "
                                    ng-mouseenter = "mouseEnterProd(item) ">
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellGrid">
@@ -1343,20 +1342,20 @@
                             Agregar Contrapedidos
                         </div>
                     </div>
-                    <form name="addContraPedidos"  >
-                        <div layout="row" class="headGridHolder">
-                            <div flex="5" class="headGrid"> % </div>
-                            <div flex="5" class="headGrid"> Id </div>
-                            <div flex="10" class="headGrid"> Fecha</div>
-                            <div flex class="headGrid"> Titulo</div>
-                            <div flex="10" class="headGrid"> Fecha Aprox</div>
-                            <div flex="15" class="headGrid"> Monto</div>
-                            <div flex class="headGrid"> Comentario</div>
+                    <form name="addContraPedidos"   >
+                        <div layout="row" class="headGridHolder" table="tbl_agrContPed" >
+                            <div flex="5" class="headGrid" orderBy="asignado"> % </div>
+                            <div flex="5" class="headGrid"  orderBy="id"> Id </div>
+                            <div flex="10" class="headGrid"  orderBy="fecha"> Fecha</div>
+                            <div flex class="headGrid"  orderBy="titulo"> Titulo</div>
+                            <div flex="10" class="headGrid"  orderBy="fecha_aprox_entrega"> Fecha Aprox</div>
+                            <div flex="15" class="headGrid"  orderBy="monto"> Monto</div>
+                            <div flex class="headGrid"  orderBy="comentario"> Comentario</div>
 
 
                         </div>
                         <div flex class="gridContent" >
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in formData.contraPedido">
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in formData.contraPedido | orderBy: tbl_agrContPed">
                                 <div class="cellGrid" flex="5" ng-click="allowEdit()">
                                     <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(formBlock)"></md-switch>
                                 </div>
@@ -1388,20 +1387,20 @@
                     </div>
 
                     <form name="KitchenBoxs" >
-                        <div layout="row" class="headGridHolder">
-                            <div flex="5" class="headGrid"> % </div>
-                            <div flex="5" class="headGrid">ID</div>
-                            <div flex="10" class="headGrid"> Fecha</div>
-                            <div flex="15" class="headGrid"> Nº de Proforma</div>
-                            <div flex="10" class="headGrid"> IMG Proforma</div>
-                            <div flex="15" class="headGrid"> Monto</div>
-                            <div flex="15" class="headGrid"> Precio</div>
-                            <div flex class="headGrid"> Tiemp. Aprox. de Entrega</div>
+                        <div layout="row" class="headGridHolder" table="tbl_agrKitBoxs">
+                            <div flex="5" class="headGrid" orderBy="asignado" > % </div>
+                            <div flex="5" class="headGrid" orderBy="id" >Id</div>
+                            <div flex="10" class="headGrid" orderBy="fecha" > Fecha</div>
+                            <div flex="15" class="headGrid" orderBy="num_proforma" > Nº de Proforma</div>
+                            <div flex="10" class="headGrid" orderBy="img_proforma" > IMG Proforma</div>
+                            <div flex="15" class="headGrid" orderBy="monto" > Monto</div>
+                            <div flex="15" class="headGrid" orderBy="precio" > Precio</div>
+                            <div flex class="headGrid" orderBy="fecha_aprox_entrega" > Tiemp. Aprox. de Entrega</div>
 
                         </div>
                         <div class="gridContent"  >
                             <div flex>
-                                <div layout="row" class="cellGridHolder" ng-repeat="item in formData.kitchenBox">
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in formData.kitchenBox | orderBy : tbl_agrKitBoxs ">
                                     <div class="cellGrid" flex="5" ng-click="allowEdit()">
                                         <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(formBlock)"></md-switch>
                                     </div>
@@ -1411,7 +1410,7 @@
                                     <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.img_proforma}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.monto}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.precio}}</div>
-                                    <div flex class="cellGrid"> {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
+                                    <div flex class="cellGrid"  ng-click="selecKitchenBox(item)" > {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
                                 </div>
                             </div>
                         </div>
@@ -1432,19 +1431,19 @@
                                 {{formMode.name}} Pendientes
                             </div>
                         </div>
-                        <div layout="row" class="headGridHolder" >
-                            <div flex="5" class="headGrid">-</div>
-                            <div flex="10" class="headGrid"> Pedido</div>
-                            <div flex="10" class="headGrid"> Proforma</div>
-                            <div flex="10" class="headGrid"> Fecha</div>
-                            <div flex="15" class="headGrid"> Nº de Factura</div>
-                            <div flex="10" class="headGrid"> Monto</div>
-                            <div flex class="headGrid"> Comentario</div>
+                        <div layout="row" class="headGridHolder" table="tbl_agrPedPend" >
+                            <div flex="5" class="headGrid" orderBy="asignado" >-</div>
+                            <div flex="10" class="headGrid" orderBy="id" > Pedido</div>
+                            <div flex="10" class="headGrid" orderBy="nro_proforma"> Proforma</div>
+                            <div flex="10" class="headGrid" orderBy="emision"> Fecha</div>
+                            <div flex="15" class="headGrid" orderBy="nro_factura"> Nº de Factura</div>
+                            <div flex="10" class="headGrid" orderBy="monto"> Monto</div>
+                            <div flex class="headGrid" orderBy="comentario"> Comentario</div>
 
                         </div>
                         <div class="gridContent" >
                             <div flex>
-                                <div layout="row" class="cellGridHolder" ng-repeat="item in docsSustitos" >
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in docsSustitos | orderBy: tbl_agrPedPend " >
                                     <div flex="5" class="cellGrid" ng-click="allowEdit()">
                                         <md-switch class="md-primary" ng-model="item.asignado"
                                                    ng-change="changePedidoSustituto(item)"
@@ -1452,9 +1451,9 @@
                                     </div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_proforma}}</div>
-                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.emision.subString(0,10) | date:'dd/MM/yyyy'}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.emision | date:'dd/MM/yyyy'}}</div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_factura}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.monto}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.monto}}</div>
                                     <div flex class="cellGrid">{{item.comentario}}</div>
                                 </div>
                             </div>
@@ -1586,21 +1585,21 @@
                                 </div>
                             </div>
                             <div >
-                                <div layout="row" class="headGridHolder">
+                                <div layout="row" class="headGridHolder" table="tbl_resumenContraPedido">
 
                                     <div flex="5" class="cellGrid">
 
                                     </div>
-                                    <div flex="15" class="headGrid"> Codigo</div>
-                                    <div flex class="headGrid"> Cod. Fabrica</div>
-                                    <div flex class="headGrid"> Descripción.</div>
-                                    <div flex="10" class="headGrid"> Cantidad</div>
-                                    <div flex class="headGrid"> Comentario</div>
-                                    <div flex class="headGrid"> Adjunto</div>
+                                    <div flex="15" class="headGrid" orderBy="asignado" > Codigo</div>
+                                    <div flex class="headGrid" orderBy="codigo"> Cod. Fabrica</div>
+                                    <div flex class="headGrid" orderBy="codigo_fabrica"> Descripción.</div>
+                                    <div flex="10" class="headGrid" orderBy="saldo"> Cantidad</div>
+                                    <div flex class="headGrid" orderBy="comentario"> Comentario</div>
+                                    <div flex class="headGrid" orderBy="adjunto"> Adjunto</div>
                                 </div>
                                 <div class="gridContent">
                                     <div flex>
-                                        <div layout="row" class="cellGridHolder" ng-repeat="item in contraPedSelec.productos">
+                                        <div layout="row" class="cellGridHolder" ng-repeat="item in contraPedSelec.productos | orderBy : tbl_resumenContraPedido ">
                                             <div flex="5" class="cellGrid">
                                                 <md-switch class="md-primary"
                                                            ng-model="item.asignado"
@@ -1839,19 +1838,19 @@
                                 </div>
                             </div>
 
-                            <div layout="row" class="headGridHolder">
-                                <div flex="5" class="headGrid"></div>
-                                <div flex="15" class="headGrid"> Codigo </div>
-                                <div flex="15" class="headGrid"> Cod. Fabrica </div>
-                                <div flex class="headGrid"> Origen</div>
-                                <div flex class="headGrid"> Descripción.</div>
-                                <div flex="10" class="headGrid"> Cantidad</div>
-                                <div flex class="headGrid"> Comentario</div>
+                            <div layout="row" class="headGridHolder" table="tbl_resumenPedidoSus">
+                                <div flex="5" class="headGrid" orderBy="asignado" ></div>
+                                <div flex="15" class="headGrid" orderBy="codigo"> Codigo </div>
+                                <div flex="15" class="headGrid" orderBy="codigo_fabrica"> Cod. Fabrica </div>
+                                <div flex class="headGrid" orderBy="documento"> Origen</div>
+                                <div flex class="headGrid" orderBy="descripcion"> Descripción.</div>
+                                <div flex="10" class="headGrid" orderBy="saldo"> Cantidad</div>
+                                <div flex class="headGrid" orderBy="comentario"> Comentario</div>
                                 <!--<div flex class="headGrid"> Adjunto</div>-->
                             </div>
                             <div  class="gridContent">
                                 <div flex>
-                                    <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos">
+                                    <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | orderBy :tbl_resumenPedidoSus ">
                                         <div flex="5" class="cellGrid" >
                                             <md-switch class="md-primary"
                                                        ng-disabled="( formBlock )" ng-model="item.asignado">
@@ -2171,18 +2170,17 @@
                         </div>
                         <div flex layout="column">
 
-                            <div layout="row" class="headGridHolder">
-                                <div flex="20" class="headGrid"> Codigo </div>
-                                <div flex="20" class="headGrid"> Cod. Fabrica </div>
-                                <div flex class="headGrid"> Descripcion</div>
-                                <div flex="15" class="headGrid"> Cantidad</div>
-                                <div style="width: 80px;" class="headGrid " ng-show="formMode.value == 23"> Cond. Pago</div>
+                            <div layout="row" class="headGridHolder" table="tbl_finalDoc">
+                                <div flex="20" class="headGrid" orderBy="codigo"> Codigo </div>
+                                <div flex="20" class="headGrid" orderBy="codigo_fabrica" > Cod. Fabrica </div>
+                                <div flex class="headGrid" orderBy="descripcion" > Descripcion</div>
+                                <div flex="15" class="headGrid" orderBy="cantidad"> Cantidad</div>
+                                <div style="width: 80px;" class="headGrid " ng-show="formMode.value == 23" orderBy="item.condicion_pago.length"> Cond. Pago</div>
                             </div>
 
                             <div flex class="gridContent" >
                                 <div  id="gridProdFinalDoc" >
-                                    <div  ng-repeat="item in finalDoc.productos "  >
-
+                                    <div  ng-repeat="item in finalDoc.productos | orderBy : tbl_finalDoc  "  >
                                         <div layout="row" class="cellGridHolder" >
                                             <div flex="20" class="cellSelect" ng-class="{'cellGrid':( finalProdSelec.id  != item.id) ,'cellSelect-select':(finalProdSelec.id  == item.id )}" class="cellGrid" > {{item.codigo}}</div>
                                             <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
@@ -2223,17 +2221,17 @@
                             Documentos sin finalizar
                         </div>
                     </div>
-                    <div layout="row" class="headGridHolder">
-                        <div flex="5" class="headGrid"> N° </div>
-                        <div flex="15" class="headGrid"> Documento</div>
-                        <div flex class="headGrid"> proveedor</div>
-                        <div flex class="headGrid"> Titulo</div>
-                        <div flex="10" class="headGrid"> Fecha</div>
-                        <div flex class="headGrid"> Monto</div>
-                        <div flex class="headGrid"> Comentario</div>
+                    <div layout="row" class="headGridHolder" table="tbl_unclosetDoc">
+                        <div flex="5" class="headGrid" orderBy="id" > N° </div>
+                        <div flex="15" class="headGrid" orderBy="documento" > Documento</div>
+                        <div flex class="headGrid" orderBy="proveedor" > proveedor</div>
+                        <div flex class="headGrid" orderBy="titulo" > Titulo</div>
+                        <div flex="10" class="headGrid" orderBy="emision"  > Fecha</div>
+                        <div flex class="headGrid" orderBy="monto" > Monto</div>
+                        <div flex class="headGrid"orderBy="comentario"  > Comentario</div>
                     </div>
                     <div class="gridContent"  >
-                        <div   ng-repeat="item in unclosetDoc" ng-click="openTempDoc(item)" tabindex="{{$index}}">
+                        <div   ng-repeat="item in unclosetDoc | orderBy : tbl_unclosetDoc " ng-click="openTempDoc(item)" tabindex="{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div flex="5" class="cellGrid" > {{item.id}}</div>
                                 <div flex="15" class="cellGrid"> {{item.documento}}</div>

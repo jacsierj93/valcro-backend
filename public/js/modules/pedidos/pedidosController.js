@@ -2389,6 +2389,9 @@ $scope.$watch('navCtrl.estado', function (newState) {
                         after: function(){
 
                             if(  setGetOrder.getState() != "built"){
+                               if(setGetOrder.getInternalState() == "new"){
+                                   $scope.buildDocChange($scope.document);
+                                }
 
                                 $scope.finalDoc = $scope.buildfinalDoc();
                                 Order.getMod({type:$scope.formMode.mod, mod:'Summary',id:$scope.document.id},{},function(response){
@@ -2520,7 +2523,7 @@ $scope.reloadDoc = function(){
             $scope.document.ult_revision= DateParse.toDate(response.ult_revision);
         }
 
-        if(setGetOrder.getState() =="select"){
+        if(setGetOrder.getState() =="select"  ){
 
             $scope.buildDocChange($scope.document);
 
@@ -2968,6 +2971,23 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
     }
 }]);
 
+MyApp.directive('table', function ($compile) {
+    return {
+        link: function (scope, elem, attrs) {
+            var head =jQuery(elem).find(".headGrid");
+            var name = attrs.table;
+            angular.forEach(head, function(v){
+                var aux = angular.element(v);
+                if(aux.attr("orderBy")){
+                    aux.attr("ng-click",""+name+" = ( "+name+" == '"+aux.attr("orderBy")+"' ) ? '-"+aux.attr("orderBy")+"' : '"+aux.attr("orderBy")+"' ");
+                    aux.removeAttr("orderBy");
+                    $compile(aux[0])(scope);
+                }
+            });
+
+        }
+    };
+});
 
 
 

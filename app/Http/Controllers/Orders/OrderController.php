@@ -2135,7 +2135,7 @@ class OrderController extends BaseController
      * @deprecated
      */
     function test(Request $req){
-        return view("emails.OrderDocument", array('name' => "demo "));
+         dd($req->session()->get('DATAUSER')['id']);
     }
     /**
      * Remuevo todos lo item de un pedido segun el documento de origen
@@ -4066,7 +4066,7 @@ class OrderController extends BaseController
             $result = array("error" => "errores en campos de formulario");
 
         }else{
-            $result = array("success" => "Registro guardado con éxito","action"=>"new");
+            $result = array("success" => "Solicitud guarda con éxito","action"=>"new");
             $model = new Solicitude();
             //////////condicion para editar
             if ($req->has('id')) {
@@ -4082,6 +4082,7 @@ class OrderController extends BaseController
             }
             $model->save();
             $result['id']= $model->id;
+            $result['user']= $model->usuario_id;
 
 
 
@@ -4166,7 +4167,7 @@ class OrderController extends BaseController
 
         } else {  ///ok
 //
-            $result['success'] = "Registro guardado con éxito!";
+            $result['success'] = "Order guardada con éxito!";
             $result['action'] = "new";
             $model = new Order();
             //////////condicion para editar
@@ -4314,6 +4315,7 @@ class OrderController extends BaseController
      **/
     private function setDocItem($model, Request $req){
         $model->ult_revision = Carbon::now();
+        $model->usuario_id = $req->session()->get('DATAUSER')['id'];
         if($req->has('monto')){
             $model->monto = $req->monto;
         }
@@ -4398,6 +4400,7 @@ class OrderController extends BaseController
         if($req->has('doc_parent_origen_id')){
             $model->doc_parent_id = $req->doc_parent_id;
         }
+
 
         return $model;
 
