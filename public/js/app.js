@@ -443,10 +443,10 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     };
 });
 
-/*MyApp.directive('skipNotif', function ($compile,$timeout) {
+MyApp.directive('skipNotif', function ($compile,$timeout) {
     return {
-        priority: 1001,
-        terminal:true,
+        /*priority: 1001,
+        terminal:true,*/
         link: function (scope, element, attrs) {
             element.bind("keydown",function(e){
                 if(e.which=="39"){
@@ -466,11 +466,11 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 }else if(e.which=="13"){
                     $timeout(function(){element.click()},0);
                 }
-            })
-            $compile(element[0])(scope)
+            });
+            //$compile(element[0])(scope)
         }
     }
-})*/
+})
 
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:"",scope:null};
