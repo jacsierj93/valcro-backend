@@ -2,6 +2,7 @@
 //###########################################################################################3
 //##############################REST service (factory)#############################################3
 //###########################################################################################3
+var defaultTime = 15;
 MyApp.directive('iconGroup', function ($timeout) {
      return {
          link: function (scope, elem, attrs,ctrl) {
@@ -199,7 +200,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                         $scope.LayersAction({close:true})
                         yes(id);
                     },
-                    default:10
+                    default:defaultTime
                 },
                 {
                     name: "NO",
@@ -525,7 +526,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
-            },default:5},{name:"No, dejame cambiarlo",action:function(){
+            },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provTypesend")[0].click();
             }}]);
         }
@@ -534,7 +535,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         //console.log($scope.projectForm)
         if(nvo==4 && !$scope.projectForm.provType.$untouched){
             setNotif.addNotif("alert","estas seguro que es tipo TRADER/FABRICA?",[{name:"Si, si lo estoy",action:function(){
-            },default:5},{name:"No, dejame cambiarlo",action:function(){
+            },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provType")[0].click();
             }}]);
         }
@@ -566,7 +567,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                             action:function(){
 
                             },
-                            default:5
+                            default:defaultTime
                         },
                     ]
                 );
@@ -589,7 +590,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                             name:"si, lo estoy",
                             action:function(){
                             },
-                            default:5
+                            default:defaultTime
                         },
                         {
                             name:"dejame corregirlo",
@@ -650,7 +651,6 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
     var preId = null;
     $scope.$watch('dir.ports.length', function(nvo,old) {
-        console.log(preId,$scope.dir.id)
         if(preId==$scope.dir.id){
             //$scope.dir.ports = $scope.svPort.ports;
             $scope.direccionesForm.$setDirty();
@@ -680,7 +680,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                     action: function () {
 
                     },
-                    default:10
+                    default:defaultTime
                 }
             ])
         }
@@ -708,7 +708,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                         action: function () {
 
                         },
-                        default:5
+                        default:defaultTime
                     }
                 ])
             }
@@ -824,7 +824,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 name: "NO",
                 action: function () {
                 },
-                default:5
+                default:defaultTime
             }
         ]);
     };
@@ -953,8 +953,9 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     var currentDeps = Object();
     $scope.over = function(nomVal){
         if (nomVal) {
+            console.log("true",$scope.valName.departments)
             if($scope.valName.departments[0] == "current"){
-                currentDeps = $scope.valName.departments
+                currentDeps = $scope.valName.departments;
             }
             $scope.overId = nomVal.name.id;
             $scope.valName.departments = {0:"over"};
@@ -971,7 +972,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             })*/
         } else {
             //$scope.overId = false;
-            console.log($scope.valName.departments)
+            console.log("false",$scope.valName.departments,currentDeps)
             if($scope.valName.departments[0] != "current"){
                 $scope.valName.departments = angular.copy(currentDeps);
             }
@@ -1007,16 +1008,19 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     });
 
     function saveValcroname(preFav,onSuccess){
-        console.log(preFav)
+
         if(!$scope.nomvalcroForm.$valid){
+            console.log("adasdasdasdasdasdasdasdasdasdasdasd")
             onSuccess();
             return false;
         }
+        console.log(preFav)
         if(preFav.length>0){
             $scope.valName.preFav = preFav;
         }else{
             $scope.valName.preFav = false;
         }
+        console.log("valname ==> ",$scope.valName);
         providers.put({type: "saveValcroName"}, $scope.valName, function (data) {
             $scope.valName.id = data.id;
             setGetProv.addChng($scope.valName,data.action,"valName");
@@ -1109,7 +1113,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                                 });
 
                             },
-                            default:3
+                            default:defaultTime
                         },
                         {
                             name:"NO",
@@ -1120,10 +1124,16 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                     ],{block:true});
                 }else{
                     /*CLICK EN UN FUERA DEL FORMULARIO, RESETEA EL FORMULARIO Y SALE DEL FOCUS*/
-                    $scope.isShow = elem;
+                    saveValcroname(preFav,function(){
+                        $scope.isShow = elem;
+                        $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
+                        valcroName = {};
+                        $scope.nomvalcroForm.$setUntouched();
+                    });
+                    /*$scope.isShow = elem;
                     $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
                     valcroName = {};
-                    $scope.nomvalcroForm.$setUntouched();
+                    $scope.nomvalcroForm.$setUntouched();*/
                 }
 
             }
@@ -1181,7 +1191,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                             $scope.valName.departments[dep.id]=fav;
                         }
                         preFav.push({"id":temp[0].id,"dep":dep.id});
-                        //saveValcroname({"id":temp[0].id,"dep":dep.id});
+                        currentDeps =$scope.valName.departments;
                     }
                 },
                 {
@@ -1194,7 +1204,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         }else{
             var fav = {fav:1};
             $scope.valName.departments[dep.id]=fav;
-            //saveValcroname();
+            currentDeps =$scope.valName.departments;
         }
 
 
@@ -1204,7 +1214,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             return false;
         }
         $scope.valName.departments[dep.id].fav=0;
-        //saveValcroname();
+        currentDeps =$scope.valName.departments;
         setNotif.addNotif("ok", "favorito quitado", [
         ],{autohidden:3000});
     };
@@ -1248,7 +1258,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
                             i++;
                         });
-                        //saveValcroname();
+                        currentDeps =$scope.valName.departments
                         setNotif.addNotif("ok", "departamento desvinculado", [
                         ],{autohidden:3000});
                     }
@@ -1267,6 +1277,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             ],{autohidden:3000});
         }
 
+        $scope.nomvalcroForm.$setDirty();
     };
 
 
@@ -2875,7 +2886,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
 
 
 
-MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists) {
+MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists,$timeout) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();
      var foraneos = Object();
@@ -2899,8 +2910,12 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
 
 
      $scope.getDato = function(id,find,field){
+         if(id!=0){
+             return $filter("filterSearch")(foraneos[find],[id])[0][field];
+         }else{
+             return [];
+         }
 
-         return $filter("filterSearch")(foraneos[find],[id])[0][field];
      };
 
      $scope.has = function(obj){
@@ -2910,5 +2925,15 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
              return 0;
          }
      };
+
+    $scope.toForm = function(formName){
+        $timeout(function(){
+            angular.element("[name='"+formName+"']").find(".activeleft").click();
+            $timeout(function(){
+                angular.element("[name='"+formName+"']").find(".showMore").click();
+            })
+        },0)
+
+    }
      //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
  });

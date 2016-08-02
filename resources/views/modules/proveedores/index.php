@@ -461,7 +461,7 @@
                             <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
                         </md-input-container>
 
-                        <div layout="column" ng-show="(isShow && !isShowMore) && address.length>0" class="row" ng-click="viewExtend(true)">
+                        <div layout="column" ng-show="(isShow && !isShowMore) && address.length>0" class="row showMore" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
 
@@ -598,7 +598,7 @@
                                 <textarea style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled "></textarea>
                             </md-input-container>
                         </div>
-                        <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row" ng-click="viewExtend(true)">
+                        <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row showMore" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
                         <div layout="column" ng-show="isShowMore" flex>
@@ -1428,6 +1428,9 @@
                         <div>
                             <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
+                        <div layout="row" ng-hide="!has(prov.valName)">
+                            <div flex></div><div ng-click="toForm('nomvalcroForm')">edit</div>
+                        </div>
                         <md-content flex style="max-height: 200px;">
                             <div ng-repeat="(k,name) in prov.valName" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
 
@@ -1458,6 +1461,9 @@
                         </div>
                         <div>
                             <span ng-show="!has(prov.dirProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div layout="row" ng-hide="!has(prov.dirProv)">
+                            <div flex></div><div ng-click="toForm('direccionesForm')">edit</div>
                         </div>
                         <md-content flex>
                             <div ng-repeat="(k,dir) in prov.dirProv" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
@@ -1512,6 +1518,9 @@
                         </div>
                         <div>
                             <span ng-show="!has(prov.contProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <div layout="row" ng-hide="!has(prov.contProv)">
+                            <div flex></div><div ng-click="toForm('provContactosForm')">edit</div>
                         </div>
                         <md-content flex>
                             <div ng-repeat="(k,cont) in prov.contProv" layout="column" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
