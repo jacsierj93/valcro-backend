@@ -2249,6 +2249,53 @@
         </md-sidenav>
 
 
+        <!-- ########################################## LAYER LISTA DE DOCUMENTOS con prioridad alta ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="priorityDocs" id="priorityDocs">
+            <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
+            <md-content  layout="row" flex class="sideNavContent" >
+                <div active-left  before="verificExit" ></div>
+                <div  layout="column" flex="" class="layerColumn">
+                    <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
+                        <div>
+                            Documentos
+                        </div>
+                    </div>
+                    <div layout="row" class="headGridHolder" table="tbl_priorityDocs">
+                        <div flex="5" class="headGrid" orderBy="id" > N° </div>
+                        <div flex="15" class="headGrid" orderBy="documento" > Documento</div>
+                        <div flex class="headGrid" orderBy="proveedor" > proveedor</div>
+                        <div flex class="headGrid" orderBy="titulo" > Titulo</div>
+                        <div flex="10" class="headGrid" orderBy="emision"  > Fecha</div>
+                        <div flex class="headGrid" orderBy="monto" > Monto</div>
+                        <div flex class="headGrid"orderBy="comentario"  > Comentario</div>
+                        <div style="width: 80px;"  class="headGrid" >M </div>
+                    </div>
+                    <div class="gridContent"  >
+                        <div   ng-repeat="item in priorityDocs | orderBy : tbl_priorityDocs " ng-click="sideaddAnswer(item)" tabindex="{{$index}}">
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex="5" class="cellGrid" > {{item.id}}</div>
+                                <div flex="15" class="cellGrid"> {{item.documento}}</div>
+                                <div flex class="cellGrid"> {{item.proveedor}}</div>
+                                <div flex class="cellGrid" > {{item.titulo}}</div>
+                                <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" > {{item.monto | currency :item.symbol :2}}</div>
+                                <div flex class="cellGrid" >{{item.comentario}}</div>
+                                <div style="width: 80px;"  class="cellEmpty "
+                                     layout-align="center center" layout="column" >
+                                    <div class="dot-empty dot-attachment "  layout-align="center center" >
+                                        <div style=" margin-top: 2.5px;">  M</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="expand"></div>
+            </md-content>
+        </md-sidenav>
+
+
         <!-- ########################################## LAYER LISTA DE PREVIEW HYML ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="htmlViewer" id="htmlViewer">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
@@ -2266,7 +2313,7 @@
         </md-sidenav>
 
 
-        <!-- ########################################## LAYER LISTA DE PREVIEW HYML ########################################## -->
+        <!-- ########################################## LAYER exception AGREGAR CONDICION DE PAGO ########################################## -->
 
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
@@ -2370,6 +2417,88 @@
             </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER exception  respuesta ########################################## -->
+
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="addAnswer" id="addAnswer"
+
+        >
+
+            <md-content   layout="row" flex class="sideNavContent" class="cntLayerHolder" layout-padding >
+                <div  layout="column" flex="" class="layerColumn"   click-out="closeAddAnswer($event)">
+
+
+                    <div layout="row" style="min-height: 36px;" ng-init="addAnswerMode == 1">
+                        <div class="titulo_formulario" layout="column" flex layout-align="start start">
+                            <div>
+                                Respuesta del proveedor
+                            </div>
+                        </div>
+                        <!--<div layout="column" layout-align="center center" ng-click="addAnswerMode = (addAnswerMode == 1) ? 2 : 1 "
+                        >
+                            <span ng-class="{'icon-Actualizar': addAnswerMode == 1, 'icon-Eliminar' : addAnswerMode != 1 }" style="font-size: 24px"></span>
+                        </div>-->
+
+                    </div>
+                    <div flex>
+                        <form flex layout="column">
+                            <div style="overflow: auto;" >
+                                <md-input-container class="md-block" flex >
+                                    <label>Descripcion</label>
+                                <textarea ng-model="addAnswer.descripcion"
+                                          info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
+                                          required
+                                ></textarea>
+                                </md-input-container>
+                            </div>
+                        </form>
+                    </div>
+                    <!--<div flex ng-show="addAnswerMode != 1">
+                        <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                            <div ngf-drop ngf-select="uploadAnswer(this)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput"  style="height: 28px; margin-top: 16px;">
+                                insertar archivo
+                            </div>
+                        </div>
+                        <div flex="" style="overflow: auto; padding: 0px 4px 4px 4px; overflow: auto;">
+                            <div class="imgItem" ng-repeat="item in addAnswer.pitures ">
+                                <img ng-src="images/thumbs/{{item.thumb}}"/>
+                            </div>
+                        </div>
+                    </div>-->
+                    <!--<div layout="row" flex="20" style="overflow-y: auto;">
+                        <form flex layout="column">
+                            <div  >
+                            <md-input-container class="md-block" flex >
+                                <label>Descripcion</label>
+                                <textarea ng-model="addAnswer.descripcion"
+                                       info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
+                                       required
+                                ></textarea>
+                            </md-input-container>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div layout="column"  flex>
+                        <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                            <div ngf-drop ngf-select="uploadAnswer(this)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput"  style="height: 28px; margin-top: 16px;">
+                                insertar archivo
+                            </div>
+                        </div>
+                        <div flex="" style="overflow: auto; padding: 0px 4px 4px 4px; overflow: auto;">
+                            <div class="imgItem" ng-repeat="item in pitures " ng-click="selectImg(item)">
+                                <img ng-src="images/thumbs/{{item.thumb}}"/>
+                            </div>
+                        </div>
+                    </div>-->
+
+                </div>
+
+            </md-content>
+        </md-sidenav>
 
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
