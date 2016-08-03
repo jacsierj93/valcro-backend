@@ -148,7 +148,7 @@
                         </div>
                         <div flex style="overflow-y:auto;">
                             <div class="itemName" ng-repeat="name in prov.nomValc">
-                                {{name.nombre}}
+                                {{name.name}}
                             </div>
                         </div>
                         <div class="titulo_formulario" style="height:39px;">
@@ -1420,17 +1420,20 @@
                     </div>
 
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Nombres Valcro
                             </div>
+                            <md-switch ng-hide="!has(prov.valName)" md-no-ink ng-model="isEdit.nomvalcroForm" ng-change="toForm('nomvalcroForm')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div layout="row" ng-hide="!has(prov.valName)">
+                        <!--<div layout="row" >
                             <div flex></div><div ng-click="toForm('nomvalcroForm')">edit</div>
-                        </div>
+                        </div>-->
                         <md-content flex style="max-height: 200px;">
                             <div ng-repeat="(k,name) in prov.valName" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
 
@@ -1454,17 +1457,20 @@
                     </div>
 
                     <div layout="column">
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Direcciones
                             </div>
+                            <md-switch md-no-ink ng-model="isEdit.direccionesForm" ng-change="toForm('direccionesForm')" aria-label="No Ink Effects">
+                               <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.dirProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div layout="row" ng-hide="!has(prov.dirProv)">
-                            <div flex></div><div ng-click="toForm('direccionesForm')">edit</div>
-                        </div>
+                        <!--<div layout="row" ng-hide="!has(prov.dirProv)">
+                            <div flex></div>
+                        </div>-->
                         <md-content flex>
                             <div ng-repeat="(k,dir) in prov.dirProv" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
 
@@ -1511,17 +1517,20 @@
                     </div>
 
                     <div layout="column">
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex="5" >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex="5" >
                             <div>
                                 Contactos
                             </div>
+                            <md-switch ng-hide="!has(prov.contProv)" md-no-ink ng-model="isEdit.provContactosForm" ng-change="toForm('provContactosForm')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.contProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div layout="row" ng-hide="!has(prov.contProv)">
+                        <!--<div layout="row" ng-hide="!has(prov.contProv)">
                             <div flex></div><div ng-click="toForm('provContactosForm')">edit</div>
-                        </div>
+                        </div>-->
                         <md-content flex>
                             <div ng-repeat="(k,cont) in prov.contProv" layout="column" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
                                 <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
@@ -1554,10 +1563,13 @@
                 </div>
                 <div  flex="33" layout="column">
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Info Bancaria
                             </div>
+                            <md-switch ng-hide="!has(prov.infoBank)" md-no-ink ng-model="isEdit.bankInfoForm" ng-change="toForm('bankInfoForm')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.infoBank)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
@@ -1585,10 +1597,13 @@
                         </div>
                     </div>
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Limite de Credito
                             </div>
+                            <md-switch ng-hide="!has(prov.limCred)" md-no-ink ng-model="isEdit.provCred" ng-change="toForm('provCred')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.limCred)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
@@ -1602,10 +1617,13 @@
                         </div>
                     </div>
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Factor de conversion
                             </div>
+                            <md-switch ng-hide="!has(prov.factConv)" md-no-ink ng-model="isEdit.provConv" ng-change="toForm('provConv')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.factConv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
@@ -1619,10 +1637,13 @@
                         </div>
                     </div>
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Puntos
                             </div>
+                            <md-switch ng-hide="!has(prov.point)" md-no-ink ng-model="isEdit.provPoint" ng-change="toForm('provPoint')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
@@ -1640,10 +1661,13 @@
                 </div>
                 <div   flex="33" layout="column">
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
                                 Puntos
                             </div>
+                            <md-switch ng-hide="!has(prov.point)" md-no-ink ng-model="isEdit.provPoint" ng-change="toForm('provPoint')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
                         </div>
                         <div>
                             <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>

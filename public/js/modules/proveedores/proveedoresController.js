@@ -1971,7 +1971,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
             setGetProv.addChng($scope.cred,data.action,"limCred");
             onSuccess();
         });
-    }
+    };
 
     $scope.rmCredit = function(elem){
         setNotif.addNotif("alert", "desea eliminar este limite de Credito", [
@@ -2295,7 +2295,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
             onSuccess();
         });
 
-    }
+    };
 
     $scope.rmPoint = function(elem){
         setNotif.addNotif("alert", "desea Borrar este Punto para este proveedor", [
@@ -2918,6 +2918,28 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
 
      };
 
+    $scope.isEdit = {direccionesForm:true,nomvalcroForm:true,provContactosForm:true,bankInfoForm:true,provCred:true,provConv:true,provPoint:true};
+    $scope.toForm = function(nvo){
+        console.log("cambio",$scope.isEdit[nvo]);
+       if(!$scope.isEdit[nvo]){
+            setNotif.addNotif("alert", "desea regresar a este formulario",[{
+                name:"llevame alli",
+                action:function(){
+                    goForm(nvo);
+                    $scope.isEdit[nvo] = true;
+                }
+            },{
+                name:"olvidalo",
+                action:function(){
+                    $scope.isEdit[nvo] = true;
+                }
+            }]);
+        }else{
+           setNotif.hideByContent("alert", "desea regresar a este formulario");
+       }
+
+    };
+
      $scope.has = function(obj){
          if(obj){
              return Object.keys(obj).length
@@ -2926,7 +2948,7 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
          }
      };
 
-    $scope.toForm = function(formName){
+    var goForm = function(formName){
         $timeout(function(){
             angular.element("[name='"+formName+"']").find(".activeleft").click();
             $timeout(function(){
