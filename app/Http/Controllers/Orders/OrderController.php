@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Masters\MasterProductController;
 
+use App\Libs\Api\RestApi;
+
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\FileModel;
@@ -46,6 +48,8 @@ use Validator;
 class OrderController extends BaseController
 {
 
+
+
     public function __construct()
     {
 
@@ -53,6 +57,66 @@ class OrderController extends BaseController
     }
 
     /*********************** SYSTEM ************************/
+
+    /**
+     * trae los documentos que estan si revisar
+     */
+
+    public function getOldReviewDoc(Request $req){
+        $allDocs = array();
+        $oldDocs = array();
+        $monedas = Monedas::get();
+        $oldReviewDays = $this->oldReview();
+        $data ['dias'] =$oldReviewDays;
+
+        $allDocs[0] = Solicitude::selectRaw("*, datediff( curdate(),ult_revision) as review ")
+            -> whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            //     ->whereNull('cancelacion')
+            ->get();
+
+        $allDocs[1] = Order::
+        selectRaw("*, datediff( curdate(),ult_revision) as review ")
+            -> whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            //     ->whereNull('cancelacion')
+            ->get();
+        $allDocs[2] = Purchase::selectRaw("*, datediff( curdate(),ult_revision) as review ")
+            -> whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            //     ->whereNull('cancelacion')
+            ->get();
+
+        foreach($allDocs as $docs){
+            foreach($docs  as $aux){
+                $temp= array();
+                $temp['id']=$aux->id;
+                $temp['documento'] = $aux->getTipo();
+                $temp['titulo'] = $aux->titulo;
+                $temp['monto'] = $aux->monto;
+                $temp['symbol'] = $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                $temp['emision'] = $aux->emision;
+                $temp['comentario'] = $aux->comentario;
+                $temp['prov_id'] = $aux->prov_id;
+                $temp['review'] = $aux->review;
+                $temp['proveedor'] = Provider::findOrFail($aux->prov_id)->razon_social;
+                $temp['productos'] = $this->getProductoItem($aux);
+
+                $oldDocs[] = $temp;
+
+
+            }
+        }
+        $data['docs']=$oldDocs;
+        return $data;
+    }
+
     /**
      * trae los documentos que no fueron fnalizados
      */
@@ -2135,7 +2199,7 @@ class OrderController extends BaseController
      * @deprecated
      */
     function test(Request $req){
-         dd($req->session()->get('DATAUSER')['id']);
+        dd($req->session()->get('DATAUSER')['id']);
     }
     /**
      * Remuevo todos lo item de un pedido segun el documento de origen
@@ -3093,9 +3157,9 @@ class OrderController extends BaseController
         where('aprobada','1')
             ->where('prov_id',$req->prov_id)
             ->get();
-/*        $purchaIts=PurchaseItem::where('tipo_origen_id',2)->get();
-        $orderIts=OrderItem::where('tipo_origen_id',2)->get();
-        $solIts=SolicitudeItem::where('tipo_origen_id',2)->get();*/
+        /*        $purchaIts=PurchaseItem::where('tipo_origen_id',2)->get();
+                $orderIts=OrderItem::where('tipo_origen_id',2)->get();
+                $solIts=SolicitudeItem::where('tipo_origen_id',2)->get();*/
 
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
@@ -3566,7 +3630,7 @@ class OrderController extends BaseController
             $paso=true;
             $tem['asignado'] =false;
 
-        // fue asignado
+            // fue asignado
             if(sizeof($docIts->where('doc_origen_id', $aux->id)->where('tipo_origen_id','3'))>0){
                 $tem['asignado'] = true;
             }
@@ -4277,10 +4341,10 @@ class OrderController extends BaseController
 
     /**
      * agregar una condicon de pago adicional a un producto
-    */
+     */
     public function addProdConditionPurchase(Request $req){
-       $resul = [];
-       $item = new PurchaseItemCondition();
+        $resul = [];
+        $item = new PurchaseItemCondition();
         $item->doc_id = $req->doc_id;
         $item->item_id=$req->id;
         $item->cantidad=$req->cantidad;
@@ -4498,7 +4562,7 @@ class OrderController extends BaseController
     }
 
     /**
-        convierte el documento para humanos
+    convierte el documento para humanos
      **/
 
     private function docForHumans($model){
@@ -4605,4 +4669,7 @@ class OrderController extends BaseController
 
     }
 
+    private function oldReview(){
+        return 7;
+    }
 }

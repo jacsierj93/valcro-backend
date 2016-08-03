@@ -167,6 +167,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     };
 
+    $scope.dasboard = function (){
+       Order.get({type:'OldReviewDocs'});
+    };
+
+    $scope.dasboard();
+
 
     /********************************************GUI ********************************************/
 

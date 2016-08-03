@@ -11,7 +11,8 @@
 */
 // systema
 $app->get("Order/UnClosetDoc",'Orders\OrderController@getUnClosetDocument'); ///trae tod el detalle de pedido
-$app->post("Order/UpLoad",'Orders\OrderController@UpLoadFiles'); ///trae tod el detalle de pedido
+$app->get("Order/OldReviewDocs",'Orders\OrderController@getOldReviewDoc'); ///trae tod el detalle de pedido
+//$app->post("Order/UpLoad",'Orders\OrderController@UpLoadFiles'); ///trae tod el detalle de pedido
 
 //Genericos
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); ///trae tod el detalle de contraPedido
