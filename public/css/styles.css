@@ -33,6 +33,10 @@ md-switch.md-checked.md-primary .md-thumb {
     background-color: rgb(84, 180, 234) !important;
 }
 
+md-switch.md-checked .md-thumb{
+    background-color: rgb(84, 180, 234) !important;
+}
+
 md-switch.md-checked.md-primary .md-ink-ripple {
     color: rgb(84, 180, 234) !important;
 }
@@ -263,6 +267,7 @@ md-select-value > span > div {
 /*=================== SWITCH =====================*/
 md-switch {
     margin: 0 !important;
+    padding-top: 10px;
 }
 
 md-switch.md-checked.md-primary .md-bar {
