@@ -1735,7 +1735,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     /****** ************************** agregar respuesta ***************************************/
-    $scope.addAnswer={}
+    $scope.addAnswer={};
     $scope.addAnswer.adjs =[];
     $scope.isOpenaddAnswer= false;
     $scope.closeAddAnswer= function(e){
@@ -1748,7 +1748,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             if ($mdSidenav("addAnswer").open()) {
 
                 if($scope.formAnswerDoc.$valid){
-                        var data = {}
+                    console.log("$scope.addAnswer", $scope.addAnswer)
+                    Order.postMod(
+                        {type:$scope.formMode.mod, mod:"AddAnswer"},{  descripcion:$scope.addAnswer.descripcion,doc_id: $scope.addAnswer.doc_id, adjs :( $scope.addAnswer.adjs.length > 0)  ? $scope.addAnswer.adjs : []},function(response){
+                        console.log("response data", response)
+                            $scope.priorityDocs.splice($scope.addAnswer.index,1);
+                            $scope.addAnswer={};
+                            $scope.addAnswer.adjs =[];
+                            $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:autohidden});
+                    });
+
+
+
                 }
                 angular.element(document).find("#priorityDocs").find("#expand").animate({width:"0"},400);
                 $mdSidenav("addAnswer").close().then(function () {
@@ -1761,7 +1772,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
     };
 
-    $scope.sideaddAnswer = function(data){
+    $scope.sideaddAnswer = function(data, item){
 
         console.log("data",data);
         if(!$scope.isOpenaddAnswer){
@@ -1769,6 +1780,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
             $mdSidenav("addAnswer").open().then(function(){
                 $scope.isOpenaddAnswer = true;
+               $scope.addAnswer.doc_id=angular.copy(item.id);
+                $scope.addAnswer.index=data.$index;
+                $scope.formMode= $scope.forModeAvilable.getXname(item.documento);
+
             });
 
         }

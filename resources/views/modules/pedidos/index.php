@@ -2255,7 +2255,7 @@
             <md-content  layout="row" flex class="sideNavContent" >
                 <div active-left  before="verificExit" ></div>
                 <div  layout="column" flex="" class="layerColumn">
-                    <div class="titulo_formulario" style="height: 39px; margin-left: 24px;">
+                    <div class="titulo_formulario" style="height: 39px;">
                         <div>
                             Documentos
                         </div>
@@ -2271,7 +2271,7 @@
                         <div style="width: 80px;"  class="headGrid" >M </div>
                     </div>
                     <div class="gridContent"  >
-                        <div   ng-repeat="item in priorityDocs | orderBy : tbl_priorityDocs " ng-click="sideaddAnswer(this)" tabindex="{{$index}}">
+                        <div   ng-repeat="item in priorityDocs | orderBy : tbl_priorityDocs " ng-click="sideaddAnswer(this, item)" tabindex="{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div flex="5" class="cellGrid" > {{item.id}}</div>
                                 <div flex="15" class="cellGrid"> {{item.documento}}</div>
