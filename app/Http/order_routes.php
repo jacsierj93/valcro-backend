@@ -79,6 +79,7 @@ $app->post("Order/Order/RemoveSustitute",'Orders\OrderController@removeSustiteOr
 $app->post("Order/Order/AddAdjuntos",'Orders\OrderController@addAttachmentsOrder'); ///agrega adjuntos al pedido
 $app->post("Order/Order/Update",'Orders\OrderController@UpdateOrder'); ///retira el final id y notifica que se actualizara el documento
 $app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Order/AddAnswer",'Orders\OrderController@AddAnswerOrder'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); ///lista de todos las solicitudes
@@ -104,6 +105,7 @@ $app->post("Order/Purchase/Update",'Orders\OrderController@PurchaseUpdate'); ///
 $app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); ///lista de todos los pedidos que se úeden sustituir
 $app->post("Order/Purchase/AddProdConditionPay",'Orders\OrderController@addProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
 $app->post("Order/Purchase/RemoveProdConditionPay",'Orders\OrderController@removeProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
+$app->post("Order/Purchase/AddAnswer",'Orders\OrderController@AddAnswerPurchase'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///lista de todos las solicitudes
@@ -128,6 +130,7 @@ $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachments
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///lista de todos las solicitudes
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); ////retira el final id y notifica que se actualizara el documento
+$app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
 

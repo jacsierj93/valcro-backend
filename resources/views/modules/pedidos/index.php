@@ -2271,7 +2271,7 @@
                         <div style="width: 80px;"  class="headGrid" >M </div>
                     </div>
                     <div class="gridContent"  >
-                        <div   ng-repeat="item in priorityDocs | orderBy : tbl_priorityDocs " ng-click="sideaddAnswer(item)" tabindex="{{$index}}">
+                        <div   ng-repeat="item in priorityDocs | orderBy : tbl_priorityDocs " ng-click="sideaddAnswer(this)" tabindex="{{$index}}">
                             <div layout="row" class="cellGridHolder" >
                                 <div flex="5" class="cellGrid" > {{item.id}}</div>
                                 <div flex="15" class="cellGrid"> {{item.documento}}</div>
@@ -2444,7 +2444,7 @@
 
                     </div>
                     <div flex style="overflow: auto;">
-                        <form flex layout="column">
+                        <form flex layout="column" name="formAnswerDoc">
                             <div  >
                                 <md-input-container class="md-block" flex >
                                 <textarea ng-model="addAnswer.descripcion"
@@ -2459,7 +2459,11 @@
                         </form>
                     </div>
                     <div style="height: : '{{ !(addAnswer.adjs) ? 0 : (20 * addAnswer.adjs.length) }}px'">
-                        <div ng-repeat="item in addAnswer.adjs" class="input-adj"> {{$index}}}<div style="width: 16px">X</div></div>
+                        <div layout="row" layout-align="center space-between" style="border: 1px solid rgb(84, 180, 234);">
+                            <div  class="vlc-buttom" style="margin-top: 0; background-color: rgb(84, 180, 234); ">{{addAnswer.adjs.length}}</div>
+                            <div flex layout-align=" center start " layout="column">Adjuntos</div>
+                            <div style="width: 16px"  layout-align=" center left " layout="column"></div>
+                        </div>
                     </div>
                 </div>
 

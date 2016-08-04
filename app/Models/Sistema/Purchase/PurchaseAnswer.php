@@ -6,18 +6,17 @@
  * Time: 03:02 PM
  */
 
-namespace App\Models\Sistema\Order;
+namespace App\Models\Sistema\Purchase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class OrderAttachment extends Model
+class PurchaseAnswer extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_pedido_adj";
+    protected $table = "tbl_compra_orden_contestacion";
     protected $dates = ['deleted_at'];
-
 
 }
 

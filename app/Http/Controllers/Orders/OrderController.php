@@ -9,6 +9,8 @@ use App\Libs\Api\RestApi;
 use App\Models\Sistema\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\FileModel;
+use App\Models\Sistema\Order\OrderAnswer;
+use App\Models\Sistema\Order\OrderAnswerAttachment;
 use App\Models\Sistema\Order\OrderAttachment;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
@@ -31,11 +33,15 @@ use App\Models\Sistema\ProviderAddress;
 use App\Models\Sistema\ProviderCondPayItem;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Purchase\Purchase;
+use App\Models\Sistema\Purchase\PurchaseAnswer;
+use App\Models\Sistema\Purchase\PurchaseAnswerAttaments;
 use App\Models\Sistema\Purchase\PurchaseAttachment;
 use App\Models\Sistema\Purchase\PurchaseItem;
 use App\Models\Sistema\Purchase\PurchaseItemCondition;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use App\Models\Sistema\Solicitude\Solicitude;
+use App\Models\Sistema\Solicitude\SolicitudeAnswer;
+use App\Models\Sistema\Solicitude\SolicitudeAnswerAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeItem;
 use Carbon\Carbon;
@@ -47,7 +53,6 @@ use Validator;
 
 class OrderController extends BaseController
 {
-
 
 
     public function __construct()
@@ -2157,8 +2162,6 @@ class OrderController extends BaseController
         return $resul;
     }
 
-
-
     public function changeItemOrder(Request $req){
         $resul['accion']= "upd";
         $model = OrderItem::findOrFail($req->id);
@@ -2178,8 +2181,6 @@ class OrderController extends BaseController
         return $resul;
     }
 
-
-
     /**
      * llena los camppos de los filtros
      */
@@ -2191,8 +2192,6 @@ class OrderController extends BaseController
         $data['tipoEnvio']= ProvTipoEnvio::select('nombre', 'id')->where("deleted_at",NULL)->get();
         return $data;
     }
-
-
 
     /**
      * prueba para metodos
@@ -2364,6 +2363,92 @@ class OrderController extends BaseController
         $data['tipoDepago'] = PaymentType::select('nombre', 'id')->where("deleted_at",NULL)->get();
         return $data;
 
+    }
+
+
+    /*********************************** AGREGAR RESPUESTA ***********************************/
+
+    public function AddAnswerSolicitude(Request $req){
+        $response =[];
+        $att =[];
+        $doc= Solicitude::findOrFail($req->doc_id);
+        $model = new SolicitudeAnswer();
+        if($req->has("id")){
+            $model = SolicitudeAnswer::findOrFail($req->id);
+        }
+
+        $model->descripcion = $req->descripcion;
+        $model->doc_id= $req->doc_id;
+        $model->save();
+
+        $doc->ult_revision  = Carbon::now();
+        $doc->save();
+        $response['accion']= "new";
+        if($req->has("adjs")){
+            $response['accion']= "edit";
+
+            foreach($req->adjs as $aux){
+                $adj= new SolicitudeAnswerAttachment();
+                $adj->contestacion_id = $doc->id;
+                $adj->archivo_id = $aux['file_id'];
+                $adj->save();
+                $att[] = $adj;
+
+            }
+        }
+        $response['id']=$model->id;
+        $response['data']=$model;
+        $response['items']=$att;
+
+    }
+
+    public function AddAnswerOrder(Request $req){
+        $doc= Solicitude::findOrFail($req->doc_id);
+        $model = new OrderAnswer();
+        if($req->has("id")){
+            $model = OrderAnswer::findOrFail($req->id);
+        }
+
+        $model->descripcion = $req->descripcion;
+        $model->doc_id= $req->doc_id;
+        $model->save();
+
+        $doc->ult_revision  = Carbon::now();
+        $doc->save();
+
+        if($req->has("adjs")){
+            foreach($req->adjs as $aux){
+                $adj= new OrderAnswerAttachment();
+                $adj->contestacion_id = $doc->id;
+                $adj->archivo_id = $aux['file_id'];
+                $adj->save();
+
+            }
+        }
+    }
+    public function AddAnswerPurchase(Request $req){
+        $doc= Solicitude::findOrFail($req->doc_id);
+        $model = new PurchaseAnswer();
+        if($req->has("id")){
+            $model = PurchaseAnswer::findOrFail($req->id);
+        }
+
+        $model->descripcion = $req->descripcion;
+        $model->doc_id= $req->doc_id;
+        $model->save();
+
+        $doc->ult_revision  = Carbon::now();
+        $doc->save();
+
+        if($req->has("adjs")){
+            foreach($req->adjs as $aux){
+                $adj= new PurchaseAnswerAttaments();
+                $adj->contestacion_id = $doc->id;
+                $adj->archivo_id = $aux['file_id'];
+                $adj->save();
+
+            }
+        }
     }
 
 

@@ -6,6 +6,7 @@
     left: 0px;
     z-index: 99;
     background: transparent;
+    cursor: default;
 " ng-show="block">
 
 </div>

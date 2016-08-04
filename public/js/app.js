@@ -958,7 +958,7 @@ MyApp.service('App' ,[function(){
 
 }]);
 
-MyApp.service('filesService' ,function(){
+MyApp.service('filesService' ,function(Upload){
     var all = [];
     var accion ={estado:false,data:{}};
     var isOpen= false;
@@ -1025,7 +1025,19 @@ MyApp.service('filesService' ,function(){
         clear : function(){
             all.splice(0,all.length);
             titulo ="Adjuntos";
-            folder="";
+
+
+        },
+        Upload :function (data){
+            var send= {url:"master/files/upload", data:{ folder:folder, file:data.file}};
+
+            console.log("data", data);
+            console.log("send", send);
+
+            Upload.upload(send).progress( !(data.progress) ? function(){} : data.progress)
+                .success(!(data.success) ? function(){} : data.success)
+                .error(!(data.error) ? function(){} : data.error);
+
 
         }
 

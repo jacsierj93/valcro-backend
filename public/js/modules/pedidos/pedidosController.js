@@ -1735,23 +1735,35 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     /****** ************************** agregar respuesta ***************************************/
-
+    $scope.addAnswer={}
+    $scope.addAnswer.adjs =[];
     $scope.isOpenaddAnswer= false;
     $scope.closeAddAnswer= function(e){
 
-        if(jQuery(e.target).parents("#lyrAlert").length == 0 && $scope.isOpenaddAnswer && !angular.element(e.target).is("#ngf-fileInput")) {
+        if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
+            jQuery(e.target).parents("#priorityDocs").length == 0 &&
+            $scope.isOpenaddAnswer &&
+            !angular.element(e.target).is("#ngf-AnswerfileInput")) {
+
             if ($mdSidenav("addAnswer").open()) {
+
+                if($scope.formAnswerDoc.$valid){
+                        var data = {}
+                }
                 angular.element(document).find("#priorityDocs").find("#expand").animate({width:"0"},400);
                 $mdSidenav("addAnswer").close().then(function () {
                     $scope.isOpenaddAnswer = false;
                 });
 
             }
+
+
         }
     };
 
-    $scope.sideaddAnswer = function(item){
+    $scope.sideaddAnswer = function(data){
 
+        console.log("data",data);
         if(!$scope.isOpenaddAnswer){
            angular.element(document).find("#priorityDocs").find("#expand").animate({width:"336px"},400);
 
@@ -1765,16 +1777,31 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.$watch('answerfiles.length', function(newValue){
         if(newValue > 0){
-            console.log("files data", $scope.answerfiles);
+            console.log("file serve",filesService)
+            filesService.setFolder("orders");
+           angular.forEach($scope.answerfiles, function(v){
+
+               filesService.Upload({file:v,
+                   success: function(data){
+                       console.log("data", data);
+                       $scope.addAnswer.adjs.push(data);
+                   },
+                   error:function(){
+                    console.log("error subiendo ",v);
+               }})
+           });
             $scope.answerfiles =[]
         }
     });
 
-    $scope.uploadAnswer = function(data){
+/*    $scope.uploadAnswer = function(data){
         console.log("this", data);
         console.log("scope", $scope);
 
-    };
+    }*/
+
+
+    ;
     $scope.updateProv= function(){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
             angular.forEach($scope.provSelec,function(v,k){
@@ -2557,7 +2584,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             $scope.reviewDoc();
             $timeout(function(){
                 $scope.oldReviewDoc();
-            }, 100);
+            }, 200);
 
 
             //        $timeout(function(){$scope.reviewDoc()},1000);

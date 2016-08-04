@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
-class OrderAttachment extends Model
+class OrderAnswerAttachment extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_pedido_adj";
+    protected $table = "tbl_pedido_contestacion_adj";
     protected $dates = ['deleted_at'];
 
 

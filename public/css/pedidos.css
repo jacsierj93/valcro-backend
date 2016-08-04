@@ -53,6 +53,21 @@
     margin-top: 1px;
     margin-bottom: 1px;
     background-color: #6e6e6e;
+    border-radius: 16px;
+}
+
+.input-adj div:first-child {
+    margin-left: 16px;
+}
+.input-adj:last-child{
+
+}
+
+div {
+    cursor:default;
+}
+div[ng-click] * {
+    cursor:pointer !important;
 }
 
 /**celda que contenga imagenes*/
