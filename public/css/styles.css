@@ -86,10 +86,24 @@ md-sidenav#lyrAlert {
 
 /*==================================================*/
 /*==================================================*/
-md-input-container,md-autocomplete {
+md-input-container{
     padding: 0 8px 0 0 !important;
     margin: 10px 0 0 0 !important;
 }
+md-autocomplete {
+    background: transparent;
+    /* display: none; */
+    margin-bottom: 10px;
+    margin: 0px !important;
+    padding: 0px !important;
+}
+md-autocomplete {
+    height: 20px !important;
+}
+md-autocomplete-wrap button{
+    display:none !important;
+}
+
 
 
 

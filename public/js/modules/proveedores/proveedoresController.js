@@ -507,6 +507,11 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         angular.element(list[list.index(this)+1]).focus().click();*/
     };
 
+    $scope.filTipo = function(elem,text){
+        console.log(elem,text)
+        return elem.nombre.toLowerCase().indexOf(text.toLowerCase()) != -1;
+    }
+
     $scope.togglecheck = function(e){
         if(e.keyCode==32 || e.type=="click"){
             $scope.dtaPrv.contraped = !$scope.dtaPrv.contraped;
@@ -2776,15 +2781,15 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     $scope.fileProcces = filesService.getProcess();
 
     $scope.$watch('fileProcces.estado', function() {console.log($scope.fileProcces);
+        recents = [];
         if($scope.fileProcces.estado=="finished"){
             var aux = [];
-            angular.forEach(filesService.getRecentUpload(),function(v,k){
+            recents = filesService.getRecentUpload();
+            recents.forEach(function(v,k){
                 aux.push(v.id);
                 list.files.push(v);
             });
-
             $scope.lp.adjs = $scope.lp.adjs.concat(aux);
-
             $scope.provPrecList.$setDirty();
         }
     });
@@ -2794,7 +2799,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
         filesService.setAllowUpload(!nvo);
     });
 
-    var list = {};
+    var list = {files:[]};
     var currentOrig = {};
     $scope.toEdit = function(ls){
         list = ls.add;
@@ -2832,7 +2837,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
 
         providers.put({type:"savePriceList"},$scope.lp,function(data){
             $scope.lp.id = data.id;
-            list.ref=$scope.lp.ref;
+            list.referencia=$scope.lp.ref;
             if(data.action=="new"){
                 list.id = $scope.lp.id;
                 $scope.lists.unshift(list);
@@ -2859,7 +2864,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
                 }*/
                 saveList(function(){
                     $scope.lp = {id:false,ref:"",idProv: $scope.prov.id||0,adjs:[]};
-                    list={};
+                    list={files:[]};
                     currentOrig = {};
                     $scope.provPrecList.$setPristine();
                     $scope.provPrecList.$setUntouched();

@@ -310,11 +310,28 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
+                                <md-autocomplete md-selected-item="dtaPrv.type"
+                                                 flex
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchText"
+                                                 md-items="item in types | customFind : ctrl.searchText : filTipo "
+                                                 md-item-text="item.nombre"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input info="seleccione un tipo de proveedor">
+                                    <md-item-template>
+                                        <span>{{item}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+
+
+                                <!--
                                 <md-select  info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="type in types" value="{{type.id}}" skip-tab>
                                         {{type.nombre}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
 
 

@@ -117,6 +117,7 @@ MyApp.filter('filterSearch', function() {
 });
 
 MyApp.filter('customFind', function() {
+
     return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
         return arr1.filter(function(val) {
             return func(val,arr2);
@@ -333,6 +334,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
+        console.log(list)
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
@@ -369,11 +371,19 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     };
 
     return {
-        priority: 1001,
+        priority: 1010,
         terminal:true,
         link: function (scope, element, attrs) {
             element.removeAttr("skip-tab");
-            element.attr("step","");
+           /* if(angular.element(element).is("md-autocomplete")){
+                angular.element(element).find("input").attr("step","");
+                element = angular.element(element).find("input");
+            }else{*/
+                element.attr("step","");
+            //}
+            if(angular.element(element).is("div")){
+                angular.element(element).attr("tab-index","-1");
+            }
             if(angular.element(element).is("md-switch")){
 
                 element.attr("ng-change","skip('"+element.attr("id")+"',this)");
@@ -388,44 +398,13 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }else{
                 element.bind("keydown",function(e){
                     var elem =this;
-                    if(angular.element(elem).is("div")){
-                        angular.element(elem).attr("tab-index","-1");
-                    }
+
                     if(e.which == "13"){
-                        skip(elem)
-                        /*var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
-                        if(list.index(elem)<list.length-1){
-                            if(angular.element(list[list.index(elem)+1]).is("md-select")){
-                                angular.element(list[list.index(elem)+1]).focus().click();
-                            }else if(angular.element(list[list.index(elem)+1]).is("vlc-group")) {
-                                $timeout(function(){
-                                    angular.element(list[list.index(elem)+1]).find("span").first().focus();
-                                },0);
-                            }else{
-                                $timeout(function(){
-                                    angular.element(list[list.index(elem)+1]).focus();
-                                },0);
-                            }
-                        }else{
-                            var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]):visible)").first();
-                            var nextFrm = angular.element(next).find("[step]:not([disabled]):visible").first();
-                            $timeout(function(){
-                                angular.element(next).click();
-                                $timeout(function(){
-                                    if(angular.element(nextFrm[0]).is("md-select")){
-                                        angular.element(nextFrm[0]).focus().click();
-                                    }else if(angular.element(nextFrm[0]).is("vlc-group")) {
-                                        $timeout(function(){
-                                            angular.element(nextFrm[0]).find("span").first().focus();
-                                        },0);
-                                    }else{
-                                        angular.element(nextFrm[0]).focus();
-                                    }
-                                },50);
-
-                            },50);
+                        /*if(angular.element(element).is("md-autocomplete")){
+                            //angular.element(element).find("input").attr("step","");
+                            elem = angular.element(element).find("input");
                         }*/
-
+                        skip(elem)
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
                     }else if(e.which=="40"){
@@ -485,7 +464,9 @@ MyApp.directive('info', function($timeout,setNotif) {
 
             });
 
-
+            /*if(element.is("md-autocomplete")){
+                element = element.find("input");
+            }*/
             element.bind("focus", function(e) {
                 if(attrs.info){
                     $timeout(function() {
