@@ -1,6 +1,6 @@
-<md-sidenav layout="row" class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="sideFiles" id="sideFiles" click-out="closeSideFile($event)">
+<md-sidenav  layout="row" class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="sideFiles" id="sideFiles" click-out="closeSideFile($event)">
 
-    <md-content  layout="row" flex class="sideNavContent" >
+    <md-content  layout="row" flex class="sideNavContent" ng-init="localizame = true" >
         <div layout="row" flex style="padding: 4px; overflow-x: hidden;">
             <!--<div class="activeleft "
                  ng-click="closeSide()" ng-class="{'white': ('detalleDoc'!=layer)}"  style="" ng-show="expand"></div>-->
@@ -17,7 +17,7 @@
                 </div>
 
                 <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="allowUpload.val">
-                    <div ngf-drop ngf-select="upload($files)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                    <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
                          ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
                         insertar archivo
                     </div>
@@ -32,12 +32,12 @@
                 <div layout="row" style="min-height: 24px;"></div>
                 <div layout="column" flex style="padding:16px;">
                     <div style="overflow: auto;">
-                    <div style="width: 100%; height: 100%;">
-                        <img style="width: 100%; height: 100%;" ng-src="{{imgSelec}}" ng-show="imgSelec" >
-                        <iframe style="width: 100%; height: 100%;"  ng-src="{{pdfSelec}}" ng-show="pdfSelec">
+                        <div style="width: 100%; height: 100%;">
+                            <img style="width: 100%; height: 100%;" ng-src="{{imgSelec}}" ng-show="imgSelec" />
+                            <iframe style="width: 100%; height: 100%;"  ng-src="{{pdfSelec}}" ng-show="pdfSelec">
 
-                        </iframe>
-                    </div>
+                            </iframe>
+                        </div>
                     </div>
                 </div>
                 <div layout="row" layout-align="center center" style="min-height: 56px;">

@@ -751,7 +751,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.imgSelec = null;
     $scope.resource = $resource('master/files/:type', {}, {
         query: {method: 'GET',params: {type: "getFiles"}, isArray: true},
-        get: {method: 'GET',params: {type:"getFile"}, headers: {'Content-Type': 'image/png'},isArray: false},
+        get: {method: 'GET',params: {type:"getFile"}, isArray: false},
 
     });
 
@@ -794,6 +794,29 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
             $scope.imgSelec =undefined;
             $scope.pdfSelec= SYSTEM.PATHAPP +"master/files/getFile?id="+doc.id;
         }
+    };
+
+    $scope.$watch('$$childHead.serviceFiles.length', function(newValue){
+
+        if(newValue > 0){
+            console.log("files data", $scope.$$childHead.serviceFiles);
+            $scope.upload( $scope.$$childHead.serviceFiles );
+            //$scope.$$childHead.serviceFiles =[]
+        }
+    });
+
+    $scope.up = function(val){
+        alert("");
+        console.log("val", val)
+        console.log("scope " ,$scope);
+
+        console.log("serviceFiles " ,$scope.serviceFiles);
+
+        $timeout(function(){
+            console.log("serviceFiles 2 " ,$scope.serviceFiles);
+
+
+        }, 100);
     };
 
     /** subida de archivos  al servidor */
@@ -858,6 +881,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                         }
                         console.log("cerrado ");
                         $scope.isOpen= false;
+                        filesService.clear();
                     });
 
 
@@ -865,6 +889,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                     $scope.isOpen= false;
                     $scope.expand = false;
                     console.log("cerrado ");
+                    filesService.clear();
                 }
                 $scope.accion.estado=false;
 
@@ -934,14 +959,14 @@ MyApp.service('App' ,[function(){
 }]);
 
 MyApp.service('filesService' ,function(){
-    var all = new Array();
+    var all = [];
     var accion ={estado:false,data:{}};
     var isOpen= false;
     var titulo ="Adjuntos";
     var folder ="";
     var process = {
         total : 0 ,
-        terminados: new Array(),
+        terminados: [],
         estado:'wait'
     };
     var allowUpload = {val:false};
@@ -951,7 +976,6 @@ MyApp.service('filesService' ,function(){
             angular.forEach(data, function(v){
                 all.push(v);
             });
-            console.log();
 
         },
         getFiles: function(){
@@ -997,6 +1021,12 @@ MyApp.service('filesService' ,function(){
         allowUpload : function(){return allowUpload;},
         setAllowUpload : function(value){
             allowUpload.val= value;
+        },
+        clear : function(){
+            all.splice(0,all.length);
+            titulo ="Adjuntos";
+            folder="";
+
         }
 
 

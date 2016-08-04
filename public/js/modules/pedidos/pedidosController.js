@@ -1739,7 +1739,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.isOpenaddAnswer= false;
     $scope.closeAddAnswer= function(e){
 
-        if(jQuery(e.target).parents("#lyrAlert").length == 0&& $scope.isOpenaddAnswer) {
+        if(jQuery(e.target).parents("#lyrAlert").length == 0 && $scope.isOpenaddAnswer && !angular.element(e.target).is("#ngf-fileInput")) {
             if ($mdSidenav("addAnswer").open()) {
                 angular.element(document).find("#priorityDocs").find("#expand").animate({width:"0"},400);
                 $mdSidenav("addAnswer").close().then(function () {
@@ -1763,8 +1763,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     };
 
+    $scope.$watch('answerfiles.length', function(newValue){
+        if(newValue > 0){
+            console.log("files data", $scope.answerfiles);
+            $scope.answerfiles =[]
+        }
+    });
+
     $scope.uploadAnswer = function(data){
-        console.log("data", data);
+        console.log("this", data);
+        console.log("scope", $scope);
+
     };
     $scope.updateProv= function(){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
@@ -2546,7 +2555,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal[0]  == 0 ){
             $scope.provSelec ={};
             $scope.reviewDoc();
-            $scope.oldReviewDoc();
+            $timeout(function(){
+                $scope.oldReviewDoc();
+            }, 100);
+
 
             //        $timeout(function(){$scope.reviewDoc()},1000);
             $scope.provIndex = null;

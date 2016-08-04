@@ -2435,66 +2435,32 @@
                                 Respuesta del proveedor
                             </div>
                         </div>
-                        <!--<div layout="column" layout-align="center center" ng-click="addAnswerMode = (addAnswerMode == 1) ? 2 : 1 "
+                       <div layout="column" layout-align="center center"
+                            ngf-drop ngf-select  ng-model="answerfiles"
+                            ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="AnswerfileInput"
                         >
-                            <span ng-class="{'icon-Actualizar': addAnswerMode == 1, 'icon-Eliminar' : addAnswerMode != 1 }" style="font-size: 24px"></span>
-                        </div>-->
+                            <span  style="font-size: 24px">&</span>
+                        </div>
 
                     </div>
-                    <div flex>
+                    <div flex style="overflow: auto;">
                         <form flex layout="column">
-                            <div style="overflow: auto;" >
+                            <div  >
                                 <md-input-container class="md-block" flex >
-                                    <label>Descripcion</label>
                                 <textarea ng-model="addAnswer.descripcion"
                                           info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
                                           required
                                 ></textarea>
+
                                 </md-input-container>
+
                             </div>
+
                         </form>
                     </div>
-                    <!--<div flex ng-show="addAnswerMode != 1">
-                        <div style="padding: 2px;; min-height: 56px;" layout="row" >
-                            <div ngf-drop ngf-select="uploadAnswer(this)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput"  style="height: 28px; margin-top: 16px;">
-                                insertar archivo
-                            </div>
-                        </div>
-                        <div flex="" style="overflow: auto; padding: 0px 4px 4px 4px; overflow: auto;">
-                            <div class="imgItem" ng-repeat="item in addAnswer.pitures ">
-                                <img ng-src="images/thumbs/{{item.thumb}}"/>
-                            </div>
-                        </div>
-                    </div>-->
-                    <!--<div layout="row" flex="20" style="overflow-y: auto;">
-                        <form flex layout="column">
-                            <div  >
-                            <md-input-container class="md-block" flex >
-                                <label>Descripcion</label>
-                                <textarea ng-model="addAnswer.descripcion"
-                                       info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
-                                       required
-                                ></textarea>
-                            </md-input-container>
-                            </div>
-                        </form>
-
+                    <div style="height: : '{{ !(addAnswer.adjs) ? 0 : (20 * addAnswer.adjs.length) }}px'">
+                        <div ng-repeat="item in addAnswer.adjs" class="input-adj"> {{$index}}}<div style="width: 16px">X</div></div>
                     </div>
-                    <div layout="column"  flex>
-                        <div style="padding: 2px;; min-height: 56px;" layout="row" >
-                            <div ngf-drop ngf-select="uploadAnswer(this)" ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput"  style="height: 28px; margin-top: 16px;">
-                                insertar archivo
-                            </div>
-                        </div>
-                        <div flex="" style="overflow: auto; padding: 0px 4px 4px 4px; overflow: auto;">
-                            <div class="imgItem" ng-repeat="item in pitures " ng-click="selectImg(item)">
-                                <img ng-src="images/thumbs/{{item.thumb}}"/>
-                            </div>
-                        </div>
-                    </div>-->
-
                 </div>
 
             </md-content>
@@ -2509,13 +2475,15 @@
                     z-index: 100;"
             layout="column" layout-align="center center" class="md-sidenav-right"
             md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
-            ng-mouseleave="showNext(false)" ng-click="next()">
+            ng-mouseleave="showNext(false)" ng-click="next()" >
             <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
 
 
         <!------------------------------------------- Alertas ------------------------------------------------>
         <div ng-controller="notificaciones" ng-include="template"></div>
+        <!------------------------------------------- files ------------------------------------------------>
+
         <div ng-controller="FilesController" ng-include="template"></div>
 
     </div>
