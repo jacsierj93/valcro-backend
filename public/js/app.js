@@ -143,7 +143,15 @@ MyApp.directive('global', function (Layers, setNotif) {
     };
 });
 
+
+
 MyApp.directive('listBox', function ($timeout) {
+    window.addEventListener("keydown", function(e) {
+        // space and arrow keys
+        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+            e.preventDefault();
+        }
+    }, false);
 
     return {
         link: function (scope, elem, attrs,ctrl) {
@@ -157,11 +165,13 @@ MyApp.directive('listBox', function ($timeout) {
                 }else{
                     if(e.which=="40"){
                         var next = (angular.element(elem).next().length>0)?angular.element(elem).next():angular.element(elem).prevAll().last();
-                        scope.$parent.scrollTo(next[0].id);
+                        angular.element(elem).parent().scrollTop(angular.element(elem).parent().scrollTop() + next.outerHeight());
                         next[0].focus();
                     }else if(e.which=="38"){
                         var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
-                        scope.$parent.scrollTo(prev[0].id);
+                        if(prev.offset().top < 0){
+                            angular.element(elem).parent().scrollTop(angular.element(elem).parent().scrollTop() - prev.outerHeight());
+                        }
                         prev[0].focus();
                     }else if(e.which=="13"){
                         $timeout(function(){
