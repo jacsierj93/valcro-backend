@@ -163,18 +163,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                     $scope.priorityDocs= [];
                                 }, after: function(){
                                     Order.get({type:'OldReviewDocs'},{}, function(response){
-                                        $scope.priorityDocs = response.docs;
+                                        angular.forEach(response.docs, function(v){
+                                            v.emision = DateParse.toDate(v.emision);
+                                            $scope.priorityDocs.push(v);
+                                        });
+                                        if($scope.priorityDocs.length > 0){
+                                            $timeout(function(){
+                                                var mo= jQuery("#priorityDocs").find('.cellSelect')[0];
+                                               console.log("mo", mo)
+                                                mo.focus();
+
+                                            }, 300);
+                                        }
+
+
                                     });
                                 }
                             }});
-                            /*$scope.navCtrl.value="unclosetDoc";
-                             $scope.navCtrl.estado=true;*/
+
                         }
                     }
                 ]);
             }else{
-                /* var mo= jQuery("#init");
-                 mo[0].focus();*/
+
             }
 
         });
@@ -1751,12 +1762,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     console.log("$scope.addAnswer", $scope.addAnswer)
                     Order.postMod(
                         {type:$scope.formMode.mod, mod:"AddAnswer"},{  descripcion:$scope.addAnswer.descripcion,doc_id: $scope.addAnswer.doc_id, adjs :( $scope.addAnswer.adjs.length > 0)  ? $scope.addAnswer.adjs : []},function(response){
-                        console.log("response data", response)
+                            console.log("response data", response)
                             $scope.priorityDocs.splice($scope.addAnswer.index,1);
                             $scope.addAnswer={};
                             $scope.addAnswer.adjs =[];
                             $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:autohidden});
-                    });
+                        });
 
 
 
@@ -1774,15 +1785,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.sideaddAnswer = function(data, item){
 
-        console.log("data",data);
         if(!$scope.isOpenaddAnswer){
-           angular.element(document).find("#priorityDocs").find("#expand").animate({width:"336px"},400);
+            angular.element(document).find("#priorityDocs").find("#expand").animate({width:"336px"},400);
 
             $mdSidenav("addAnswer").open().then(function(){
                 $scope.isOpenaddAnswer = true;
-               $scope.addAnswer.doc_id=angular.copy(item.id);
+                $scope.addAnswer.doc_id=angular.copy(item.id);
                 $scope.addAnswer.index=data.$index;
                 $scope.formMode= $scope.forModeAvilable.getXname(item.documento);
+
 
             });
 
@@ -1794,26 +1805,26 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newValue > 0){
             console.log("file serve",filesService)
             filesService.setFolder("orders");
-           angular.forEach($scope.answerfiles, function(v){
+            angular.forEach($scope.answerfiles, function(v){
 
-               filesService.Upload({file:v,
-                   success: function(data){
-                       console.log("data", data);
-                       $scope.addAnswer.adjs.push(data);
-                   },
-                   error:function(){
-                    console.log("error subiendo ",v);
-               }})
-           });
+                filesService.Upload({file:v,
+                    success: function(data){
+                        console.log("data", data);
+                        $scope.addAnswer.adjs.push(data);
+                    },
+                    error:function(){
+                        console.log("error subiendo ",v);
+                    }})
+            });
             $scope.answerfiles =[]
         }
     });
 
-/*    $scope.uploadAnswer = function(data){
-        console.log("this", data);
-        console.log("scope", $scope);
+    /*    $scope.uploadAnswer = function(data){
+     console.log("this", data);
+     console.log("scope", $scope);
 
-    }*/
+     }*/
 
 
     ;
@@ -2408,8 +2419,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                             },
                             after: function(){
                                 $scope.isTasaFija=true;
-                                var mo= jQuery("#prov_id");
-                                mo[0].focus();
+                                $timeout(function(){
+                                    if($scope.provDocs.length > 0){
+                                        var mo= angular.element("#"+$scope.layer+" .activeleft");
+                                        console.log("focus ", mo);
+                                        mo[0].focus();
+                                    }
+                                }, 100);
+
+
                             }
                         }})
                         ;break;
@@ -2555,9 +2573,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                     });
                                     if($scope.unclosetDoc.length == 0){
                                         $scope.LayersAction({close:{search:true}});
+                                    }else{
+                                        $timeout(function(){
+                                            var mo= jQuery("#unclosetDoc").find('.cellSelect')[0];
+                                            mo.focus();
+
+                                        }, 100);
                                     }
 
-                                    // $scope.unclosetDoc =
+
 
                                 });
                                 $scope.tempDoc= {};
@@ -2594,6 +2618,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
 
+        if($scope.layer){
+              /* var form =  angular.element("#"+$scope.layer).find("form:first");
+             console.log("form", form);
+             if(form){
+             form.focus();
+             }*/
+        }
         if(newVal[0]  == 0 ){
             $scope.provSelec ={};
             $scope.reviewDoc();
@@ -2799,20 +2830,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
             }else
             if(arg.search){
                 search(arg.search, module);
-                /*                var acc = arg.search;
-                 if(acc.search){
-
-                 if(module.layers[acc.name]){
-                 acc = module.layers[acc.name];
-                 }
-                 }
-
-                 if(module.historia.indexOf(arg.search.name) == -1) {
-                 open(acc, module);
-
-                 }else {
-                 close(acc, module);
-                 }*/
             }else {
                 console.log("error parametro no implemtnado")
             }
@@ -2936,6 +2953,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 }
                 $mdSidenav(arg.name).open().then(function(){
                     if(arg.after){
+
                         arg.after();
                     }
                 });
@@ -3098,7 +3116,7 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
 MyApp.directive('table', function ($compile) {
     return {
         link: function (scope, elem, attrs) {
-            var head =jQuery(elem).find(".headGrid");
+            var head =jQuery(elem).find("[orderBy]");
             var name = attrs.table;
             angular.forEach(head, function(v){
                 var aux = angular.element(v);
@@ -3109,6 +3127,21 @@ MyApp.directive('table', function ($compile) {
                 }
             });
 
+        }
+    };
+});
+
+MyApp.directive('vlcKeys', function ($compile) {
+    return {
+        link: function (scope, elem, attrs) {
+            elem.bind("keydown",function(e){
+                // teclas muertas
+                if(e.which=="9"){
+                    e.preventDefault();
+                }
+
+
+            })
         }
     };
 });

@@ -2390,7 +2390,7 @@ class OrderController extends BaseController
             foreach($req->adjs as $aux){
                 $adj= new SolicitudeAnswerAttachment();
                 $adj->contestacion_id = $doc->id;
-                $adj->archivo_id = $aux['file_id'];
+                $adj->archivo_id = $aux['id'];
                 $adj->save();
                 $att[] = $adj;
 
@@ -2420,7 +2420,7 @@ class OrderController extends BaseController
             foreach($req->adjs as $aux){
                 $adj= new OrderAnswerAttachment();
                 $adj->contestacion_id = $doc->id;
-                $adj->archivo_id = $aux['file_id'];
+                $adj->archivo_id = $aux['id'];
                 $adj->save();
 
             }
@@ -2444,7 +2444,7 @@ class OrderController extends BaseController
             foreach($req->adjs as $aux){
                 $adj= new PurchaseAnswerAttaments();
                 $adj->contestacion_id = $doc->id;
-                $adj->archivo_id = $aux['file_id'];
+                $adj->archivo_id = $aux['id'];
                 $adj->save();
 
             }
