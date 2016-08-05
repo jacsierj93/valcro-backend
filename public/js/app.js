@@ -125,6 +125,13 @@ MyApp.filter('customFind', function() {
     }
 });
 
+MyApp.filter('filtCountry', function() {
+    return function(lists, search) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return lists.filter(function(val) {
+            return val.short_name.toLowerCase().indexOf(search.toLowerCase()) != -1 ;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+        });
+    }
+});
 
 MyApp.directive('global', function (Layers, setNotif) {
     return {
@@ -148,7 +155,7 @@ MyApp.directive('global', function (Layers, setNotif) {
 MyApp.directive('listBox', function ($timeout) {
     window.addEventListener("keydown", function(e) {
         // space and arrow keys
-        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        if([37, 38, 39, 40].indexOf(e.keyCode) > -1) {
             e.preventDefault();
         }
     }, false);
@@ -344,7 +351,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
-        console.log(list)
+
         if(list.index(elem)<list.length-1){
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).is("md-select")){
@@ -353,6 +360,8 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     $timeout(function(){
                         angular.element(list[list.index(elem)+1]).find("span").first().focus();
                     },0);
+                }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
+                    angular.element(list[list.index(elem)+1]).find("input").focus();
                 }else{
                     angular.element(list[list.index(elem)+1]).focus();
                 }
@@ -474,24 +483,42 @@ MyApp.directive('info', function($timeout,setNotif) {
 
             });
 
-            /*if(element.is("md-autocomplete")){
-                element = element.find("input");
-            }*/
-            element.bind("focus", function(e) {
-                if(attrs.info){
-                    $timeout(function() {
-                        if(old.element!=element[0]){
-                            setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
-                            old.element = element[0];
-                            old.info = attrs.info;
-                        }
-                        $timeout.cancel(ref);
-                        ref = $timeout(function() {
-                            old ={element:"",info:""};
-                        },30000);
-                    }, 0);
-                }
-            })
+            if(element.is("md-autocomplete")){
+                element.on("focus","input", function(e) {
+
+                    if(attrs.info){
+                        $timeout(function() {
+                            if(old.element!=element[0]){
+                                setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                                old.element = element[0];
+                                old.info = attrs.info;
+                            }
+                            $timeout.cancel(ref);
+                            ref = $timeout(function() {
+                                old ={element:"",info:""};
+                            },30000);
+                        }, 0);
+                    }
+                })
+                //element = element.find("input");
+            }else{
+                element.bind("focus", function(e) {
+                    if(attrs.info){
+                        $timeout(function() {
+                            if(old.element!=element[0]){
+                                setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                                old.element = element[0];
+                                old.info = attrs.info;
+                            }
+                            $timeout.cancel(ref);
+                            ref = $timeout(function() {
+                                old ={element:"",info:""};
+                            },30000);
+                        }, 0);
+                    }
+                })
+            }
+
         }
     }
 });
@@ -533,7 +560,6 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
         }
     };
 });
-
 
 MyApp.directive('range', function () {
     function validateRange(viewValue,min,max){

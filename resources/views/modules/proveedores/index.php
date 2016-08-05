@@ -312,15 +312,16 @@
                                 <label>Tipo</label>
                                 <md-autocomplete md-selected-item="dtaPrv.type"
                                                  flex
+                                                 info="seleccione un tipo de proveedor"
                                                  skip-tab
                                                  md-search-text="ctrl.searchText"
                                                  md-items="item in types | customFind : ctrl.searchText : filTipo "
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
                                                  md-min-length="0">
-                                    <input info="seleccione un tipo de proveedor">
+                                    <input >
                                     <md-item-template>
-                                        <span>{{item}}</span>
+                                        <span>{{item.nombre}}</span>
                                     </md-item-template>
                                 </md-autocomplete>
 
@@ -354,11 +355,28 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo de Envio</label>
-                                <md-select skip-tab info="seleccione un tipo de envio" id="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-autocomplete md-selected-item="dtaPrv.envio"
+                                                 flex
+                                                 id="provTypesend"
+                                                 info="seleccione un tipo de envio"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchSend"
+                                                 md-items="item in envios | customFind : ctrl.searchSend : filTipo "
+                                                 md-item-text="item.nombre"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.nombre}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+                               <!-- <md-select skip-tab info="seleccione un tipo de envio" id="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
                                     <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                         {{envio.nombre}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
 
                             </md-input-container>
 
@@ -438,11 +456,28 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
-                                <md-select skip-tab id="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
+                                <md-autocomplete md-selected-item="dir.pais"
+                                                 flex
+                                                 id="dirPais"
+                                                 info="indica el pais de la direccion"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchCountry"
+                                                 md-items="item in paises | filtCountry : ctrl.searchCountry"
+                                                 md-item-text="item.short_name"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.short_name}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+                                <!--<md-select skip-tab id="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                                 <!--<div ng-messages="user.pais.$error">
                                     <div ng-message="required">Campo Obligatorio.</div>
 
