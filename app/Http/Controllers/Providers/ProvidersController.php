@@ -541,7 +541,7 @@ class ProvidersController extends BaseController
         $lim->prov_id = $req->id_prov;
         $lim->moneda_id = $req->coin;
         $lim->limite = $req->amount;
-        $lim->linea_id = ($req->line!=0)?$req->line:NULL;
+        $lim->linea_id = ($req->line!=0)?$req->line:"";
 
         $lim->save();
         $result['id']=$lim->id;
@@ -574,7 +574,7 @@ class ProvidersController extends BaseController
             $cond = new ProviderCondPay();
         }
         $cond->titulo = $req->title;
-        $cond->linea_id = $req->line;
+        $cond->linea_id = ($req->line=='0')?NULL:$req->line;
         $cond->prov_id = $req->id_prov;
 
         $cond->save();
@@ -633,7 +633,7 @@ class ProvidersController extends BaseController
         $lim->gastos = $req->expens;
         $lim->ganancia = $req->gain;
         $lim->descuento = $req->disc;
-        $lim->linea_id = $req->line;
+        $lim->linea_id = ($req->line=='0')?NULL:$req->line;;
 
         $lim->save();
         $result['id']=$lim->id;
@@ -657,7 +657,7 @@ class ProvidersController extends BaseController
 
         $point->prov_id = $req->id_prov;
         $point->moneda_id = $req->coin;
-        $point->linea_id = $req->line;
+        $point->linea_id = ($req->line=='0')?NULL:$req->line;
         $point->costo = $req->cost;
         $point->save();
         $result['id']=$point->id;
@@ -718,7 +718,7 @@ class ProvidersController extends BaseController
         $time->prov_id = $req->id_prov;
         $time->min_dias = $req->from;
         $time->max_dias = $req->to;
-        $time->linea_id = $req->line;
+        $time->linea_id = ($req->line=='0')?NULL:$req->line;
 
         $time->save();
         $result['id']=$time->id;

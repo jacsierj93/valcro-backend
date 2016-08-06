@@ -310,11 +310,13 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
-                                <md-autocomplete md-selected-item="dtaPrv.type"
+                                <md-autocomplete md-selected-item="ctrl.typeProv"
                                                  flex
                                                  info="seleccione un tipo de proveedor"
                                                  skip-tab
+                                                 id="provType"
                                                  md-search-text="ctrl.searchText"
+                                                 ng-disabled="$parent.enabled && prov.id"
                                                  md-items="item in types | customFind : ctrl.searchText : filTipo "
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
@@ -328,7 +330,7 @@
 
 
                                 <!--
-                                <md-select  info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                                <md-select  info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" md-no-ink>
                                     <md-option ng-repeat="type in types" value="{{type.id}}" skip-tab>
                                         {{type.nombre}}
                                     </md-option>
@@ -1137,7 +1139,7 @@
                 <form name="provConv" layout="row" ng-controller="convController" global  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
+                        <div class="titulo_formulario" ng-click="$parent.openPopUp('excepFactor')" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
                             <div>
                                 Factor de Conversión
                             </div>
@@ -1427,7 +1429,31 @@
 
             </div>
         </md-sidenav>
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="excepFactor" id="excepFactor" click-out="closePopUp('excepFactor',$event)">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+                <input type="hidden" md-autofocus>
+                <md-tabs md-dynamic-height="" md-border-bottom="">
+                    <md-tab label="productos">
+                        <h1 class="md-display-2">por linea</h1>
+                        <h2>sub Linea</h2>
+                        <h3>productos</h3>
+                    </md-tab>
+                    <md-tab label="temporada">
+                        <md-content class="md-padding">
+                            <h1 class="md-display-2">por temporada </h1>
+                            <h2>puertos</h2>
 
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="otros">
+                        <md-content class="md-padding">
+                            <h3 class="md-display-2">otros con comentario y adjuntos</h3>
+
+                        </md-content>
+                    </md-tab>
+                </md-tabs>
+            </md-content>
+        </md-sidenav>
         <!-- ########################################## LAYER (5) RESUMEN FINAL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5" id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->

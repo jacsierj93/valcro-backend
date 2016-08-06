@@ -361,15 +361,15 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         angular.element(list[list.index(elem)+1]).find("span").first().focus();
                     },0);
                 }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
-                    angular.element(list[list.index(elem)+1]).find("input").focus();
+                    angular.element(list[list.index(elem)+1]).find("input").focus().click();
                 }else{
                     angular.element(list[list.index(elem)+1]).focus();
                 }
 
             },50);
         }else{
-            var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]):visible)").first();
-            var nextFrm = angular.element(next).find("[step]:not([disabled]):visible").first();
+            var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
+            var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
             $timeout(function(){
                 angular.element(next).click();
                 $timeout(function(){
@@ -394,17 +394,11 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         terminal:true,
         link: function (scope, element, attrs) {
             element.removeAttr("skip-tab");
-           /* if(angular.element(element).is("md-autocomplete")){
-                angular.element(element).find("input").attr("step","");
-                element = angular.element(element).find("input");
-            }else{*/
-                element.attr("step","");
-            //}
+            element.attr("step","");
             if(angular.element(element).is("div")){
                 angular.element(element).attr("tab-index","-1");
             }
             if(angular.element(element).is("md-switch")){
-
                 element.attr("ng-change","skip('"+element.attr("id")+"',this)");
                 if(!("skip" in  scope)){
                     scope.skip = skip;
@@ -417,12 +411,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }else{
                 element.bind("keydown",function(e){
                     var elem =this;
-
                     if(e.which == "13"){
-                        /*if(angular.element(element).is("md-autocomplete")){
-                            //angular.element(element).find("input").attr("step","");
-                            elem = angular.element(element).find("input");
-                        }*/
                         skip(elem)
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
