@@ -100,6 +100,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.paises = {};
     $scope.todos =[];
 
+
+    //// tablas
+
+    $scope.docOrder ={};
+    $scope.docOrder.order ='id';
     Order.get({type:"OrderProvList"},{},function(response){
         $scope.todos = response.proveedores;
         $scope.paises = response.paises;
@@ -512,8 +517,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     /********************************************DEBUGGIN ********************************************/
 
+
     $scope.test = function (test) {
         alert(test);
+        console.log("tet", test);
+        console.log("escope", $scope);
     };
     $scope.simulateClick = function (id) {
         var a = angular.element(document).find(id);
@@ -582,6 +590,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         return item.short_name.indexOf(texto) > -1;
     };
 
+    //proveedores
     $scope.search = function(){
         var data  =[];
         if($scope.todos.length > 0){
@@ -691,23 +700,84 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         //  return data;
     };
 
-    $scope.searchEmails= function(){
-        return $scope.email.contactos;
+    // documentos
+
+    $scope.filterDocuments = function (data, obj){
+
+        if(data.length > 0 && obj){
+            data = $filter("customFind")(data, obj,function(current,compare){
+                if(compare.id ){
+                    return current.id.toLowerCase().indexOf(compare.id)!= -1;
+                }
+                if(compare.documento){
+                    return current.documento.toLowerCase().indexOf(compare.documento)!= -1;
+                }
+
+                if(compare.titulo){
+                    return current.titulo.toLowerCase().indexOf(compare.titulo)!= -1;
+                }
+
+                if(compare.nro_proforma){
+                    return current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)!= -1;
+                }
+                if(compare.nro_factura){
+                    return current.nro_factura.toLowerCase().indexOf(compare.nro_factura)!= -1;
+                }
+                if(compare.emision){
+                    var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
+                    if( patern.test(compare.emision)){
+                        var dc=new Date(Date.parse(current.emision));
+                        var m;
+                        if ((m = patern.exec(compare.emision)) !== null) {
+                            var aux, dcp;
+                            if(m[0].indexOf('-') != -1){
+                                aux = m[0].split('-');
+                                dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+                                return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear()
+
+                            }else if(m[0].indexOf('/') != -1){
+                                 aux = m[0].split('/');
+                                dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+
+
+
+                            }
+
+                            return dc.getDate() == dcp.getDate() && dc.getMonth() == dc.getMonth() && dcp.getFullYear() == dcp.getFullYear()
+
+
+                        }
+
+                    }else{
+                        var date=DateParse.toDate(current.emision);
+                        return date.getDay().toString().toLowerCase().indexOf(compare.emision)!= -1
+                            || (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.emision)!= -1
+                            || ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.emision)!= -1
+                            || ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.emision)!= -1
+                            || date.getDate().toString().toLowerCase().indexOf(compare.emision)!= -1
+                            || date.getFullYear().toString().toLowerCase().indexOf(compare.emision)!= -1
+                            || date.toString().toLowerCase().indexOf(compare.emision)!= -1;
+                    }
+
+
+
+
+
+                }
+                if(compare.diasEmit && compare.diasEmit != '-1'){
+                    console.log("diasd emit ", current.diasEmit);
+                    return current.diasEmit == compare.diasEmit;
+                }
+                return true;
+            });
+
+        }
+
+        return data;
     };
 
-    $scope.provShow = function(item){
-        /* if(item!= null){
-         if($scope.provdiderFilter.$valid){
-         console.log(" filtro valido", item);
-         if(item.razon_social.includes($scope.fRazSocial)){
-         return true;
-         }
-         return false;
-         }
-         }
-         */
-        return true;
-
+    $scope.searchEmails= function(){
+        return $scope.email.contactos;
     };
 
 
@@ -1167,7 +1237,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     };
 
-
+    $scope.clearSelec = function(obj){
+        console.log("obj", obj)
+        if(!obj){
+            delete obj;
+        };
+    }
     $scope.addRemoveItem = function(item){
         Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItem"},item, function(response){
             if(response.accion == "del"){
