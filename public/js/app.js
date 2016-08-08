@@ -488,10 +488,10 @@ MyApp.directive('info', function($timeout,setNotif) {
                             },30000);
                         }, 0);
                     }
-                })
+                });
                 //element = element.find("input");
             }else{
-                element.bind("focus", function(e) {
+                element.bind("focus", function(e){
                     if(attrs.info){
                         $timeout(function() {
                             if(old.element!=element[0]){

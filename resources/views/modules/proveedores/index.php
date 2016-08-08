@@ -327,14 +327,6 @@
                                     </md-item-template>
                                 </md-autocomplete>
 
-
-
-                                <!--
-                                <md-select  info="seleccione un tipo de proveedor" id="provType" ng-model="dtaPrv.type" md-no-ink>
-                                    <md-option ng-repeat="type in types" value="{{type.id}}" skip-tab>
-                                        {{type.nombre}}
-                                    </md-option>
-                                </md-select>-->
                             </md-input-container>
 
 
@@ -357,10 +349,11 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo de Envio</label>
-                                <md-autocomplete md-selected-item="dtaPrv.envio"
+                                <md-autocomplete md-selected-item="ctrl.typeSend"
                                                  flex
                                                  id="provTypesend"
                                                  info="seleccione un tipo de envio"
+                                                 ng-disabled="$parent.enabled && prov.id"
                                                  skip-tab
                                                  md-search-text="ctrl.searchSend"
                                                  md-items="item in envios | customFind : ctrl.searchSend : filTipo "
@@ -374,7 +367,7 @@
                                     </md-item-template>
                                 </md-autocomplete>
 
-                               <!-- <md-select skip-tab info="seleccione un tipo de envio" id="provTypesend" ng-model="dtaPrv.envio" ng-disabled="$parent.enabled && prov.id" md-no-ink>
+                               <!-- <md-select skip-tab info="seleccione un tipo de envio" id="provTypesend" ng-model="dtaPrv.envio" md-no-ink>
                                     <md-option ng-repeat="envio in envios" value="{{envio.id}}">
                                         {{envio.nombre}}
                                     </md-option>
@@ -430,7 +423,7 @@
                 </form>
                 <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm" layout="row" ng-controller="provAddrsController" global ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="direccionesForm" layout="row" ng-controller="provAddrsController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':address.length==0}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex layout="column">
 
@@ -502,14 +495,7 @@
                             </md-input-container>
 
                         </div>
-                        <!--<md-input-container class="md-block"ng-show="dir.tipo==2 || dir.tipo==3">
-                            <label>puertos</label>
-                            <md-select skip-tab id="dirPort" ng-required="dir.tipo==2" info="es necesario que indique un puerto (estan filtrados por el pais seleccinado)" ng-model="dir.ports" multiple="" md-no-ink ng-disabled="$parent.enabled || !dir.pais">
-                                <md-option ng-repeat="port in ports | customFind : dir.pais : searchPort" value="{{port.id}}">
-                                    {{port.Main_port_name}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>-->
+
                         <md-input-container class="md-block">
                             <label>Direccion</label>
                             <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
@@ -568,11 +554,28 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Pais de Residencia</label>
-                                <md-select id="paisCont" skip-tab info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="$parent.enabled || cnt.isAgent==1" md-no-ink>
+                                <md-autocomplete md-selected-item="ctrl.pais"
+                                                 flex
+                                                 id="paisCont"
+                                                 info="pais de residencia del contacto (no es el mismo de direcciones)"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchCountry"
+                                                 md-items="item in paises | filtCountry : ctrl.searchCountry"
+                                                 md-item-text="item.short_name"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 ng-disabled="$parent.enabled || cnt.isAgent==1"
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.short_name}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                                <!--<md-select id="paisCont" skip-tab info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="$parent.enabled || cnt.isAgent==1" md-no-ink>
                                     <md-option ng-repeat="pais in paises" value="{{pais.id}}">
                                         {{pais.short_name}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
 
                             <div layout="row" flex="30">

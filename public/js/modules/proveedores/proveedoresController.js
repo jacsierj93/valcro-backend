@@ -530,12 +530,9 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         angular.element(list[list.index(this)+1]).focus().click();*/
     };
 
-
-
     $scope.filTipo = function(elem,text){
-        console.log(elem,text)
         return elem.nombre.toLowerCase().indexOf(text.toLowerCase()) != -1;
-    }
+    };
 
     $scope.togglecheck = function(e){
         if(e.keyCode==32 || e.type=="click"){
@@ -550,22 +547,29 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     $scope.prov = setGetProv.getProv();
     $scope.list = setGetProv.seeList();
     $scope.$watch('prov.id',function(nvo){
-        $scope.localId = nvo
-        $scope.ctrl.typeProv = $filter("filterSearch")($scope.types,[$scope.prov.tipo_id])[0];
+        $scope.localId = nvo;
+        $scope.ctrl.typeProv = $filter("filterSearch")($scope.types,[$scope.prov.type])[0];
+        $scope.ctrl.typeSend = $filter("filterSearch")($scope.envios,[$scope.prov.envio])[0];
     });
-    $scope.ctrl = {typeProv:{}};
+    $scope.ctrl = {typeProv:{id:""},typeSend:{id:""}};
     $scope.$watch("ctrl.typeProv.id",function(nvo){
         $scope.dtaPrv.type = nvo;
     });
-    $scope.$watch('dtaPrv.envio',function(nvo){
-
+    $scope.$watch("ctrl.typeSend.id",function(nvo){
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
+                $scope.dtaPrv.envio = nvo;
+                console.log("cambio",nvo);
             },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provTypesend")[0].click();
             }}]);
         }
+
     });
+   /* $scope.$watch('dtaPrv.envio',function(nvo){
+
+
+    });*/
     $scope.$watch('projectForm.provType.$modelValue',function(nvo){
         //console.log($scope.projectForm)
         if(nvo==4 && !$scope.projectForm.provType.$untouched){
@@ -2846,7 +2850,6 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
     };
 
 });
-
 
 
 MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists,$timeout) {

@@ -104,6 +104,10 @@ md-autocomplete-wrap button{
 
 }
 
+md-autocomplete.md-default-theme[disabled], md-autocomplete[disabled]{
+    background: transparent !important;
+}
+
 
 
 
@@ -736,6 +740,13 @@ form.focused .titulo_formulario>div{
 }
 form.focused .titulo_formulario{
     color: rgb(84, 180, 234);
+}
+
+form.required .titulo_formulario>div{
+    border-bottom-color: #febd33;
+}
+form.required .titulo_formulario{
+    color: #febd33;
 }
 
 .cntLayerHolder {
