@@ -1357,12 +1357,13 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.$watch('prov.id',function(nvo){
         $scope.contacts = setGetProv.getContacts();//(nvo)?providers.query({type: "contactProv", id_prov: $scope.prov.id || 0}):[];
         $scope.dirAssign = setGetProv.getAddress();
-        $scope.cnt.prov_id=$scope.prov.id
+        $scope.cnt.prov_id=$scope.prov.id;
     });
 
 
-    $scope.$watch('cnt.pais',function(nvo,old)
+    $scope.$watch('ctrl.pais.id',function(nvo,old)
     {
+        $scope.cnt.pais_id = nvo;
         if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
             setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
                 name:"si",
@@ -1566,6 +1567,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.toEdit = function(element){
         contact = element.cont;
         contact.prov_id = $scope.prov.id;
+        $scope.ctrl['pais'] = contact.pais;
         setGetContac.setContact(contact);
         currentOrig = angular.copy($scope.cnt);
         setGetProv.addToRllBck($scope.cnt,"contProv")

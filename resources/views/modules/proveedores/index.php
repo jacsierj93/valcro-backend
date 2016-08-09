@@ -1621,9 +1621,9 @@
                                     </md-tooltip>
                                 </div>
                                 <div flex class="collapseResum">
-                                    <span style="font-weight: bolder">Email :</span>{{cont.datos.emailCont}}
+                                    <span style="font-weight: bolder">Email :</span>{{cont.datos.emailCont.valor}}
                                     <md-tooltip >
-                                        {{cont.datos.emailCont}}
+                                        {{cont.datos.emailCont.valor}}
                                     </md-tooltip>
                                 </div>
                               <!--  <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
