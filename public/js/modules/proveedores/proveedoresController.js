@@ -167,12 +167,19 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     var chngProv = function(prov){
-        $scope.LayersAction({close:{all:true}});
+
+
         setGetProv.cancelNew();
         $scope.edit = false;
         $scope.enabled = true;
         setGetProv.setProv(prov.item);
-        $scope.LayersAction({open:{name:"layer0"}});
+        if($scope.module.index>0){
+            $scope.LayersAction({close:{first:true}});
+        }else{
+            $scope.LayersAction({open:{name:"layer0"}});
+        }
+
+
         //openLayer("layer0");//modificado para mostrar resumen proveedor
     };
 
@@ -193,11 +200,11 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         id = id||null;
         if(setGetProv.haveChang()){
             $scope.LayersAction({open:{name:"layer5"}});
+
             setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
                 {
                     name: "SI",
                     action: function () {
-                        $scope.LayersAction({close:true})
                         yes(id);
                     },
                     default:defaultTime
@@ -216,6 +223,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
 
     var newProv = function(){
+        $scope.LayersAction({close:{fisrt:true}});
         setGetProv.setProv(false);
         $scope.LayersAction({close:{all:true}});
         //closeLayer(true);
@@ -1363,8 +1371,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     $scope.$watch('ctrl.pais.id',function(nvo,old)
     {
-        $scope.cnt.pais_id = nvo;
-        if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
+        $scope.cnt.pais = nvo;
+        /*if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
             setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
                 name:"si",
                 action:function(){
@@ -1376,7 +1384,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     console.log($scope.provContactosForm);
                 }
             }]);
-        }
+        }*/
         var preVal = angular.element("#contTelf").find("input").val();
         if(preVal){
             if(preVal!=""){
@@ -1566,8 +1574,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
     $scope.toEdit = function(element){
         contact = element.cont;
+        console.log(contact)
         contact.prov_id = $scope.prov.id;
-        $scope.ctrl['pais'] = contact.pais;
+        $scope.ctrl['pais'] = contact.country;
         setGetContac.setContact(contact);
         currentOrig = angular.copy($scope.cnt);
         setGetProv.addToRllBck($scope.cnt,"contProv")
@@ -1579,8 +1588,10 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
             if(!elem){
                 saveContact(function(){
+                    console.log("BORRADO")
                     contact = {};
                     setGetContac.setContact(false);
+                    $scope.ctrl.searchCountry = "";
                     $scope.provContactosForm.$setUntouched();
                     $scope.provContactosForm.$setPristine();
                     angular.element("#contTelf").find("input").val("");

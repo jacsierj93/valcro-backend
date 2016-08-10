@@ -94,6 +94,7 @@ class ProvidersController extends BaseController
         $data->contacts = $data->contacts()->get();
         foreach($data->contacts as $contact){
             $contact->languages=$contact->idiomas()->lists("languaje_id");
+            $contact->country;
             $contact->emails=$contact->campos()->where("prov_id",$data->id)->where("campo","email")->get();
             $contact->phones=$contact->campos()->where("prov_id",$data->id)->where("campo","telefono")->get();
             $contact->cargos=$contact->campos()->where("prov_id",$data->id)->where("campo","cargos")->lists("valor");

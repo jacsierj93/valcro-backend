@@ -23,6 +23,11 @@ class Contactos extends  Model
         return $this->hasMany('App\Models\Sistema\ContactField', 'cont_id');
     }
 
+    public function country()
+    {
+        return $this->hasOne('App\Models\Sistema\Country','id','pais_id');
+    }
+
     public function cont_telefono()
     {
         return $this->belongsToMany('App\Models\Sistema\Provider', 'tbl_prov_cont', 'cont_id', 'prov_id')->withPivot("direccion","responsabilidades");
