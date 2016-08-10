@@ -156,7 +156,17 @@ div[ng-click] * {
 
 .cellSelect.cellEmpty{
     border-bottom:none;
-    margin-top: 0px;
+    margin-top: 0;
+    padding-top: 8px;
+}
+
+.form-head{
+    min-height: 40px;
+    height: 48px;
+}
+.form-body div{
+    min-height: 32px;
+    height: 32px;
 }
 /**contenedor de la grilla*/
 .gridContent{
@@ -166,6 +176,9 @@ div[ng-click] * {
 
 }
 
+.head-cell-order{
+    width: 80px;
+}
 /**contenedor de la grilla*/
 .dotRow{
     height: 22px;

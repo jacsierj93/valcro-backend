@@ -85,7 +85,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.selecPed=false;
     $scope.preview=true;
     $scope.mouseProview= false;
-    $scope.gridView =-1;
+    $scope.gridView = 1;
     $scope.gridViewCp= 1;
     $scope.gridViewSus= 1;
     $scope.gridViewFinalDoc= 1;
@@ -880,7 +880,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         $scope.LayersAction({open:{name:"menuAgr", before: function(){
             $scope.document = {};
         }}});
-        $scope.gridView=-1;
+        $scope.gridView= 1;
         $scope.preview =false;
 
     };
@@ -1661,7 +1661,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.DtPedido = function (doc) {
         $scope.document= {};
-        $scope.gridView=-1;
+        $scope.gridView= 1;
         var aux= angular.copy(doc);
         if(doc && $scope.module.index <2){
             if (segurity('editPedido')) {
@@ -1681,7 +1681,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     $scope.openTempDoc = function(doc){
-        $scope.gridView=-1;
+        $scope.gridView= 1;
         //init();
         var aux= angular.copy(doc);
         if (segurity('editPedido')) {
@@ -2763,7 +2763,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
             if($scope.layer != "detalleDoc"){
-                $scope.gridView=-1;
+                $scope.gridView= 1;
                 $scope.imagenes = [];
                 $scope.formBlock = true;
                 $scope.isTasaFija= true;
@@ -2994,12 +2994,15 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                     close = arg.to;
 
                 }else if(arg.all){
+                    alert("asdfa");
                     close = module.index ;
+                    console.log("all recibido", module);
                 }else if(arg.first ){
                     close = module.index -1;
                 }
             }
             paso = (close != 0) ;
+
             if(paso){
                 module.block=true;
 
@@ -3048,6 +3051,11 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                     }
 
 
+                }
+            }else {
+                console.log("entro en cero")
+                if(arg.after){
+                    arg.after();
                 }
             }
 
