@@ -417,6 +417,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
                     }else if(e.which=="40"){
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){
+                            scope.$parent.prevFocus = angular.element(":focus");
                             if(angular.element("#lyrAlert").find(".alertTextOpcs:visible").length > 0){
                                var focus =angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first();
                                 angular.element(focus).focus();
@@ -452,6 +453,7 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
                     }
                 }else if(e.which=="13"){
                     $timeout(function(){element.click()},0);
+                    scope.$parent.prevFocus.focus();
                 }
             });
             //$compile(element[0])(scope)
