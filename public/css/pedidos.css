@@ -79,6 +79,25 @@ div[ng-click] * {
     width: 12px;
     display: block;
 }
+.cell-filter-order > div {
+   height: 50%;
+}
+.cell-filter-order > div:not(.filter-select) > span{
+    display: none;
+}
+.cell-filter-order > div:hover > span{
+    display: block ;
+}
+
+.cell-filter-order > div:hover > span{
+    display: block ;
+}
+
+.filter-select *{
+    display: block ;
+}
+
+
 
 .cellGrid input{
     border: none;
@@ -120,9 +139,9 @@ div[ng-click] * {
     border-left: 1px solid rgb(84, 180, 234);
 }
 
-*:focus{
+/**:focus{
     border-left: 1px solid rgb(84, 180, 234);
-}
+}*/
 .cellSelect{
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -133,6 +152,11 @@ div[ng-click] * {
     display: flex;
     padding-top: 19px;
     margin-top: -9px;
+}
+
+.cellSelect.cellEmpty{
+    border-bottom:none;
+    margin-top: 0px;
 }
 /**contenedor de la grilla*/
 .gridContent{

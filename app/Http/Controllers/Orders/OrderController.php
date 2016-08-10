@@ -2403,7 +2403,7 @@ class OrderController extends BaseController
     }
 
     public function AddAnswerOrder(Request $req){
-        $doc= Solicitude::findOrFail($req->doc_id);
+        $doc= Order::findOrFail($req->doc_id);
         $model = new OrderAnswer();
         if($req->has("id")){
             $model = OrderAnswer::findOrFail($req->id);
@@ -2427,7 +2427,7 @@ class OrderController extends BaseController
         }
     }
     public function AddAnswerPurchase(Request $req){
-        $doc= Solicitude::findOrFail($req->doc_id);
+        $doc= Purchase::findOrFail($req->doc_id);
         $model = new PurchaseAnswer();
         if($req->has("id")){
             $model = PurchaseAnswer::findOrFail($req->id);

@@ -175,7 +175,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                         if($scope.priorityDocs.length > 0){
                                             $timeout(function(){
                                                 var mo= jQuery("#priorityDocs").find('.cellSelect')[0];
-                                               console.log("mo", mo)
                                                 mo.focus();
 
                                             }, 300);
@@ -707,21 +706,44 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(data.length > 0 && obj){
             data = $filter("customFind")(data, obj,function(current,compare){
                 if(compare.id ){
-                    return current.id.toLowerCase().indexOf(compare.id)!= -1;
+                    if(current.id.toLowerCase().indexOf(compare.id)== -1){
+                        return false;
+                    }
                 }
-                if(compare.documento){
-                    return current.documento.toLowerCase().indexOf(compare.documento)!= -1;
+                if(compare.documento && compare.documento != '-1'){
+                   if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
+                       return false;
+                   }
+
+                   /* if(current.documento.toLowerCase().indexOf(compare.documento)== -1){
+                        return false;
+                    }*/
+
                 }
 
                 if(compare.titulo){
-                    return current.titulo.toLowerCase().indexOf(compare.titulo)!= -1;
+                    if( current.titulo.toLowerCase().indexOf(compare.titulo)== -1){
+                        return false;
+                    }
                 }
 
                 if(compare.nro_proforma){
-                    return current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)!= -1;
+                    if(!current.nro_proforma){
+                        return false;
+                    }
+                   if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
+                       return false;
+                   }
+
                 }
-                if(compare.nro_factura){
-                    return current.nro_factura.toLowerCase().indexOf(compare.nro_factura)!= -1;
+                if(compare.nro_factura ){
+                    if(!current.nro_factura){
+                        return false;
+                    }
+                    if(current.nro_factura.toLowerCase().indexOf(compare.nro_factura) == -1){
+                        return false;
+                    }
+
                 }
                 if(compare.emision){
                     var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
@@ -738,18 +760,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                             }else if(m[0].indexOf('/') != -1){
                                  aux = m[0].split('/');
                                 dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
-
-
-
+                            }
+                            if(dc.getDate() != dcp.getDate() || dc.getMonth() != dc.getMonth() || dcp.getFullYear() != dcp.getFullYear()){
+                                return false;
                             }
 
-                            return dc.getDate() == dcp.getDate() && dc.getMonth() == dc.getMonth() && dcp.getFullYear() == dcp.getFullYear()
-
-
                         }
-
                     }else{
                         var date=DateParse.toDate(current.emision);
+
                         return date.getDay().toString().toLowerCase().indexOf(compare.emision)!= -1
                             || (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.emision)!= -1
                             || ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.emision)!= -1
@@ -758,16 +777,33 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                             || date.getFullYear().toString().toLowerCase().indexOf(compare.emision)!= -1
                             || date.toString().toLowerCase().indexOf(compare.emision)!= -1;
                     }
-
-
-
-
-
                 }
+
                 if(compare.diasEmit && compare.diasEmit != '-1'){
-                    console.log("diasd emit ", current.diasEmit);
-                    return current.diasEmit == compare.diasEmit;
+                    if( current.diasEmit != compare.diasEmit){
+                        return false;
+                    }
                 }
+                if(compare.monto){
+                    if(!current.monto){
+                        return false;
+                    }
+                    if(current.monto.toString().toLowerCase().indexOf(compare.monto) == -1){
+                        return false;
+                    }
+
+                }
+                if(compare.comentario){
+                    if(!current.comentario){
+                        return false;
+                    }
+                    if(current.comentario.toLowerCase().indexOf(compare.comentario) == -1){
+
+                        return false;
+                    }
+
+                }
+
                 return true;
             });
 
@@ -869,6 +905,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     /*************** conversores **********/
 
+    $scope.transforDocToImg = function(doc){
+        var mode = $scope.forModeAvilable.getXname(doc);
+        if(mode){
+            switch(mode.value){
+                case 21:return "images/solicitud_icon_48x48.gif";
+                case 22:return "images/proforma_icon_48x48.gif";
+                case 23:return "images/odc_icon_48x48.gif";
+                default: return "";
+            }
+        }
+    }
     $scope.transformChip = function(chip) {
 
         if (angular.isObject(chip)) {
@@ -877,7 +924,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
         return { email: chip}
     }
-
 
     $scope.selecContraP = function (item) {
         $scope.contraPedSelec ={};
@@ -1827,7 +1873,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.closeAddAnswer= function(e){
 
         if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
-            jQuery(e.target).parents("#priorityDocs").length == 0 &&
+            jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
             $scope.isOpenaddAnswer &&
             !angular.element(e.target).is("#ngf-AnswerfileInput")) {
 
@@ -1847,7 +1893,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
                 }
-                angular.element(document).find("#priorityDocs").find("#expand").animate({width:"0"},400);
+                angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"0"},400);
                 $mdSidenav("addAnswer").close().then(function () {
                     $scope.isOpenaddAnswer = false;
                 });
@@ -1861,7 +1907,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.sideaddAnswer = function(data, item){
 
         if(!$scope.isOpenaddAnswer){
-            angular.element(document).find("#priorityDocs").find("#expand").animate({width:"336px"},400);
+            angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"336px"},400);
 
             $mdSidenav("addAnswer").open().then(function(){
                 $scope.isOpenaddAnswer = true;
