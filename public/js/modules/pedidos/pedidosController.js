@@ -585,6 +585,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
     /******************************************** filtros ********************************************/
+
+    $scope.EqualsDate = function(current,compare){
+        var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
+        if( patern.test(compare)){
+            var dc=new Date(Date.parse(current));
+            var m;
+            if ((m = patern.exec(compare)) !== null) {
+                var aux, dcp;
+                if(m[0].indexOf('-') != -1){
+                    aux = m[0].split('-');
+                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2])
+
+
+                }else if(m[0].indexOf('/') != -1){
+                    aux = m[0].split('/');
+                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+                }
+                return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear() && dc.getMonth() == dcp.getMonth()
+            }
+        }
+        return false;
+    };
+
     $scope.searchCountry = function(item,texto){
         return item.short_name.indexOf(texto) > -1;
     };
@@ -710,9 +733,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     }
                 }
                 if(compare.documento && compare.documento != '-1'){
-                   if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
-                       return false;
-                   }
+                    if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
+                        return false;
+                    }
                 }
 
                 if(compare.titulo){
@@ -725,9 +748,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     if(!current.nro_proforma){
                         return false;
                     }
-                   if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
-                       return false;
-                   }
+                    if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
+                        return false;
+                    }
 
                 }
                 if(compare.nro_factura ){
@@ -752,7 +775,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                 return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear()
 
                             }else if(m[0].indexOf('/') != -1){
-                                 aux = m[0].split('/');
+                                aux = m[0].split('/');
                                 dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
                             }
                             if(dc.getDate() != dcp.getDate() || dc.getMonth() != dc.getMonth() || dcp.getFullYear() != dcp.getFullYear()){
@@ -812,11 +835,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(data){
             if(data.length > 0 && obj){
                 data = $filter("customFind")(data,obj, function(current, compare){
-                   if(compare.cod_producto){
-                       if(current.cod_producto.toString().indexOf(compare.cod_producto) == -1){
-                           return false;
-                       }
-                   }
+                    if(compare.cod_producto){
+                        if(current.cod_producto.toString().indexOf(compare.cod_producto) == -1){
+                            return false;
+                        }
+                    }
                     if(compare.descripcion && current.descripcion){
                         if(current.descripcion.toLowerCase().indexOf(compare.descripcion) == -1){
                             return false;
@@ -838,6 +861,136 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             }
         }
 
+        return data;
+    };
+
+    //productos del proveedor
+    $scope.filterProd = function(data,obj){
+        if(data){
+            if(data.length > 0 && obj){
+                data  = $filter("customFind")(data, obj,function(current,compare){
+                    if(compare.codigo){
+                        if(current.codigo.toString().toLowerCase().indexOf(compare.codigo) == -1){
+                            return false;
+                        }
+                    }
+                    if(compare.codigo_fabrica){
+                        if(!current.codigo_fabrica){
+                            return false;
+                        }
+                        if(current.codigo_fabrica.toString().toLowerCase().indexOf(compare.codigo_fabrica) == -1){
+                            return false;
+                        }
+                    }
+
+                    if(compare.descripcion){
+                        if(!current.descripcion){
+                            return false;
+                        }
+                        if(current.descripcion.toString().toLowerCase().indexOf(compare.descripcion) == -1){
+                            return false;
+                        }
+                    }
+                    if(compare.saldo){
+                        if(current.saldo.toString().toLowerCase().indexOf(compare.saldo) == -1){
+                            return false;
+                        }
+                    }
+
+                    return true;
+
+
+                });
+            }
+        }
+        return data;
+    };
+
+    $scope.filterContraPed = function(data, obj){
+        if(data){
+            if(data.length > 0 && obj){
+                data  = $filter("customFind")(data, obj,function(current,compare){
+                    if(compare.id){
+                        if(current.id.toString().toLowerCase().indexOf((compare.id)) == -1){
+                            return false;
+                        }
+                    }
+
+                    if(compare.fecha){
+                        if($scope.EqualsDate(current.fecha,compare.fecha)){
+                            console.log("son iguales");
+                            return true;
+                        }else{
+                            var date=DateParse.toDate(current.fecha);
+                            console.log("no son iguales",current.fecha);
+                            console.log("no son iguales date",date);
+
+                            if( date.getDay().toString().toLowerCase().indexOf(compare.fecha)== -1
+                                && (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.fecha) == -1
+                                && ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.fecha) == -1
+                                && ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.fecha) == -1
+                                && date.getDate().toString().toLowerCase().indexOf(compare.fecha) == -1
+                                && date.getFullYear().toString().toLowerCase().indexOf(compare.fecha) == -1
+                                && date.toString().toLowerCase().indexOf(compare.fecha) == -1){
+                                return false;
+                            }
+                        }
+                    }
+                    if(compare.titulo){
+                        if(!current.titulo){
+                            return  false;
+                        }
+                        if(current.titulo.toLowerCase().indexOf((compare.titulo)) == -1){
+                            return false;
+                        }
+                    }
+
+
+                    if(compare.fecha_aprox_entrega){
+                        if(!current.fecha_aprox_entrega){
+                            return false;
+                        }
+                        if($scope.EqualsDate(current.fecha_aprox_entrega,compare.fecha_aprox_entrega)){
+                            console.log("son iguales");
+                            return true;
+                        }else{
+                            var date=DateParse.toDate(current.fecha_aprox_entrega);
+                            console.log("no son iguales",current.fecha_aprox_entrega);
+                            console.log("no son iguales date",fecha_aprox_entrega);
+
+                            if( date.getDay().toString().toLowerCase().indexOf(compare.fecha_aprox_entrega)== -1
+                                && (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.fecha_aprox_entrega) == -1
+                                && ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.fecha_aprox_entrega) == -1
+                                && ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.fecha_aprox_entrega) == -1
+                                && date.getDate().toString().toLowerCase().indexOf(compare.fecha_aprox_entrega) == -1
+                                && date.getFullYear().toString().toLowerCase().indexOf(compare.fecha_aprox_entrega) == -1
+                                && date.toString().toLowerCase().indexOf(compare.fecha_aprox_entrega) == -1){
+                                return false;
+                            }
+                        }
+                    }
+
+                    if(compare.monto){
+                        if(!current.monto){
+                            return false;
+                        }
+                        if(current.monto.toString().toLowerCase().indexOf((compare.monto)) == -1){
+                            return false;
+                        }
+                    }
+                    if(compare.comentario){
+                        if(!current.comentario){
+                            return  false;
+                        }
+                        if(current.comentario.toLowerCase().indexOf((compare.comentario)) == -1){
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+            }
+        }
         return data;
     };
 
@@ -2698,8 +2851,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                         break;
                     case "agrPedPend":
                         $scope.LayersAction({search:{name:"agrPedPend",
+                            before:function(){
+                                $scope.docsSustitos =[];
+                            },
                             after: function(){
-                                $scope.docsSustitos = Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id});
+                             Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id},{},function(response){
+
+                                 angular.forEach(response, function(v,k){
+                                     if(v.emision){
+                                         v.emision= DateParse.toDate(v.emision);
+                                     }
+                                     $scope.docsSustitos.push(v);
+                                 });
+
+                             });
                             }
                         }});
                         break;
@@ -2769,7 +2934,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         $scope.index= newVal[0];
 
         if($scope.layer){
-              /* var form =  angular.element("#"+$scope.layer).find("form:first");
+            /* var form =  angular.element("#"+$scope.layer).find("form:first");
              console.log("form", form);
              if(form){
              form.focus();

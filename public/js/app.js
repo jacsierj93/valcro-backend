@@ -1211,7 +1211,7 @@ MyApp.service('DateParse', function() {
         var aux= text;
         if(typeof (text) != 'undefined'){
             if(text.length >= 10){
-                aux=text.substring(0, 10);
+                aux=text.substring(0, 10).replace("-","/");
             }
             return new Date(Date.parse(aux));
         }

@@ -1740,9 +1740,9 @@ class OrderController extends BaseController
         if($prodTemp->descripcion == null){
             $temp['descripcion'] = "Profit ".$prodTemp->descripcion_profit;
         }
-        if($req->has('cantidad')){
-            $temp['cantidad'] = $req->cantidad;
-            $temp['saldo'] = $req->cantidad;
+        if($req->has('saldo')){
+            $temp['cantidad'] = $req->saldo;
+            $temp['saldo'] = $req->saldo;
         }
 
 

@@ -79,17 +79,26 @@ div[ng-click] * {
     width: 12px;
     display: block;
 }
+
+.cell-filter-order *{
+    width: 100%;
+}
 .cell-filter-order > div {
    height: 50%;
+    width: 100%;
 }
-.cell-filter-order > div:not(.filter-select) > span{
+
+.cell-filter-order > div > div{
+  padding-top: 4px;
+}
+.cell-filter-order > div:not(.filter-select) > img{
     display: none;
 }
-.cell-filter-order > div:hover > span{
+.cell-filter-order > div:hover > img{
     display: block ;
 }
 
-.cell-filter-order > div:hover > span{
+.cell-filter-order > div:hover > img{
     display: block ;
 }
 
