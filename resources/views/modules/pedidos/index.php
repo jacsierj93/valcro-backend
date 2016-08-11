@@ -990,7 +990,7 @@
                             </div>
                             <div layout="row"  ng-class="{focused: (gridView == 2) }"  ng-show="( gridView != 5 )" >
                                 <div flex layout="column">
-                                    <div  layout="row"  >
+                                    <div  layout="row"  class="form-row" >
                                         <md-input-container class="md-block" flex="50" ng-click="allowEdit()" >
                                             <label>Proveedor</label>
                                             <md-select ng-model="provSelec.id"
@@ -1026,7 +1026,7 @@
                                             ></md-datepicker>
                                         </div>
                                     </div>
-                                    <div layout="row">
+                                    <div layout="row"  class="form-row">
                                         <md-input-container   ng-show="( gridView != 4 )"  class="md-block" flex ng-click="allowEdit()" >
                                             <label>Titulo</label>
                                             <input  ng-model="document.titulo"
@@ -1040,7 +1040,7 @@
                                             >
                                         </md-input-container>
                                     </div>
-                                    <div  layout="row"  >
+                                    <div  layout="row"  class="form-row" >
 
                                         <md-input-container class="md-block" flex="30" ng-click="allowEdit()">
                                             <label>Pais</label>
@@ -1084,7 +1084,7 @@
                                         </md-input-container>
 
                                     </div>
-                                    <div  layout="row" >
+                                    <div  layout="row"  class="form-row" >
 
                                         <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                             <label>Direccion almacen</label>
@@ -1110,7 +1110,7 @@
                                             </md-select>
                                         </md-input-container>
                                     </div>
-                                    <div   layout="row" >
+                                    <div   layout="row"  class="form-row">
                                         <md-input-container class="md-block" flex="15" ng-click="allowEdit()">
                                             <label>Monto</label>
                                             <input  ng-model="document.monto"
@@ -1182,7 +1182,7 @@
                                         </md-input-container>
 
                                     </div>
-                                    <div    layout="row" ng-click="allowEdit()">
+                                    <div    layout="row"  class="form-row">
 
                                         <md-input-container class="md-block" flex  >
                                             <label>N° Factura:</label>
@@ -1219,7 +1219,7 @@
                                             <span class="icon-Adjuntar" style="font-size: 24px"></span>
                                         </div>
                                     </div>
-                                    <div  layout="row" >
+                                    <div  layout="row"  class="form-row" >
 
                                         <md-input-container class="md-block" flex="10">
                                             <label>Mt3</label>
@@ -1245,7 +1245,7 @@
 
 
                                     </div>
-                                    <div layout="row" ng-click="allowEdit()">
+                                    <div layout="row"  class="form-row">
                                         <md-input-container class="md-block" flex >
                                             <label>Comentario</label>
                                             <input ng-model="document.comentario"  ng-disabled="( formBlock)"
@@ -1274,7 +1274,7 @@
                                 </div>
 
                             </div>
-                            <div layout="row"  ng-class="{focused: (gridView == 2) }"   ng-show="( gridView == 2 )" ng-click="allowEdit()">
+                            <div layout="row"  class="form-row"  ng-class="{focused: (gridView == 2) }"   ng-show="( gridView == 2 )" ng-click="allowEdit()">
                                 <div layout="row" flex>
                                     <div layout="row" flex >
                                         <md-input-container class="md-block" flex="">
@@ -1306,7 +1306,7 @@
                                 </div>
                             </div>
 
-                            <div layout="row"   ng-class="{focused: (gridView == 3) }"  name="FormEstatusDoc" ng-show="( gridView == 3 )" >
+                            <div layout="row"  class="form-row"  ng-class="{focused: (gridView == 3) }"  name="FormEstatusDoc" ng-show="( gridView == 3 )" >
                                 <div layout="row" flex>
                                     <div  style="height: 30px;margin-top: 9px;  color: #999999;" >
                                         Fecha de Aprobación
@@ -1349,7 +1349,7 @@
                                 </div>
                             </div>
 
-                            <div layout="row"  ng-class="{focused: (gridView == 4) }" ng-show="( gridView == 4 )" >
+                            <div layout="row"  class="form-row" ng-class="{focused: (gridView == 4) }" ng-show="( gridView == 4 )" >
                                 <div layout="row" flex>
                                     <md-input-container class="md-block" flex  ng-click="allowEdit()">
                                         <label>Motivo de cancelacion </label>
@@ -1366,8 +1366,8 @@
                     </form>
                     <form layout="row" ng-class="{focused: (gridView == 5)}">
                         <div active-left></div>
-                        <div layout="row" flex>
-                            <div layout-align="center center">
+                        <div layout="row"  flex>
+                            <div layout-align="center center" layout="column">
                                 <span style="color: #1f1f1f" ng-show="(document.productos.todos.length > 0 )">
                                         ({{document.productos.todos.length}})</span>
                             </div>
@@ -1386,54 +1386,46 @@
                             <div flex="5">
 
                             </div>
-                            <div flex="10">
-                                <div flex>
+                            <div flex="10" layout="row">
                                     <md-input-container class="md-block" flex >
                                         <label>Codigo</label>
                                         <input  ng-model="tbl_dtDoc.filter.cod_producto"
                                         >
                                     </md-input-container>
-                                </div>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_dtDoc.order = 'cod_producto' " ng-class="{'filter-select':(tbl_dtDoc.order == 'cod_producto')}"><span>+</span></div>
                                     <div ng-click="tbl_dtDoc.order = '-cod_producto' " ng-class="{'filter-select':(tbl_dtDoc.order == '-cod_producto')}"><span>-</span></div>
                                 </div>
                             </div>
 
-                            <div flex>
-                                <div flex>
+                            <div flex layout="row">
                                     <md-input-container class="md-block" flex >
                                         <label>Descripcion</label>
                                         <input  ng-model="tbl_dtDoc.filter.descripcion"
                                         >
                                     </md-input-container>
-                                </div>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_dtDoc.order = 'descripcion' " ng-class="{'filter-select':(tbl_dtDoc.order == 'descripcion')}"><span>+</span></div>
                                     <div ng-click="tbl_dtDoc.order = '-descripcion' " ng-class="{'filter-select':(tbl_dtDoc.order == '-descripcion')}"><span>-</span></div>
                                 </div>
                             </div>
-                            <div flex>
-                                <div flex>
+                            <div flex layout="row">
                                     <md-input-container class="md-block" flex >
                                         <label>Documento</label>
                                         <input  ng-model="tbl_dtDoc.filter.documento"
                                         >
                                     </md-input-container>
-                                </div>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_dtDoc.order = 'documento' " ng-class="{'filter-select':(tbl_dtDoc.order == 'documento')}"><span>+</span></div>
                                     <div ng-click="tbl_dtDoc.order = '-documento' " ng-class="{'filter-select':(tbl_dtDoc.order == '-documento')}"><span>-</span></div>
                                 </div>
                             </div>
-                            <div flex="10">
-                                <div flex>
+                            <div flex="10" layout="row">
                                     <md-input-container class="md-block" flex >
                                         <label>Cantidad</label>
                                         <input  ng-model="tbl_dtDoc.filter.saldo"
                                         >
                                     </md-input-container>
-                                </div>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_dtDoc.order = 'saldo' " ng-class="{'filter-select':(tbl_dtDoc.order == 'saldo')}"><span>+</span></div>
                                     <div ng-click="tbl_dtDoc.order = '-saldo' " ng-class="{'filter-select':(tbl_dtDoc.order == '-saldo')}"><span>-</span></div>
@@ -1446,7 +1438,7 @@
                         <div active-left></div>
                         <div layout="column" flex>
                             <div >
-                                <div ng-repeat="item in document.productos.todos " id="prodDt{{$index}}" row-select>
+                                <div ng-repeat="item in filterProdDoc(document.productos.todos,tbl_dtDoc.filter) | orderBy : tbl_dtDoc.order " id="prodDt{{$index}}" row-select>
                                     <div layout="row" class="cellGridHolder" >
                                         <div flex="5" class="cellEmpty">
                                             <md-switch class="md-primary" ng-change="addRemoveItem(item)"

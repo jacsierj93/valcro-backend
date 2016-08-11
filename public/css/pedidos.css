@@ -168,6 +168,10 @@ div[ng-click] * {
     min-height: 32px;
     height: 32px;
 }
+.form-row{
+    min-height: 28px;
+    height: 28px;
+}
 /**contenedor de la grilla*/
 .gridContent{
     overflow-y:auto;

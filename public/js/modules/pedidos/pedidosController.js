@@ -700,7 +700,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     // documentos
-
     $scope.filterDocuments = function (data, obj){
 
         if(data.length > 0 && obj){
@@ -714,11 +713,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                    if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
                        return false;
                    }
-
-                   /* if(current.documento.toLowerCase().indexOf(compare.documento)== -1){
-                        return false;
-                    }*/
-
                 }
 
                 if(compare.titulo){
@@ -807,6 +801,41 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 return true;
             });
 
+        }
+
+        return data;
+    };
+
+    // productos del documentos
+    $scope.filterProdDoc = function(data, obj){
+
+        if(data){
+            if(data.length > 0 && obj){
+                data = $filter("customFind")(data,obj, function(current, compare){
+                   if(compare.cod_producto){
+                       if(current.cod_producto.toString().indexOf(compare.cod_producto) == -1){
+                           return false;
+                       }
+                   }
+                    if(compare.descripcion && current.descripcion){
+                        if(current.descripcion.toLowerCase().indexOf(compare.descripcion) == -1){
+                            return false;
+                        }
+                    }
+                    if(compare.documento && current.documento){
+                        if(current.documento.toLowerCase().indexOf(compare.documento) == -1){
+                            return false;
+                        }
+                    }
+                    if(compare.saldo){
+                        if(current.saldo.toString().indexOf(compare.saldo) == -1){
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+            }
         }
 
         return data;
@@ -2543,7 +2572,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                 $timeout(function(){
                                     if($scope.provDocs.length > 0){
                                         var mo= angular.element("#"+$scope.layer+" .activeleft");
-                                        console.log("focus ", mo);
+
                                         mo[0].focus();
                                     }
                                 }, 100);
