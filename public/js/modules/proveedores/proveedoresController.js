@@ -24,7 +24,8 @@ MyApp.directive('iconGroup', function ($timeout) {
 MyApp.factory('masters', ['$resource',
     function ($resource) {
         return $resource('master/:type/:id', {}, {
-            query: {method: 'GET', params: {type: "",id:""}, isArray: true}
+            query: {method: 'GET', params: {type: "",id:""}, isArray: true},
+            get: {method: 'POST', params: {type: "",id:""}, isArray: false}
         });
     }
 ]);
@@ -2865,7 +2866,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
 });
 
 
-MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists,$timeout) {
+MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists,$timeout,masters) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();
      var foraneos = Object();
@@ -2897,9 +2898,20 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
 
      };
 
+    $scope.checkSimil = function(elem,campo){
+        var find = {
+            table:"tbl_proveedor",
+            campo:"razon_social",
+            search:elem.datos[campo],
+            provId : $scope.provider.id
+        };
+        return masters.get({type:"search"},find);
+        //console.log(simil[$scope.provider.id]);
+
+    };
+
     $scope.isEdit = {direccionesForm:true,nomvalcroForm:true,provContactosForm:true,bankInfoForm:true,provCred:true,provConv:true,provPoint:true};
     $scope.toForm = function(nvo){
-        console.log("cambio",$scope.isEdit[nvo]);
        if(!$scope.isEdit[nvo]){
             setNotif.addNotif("alert", "desea regresar a este formulario",[{
                 name:"llevame alli",

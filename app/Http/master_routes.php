@@ -18,6 +18,7 @@ $app->get("master/getOrderReason",'Masters\MasterController@getReason'); ///obte
 $app->get("master/getOrderCondition",'Masters\MasterController@getCondition'); ///obtener condiciones de pedido
 $app->get("master/getOrderStatus",'Masters\MasterController@getStatus'); ///obtener estado de pedidos
 $app->get("master/getPaymentType",'Masters\MasterController@getPaymentType'); ///obtener tipos de pagos
+$app->post("master/search",'Masters\Compare@search'); ///obtener tipos de pagos
 
 $app->post("master/files/upload",'Masters\FilesController@uploadFile'); ///sube un archivo al servidors
 $app->get("master/files/getFile",'Masters\FilesController@getFileId'); /// obtiene el archivo

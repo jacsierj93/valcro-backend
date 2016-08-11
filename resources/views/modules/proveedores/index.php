@@ -1518,7 +1518,7 @@
                         <md-content flex style="max-height: 200px;">
                             <div ng-repeat="(k,name) in prov.valName" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
 
-                                <div layout="column" ><!--ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}"-->
+                                <div layout="column" ng-click="checkSimil(name,'name')" ><!--ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}"-->
                                     <div layout="row" flex="grow">
                                         <div ng-show="name.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
                                         <div ng-show="name.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
