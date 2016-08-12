@@ -84,7 +84,8 @@
                             <div style="height:48px; padding-right: 16px;" layout="row" layout-align="space-between center">
                                 <div flex="" style="overflow: hidden;" layout="row" ng-init="filterProv.op = '+'">
                                     <div  style="width: 16px;" layout="column" layout-align="center center" ng-click="filterProv.op = (filterProv.op == '+') ? '-' : '+' " >
-                                        <span  style="font-size: 24px"  >  {{filterProv.op }} </span>
+                                      <img src="{{(filterProv.op == '+') ? 'images/TrianguloUp.png' : 'images/TrianguloDown.png' }}" >
+                                        <!-- <span  style="font-size: 24px"  >  {{filterProv.op }} </span>-->
                                     </div>
                                     <md-input-container class="md-block" flex >
                                         <label>Monto</label>
@@ -3212,7 +3213,7 @@
                                     <div ng-click="tbl_priorityDocs.order = '-documento' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-documento')}"><img src="images/TrianguloDown.png" ></div>
                                 </div>
                                 <md-input-container class="md-block"  flex>
-                                    <md-select ng-model="tbl_priorityDocs.filter.documento" ng-init="tbl_unclosetDoc.filter.documento ='-1'">
+                                    <md-select ng-model="tbl_priorityDocs.filter.documento" ng-init="tbl_priorityDocs.filter.documento ='-1'">
 
                                         <md-option value="-1" layout="row">
                                             <img src="images/Documentos.png" style="width:20px;">
