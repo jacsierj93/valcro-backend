@@ -25,7 +25,7 @@ MyApp.factory('masters', ['$resource',
     function ($resource) {
         return $resource('master/:type/:id', {}, {
             query: {method: 'GET', params: {type: "",id:""}, isArray: true},
-            get: {method: 'POST', params: {type: "",id:""}, isArray: false}
+            post: {method: 'POST', params: {type: "",id:""}, isArray: false}
         });
     }
 ]);
@@ -679,7 +679,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
 });
 //###########################################################################################3
-MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,masterLists,$filter,setNotif,$timeout,$mdSidenav,asignPort) {
+MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,masterLists,$filter,setNotif,$timeout,$mdSidenav,asignPort)   {
     $scope.id = "provAddrsControllers";
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
     var dirSel = {};
@@ -714,8 +714,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
       });
     };
 
-    $scope.$watch('dir.pais',function(nvo,old){
-        asignPort.setCountry(nvo);
+    $scope.$watch('ctrl.selPais.id',function(nvo,old){
+        console.log("pais",nvo);
         if((nvo) && $filter("filterSearch")(masterLists.getCommonCountry(),[nvo]).length <= 0 && $scope.direccionesForm.$dirty){
             setNotif.addNotif("alert","al parecer este pais no es muy comun, esta seguro que esta correcto?", [
                 {
@@ -726,13 +726,16 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 },{
                     name: "esta bien",
                     action: function () {
-
+                        $scope.dir.pais = nvo;
+                        asignPort.setCountry(nvo);
                     },
                     default:defaultTime
                 }
             ])
         }
 
+        $scope.dir.pais = nvo;
+        asignPort.setCountry(nvo);
         var preVal = angular.element("#dirPhone").val();
         if(preVal){
             angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
@@ -775,6 +778,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.id_prov = dirSel.prov_id;
         $scope.dir.direccProv = dirSel.direccion;
         $scope.dir.tipo = dirSel.tipo_dir;
+        $scope.ctrl['selPais'] = dirSel.pais;
         $scope.dir.pais = dirSel.pais_id;
         asignPort.setCountry(dirSel.pais_id);
         $scope.dir.provTelf = dirSel.telefono;
@@ -861,6 +865,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                             dirSel = {};
                             $scope.direccionesForm.$setUntouched();
                             $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+                            $scope.ctrl.searchCountry = "";
                             setNotif.addNotif("ok", "Direccion borrada", [
                             ],{autohidden:3000});
                         });
@@ -884,6 +889,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 saveAddress(function(){
                     asignPort.setPorts(false);
                     $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+                    $scope.ctrl.searchCountry = "";
                     currentOrig = {};
                     $scope.direccionesForm.$setPristine();
                     $scope.direccionesForm.$setUntouched();
@@ -954,7 +960,7 @@ MyApp.service("asignPort",function(){
             return defaultCountry;
         }
     }
-})
+});
 
 MyApp.controller('valcroNameController', function($scope,setGetProv,$http,providers,$mdSidenav,$filter,valcroNameDetail,setNotif,$timeout) {
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
@@ -1354,7 +1360,7 @@ MyApp.controller('nomValAssign', function ($scope,setGetProv,valcroNameDetail,$m
     }
 });
 
-MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout,$q) {
+MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout) {
     $scope.id = "contactProv";
     $scope.prov = setGetProv.getProv();
     $scope.cnt = setGetContac.getContact();
@@ -1480,20 +1486,29 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var saveContact = function(onSuccess){
 
         if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
-            onSuccess();
+           //onSuccess();
             return false;
         }
 
         if(!$scope.provContactosForm.$valid && !$scope.provContactosForm.$pristine){
+            var prefocus = angular.element(":focus");
+            $timeout(function(){
+                angular.element("[name='provContactosForm']").click();
+            },20);
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
                     onSuccess();
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
                 }
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    console.log($scope.provContactosForm);
+                    angular.element("[name='provContactosForm']").find(".ng-invalid").first().focus()
+                    //console.log($scope.provContactosForm);
                 }
             }]);
             return false;
@@ -1523,7 +1538,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 ],{autohidden:3000});
             };
             setGetProv.addChng($scope.cnt,data.action,"contProv");
-            onSuccess();
+           // onSuccess();
 
         });
     };
@@ -1590,7 +1605,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             if(!elem){
                 saveContact(function(){
                     console.log("BORRADO")
-                    contact = {};
+                    /*contact = {};
                     setGetContac.setContact(false);
                     $scope.ctrl.searchCountry = "";
                     $scope.provContactosForm.$setUntouched();
@@ -1599,7 +1614,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
-                    }
+                    }*/
                 });
 
 
@@ -2905,7 +2920,7 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
             search:elem.datos[campo],
             provId : $scope.provider.id
         };
-        return masters.get({type:"search"},find);
+        return masters.post({type:"search"},find);
         //console.log(simil[$scope.provider.id]);
 
     };

@@ -451,7 +451,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Pais</label>
-                                <md-autocomplete md-selected-item="dir.pais"
+                                <md-autocomplete md-selected-item="ctrl.selPais"
                                                  flex
                                                  id="dirPais"
                                                  info="indica el pais de la direccion"
