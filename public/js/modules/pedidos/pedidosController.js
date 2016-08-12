@@ -725,107 +725,118 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     // documentos
     $scope.filterDocuments = function (data, obj){
 
-        if(data.length > 0 && obj){
-            data = $filter("customFind")(data, obj,function(current,compare){
-                if(compare.id ){
-                    if(current.id.toLowerCase().indexOf(compare.id)== -1){
-                        return false;
-                    }
-                }
-                if(compare.documento && compare.documento != '-1'){
-                    if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
-                        return false;
-                    }
-                }
+        if(data){
 
-                if(compare.titulo){
-                    if( current.titulo.toLowerCase().indexOf(compare.titulo)== -1){
-                        return false;
-                    }
-                }
 
-                if(compare.nro_proforma){
-                    if(!current.nro_proforma){
-                        return false;
-                    }
-                    if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
-                        return false;
-                    }
-
-                }
-                if(compare.nro_factura ){
-                    if(!current.nro_factura){
-                        return false;
-                    }
-                    if(current.nro_factura.toLowerCase().indexOf(compare.nro_factura) == -1){
-                        return false;
-                    }
-
-                }
-                if(compare.emision){
-                    var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
-                    if( patern.test(compare.emision)){
-                        var dc=new Date(Date.parse(current.emision));
-                        var m;
-                        if ((m = patern.exec(compare.emision)) !== null) {
-                            var aux, dcp;
-                            if(m[0].indexOf('-') != -1){
-                                aux = m[0].split('-');
-                                dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
-                                return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear()
-
-                            }else if(m[0].indexOf('/') != -1){
-                                aux = m[0].split('/');
-                                dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
-                            }
-                            if(dc.getDate() != dcp.getDate() || dc.getMonth() != dc.getMonth() || dcp.getFullYear() != dcp.getFullYear()){
-                                return false;
-                            }
-
+            if(data.length > 0 && obj){
+                data = $filter("customFind")(data, obj,function(current,compare){
+                    if(compare.id ){
+                        if(current.id.toLowerCase().indexOf(compare.id)== -1){
+                            return false;
                         }
-                    }else{
-                        var date=DateParse.toDate(current.emision);
-
-                        return date.getDay().toString().toLowerCase().indexOf(compare.emision)!= -1
-                            || (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.emision)!= -1
-                            || ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.emision)!= -1
-                            || ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.emision)!= -1
-                            || date.getDate().toString().toLowerCase().indexOf(compare.emision)!= -1
-                            || date.getFullYear().toString().toLowerCase().indexOf(compare.emision)!= -1
-                            || date.toString().toLowerCase().indexOf(compare.emision)!= -1;
                     }
-                }
-
-                if(compare.diasEmit && compare.diasEmit != '-1'){
-                    if( current.diasEmit != compare.diasEmit){
-                        return false;
-                    }
-                }
-                if(compare.monto){
-                    if(!current.monto){
-                        return false;
-                    }
-                    if(current.monto.toString().toLowerCase().indexOf(compare.monto) == -1){
-                        return false;
+                    if(compare.documento && compare.documento != '-1'){
+                        if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
+                            return false;
+                        }
                     }
 
-                }
-                if(compare.comentario){
-                    if(!current.comentario){
-                        return false;
-                    }
-                    if(current.comentario.toLowerCase().indexOf(compare.comentario) == -1){
-
-                        return false;
+                    if(compare.titulo){
+                        if( current.titulo.toLowerCase().indexOf(compare.titulo)== -1){
+                            return false;
+                        }
                     }
 
-                }
+                    if(compare.nro_proforma){
+                        if(!current.nro_proforma){
+                            return false;
+                        }
+                        if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
+                            return false;
+                        }
 
-                return true;
-            });
+                    }
+                    if(compare.proveedor){
+                        if(!current.proveedor){
+                            return false;
+                        }
+                        if(current.toLowerCase().indexOf(compare.proveedor) == -1){
+                            return false;
+                        };
+                    }
+                    if(compare.nro_factura ){
+                        if(!current.nro_factura){
+                            return false;
+                        }
+                        if(current.nro_factura.toLowerCase().indexOf(compare.nro_factura) == -1){
+                            return false;
+                        }
 
+                    }
+                    if(compare.emision){
+                        var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
+                        if( patern.test(compare.emision)){
+                            var dc=new Date(Date.parse(current.emision));
+                            var m;
+                            if ((m = patern.exec(compare.emision)) !== null) {
+                                var aux, dcp;
+                                if(m[0].indexOf('-') != -1){
+                                    aux = m[0].split('-');
+                                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+                                    return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear()
+
+                                }else if(m[0].indexOf('/') != -1){
+                                    aux = m[0].split('/');
+                                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+                                }
+                                if(dc.getDate() != dcp.getDate() || dc.getMonth() != dc.getMonth() || dcp.getFullYear() != dcp.getFullYear()){
+                                    return false;
+                                }
+
+                            }
+                        }else{
+                            var date=DateParse.toDate(current.emision);
+
+                            return date.getDay().toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.emision)!= -1
+                                || ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.emision)!= -1
+                                || date.getDate().toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || date.getFullYear().toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || date.toString().toLowerCase().indexOf(compare.emision)!= -1;
+                        }
+                    }
+
+                    if(compare.diasEmit && compare.diasEmit != '-1'){
+                        if( current.diasEmit != compare.diasEmit){
+                            return false;
+                        }
+                    }
+                    if(compare.monto){
+                        if(!current.monto){
+                            return false;
+                        }
+                        if(current.monto.toString().toLowerCase().indexOf(compare.monto) == -1){
+                            return false;
+                        }
+
+                    }
+                    if(compare.comentario){
+                        if(!current.comentario){
+                            return false;
+                        }
+                        if(current.comentario.toLowerCase().indexOf(compare.comentario) == -1){
+
+                            return false;
+                        }
+
+                    }
+
+                    return true;
+                });
+
+            }
         }
-
         return data;
     };
 
@@ -1844,8 +1855,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.DtPedido = function (doc) {
         $scope.document= {};
         $scope.gridView= 1;
+        var  paso=  true;
+        if ($mdSidenav("addAnswer").isOpen()){
+            paso=false;
+
+        }
+
         var aux= angular.copy(doc);
-        if(doc && $scope.module.index <2){
+        if(doc && $scope.module.index <2 && paso){
             if (segurity('editPedido')) {
                 $scope.document.id=aux.id;
                 $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
@@ -2052,20 +2069,21 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.addAnswer={};
     $scope.addAnswer.adjs =[];
     $scope.isOpenaddAnswer= false;
+
     $scope.closeAddAnswer= function(e){
 
         if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
-            jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
+                /*
+                 jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
+                 */
             $scope.isOpenaddAnswer &&
             !angular.element(e.target).is("#ngf-AnswerfileInput")) {
 
-            if ($mdSidenav("addAnswer").open()) {
+            if ($mdSidenav("addAnswer").isOpen()) {
 
                 if($scope.formAnswerDoc.$valid){
-                    console.log("$scope.addAnswer", $scope.addAnswer)
                     Order.postMod(
                         {type:$scope.formMode.mod, mod:"AddAnswer"},{  descripcion:$scope.addAnswer.descripcion,doc_id: $scope.addAnswer.doc_id, adjs :( $scope.addAnswer.adjs.length > 0)  ? $scope.addAnswer.adjs : []},function(response){
-                            console.log("response data", response)
                             $scope.priorityDocs.splice($scope.addAnswer.index,1);
                             $scope.addAnswer={};
                             $scope.addAnswer.adjs =[];
@@ -2855,16 +2873,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                 $scope.docsSustitos =[];
                             },
                             after: function(){
-                             Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id},{},function(response){
+                                Order.queryMod({type:$scope.formMode.mod,mod:"Substitutes", doc_id:$scope.document.id, prov_id:$scope.provSelec.id},{},function(response){
 
-                                 angular.forEach(response, function(v,k){
-                                     if(v.emision){
-                                         v.emision= DateParse.toDate(v.emision);
-                                     }
-                                     $scope.docsSustitos.push(v);
-                                 });
+                                    angular.forEach(response, function(v,k){
+                                        if(v.emision){
+                                            v.emision= DateParse.toDate(v.emision);
+                                        }
+                                        $scope.docsSustitos.push(v);
+                                    });
 
-                             });
+                                });
                             }
                         }});
                         break;
