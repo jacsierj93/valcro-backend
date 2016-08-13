@@ -805,8 +805,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         if(!$scope.direccionesForm.$valid && !$scope.direccionesForm.$pristine){
             var prefocus = angular.element(":focus");
             $timeout(function(){
-                angular.element("[name='"+$scope.direccionesForm.$name+"']").click();
-            },10)
+                angular.element("[name='direccionesForm']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
+
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
@@ -819,7 +824,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    angular.element("[name='"+$scope.direccionesForm.$name+"']").find(".ng-invalid").first().focus()
+                    angular.element("[name='direccionesForm']").find(".ng-invalid").first().focus()
                 }
             }]);
             return false;
@@ -1486,15 +1491,20 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var saveContact = function(onSuccess){
 
         if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
-           //onSuccess();
+            onSuccess();
             return false;
         }
 
         if(!$scope.provContactosForm.$valid && !$scope.provContactosForm.$pristine){
             var prefocus = angular.element(":focus");
+
             $timeout(function(){
                 angular.element("[name='provContactosForm']").click();
-            },20);
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
@@ -1538,7 +1548,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 ],{autohidden:3000});
             };
             setGetProv.addChng($scope.cnt,data.action,"contProv");
-           // onSuccess();
+            onSuccess();
 
         });
     };
@@ -1605,7 +1615,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             if(!elem){
                 saveContact(function(){
                     console.log("BORRADO")
-                    /*contact = {};
+                    contact = {};
                     setGetContac.setContact(false);
                     $scope.ctrl.searchCountry = "";
                     $scope.provContactosForm.$setUntouched();
@@ -1614,18 +1624,20 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
-                    }*/
+                    }
                 });
 
 
             }else{
-                if($scope.dirAssign.length>0 && !$scope.isShow){
+                if($scope.dirAssign.length>0 && !$scope.isShow && $scope.provContactosForm.$pristine){
                     var def = $scope.dirAssign[0];
                     setGetContac.setContact({pais_id:def.pais_id});
                     angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[def.pais_id])[0].area_code.phone);
                 }
             }
-            $scope.isShow = elem;
+            $timeout(function(){
+                $scope.isShow = elem;
+            },20);
         }
     };
 
@@ -1852,15 +1864,28 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
         }
 
         if(!$scope.bankInfoForm.$valid && !$scope.bankInfoForm.$pristine){
+            var prefocus = angular.element(":focus");
+            $timeout(function(){
+                angular.element("[name='bankInfoForm']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
+
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
                     onSuccess();
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
                 }
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    console.log($scope.bankInfoForm);
+                    angular.element("[name='bankInfoForm']").find(".ng-invalid").first().focus()
                 }
             }]);
 
