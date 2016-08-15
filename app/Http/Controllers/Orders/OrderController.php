@@ -407,6 +407,91 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /*********************** Approved Purchases ************************/
+
+    public function  ApprovedPurchasesSolicitude(Request $req){
+
+        $response = [];
+        $model = Solicitude::findOrFail($req->id);
+        $model->fecha_aprob_compra= $req->fecha_aprob_compra;
+        $model->nro_doc= $req->nro_doc;
+        $response['response']=$model->save();
+
+        $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        $response['success']='Solicitud aprobada';
+        return $response;
+
+    }
+    public function  ApprovedPurchasesOrder(Request $req){
+
+        $response = [];
+        $model = Order::findOrFail($req->id);
+        $model->fecha_aprob_compra= $req->fecha_aprob_compra;
+        $model->nro_doc= $req->nro_doc;
+        $response['response']=$model->save();
+
+        $response['success']='Pedido aprobado';
+        $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        return $response;
+
+    }
+    public function  ApprovedPurchasesPurchase(Request $req){
+
+        $response = [];
+        $model = Purchase::findOrFail($req->id);
+        $model->fecha_aprob_compra= $req->fecha_aprob_compra;
+        $model->nro_doc= $req->nro_doc;
+        $response['response']=$model->save();
+
+        $response['success']='ODC aprobada';
+
+        $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        return $response;
+
+    }
+
+
+    /*********************** cancel  ************************/
+
+    public function  cancelSolicitude(Request $req){
+
+        $response = [];
+        $model = Solicitude::findOrFail($req->id);
+        $model->comentario_cancelacion= $req->comentario_cancelacion;
+        $response['response']=$model->save();
+
+        $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        $response['success']='Solicitud Cancelada';
+        return $response;
+
+    }
+    public function  cancelOrder(Request $req){
+
+        $response = [];
+        $model = Order::findOrFail($req->id);
+        $model->comentario_cancelacion= $req->comentario_cancelacion;
+        $response['response']=$model->save();
+
+        $response['success']='Pedido Cancelado';
+        $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        return $response;
+
+    }
+    public function  cancelPurchase(Request $req){
+
+        $response = [];
+        $model = Purchase::findOrFail($req->id);
+        $model->comentario_cancelacion= $req->comentario_cancelacion;
+        $response['response']=$model->save();
+
+        $response['success']='ODC Cancelada';
+
+        $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        return $response;
+
+    }
+
+
     /*********************** UPDATE ************************/
 
     public  function UpdateOrder(Request $req){
@@ -3374,6 +3459,7 @@ class OrderController extends BaseController
 
         $tem['nro_proforma']=$model->nro_proforma;
         $tem['nro_factura']=$model->nro_factura;
+        $tem['nro_doc']=$model->nro_doc;
         $tem['img_proforma']=$model->img_proforma;
         $tem['img_factura']=$model->img_factura;
         $tem['mt3']=$model->mt3;
@@ -4190,8 +4276,13 @@ class OrderController extends BaseController
         $text='';
         foreach( $auxCond as $aux){
             $cond[$i]['id']= $aux->id;
-            foreach( $aux->getItems()->get() as $aux2){
-                $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+            $items=$aux->getItems()->get();
+            if(sizeof($items) > 0){
+                foreach( $items  as $aux2){
+                    $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+                }
+            }else{
+                $text = $aux->titulo;
             }
             $cond[$i]['titulo']= $text;
             $text='';

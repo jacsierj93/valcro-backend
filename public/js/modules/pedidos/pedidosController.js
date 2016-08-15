@@ -1,5 +1,5 @@
 MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
-    ,$filter,$log,$location, $anchorScroll,App, Order,masters,providers,
+    ,$filter,$location,App, Order,masters,providers,
                                            Upload,Layers,setGetOrder, DateParse, Accion,filesService,SYSTEM) {
 
     var autohidden= SYSTEM.noti_autohidden;
@@ -128,8 +128,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     {
                         name:"Revisar luego",
                         action:function(){
-                            var mo= jQuery("#init");
-                            mo[0].focus();
+
                         }
                     }, {
                         name:"Ver",
@@ -140,8 +139,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     }
                 ],{block:true});
             }else{
-                var mo= jQuery("#init");
-                mo[0].focus();
+              /*  var mo= jQuery("#init");
+                mo[0].focus();*/
             }
 
 
@@ -246,7 +245,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.FilterLateralMas = function(){
         if(!$scope.showLateralFilterCpl){
-            jQuery("#menu").animate({height:"80%"},400);
+             var ele= jQuery("#barraLateral");
+            var newHeight =ele.height() - (176);
+            if(newHeight >= 176){
+                jQuery("#menu").animate({height:newHeight},400);
+            }else{
+                jQuery("#menu").animate({height:"100%"},400);
+            }
+            console.log("new he", newHeight);
+
+
             $scope.showLateralFilterCpl=true;
             $scope.imgLateralFilter="images/Down.png";
         }else {
@@ -450,7 +458,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.updateForm = function () {
         $scope.formBlock = false;
         Order.postMod({type:$scope.formMode.mod,mod:"Update"},{id: $scope.document.id},function(){
-            $scope.isTasaFija=false;
+            $scope.isTasaFija=true;
             var mo= jQuery("#"+$scope.layer).find("md-content");
 //            console.log("mo", mo)
             mo[0].focus();
@@ -2644,24 +2652,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
     /****** **************************listener ***************************************/
 
-    $scope.$watch('provSelec.id',function(nvo){
-
-        if(nvo && nvo != "-1" && $scope.layer!= "detalleDoc"){
-            var newHash ='prov' + nvo;
-            if ($location.hash() !== newHash) {
-                $location.hash(newHash);
-            } else {
-
-                $anchorScroll();
-            }
-        }else if(nvo == "-1"){
-            $scope.redirect({module:'proveedores', action:'new',calback:$scope.calbackPais});
-        }
-
-    });
-
     $scope.$watch('provSelec.id', function (newVal) {
-        if(newVal){
+        if(newVal && newVal != '-1' ){
             $scope.formData.direccionesFact= Order.query({type:"InvoiceAddress", prov_id:newVal});
             $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal});
             $scope.formData.paises= Order.query({type:"ProviderCountry",id:newVal});
@@ -2670,6 +2662,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
              setGetOrder.restore();
              $scope.document={};
              }*/
+        }else if(newVal == "-1"){
+            $scope.redirect({module:'proveedores', action:'new',calback:$scope.calbackPais});
         }
 
     });
@@ -2995,7 +2989,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
     });
 
-
     $scope.reloadDoc = function(){
         Order.get({type:"Document", id:$scope.document.id,tipo:$scope.formMode.value}, {},function(response){
             $scope.document= response;
@@ -3076,20 +3069,39 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
     });
 
-
-
     $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
 
         if (nuevo[0] && !nuevo[1]) {
 
-            /* $scope.document.prov_id = $scope.provSelec.id;
+            $scope.document.prov_id = $scope.provSelec.id;
              //{id:$scope.document.id, estado_id:$scope.document.estado_id}
-             Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
-             if (response.success) {
-             $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
+             Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
+                 $scope.FormCancelDoc.$setPristine();
+
+                 if (response.success && response.accion == 'new') {
+                 $scope.NotifAction("ok","Cancelado",[],{autohidden:autohidden});
              }
 
-             });*/
+             });
+        }
+
+
+    });
+
+    $scope.$watchGroup(['FormAprobCompras.$valid', 'FormAprobCompras.$pristine'], function (nuevo) {
+
+        if (nuevo[0] && !nuevo[1]) {
+
+             $scope.document.prov_id = $scope.provSelec.id;
+             //{id:$scope.document.id, estado_id:$scope.document.estado_id}
+             Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document, function(response){
+                 $scope.FormAprobCompras.$setPristine();
+
+                 if (response.success  && response.accion == 'new') {
+                    $scope.NotifAction("ok","Aprobado",[],{autohidden:autohidden});
+             }
+
+             });
         }
 
 

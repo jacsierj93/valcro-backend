@@ -1,7 +1,7 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION PEDIDOS########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="PedidosCtrll" global xmlns="http://www.w3.org/1999/html" vlc-keys>
     <div class="contentHolder" layout="row" flex>
-        <div class="barraLateral" layout="column" >
+        <div class="barraLateral" layout="column" id="barraLateral" >
 
 
             <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1;
@@ -117,10 +117,8 @@
                 </div>
             </div>
 
-            <md-virtual-repeat-container id="vertical-container" flex id="providers">
-                <div style="width:0px; height: 0px;"  id="init" tabindex="1"></div>
-
-                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' " ng-click="setProvedor(item, this)" ng-init="item.order = 1"
+            <div id="listado" flex  style="overflow-y:auto;"  >
+                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
@@ -186,7 +184,7 @@
                     </div>
 
                 </div>
-            </md-virtual-repeat-container>
+            </div>
         </div>
 
         <div layout="column" flex class="md-whiteframe-1dp">
@@ -1372,7 +1370,7 @@
                                     <div layout="column" flex="20">
                                         <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
                                                        ng-disabled="(formBlock)"
-                                                       ng-change="toEditHead('fecha_aprob_compra', document.fecha_aprob_compra)"
+                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
 
                                         ></md-datepicker skip-tab>
                                     </div>
@@ -1412,6 +1410,7 @@
                                             ng-disabled="(formBlock)"
                                             id="mtvCancelacion"
                                             ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
+                                            required
 
                                     >
                                 </md-input-container>
@@ -3060,21 +3059,6 @@
                     <form layout="row">
                         <div active-left  before="verificExit" ></div>
                         <div flex layout="row">
-                            <div flex="5" layout="row"  >
-                                <md-input-container class="md-block"  flex>
-                                    <label>N°</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_unclosetDoc.filter.id"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'id' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'id')}"><img src="images/TrianguloUp.png" ></div>
-                                    <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-id' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-id')}"><img src="images/TrianguloDown.png"/></div>
-                                </div>
-
-
-                            </div>
                             <div layout="row" style="width: 80px;">
                                 <md-input-container class="md-block"  flex>
                                     <md-select ng-model="tbl_unclosetDoc.filter.documento" ng-init="tbl_unclosetDoc.filter.documento ='-1'">
@@ -3101,6 +3085,22 @@
                                 </div>
 
                             </div>
+                            <div flex="5" layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>N°</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_unclosetDoc.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'id' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'id')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-id' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-id')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+
+                            </div>
+
                             <div flex layout="row"  >
                                 <md-input-container class="md-block"  flex>
                                     <label>Proveedor</label>
@@ -3166,7 +3166,6 @@
                             <div  flex >
                                 <div   ng-repeat="item in filterDocuments(unclosetDoc ,tbl_unclosetDoc.filter) | orderBy : tbl_unclosetDoc.order " ng-click="openTempDoc(item)" row-select >
                                     <div layout="row" class="cellGridHolder" >
-                                        <div flex="5" class="cellSelect"  tabindex="{{$index + 1}}" > {{item.id}}</div>
                                         <div style="width: 80px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
                                             <div>
                                                 <div layout-align="center center"  style="text-align: center;     margin-left: 12px;">
@@ -3174,6 +3173,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div flex="5" class="cellSelect"  tabindex="{{$index + 1}}" > {{item.id}}</div>
                                         <!-- <div flex="15" class="cellGrid"> {{item.documento}}</div>-->
                                         <div flex class="cellGrid"> {{item.proveedor}}</div>
                                         <div flex class="cellGrid" > {{item.titulo}}</div>

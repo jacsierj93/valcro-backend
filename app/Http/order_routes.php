@@ -80,6 +80,8 @@ $app->post("Order/Order/AddAdjuntos",'Orders\OrderController@addAttachmentsOrder
 $app->post("Order/Order/Update",'Orders\OrderController@UpdateOrder'); ///retira el final id y notifica que se actualizara el documento
 $app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); ///lista de todos los pedidos que se úeden sustituir
 $app->post("Order/Order/AddAnswer",'Orders\OrderController@AddAnswerOrder'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesOrder'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Order/Cancel",'Orders\OrderController@cancelsOrder'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); ///lista de todos las solicitudes
@@ -106,6 +108,8 @@ $app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); ///list
 $app->post("Order/Purchase/AddProdConditionPay",'Orders\OrderController@addProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
 $app->post("Order/Purchase/RemoveProdConditionPay",'Orders\OrderController@removeProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
 $app->post("Order/Purchase/AddAnswer",'Orders\OrderController@AddAnswerPurchase'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Purchase/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesPurchase'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Purchase/Cancel",'Orders\OrderController@cancelPurchase'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes
 $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///lista de todos las solicitudes
@@ -131,6 +135,8 @@ $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSu
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///lista de todos las solicitudes
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); ////retira el final id y notifica que se actualizara el documento
 $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Solicitude/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesSolicitude'); ///lista de todos los pedidos que se úeden sustituir
+$app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude'); ///lista de todos los pedidos que se úeden sustituir
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido
 
