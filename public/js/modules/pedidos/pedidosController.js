@@ -3472,13 +3472,17 @@ MyApp.directive('table', function ($compile) {
     };
 });
 
-MyApp.directive('vlcKeys', function ($compile) {
+MyApp.directive('vlcKeys', function ( Layers) {
     return {
         link: function (scope, elem, attrs) {
             elem.bind("keydown",function(e){
-                // teclas muertas
+                // teclas muertash
+               // console.log(" key ", e.which)
                 if(e.which=="9"){
                     e.preventDefault();
+                }
+                if(e.which == "27"){
+                    Layers.setAccion({close:true});
                 }
 
 

@@ -2,16 +2,7 @@ var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages'/*,'ngSanitiz
 var MyApp = angular.module('MyApp', dependency, function() {
 
 });
-/***Jacsiel 06-06-2016
- * prevent open files on drop in browser ****/
-window.addEventListener("dragover",function(e){
-    e = e || event;
-    e.preventDefault();
-},false);
-window.addEventListener("drop",function(e){
-    e = e || event;
-    e.preventDefault();
-},false);
+
 /********************************************************/
 
 
@@ -153,12 +144,7 @@ MyApp.directive('global', function (Layers, setNotif) {
 
 
 MyApp.directive('listBox', function ($timeout) {
-    window.addEventListener("keydown", function(e) {
-        // space and arrow keys
-        if([37, 38, 39, 40].indexOf(e.keyCode) > -1) {
-            e.preventDefault();
-        }
-    }, false);
+
 
     return {
         link: function (scope, elem, attrs,ctrl) {

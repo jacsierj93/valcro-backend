@@ -22,3 +22,22 @@ $.ajaxSetup({
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 });
+
+
+/***Jacsiel 06-06-2016
+ * prevent open files on drop in browser ****/
+window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
+window.addEventListener("dragover",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
+window.addEventListener("drop",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
