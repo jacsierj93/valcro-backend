@@ -29,6 +29,12 @@ var MyApp = angular.module('MyApp', dependency, function() {
  $routeProvider
  .when('/home',  {templateUrl:"modules/home"})
  }]);*/
+window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
 
 MyApp.config(function ($provide, $httpProvider, $locationProvider) {
 
@@ -166,15 +172,14 @@ MyApp.directive('listBox', function ($timeout) {
                             angular.element(elem).parent().scrollTop(angular.element(elem).parent().scrollTop() - prev.outerHeight());
                         }
                         prev[0].focus();
-                    }else if(e.which=="13"){
-                        $timeout(function(){
-                            angular.element(elem).click();
-                        },0)
                     }
-
                 }
-
-            })
+            });
+            elem.bind("click",function(e){
+                $timeout(function(){
+                    angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
+                },0)
+            });
 
         }
     };

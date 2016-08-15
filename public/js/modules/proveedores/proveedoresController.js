@@ -2,6 +2,8 @@
 //###########################################################################################3
 //##############################REST service (factory)#############################################3
 //###########################################################################################3
+
+
 var defaultTime = 15;
 MyApp.directive('iconGroup', function ($timeout) {
      return {
@@ -527,16 +529,10 @@ MyApp.service("setGetProv",function($http,providers,$q){
 //###########################################################################################3
 //##############################FORM CONTROLLERS#############################################3
 //###########################################################################################3
-MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers,$filter,setNotif,masterLists) {
+MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,providers,$filter,setNotif,masterLists,$timeout) {
     $scope.id="DataProvController";
     $scope.inputSta = function(inp){
         $scope.toCheck = true;
-    };
-    $scope.test = function(e){
-       console.log(e    );
-
-        /*var list = angular.element(this).parents("form").first().find("[info]:visible");
-        angular.element(list[list.index(this)+1]).focus().click();*/
     };
 
     $scope.filTipo = function(elem,text){
@@ -563,15 +559,22 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     $scope.ctrl = {typeProv:{id:""},typeSend:{id:""}};
     $scope.$watch("ctrl.typeProv.id",function(nvo){
         $scope.dtaPrv.type = nvo;
+        $scope.projectForm.$setDirty();
     });
     $scope.$watch("ctrl.typeSend.id",function(nvo){
         if(nvo==1 && !$scope.projectForm.$pristine){
             setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
                 $scope.dtaPrv.envio = nvo;
-                console.log("cambio",nvo);
+                $scope.projectForm.$setDirty();
             },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
                 document.getElementsByName("provTypesend")[0].click();
             }}]);
+        }else if(nvo){
+            $scope.dtaPrv.envio = nvo;
+            $timeout(function(){
+                $scope.projectForm.$setDirty();
+            },100)
+
         }
 
     });
@@ -656,6 +659,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     $scope.dtaPrv = setGetProv.getProv();
     $scope.$watchGroup(['projectForm.$valid','projectForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
+            console.log("proveedor",$scope.dtaPrv)
             providers.put({type:"saveProv"},$scope.dtaPrv,function(data){
                 $scope.dtaPrv.id = data.id;
                 $scope.projectForm.$setPristine();
@@ -1635,9 +1639,9 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[def.pais_id])[0].area_code.phone);
                 }
             }
-            $timeout(function(){
-                $scope.isShow = elem;
-            },20);
+
+            $scope.isShow = elem;
+
         }
     };
 

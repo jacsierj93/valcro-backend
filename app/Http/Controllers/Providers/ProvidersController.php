@@ -165,7 +165,7 @@ class ProvidersController extends BaseController
         $prov->tipo_id = $req->type;
         $prov->siglas = $req->siglas;
         $prov->tipo_envio_id = $req->envio;
-        $prov->contrapedido = $req->contraped;
+        $prov->contrapedido = ($req->contraped)?1:0;
 
         $prov->save();
         $result['id']=$prov->id;
