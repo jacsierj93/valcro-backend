@@ -119,6 +119,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $timeout(function(){$scope.init();},0);
 
+    $scope.reviewState = function(){
+        $scope.reviewDoc();
+    };
+
     $scope.reviewDoc = function(){
         $scope.unclosetDoc = [];
         Order.query({type:"UnClosetDoc"},{}, function(response){
@@ -139,9 +143,54 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     }
                 ],{block:true});
             }else{
-              /*  var mo= jQuery("#init");
-                mo[0].focus();*/
+
             }
+            $timeout(function(){
+                Order.get({type:'OldReviewDocs'},{}, function(response){
+                    if(response.docs.length > 0){
+                        $scope.NotifAction("alert","Existen "+response.docs.length + " documentos con mas de "
+                            +response.dias +" sin respuesta ",[
+                            {
+                                name:"Revisar luego",
+                                action:function(){
+                                    /*var mo= jQuery("#init");
+                                     mo[0].focus();*/
+                                }
+                            }, {
+                                name:"Ver",
+                                action: function(){
+                                    $scope.LayersAction({open:{name:"priorityDocs",
+                                        before: function(){
+                                            $scope.priorityDocs= [];
+                                        }, after: function(){
+                                            Order.get({type:'OldReviewDocs'},{}, function(response){
+                                                angular.forEach(response.docs, function(v){
+                                                    v.emision = DateParse.toDate(v.emision);
+                                                    $scope.priorityDocs.push(v);
+                                                });
+                                                if($scope.priorityDocs.length > 0){
+                                                    $timeout(function(){
+                                                        var mo= jQuery("#priorityDocs").find('.cellSelect')[0];
+                                                        mo.focus();
+
+                                                    }, 300);
+                                                }
+
+
+                                            });
+                                        }
+                                    }});
+
+                                }
+                            }
+                        ]);
+                    }else{
+
+                    }
+
+                });
+            },500);
+
 
 
         });
@@ -149,53 +198,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     $scope.oldReviewDoc = function (){
-        Order.get({type:'OldReviewDocs'},{}, function(response){
-            if(response.docs.length > 0){
-                $scope.NotifAction("alert","Existen "+response.docs.length + " documentos con mas de "
-                    +response.dias +" sin respuesta ",[
-                    {
-                        name:"Revisar luego",
-                        action:function(){
-                            /*var mo= jQuery("#init");
-                             mo[0].focus();*/
-                        }
-                    }, {
-                        name:"Ver",
-                        action: function(){
-                            $scope.LayersAction({open:{name:"priorityDocs",
-                                before: function(){
-                                    $scope.priorityDocs= [];
-                                }, after: function(){
-                                    Order.get({type:'OldReviewDocs'},{}, function(response){
-                                        angular.forEach(response.docs, function(v){
-                                            v.emision = DateParse.toDate(v.emision);
-                                            $scope.priorityDocs.push(v);
-                                        });
-                                        if($scope.priorityDocs.length > 0){
-                                            $timeout(function(){
-                                                var mo= jQuery("#priorityDocs").find('.cellSelect')[0];
-                                                mo.focus();
 
-                                            }, 300);
-                                        }
-
-
-                                    });
-                                }
-                            }});
-
-                        }
-                    }
-                ]);
-            }else{
-
-            }
-
-        });
     };
 
     $scope.init = function () {
         $scope.estadosDoc = masters.query({type: 'getOrderStatus'});
+        $scope.reviewState();
     };
 
     $scope.redirect = function(data){
@@ -1812,29 +1820,128 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.setProvedor =function(prov, p) {
 
         $scope.provIndex= angular.copy(p.$index);
-
-        if($scope.module.layer == "listPedido" ){
-            $scope.provSelec = prov;
-            loadPedidosProvedor(prov.id);
-        }else if($scope.module.layer != "listPedido" && $scope.module.index == 0 ){
+        console.log(" provedor");
+        if( $scope.module.index == 0){
             $scope.navCtrl.value="listPedido";
             $scope.navCtrl.estado=true;
             $scope.provSelec = prov;
-        }else if($scope.module.index > 0 && !$scope.document.id){
-            $scope.NotifAction("alert", "¿Esta seguro de cambiar de proveedor?",
+        }else if($scope.module.layer == "listPedido" ){
+            $scope.provSelec = prov;
+            loadPedidosProvedor(prov.id);
+        }else  if($scope.module.layer != "listPedido" && !$scope.provSelec.id){
+
+            $scope.LayersAction({close:{init:true, after: function(){
+                $scope.LayersAction({open:{name:"listPedido", after:function(){
+                    $scope.provSelec = prov;
+                    loadPedidosProvedor(prov.id);
+                    console.log("log");
+                }}});
+            }}});
+        }
+        else if($scope.module.layer != "listPedido" && $scope.provSelec.id){
+            if( setGetOrder.getInternalState() == 'new'){
+                $scope.LayersAction({close:{all:true, after: function(){
+                    $scope.LayersAction({open:{name:"listPedido", after:function(){
+                        $scope.provSelec = prov;
+                        loadPedidosProvedor(prov.id);
+                    }}});
+                }}});
+            }else{
+                $scope.NotifAction("alert","Se han realizado cambio en la "+$scope.formMode.name+ " ¿esta seguro de salir sin culminar?",[
+                    {
+                        name:"No",
+                        action: function(){
+                            angular.element("#prov"+$scope.provSelec.id).focus();
+                        }
+                    },
+                    {
+                        name:"Si",
+                        action: function(){
+                            $scope.LayersAction({close:{all:true, after: function(){
+                                $scope.LayersAction({open:{name:"listPedido", after:function(){
+                                    $scope.provSelec = prov;
+                                    loadPedidosProvedor(prov.id);
+                                }}});
+                            }}});
+
+
+                        }
+                    }
+
+                ],{block:true});
+
+            }
+
+
+            /*if($scope.provSelec.id){
+                $scope.LayersAction({close:{init:true, after: function(){
+                    $scope.navCtrl.value="listPedido";
+                    $scope.navCtrl.estado=true;
+                    $scope.provSelec = prov;
+                    console.log(" after llamda");
+                }}});
+
+            }else{
+                $scope.LayersAction({close:{all:true}});
+            }*/
+
+        }
+      /*  else
+        if($scope.document.id ){
+            if($scope.verificExit()){
+                $scope.LayersAction({close:{all:true}});
+                $scope.navCtrl.value="listPedido";
+                $scope.navCtrl.estado=true;
+                $scope.provSelec = prov;
+                console.log(" open list all");
+            }else {
+                if($scope.provSelec.id){
+                    angular.element("#prov"+$scope.provSelec.id).focus();
+                    console.log("set all");
+                }else{
+                    console.log("close all");
+                    $scope.LayersAction({close:{init:true, after: function(){
+                        $scope.navCtrl.value="listPedido";
+                        $scope.navCtrl.estado=true;
+                        $scope.provSelec = prov;
+                    }}});
+
+                }
+            }
+        }*/
+       /* if($scope.module.layer == "listPedido" ){
+            $scope.provSelec = prov;
+            loadPedidosProvedor(prov.id);
+        }else if($scope.module.layer != "listPedido" && $scope.module.index == 0 ){
+
+        }else if($scope.module.index > 0 && $scope.document.id ){
+            if( $scope.provSelec.id != prov.id){
+                if( $scope.verificExit()){
+                    $scope.navCtrl.value="listPedido";
+                    $scope.navCtrl.estado=true;
+                    $scope.provSelec = prov;
+                }else{
+                    angular.element("#prov"+$scope.provSelec.id).focus();
+
+                }
+            }*/
+
+            /*$scope.NotifAction("alert", "¿Esta seguro de cambiar de proveedor?",
                 [
                     {name:"No", action: function(){}},
-                    {name: "Si", default :2, action: function(){$scope.provSelec = prov;}}
-                ]);
+                    {name: "Si", default :2, action: function(){
+
+                    }}
+                ]);*/
             /*if(){
              $scope.provSelec = prov;
 
              }else {
              $scope.verificExit();
              }*/
-        }else {
-            $scope.verificExit();
-        }
+      /*  }else {
+          //  $scope.verificExit();
+        }*/
 
 
 
@@ -2116,12 +2223,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
         if(!$scope.isOpenaddAnswer){
             angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"336px"},400);
-
+            $scope.formAnswerDoc.$setUntouched();
             $mdSidenav("addAnswer").open().then(function(){
                 $scope.isOpenaddAnswer = true;
                 $scope.addAnswer.doc_id=angular.copy(item.id);
                 $scope.addAnswer.index=data.$index;
                 $scope.formMode= $scope.forModeAvilable.getXname(item.documento);
+                angular.element(document).find("#addAnswer").find("#textarea").focus();
 
 
             });
@@ -2938,6 +3046,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     });
 
+
     /**layers
      working
      * */
@@ -2952,14 +3061,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
              form.focus();
              }*/
         }
+        if(newVal[1] == "listPedido" || newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs"){
+            $scope.provSelec ={};
+            $scope.document ={};
+        }
         if(newVal[0]  == 0 ){
             $scope.provSelec ={};
-            $scope.reviewDoc();
+
             $timeout(function(){
-                $scope.oldReviewDoc();
-            }, 200);
-
-
+                if($scope.module.index==0){
+                    $scope.reviewState();
+                }
+            },2000);
             //        $timeout(function(){$scope.reviewDoc()},1000);
             $scope.provIndex = null;
             $scope.tempDoc= {};
@@ -3219,9 +3332,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
                     close = arg.to;
 
                 }else if(arg.all){
-                    alert("asdfa");
                     close = module.index ;
-                    console.log("all recibido", module);
                 }else if(arg.first ){
                     close = module.index -1;
                 }
@@ -3251,6 +3362,8 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
 
                 }
                 var  l = module.historia[current];
+                console.log("last" ,l);
+                console.log("arg" ,arg);
                 $mdSidenav(l).close().then(function(){
 
                     if(arg.after){
