@@ -353,6 +353,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     },0);
                 }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
                     angular.element(list[list.index(elem)+1]).find("input").focus().click();
+                    /*angular.element(list[list.index(elem)+1]).find("input").select();*/
                 }else{
                     angular.element(list[list.index(elem)+1]).focus();
                 }
@@ -449,8 +450,8 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
             });
             //$compile(element[0])(scope)
         }
-    }
-})
+    };
+});
 
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:"",scope:null};
@@ -467,7 +468,7 @@ MyApp.directive('info', function($timeout,setNotif) {
 
             if(element.is("md-autocomplete")){
                 element.on("focus","input", function(e) {
-
+                    this.select();
                     if(attrs.info){
                         $timeout(function() {
                             if(old.element!=element[0]){

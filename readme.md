@@ -7,6 +7,12 @@
 [![License](https://poser.pugx.org/laravel/lumen-framework/license.svg)](https://packagist.org/packages/laravel/lumen-framework)
 
 Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+## Special Changes
+[jacsiel]
+in angular-material.js comment line 18000 for disabled return focus after close sidenav
+ #code:triggeringElement && triggeringElement.focus();
+this is because cause errors on close notifications
+
 
 ## Official Documentation
 
