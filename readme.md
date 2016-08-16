@@ -12,6 +12,8 @@ Laravel Lumen is a stunningly fast PHP micro-framework for building web applicat
 in angular-material.js comment line 18000 for disabled return focus after close sidenav
  #code:triggeringElement && triggeringElement.focus();
 this is because cause errors on close notifications
+in angular-material.js line 18019 change function onKeyDown(ev) for return always true
+this disabled close sidenav when key ESC is pressed
 
 
 ## Official Documentation
