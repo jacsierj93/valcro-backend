@@ -353,13 +353,12 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     },0);
                 }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
                     angular.element(list[list.index(elem)+1]).find("input").focus().click();
-                    /*angular.element(list[list.index(elem)+1]).find("input").select();*/
                 }else{
                     angular.element(list[list.index(elem)+1]).focus();
                 }
 
             },50);
-        }else{
+        }else if(angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").length>0){
             var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
             var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
             $timeout(function(){
@@ -377,6 +376,13 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     }
                 },50)
             },0);
+
+        }else{
+            $timeout(function(){
+                angular.element(elem).blur();
+                angular.element("[md-component-id='NEXT']").click();
+                angular.element("[md-component-id='NEXT']").focus();
+            },0)
 
         }
     };

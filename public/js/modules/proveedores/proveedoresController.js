@@ -199,28 +199,35 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     var endProvider = function(yes,not,id){
-        not = not||null;
-        id = id||null;
-        if(setGetProv.haveChang()){
-            $scope.LayersAction({open:{name:"layer5"}});
+        if($scope.prov.id){
+            $timeout(function(){
+                not = not||null;
+                id = id||null;
+                if(setGetProv.haveChang()){
+                    $scope.LayersAction({open:{name:"layer5"}});
 
-            setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
-                {
-                    name: "SI",
-                    action: function () {
-                        yes(id);
-                    },
-                    default:defaultTime
-                },
-                {
-                    name: "NO",
-                    action: function () {
-                    }
+                    setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
+                        {
+                            name: "SI",
+                            action: function () {
+                                yes(id);
+                            },
+                            default:defaultTime
+                        },
+                        {
+                            name: "NO",
+                            action: function () {
+                            }
+                        }
+                    ]);
+                }else{
+                    yes(id);
                 }
-            ]);
+            },1000);
         }else{
             yes(id);
         }
+
     };
 
 
@@ -558,24 +565,30 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     });
     $scope.ctrl = {typeProv:{id:""},typeSend:{id:""}};
     $scope.$watch("ctrl.typeProv.id",function(nvo){
-        $scope.dtaPrv.type = nvo;
-        $scope.projectForm.$setDirty();
-    });
-    $scope.$watch("ctrl.typeSend.id",function(nvo){
-        if(nvo==1 && !$scope.projectForm.$pristine){
-            setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
-                $scope.dtaPrv.envio = nvo;
-                $scope.projectForm.$setDirty();
-            },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
-                document.getElementsByName("provTypesend")[0].click();
-            }}]);
-        }else if(nvo){
-            $scope.dtaPrv.envio = nvo;
-            $timeout(function(){
-                $scope.projectForm.$setDirty();
-            },100)
-
+        if(!$scope.projectForm.$pristine) {
+            $scope.dtaPrv.type = nvo;
+            $scope.projectForm.$setDirty();
         }
+    });
+
+    $scope.$watch("ctrl.typeSend.id",function(nvo){
+        if(!$scope.projectForm.$pristine){
+            if(nvo==1){
+                setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
+                    $scope.dtaPrv.envio = nvo;
+                    $scope.projectForm.$setDirty();
+                },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
+                    document.getElementsByName("provTypesend")[0].click();
+                }}]);
+            }else if(nvo){
+                $scope.dtaPrv.envio = nvo;
+                $timeout(function(){
+                    $scope.projectForm.$setDirty();
+                },100)
+
+            }
+        }
+
 
     });
    /* $scope.$watch('dtaPrv.envio',function(nvo){
@@ -718,6 +731,11 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
       });
     };
 
+    /*filter para que funcione el md-autocomplete de tipo de direccion*/
+    $scope.filTipo = function(elem,text){
+        return elem.descripcion.toLowerCase().indexOf(text.toLowerCase()) != -1;
+    };
+
     $scope.$watch('ctrl.selPais.id',function(nvo,old){
         //console.log("pais",nvo);
         if((nvo) && $filter("filterSearch")(masterLists.getCommonCountry(),[nvo]).length <= 0 && $scope.direccionesForm.$dirty){
@@ -773,6 +791,13 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.searchPort = function(ports,pais){
         return ports.pais_id == pais;
     };
+    $scope.$watch('ctrl.dirType.id',function(nvo){
+        if($scope.direccionesForm.$dirty){
+            $scope.dir.tipo = nvo;
+        }
+       // setGetProv.setComplete("address",nvo);
+    });
+
 
     var currentOrig = {};
 
@@ -783,6 +808,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.direccProv = dirSel.direccion;
         $scope.dir.tipo = dirSel.tipo_dir;
         $scope.ctrl['selPais'] = dirSel.pais;
+        $scope.ctrl['dirType'] = dirSel.tipo;
         $scope.dir.pais = dirSel.pais_id;
         asignPort.setCountry(dirSel.pais_id);
         $scope.dir.provTelf = dirSel.telefono;
@@ -875,6 +901,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                             $scope.direccionesForm.$setUntouched();
                             $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
                             $scope.ctrl.searchCountry = "";
+                            $scope.ctrl.searchType = "";
                             setNotif.addNotif("ok", "Direccion borrada", [
                             ],{autohidden:3000});
                         });

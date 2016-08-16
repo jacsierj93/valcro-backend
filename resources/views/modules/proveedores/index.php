@@ -320,6 +320,7 @@
                                                  md-items="item in types | customFind : ctrl.searchText : filTipo "
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
+                                                 md-autoselect = "true"
                                                  md-min-length="0">
                                     <input >
                                     <md-item-template>
@@ -439,11 +440,29 @@
                         <div layout="row" class="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
-                                <md-select skip-tab id="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
+                                <md-autocomplete md-selected-item="ctrl.dirType"
+                                                 flex
+                                                 info="es facturacion o Almacen?"
+                                                 skip-tab
+                                                 id="dirType"
+                                                 md-search-text="ctrl.searchType"
+                                                 ng-disabled="$parent.enabled"
+                                                 md-items="item in tipos | customFind : ctrl.searchType : filTipo "
+                                                 md-item-text="item.descripcion"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.descripcion}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+                                <!--<md-select skip-tab id="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
                                     <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
                                         {{tipo.descripcion}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                                 <!--<div ng-messages="user.tipo.$error">
                                     <div ng-message="required">Campo Obligatorio.</div>
                                     <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
@@ -652,7 +671,7 @@
                         <div layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Notas</label>
-                                <textarea style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled "></textarea>
+                                <input style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled "/>
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && contacts.length>0" class="row showMore" ng-click="viewExtend(true)">
@@ -1621,10 +1640,13 @@
                                     </md-tooltip>
                                 </div>
                                 <div flex class="collapseResum">
-                                    <span style="font-weight: bolder">Email :</span>{{cont.datos.emailCont.valor}}
-                                    <md-tooltip >
-                                        {{cont.datos.emailCont.valor}}
-                                    </md-tooltip>
+                                    <span style="font-weight: bolder">Email :</span>
+                                    <span ng-repeat="mail in cont.datos.emailCont">{{mail.valor}},
+                                        <md-tooltip >
+                                            {{mail.valor}}
+                                        </md-tooltip>
+                                    </span>
+
                                 </div>
                               <!--  <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
                                     {{cont.datos.emailCont}}
@@ -1633,7 +1655,13 @@
                                     </md-tooltip>
                                 </div>-->
                                 <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
-                                    <span style="font-weight: bolder">Telf :</span>{{cont.datos.contTelf}}
+                                    <span style="font-weight: bolder">Telf :
+                                        <span ng-repeat="tlf in cont.datos.contTelf">{{tlf.valor}},
+                                            <md-tooltip >
+                                                {{tlf.valor}}
+                                            </md-tooltip>
+                                        </span>
+                                    </span>
                                 </div>
 
                             </div>
