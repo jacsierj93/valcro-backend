@@ -3158,7 +3158,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 });
 
-MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
+MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
 
     $scope.accion= Layers.getAccion();
     $scope.$watch("accion.estado", function(newVal){
@@ -3178,6 +3178,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
             }else {
                 console.log("error parametro no implemtnado")
             }
+
         }
     });
 
@@ -3304,11 +3305,14 @@ MyApp.controller("LayersCtrl",function($mdSidenav, Layers, $scope){
                 } else{
                     l.css('width', 'calc(100% - ' + arg.width + 'px)');
                 }
+
+
                 $mdSidenav(arg.name).open().then(function(){
                     if(arg.after){
 
                         arg.after();
                     }
+
                 });
                 module.historia[module.index] = arg.name;
                 module.layers[arg.name]= arg;
