@@ -26,6 +26,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.index= 0;
     $scope.formData ={};
     $scope.formDataContraP ={};
+    $scope.ctrl = {};
 
     filesService.setFolder('orders');
 
@@ -494,7 +495,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         $scope.formBlock= false;
         $scope.LayersAction({search:{name:"detalleDoc", before: function(){
             $scope.document.estado_id=3;// se cambia el estado a cancelado
-            $scope.gridView =3;
+            $scope.gridView =4;
             var mo= jQuery("#mtvCancelacion");
             mo[0].focus();
         }}});
@@ -737,6 +738,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         return  data;
         //  return data;
     };
+
+   $scope.searchXText = function(data, text, key){
+
+   };
 
     // documentos
     $scope.filterDocuments = function (data, obj){
@@ -1820,21 +1825,24 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.setProvedor =function(prov, p) {
 
         $scope.provIndex= angular.copy(p.$index);
-        console.log(" provedor");
         if( $scope.module.index == 0){
-            $scope.navCtrl.value="listPedido";
-            $scope.navCtrl.estado=true;
-            $scope.provSelec = prov;
+            $scope.LayersAction({open:{name:"listPedido", after:function(){
+                $scope.provSelec = prov;
+                loadPedidosProvedor(prov.id);
+            }}});
         }else if($scope.module.layer == "listPedido" ){
             $scope.provSelec = prov;
+            $scope.ctrl.provSelec = prov;
+            $scope.ctrl.provSelec = prov;
+
             loadPedidosProvedor(prov.id);
         }else  if($scope.module.layer != "listPedido" && !$scope.provSelec.id){
 
             $scope.LayersAction({close:{init:true, after: function(){
                 $scope.LayersAction({open:{name:"listPedido", after:function(){
                     $scope.provSelec = prov;
+                    $scope.ctrl.provSelec = prov;
                     loadPedidosProvedor(prov.id);
-                    console.log("log");
                 }}});
             }}});
         }
@@ -1843,6 +1851,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.LayersAction({close:{all:true, after: function(){
                     $scope.LayersAction({open:{name:"listPedido", after:function(){
                         $scope.provSelec = prov;
+                        $scope.ctrl.provSelec = prov;
                         loadPedidosProvedor(prov.id);
                     }}});
                 }}});
@@ -1886,65 +1895,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             }*/
 
         }
-      /*  else
-        if($scope.document.id ){
-            if($scope.verificExit()){
-                $scope.LayersAction({close:{all:true}});
-                $scope.navCtrl.value="listPedido";
-                $scope.navCtrl.estado=true;
-                $scope.provSelec = prov;
-                console.log(" open list all");
-            }else {
-                if($scope.provSelec.id){
-                    angular.element("#prov"+$scope.provSelec.id).focus();
-                    console.log("set all");
-                }else{
-                    console.log("close all");
-                    $scope.LayersAction({close:{init:true, after: function(){
-                        $scope.navCtrl.value="listPedido";
-                        $scope.navCtrl.estado=true;
-                        $scope.provSelec = prov;
-                    }}});
-
-                }
-            }
-        }*/
-       /* if($scope.module.layer == "listPedido" ){
-            $scope.provSelec = prov;
-            loadPedidosProvedor(prov.id);
-        }else if($scope.module.layer != "listPedido" && $scope.module.index == 0 ){
-
-        }else if($scope.module.index > 0 && $scope.document.id ){
-            if( $scope.provSelec.id != prov.id){
-                if( $scope.verificExit()){
-                    $scope.navCtrl.value="listPedido";
-                    $scope.navCtrl.estado=true;
-                    $scope.provSelec = prov;
-                }else{
-                    angular.element("#prov"+$scope.provSelec.id).focus();
-
-                }
-            }*/
-
-            /*$scope.NotifAction("alert", "¿Esta seguro de cambiar de proveedor?",
-                [
-                    {name:"No", action: function(){}},
-                    {name: "Si", default :2, action: function(){
-
-                    }}
-                ]);*/
-            /*if(){
-             $scope.provSelec = prov;
-
-             }else {
-             $scope.verificExit();
-             }*/
-      /*  }else {
-          //  $scope.verificExit();
-        }*/
-
-
-
     };
 
     $scope.closeSide = function(){
@@ -1999,13 +1949,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         //init();
         var aux= angular.copy(doc);
         if (segurity('editPedido')) {
-            $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id==compare})[0];
+            $scope.provSelec = $filter("customFind")($scope.todos, aux.prov_id,function(current,compare){return current.id == compare})[0];
             $scope.document.id=aux.id;
             $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-
+            console.log("provSl",$scope.provSelec);
+         //   $scope.ctrl.provSelec = $scope.provSelec;
             setGetOrder.setState("select");
             $scope.formGlobal ="upd";
-            $scope.provSelec.id= aux.prov_id;
+            //$scope.provSelec.id= aux.prov_id;
             $scope.reloadDoc();
             $scope.navCtrl.value="detalleDoc";
             $scope.navCtrl.estado=true;
@@ -2264,7 +2215,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
      }*/
 
 
-    ;
+
     $scope.updateProv= function(){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
             angular.forEach($scope.provSelec,function(v,k){
@@ -2758,7 +2709,91 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
         });
     };
+
+    /****** ************************** autocomplete ***************************************/
+    $scope.$watch('ctrl.provSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.provSelec= newVal;
+        }
+
+    });
+
+    $scope.$watch('ctrl.paisSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.document.pais_id = newVal.id;
+        }
+
+    });
+
+    $scope.$watch('ctrl.dirFacSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.document.direccion_facturacion_id = newVal.id;
+        }
+
+    });
+
+    $scope.$watch('ctrl.dirAlmacenSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.document.direccion_almacen_id = newVal.id;
+        }
+
+    });
+
+
+    $scope.$watch('ctrl.MonedaSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.document.prov_moneda_id = newVal.id;
+        }
+
+    });
+
+    $scope.$watch('ctrl.condPagoSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.document.condicion_pago_id = newVal.id;
+        }
+
+    });
+
+    $scope.$watch('ctrl.condPagoSelec', function (newVal) {
+
+        if(newVal ){
+
+            $scope.document.prov_moneda_id = newVal.id;
+        }
+
+    });
+
     /****** **************************listener ***************************************/
+
+    $scope.$watch('document.prov_id', function (newVal) {
+
+        if(newVal){
+            var prov= $filter("customFind")($scope.todos, newVal,function(current,compare){return current.id == compare})[0];
+            $scope.provSelec = prov;
+            $scope.ctrl.provSelec = prov;
+        }
+    });
+
+    $scope.$watch('document.prov_moneda_id', function (newVal) {
+        if(newVal){
+            var data= $filter("customFind")($scope.formData.monedas, newVal,function(current,compare){return current.id == compare})[0];
+            $scope.ctrl.MonedaSelec = data;
+        }
+    });
+
+
 
     $scope.$watch('provSelec.id', function (newVal) {
         if(newVal && newVal != '-1' ){
@@ -2775,6 +2810,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
 
     });
+
+
 
     $scope.$watch('document.pais_id', function (newVal) {
         if(newVal && newVal != "-1"){
@@ -2844,7 +2881,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                 $scope.isTasaFija=true;
                                 $timeout(function(){
                                     if($scope.provDocs.length > 0){
-                                        var mo= angular.element("#"+$scope.layer+" .activeleft");
+                                        var mo= angular.element("#"+$scope.layer+" #prov_id ");
 
                                         mo[0].focus();
                                     }
@@ -3061,19 +3098,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
              form.focus();
              }*/
         }
-        if(newVal[1] == "listPedido" || newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs"){
-            $scope.provSelec ={};
-            $scope.document ={};
+        if( newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs"){
+           $timeout(function(){
+               $scope.document ={};
+               $scope.provSelec ={};
+               $scope.ctrl = {};
+
+           },400);
+
+        }
+        if(newVal[1] == "listPedido" ){
+            $timeout(function(){
+                $scope.document ={};
+            },400);
+
         }
         if(newVal[0]  == 0 ){
             $scope.provSelec ={};
-
+            $scope.ctrl = {};
             $timeout(function(){
                 if($scope.module.index==0){
                     $scope.reviewState();
                 }
             },2000);
-            //        $timeout(function(){$scope.reviewDoc()},1000);
             $scope.provIndex = null;
             $scope.tempDoc= {};
         }
@@ -3583,6 +3630,14 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
     }
 }]);
 
+MyApp.filter('stringKey', function() {
+
+    return function(data,compare, key) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        return data.filter(function(val) {
+            return (!compare || !val || !val[key] ) ? false: val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
+        });
+    }
+});
 MyApp.directive('table', function ($compile) {
     return {
         link: function (scope, elem, attrs) {
