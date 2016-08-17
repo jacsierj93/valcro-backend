@@ -3416,6 +3416,7 @@ class OrderController extends BaseController
         $tem['pais_id']=$model->pais_id;
         $tem['final_id']=$model->final_id;
         $tem['direccion_almacen_id']=$model->direccion_almacen_id;
+        $tem['prov_id']=$model->prov_id;
         $tem['condicion_pago_id']=$model->condicion_pago_id;
         $tem['motivo_pedido_id']=$model->motivo_pedido_id;
         $tem['prioridad_id']=$model->prioridad_id;

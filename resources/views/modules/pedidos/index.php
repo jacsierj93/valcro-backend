@@ -987,7 +987,7 @@
                             md-items="item in searchEmails(emailToText)"
                             md-item-text="item.email"
                             placeholder="Para:">
-                            <span md-highlight-text="ctrl.searchText">{{item.email}}</span>
+                            <span md-highlight-text="direccionesFactsearchText">{{item.email}}</span>
 
                         </md-autocomplete>
 
@@ -1046,6 +1046,27 @@
                             <div   ng-show="( gridView != 5 )"  layout="row"  >
                                 <md-input-container class="md-block" flex="50" ng-click="allowEdit()" >
                                     <label>Proveedor</label>
+                                    <md-autocomplete md-selected-item="ctrl.provSelec"
+                                                     info="Seleccione un proveedor para el documento"
+                                                     required
+                                                     ng-disabled="( document.id )"
+                                                     ng-click="toEditHead('prov_id', provSelect.id)"
+                                                     id="prov_id"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchProveedor"
+                                                     md-auto-select="true"
+                                                     md-items="item in todos | stringKey : ctrl.searchProveedor : 'razon_social' "
+                                                     md-item-text="item.razon_social"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.razon_social}}</span>
+                                        </md-item-template>
+                                        </md-autocomplete>
+                                </md-input-container>
+                                <!--<md-input-container class="md-block" flex="50" ng-click="allowEdit()" >
+                                    <label>Proveedor</label>
                                     <md-select ng-model="provSelec.id"
                                                md-no-ink
                                                info="Seleccione un proveedor para el documento"
@@ -1063,7 +1084,7 @@
                                             Nuevo Proveedor
                                         </md-option>
                                     </md-select>
-                                </md-input-container>
+                                </md-input-container>-->
                                 <md-input-container class="md-block" flex="15" ng-click="allowEdit()">
                                     <label>N° de Pedido</label>
                                     <input  ng-model="document.id"
@@ -1099,7 +1120,25 @@
 
                                 <md-input-container class="md-block" flex="30" ng-click="allowEdit()">
                                     <label>Pais</label>
-                                    <md-select ng-model="document.pais_id" md-no-ink
+                                    <md-autocomplete md-selected-item="ctrl.paisSelec"
+                                                     info="Selecione el pais de origen de los productos"
+                                                     required
+                                                     ng-disabled="( formBlock || !provSelec.id )"
+                                                     ng-click="toEditHead('pais_id', document.pais_id)"
+                                                     id="prov_id"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchPais"
+                                                     md-auto-select="true"
+                                                     md-items="item in formData.paises | stringKey : ctrl.searchPais : 'short_name' "
+                                                     md-item-text="item.short_name"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.short_name}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                   <!-- <md-select ng-model="document.pais_id" md-no-ink
                                                ng-disabled="( formBlock || !provSelec.id )"
                                                ng-change="toEditHead('pais_id', document.pais_id)"
                                                info="Selecione el pais de origen de los productos"
@@ -1113,11 +1152,31 @@
                                         <md-option  value="-1" >
                                             Nuevo Pais
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                     <label>Direccion Facturacion</label>
-                                    <md-select ng-model="document.direccion_facturacion_id"
+                                    <md-autocomplete md-selected-item="ctrl.dirFacSelec"
+                                                     ng-disabled="( formBlock || provSelec.id == '' )"
+                                                     ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
+                                                     info="Selecione la direccion que debe especificarse en la factura"
+                                                     id="direccion_facturacion_id"
+                                                     skip-tab
+                                                     id="direccion_facturacion_id"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchdirFact"
+                                                     md-auto-select="true"
+                                                     md-items="item in formData.direccionesFact | stringKey : ctrl.searchdirFact : 'direccion' "
+                                                     md-item-text="item.direccion"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.direccion}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+
+                                    <!--<md-select ng-model="document.direccion_facturacion_id"
                                                md-no-ink
                                                ng-disabled="( formBlock || provSelec.id == '' )"
                                                ng-change="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
@@ -1135,7 +1194,7 @@
                                         <md-option  value="-1" >
                                             Nueva Direccion de facturacion
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
 
                             </div>
@@ -1143,7 +1202,26 @@
 
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                     <label>Direccion almacen</label>
-                                    <md-select ng-model="document.direccion_almacen_id"
+                                    <md-autocomplete md-selected-item="ctrl.dirAlmacenSelec"
+                                                     ng-disabled="( formBlock || provSelec.id == '' )"
+                                                     ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
+                                                     info="Selecione la direccion que debe especificarse en la factura"
+                                                     id="direccion_facturacion_id"
+                                                     skip-tab
+                                                     id="direccion_facturacion_id"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchdirAlmacenSelec"
+                                                     md-auto-select="true"
+                                                     md-items="item in formData.direcciones | stringKey : ctrl.searchdirAlmacenSelec : 'direccion' "
+                                                     md-item-text="item.direccion"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.direccion}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                   <!-- <md-select ng-model="document.direccion_almacen_id"
                                                md-no-ink
                                                ng-disabled="( formBlock || !provSelec.id || !document.pais_id  )"
                                                ng-change="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
@@ -1162,7 +1240,7 @@
                                         <md-option  value="-1" >
                                             Nuevo Direccion de almacen
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                             </div>
                             <div   ng-show="( gridView != 5 )"  layout="row" >
@@ -1182,7 +1260,25 @@
 
                                 <md-input-container class="md-block" flex="10" ng-click="allowEdit()">
                                     <label>Moneda</label>
-                                    <md-select ng-model="document.prov_moneda_id" md-no-ink
+                                    <md-autocomplete md-selected-item="ctrl.MonedaSelec"
+                                                     ng-disabled="( formBlock)"
+                                                     required
+                                                     ng-click="toEditHead('prov_moneda_id', document.prov_moneda_id)"
+                                                     info="Seleccione la moneda en la que se realizara el pago"
+                                                     id="prov_moneda_id"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchMonedaSelec"
+                                                     md-auto-select="true"
+                                                     md-items="item in formData.monedas | stringKey : ctrl.searchMonedaSelec : 'nombre' "
+                                                     md-item-text="item.nombre"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                   <!-- <md-select ng-model="document.prov_moneda_id" md-no-ink
                                                ng-disabled="( formBlock)"
                                                required
                                                ng-change="toEditHead('prov_moneda_id', document.prov_moneda_id)"
@@ -1197,7 +1293,7 @@
                                         <md-option  value="-1" >
                                             Nuevo Moneda
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
 
                                 <md-input-container class="md-block" flex="10" ng-dblclick="editTasa()"  ng-click="allowEdit()">
@@ -1215,7 +1311,26 @@
 
                                 <md-input-container class="md-block" flex="" ng-click="allowEdit()">
                                     <label>Condicion de pago</label>
-                                    <md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock  || !provSelec.id)"
+                                    <md-autocomplete md-selected-item="ctrl.condPagoSelec"
+                                                     ng-disabled="( formBlock  || !provSelec.id)"
+                                                     ng-click="toEditHead('condicion_pago_id', document.condicion_pago_id)"
+                                                     md-no-ink
+                                                     ng-required ="(formMode.value == 23)"
+                                                     info="Seleccione una condicion para la realizacion del pago"
+                                                     skip-tab
+                                                     id="condicion_pago_id"
+                                                     md-search-text="ctrl.searchcondPagoSelec"
+                                                     md-auto-select="true"
+                                                     md-items="item in formData.condicionPago | stringKey : ctrl.searchcondPagoSelec : 'titulo' "
+                                                     md-item-text="item.nombre"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.titulo}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                    <!--<md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock  || !provSelec.id)"
                                                ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                md-no-ink
                                                ng-required ="(formMode.value == 23)"
@@ -1233,7 +1348,7 @@
                                         <md-option  value="-1" >
                                             Nueva Condicion de pago
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
 
                             </div>
