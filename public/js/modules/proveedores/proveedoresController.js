@@ -239,7 +239,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         //closeLayer(true);
         $scope.edit = false;
         $scope.enabled = true;
-        $scope.LayersAction({open:{name:"layer1"}});
+        $scope.LayersAction({open:{name:"layer1",after:function(){
+            angular.element("#provType").find("input").focus();
+        }}});
        // $scope.openLayer("layer1","first");
         setGetProv.addToList({
             razon_social: "Nuevo Proveedor  ",
@@ -248,9 +250,9 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             id: false,
             siglas:""
         });
-        $timeout(function(){
-            angular.element("#provType").focus().click();
-        },50)
+       /* $timeout(function(){
+
+        },100)*/
 
     };
 
@@ -806,10 +808,10 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         $scope.dir.id = dirSel.id;
         $scope.dir.id_prov = dirSel.prov_id;
         $scope.dir.direccProv = dirSel.direccion;
-        $scope.dir.tipo = dirSel.tipo_dir;
+        //$scope.dir.tipo = dirSel.tipo_dir;
         $scope.ctrl['selPais'] = dirSel.pais;
         $scope.ctrl['dirType'] = dirSel.tipo;
-        $scope.dir.pais = dirSel.pais_id;
+       // $scope.dir.pais = dirSel.pais_id;
         asignPort.setCountry(dirSel.pais_id);
         $scope.dir.provTelf = dirSel.telefono;
         $scope.dir.ports = dirSel.ports;
@@ -1773,6 +1775,7 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
 });
 
 MyApp.controller('coinController', function ($scope,masters,providers,setGetProv,listCoins,masterLists,$filter,setNotif) {
+    $scope.id="coinController";
     $scope.prov = setGetProv.getProv();
     $scope.coins =masterLists.getAllCoins();
     $scope.$watch('prov.id',function(nvo){
@@ -1837,6 +1840,31 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         ]);
     };
 
+    $scope.showGrid = function(elem,event){
+        if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
+            $scope.isShow = elem;
+            /*if(!elem) {
+                saveAddress(function(){
+                    asignPort.setPorts(false);
+                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+                    $scope.ctrl.searchCountry = "";
+                    currentOrig = {};
+                    $scope.direccionesForm.$setPristine();
+                    $scope.direccionesForm.$setUntouched();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                });
+            }
+            if(lryOpen){
+                $mdSidenav("portsLyr").close().then(function(){
+                    lryOpen = false;
+                });
+            }*/
+        }
+    };
+
 });
 
 MyApp.controller('bankInfoController', function ($scope,masters,masterLists,providers,setGetProv,setNotif,$filter,$timeout,$q) {
@@ -1868,12 +1896,19 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
 
     };
 
-    $scope.$watch('bnk.pais', function(nvo) {
-        $scope.states = (nvo)?masters.query({ type:"getStates",id:$scope.bnk.pais||0}):[];
+    $scope.$watch('ctrl.pais.id', function(nvo) {
+        $scope.bnk.pais = nvo;
+        $scope.states = (nvo)?masters.query({ type:"getStates",id:nvo||0}):[];
     });
-    $scope.$watch('bnk.est', function(nvo) {
-        $scope.cities = (nvo)?masters.query({ type:"getCities",id:$scope.bnk.est||0}):[];
+    $scope.$watch('ctrl.state.id', function(nvo) {
+        $scope.bnk.est = nvo;
+        $scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
     });
+    $scope.$watch('ctrl.city.id', function(nvo) {
+        $scope.bnk.ciudad = nvo;
+        //$scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
+    });
+
     var account = {};
 
     /*escuha el estatus del formulario y guarda cuando este valido*/
@@ -1989,20 +2024,21 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
         $scope.bnk.bankSwift = account.swift;
         $scope.bnk.bankIban = account.cuenta;
         $scope.bnk.pais = account.pais.id;
+        $scope.ctrl.pais = account.pais;
         $scope.bnk.est = account.estado.id;
+        $scope.ctrl.state = account.estado;
         $scope.bnk.ciudad = account.ciudad_id;
+        $scope.ctrl.city = account.ciudad;
         currentOrig = angular.copy($scope.bnk);
         setGetProv.addToRllBck($scope.bnk,"infoBank")
     };
 
-
     $scope.showGrid = function(elem,event){
         if(jQuery(event.target).parents("#lyrAlert").length==0) {
-
             if(!elem) {
-
                 saveBank(function(){
                     $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                    $scope.ctrl = {searchCity:"",searchCountry:"",searchState:""};
                     account={};
                     currentOrig = {};
                     $scope.bankInfoForm.$setPristine();
@@ -2012,10 +2048,12 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
                         $scope.$parent.expand = false;
                     }
                 })
-
             }else{
                 if(!$scope.isShow){
                     $scope.bnk.bankBenef = $scope.prov.description;
+                    $scope.bnk.bankBenefAddr = $filter("customFind")(setGetProv.getAddress(),["1","3"],function(c,v){
+                        return v.indexOf(c.tipo.id)!==-1;
+                    })[0].direccion || "";
                 }
             }
             $scope.isShow = elem;
@@ -2025,7 +2063,6 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
         $scope.isShowMore = sel;
         $scope.$parent.expand =(sel)?"bankInfoController":false;
     };
-
 });
 
 MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif) {

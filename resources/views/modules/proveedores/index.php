@@ -315,9 +315,9 @@
                                                  info="seleccione un tipo de proveedor"
                                                  skip-tab
                                                  id="provType"
-                                                 md-search-text="ctrl.searchText"
+                                                 md-search-text="ctrl.searchType"
                                                  ng-disabled="$parent.enabled && prov.id"
-                                                 md-items="item in types | customFind : ctrl.searchText : filTipo "
+                                                 md-items="item in types | stringKey : ctrl.searchType: 'nombre' "
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
                                                  md-autoselect = "true"
@@ -357,7 +357,7 @@
                                                  ng-disabled="$parent.enabled && prov.id"
                                                  skip-tab
                                                  md-search-text="ctrl.searchSend"
-                                                 md-items="item in envios | customFind : ctrl.searchSend : filTipo "
+                                                 md-items="item in envios | stringKey : ctrl.searchSend: 'nombre' "
                                                  md-item-text="item.nombre"
                                                  md-autoselect = "true"
                                                  md-no-asterisk
@@ -447,7 +447,7 @@
                                                  id="dirType"
                                                  md-search-text="ctrl.searchType"
                                                  ng-disabled="$parent.enabled"
-                                                 md-items="item in tipos | customFind : ctrl.searchType : filTipo "
+                                                 md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
                                                  md-item-text="item.descripcion"
                                                  md-autoselect = "true"
                                                  md-no-asterisk
@@ -476,7 +476,7 @@
                                                  info="indica el pais de la direccion"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCountry"
-                                                 md-items="item in paises | filtCountry : ctrl.searchCountry"
+                                                 md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
                                                  md-autoselect = "true"
                                                  md-no-asterisk
@@ -579,7 +579,7 @@
                                                  info="pais de residencia del contacto (no es el mismo de direcciones)"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCountry"
-                                                 md-items="item in paises | filtCountry : ctrl.searchCountry"
+                                                 md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
                                                  md-autoselect = "true"
                                                  md-no-asterisk
@@ -590,11 +590,7 @@
                                         <span>{{item.short_name}}</span>
                                     </md-item-template>
                                 </md-autocomplete>
-                                <!--<md-select id="paisCont" skip-tab info="pais de residencia del contacto (no es el mismo de direcciones)" ng-model="cnt.pais" ng-disabled="$parent.enabled || cnt.isAgent==1" md-no-ink>
-                                    <md-option ng-repeat="pais in paises" value="{{pais.id}}">
-                                        {{pais.short_name}}
-                                    </md-option>
-                                </md-select>-->
+
                             </md-input-container>
 
                             <div layout="row" flex="30">
@@ -608,18 +604,7 @@
                             </div>
                         </div>
                         <div class="row" layout="row">
-                            <!--<div flex style="height: 100%; margin-top:6px" layout="row">
-                                <div style="max-width: calc(100% - 200px); overflow-x: auto; height:24px; margin-top:5px; border-bottom:1px solid #ccc">
-                                        <div ng-repeat="block in cnt.emailCont" style="overflow: hidden;height: 24px; width: 24px; background: #ccc; color:white; font-weight: bolder; float: left; margin-right: 8px;">
-                                            {{block.valor}}
-                                        </div>
-                                </div>
-                                <md-input-container class="md-block" flex>
-                                    <label>Email</label>
-                                    <input skip-tab info="detalles de las responsabilidades" autocomplete="off" name="cntcRespon" maxlength="100" ng-minlength="3" ng-disabled=" $parent.enabled ">
-                                </md-input-container>
 
-                            </div>-->
                             <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -653,12 +638,7 @@
 
                                      </span>
                                 </vlc-group>
-                                <!--<md-input-container flex>
-                                    <label>cargos</label>
-                                    <md-select info="el cargo que desempeña el contacto en el proveedor"  ng-model="cnt.cargo" multiple="" ng-disabled="(cnt.id===false) || $parent.enabled || cnt.isAgent==1" md-no-ink>
-                                        <md-option ng-value="cargo.id" ng-repeat="cargo in cargos">{{cargo.cargo}}</md-option>
-                                    </md-select>
-                                </md-input-container>-->
+
                             </div>
                         </div>
 
@@ -845,42 +825,86 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Pais</label>
-                                <md-select skip-tab id="bankPais" required ng-disabled="$parent.enabled" ng-model="bnk.pais" name="state" ng-disabled="$parent.enabled" ng-change="setState(this)" md-no-ink>
+                                <md-autocomplete md-selected-item="ctrl.pais"
+                                                 flex
+                                                 id="bankPais"
+                                                 info="pais de residencia del contacto (no es el mismo de direcciones)"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchCountry"
+                                                 md-items="item in countries | stringKey : ctrl.searchCountry: 'short_name'"
+                                                 md-item-text="item.short_name"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 ng-disabled="$parent.enabled"
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.short_name}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+                                <!--<md-select skip-tab id="bankPais" required ng-disabled="$parent.enabled" ng-model="bnk.pais" name="state" ng-disabled="$parent.enabled" ng-change="setState(this)" md-no-ink>
                                     <md-option ng-repeat="country in countries" value="{{country.id}}">
                                         {{country.short_name}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="20">
                                 <label>{{(states.length==0)?'sin estados para mostrar':'Estado'}}</label>
-                                <md-select skip-tab id="bankState" required ng-disabled="$parent.enabled || states.length==0" ng-model="bnk.est" name="state" ng-disabled="$parent.enabled || (bnk.pais==false)" md-no-ink>
+                                <md-autocomplete md-selected-item="ctrl.state"
+                                                 flex
+                                                 id="bankState"
+                                                 info="estado del pais"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchState"
+                                                 md-items="item in states | stringKey : ctrl.searchState: 'local_name'"
+                                                 md-item-text="item.local_name"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 name="state"
+                                                 ng-disabled="$parent.enabled || states.length==0"
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.local_name}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                               <!-- <md-select skip-tab id="bankState" required ng-disabled="$parent.enabled " ng-model="bnk.est" name="state" ng-disabled="$parent.enabled || (bnk.pais==false)" md-no-ink>
                                     <md-option ng-repeat="state in states" value="{{state.id}}">
                                         {{state.local_name}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="20">
                                 <label>{{(states.length==0)?'sin ciudades para mostrar':'Ciudades'}}</label>
-                                <md-select skip-tab id="bankCity" ng-disabled="$parent.enabled || cities.length==0" ng-model="bnk.ciudad" name="state" ng-disabled="$parent.enabled || (bnk.est==false)" required md-no-ink>
+                                <md-autocomplete md-selected-item="ctrl.city"
+                                                 flex
+                                                 id="bankCity"
+                                                 info="seleccione la ciudad"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchCity"
+                                                 md-items="item in cities | stringKey : ctrl.searchCity: 'local_name'"
+                                                 md-item-text="item.local_name"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 name="state"
+                                                 ng-disabled="$parent.enabled || cities.length==0"
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.local_name}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                                <!--<md-select skip-tab id="bankCity" ng-disabled="$parent.enabled || cities.length==0" ng-model="bnk.ciudad" name="state" ng-disabled="$parent.enabled || (bnk.est==false)" required md-no-ink>
                                     <md-option ng-repeat="city in cities" value="{{city.id}}">
                                         {{city.local_name}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
 
 
-
-                           <!-- <md-autocomplete md-match-case-insensitive="true" md-delay="500" md-selected-item="bnk.ciudad" md-search-text="ctrl.searchText"  md-items="item in querySearch(ctrl.searchText)" md-item-text="item.local_name" md-min-length="0" placeholder="ciudad del banco">
-                                <md-item-template>
-                                    <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.local_name}}</span>
-                                </md-item-template>
-                                <md-not-found>
-                                    No existe la ciudad indicada
-                                    <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
-                                </md-not-found>
-                            </md-autocomplete>-->
                         </div>
 
                         <md-input-container class="md-block row">
@@ -943,7 +967,7 @@
                 </form>
 
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda" layout="row"  ng-controller="coinController"  ng-class="{'focused':isShow,'preNew':!prov.id}">
+                <form name="provMoneda" layout="row"  ng-controller="coinController"  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" class="row" ng-class="{'onlyread' : (!$parent.edit)}">
@@ -955,7 +979,27 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
-                                    <md-select id="selCoin" ng-model="cn.coin" name="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink>
+                                    <!--<md-autocomplete md-selected-item="cn.coin"
+                                                     flex
+                                                     id="selCoin"
+                                                     info="seleccione las monedas"
+                                                     skip-tab
+                                                     required
+                                                     md-search-text="ctrl.searchCoin"
+                                                     md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' | filterSelect: filt"
+                                                     md-item-text="item.nombre"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     name="state"
+                                                     ng-disabled="(coins.length == filt.length) || $parent.enabled"
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>-->
+                                    <md-select id="selCoin" ng-model="cn.coin" name="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink info="seleccione las monedas"
+                                               skip-tab>
                                         <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
