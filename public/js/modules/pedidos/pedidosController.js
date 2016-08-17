@@ -494,7 +494,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         $scope.formBlock= false;
         $scope.LayersAction({search:{name:"detalleDoc", before: function(){
             $scope.document.estado_id=3;// se cambia el estado a cancelado
-            $scope.gridView =3;
+            $scope.gridView =4;
             var mo= jQuery("#mtvCancelacion");
             mo[0].focus();
         }}});
@@ -1820,11 +1820,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.setProvedor =function(prov, p) {
 
         $scope.provIndex= angular.copy(p.$index);
-        console.log(" provedor");
         if( $scope.module.index == 0){
-            $scope.navCtrl.value="listPedido";
-            $scope.navCtrl.estado=true;
-            $scope.provSelec = prov;
+            $scope.LayersAction({open:{name:"listPedido", after:function(){
+                $scope.provSelec = prov;
+                loadPedidosProvedor(prov.id);
+            }}});
         }else if($scope.module.layer == "listPedido" ){
             $scope.provSelec = prov;
             loadPedidosProvedor(prov.id);
@@ -1834,7 +1834,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.LayersAction({open:{name:"listPedido", after:function(){
                     $scope.provSelec = prov;
                     loadPedidosProvedor(prov.id);
-                    console.log("log");
                 }}});
             }}});
         }
@@ -2844,7 +2843,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                 $scope.isTasaFija=true;
                                 $timeout(function(){
                                     if($scope.provDocs.length > 0){
-                                        var mo= angular.element("#"+$scope.layer+" .activeleft");
+                                        var mo= angular.element("#"+$scope.layer+" #prov_id ");
 
                                         mo[0].focus();
                                     }
@@ -3061,9 +3060,19 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
              form.focus();
              }*/
         }
-        if(newVal[1] == "listPedido" || newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs"){
-            $scope.provSelec ={};
-            $scope.document ={};
+        if( newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs"){
+           $timeout(function(){
+               $scope.document ={};
+               $scope.provSelec ={};
+
+           },400);
+
+        }
+        if(newVal[1] == "listPedido" ){
+            $timeout(function(){
+                $scope.document ={};
+            },400);
+
         }
         if(newVal[0]  == 0 ){
             $scope.provSelec ={};
@@ -3073,7 +3082,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     $scope.reviewState();
                 }
             },2000);
-            //        $timeout(function(){$scope.reviewDoc()},1000);
             $scope.provIndex = null;
             $scope.tempDoc= {};
         }
