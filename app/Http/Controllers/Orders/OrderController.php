@@ -30,6 +30,7 @@ use App\Models\Sistema\Ports;
 use App\Models\Sistema\Product\ProductType;
 use App\Models\Sistema\Provider;
 use App\Models\Sistema\ProviderAddress;
+use App\Models\Sistema\ProviderCondPay;
 use App\Models\Sistema\ProviderCondPayItem;
 use App\Models\Sistema\ProvTipoEnvio;
 use App\Models\Sistema\Purchase\Purchase;
@@ -103,6 +104,7 @@ class OrderController extends BaseController
                 $temp= array();
                 $temp['id']=$aux->id;
                 $temp['documento'] = $aux->getTipo();
+                $temp['tipo'] = $aux->getTipoId();
                 $temp['titulo'] = $aux->titulo;
                 $temp['monto'] = $aux->monto;
                 $temp['symbol'] = $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo;
@@ -110,6 +112,7 @@ class OrderController extends BaseController
                 $temp['comentario'] = $aux->comentario;
                 $temp['prov_id'] = $aux->prov_id;
                 $temp['review'] = $aux->review;
+                $temp['prov_id'] =$aux->prov_id;
                 $temp['proveedor'] = Provider::findOrFail($aux->prov_id)->razon_social;
                 $temp['productos'] = $this->getProductoItem($aux);
 
@@ -152,6 +155,7 @@ class OrderController extends BaseController
                 $temp= array();
                 $temp['id']=$aux->id;
                 $temp['documento'] = $aux->getTipo();
+                $temp['tipo'] = $aux->getTipoId();
                 $temp['titulo'] = $aux->titulo;
                 $temp['monto'] = $aux->monto;
                 $temp['symbol'] = $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo;
@@ -160,6 +164,7 @@ class OrderController extends BaseController
                 $temp['prov_id'] = $aux->prov_id;
                 $temp['proveedor'] = Provider::findOrFail($aux->prov_id)->razon_social;
                 $temp['productos'] = $this->getProductoItem($aux);
+
 
                 $data[] = $temp;
 
@@ -2374,6 +2379,7 @@ class OrderController extends BaseController
             $tem['proveedor']=$prov->razon_social;
             $tem['titulo']=$aux->titulo;
             $tem['documento']= $aux->getTipo();
+            $tem['tipo']= $aux->getTipoId();
             $tem['diasEmit']=$aux->daysCreate();
             $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
             $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
@@ -3416,6 +3422,7 @@ class OrderController extends BaseController
         $tem['pais_id']=$model->pais_id;
         $tem['final_id']=$model->final_id;
         $tem['direccion_almacen_id']=$model->direccion_almacen_id;
+        $tem['direccion_facturacion_id']=$model->direccion_facturacion_id;
         $tem['prov_id']=$model->prov_id;
         $tem['condicion_pago_id']=$model->condicion_pago_id;
         $tem['motivo_pedido_id']=$model->motivo_pedido_id;
@@ -4216,18 +4223,8 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getProviderCountry(Request $req){
-        /*
-                $model=  ProviderAddress::where('prov_id',$req->id)->get();
-                $data= Collection::make(array());
-                foreach($model as $aux){
-                    if(!$data->contains($aux->pais_id)){
-                        $p=Country::find($aux->pais_id);
-                        $data->push($p);
-                    }
 
-                }*/
-
-        return $this->getCountryProvider($req->id);
+        return (!$req->has('id')) ? $this->getCountryProvider($req->prov_id) : Country::where('id',$req->id)->get();
     }
 
 
@@ -4238,6 +4235,9 @@ class OrderController extends BaseController
      * almacen
      **/
     public function getInvoiceAddressCountry(Request $req){
+        if($req->has('id')){
+            return ProviderAddress::where('id',$req->id)->get();
+        }
         $data =ProviderAddress::where('prov_id', $req->prov_id)->where(
             function ($query){
                 $query->where('tipo_dir',1)->orWhere('tipo_dir',3);
@@ -4249,6 +4249,9 @@ class OrderController extends BaseController
     }
 
     public function getStoreAddressCountry(Request $req){
+        if($req->has('id')){
+            return ProviderAddress::where('id',$req->id)->get();
+        }
         $data =ProviderAddress::where('prov_id', $req->prov_id)->where(
             function ($query){
                 $query->where('tipo_dir',2)->orWhere('tipo_dir',3);
@@ -4271,7 +4274,9 @@ class OrderController extends BaseController
      * Condiciones de pago de un proveedor
      **/
     public function getProviderPaymentCondition(Request $req){
-        $auxCond=Provider::findOrFail($req->id)->getPaymentCondition()->get();
+
+        $auxCond = (!$req->has('id')) ?Provider::findOrFail($req->prov_id)->getPaymentCondition()->get() : ProviderCondPay::where('id',$req->id)->get();
+        //$auxCond=Provider::findOrFail($req->prov_id)->getPaymentCondition()->get();
         $cond= Array();
         $i=0;
         $text='';

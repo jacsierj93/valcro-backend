@@ -130,10 +130,10 @@ class MasterController extends BaseController
 	}
 
 	/*Maestros para modulo de pedido**/
-	public function getReason(){  return OrderReason::get();}
-	public function getCondition(){  return OrderCondition::get();}
-	public function getStatus(){  return OrderStatus::get();}
-	public function getPaymentType(){  return PaymentType::get();}
+	public function getReason(Request $req){  return (!$req->has('id')) ? OrderReason::get() : OrderReason::findOrFail($req->id) ;}
+	public function getCondition(Request $req){  return (!$req->has('id')) ? OrderCondition::get() : OrderCondition::findOrFail($req->id) ; }
+	public function getStatus(Request $req){  return (!$req->has('id')) ? OrderStatus::get() : OrderStatus::findOrFail($req->id) ;}
+	public function getPaymentType(Request $req){ return (!$req->has('id')) ?  PaymentType::get() : PaymentType::findOrFail($req->id) ;}
 
 
 
