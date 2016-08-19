@@ -75,6 +75,22 @@ div[ng-click] * {
     margin-top: -2px !important
 }
 
+.cellGrid-input{
+    border-bottom:  1px solid #999999 ;
+}
+
+.cellGrid-input-focus{
+    border-bottom:  1px solid rgb(84, 180, 234) ;
+}
+
+.cellGrid-input-no-focus{
+    border-bottom:  1px solid #999999 ;
+}
+
+.input-grid{
+    border-bottom:  none;
+
+}
 .cell-filter-order{
     width: 12px;
     display: block;

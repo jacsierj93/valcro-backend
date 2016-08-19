@@ -1028,7 +1028,7 @@
 
             <md-content  layout="row" flex class="sideNavContent">
                 <div  layout="column" flex="" layout-align=" none" >
-                    <form name="FormHeadDocument" layout="row" ng-class="{focused: gridView == 1}" >
+                    <form name="FormHeadDocument" layout="row" ng-class="{focused: gridView == 1}" ng-style="(gridView != 5) ? {'min-height' : '320px'} : {} ">
                         <div active-left></div>
                         <div layout="column" flex >
                             <div layout="row" class="row" >
@@ -1086,9 +1086,9 @@
                                 <md-input-container   ng-show="( gridView != 5 )"  class="md-block" flex ng-click="allowEdit()" >
                                     <label>Titulo</label>
                                     <input  ng-model="document.titulo"
+                                            ng-change=" toEditHead('titulo', document.titulo ) "
                                             ng-disabled="( formBlock )"
                                             required
-                                            ng-change="toEditHead('titulo', document.titulo)"
                                             info="Escriba un titulo para facilitar identificacion del documento"
                                             skip-tab
 
@@ -1105,7 +1105,6 @@
                                                      info="Selecione el pais de origen de los productos"
                                                      ng-disabled="( formBlock || !provSelec.id )"
                                                      ng-click="toEditHead('pais_id', document.pais_id)"
-                                                     id="prov_id"
                                                      skip-tab
                                                      md-search-text="ctrl.searchPais"
                                                      md-items="item in formData.paises | stringKey : ctrl.searchPais : 'short_name' "
@@ -1115,8 +1114,9 @@
                                                      md-min-length="0"
                                                      md-require-match="true"
                                                      md-no-cache="true"
-                                                     md-delay="0"
-                                                     md-escape-options=" blur clear "
+                                                     md-escape-options="test()"
+                                                     vlc-autocomplete
+
                                     >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
@@ -1421,8 +1421,7 @@
                             </div>
                         </div>
                     </form>
-                    <div ng-show="document.final_id != null || document.version > 1">
-                        <form name="FormEstatusDoc"ng-class="{focused: gridView == 2}" layout="row">
+                    <form name="FormEstatusDoc"ng-class="{focused: gridView == 2}" layout="row" ng-show="document.final_id != null || document.version > 1">
                             <div active-left></div>
                             <div></div>
                             <div layout="column" flex >
@@ -1456,7 +1455,7 @@
                             </div>
 
                         </form>
-                        <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" >
+                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row"ng-show="document.final_id != null || document.version > 1" >
                             <div active-left></div>
                             <div layout="column" flex>
                                 <div layout="row" flex class="row" >
@@ -1498,7 +1497,7 @@
                                 </div>
                             </div>
                         </form>
-                        <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" >
+                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.final_id != null || document.version > 1" >
                             <div active-left></div>
                             <div layout="column" flex>
                                 <div layout="row" flex class="row" >
@@ -1523,7 +1522,6 @@
 
                             </div>
                         </form>
-                    </div>
                     <form layout="row" ng-class="{focused: (gridView == 5)}">
                         <div active-left></div>
                         <div layout="row"  flex class="row" >
@@ -1874,9 +1872,12 @@
                                     <div flex="10" class="cellGrid" >
                                         <md-switch class="md-primary" ng-disabled="true" ng-model="item.puntoCompra"></md-switch>
                                     </div>
-                                    <div flex="15" class="cellGrid">
+                                    <div flex="15" class="cellGrid cellGrid-input {{(provRow ==  item.id) ? 'cellGrid-input-focus' : 'cellGrid-input-no-focus'}}"
+
+                                    >
                                         <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
-                                                type="number" range="{{item.asignado}}" minVal="1" maxVal="6"id="p{{item.id}}" ng-disabled="(!item.asignado || formBlock) " />
+                                                type="number" range="{{item.asignado}}" minVal="1" maxVal="6" id="p{{item.id}}"
+                                                ng-disabled="(!item.asignado || formBlock) " ng-focus="provRow = item.id "  ng-blur="provRow = '-1'" />
                                     </div>
 
 
@@ -2720,7 +2721,7 @@
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
-                <div layout="column" id="headFinalDoc"  ng-class="{preview: isOpenexcepAddCP }">
+                <div flex="30"layout="column" id="headFinalDoc"  ng-class="{preview: isOpenexcepAddCP }">
                     <form layout="row" >
                         <div active-left> </div>
                         <div layout="column" flex>

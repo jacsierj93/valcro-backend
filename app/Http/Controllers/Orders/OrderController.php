@@ -4454,6 +4454,7 @@ class OrderController extends BaseController
         $model->save();
         //  EmailController::sendEmail("emails.prueba", [],[]);
         $result['template'] = view("emails.prueba");
+        $result['model']= $model;
         //dd( $result['template']);
 
 

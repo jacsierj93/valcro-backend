@@ -232,7 +232,37 @@ MyApp.directive('phone', function (setNotif) {
         }
     };
 });
+MyApp.directive('decimal', function () {
+    return {
+        require: 'ngModel',
+        link: function (scope, elem, attrs,ctrl) {
 
+            elem.bind("keydown",function(e){
+
+
+                var key = window.Event ? e.which : e.keyCode;
+
+                if(!((key >= 48 && key <= 57) || (key==8)  || (key >= 96 && key <= 105
+                    || key == 188 || key == 190 ||key == 110 || key == 17 || key == 16 || key == 20 || key == 93 || key == 225)
+                    || (key >= 112 && key <= 123)
+                    )   ){
+                    e.preventDefault();
+                }
+            });
+
+            ctrl.$validators.decimal = function(modelValue, viewValue) {
+                if(viewValue === undefined || viewValue=="" || viewValue==null){
+                    return true;
+                }
+                var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
+
+                return !(num === null)
+            };
+
+        }
+    };
+});
+/*
 MyApp.directive('decimal', function () {
     return {
         require: 'ngModel',
@@ -249,7 +279,7 @@ MyApp.directive('decimal', function () {
             };
         }
     };
-});
+});*/
 
 MyApp.directive('chip', function ($timeout) {
     return {
@@ -553,7 +583,6 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 MyApp.directive('range', function () {
     function validateRange(viewValue,min,max){
         if(viewValue === undefined || viewValue=="" || viewValue==null){
-            console.log('view value', viewValue);
             return false;
         }
         if(min){
@@ -879,14 +908,11 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                 }
 
                 if(!$scope.expand){
-                    console.log("cerrado")
 
                     $mdSidenav("sideFiles").close().then(function(){
                         if($scope.expand){
                             $scope.expand=false;
                         }
-                        console.log("cerrado ");
-                        $scope.isOpen= false;
                         filesService.clear();
                     });
 
