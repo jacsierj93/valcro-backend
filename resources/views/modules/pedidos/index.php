@@ -257,11 +257,345 @@
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
-                <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
-                    <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
-                        P
-                    </div>
-                    <br> Selecciones un Proveedor
+                <div layout="column" flex >
+                    <md-tabs  md-autoselect md-center-tabs md-no-ink md-center-tabs  flex class="tab-dashboard" md-stretch-tabs="always">
+                        <md-tab  flex style="width: 100%;height: 100%;">
+                            <md-tab-label flex>
+                                <div style="text-align: center; width: 100%; height: 100%;">
+                                    <span >
+                                    Inicio
+                                    </span>
+                                </div>
+                            </md-tab-label>
+                            <md-tab-body   flex>
+
+                                <div  layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22); width: 100%; height: 100%;">
+                                    <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                                       D
+                                    </div>
+                                    <br> DashBoard
+                                </div>
+                            </md-tab-body>
+
+                        </md-tab>
+                        <md-tab flex >
+                            <md-tab-label flex>
+                                <div style="text-align: center; width: 100%; height: 100%;">
+                                <span >
+                               Documentos sin Finalizar
+                                    </span>
+                                </div>
+                            </md-tab-label>
+                            <md-tab-body  flex ng-show=" unclosetDoc.length > 0">
+                                <form layout="row">
+                                    <div active-left  before="verificExit" ></div>
+                                    <div flex layout="row">
+                                        <div layout="row" style="width: 80px;">
+                                            <md-input-container class="md-block"  flex>
+                                                <md-select ng-model="tbl_unclosetDoc.filter.documento" ng-init="tbl_unclosetDoc.filter.documento ='-1'">
+
+                                                    <md-option value="-1" layout="row">
+                                                        <img src="images/Documentos.png" style="width:20px;">
+                                                    </md-option>
+                                                    <md-option value="21" layout="row" >
+                                                        <img src="images/solicitud_icon_48x48.gif" style="width:20px;">
+                                                    </md-option>
+                                                    <md-option value="22" layout="row">
+                                                        <img src="images/proforma_icon_48x48.gif" style="width:20px;">
+
+                                                    </md-option>
+                                                    <md-option value="23" layout="row">
+                                                        <img src="images/odc_icon_48x48.gif" style="width:20px;">
+                                                    </md-option>
+                                                </md-select>
+
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" >
+                                                <div ng-click="tbl_unclosetDoc.order = 'documento' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'documento')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div ng-click="tbl_unclosetDoc.order = '-documento' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-documento')}"><img src="images/TrianguloDown.png" ></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex="5" layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>N°</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_unclosetDoc.filter.id"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'id' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'id')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-id' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-id')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Proveedor</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_unclosetDoc.filter.proveedor"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'proveedor' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'proveedor')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-proveedor' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-proveedor')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Titulo</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_unclosetDoc.filter.titulo"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'titulo' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'titulo')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-titulo' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-titulo')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex="10" layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Fecha</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_unclosetDoc.filter.emision"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'emision' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'emision')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-emision' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-emision')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Monto</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_unclosetDoc.filter.monto"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'monto' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'monto')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-monto' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-monto')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Comentario</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_unclosetDoc.filter.comentario"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_unclosetDoc.order = 'comentario' " ng-class="{'filter-select':(tbl_unclosetDoc.order == 'comentario')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_unclosetDoc.order = '-comentario' " ng-class="{'filter-select':(tbl_unclosetDoc.order == '-comentario')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </form>
+                                <form layout="row"  class="gridContent">
+                                    <div active-left  before="verificExit" ></div>
+                                    <div layout="column" flex>
+                                        <div  flex >
+                                            <div   ng-repeat="item in filterDocuments(unclosetDoc ,tbl_unclosetDoc.filter) | orderBy : tbl_unclosetDoc.order " ng-click="openTempDoc(item)" row-select >
+                                                <div layout="row" class="cellGridHolder" >
+                                                    <div style="width: 80px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
+                                                        <div>
+                                                            <div layout-align="center center"  style="text-align: center;     margin-left: 12px;">
+                                                                <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div flex="5" class="cellSelect"  tabindex="{{$index + 1}}" > {{item.id}}</div>
+                                                    <!-- <div flex="15" class="cellGrid"> {{item.documento}}</div>-->
+                                                    <div flex class="cellGrid"> {{item.proveedor}}</div>
+                                                    <div flex class="cellGrid" > {{item.titulo}}</div>
+                                                    <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                                    <div flex class="cellGrid" > {{item.monto | currency :item.symbol :2}}</div>
+                                                    <div flex class="cellGrid" >{{item.comentario}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </md-tab-body>
+                        </md-tab>
+                      <md-tab flex ng-show="priorityDocs.docs > 0">
+                            <md-tab-label flex>
+                                <div style="text-align: center; width: 100%; height: 100%;">
+                                <span >
+                                    Documentos con mas de {{priorityDocs.dias}} dias sin revisar ({{priorityDocs.docs.length}})
+                                </span>
+                                    </div>
+                            </md-tab-label>
+                            <md-tab-body   flex>
+                                <form layout="row">
+                                    <div layout="row" flex>
+                                        <div layout="row" style="width: 80px;">
+                                            <md-input-container class="md-block"  flex>
+                                                <md-select ng-model="tbl_priorityDocs.filter.documento" ng-init="tbl_priorityDocs.filter.documento ='-1'">
+
+                                                    <md-option value="-1" layout="row">
+                                                        <img src="images/Documentos.png" style="width:20px;">
+                                                    </md-option>
+                                                    <md-option value="21" layout="row" >
+                                                        <img src="images/solicitud_icon_48x48.gif" style="width:20px;">
+                                                    </md-option>
+                                                    <md-option value="22" layout="row">
+                                                        <img src="images/proforma_icon_48x48.gif" style="width:20px;">
+
+                                                    </md-option>
+                                                    <md-option value="23" layout="row">
+                                                        <img src="images/odc_icon_48x48.gif" style="width:20px;">
+                                                    </md-option>
+                                                </md-select>
+
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" >
+                                                <div ng-click="tbl_priorityDocs.order = 'documento' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'documento')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div ng-click="tbl_priorityDocs.order = '-documento' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-documento')}"><img src="images/TrianguloDown.png" ></div>
+                                            </div>
+
+                                        </div>
+
+                                        <div flex="5" layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>N°</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_priorityDocs.filter.id"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_priorityDocs.order = 'id' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'id')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_priorityDocs.order = '-id' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-id')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Proveedor</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_priorityDocs.filter.proveedor"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_priorityDocs.order = 'proveedor' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'proveedor')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_priorityDocs.order = '-proveedor' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-proveedor')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Titulo</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_priorityDocs.filter.titulo"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_priorityDocs.order = 'titulo' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'titulo')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_priorityDocs.order = '-titulo' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-titulo')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex="10" layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Fecha</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_priorityDocs.filter.emision"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_priorityDocs.order = 'emision' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'emision')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_priorityDocs.order = '-emision' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-emision')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Monto</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_priorityDocs.filter.monto"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_priorityDocs.order = 'monto' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'monto')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_priorityDocs.order = '-monto' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-monto')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div flex layout="row"  >
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Comentario</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="1"
+                                                       ng-model="tbl_priorityDocs.filter.comentario"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                                <div  layout-align="end center" ng-click="tbl_priorityDocs.order = 'comentario' " ng-class="{'filter-select':(tbl_priorityDocs.order == 'comentario')}"><img src="images/TrianguloUp.png" ></div>
+                                                <div layout-align="star center" ng-click="tbl_priorityDocs.order = '-comentario' " ng-class="{'filter-select':(tbl_priorityDocs.order == '-comentario')}"><img src="images/TrianguloDown.png"/></div>
+                                            </div>
+
+                                        </div>
+                                        <div style="width: 80px;"   ></div>
+                                    </div>
+                                </form>
+                                <form layout="row" class="gridContent">
+                                    <div layout="column" flex>
+                                        <div flex>
+                                            <div ng-repeat="item in filterDocuments(priorityDocs.docs, tbl_priorityDocs.filter) | orderBy : tbl_priorityDocs.order "  row-select>
+                                                <div layout="row" class="cellGridHolder" >
+
+                                                    <div style="width: 80px;" ng-click="openTempDoc(item)" class="cellEmpty cellSelect" tabindex="{{$index + 1}}">
+                                                        <div>
+                                                            <div layout-align="center center"  style="text-align: center;     margin-left: 12px;">
+                                                                <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div flex="5" class="cellSelect" ng-click="openTempDoc(item)"
+                                                         ng-class="{'cellGrid':( addAnswer.doc_id  != item.id) ,'cellSelect-select':(addAnswer.doc_id  == item.id )}"
+                                                         tabindex="{{$index + 1}}"
+                                                    > {{item.id}}</div>
+                                                    <div flex class="cellGrid" ng-click="openTempDoc(item)"> {{item.proveedor}}</div>
+                                                    <div flex class="cellGrid" ng-click="openTempDoc(item)" > {{item.titulo}}</div>
+                                                    <div flex="10" class="cellGrid" ng-click="openTempDoc(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                                    <div flex class="cellGrid" ng-click="openTempDoc(item)" > {{item.monto | currency :item.symbol :2}}</div>
+                                                    <div flex class="cellGrid"  ng-click="openTempDoc(item)" >{{item.comentario}}</div>
+                                                    <div style="width: 80px;"  class="cellEmpty " ng-click="sideaddAnswer(this, item)"
+                                                         layout-align="center center" layout="column" >
+                                                        <div class="dot-empty dot-attachment "  layout-align="center center" >
+                                                            <div style=" margin-top: 2.5px;">  M</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </md-tab-body
+
+                        </md-tab>
+                   </md-tabs>
+
                 </div>
             </div>
         </div>
@@ -1403,11 +1737,11 @@
                                 </md-input-container>
 
                             </div>
-<!--                            <div ng-show="( gridView != 5 )"  layout="row" class="row" >
+                            <!--                            <div ng-show="( gridView != 5 )"  layout="row" class="row" >
 
 
 
-                            </div>-->
+                                                        </div>-->
                             <div ng-show="( gridView != 5 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
@@ -1422,106 +1756,106 @@
                         </div>
                     </form>
                     <form name="FormEstatusDoc"ng-class="{focused: gridView == 2}" layout="row" ng-show="document.final_id != null || document.version > 1">
-                            <div active-left></div>
-                            <div></div>
-                            <div layout="column" flex >
-                                <div layout="row" flex class="row">
-                                    <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 2">
-                                        <div>
-                                            Aprobacion de Gerente
-                                        </div>
+                        <div active-left></div>
+                        <div></div>
+                        <div layout="column" flex >
+                            <div layout="row" flex class="row">
+                                <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 2">
+                                    <div>
+                                        Aprobacion de Gerente
                                     </div>
-                                </div>
-
-                                <div layout="row" ng-show="( gridView == 2 )" class="row" >
-
-                                    <md-input-container class="md-block" flex="">
-                                        <label>Estatus</label>
-                                        <md-select ng-model="document.estado_id"  ng-disabled="formBlock"
-                                                   ng-change="toEditHead('estado_id', document.estado_id)"
-                                                   skip-tab
-                                                   id="condicion_pago_id"
-
-                                        >
-                                            <md-option ng-repeat="item in estadosDoc" value="{{item.id}}" skip-tab>
-                                                {{item.estado}}
-                                            </md-option>
-
-
-                                        </md-select>
-                                    </md-input-container>
-
                                 </div>
                             </div>
 
-                        </form>
+                            <div layout="row" ng-show="( gridView == 2 )" class="row" >
+
+                                <md-input-container class="md-block" flex="">
+                                    <label>Estatus</label>
+                                    <md-select ng-model="document.estado_id"  ng-disabled="formBlock"
+                                               ng-change="toEditHead('estado_id', document.estado_id)"
+                                               skip-tab
+                                               id="condicion_pago_id"
+
+                                    >
+                                        <md-option ng-repeat="item in estadosDoc" value="{{item.id}}" skip-tab>
+                                            {{item.estado}}
+                                        </md-option>
+
+
+                                    </md-select>
+                                </md-input-container>
+
+                            </div>
+                        </div>
+
+                    </form>
                     <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row"ng-show="document.final_id != null || document.version > 1" >
-                            <div active-left></div>
-                            <div layout="column" flex>
-                                <div layout="row" flex class="row" >
-                                    <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
-                                        <div>
-                                            Aprobación
-                                        </div>
+                        <div active-left></div>
+                        <div layout="column" flex>
+                            <div layout="row" flex class="row" >
+                                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
+                                    <div>
+                                        Aprobación
                                     </div>
-                                </div>
-
-                                <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
-
-                                    <div  style="height: 30px;margin-top: 9px;  color: #999999;" >
-                                        Fecha de Aprobación
-                                    </div>
-
-                                    <div layout="column" flex="20">
-                                        <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
-                                                       ng-disabled="(formBlock)"
-                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
-
-                                        ></md-datepicker skip-tab>
-                                    </div>
-
-                                    <md-input-container class="md-block" flex="20">
-                                        <label>N° Documento</label>
-                                        <input ng-model="document.nro_doc"  ng-disabled="(formBlock)"
-                                               ng-click="toEditHead('nro_doc', document.nro_doc)"
-                                               required
-
-                                        >
-                                    </md-input-container>
-
-                                    <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
-                                         info=" Cargar adjuntos de la aprobacion " >
-                                        <span class="icon-Adjuntar" style="font-size: 24px"></span>
-                                    </div>
-
                                 </div>
                             </div>
-                        </form>
-                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.final_id != null || document.version > 1" >
-                            <div active-left></div>
-                            <div layout="column" flex>
-                                <div layout="row" flex class="row" >
 
-                                    <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 4">
-                                        <div>
-                                            Cancelacion
-                                        </div>
-                                    </div>
+                            <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
+
+                                <div  style="height: 30px;margin-top: 9px;  color: #999999;" >
+                                    Fecha de Aprobación
                                 </div>
 
-                                <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
-                                    <label>Motivo de cancelacion </label>
-                                    <input  ng-model="document.comentario_cancelacion"
-                                            ng-disabled="(formBlock)"
-                                            id="mtvCancelacion"
-                                            ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
-                                            required
+                                <div layout="column" flex="20">
+                                    <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
+                                                   ng-disabled="(formBlock)"
+                                                   ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
+
+                                    ></md-datepicker skip-tab>
+                                </div>
+
+                                <md-input-container class="md-block" flex="20">
+                                    <label>N° Documento</label>
+                                    <input ng-model="document.nro_doc"  ng-disabled="(formBlock)"
+                                           ng-click="toEditHead('nro_doc', document.nro_doc)"
+                                           required
 
                                     >
                                 </md-input-container>
 
+                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
+                                     info=" Cargar adjuntos de la aprobacion " >
+                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
+                                </div>
+
                             </div>
-                        </form>
+                        </div>
+                    </form>
+                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.final_id != null || document.version > 1" >
+                        <div active-left></div>
+                        <div layout="column" flex>
+                            <div layout="row" flex class="row" >
+
+                                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 4">
+                                    <div>
+                                        Cancelacion
+                                    </div>
+                                </div>
+                            </div>
+
+                            <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
+                                <label>Motivo de cancelacion </label>
+                                <input  ng-model="document.comentario_cancelacion"
+                                        ng-disabled="(formBlock)"
+                                        id="mtvCancelacion"
+                                        ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
+                                        required
+
+                                >
+                            </md-input-container>
+
+                        </div>
+                    </form>
                     <form layout="row" ng-class="{focused: (gridView == 5)}">
                         <div active-left></div>
                         <div layout="row"  flex class="row" >
@@ -1821,6 +2155,8 @@
                                         <input type="text" class="inputFilter"  ng-minlength="2"
                                                ng-model="tbl_listProducProv.filter.descripcion"
                                                skip-tab
+                                               id="listProducProDescripcion"
+
 
                                         >
                                     </md-input-container>
@@ -1841,6 +2177,7 @@
                                                ng-model="tbl_listProducProv.filter.saldo"
                                                class="inputFilter"
                                                skip-tab
+                                               id="listProducProSaldo"
 
                                         >
                                     </md-input-container>
@@ -1849,7 +2186,7 @@
                                         <div ng-click="tbl_listProducProv.order = '-cantidad' "ng-class="{'filter-select':(tbl_listProducProv.order == '-cantidad')}"><img src="images/TrianguloDown.png" ></div>
                                     </div>
                                     <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center">
-                                        <div ng-click="createProduct(tbl_listProducProv.filter)" style="width: 24px;" ng-show="(!formBlock)" ng-disabled="(formBlock)">
+                                        <div ng-click="createProduct(tbl_listProducProv.filter)" style="width: 24px; margin-top:8px;" ng-show="(!formBlock)" ng-disabled="(formBlock)">
                                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                                         </div skip-tab >
                                     </div>
@@ -3423,7 +3760,6 @@
 
                             </div>
                             <div style="width: 80px;"   ></div>
-
                         </div>
 
                     </form>
@@ -3431,7 +3767,7 @@
                         <div active-left  before="verificExit" ></div>
                         <div layout="column" flex>
                             <div flex>
-                                <div ng-repeat="item in filterDocuments(priorityDocs, tbl_priorityDocs.filter) | orderBy : tbl_priorityDocs.order "  row-select>
+                                <div ng-repeat="item in filterDocuments(priorityDocs.docs, tbl_priorityDocs.filter) | orderBy : tbl_priorityDocs.order "  row-select>
                                     <div layout="row" class="cellGridHolder" >
 
                                         <div style="width: 80px;" ng-click="openTempDoc(item)" class="cellEmpty cellSelect" tabindex="{{$index + 1}}">

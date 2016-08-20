@@ -1871,7 +1871,7 @@ class OrderController extends BaseController
             if($req->has('reng_id')){
                 $item = SolicitudeItem::findOrFail($req->reng_id);
                 $res['accion'] ='del';
-                $item->destroy($item);
+                $item->destroy($item->id);
             }
         }
 
@@ -1907,7 +1907,9 @@ class OrderController extends BaseController
             if($req->has('reng_id')){
                 $item = OrderItem::findOrFail($req->reng_id);
                 $res['accion'] ='del';
-                $item->destroy($item);
+                $res['item'] =$item;
+                $res['response']=$item->destroy($item->id);
+
             }
         }
         return $res;
@@ -1940,7 +1942,7 @@ class OrderController extends BaseController
             if($req->has('reng_id')){
                 $item = PurchaseItem::findOrFail($req->reng_id);
                 $res['accion'] ='del';
-                $item->destroy($item);
+                $item->destroy($item->id);
             }
         }
         return $res;

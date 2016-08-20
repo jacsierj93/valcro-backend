@@ -612,7 +612,7 @@ MyApp.directive('range', function () {
                     }
                 }else{
                     validate= false;
-                    if(ctrl.$viewValue != "0"){
+                    if(!ctrl.$valid){
                         ctrl.$render();
                         ctrl.$setViewValue("0");
                         ctrl.$render();
@@ -1247,7 +1247,7 @@ MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
     PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/",
-    noti_autohidden :10000
+    noti_autohidden :1500
 });
 
 
