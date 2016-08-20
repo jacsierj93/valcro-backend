@@ -215,6 +215,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 */
     };
 
+    $scope.openUncloseDoc = function (){
+        $scope.navCtrl.value="unclosetDoc";
+        $scope.navCtrl.estado=true;
+    };
+
+    $scope.openOldDocs = function (){
+        $scope.LayersAction({open:{name:"priorityDocs",
+            before: function(){
+                Order.get({type:"OldReviewDocs"},{}, function(response){
+                    $scope.priorityDocs =response;
+
+                });
+            }, after: function(){
+            }
+        }});
+    };
     $scope.oldReviewDoc = function (){
 
     };

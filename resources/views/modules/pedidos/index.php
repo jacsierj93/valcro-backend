@@ -223,28 +223,22 @@
                 </div>
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
 
-                <div layout="row" ng-show="(layer == 'listPedido')"  flex>
-                    <!-- <div style="margin-left: 4px; margin-right: 4px" layout="colum"
-                          layout-align="center center" ng-repeat="item in filterData.tipoPedidos"  >
-                         {{item.tipo}}
-                     </div>
-                     <div style="margin-left: 4px; margin-right: 4px" layout="colum"
-                          layout-align="center center"  >
-                         Todos
-                     </div>-->
-                    <div layout="colum" style="height: 28px;" flex="25" layout-align="center center">
-                        <!--<md-input-container class="md-block" layout-align="center center" flex  >
-                            <md-select ng-model="filterOption.tipo_pedido_id" md-no-ink >
-                                <md-option ng-repeat="item in filterData.tipoPedidos" >
-                                    {{item.tipo}}
-                                </md-option>
-                                <md-option value ="-1">
-                                    Todos
-                                </md-option>
-                            </md-select>
-                closeLayer        </md-input-container>-->
-
+                <div layout="row" flex layout-align="start center ">
+                    <div style="text-align: center;" flex layout-align="center start " layout="column" ng-show="unclosetDoc.length > 0" ng-click="openUncloseDoc()">
+                           {{unclosetDoc.length}} sin Finalizar
                     </div>
+
+                    <div style="text-align: center;" flex layout-align="center start "  layout="column" ng-show="priorityDocs.docs.length > 0" ng-click="openOldDocs()" >
+                         {{priorityDocs.docs.length}} sin revisar en {{priorityDocs.dias}} dias
+                    </div>
+
+                    <div style="text-align: center;" flex layout-align="center start "  layout="column"  >
+                       0  Tareas en Drive
+                    </div>
+
+
+
+
                 </div>
             </div>
 
@@ -258,7 +252,13 @@
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
                 <div layout="column" flex >
-                    <md-tabs  md-autoselect md-center-tabs md-no-ink md-center-tabs  flex class="tab-dashboard" md-stretch-tabs="always">
+                    <div  layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22); width: 100%; height: 100%;">
+                        <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                            D
+                        </div>
+                        <br> DashBoard
+                    </div>
+<!--                    <md-tabs  md-autoselect md-center-tabs md-no-ink md-center-tabs  flex class="tab-dashboard" md-stretch-tabs="always">
                         <md-tab  flex style="width: 100%;height: 100%;">
                             <md-tab-label flex>
                                 <div style="text-align: center; width: 100%; height: 100%;">
@@ -418,7 +418,7 @@
                                                         </div>
                                                     </div>
                                                     <div flex="5" class="cellSelect"  tabindex="{{$index + 1}}" > {{item.id}}</div>
-                                                    <!-- <div flex="15" class="cellGrid"> {{item.documento}}</div>-->
+                                                    <!-- <div flex="15" class="cellGrid"> {{item.documento}}</div>
                                                     <div flex class="cellGrid"> {{item.proveedor}}</div>
                                                     <div flex class="cellGrid" > {{item.titulo}}</div>
                                                     <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
@@ -595,7 +595,7 @@
 
                         </md-tab>
                    </md-tabs>
-
+-->
                 </div>
             </div>
         </div>
