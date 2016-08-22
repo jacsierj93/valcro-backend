@@ -77,7 +77,7 @@ class OrderController extends BaseController
 
         $allDocs[0] = Solicitude::selectRaw("*, datediff( curdate(),ult_revision) as review ")
             -> whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
 //            ->where('aprob_compras',0)
 //            ->where('aprob_gerencia',0)
             //     ->whereNull('cancelacion')
@@ -174,21 +174,86 @@ class OrderController extends BaseController
         return $data;
     }
 
-    public function UpLoadFiles(Request $req){
+    public function getNotifications (){
+        $result = [];
+        $oldReviewDays = $this->oldReview();
 
-        $fil= array();
-        $archivo = new Files("orders");
-        //  dd($req->file("file"));
-        $archivo->upload("file"); ///probando
-        $resul['accion']= "upLoad";
+        /**********  slicitudes sin cerrar   ***/
 
-        $fil['id']= $archivo->getCurrentFileId();
-        $fil['file']= $archivo->getCurrentFileName();
-        $fil['thumb']= $archivo->getCurrentFileThumbName();
-        $fil['tipo']= $archivo->getCurrentFileType();
-        $resul['file']= $fil;
+        $aux= Solicitude::selectRaw("count(id) as cantidad")
+            -> whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            //     ->whereNull('cancelacion')
+            ->get();
 
-        return $resul;
+        if($aux[0][0] > 0){
+            $result[] = array('titulo'=>'Solicitudes con mas de '. $oldReviewDays. " dias sin revisar ",'key'=>'priorityDocs', 'cantidad'=>$aux[0][0]);
+        }
+
+        $aux= Order::selectRaw("count(id)")
+            -> whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            //     ->whereNull('cancelacion')
+            ->get();
+
+        if($aux[0][0] > 0){
+            $result[] = array('titulo'=>'Proformas con mas de '. $oldReviewDays. " dias sin revisar ",'key'=>'priorityDocs', 'cantidad'=>$aux[0][0]);
+        }
+
+        $aux= Purchase::selectRaw("count(id)")
+            -> whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            //     ->whereNull('cancelacion')
+            ->get();
+
+        if($aux[0][0] > 0){
+            $result[] = array('titulo'=>'Ordenes de compra con mas de '. $oldReviewDays. " dias sin revisar ", 'key'=>'priorityDocs','cantidad' =>$aux[0][0]);
+        }
+
+        $aux=  Solicitude::selectRaw("count(id)")
+            ->whereNull("final_id")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+            ->get();
+
+        if($aux[0][0] > 0){
+            $result[] = array('titulo'=>"Solicitudes sin culminar", 'key'=>'unclosetDoc','cantidad'=>$aux[0][0]);
+        }
+
+        $aux=  Order::selectRaw("count(id)")
+            ->whereNull("final_id")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+            ->get();
+
+        if($aux[0][0] > 0){
+            $result[] = array('titulo'=>"Proformas sin culminar",'key'=>'unclosetDoc', 'cantidad'=>$aux[0][0]);
+        }
+
+        $aux=  Purchase::selectRaw("count(id)")
+            ->whereNull("final_id")
+//            ->where('aprob_compras',0)
+//            ->where('aprob_gerencia',0)
+            ->whereNull('cancelacion')
+            ->get();
+
+        if($aux[0][0] > 0){
+            $result[] = array('titulo'=>"Ordenes de compra sin culminar",'key'=>'unclosetDoc','cantidad'=>$aux[0][0]);
+        }
+
+        return $result;
+
+
+
+
     }
 
     /*********************** PROVIDER ************************/
@@ -2154,11 +2219,12 @@ class OrderController extends BaseController
      * Asigna el parent a un pedido(proforma)
      */
     public function setParentOrder(Request $req){
-        $resul = array();
+        $resul = [];
         $princ = Order::findOrFail($req->princ_id);
         $princ->doc_parent_id = $req->doc_parent_id;
         $princ->doc_parent_origen_id = 21;
         $princ->save();
+        $resul['accion']='upd';
         return $resul;
     }
 
@@ -2171,6 +2237,7 @@ class OrderController extends BaseController
         $princ->doc_parent_id = $req->doc_parent_id;
         $princ->doc_parent_origen_id = 21;
         $princ->save();
+        $resul['accion']='upd';
 
         return $resul;
     }
@@ -2184,6 +2251,7 @@ class OrderController extends BaseController
         $princ->doc_parent_id = $req->doc_parent_id;
         $princ->doc_parent_origen_id = 21;
         $princ->save();
+        $resul['accion']='upd';
 
         return $resul;
     }
@@ -3415,7 +3483,6 @@ class OrderController extends BaseController
         $model = $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->id);
         $prov= Provider::findOrFail($model->prov_id);
-        $mone=Monedas::findOrFail($model->prov_moneda_id);
         $adjs = array();
         //para maquinas
         $tem = array();
@@ -3457,12 +3524,14 @@ class OrderController extends BaseController
         if($model->prioridad_id){
             $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
         }
+
         if($model->prov_moneda_id){
+            $mone=Monedas::findOrFail($model->prov_moneda_id);
             $tem['moneda']=$mone->nombre;
-        }
-        if($model->prov_moneda_id){
             $tem['symbol']=$mone->simbolo;
+
         }
+
         if($model->tipo_id != null){
             $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
         }
@@ -4855,6 +4924,6 @@ class OrderController extends BaseController
     }
 
     private function oldReview(){
-        return 7;
+        return 30;
     }
 }

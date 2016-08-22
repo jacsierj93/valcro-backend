@@ -355,5 +355,26 @@ md-autocomplete > md-autocomplete-wrap{
 }*/
 #autoFilter{
     padding: 0 0 0 4px !important;
-    height: 24px;
+}
+.animation-arrow-disable{
+    border: 1px solid #f1f1f1;
+    background-color: rgba(241, 241,241,1);
+}
+/**********key frames class ***********/
+
+.animation-arrow{
+    background-color: #f4a200;
+    animation : resal-noti 5s infinite;
+}
+
+@keyframes resal-noti {
+    0% {
+        background: #fdd34f;
+    }
+    30%{
+        background:  #fff44c;
+    }
+    100% {
+        background: #fdd44c;
+    }
 }
