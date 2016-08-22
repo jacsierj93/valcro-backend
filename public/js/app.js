@@ -31,6 +31,7 @@ var MyApp = angular.module('MyApp', dependency, function() {
  }]);*/
 window.addEventListener("keydown", function(e) {
     // space and arrow keys
+    console.log("target == ",e)
     if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
@@ -492,6 +493,7 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
 MyApp.directive('info', function($timeout,setNotif) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
+
     return {
         restrict: 'A',
         link: function(scope, element, attrs) {
@@ -518,6 +520,24 @@ MyApp.directive('info', function($timeout,setNotif) {
                             },30000);
                         }, 0);
                     }
+                });
+
+                element.on("blur","input", function(e) {
+                    console.log(scope.$eval("scope"))
+/*                    this.select();
+                    if(attrs.info){
+                        $timeout(function() {
+                            if(old.element!=element[0]){
+                                setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                                old.element = element[0];
+                                old.info = attrs.info;
+                            }
+                            $timeout.cancel(ref);
+                            ref = $timeout(function() {
+                                old ={element:"",info:""};
+                            },30000);
+                        }, 0);
+                    }*/
                 });
                 //element = element.find("input");
             }else{

@@ -311,6 +311,7 @@
                             <md-input-container class="md-block" flex="15">
                                 <label>Tipo</label>
                                 <md-autocomplete md-selected-item="ctrl.typeProv"
+                                                 md-input-name="autocomplete"
                                                  flex
                                                  info="seleccione un tipo de proveedor"
                                                  skip-tab
@@ -958,6 +959,7 @@
                                 </div>
 
                             </md-content>
+
                             <div layout="column" class="row" ng-click="viewExtend(false)">
                                 <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
                             </div>
@@ -1248,8 +1250,8 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
-                            <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
-                                <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{factors.length}})</div>
+                            <div layout="column" ng-show="isShow && !isShowMore && factors.length>0" class="row" style="height: 40px" ng-click="viewExtend(true)" >
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                             </div>
                             <div layout="column" ng-show="isShowMore" flex>
                                 <div layout="row" class="headGridHolder">
@@ -1260,8 +1262,8 @@
                                     <div flex="30" class="headGrid"> Moneda</div>
                                     <div flex="30" class="headGrid"> Linea</div>
                                 </div>
-                                <div id="grid" style="overflow-y: auto; height: 120px">
-                                    <div flex ng-repeat="factor in factors" ng-click="toEdit(this)">
+                                <md-content id="grid">
+                                    <div flex ng-repeat="factor in factors" ng-click="toEdit(this)" class="row">
                                         <div layout="row" layout-wrap class="cellGridHolder"  ng-class="{'rowSel':(factor.id == conv.id)}">
                                             <div ng-show="(factor.id==conv.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmConv(this)"></div>
                                             <div flex="10" class="cellGrid"> {{factor.flete | number:2}}</div>
@@ -1272,6 +1274,9 @@
                                             <div flex="30" class="cellGrid">{{factor.linea.linea}}</div>
                                         </div>
                                     </div>
+                                </md-content>
+                                <div layout="column" class="row" ng-click="viewExtend(false)">
+                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Up"></span></div>
                                 </div>
                             </div>
                         </div>
@@ -1313,8 +1318,8 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
-                            <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
-                                <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{points.length}})</div>
+                            <div layout="column" ng-show="isShow && !isShowMore && points.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                             </div>
                             <div layout="column" ng-show="isShowMore" flex>
                                 <div layout="row" class="headGridHolder">
@@ -1323,8 +1328,8 @@
                                     <div flex="20" class="headGrid"> Linea</div>
                                     <div flex class="headGrid"></div>
                                 </div>
-                                <div id="grid" style="overflow-y: auto; height: 120px">
-                                    <div flex ng-repeat="point in points" ng-click="toEdit(this)" >
+                                <md-content id="grid">
+                                    <div flex ng-repeat="point in points" ng-click="toEdit(this)" class="row">
                                         <div layout="row" layout-wrap class="cellGridHolder">
                                             <div ng-show="(point.id==pnt.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmPoint(this)"></div>
                                             <div flex="30" class="cellGrid"> {{point.costo | number:2}}</div>
@@ -1333,8 +1338,12 @@
                                             <div flex class="cellGrid"></div>
                                         </div>
                                     </div>
+                                </md-content>
+                                <div layout="column" class="row" ng-click="viewExtend(false)">
+                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Up"></span></div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </form>
@@ -1369,8 +1378,8 @@
                                 </md-select>
                             </md-input-container>
                         </div>
-                        <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                        <div layout="column" ng-show="isShow && !isShowMore && timesP.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
                         <div layout="column" ng-show="isShowMore" flex>
                             <div layout="row" class="headGridHolder">
@@ -1379,16 +1388,21 @@
                                 <div flex class="headGrid">Linea</div>
                             </div>
                             <div id="grid" style="overflow-y: auto; height: 120px">
-                                <div flex ng-repeat="time in timesP" ng-click="toEdit(this)">
-                                    <div layout="row" layout-wrap class="cellGridHolder">
+                                <md-content flex ng-repeat="time in timesP" ng-click="toEdit(this)">
+                                    <div layout="row" layout-wrap class="cellGridHolder" class="row">
                                         <div ng-show="(time.id==tp.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmTimeProd(this)"></div>
                                         <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
                                         <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
                                         <div flex class="cellGrid">{{time.lines.linea}}</div>
                                     </div>
+                                </md-content>
+                                <div layout="column" class="row" ng-click="viewExtend(false)">
+                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Up"></span></div>
                                 </div>
                             </div>
+
                         </div>
+
                     </div>
                    </div>
                 </form>
@@ -1422,8 +1436,8 @@
                                     </md-select>
                                 </md-input-container>
                             </div>
-                            <div layout="column" ng-show="isShow && !isShowMore" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
-                                <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{timesP.length}})</div>
+                            <div layout="column" ng-show="isShow && !isShowMore && timesT.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                             </div>
                             <div layout="column" ng-show="isShowMore" flex>
                                 <div layout="row" class="headGridHolder">
@@ -1431,7 +1445,7 @@
                                     <div flex="20" class="headGrid">Maximo Dias</div>
                                     <div flex class="headGrid">Pais</div>
                                 </div>
-                                <div id="grid" style="overflow-y: auto; height: 120px">
+                                <md-content id="grid" >
                                     <div flex ng-repeat="time in timesT" ng-click="toEdit(this)">
                                         <div layout="row" layout-wrap class="cellGridHolder">
                                             <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
@@ -1439,6 +1453,9 @@
                                             <div flex class="cellGrid">{{time.country.short_name}}</div>
                                         </div>
                                     </div>
+                                </md-content>
+                                <div layout="column" class="row" ng-click="viewExtend(false)">
+                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Up"></span></div>
                                 </div>
                             </div>
                         </div>
