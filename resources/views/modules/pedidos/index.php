@@ -206,7 +206,7 @@
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras    )"
+                         ng-show="( document.id )"
                          ng-click="copyDoc()">
                         <span style="font-size: 24px"> CP</span>
                     </div>
@@ -1614,13 +1614,13 @@
                                 <md-input-container class="md-block" flex="10" ng-dblclick="editTasa()"  ng-click="allowEdit()">
                                     <label>Tasa</label>
                                     <input  ng-model="document.tasa"
-                                            type="number"
                                             ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
                                             ng-readonly="isTasaFija"
                                             required
                                             info="Tasa segun la moneda selecionada"
                                             skip-tab
                                             id="tasa"
+                                            decimal
                                     >
                                 </md-input-container>
 
@@ -1762,7 +1762,8 @@
 
                                 <md-input-container class="md-block" flex="">
                                     <label>Estatus</label>
-                                    <md-select ng-model="document.estado_id"  ng-disabled="(formBlock || document.final_id != null || document.version > 1 )"
+                                    <md-select ng-model="document.estado_id"
+                                               ng-disabled="(true)"
                                                ng-change="toEditHead('estado_id', document.estado_id)"
                                                skip-tab
                                                id="condicion_pago_id"

@@ -101,8 +101,8 @@ $app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'
 $app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
 $app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // cierra el documento y notifica por correo
-$app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addSustitutOrder'); // add un solicitud vieja a un anueva
-$app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
+$app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addPurchaseOrder'); // add un solicitud vieja a un anueva
+$app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removePurchaseOrder'); // quita la solicitud anterio
 $app->post("Order/Purchase/AddAdjuntos",'Orders\OrderController@addAttachmentsPurchase'); ///agrega adjuntos a la orden de compra
 $app->post("Order/Purchase/Update",'Orders\OrderController@PurchaseUpdate'); ///agrega adjuntos a la orden de compra
 $app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); ///lista de todos los pedidos que se úeden sustituir
