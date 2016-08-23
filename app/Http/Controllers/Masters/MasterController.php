@@ -135,6 +135,18 @@ class MasterController extends BaseController
 	public function getStatus(Request $req){  return (!$req->has('id')) ? OrderStatus::get() : OrderStatus::findOrFail($req->id) ;}
 	public function getPaymentType(Request $req){ return (!$req->has('id')) ?  PaymentType::get() : PaymentType::findOrFail($req->id) ;}
 
+	public function newCoin(Request $req){
+		$result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+		if(!$req->id){
+			$coin = new Monedas();
+			$coin->nombre = $req->name;
+			$coin->codigo = $req->code;
+			$coin->precio_usd = $req->usd;
+		}
 
+		$coin->save();
+		$result['id'] = $coin->id;
+		return $result;
+	}
 
 }
