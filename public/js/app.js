@@ -390,33 +390,37 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
             },50);
         }else if(angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").length>0){
-            var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
-            var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
-            $timeout(function(){
-                angular.element(next).click();
-                $timeout(function(){
-                    if(angular.element(nextFrm[0]).is("md-select")){
-                        angular.element(nextFrm[0]).focus().click();
-                    }else if(angular.element(nextFrm[0]).is("vlc-group")) {
-                        $timeout(function(){
-                            angular.element(nextFrm[0]).find("span").first().focus();
-                        },0);
-                    }else
-                    {
-                        angular.element(nextFrm[0]).focus();
-                    }
-                },50)
-            },0);
-
+            if(!scope.endLayer) {
+                var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
+                var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
+                $timeout(function () {
+                    angular.element(next).click();
+                    $timeout(function () {
+                        if (angular.element(nextFrm[0]).is("md-select")) {
+                            angular.element(nextFrm[0]).focus().click();
+                        } else if (angular.element(nextFrm[0]).is("vlc-group")) {
+                            $timeout(function () {
+                                angular.element(nextFrm[0]).find("span").first().focus();
+                            }, 0);
+                        } else {
+                            angular.element(nextFrm[0]).focus();
+                        }
+                    }, 50)
+                }, 0);
+            }else{
+                scope.endLayer();
+            }
         }else{
             $timeout(function(){
                 if(!angular.element(elem).parents("md-sidenav.popUp").length>0){
-                    angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
-                    angular.element(elem).blur();
-                    console.log(angular.element("[md-component-id='NEXT']"))
-
-                    angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
-                    /*angular.element("[md-component-id='NEXT']").focus();*/
+                    if(!scope.endLayer) {
+                        angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
+                        angular.element(elem).blur();
+                        angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
+                        /*angular.element("[md-component-id='NEXT']").focus();*/
+                    }else{
+                        scope.endLayer();
+                    }
                 }else{
                     if(scope.endLayer){
                         scope.endLayer();
@@ -431,8 +435,11 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         priority: 1010,
         terminal:true,
         link: function (scope, element, attrs) {
+            //console.log(attrs)
+            if(attrs["skipTab"] != "off"){
+                element.attr("step","");
+            }
             element.removeAttr("skip-tab");
-            element.attr("step","");
             if(angular.element(element).is("div")){
                 angular.element(element).attr("tab-index","-1");
             }
@@ -532,7 +539,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                    console.log(scope.$eval("scope"))
+                    console.log(scope)
 /*                    this.select();
                     if(attrs.info){
                         $timeout(function() {
