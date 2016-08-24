@@ -26,7 +26,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.previewHtmlDoc ="";
     $scope.layer= undefined;
     $scope.index= 0;
-    $scope.formData ={};
+    $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[]};
     $scope.formDataContraP ={};
     $scope.ctrl = setGetOrder.getObjs();
 
@@ -1331,7 +1331,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 )
                 {
                     $scope.NotifAction("alert",
-                        "No se a selecionado ningun documento para la "+$scope.formMode.name+ "¿desea continuar de todas formas? "
+                        "No se a selecionado ningun documento para la "+$scope.formMode.name+ " ¿desea continuar de todas formas? "
                         ,[
                             {name:"Cancelar", action: function(){}}
                             ,{name:"Continuar",action: function(){
@@ -1352,7 +1352,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 if($scope.finalDoc.productos.length == 0 && !$scope.formBlock)
                 {
                     $scope.NotifAction("alert",
-                        "No se ha cargado ningun articulo para la "+$scope.formMode.name+ "¿desea continuar? "
+                        "No se ha cargado ningun articulo para la "+$scope.formMode.name+ " ¿desea continuar? "
                         ,[
                             {name:"Cancelar", action: function(){}}
                             ,{name:"Continuar",action: function(){
@@ -1605,9 +1605,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
      * @review
      * */
     $scope.changeItem = function(item){
-        Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
-            setGetOrder.change('producto'+item.id,'id',item);
-        });
+        if($scope.dtdocProductos.$valid){
+            Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
+                setGetOrder.change('producto'+item.id,'id',item);
+            });
+        }
+
     };
 
     $scope.isEditItem = function(item) {
@@ -1836,7 +1839,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
                 $scope.document.id = response.id;
                 setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
-                $scope.reloadDoc();
+                setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
+
 
             });
         }
@@ -1999,7 +2003,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     $scope.DtPedido = function (doc) {
-        setGetOrder.clear();
+       // setGetOrder.clear();
         $scope.gridView= 1;
         var  paso=  true;
         if ($mdSidenav("addAnswer").isOpen()){
@@ -2938,14 +2942,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal ){
             if($scope.provSelec.id != newVal.id){
                 $scope.provSelec= newVal;
-                $scope.formData.direccionesFact = [];
-                $scope.formData.monedas =[];
-                $scope.formData.paises = [];
-                $scope.formData.condicionPago = [];
-                $scope.formData.direccionesFact= Order.query({type:"InvoiceAddress", prov_id:newVal.id});
-                $scope.formData.monedas = providers.query({type: "provCoins", id_prov: newVal.id});
-                $scope.formData.paises= Order.query({type:"ProviderCountry",prov_id:newVal.id});
-                $scope.formData.condicionPago= Order.query({type:"ProviderPaymentCondition", prov_id:newVal.id});
+                $scope.formData.direccionesFact.splice(0,$scope.formData.direccionesFact.length);
+                $scope.formData.monedas.splice(0,$scope.formData.monedas.length);
+                $scope.formData.paises.splice(0,$scope.formData.paises.length);
+                $scope.formData.condicionPago.splice(0,$scope.formData.condicionPago.length);
+               Order.query({type:"InvoiceAddress", prov_id:newVal.id},{}, function(response){
+                   $scope.formData.direccionesFact=response;
+               });
+                providers.query({type: "provCoins", id_prov: newVal.id},{}, function(response){
+                    $scope.formData.monedas =response;
+                });
+                Order.query({type:"ProviderCountry",prov_id:newVal.id},{}, function(response){
+                    $scope.formData.paises=response;
+                });
+               Order.query({type:"ProviderPaymentCondition", prov_id:newVal.id},{}, function(response){
+                   $scope.formData.condicionPago=response;
+               });
                 $timeout(function(){
                     var elem=angular.element("#prov"+newVal.id);
                     angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
@@ -3381,6 +3393,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal[1] == "agrPed" || newVal[1] == "newVal" || newVal[1] == "finalDoc" || newVal[1] == "detalleDoc"){
             if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
                 $scope.reloadDoc();
+                setGetOrder.reload();
             }
         }
 
@@ -3843,7 +3856,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         },
 
         setOrder : function(doc){
-            order={};
+           // order={};
             if(doc.id && doc.tipo){
                 bindin.estado=false;
                 Order.get({type:"Document", id:doc.id,tipo: doc.tipo}, {},function(response) {
@@ -3913,6 +3926,8 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
             }
         },
         reload: function(doc){
+            console.log("order antes de reload", order);
+            console.log("doc params", doc);
             doc= (doc) ? doc : {id:order.id, tipo:order.tipo};
             bindin.estado=false;
             Order.get({type:"Document", id:doc.id,tipo: doc.tipo}, {},function(response) {
