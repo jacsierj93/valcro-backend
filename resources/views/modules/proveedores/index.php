@@ -1043,9 +1043,9 @@
                                 <label>Moneda</label>
                                 <md-autocomplete md-selected-item="ctrl.coin"
                                                  flex
-                                                 id="provTypesend"
+                                                 id="credCoin"
                                                  info="seleccione un tipo de envio"
-                                                 ng-disabled="$parent.enabled && prov.id"
+                                                 ng-disabled="$parent.enabled || coins.length<1"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCoin"
                                                  md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' "
@@ -1057,6 +1057,7 @@
                                     <md-item-template>
                                         <span>{{item.nombre}}</span>
                                     </md-item-template>
+                                </md-autocomplete>
                                 <!--<md-select id="credCoin" skip-tab ng-model="cred.coin" name="state" ng-disabled="$parent.enabled || coins.length<1" ng-controller="provCoins" required md-no-ink>
                                     <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                         {{coin.nombre}}
@@ -1066,11 +1067,29 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Linea</label>
-                                <md-select id="credLine" skip-tab ng-disabled="$parent.enabled" ng-model="cred.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
+
+                                <md-autocomplete md-selected-item="ctrl.line"
+                                                 flex
+                                                 id="credLine"
+                                                 info="seleccione una Linea"
+                                                 ng-disabled="$parent.enabled || coins.length<1"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchLine"
+                                                 md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
+                                                 md-item-text="item.linea"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.linea}}</span>
+                                    </md-item-template>
+                                <md-autocomplete>
+                                <!--<md-select id="credLine" skip-tab ng-disabled="$parent.enabled" ng-model="cred.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
                                     <md-option ng-repeat="line in lines" value="{{line.id}}">
                                         {{line.linea}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && limits.length>0" class="row" ng-click="viewExtend(true)">
@@ -1122,15 +1141,32 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="60">
                                     <label>Titulo</label>
-                                    <input autocomplete="off" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                    <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select id="conLine" skip-tab ng-model="condHead.line" ng-disabled="$parent.enabled" md-no-ink>
+                                    <md-autocomplete md-selected-item="ctrl.line"
+                                                     flex
+                                                     id="conLine"
+                                                     info="seleccione una Linea"
+                                                     ng-disabled="$parent.enabled"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchLine"
+                                                     md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
+                                                     md-item-text="item.linea"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.linea}}</span>
+                                        </md-item-template>
+                                    <md-autocomplete>
+                                    <!--<md-select id="conLine" skip-tab ng-model="condHead.line" ng-disabled="$parent.enabled" md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                                 <div style="width:24px;">
                                     <?= HTML::image("images/menu.png","",array("ng-click"=>"openFormCond()","ng-show"=>"(condHead.id)")) ?>

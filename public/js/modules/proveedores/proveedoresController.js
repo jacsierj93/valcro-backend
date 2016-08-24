@@ -383,8 +383,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var itemsel = {};
     var list = {};
     var statusProv = {};
-    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
-    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
+    var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
+    var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var onSet = {setting:false};
     return {
         getProv: function () {
@@ -392,8 +392,8 @@ MyApp.service("setGetProv",function($http,providers,$q){
         },
         setProv: function(index) {
             onSet.setting = true;
-            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
-            changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.factConv={};changes.point={};changes.timeProd={};changes.timeTrans={};changes.provCoin={};changes.priceList={};
+            rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
+            changes.dataProv = {};changes.dirProv = {};changes.valName = {};changes.contProv = {};changes.infoBank={};changes.limCred={};changes.payCond={};changes.factConv={};changes.point={};changes.timeProd={};changes.timeTrans={};changes.provCoin={};changes.priceList={};
             if (index){
                 itemsel = index;
                 id = itemsel.id;
@@ -2097,14 +2097,14 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     $scope.$watch('limits.length',function(nvo){
         setGetProv.setComplete("limits",nvo);
     });
+    $scope.$watch('ctrl.coin.id',function(nvo){
+        $scope.cred.coin = nvo;
+    });
+    $scope.$watch('ctrl.line.id',function(nvo){
+        $scope.cred.line = nvo;
+    });
     var credit = {};
-    /*escuha el estatus del formulario y guarda cuando este valido*/
-   /* $scope.$watchGroup(['provCred.$valid','provCred.$pristine'], function(nuevo) {
-        if(nuevo[0] && !nuevo[1]) {
 
-
-        }
-    });*/
     var currentOrig = {};
     var saveCredit = function(onSuccess){
         if((angular.equals(currentOrig,$scope.cred) && $scope.cred ) || ($scope.provCred.$pristine )){
@@ -2186,6 +2186,8 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         $scope.cred.coin = credit.moneda_id;
         $scope.cred.amount = credit.limite;
         $scope.cred.line = credit.linea_id;
+        $scope.ctrl.coin=credit.moneda;
+        $scope.ctrl.line=credit.line;
         currentOrig = angular.copy($scope.bnk);
         setGetProv.addToRllBck($scope.bnk,"limCred");
     };
@@ -2202,11 +2204,15 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
                 }
             }
             $scope.isShow = elem;
+        }else{
+            $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
         }
     };
 
     var clearForm = function(elem){
         $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
+        $scope.ctrl.searchLine = "";
+        $scope.ctrl.searchCoin = "";
         credit = {};
         currentOrig = {};
         $scope.provCred.$setUntouched();
@@ -2720,14 +2726,52 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
         $scope.conditions = setGetProv.getPayCond();//(nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
     });
+
+    $scope.$watch('ctrl.line.id',function(nvo) {
+        $scope.condHead.line = nvo;
+    });
     $scope.openFormCond = function(){
         setgetCondition.setTitle(cond);
         $mdSidenav("payCond").open();
     };
     var cond = {};
-    $scope.$watchGroup(['condHeadFrm.$valid','condHeadFrm.$pristine'], function(nuevo) {
-        var sum = $scope.conv;
-        if (nuevo[0] && !nuevo[1]) {
+    var currentOrig = {};
+    var saveLimCred = function(onSuccess,onError){
+        if((angular.equals(currentOrig,$scope.condHead) && $scope.condHead.id) || ($scope.condHeadFrm.$pristine )){
+            console.log("blancoCOND")
+            onError();
+            return false;
+        }
+
+        if(!$scope.condHeadFrm.$valid && !$scope.condHeadFrm.$pristine){
+            var prefocus = angular.element(":focus");
+            $timeout(function(){
+                angular.element("[name='condHeadFrm']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
+
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onError();
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    angular.element("[name='condHeadFrm']").find(".ng-invalid").first().focus()
+                }
+            }]);
+
+        }
+
+        if($scope.condHeadFrm.$valid && !$scope.condHeadFrm.$pristine){
             providers.put({type:"saveHeadCond"},$scope.condHead,function(data){
                 $scope.condHead.id = data.id;
                 $scope.condHeadFrm.$setPristine();
@@ -2740,10 +2784,59 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                     $scope.conditions.unshift(cond);
                     setNotif.addNotif("ok", "nueva condicion de pago", [
                     ],{autohidden:3000});
+                }else{
+                    setNotif.addNotif("ok", "Datos Actualizados", [
+                    ],{autohidden:3000});
                 }
+                setGetProv.addChng($scope.condHead,data.action,"payCond");
+                onSuccess()
             });
+            /*providers.put({type:"saveBank"},$scope.bnk,function(data){
+                $scope.bnk.id = data.id;
+                $scope.bankInfoForm.$setPristine();
+                account.prov_id = $scope.bnk.id_prov;
+                account.banco = $scope.bnk.bankName;
+                account.beneficiario = $scope.bnk.bankBenef;
+                account.dir_beneficiario = $scope.bnk.bankBenefAddr;
+                account.dir_banco = $scope.bnk.bankAddr;
+                account.swift = $scope.bnk.bankSwift;
+                account.cuenta = $scope.bnk.bankIban;
+                account.ciudad_id = $scope.bnk.ciudad;
+                if(data.action=="new"){
+                    account.id = $scope.bnk.id;
+                    $scope.accounts.unshift(account);
+                    setNotif.addNotif("ok", "nueva info bancaria", [
+                    ],{autohidden:3000});
+                }else{
+                    setNotif.addNotif("ok", "Datos Actualizados", [
+                    ],{autohidden:3000});
+                }
+                setGetProv.addChng($scope.bnk,data.action,"infoBank");
+                onSuccess()
+            });*/
+        }else{
+            //console.log("invalid")
         }
-    });
+
+    };
+
+    $scope.endLayer = function(){
+        saveLimCred(function(){
+            $scope.openFormCond();
+        },function(){
+            $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+            $scope.ctrl.searchLine = "";
+            cond = {};
+            currentOrig = {};
+            $scope.condHeadFrm.$setUntouched();
+            if($scope.$parent.expand==$scope.id){
+                $scope.isShowMore = false;
+                $scope.$parent.expand = false;
+            }
+        })
+
+    };
+
 
     $scope.rmCond = function(elem){
         setNotif.addNotif("alert", "desea Borrar toda esta Condicion de pago", [
@@ -2775,22 +2868,32 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         $scope.condHead.id_prov = cond.prov_id;
         $scope.condHead.title = cond.titulo;
         $scope.condHead.line = cond.linea_id;
+        $scope.ctrl.line = cond.line;
+        currentOrig = angular.copy($scope.condHead);
+        setGetProv.addToRllBck($scope.condHead,"payCond")
     };
 
     $scope.showGrid = function(elem,event){
         if((jQuery(event.target).parents("#payCond").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
             if(!elem){
-                $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
-                cond = {};
-                $scope.condHeadFrm.$setUntouched();
-                if($scope.$parent.expand==$scope.id){
-                    $scope.isShowMore = elem;
-                    $scope.$parent.expand = false;
-                }
+                saveLimCred(function() {
+                    $scope.openFormCond();
+                },function() {
+                    $scope.condHead = {id: false, title: "", line: "", id_prov: $scope.prov.id || 0};
+                    cond = {};
+                    currentOrig = {};
+                    $scope.condHeadFrm.$setUntouched();
+                    if ($scope.$parent.expand == $scope.id) {
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                })
+
             }else{
                 if(!$scope.isShow){
                     $scope.condHead.title = $scope.conditions.length+1;
-                    $scope.condHead.line = 0;
+                    console.log($scope.lines)
+                    $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
                 }
 
 

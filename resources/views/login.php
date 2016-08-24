@@ -53,13 +53,13 @@
         <form id="lgnForm" name="lgnForm" ng-controller="login" layout="row">
             <md-input-container>
                 <label style="color: #ffffff">Usuario</label>
-                <input ng-model="user.usr" name="usr" autocomplete="off" style="color: #ffffff"
+                <input ng-model="user.usr" skip-tab name="usr" autocomplete="off" style="color: #ffffff"
                       
                 >
             </md-input-container>
             <md-input-container>
                 <label style="color: #ffffff">Clave</label>
-                <input ng-model="user.pss" name="pss" type="password" style="color: #ffffff"
+                <input ng-model="user.pss" skip-tab name="pss" type="password" style="color: #ffffff"
                        ng-keypress="($event.which === 13)? lgn(): 0 "
                 >
             </md-input-container>

@@ -16,7 +16,6 @@ class Line extends Model
 {
     use SoftDeletes;
     protected $table = 'tbl_lineas';
-
     public function prodTime()
     {
         return $this->belongsTo('App\Models\Sistema\ProdTime','linea_id');

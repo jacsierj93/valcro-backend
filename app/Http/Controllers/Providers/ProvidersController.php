@@ -115,21 +115,21 @@ class ProvidersController extends BaseController
         $data->limites = $data->limitCredit()->get();
         foreach ($data->limites as $lim){
             $lim->moneda = Monedas::find($lim->moneda_id);
-            $lim->line = Line::find($lim->linea_id);
+            $lim->line = (Line::find($lim->linea_id))? Line::find($lim->linea_id): array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->factors = $data->convertFact()->get();
         foreach($data->factors as $fact){
             $fact->moneda;
-            $fact->linea;
+            $fact->linea = ($fact->linea)?$fact->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->points = $data->points()->get();
         foreach($data->points as $pnt){
             $pnt->moneda;
-            $pnt->linea;
+            $pnt->linea = ($pnt->linea)?$pnt->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->prodTime = $data->prodTime()->get();
         foreach ($data->prodTime as $time) {
-            $time->lines;
+            $time->lines = ($time->linea)?$time->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->transTime = $data->transTime()->get();
         foreach ($data->prodTime as $time) {
@@ -138,7 +138,7 @@ class ProvidersController extends BaseController
         $data->payCondition = $data->getPaymentCondition()->get();
         foreach ($data->payCondition as $cond) {
             $cond['items'] = $cond->getItems()->get();
-            $cond->line;
+            $cond->line = ($cond->linea)?$cond->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo") ;
         }
         $data->listPrice = $data->listPrice()->get();
         foreach ($data->listPrice as $list) {
@@ -542,7 +542,7 @@ class ProvidersController extends BaseController
         $lim->prov_id = $req->id_prov;
         $lim->moneda_id = $req->coin;
         $lim->limite = $req->amount;
-        $lim->linea_id = ($req->line!=0)?$req->line:"";
+        $lim->linea_id = ($req->line!=0)?$req->line:null;
 
         $lim->save();
         $result['id']=$lim->id;
