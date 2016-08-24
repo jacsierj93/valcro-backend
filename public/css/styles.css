@@ -796,7 +796,6 @@ form.required .titulo_formulario{
 /*----------------------------------------------------------------*/
 .cellGridHolder {
     height: 40px;
-    padding-right: 8px;
 }
 
 .cellGridHolder:hover {

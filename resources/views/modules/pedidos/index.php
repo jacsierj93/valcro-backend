@@ -2913,306 +2913,208 @@
             <!-- ) ########################################## CONTENDOR SECCION PEDIDO SUSTITO ########################################## -->
 
             <md-content  layout="row" flex class="sideNavContent" >
-                <div flex="40"layout="column" id="headFinalDoc"  >
-                    <form layout="row" class="focused" >
-                        <div active-left> </div>
-                        <div layout="column" flex>
-                            <div class="titulo_formulario" style="height:39px;" >
-                                <div>
-                                    {{formMode.name}}
-                                </div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Creado: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.emision | date:'dd/MM/yyyy' }}</div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Titulo: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.titulo }}</div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Prioridad: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.prioridad }}</div>
-                            </div>
-                        </div>
-
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Pais: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.pais }}</div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Dir. Almacen: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.dir_almacen }}</div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Puerto: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.puerto }}</div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Dir. Facturacion: </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.dir_fac }}</div>
-                            </div>
-                        </div>
-
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Monto </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.monto }}</div>
-                            </div>
-                        </div>
-
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Moneda </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.moneda }}</div>
-                            </div>
-                        </div>
-
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Tasa </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.tasa }}</div>
-                            </div>
-                        </div>
-
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Cond. Pago </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.cond_pago }}</div>
-                            </div>
-                        </div>
-                        <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura || finalDoc.adjFactura.length > 0) )">
-                            <div layout="row" flex="40" >
-                                <div class="rowRsmTitle"> Factura </div>
-                            </div>
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.nro_factura}}</div>
-                                <div class="circle"  ng-show="pedidoSusPedSelec.adjFactura.length > 0" >{{pedidoSusPedSelec.adjFactura.length}}</div>
-                            </div>
-                        </div>
-                        <div layout="row"  class="rowRsm" >
-                            <div layout="row" flex="40" >
-                                <div class="rowRsmTitle"> Proforma </div>
-                            </div>
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.nro_Proforma}}</div>
-                                <div class="circle"   >{{pedidoSusPedSelec.adjFactura.length}}</div>
-                            </div>
-                        </div>
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Mt3 </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.mt3 }}</div>
-                            </div>
-                        </div>
-
-                        <div layout="row" flex  class="rowRsm" >
-                            <div class="rowRsmTitle" flex="40"> Peso </div>
-
-                            <div class="rms" flex  layout="row" layout-align="space-between center">
-                                <div>{{pedidoSusPedSelec.peso }}</div>
-                            </div>
-                        </div>
-                        <div layout="column" flex  class="rowRsm" >
-                            <div > Comentario </div>
-
-                            <div flex >
-                                <div>{{pedidoSusPedSelec.comentario }}</div>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-               <!-- <div layout="row" flex>
-                    <div flex="30" layout="column" >
-                        <div layout="row" flex>
-
-                        </div>
-                    </div>
-                    <form name="FormPedidoSusProduc" layout="row" >
+                <div layout="column" flex >
+                    <form name="FormPedidoSusProduc" layout="row"  ng-style="(tbl_pediSutitut.extend == 0 ) ? {'min-height' : '204px'} : {} " ng-class="{'focused' : (tbl_pediSutitut.extend == 0 )}">
                         <div active-left></div>
-                        <div  layout="column" flex class="layerColumn">
-                            <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div  layout="column" flex ng-init="tbl_pediSutitut.extend = 0 ">
+                            <div class="titulo_formulario" layout="Column" layout-align="start start" class="row" ng-click="tbl_pediSutitut.extend = 0 " >
                                 <div>
                                     Datos de la {{formMode.name}}
                                 </div>
                             </div>
-                            <div layout="row" ng-show="gridViewSus == 1" >
+                            <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
                                 <md-input-container class="md-block" flex >
                                     <label>Titulo</label>
                                     <input  ng-model="pedidoSusPedSelec.titulo" ng-disabled="true">
                                 </md-input-container>
-                                <div layout="column" flex="15">
-                                    <md-datepicker ng-model="pedidoSusPedSelec.emision"
-                                                   md-placeholder="Emision"
-                                                   ng-disabled="true"
-                                    ></md-datepicker>
+                                <div layout="column" class="md-block" layout-align="center center" >
+                                    <div>Creado: </div>
+                                </div>
+                                <div flex="20" class="md-block" layout="column" layout-align="center center" >
+                                    <div>{{pedidoSusPedSelec.emision | date:'dd/MM/yyyy'}}</div>
                                 </div>
                             </div>
-                            <div layout="row"  ng-show="gridViewSus == 1" flex >
-                                <md-input-container class="md-block" flex="20" >
-                                    <label>Prioridad</label>
-                                    <input  ng-model="pedidoSusPedSelec.prioridad" ng-disabled="true">
-                                </md-input-container>
+                            <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
                                 <md-input-container class="md-block" flex="20">
                                     <label>Pais</label>
-                                    <input ng-model="pedidoSusPedSelec.pasi"
-                                           ng-disabled="true" required >
-                                </md-input-container>
-                                <md-input-container class="md-block" flex >
-                                    <label>Direccion Facturación</label>
-                                    <input ng-model="pedidoSusPedSelec.dir_fact"
-                                           ng-disabled="true">
-                                </md-input-container>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
 
-                            </div>
-                            <div layout="row"  ng-show="gridViewSus == 1" flex>
-                                <md-input-container class="md-block" flex>
-                                    <label>Direccion Almacen</label>
-                                    <input ng-model="pedidoSusPedSelec.pais"
-                                           ng-disabled="true" required >
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
-                                    <label>Puerto</label>
-                                    <input ng-model="pedidoSusPedSelec.puerto"
-                                           ng-disabled="true" required >
-                                </md-input-container>
-                            </div>
+                                    <label>Almacen</label>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
 
-                            <div layout="row"  ng-show="gridViewSus == 1" flex>
+                                </md-input-container>
                                 <md-input-container class="md-block" flex="15" >
-                                    <label>Monto</label>
-                                    <input ng-model="pedidoSusPedSelec.monto"  decimal  ng-disabled="true">
+                                    <label>Puerto</label>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+
+
+                            </div>
+                            <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
+                                <md-input-container class="md-block" flex="" >
+                                    <label>Dir. Facturación</label>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="30" >
+                                    <label>Prioridad</label>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+                                <md-input-container class="md-block" flex="10" >
+                                    <label>Mt3</label>
+                                    <input ng-model="pedidoSusPedSelec.mt3" md-no-ink
+                                           ng-disabled="true" />
+
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10" >
+                                    <label>Peso</label>
+                                    <input ng-model="pedidoSusPedSelec.peso" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+                            </div>
+                            <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
+                                <md-input-container class="md-block" flex="10">
+                                    <label>Monto</label>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15">
                                     <label>Moneda</label>
-                                    <input ng-model="pedidoSusPedSelec.moneda"  decimal  ng-disabled="true">
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10" >
                                     <label>Tasa</label>
-                                    <input ng-model="pedidoSusPedSelec.tasa"  decimal  ng-disabled="true">
-                                </md-input-container>
-                                <md-input-container class="md-block" flex >
-                                    <label>Condicion de Pago</label>
-                                    <input ng-model="pedidoSusPedSelec.condicion_pago"
-                                           ng-disabled="true">
-                                </md-input-container>
-                            </div>
-                            <div layout="row"  ng-show="gridViewSus == 1" flex >
-                                <md-input-container class="md-block" flex >
-                                    <label>Comentario</label>
-                                    <input ng-model="pedidoSusPedSelec.comentario"  ng-disabled="true">
-                                </md-input-container>
-                            </div>
-                            <div layout="row"  ng-show="gridViewSus == 1" flex >
-                                <md-input-container class="md-block" flex  >
-                                    <label>N° Factura:</label>
-                                    <input ng-model="pedidoSusPedSelec.nro_factura"  ng-disabled="( true )"
-                                    >
-                                </md-input-container>
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
-                                     info=" Cargar adjuntos de la factura "
-                                >
-                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
-                                </div>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
 
-                                <md-input-container class="md-block" flex >
-                                    <label>N° Proforma:</label>
-                                    <input ng-model="pedidoSusPedSelec.nro_proforma"  ng-disabled="( true)"
-                                    >
                                 </md-input-container>
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Proforma')"
-                                     info="Cargar adjuntos de la proforma "
-                                >
-                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
-                                </div>
-                                <md-input-container class="md-block" flex="10">
-                                    <label>Mt3</label>
-                                    <input ng-model="pedidoSusPedSelec.mt3"  name="mt3"
-                                           ng-model="number"
-                                           ng-disable="true"
-                                    >
+                                <md-input-container class="md-block" flex >
+                                    <label>Condicion de pago</label>
+                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="10" >
-                                    <label>Peso</label>
-                                    <input ng-model="document.peso" name="peso" decimal
-                                           ng-disabled="( true )"
-                                    >
-                                </md-input-container>
                             </div>
+
                         </div>
-
                     </form>
-                    <form name="FormResumenContra"  layout="row" flex >
+                    <form layout="row" class=""  ng-class="{'focused' : (tbl_pediSutitut.extend == 1 )}">
                         <div active-left></div>
-                        <div  layout="column" flex class="layerColumn">
+                        <div layout="row" flex ng-class="{'focused' : (tbl_pediSutitut.extend == 1 )}">
                             <div class="titulo_formulario" layout="column" layout-align="start start" >
                                 <div>
                                     Productos
                                 </div>
                             </div>
-
-                            <div layout="row" class="headGridHolder" table="tbl_resumenPedidoSus">
-                                <div flex="5" class="headGrid" orderBy="asignado" ></div>
-                                <div flex="15" class="headGrid" orderBy="codigo"> Codigo </div>
-                                <div flex="15" class="headGrid" orderBy="codigo_fabrica"> Cod. Fabrica </div>
-                                <div flex class="headGrid" orderBy="documento"> Origen</div>
-                                <div flex class="headGrid" orderBy="descripcion"> Descripción.</div>
-                                <div flex="10" class="headGrid" orderBy="saldo"> Cantidad</div>
-                                <div flex class="headGrid" orderBy="comentario"> Condicion Pago</div>
+                        </div>
+                    </form>
+                    <form layout="row" ng-init="tbl_pediSutitut.order= 'asignado' ">
+                        <div active-left></div>
+                        <div layout="row" flex>
+                            <div flex="5" ></div>
+                             <div flex="15" layout="row">
+                            <md-input-container class="md-block" flex >
+                                <label>Codigo</label>
+                                <input  ng-model="tbl_pediSutitut.filter.cod_producto"
+                                >
+                            </md-input-container>
+                            <div class="cell-filter-order" layout-align="center center" >
+                                <div ng-click="tbl_pediSutitut.order = 'cod_producto' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'cod_producto')}"><img src="images/TrianguloUp.png" ></div>
+                                <div ng-click="tbl_pediSutitut.order = '-cod_producto' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-cod_producto')}"><img src="images/TrianguloDown.png" ></div>
                             </div>
-                            <div  class="gridContent">
-                                <div flex>
-                                    <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | orderBy :tbl_resumenPedidoSus ">
-                                        <div flex="5" class="cellEmpty" >
-                                            <md-switch class="md-primary"
-                                                       ng-disabled="( formBlock )" ng-model="item.asignado">
-                                            </md-switch>
-                                        </div>
-                                        <div flex="15" class="cellGrid">  {{item.codigo}}</div>
-                                        <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
-                                        <div flex class="cellGrid"> {{item.documento}}</div>
-                                        <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                        <div flex="10" class="cellGrid">{{item.saldo}}</div>
-                                        <div flex >{{item.condicionPago}} </div>
+
+                        </div>
+                        <div flex="15" layout="row" >
+                            <md-input-container class="md-block" flex >
+                                <label>Cod. Fabrica</label>
+                                <input  ng-model="tbl_pediSutitut.filter.codigo_fabrica"
+                                >
+                            </md-input-container>
+                            <div class="cell-filter-order" layout-align="center center" >
+                                <div ng-click="tbl_pediSutitut.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'codigo_fabrica')}"><img src="images/TrianguloUp.png" ></div>
+                                <div ng-click="tbl_pediSutitut.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-codigo_fabrica')}"><img src="images/TrianguloDown.png" ></div>
+                            </div>
+                        </div>
+                        <div flex layout="row" >
+                            <md-input-container class="md-block" flex >
+                                <label>Origen</label>
+                                <input  ng-model="tbl_pediSutitut.filter.documento"
+                                >
+                            </md-input-container>
+                            <div class="cell-filter-order" layout-align="center center" >
+                                <div ng-click="tbl_pediSutitut.order = 'documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'documento')}"><img src="images/TrianguloUp.png" ></div>
+                                <div ng-click="tbl_pediSutitut.order = '-documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-documento')}"><img src="images/TrianguloDown.png" ></div>
+                            </div>
+                        </div>
+                        <div flex layout="row" >
+                            <md-input-container class="md-block" flex >
+                                <label>Descripcion</label>
+                                <input  ng-model="tbl_pediSutitut.filter.descripcion"
+                                >
+                            </md-input-container>
+                            <div class="cell-filter-order" layout-align="center center" >
+                                <div ng-click="tbl_pediSutitut.order = 'descripcion' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'descripcion')}"><img src="images/TrianguloUp.png" ></div>
+                                <div ng-click="tbl_pediSutitut.order = '-descripcion' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-descripcion')}"><img src="images/TrianguloDown.png" ></div>
+                            </div>
+                        </div>
+                        <div flex="10" layout="row">
+                            <md-input-container class="md-block" flex >
+                                <label>Cantidad</label>
+                                <input  ng-model="tbl_pediSutitut.filter.saldo"
+                                >
+                            </md-input-container>
+                            <div class="cell-filter-order" layout-align="center center" >
+                                <div ng-click="tbl_pediSutitut.order = 'saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'saldo')}"><img src="images/TrianguloUp.png" ></div>
+                                <div ng-click="tbl_pediSutitut.order = '-saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-saldo')}"><img src="images/TrianguloDown.png" ></div>
+                            </div>
+                        </div>
+                        </div>
+                    </form>
+                    <form class="gridContent"  layout="row" flex >
+                        <div active-left></div>
+                        <div layout="column" flex>
+                            <div >
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | filter :tbl_pediSutitut.filter:strict | orderBy :tbl_pediSutitut.order   ">
+                                    <div flex="5" class="cellEmpty" >
+                                        <md-switch class="md-primary"
+                                                   ng-disabled="( formBlock )" ng-model="item.asignado">
+                                        </md-switch>
                                     </div>
+                                   <div flex="15" class="cellGrid">  {{item.codigo}}</div>
+                                    <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
+                                    <div flex class="cellGrid"> {{item.documento}}</div>
+                                    <div flex class="cellGrid">  {{item.descripcion}}</div>
+                                    <div flex="10" class="cellGrid">{{item.saldo}}</div>
                                 </div>
                             </div>
                         </div>
+
                     </form>
-                    <div layout="column" ng-show="pedidoSusPedSelec.productos >0 && gridViewSus == 1 " class="showMoreDiv" style="height: 40px" ng-click=" gridViewSus = 2" >
-                        <div flex style="border: dashed 1px #f1f1f1; text-align: center">ver mas ({{contraPedSelec.productos.length}})</div>
-                    </div>
-                </div>-->
+                        <div layout="column"  class="row" ng-click=" tbl_pediSutitut.extend = ( tbl_pediSutitut.extend == 0) ? 1: 0 " ng-show="pedidoSusPedSelec.productos.length > 0">
+                            <div flex style="border: dashed 1px #f1f1f1; text-align: center" layout="column" layout-align="end none">
+                                <span class="icon-Up"></span>
+                            </div>
+                        </div>
+                </div>
             </md-content>
         </md-sidenav>
-
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >

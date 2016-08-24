@@ -3050,6 +3050,7 @@ class OrderController extends BaseController
 
         $prov= Provider::findOrFail($model->prov_id);
         $mone=Monedas::findOrFail($model->prov_moneda_id);
+        $tipos = SourceType::get();
 
         //para maquinas
         $tem = array();
@@ -3109,8 +3110,17 @@ class OrderController extends BaseController
         $tem['monto']=$model->monto;
         $prods = [];
         foreach($model->items()->get() as $item){
+            $produc=Product::findOrFail($item->producto_id);
             $prod = [];
-            $prod = $item;
+           // $prod = $item;
+            $prod['id']= $item->id;
+            $prod['producto_id']= $item->producto_id;
+            $prod['codigo']= $item->codigo;
+            $prod['descripcion']= $item->descripcion;
+            $prod['cantidad']= $item->cantidad;
+            $prod['saldo']= $item->saldo;
+            $prod['cod_fabrica']= $produc->cod_fabrica;
+            $prod ['documento'] = $tipos->where('id', $item->tipo_origen_id )[0]->descripcion;
             $prod['asignado']= false;
             if(sizeof($docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id))){
                 $prod['asignado']= true;

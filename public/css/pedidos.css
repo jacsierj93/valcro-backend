@@ -204,7 +204,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 /**contenedor de la grilla*/
 .gridContent{
     overflow-y:auto;
-    height: calc(100% - 78px);
+    /*height: calc(100% - 78px);*/
     margin-bottom: 4px;
 
 }
