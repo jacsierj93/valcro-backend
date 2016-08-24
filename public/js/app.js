@@ -410,9 +410,18 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
         }else{
             $timeout(function(){
-                angular.element(elem).blur();
-                angular.element("[md-component-id='NEXT']").click();
-                angular.element("[md-component-id='NEXT']").focus();
+                if(!angular.element(elem).parents("md-sidenav.popUp").length>0){
+                    angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
+                    angular.element(elem).blur();
+                    console.log(angular.element("[md-component-id='NEXT']"))
+
+                    angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
+                    /*angular.element("[md-component-id='NEXT']").focus();*/
+                }else{
+                    if(scope.endLayer){
+                        scope.endLayer();
+                    }
+                }
             },0)
 
         }
@@ -441,7 +450,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 element.bind("keydown",function(e){
                     var elem =this;
                     if(e.which == "13"){
-                        skip(elem)
+                        skip(elem,scope)
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
                     }else if(e.which=="40"){

@@ -688,7 +688,7 @@
 
             </md-content>
 
-            <div style="width: 16px;" ng-mouseover="showNext(true,'layer2')">
+            <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'layer2')">
 
             </div>
 
@@ -1007,10 +1007,11 @@
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
+                                <div ng-click="createCoin()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom">*</div>
                                 <!--<div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>-->
                                 <div flex layout="column">
                                     <div flex>
-                                        <div class="itemName" style="width:80px" ng-repeat="coinSel in coinAssign" ng-click="toEdit(this);" ng-class="{'gridSel':(coinSel.id==cn.id)}" layout="row"><span ng-class="{'rm' : (coinSel.id==cn.id)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmCoin(this)"></span><div flex>{{coinSel.nombre}}</div> <div style="width:16px">{{coinSel.simbolo}}</div></div>
+                                        <div class="itemName" style="width:80px" ng-repeat="coinSel in coinAssign" ng-click="toEdit(this);" ng-class="{'gridSel':(coinSel.id==cn.id)}" layout="row"><span ng-class="{'rm' : (coinSel.id==cn.id)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmCoin(this)"></span><div flex>{{coinSel.nombre}}</div> <!--<div style="width:16px">{{coinSel.simbolo}}</div>--></div>
                                     </div>
 
                                 </div>
@@ -1040,11 +1041,27 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Moneda</label>
-                                <md-select id="credCoin" skip-tab ng-model="cred.coin" name="state" ng-disabled="$parent.enabled || coins.length<1" ng-controller="provCoins" required md-no-ink>
+                                <md-autocomplete md-selected-item="ctrl.coin"
+                                                 flex
+                                                 id="provTypesend"
+                                                 info="seleccione un tipo de envio"
+                                                 ng-disabled="$parent.enabled && prov.id"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchCoin"
+                                                 md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' "
+                                                 md-item-text="item.nombre"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.nombre}}</span>
+                                    </md-item-template>
+                                <!--<md-select id="credCoin" skip-tab ng-model="cred.coin" name="state" ng-disabled="$parent.enabled || coins.length<1" ng-controller="provCoins" required md-no-ink>
                                     <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                         {{coin.nombre}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
 
                             <md-input-container class="md-block" flex>
@@ -1151,7 +1168,7 @@
                 </form>
 
             </md-content>
-            <div style="width: 16px;" ng-mouseover="showNext(true,'layer3')">
+            <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'layer3')">
 
             </div>
         </md-sidenav>
@@ -1198,7 +1215,59 @@
                 </form>
             </md-content>
         </md-sidenav>
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="newCoin" id="newCoin" click-out="closePopUp('newCoin',$event)">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <input type="hidden" >
+                <form name="newCoinForm" layout="row" class="focused" ng-controller="newCoinController">
+                    <div style="width:24px; height: 100%;"></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
+                            <div>
+                                Nueva Moneda
+                            </div>
+                        </div>
+                        <div layout="row" class="row">
+                            <md-input-container class="md-block" flex="40">
+                                <label>Nombre</label>
+                                <input md-autofocus skip-tab duplicate="coins" field="nombre" alpha autocomplete="off" ng-disabled="$parent.enabled" ng-model="newCoin.name">
+                            </md-input-container>
+                            <md-input-container class="md-block" flex="30">
+                                <label>Codigo</label>
+                                <input skip-tab alpha duplicate="coins" field="codigo" autocomplete="off" ng-disabled="$parent.enabled" ng-model="newCoin.code">
+                            </md-input-container>
+                            <md-input-container class="md-block" flex>
+                                <label>precio USD</label>
+                                <input skip-tab decimal autocomplete="off" ng-disabled="$parent.enabled" ng-model="newCoin.usd" >
+                            </md-input-container>
+                        </div>
 
+                        <div layout="column" flex>
+                            <div layout="row" class="headGridHolder" class="row">
+                                <div flex="40" class="headGrid"> Moneda</div>
+                                <div flex="30" class="headGrid"> Codigo</div>
+                                <div flex="30" class="headGrid"> conv. USD </div>
+                            </div>
+                            <md-content id="grid">
+                                <div flex ng-repeat="coin in coins" class="row">
+                                    <div layout="row" layout-wrap class="cellGridHolder"  ng-class="{'rowSel':(factor.id == conv.id)}">
+                                        <!--<div ng-show="(factor.id==conv.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmConv(this)"></div>-->
+                                        <div flex="40" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{coin.nombre}}</div>
+                                        <div flex="30" class="cellGrid"> {{coin.codigo}}</div>
+                                        <div flex="30" class="cellGrid">{{coin.precio_usd | number:2}}</div>
+
+                                    </div>
+                                </div>
+                            </md-content>
+                           <!-- <div layout="column" class="row" ng-click="viewExtend(false)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Up"></span></div>
+                            </div>-->
+                        </div>
+                    </div>
+
+                </form>
+
+            </md-content>
+        </md-sidenav>
         <!-- ########################################## LAYER (4) TIEMPOS (PRODUCCION/TRANSITO) ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -1216,7 +1285,7 @@
                             </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand">
-                            <div layout="row">
+                            <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="10">
                                     <label>% Flete</label>
                                     <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.freight">
@@ -1508,7 +1577,7 @@
                     </div>
                 </form>
             </md-content>
-            <div style="width: 16px;" ng-mouseover="showNext(true,'END')">
+            <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
 
             </div>
         </md-sidenav>

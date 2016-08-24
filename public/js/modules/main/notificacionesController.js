@@ -96,6 +96,10 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
             if("block" in params){
                 angular.element(":focus").blur();
                 $scope.block = notif.type;
+                $timeout(function(){
+                    angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first().focus();
+                },10);
+
             }
             if("inputTitle" in params){
                 console.log(" title")

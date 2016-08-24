@@ -1546,6 +1546,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                         prefocus.click();
                         prefocus.focus();
                     },10)
+
                 }
             },{
                 name:"dejame Corregirlos",
@@ -1825,8 +1826,10 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
                     providers.put({type:"delCoin"},coin,function(data){
                         setGetProv.addChng($scope.cn,data.action,"provCoin");
                         $scope.coinAssign.splice(elem.$index,1);
+                        $scope.filt.splice($scope.filt.indexOf(elem.coinSel.id),1);
                         $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
                         $scope.provMoneda.$setUntouched();
+
                         setNotif.addNotif("ok", "Moneda Eliminada", [
                         ],{autohidden:3000});
                     });
@@ -1839,6 +1842,23 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
             }
         ]);
     };
+
+    $scope.createCoin = function(){
+        setNotif.addNotif("alert", "¿desea crear una nueva moneda?", [
+            {
+                name:"Crearla",
+                action:function(){
+                    $scope.$parent.openPopUp('newCoin');
+                }
+            },
+            {
+                name:"olvidalo",
+                action:function(){
+                    angular.element("#selCoin").focus().click();
+                }
+            }
+        ],{block:true})
+    }
 
     $scope.showGrid = function(elem,event){
         if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
@@ -2973,7 +2993,53 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
 
 });
 
+MyApp.controller('newCoinController',function($scope,setGetProv,providers,masters,setNotif,masterLists){
+    $scope.coins =masterLists.getAllCoins();
+    $scope.newCoin = {id:false,name:"",code:"",usd:""};
 
+    var saveNewCoin = function(e){
+        if(!$scope.newCoinForm.$valid && !$scope.newCoinForm.$pristine){
+            var prefocus = angular.element(":focus");
+
+            $timeout(function(){
+                angular.element("[name='newCoinForm']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    onSuccess();
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
+
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    angular.element("[name='newCoinForm']").find(".ng-invalid").first().focus()
+                }
+            }]);
+            return false;
+        }
+        masters.post({type:"newCoin"},$scope.newCoin,function(resp){
+            if(resp.action=="new"){
+                $scope.coins.unshift({id:resp.id,nombre:$scope.newCoin.name,codigo:$scope.newCoin.code,precio_usd:$scope.newCoin.usd});
+                $scope.newCoin = {id:false,name:"",code:"",usd:""};
+                setNotif.addNotif("ok", "Moneda Creada!!", [
+                ],{autohidden:3000});
+                $scope.$parent.closePopUp('newCoin')
+                angular.element("#selCoin").focus().click();
+            }
+        });
+    };
+
+    $scope.endLayer = saveNewCoin;
+});
 MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists,$timeout,masters) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();
