@@ -11,16 +11,16 @@ use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
-use App\Models\Sistema\Country;
-use App\Models\Sistema\Monedas;
-use App\Models\Sistema\ProviderType;
-use App\Models\Sistema\ProvTipoEnvio;
-use App\Models\Sistema\State;
-use App\Models\Sistema\TypeAddress;
-use App\Models\Sistema\Line;
-use App\Models\Sistema\Language;
-use App\Models\Sistema\CargoContact;
-use App\Models\Sistema\City;
+use App\Models\Sistema\Masters\Country;
+use App\Models\Sistema\Masters\Monedas;
+use App\Models\Sistema\Providers\ProviderType;
+use App\Models\Sistema\Providers\ProvTipoEnvio;
+use App\Models\Sistema\Masters\State;
+use App\Models\Sistema\Providers\TypeAddress;
+use App\Models\Sistema\Masters\Line;
+use App\Models\Sistema\Masters\Language;
+use App\Models\Sistema\Providers\CargoContact;
+use App\Models\Sistema\Masters\City;
 use Illuminate\Database\Eloquent\Collection;
 
 

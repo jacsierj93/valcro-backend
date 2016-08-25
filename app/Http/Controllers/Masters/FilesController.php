@@ -3,12 +3,12 @@ namespace App\Http\Controllers\Masters;
 
 
 use App\Libs\Utils\Files;
-use App\Models\Sistema\FileModel;
+use App\Models\Sistema\Masters\FileModel;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
 
-use App\Models\Sistema\CargoContact;
+use App\Models\Sistema\Providers\CargoContact;
 
 
 class FilesController extends BaseController
