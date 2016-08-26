@@ -90,7 +90,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.preview=true;
     $scope.mouseProview= false;
     $scope.gridView = 1;
-    $scope.gridViewCp= 1;
+    //$scope.gridViewCp= 1;
     $scope.gridViewSus= 1;
     $scope.gridViewFinalDoc= 1;
     $scope.productTexto="";
@@ -1106,7 +1106,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.openAdj = function(folder){
         if($scope.document.id){
             filesService.open();
-            var items = new Array();
+            var items = [];
             $scope.folder = folder;
             filesService.setTitle(folder);
             var data= $filter("customFind")($scope.document.adjuntos,folder.toUpperCase(),function(current,compare){return current.documento==compare});
@@ -1158,7 +1158,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
     $scope.menuAgregar= function(){
-        $scope.LayersAction({close:"all"});
+        $scope.LayersAction({close:{all:true}});
         $scope.LayersAction({open:{name:"menuAgr", before: function(){
             setGetOrder.clear();
         }}});
@@ -1314,12 +1314,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
 
-                $scope.LayersAction({search:{name:"agrPed",
-                    before: function(){
-
-
-                    }
-                }});
+                $scope.LayersAction({search:{name:"agrPed",before: function(){}}});
 
                 break;
             case "agrPed":
@@ -2388,7 +2383,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                     items: items
                                 };
                                 Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
-                                    if (response.success) {
+                                    $scope.document.id = response.id;
+                                    if (response.id) {
                                         Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id});
                                         $scope.NotifAction("ok","Realizado",[
                                             {name:"Ok",default:2, action: function(){
@@ -2433,8 +2429,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                 };
                                 Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
                                     console.log("response de add remo", response);
-                                    if (response.success) {
-                                       // $scope.document.productos.todos.push(response.new);
+                                    if (response.id) {
+                                        $scope.document.id = response.id;
                                         angular.forEach(globalData.asignado, function(v,k){
                                             $scope.document[k]=v;
                                             console.log("asignado " +k ,v);
@@ -2693,6 +2689,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                                                                 items: items
                                                             };
                                                             Order.postMod({type:$scope.formMode.mod, mod:"AdddRemoveItems"},data, function(response){
+                                                                $scope.document.id = response.id;
                                                                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(){
                                                                     Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id}, function(){
                                                                         $scope.NotifAction("ok","Realizado",[
@@ -3251,7 +3248,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                         }});
                         break;
                     case  "close":
-                        if(setGetOrder.getInternalState() == 'new' && $scope.formGlobal !='new' && $scope.document.final_id){
+                        console.log("internal",setGetOrder.getInternalState() );
+                        console.log("global",$scope.formGlobal );
+                        console.log("document",$scope.document );
+                        if(setGetOrder.getInternalState() == 'new' && $scope.document.final_id){
                             $scope.NotifAction("alert","Sin cambios no se llevara a cabo ninguna accion",[],{autohidden:autohidden});
                         }else {
 
@@ -3749,8 +3749,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
     var bindin ={estado:false};
 
     var change = function(form,fiel, value){
-        externo='upd';
-        interno='upd';
+
         if(!forms[form]){
             forms[form]={};
         }
@@ -3815,7 +3814,11 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                  });*/
             }
         },
-        change:change,
+        change:function(form,fiel, value){
+            externo='upd';
+            interno='upd';
+            change(form,fiel, value);
+        },
         getForm: function(name){
             if(name){
                 return forms[name];
@@ -3926,8 +3929,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
             }
         },
         reload: function(doc){
-            console.log("order antes de reload", order);
-            console.log("doc params", doc);
+            console.log("form antes de reload", forms);
             doc= (doc) ? doc : {id:order.id, tipo:order.tipo};
             bindin.estado=false;
             Order.get({type:"Document", id:doc.id,tipo: doc.tipo}, {},function(response) {
@@ -3960,6 +3962,8 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                     change('pedidoSusti'+ v.id,k,v);
                 });
                 bindin.estado=true;
+                console.log("form despues de reload", forms);
+
             });
 
 

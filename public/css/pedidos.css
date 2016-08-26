@@ -293,9 +293,6 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .sideNavContent{
     height: 100%;
 }
-.layerColumn{
-    padding-top: 4px;
-}
 
 .titleForm{
     min-height: 39px;
@@ -330,14 +327,18 @@ md-sidenav .md-sidenav-right.md-locked-open{
     background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
     text-decoration: none;
 }
-.tab-dashboard {
-    width: 100%;
+.date-row {
+    color: #c3c3c3;
+    min-width: 200px;
 }
-md-tabs.tab-dashboard div[md-tabs-template] {
-    width: 100%;
-    height: 100%;
+.date-row > div:first-child{
+    margin-right: 4px;
 }
 
+.date-row > div:last-child > div {
+    border-bottom: 1px dotted #c3c3c3;
+
+}
 .resalt{
     background-color: #3cb0fd;
 }

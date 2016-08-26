@@ -6,9 +6,8 @@ use App\Http\Controllers\Masters\MasterProductController;
 
 use App\Libs\Api\RestApi;
 
-use App\Models\Sistema\Country;
+use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
-use App\Models\Sistema\FileModel;
 use App\Models\Sistema\Order\OrderAnswer;
 use App\Models\Sistema\Order\OrderAnswerAttachment;
 use App\Models\Sistema\Order\OrderAttachment;
@@ -16,7 +15,7 @@ use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\CustomOrders\CustomOrderPriority;
 use App\Models\Sistema\CustomOrders\CustomOrderReason;
 use App\Models\Sistema\KitchenBoxs\KitchenBox;
-use App\Models\Sistema\Monedas;
+use App\Models\Sistema\Masters\Monedas;
 use App\Models\Sistema\Order\Order;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderItem;
@@ -26,13 +25,13 @@ use App\Models\Sistema\Order\OrderStatus;
 use App\Models\Sistema\Order\OrderType;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Payments\PaymentType;
-use App\Models\Sistema\Ports;
+use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Product\ProductType;
-use App\Models\Sistema\Provider;
-use App\Models\Sistema\ProviderAddress;
-use App\Models\Sistema\ProviderCondPay;
-use App\Models\Sistema\ProviderCondPayItem;
-use App\Models\Sistema\ProvTipoEnvio;
+use App\Models\Sistema\Providers\Provider;
+use App\Models\Sistema\Providers\ProviderAddress;
+use App\Models\Sistema\Providers\ProviderCondPay;
+use App\Models\Sistema\Providers\ProviderCondPayItem;
+use App\Models\Sistema\Providers\ProvTipoEnvio;
 use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Purchase\PurchaseAnswer;
 use App\Models\Sistema\Purchase\PurchaseAnswerAttaments;
@@ -1291,7 +1290,6 @@ class OrderController extends BaseController
             ->where('tipo_producto_id', '<>', 3)
             ->get();
         $types = ProductType::get();
-        $i=0;
 
         $model= $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->doc_id);
@@ -1300,16 +1298,15 @@ class OrderController extends BaseController
             $temp= array();
             $temp['id'] = $aux->id;
             $temp['descripcion'] = $aux->descripcion;
-            $temp['codigo'] = "(demo".$i.")";
+            $temp['codigo'] = $aux->codigo;
             $temp['codigo_fabrica'] =$aux->codigo_fabrica;
             $temp['puntoCompra'] = false;
             $temp['cantidad'] =0;
             $temp['saldo'] =0;
-            $temp['stock'] = $i;
+/*            $temp['stock'] = $i;*/
             $temp['tipo_producto_id'] = $aux->tipo_producto_id;
             $temp['tipo_producto'] = $types->where('id',$aux->tipo_producto_id)->first()->descripcion;
             $temp['asignado'] = false;
-            $i++;
             if($aux->descripcion == null){
                 $temp['descripcion'] = "Profit ".$aux->descripcion_profit;
             }
@@ -3392,8 +3389,12 @@ class OrderController extends BaseController
 
         $data['id'] =$model->id;
         $data['fecha'] =$model->fecha;
+        $data['titulo'] =$model->titulo;
+        $data['motivo_contrapedido'] = (CustomOrderReason::find($model->motivo_contrapedido_id) != null) ? CustomOrderReason::find($model->motivo_contrapedido_id)->motivo : 'Desconocido';
         $data['motivo_contrapedido_id'] =$model->motivo_contrapedido_id;
         $data['tipo_envio_id'] =$model->tipo_envio_id;
+        $data['tipo_envio'] = (ProvTipoEnvio::find($model->tipo_envio_id) != null) ? ProvTipoEnvio::find($model->tipo_envio_id)->nombre : 'Desconocido';
+        $data['prioridad'] = (CustomOrderPriority::find($model->prioridad_id) != null ) ? CustomOrderPriority::find($model->prioridad_id)->descripcion : 'Desconocido' ;
         $data['prioridad_id'] =$model->prioridad_id;
         $data['comentario'] =$model->comentario;
         $data['prov_id'] =$model->prov_id;
@@ -3403,6 +3404,7 @@ class OrderController extends BaseController
         $data['fecha_aprox_entrega'] =$model->fecha_aprox_entrega;
         $data['monto'] =$model->monto;
         $data['moneda_id'] =$model->moneda_id;
+        $data['moneda'] = (Monedas::find($model->moneda_id)) ? Monedas::find($model->moneda_id)->simbolo.Monedas::find($model->moneda_id)->nombre : 'Desconocido';
         $data['abono'] =$model->abono;
         $data['img_abono'] =$model->img_abono;
         $data['fecha_abono'] =$model->fecha_abono;
@@ -3913,6 +3915,7 @@ class OrderController extends BaseController
 
     public function getKitchenBox(Request $req){
         $model=KitchenBox:: findOrFail($req->id);
+
         return $model;
     }
     /**
