@@ -256,7 +256,7 @@
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" >
                 <div layout="column" flex>
-                    <form layout="row">
+                    <form layout="row" class="focused">
                         <div active-left  ></div>
                         <div flex layout="column">
                             <div class="titulo_formulario" style="height: 39px;">
@@ -269,19 +269,6 @@
                     <form layout="row">
                         <div active-left ></div>
                         <div layout="row" flex ng-init="tbl_listImport.order = 'id'" >
-                            <div flex="5" layout="row" >
-                                <md-input-container flex>
-                                    <label>-</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_listImport.filter.id"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_listImport.order = 'id' " ng-class="{'filter-select':(tbl_listImport.order == 'id')}"><img src="images/TrianguloUp.png" ></div>
-                                    <div ng-click="tbl_listImport.order = '-id' " ng-class="{'filter-select':(tbl_listImport.order == '-id')}"><img src="images/TrianguloDown.png"/></div>
-                                </div>
-                            </div>
                             <div flex layout="row" >
                                 <md-input-container flex>
                                     <label>Titulo</label>
@@ -295,7 +282,6 @@
                                     <div ng-click="tbl_listImport.order = '-titulo' " ng-class="{'filter-select':(tbl_listImport.order == '-titulo')}"><img src="images/TrianguloDown.png"/></div>
                                 </div>
                             </div>
-
                             <div flex="15" layout="row" >
                                 <md-input-container flex>
                                     <label>Proforma</label>
@@ -382,7 +368,7 @@
                                     <div ng-click="tbl_listImport.order = '-diasEmit' " ng-class="{'filter-select':(tbl_listImport.order == '-diasEmit')}"><img src="images/TrianguloDown.png"/></div>
                                 </div>
                             </div>
-                            <div flex="10" layout="row">
+                            <div flex="15" layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Factura</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -395,7 +381,7 @@
                                     <div ng-click="tbl_listImport.order = '-nro_factura' " ng-class="{'filter-select':(tbl_listImport.order == '-nro_factura')}"><img src="images/TrianguloDown.png"/></div>
                                 </div>
                             </div>
-                            <div flex="" layout="row">
+                            <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -428,15 +414,12 @@
                         <div layout="column" flex>
                             <div   ng-repeat="item in filterDocuments(docImports, tbl_listImport.filter) | orderBy : tbl_listImport.order" >
                                 <div layout="row" class="cellGridHolder" ng-click="docImport(item)" >
-                                    <div flex="5" class="cellGrid" ng-click="docImport(item)" > {{item.tipo}}</div>
-                                    <div flex="5" class="cellGrid" ng-click="docImport(item)"> {{item.id}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="docImport(item)"> {{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="docImport(item)"> {{item.titulo}}</div>
                                     <div flex="15" class="cellGrid" ng-click="docImport(item)"> {{item.nro_proforma}}</div>
                                     <div flex="10" class="cellGrid" ng-click="docImport(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
-                                    <div flex="5" class="cellGrid" ng-click="docImport(item)">
+                                    <div  style="width: 80px;text-align: -webkit-center; "class="cellGrid" ng-click="docImport(item)">
                                         <div style="width: 16px; height: 16px; border-radius: 50%"
-                                             class="emit{{item.diasEmit}}"></div>
-                                    </div>
+                                             class="emit{{item.diasEmit}}"></div>                                    </div>
                                     <div flex="15" class="cellGrid" ng-click="docImport(item)" > {{item.nro_factura}}</div>
                                     <div flex class="cellGrid" ng-click="docImport(item)" > {{item.monto | currency :item.symbol :2}}</div>
                                     <div flex class="cellGrid" ng-click="docImport(item)" >{{item.comentario}}</div>
@@ -1118,7 +1101,6 @@
                                                      ng-disabled="( formBlock || provSelec.id == '' )"
                                                      ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
                                                      info="Selecione la direccion que debe especificarse en la factura"
-                                                     id="direccion_facturacion_id"
                                                      skip-tab
                                                      id="direccion_facturacion_id"
                                                      md-search-text="ctrl.searchdirFact"
@@ -1411,7 +1393,7 @@
                                 <md-input-container class="md-block" flex="">
                                     <label>Estatus</label>
                                     <md-select ng-model="document.estado_id"
-                                               ng-disabled="(true)"
+                                               ng-disabled="( gridView != 2 ||  formBlock )"
                                                ng-change="toEditHead('estado_id', document.estado_id)"
                                                skip-tab
                                                id="condicion_pago_id"
@@ -1618,16 +1600,12 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPed" id="agrPed">
             <!-- ) ########################################## Agregar Pedidos ########################################## -->
             <md-content  layout="row" class="sideNavContent" flex ng-init="overSusitu = -1">
-
                 <div active-left></div>
                 <div layout="row" flex>
                     <div layout="column" flex>
                         <form>
                             <div class="titulo_formulario md-block"  layout="row"  >
 
-                                <!-- <div style="width: 24px;" layout-align="center center">
-                                     <div class="dot-empty dot-exception" ></div>
-                                 </div>-->
                                 <div>
                                     Contrapedidos
                                 </div>
@@ -1639,26 +1617,21 @@
                                 </div>
                             </div>
                         </form>
-                        <div >
-                            <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
+                        <form  layout="column" class="gridContent" flex  style="margin-left: 8px; margin-top: 8px;">
+                            <div >
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.contraPedido">
 
-                                    <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.id}}</div>
                                     <div flex="" class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
                                     <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                    <div flex="10" class="cellGrid" ng-click="removeList(item)">
-                                        <span class="icon-Eliminar fontEli"></span>
-                                    </div>
                                 </div>
                             </div>
-                        </div>
-
+                        </form>
                     </div>
                     <div layout="column" flex>
                         <form>
                             <div class="titulo_formulario md-block"   layout="row" >
                                 <div>
-                                    Kitchen Boxs
+                                    KitchenBoxs
                                 </div>
                                 <div
                                     ng-click="openSide('agrKitBoxs')"
@@ -1667,19 +1640,14 @@
                                 </div>
                             </div>
                         </form>
-                        <div >
-                            <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
+                        <form  layout="column" class="gridContent" flex  style="margin-top: 8px;">
+                            <div>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.kitchenBox" ng-class="{resalt : overSusitu == item.sustituto }">
-
-                                    <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.id}}</div>
                                     <div flex class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.titulo}}</div>
                                     <div flex class="cellGrid"ng-click="selecKitchenBox(item)" > {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                    <div flex="10" class="cellGrid" ng-click="removeList(item)">
-                                        <span class="icon-Eliminar fontEli"></span>
-                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form >
 
                     </div>
 
@@ -1691,23 +1659,19 @@
                                 </div>
                                 <div
                                     ng-click="openSide('agrPedPend')"
-
                                     style="width: 24px;">
                                     <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                                 </div>
                             </div>
                         </form>
-                        <div layout="column" flex="" style="margin-left: 8px; margin-top: 8px;">
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.pedidoSusti" ng-mouseover = "overSusitu =  item.id">
-
-                                <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>
-                                <!-- <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.id}}</div>-->
-                                <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.emision.substring(0, 10) | date:'dd/MM/yyyy' }}</div>
-                                <div flex="10" class="cellGrid" ng-click="removeList(item)">
-                                    <span class="icon-Eliminar fontEli"></span>
+                        <form  layout="column" class="gridContent" flex  style="margin-top: 8px;">
+                            <div>
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.pedidoSusti" ng-mouseover = "overSusitu =  item.id">
+                                    <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.emision | date:'dd/MM/yyyy' }}</div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
 
                     </div>
 
@@ -1722,7 +1686,7 @@
 
             <md-content  layout="row" flex class="sideNavContent">
                 <div  layout="column" flex class="layerColumn" >
-                    <form  layout="row">
+                    <form  layout="row" class="focused">
                         <!----FILTROS ---->
                         <div active-left ></div>
                         <div class="titulo_formulario md-block"  layout="row" >
@@ -2916,7 +2880,7 @@
                                 <md-content style="margin: 4px;">
 
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contraPedido" layout-align="space-between center" >
-                                        <div layout="row"  flex="40">
+                                        <div layout="row"  flex>
                                             <div  layout="column" ng-show="item.id.estado == 'new' && item.id.trace.length > 0"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
@@ -2927,10 +2891,8 @@
                                             <div  layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
                                                 <span class="icon-Eliminar" style="font-size: 16px"></span>
                                             </div>
-                                            <div>{{item.id.v}}</div>
+                                            <div class="rowRsm ">{{item.titulo.v}}</div>
                                         </div>
-
-                                        <div  flex>{{item.titulo.v}}</div>
                                     </div>
                                 </md-content>
                             </div>
@@ -2947,9 +2909,8 @@
                             </div>
                             <div flex ng-show="gridViewFinalDoc == 3">
                                 <md-content style="margin: 4px;">
-
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.kitchenBox" layout-align="space-between center" >
-                                        <div layout="row"  flex="40">
+                                        <div layout="row" >
                                             <div  layout="column" ng-show="item.id.estado == 'new' && item.id.trace.length > 0"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
@@ -2960,10 +2921,8 @@
                                             <div  layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
                                                 <span class="icon-Eliminar" style="font-size: 16px"></span>
                                             </div>
-                                            <div>{{item.id.v}}</div>
+                                            <div class="rowRsm " >{{item.titulo.v}}</div>
                                         </div>
-
-                                        <div  flex>{{item.titulo.v}}</div>
                                     </div>
                                 </md-content>
 
@@ -2982,8 +2941,8 @@
                             <div flex ng-show="gridViewFinalDoc == 4">
                                 <md-content style="margin: 4px;">
 
-                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.pedidoSusti" layout-align="space-between center" >
-                                        <div layout="row"  flex="40">
+                                    <div layout="row" class="cellGridHolder "  ng-repeat=" item in finalDoc.pedidoSusti" layout-align="space-between center" >
+                                        <div layout="row"  flex >
                                             <div  layout="column" ng-show="item.id.estado == 'new' && item.id.trace.length > 0"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
@@ -2994,10 +2953,9 @@
                                             <div  layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
                                                 <span class="icon-Eliminar" style="font-size: 16px"></span>
                                             </div>
-                                            <div>{{item.id.v}}</div>
+                                            <div class="rowRsm">{{item.titulo.v}}</div>
                                         </div>
 
-                                        <div  flex>{{item.titulo.v}}</div>
                                     </div>
                                 </md-content>
                             </div>

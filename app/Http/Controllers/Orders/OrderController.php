@@ -595,7 +595,7 @@ class OrderController extends BaseController
      */
     public  function getOrderToImport(Request $req){
         $data = array();
-        $items = Order::where('id', "<>" ,$req->id)
+        $items = Order::where('id', "<>" ,$req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
             //  ->where('aprob_compras' ,1)
             //  ->where("aprob_gerencia", 1)
             ->whereNull("comentario_cancelacion");
@@ -689,7 +689,7 @@ class OrderController extends BaseController
      */
     public  function getSolicitudeToImport(Request $req){
         $data = array();
-        $items = Solicitude::where('id', "<>" ,$req->id)
+        $items = Solicitude::where('id', "<>" ,$req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
 
             //where('aprob_compras' ,1)
             //  ->where("aprob_gerencia", 1)
@@ -1303,7 +1303,7 @@ class OrderController extends BaseController
             $temp['puntoCompra'] = false;
             $temp['cantidad'] =0;
             $temp['saldo'] =0;
-/*            $temp['stock'] = $i;*/
+            /*            $temp['stock'] = $i;*/
             $temp['tipo_producto_id'] = $aux->tipo_producto_id;
             $temp['tipo_producto'] = $types->where('id',$aux->tipo_producto_id)->first()->descripcion;
             $temp['asignado'] = false;
@@ -1543,7 +1543,7 @@ class OrderController extends BaseController
                 $item->saldo= $aux['saldo'];
                 $item->producto_id= $aux['producto_id'];
                 $item->descripcion= $aux['descripcion'];
-                $item->save();
+                //$item->save();
                 $asig[]=$aux;
 
             }else{
@@ -1555,7 +1555,7 @@ class OrderController extends BaseController
         $resul['new']= $asig;
         $resul['del']= $remo;
         $resul['success']= "Items agregados";
-        $model->destroy($remo);
+       // $model->destroy($remo);
 
         return $resul;
     }
@@ -1589,7 +1589,7 @@ class OrderController extends BaseController
         $resul['new']= $asig;
         $resul['del']= $remo;
         $resul['success']= "Items agregados";
-       // $model->destroy($remo);
+        // $model->destroy($remo);
 
         return $resul;
     }
@@ -2074,86 +2074,86 @@ class OrderController extends BaseController
      * obtiene las solicitudes que pueden ser reempladas
      */
 
-   /* public  function  getSolicitudeToReplace(Request $req){
-        $items = Solicitude::where('id', '<>', $req->id)
-            ->whereNull('fecha_sustitucion')
-            ->get();
-        $data = array();
-        $type = OrderType::get();
-        $prov = Provider::findOrFail($req->prov_id);
-        $coin = Monedas::get();
-        $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        foreach($items as $aux){
-            //para maquinas
-            $tem = array();
-            $tem['id']=$aux->id;
-            //$tem['tipo_id']=$aux->tipo_pedido_id;
-            $tem['pais_id']=$aux->pais_id;
-            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-            $tem['condicion_pago_id']=$aux->condicion_pago_id;
-            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-            $tem['prioridad_id']=$aux->prioridad_id;
-            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-            $tem['prov_moneda_id']=$aux->prov_moneda_id;
-            $tem['estado_id']=$aux->estado_id;
-            // $tem['tipo_value']=$aux->typevalue;
-            // pra humanos
-            $tem['comentario']=$aux->comentario;
-            $tem['tasa']=$aux->tasa;
-            $tem['proveedor']=$prov->razon_social;
-            $tem['documento']= $aux->getTipo();
-            $tem['diasEmit']=$aux->daysCreate();
-            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-            $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-            $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-            $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+    /* public  function  getSolicitudeToReplace(Request $req){
+         $items = Solicitude::where('id', '<>', $req->id)
+             ->whereNull('fecha_sustitucion')
+             ->get();
+         $data = array();
+         $type = OrderType::get();
+         $prov = Provider::findOrFail($req->prov_id);
+         $coin = Monedas::get();
+         $motivo = OrderReason::get();
+         $prioridad= OrderPriority::get();
+         $estados= OrderStatus::get();
+         foreach($items as $aux){
+             //para maquinas
+             $tem = array();
+             $tem['id']=$aux->id;
+             //$tem['tipo_id']=$aux->tipo_pedido_id;
+             $tem['pais_id']=$aux->pais_id;
+             $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+             $tem['condicion_pago_id']=$aux->condicion_pago_id;
+             $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+             $tem['prioridad_id']=$aux->prioridad_id;
+             $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+             $tem['prov_moneda_id']=$aux->prov_moneda_id;
+             $tem['estado_id']=$aux->estado_id;
+             // $tem['tipo_value']=$aux->typevalue;
+             // pra humanos
+             $tem['comentario']=$aux->comentario;
+             $tem['tasa']=$aux->tasa;
+             $tem['proveedor']=$prov->razon_social;
+             $tem['documento']= $aux->getTipo();
+             $tem['diasEmit']=$aux->daysCreate();
+             $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+             $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
+             $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
+             $tem['img_aprob'] =$aux->fecha_aprob_compra ;
 
 
-            if($aux->motivo_id){
-                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
-            }
-            if($aux->pais_id){
-                //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
-            }
-            if($aux->prioridad_id){
-                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
-            }
-            if($aux->prov_moneda_id){
-                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
-            }
-            if($aux->prov_moneda_id){
-                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-            }
-            if($aux->tipo_id != null){
-                $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
-            }
+             if($aux->motivo_id){
+                 $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+             }
+             if($aux->pais_id){
+                 //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+             }
+             if($aux->prioridad_id){
+                 $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+             }
+             if($aux->prov_moneda_id){
+                 $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+             }
+             if($aux->prov_moneda_id){
+                 $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+             }
+             if($aux->tipo_id != null){
+                 $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+             }
 
 
-            $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['nro_factura']=$aux->nro_factura;
-            $tem['img_proforma']=$aux->img_proforma;
-            $tem['img_factura']=$aux->img_factura;
-            $tem['mt3']=$aux->mt3;
-            $tem['peso']=$aux->peso;
-            $tem['emision']=$aux->emision;
-            $tem['monto']=$aux->monto;
+             $tem['nro_proforma']=$aux->nro_proforma;
+             $tem['nro_factura']=$aux->nro_factura;
+             $tem['img_proforma']=$aux->img_proforma;
+             $tem['img_factura']=$aux->img_factura;
+             $tem['mt3']=$aux->mt3;
+             $tem['peso']=$aux->peso;
+             $tem['emision']=$aux->emision;
+             $tem['monto']=$aux->monto;
 
-            //actualizar cuando este el final
-            $tem['almacen']="Desconocido";
+             //actualizar cuando este el final
+             $tem['almacen']="Desconocido";
 
-            // modificar cuando se sepa la logica
-            $tem['aero']=1;
-            $tem['version']=1;
-            $tem['maritimo']=1;
-            $data[]=$tem;
+             // modificar cuando se sepa la logica
+             $tem['aero']=1;
+             $tem['version']=1;
+             $tem['maritimo']=1;
+             $data[]=$tem;
 
-        }
-        return $data;
+         }
+         return $data;
 
-    }
-   */
+     }
+    */
     /**
      * agrega la solicitud al nuevo documento
      * marca
@@ -2262,85 +2262,85 @@ class OrderController extends BaseController
      * obtiene las proformas que pueden ser reempladas
      */
 
-/*    public  function  getOrderToReplace(Request $req){
-        $items = Order::where('id', '<>', $req->id)
-            ->whereNull('fecha_sustitucion')
-            ->get();
-        $data = array();
-        $type = OrderType::get();
-        $prov = Provider::findOrFail($req->prov_id);
-        $coin = Monedas::get();
-        $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        foreach($items as $aux){
-            //para maquinas
-            $tem = array();
-            $tem['id']=$aux->id;
-            //$tem['tipo_id']=$aux->tipo_pedido_id;
-            $tem['pais_id']=$aux->pais_id;
-            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-            $tem['condicion_pago_id']=$aux->condicion_pago_id;
-            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-            $tem['prioridad_id']=$aux->prioridad_id;
-            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-            $tem['prov_moneda_id']=$aux->prov_moneda_id;
-            $tem['estado_id']=$aux->estado_id;
-            // $tem['tipo_value']=$aux->typevalue;
-            // pra humanos
-            $tem['comentario']=$aux->comentario;
-            $tem['tasa']=$aux->tasa;
-            $tem['proveedor']=$prov->razon_social;
-            $tem['documento']= $aux->getTipo();
-            $tem['diasEmit']=$aux->daysCreate();
-            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-            $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-            $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-            $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+    /*    public  function  getOrderToReplace(Request $req){
+            $items = Order::where('id', '<>', $req->id)
+                ->whereNull('fecha_sustitucion')
+                ->get();
+            $data = array();
+            $type = OrderType::get();
+            $prov = Provider::findOrFail($req->prov_id);
+            $coin = Monedas::get();
+            $motivo = OrderReason::get();
+            $prioridad= OrderPriority::get();
+            $estados= OrderStatus::get();
+            foreach($items as $aux){
+                //para maquinas
+                $tem = array();
+                $tem['id']=$aux->id;
+                //$tem['tipo_id']=$aux->tipo_pedido_id;
+                $tem['pais_id']=$aux->pais_id;
+                $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+                $tem['condicion_pago_id']=$aux->condicion_pago_id;
+                $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+                $tem['prioridad_id']=$aux->prioridad_id;
+                $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+                $tem['prov_moneda_id']=$aux->prov_moneda_id;
+                $tem['estado_id']=$aux->estado_id;
+                // $tem['tipo_value']=$aux->typevalue;
+                // pra humanos
+                $tem['comentario']=$aux->comentario;
+                $tem['tasa']=$aux->tasa;
+                $tem['proveedor']=$prov->razon_social;
+                $tem['documento']= $aux->getTipo();
+                $tem['diasEmit']=$aux->daysCreate();
+                $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+                $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
+                $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
+                $tem['img_aprob'] =$aux->fecha_aprob_compra ;
 
 
-            if($aux->motivo_id){
-                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+                if($aux->motivo_id){
+                    $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+                }
+                if($aux->pais_id){
+                    //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+                }
+                if($aux->prioridad_id){
+                    $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+                }
+                if($aux->prov_moneda_id){
+                    $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+                }
+                if($aux->prov_moneda_id){
+                    $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                }
+                if($aux->tipo_id != null){
+                    $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+                }
+
+
+                $tem['nro_proforma']=$aux->nro_proforma;
+                $tem['nro_factura']=$aux->nro_factura;
+                $tem['img_proforma']=$aux->img_proforma;
+                $tem['img_factura']=$aux->img_factura;
+                $tem['mt3']=$aux->mt3;
+                $tem['peso']=$aux->peso;
+                $tem['emision']=$aux->emision;
+                $tem['monto']=$aux->monto;
+
+                //*actualizar cuando este el final
+                $tem['almacen']="Desconocido";
+
+                // modificar cuando se sepa la logica
+                $tem['aero']=1;
+                $tem['version']=1;
+                $tem['maritimo']=1;
+                $data[]=$tem;
+
             }
-            if($aux->pais_id){
-                //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
-            }
-            if($aux->prioridad_id){
-                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
-            }
-            if($aux->prov_moneda_id){
-                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
-            }
-            if($aux->prov_moneda_id){
-                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-            }
-            if($aux->tipo_id != null){
-                $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
-            }
+            return $data;
 
-
-            $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['nro_factura']=$aux->nro_factura;
-            $tem['img_proforma']=$aux->img_proforma;
-            $tem['img_factura']=$aux->img_factura;
-            $tem['mt3']=$aux->mt3;
-            $tem['peso']=$aux->peso;
-            $tem['emision']=$aux->emision;
-            $tem['monto']=$aux->monto;
-
-            //*actualizar cuando este el final
-            $tem['almacen']="Desconocido";
-
-            // modificar cuando se sepa la logica
-            $tem['aero']=1;
-            $tem['version']=1;
-            $tem['maritimo']=1;
-            $data[]=$tem;
-
-        }
-        return $data;
-
-    }*/
+        }*/
 
     /**
      * agrega la solicitud al nuevo documento
@@ -2446,87 +2446,87 @@ class OrderController extends BaseController
     /**
      * obtiene las proformas que pueden ser reempladas
      */
-/*
-    public  function  getPurchaseToReplace(Request $req){
-        $items = Purchase::where('id', '<>', $req->id)
-            ->whereNull('fecha_sustitucion')
-            ->get();
-        $data = array();
-        $type = OrderType::get();
-        $prov = Provider::findOrFail($req->prov_id);
-        $coin = Monedas::get();
-        $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        foreach($items as $aux){
-            //para maquinas
-            $tem = array();
-            $tem['id']=$aux->id;
-            //$tem['tipo_id']=$aux->tipo_pedido_id;
-            $tem['pais_id']=$aux->pais_id;
-            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-            $tem['condicion_pago_id']=$aux->condicion_pago_id;
-            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-            $tem['prioridad_id']=$aux->prioridad_id;
-            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-            $tem['prov_moneda_id']=$aux->prov_moneda_id;
-            $tem['estado_id']=$aux->estado_id;
-            // $tem['tipo_value']=$aux->typevalue;
-            // pra humanos
-            $tem['comentario']=$aux->comentario;
-            $tem['tasa']=$aux->tasa;
-            $tem['proveedor']=$prov->razon_social;
-            $tem['documento']= $aux->getTipo();
-            $tem['diasEmit']=$aux->daysCreate();
-            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-            $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-            $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-            $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+    /*
+        public  function  getPurchaseToReplace(Request $req){
+            $items = Purchase::where('id', '<>', $req->id)
+                ->whereNull('fecha_sustitucion')
+                ->get();
+            $data = array();
+            $type = OrderType::get();
+            $prov = Provider::findOrFail($req->prov_id);
+            $coin = Monedas::get();
+            $motivo = OrderReason::get();
+            $prioridad= OrderPriority::get();
+            $estados= OrderStatus::get();
+            foreach($items as $aux){
+                //para maquinas
+                $tem = array();
+                $tem['id']=$aux->id;
+                //$tem['tipo_id']=$aux->tipo_pedido_id;
+                $tem['pais_id']=$aux->pais_id;
+                $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
+                $tem['condicion_pago_id']=$aux->condicion_pago_id;
+                $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
+                $tem['prioridad_id']=$aux->prioridad_id;
+                $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
+                $tem['prov_moneda_id']=$aux->prov_moneda_id;
+                $tem['estado_id']=$aux->estado_id;
+                // $tem['tipo_value']=$aux->typevalue;
+                // pra humanos
+                $tem['comentario']=$aux->comentario;
+                $tem['tasa']=$aux->tasa;
+                $tem['proveedor']=$prov->razon_social;
+                $tem['documento']= $aux->getTipo();
+                $tem['diasEmit']=$aux->daysCreate();
+                $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
+                $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
+                $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
+                $tem['img_aprob'] =$aux->fecha_aprob_compra ;
 
 
-            if($aux->motivo_id){
-                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
-            }
-            if($aux->pais_id){
-                //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
-            }
-            if($aux->prioridad_id){
-                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
-            }
-            if($aux->prov_moneda_id){
-                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
-            }
-            if($aux->prov_moneda_id){
-                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-            }
-            if($aux->tipo_id != null){
-                $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
-            }
+                if($aux->motivo_id){
+                    $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+                }
+                if($aux->pais_id){
+                    //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+                }
+                if($aux->prioridad_id){
+                    $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+                }
+                if($aux->prov_moneda_id){
+                    $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+                }
+                if($aux->prov_moneda_id){
+                    $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                }
+                if($aux->tipo_id != null){
+                    $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+                }
 
 
-            $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['nro_factura']=$aux->nro_factura;
-            $tem['img_proforma']=$aux->img_proforma;
-            $tem['img_factura']=$aux->img_factura;
-            $tem['mt3']=$aux->mt3;
-            $tem['peso']=$aux->peso;
-            $tem['emision']=$aux->emision;
-            $tem['monto']=$aux->monto;
+                $tem['nro_proforma']=$aux->nro_proforma;
+                $tem['nro_factura']=$aux->nro_factura;
+                $tem['img_proforma']=$aux->img_proforma;
+                $tem['img_factura']=$aux->img_factura;
+                $tem['mt3']=$aux->mt3;
+                $tem['peso']=$aux->peso;
+                $tem['emision']=$aux->emision;
+                $tem['monto']=$aux->monto;
 
-            //actualizar cuando este el final
-            $tem['almacen']="Desconocido";
+                //actualizar cuando este el final
+                $tem['almacen']="Desconocido";
 
-            // modificar cuando se sepa la logica
-            $tem['aero']=1;
-            $tem['version']=1;
-            $tem['maritimo']=1;
-            $data[]=$tem;
+                // modificar cuando se sepa la logica
+                $tem['aero']=1;
+                $tem['version']=1;
+                $tem['maritimo']=1;
+                $data[]=$tem;
+
+            }
+            return $data;
 
         }
-        return $data;
-
-    }
-*/
+    */
 
     /**
      * agrega la solicitud al nuevo documento
@@ -3109,7 +3109,7 @@ class OrderController extends BaseController
         foreach($model->items()->get() as $item){
             $produc=Product::findOrFail($item->producto_id);
             $prod = [];
-           // $prod = $item;
+            // $prod = $item;
             $prod['id']= $item->id;
             $prod['producto_id']= $item->producto_id;
             $prod['codigo']= $item->codigo;
