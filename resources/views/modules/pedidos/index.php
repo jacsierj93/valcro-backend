@@ -437,9 +437,6 @@
             <md-content  layout="row" flex class="sideNavContent" >
                 <form layout="row">
                     <div active-left before="verificExit" ></div>
-
-
-
                 </form>
                 <form layout="row" flex>
                     <div active-left before="verificExit"></div>
@@ -922,7 +919,6 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="email" id="email">
             <!--  ########################################## CONTENDOR  EMAIL ########################################## -->
             <md-content  layout="row" flex class="sideNavContent">
-
                 <div  layout="column" flex="" >
                     <div style="background-color: #0a0a0a; width: 100%; height: 36px; min-height: 36px;">
                         <div style="margin: 8px; color: white;">Mensaje Nuevo</div>
@@ -975,8 +971,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </md-content>
         </md-sidenav>
 
@@ -2476,7 +2470,6 @@
 
         </md-sidenav>
 
-
         <!-- 14) ########################################## LAYER (5) RESUMEN de Pedido a sustotuir########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedidoSus" id="resumenPedidoSus" >
             <!-- ) ########################################## CONTENDOR SECCION PEDIDO SUSTITO ########################################## -->
@@ -2684,6 +2677,7 @@
                 </div>
             </md-content>
         </md-sidenav>
+
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
@@ -3432,11 +3426,8 @@
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" >
                 <div active-left   ></div>
-
                 <div  layout="column" flex="" class="layerColumn" style="padding: ">
                     <div contenteditable ng-model="previewHtmltext " style="min-height: 48px" > Texto adicional </div>
-
-
                     <div ng-bind-html="previewHtmlDoc" flex="">
                     </div>
                 </div>
@@ -3444,9 +3435,7 @@
         </md-sidenav>
 
 
-
-        <!-- ########################################## LAYER Mensaje de notificaacion########################################## -->
-
+        <!-- ########################################## LAYER Mensaje de notificacion########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(30%); z-index: 60 ;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
                     md-disable-backdrop="true" md-component-id="moduleMsm" id="moduleMsm"
@@ -3590,7 +3579,6 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER exception  respuesta ########################################## -->
-
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
                     md-disable-backdrop="true" md-component-id="addAnswer" id="addAnswer"
@@ -3651,7 +3639,6 @@
             ng-mouseleave="showNext(false)" ng-click="next()" >
             <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
-
 
         <!------------------------------------------- Alertas ------------------------------------------------>
         <div ng-controller="notificaciones" ng-include="template"></div>

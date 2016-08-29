@@ -66,7 +66,6 @@ class OrderController extends BaseController
     /**
      * trae los documentos que estan si revisar
      */
-
     public function getOldReviewDoc(Request $req){
         $allDocs = array();
         $oldDocs = array();
@@ -174,6 +173,9 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /**
+     * trae las notificaciones del sistema
+    */
     public function getNotifications (){
         $result = [];
         $oldReviewDays = $this->oldReview();
@@ -311,7 +313,6 @@ class OrderController extends BaseController
     /**
      * cuentas los provedores que pueden hacer pedidos
      */
-
     public function countProvider(){
         //$data =Provider::selectRaw("count('id')")->get()->get(0)[0];
         $data['value'] =Provider::selectRaw("count('id')")->get()->get(0)[0];
@@ -322,7 +323,6 @@ class OrderController extends BaseController
     /**
      * traue a los provedores
      */
-
     public function getProviders(Request $req){
         $data = array();
         $provs = Provider::
@@ -437,11 +437,9 @@ class OrderController extends BaseController
     }
 
 
-
     /**
      * traue a los provedores
      */
-
     public function getProvider(Request $req){
         $rawn = "id, razon_social ,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
@@ -470,12 +468,24 @@ class OrderController extends BaseController
     /***
      * obtiene todos los documentos que pueden ser importado por una solictud
      */
-
     public  function getEmails(Request $req){
         $data = array();
 
         return $data;
     }
+
+    public function  getAddressrPort(Request $req){
+        $data =array();
+        if($req->has('id')){
+            $data = ProviderAddress::findOrfail($req->id)->ports()->get();
+            if(sizeof($data)>0){
+                return $data;
+            }
+        }
+
+        return $data;
+    }
+
 
     /*********************** Approved Purchases ************************/
 
@@ -1157,17 +1167,6 @@ class OrderController extends BaseController
     }
 
 
-    public function  getAddressrPort(Request $req){
-        $data =array();
-        if($req->has('id')){
-            $data = ProviderAddress::findOrfail($req->id)->ports()->get();
-            if(sizeof($data)>0){
-                return $data;
-            }
-        }
-
-        return $data;
-    }
 
     /*********************** COPY ************************/
 
@@ -1652,7 +1651,6 @@ class OrderController extends BaseController
     }
 
 
-
     /**
      * cambio el estado de una solicitud
      */
@@ -2015,7 +2013,6 @@ class OrderController extends BaseController
         $response['items']=$att;
 
     }
-
     public function AddAnswerOrder(Request $req){
         $doc= Order::findOrFail($req->doc_id);
         $model = new OrderAnswer();
@@ -3181,7 +3178,6 @@ class OrderController extends BaseController
          return $model;*/
         return $tem;
     }
-
 
 
     /*********************************** CONTRAPEDIDOS ***********************************/
@@ -4365,7 +4361,6 @@ class OrderController extends BaseController
 
         return (!$req->has('id')) ? $this->getCountryProvider($req->prov_id) : Country::where('id',$req->id)->get();
     }
-
 
 
     /**

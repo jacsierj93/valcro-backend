@@ -133,89 +133,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.reviewDoc = function(){
         $scope.unclosetDoc = [];
         $scope.alerts  =  Order.query({type:'Notifications'});
-   /*    Order.query({type:"UnClosetDoc"},{}, function(response){
-           console.log("n close", response);
-           $scope.unclosetDoc=response;
-       });*/
 
-/*
-        Order.get({type:"OldReviewDocs"},{}, function(response){
-            console.log("n close old", response)
-            $scope.priorityDocs =response;
-        });*/
-
-       // $scope.priorityDocs = Order.get({type:'OldReviewDocs'});
-
-       /* Order.query({type:"UnClosetDoc"},{}, function(response){
-            // $scope.unclosetDoc = response;
-            if(response.length > 0){
-                /!*$scope.NotifAction("alert","Existen "+response.length + " documentos sin finalizar ",[
-                    {
-                        name:"Revisar luego",
-                        action:function(){
-
-                        }
-                    }, {
-                        name:"Ver",
-                        action: function(){
-                            $scope.navCtrl.value="unclosetDoc";
-                            $scope.navCtrl.estado=true;
-                        }
-                    }
-                ],{block:true});*!/
-            }else{
-
-            }
-            $timeout(function(){
-                Order.get({type:'OldReviewDocs'},{}, function(response){
-                   /!* if(response.docs.length > 0){
-                        $scope.NotifAction("alert","Existen "+response.docs.length + " documentos con mas de "
-                            +response.dias +" sin respuesta ",[
-                            {
-                                name:"Revisar luego",
-                                action:function(){
-                                    /!*var mo= jQuery("#init");
-                                     mo[0].focus();*!/
-                                }
-                            }, {
-                                name:"Ver",
-                                action: function(){
-                                    $scope.LayersAction({open:{name:"priorityDocs",
-                                        before: function(){
-                                        }, after: function(){
-                                            $scope.priorityDocs= [];
-                                            Order.get({type:'OldReviewDocs'},{}, function(response){
-                                                angular.forEach(response.docs, function(v){
-                                                    v.emision = DateParse.toDate(v.emision);
-                                                    $scope.priorityDocs.push(v);
-                                                });
-                                                if($scope.priorityDocs.length > 0){
-                                                    $timeout(function(){
-                                                        var mo= jQuery("#priorityDocs").find('.cellSelect')[0];
-                                                        mo.focus();
-
-                                                    }, 300);
-                                                }
-
-
-                                            });
-                                        }
-                                    }});
-
-                                }
-                            }
-                        ]);
-                    }else{
-
-                    }
-*!/
-                });
-            },500);
-
-
-
-        });
-*/
     };
 
     $scope.openUncloseDoc = function (){
@@ -3707,8 +3625,9 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
     }
 });
 
-/**************  SERVICIOS   ***********************/
-
+/*
+Servicio que almacena la informacion del docuemnto y monitoriza cambios
+ */
 MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
 
     var forms ={};
@@ -3980,8 +3899,12 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
     };
 });
 
-
-
+/**
+ *
+ * Servicio encargado de la realizacion de peticiones del modulo de pedidos
+ * @param type especifica el documento a hacer la peticion['Order', 'Purchase','Solicitude']
+ * @param mod accion a realizar ['update', 'save'....]
+ * */
 MyApp.factory('Order', ['$resource',
     function ($resource) {
         return $resource('Order/:type/:mod', {}, {
@@ -3997,8 +3920,12 @@ MyApp.factory('Order', ['$resource',
         });
     }
 ]);
-//
 
+/**
+ *
+ * fabrica de objetos ideales para $watch de angular
+ *
+ * */
 MyApp.factory('Accion', function(){
     function  Accion (){
         return {
@@ -4015,12 +3942,22 @@ MyApp.factory('Accion', function(){
 
 });
 
+/**
+ * filtro paraa poder visualizar codigo html que venga de peticiones
+ * */
 MyApp.filter("sanitize", ['$sce', function($sce) {
     return function(htmlCode){
         return $sce.trustAsHtml(htmlCode);
     }
 }]);
 
+/**
+ * filtra para buscar dentro de array de json
+ * @param data el array de objetos
+ * @param compare el valor a evaluar
+ * @param key clave que corresponde al json
+ *
+ * **/
 MyApp.filter('stringKey', function() {
 
     return function(data,compare, key) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -4031,6 +3968,9 @@ MyApp.filter('stringKey', function() {
     }
 });
 
+/**
+ * valida campos del formulario, solo admite numeros y puntos
+ * */
 MyApp.directive('decimal', function () {
     return {
         require: 'ngModel',
@@ -4060,25 +4000,4 @@ MyApp.directive('decimal', function () {
     };
 });
 
-/*
- MyApp.directive('vlcAutocomplete', function ($timeout, $compile) {
- return {
- link: function (scope, elem, attrs,model) {
- $timeout(function(){
- var input = angular.element(elem.find("input"));
- input.attr();
 
- },400)
-
-
-
-
- }
- };
- });
-
- */
-
-
-
-/******************************** trash ***********************************/
