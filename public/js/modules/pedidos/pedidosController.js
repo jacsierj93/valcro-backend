@@ -127,7 +127,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $timeout(function(){$scope.init();},0);
 
     $scope.reviewState = function(){
-       $scope.reviewDoc();
+        $scope.reviewDoc();
     };
 
     $scope.reviewDoc = function(){
@@ -456,17 +456,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     descripcion :response.descripcion,id: response.id,otre:null,puntoCompra:false,stock:0,tipo_producto:response.tipo_producto,
                     tipo_producto_id:response.tipo_producto};
                 $scope.providerProds.push(aux);
-               $timeout(function(){
-                   aux.asignado= true;
-                   console.log("asignando", aux);
-                   $scope.changeProducto(aux);
-                   item.saldo ="";
-                   item.despcripcion ="";
-                   item.codigo_fabrica ="";
-                   item.codigo ="";
-                   item.cantidad ="";
+                $timeout(function(){
+                    aux.asignado= true;
+                    console.log("asignando", aux);
+                    $scope.changeProducto(aux);
+                    item.saldo ="";
+                    item.despcripcion ="";
+                    item.codigo_fabrica ="";
+                    item.codigo ="";
+                    item.cantidad ="";
 
-               },0);
+                },0);
 
             });
         }else{
@@ -532,14 +532,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         return false;
     };
     $scope.printTrace = function(){
-        if($scope.previewHtmltext == "Introdusca texto "){
-            $scope.previewHtmltext="";
-        }
+        /*       if($scope.previewHtmltext == "Introdusca texto "){
+         $scope.previewHtmltext="";
+         }
 
-        $scope.previewHtmlDoc ="";
-        $http.get("Order/test").success(function (response) { $scope.previewHtmlDoc = response;});
+         $scope.previewHtmlDoc ="";
+         $http.get("Order/test").success(function (response) { $scope.previewHtmlDoc = response;});
 
-        $scope.LayersAction({open:{name:"htmlViewer"}});
+         $scope.LayersAction({open:{name:"htmlViewer"}});*/
 
 
     };
@@ -1056,7 +1056,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},doc, function(response){
                     $scope.document.id = response.id;
                     setGetOrder.setOrder({id:response.id,tipo:$scope.formMode.value});
-                     /*setGetOrder.addForm('document',$scope.document);
+                    /*setGetOrder.addForm('document',$scope.document);
                      setGetOrder.setState('select');*/
                     $scope.navCtrl.value="listImport";
                     $scope.navCtrl.estado=true;
@@ -1128,7 +1128,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
             Order.get({type:"CustomOrder", id: item.id, doc_id: $scope.document.id, tipo: $scope.formMode.value}, {},
                 function(response){
-                    console.log("respnose customer", response);
+
                     $scope.contraPedSelec= response;
                     if(response.fecha_aprox_entrega != null){
                         $scope.contraPedSelec.fecha_aprox_entrega = new Date(Date.parse(response.fecha_aprox_entrega));
@@ -1324,16 +1324,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 });
         }
     };
-    /* /!**@deprecated
-     * *!/
-     $scope.change = function (odc) {
-     if (odc.asig) {
-     addOrdenCompra(odc.id, $scope.document.id);
-     } else {
-     removeOrdenCompra(odc.id, $scope.document.id);
-     }
 
-     };*/
     $scope.changeContraP = function (item) {
         if(item.import){
             $scope.NotifAction("error",
@@ -1591,8 +1582,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             tipo_origen_id: 2,
             doc_origen_id: item.contra_pedido_id,
             doc_id: $scope.document.id,
-            cantidad:  item.cantidad,
-            saldo:  item.cantidad,
+            cantidad:  item.saldo,
+            saldo:  item.saldo,
             producto_id:  item.producto_id,
             descripcion:  item.descripcion,
             id:item.id
@@ -1655,6 +1646,55 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
     };
+
+    $scope.addRemoveDocSusItem = function(item){
+        console.log(" item ",item);
+        var aux = {
+            asignado:item.asignado,
+            tipo_origen_id: $scope.formMode.value,
+            doc_origen_id: item.doc_id,
+            doc_id: $scope.document.id,
+            cantidad:  item.saldo,
+            saldo:  item.saldo,
+            producto_id:  item.producto_id,
+            descripcion:  item.descripcion,
+            id:item.id
+
+        };
+        if(item.asignado){
+            Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                if(response.accion == "new"){
+                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+                    item.renglon_id= response.renglon_id;
+                }
+
+            });
+
+        }else if(!item.asignado && item.renglon_id){
+            $scope.NotifAction("alert","Se Removera el articulo",[
+                {name:'Cancelar',
+                    action: function(){
+
+                    }
+                },
+                {name:'Continuar',default:4,
+                    action: function(){
+                        Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+                            if(response.accion == "new"){
+                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+                                item.renglon_id= response.renglon_id;
+                            }
+                        });
+
+                    }
+                }
+            ]);
+        }
+
+
+
+    };
+
 
     $scope.changeKitchenBox = function (item) {
         var paso = true;
@@ -1913,7 +1953,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     $scope.DtPedido = function (doc) {
-       // setGetOrder.clear();
+        // setGetOrder.clear();
         $scope.gridView= 1;
         var  paso=  true;
         if ($mdSidenav("addAnswer").isOpen()){
@@ -2178,11 +2218,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
     };
 
-   $scope.openNoti = function(key){
-           $scope.navCtrl.value=key;
-           $scope.navCtrl.estado=true;
-       $mdSidenav("moduleMsm").close();
-   };
+    $scope.openNoti = function(key){
+        $scope.navCtrl.value=key;
+        $scope.navCtrl.estado=true;
+        $mdSidenav("moduleMsm").close();
+    };
 
     $scope.closeNotis= function(e){
         if(jQuery(e.target).parents("#lyrAlert").length == 0
@@ -2851,18 +2891,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.formData.monedas.splice(0,$scope.formData.monedas.length);
                 $scope.formData.paises.splice(0,$scope.formData.paises.length);
                 $scope.formData.condicionPago.splice(0,$scope.formData.condicionPago.length);
-               Order.query({type:"InvoiceAddress", prov_id:newVal.id},{}, function(response){
-                   $scope.formData.direccionesFact=response;
-               });
+                Order.query({type:"InvoiceAddress", prov_id:newVal.id},{}, function(response){
+                    $scope.formData.direccionesFact=response;
+                });
                 providers.query({type: "provCoins", id_prov: newVal.id},{}, function(response){
                     $scope.formData.monedas =response;
                 });
                 Order.query({type:"ProviderCountry",prov_id:newVal.id},{}, function(response){
                     $scope.formData.paises=response;
                 });
-               Order.query({type:"ProviderPaymentCondition", prov_id:newVal.id},{}, function(response){
-                   $scope.formData.condicionPago=response;
-               });
+                Order.query({type:"ProviderPaymentCondition", prov_id:newVal.id},{}, function(response){
+                    $scope.formData.condicionPago=response;
+                });
                 $timeout(function(){
                     var elem=angular.element("#prov"+newVal.id);
                     angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
@@ -3009,8 +3049,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                             after: function(){
                                 $scope.isTasaFija=true;
                                 $timeout(function(){
-                                   /* var mo= angular.element("#"+$scope.layer+" #prov_id ");
-                                    mo[0].focus();*/
+                                    /* var mo= angular.element("#"+$scope.layer+" #prov_id ");
+                                     mo[0].focus();*/
 
                                 }, 100);
                             }
@@ -3046,9 +3086,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                         break;
                     case "agrContPed":
                         $scope.LayersAction({search:{name:"agrContPed",
-                            before: function(){
+                            after: function(){
                                 $scope.formData.contraPedido = Order.query({type:"CustomOrders",  prov_id:$scope.provSelec.id, doc_id:$scope.document.id, tipo:$scope.formMode.value});
-
                             }
                         }});
                         break;
@@ -3626,7 +3665,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
 });
 
 /*
-Servicio que almacena la informacion del docuemnto y monitoriza cambios
+ Servicio que almacena la informacion del docuemnto y monitoriza cambios
  */
 MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
 
@@ -3752,7 +3791,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         },
 
         setOrder : function(doc){
-           // order={};
+            // order={};
             if(doc.id && doc.tipo){
                 bindin.estado=false;
                 Order.get({type:"Document", id:doc.id,tipo: doc.tipo}, {},function(response) {
@@ -3863,20 +3902,20 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                 angular.forEach(response,function(v,k){
                     if(!order[k]){
                         order[k]= v;
-                       /* if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && !angular.isNumber(k)){
-                            change('document',k,v);
-                        }*/
+                        /* if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && !angular.isNumber(k)){
+                         change('document',k,v);
+                         }*/
                     }
                 });
                 /*angular.forEach(response.productos.contraPedido, function(v,k){
-                    change('contraPedido'+ v.id,k,v);
-                });
-                angular.forEach(response.productos.kitchenBox, function(v,k){
-                    change('kitchenBox'+ v.id,k,v);
-                });
-                angular.forEach(response.productos.pedidoSusti, function(v,k){
-                    change('pedidoSusti'+ v.id,k,v);
-                });*/
+                 change('contraPedido'+ v.id,k,v);
+                 });
+                 angular.forEach(response.productos.kitchenBox, function(v,k){
+                 change('kitchenBox'+ v.id,k,v);
+                 });
+                 angular.forEach(response.productos.pedidoSusti, function(v,k){
+                 change('pedidoSusti'+ v.id,k,v);
+                 });*/
                 bindin.estado=true;
 
             });

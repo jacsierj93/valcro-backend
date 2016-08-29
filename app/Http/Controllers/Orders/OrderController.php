@@ -1612,7 +1612,7 @@ class OrderController extends BaseController
 
             }
             $resul['response']=$model->save();
-            $resul['id']=$model->id;
+            $resul['renglon_id']=$model->id;
 
 
         }else{
@@ -1640,7 +1640,7 @@ class OrderController extends BaseController
 
             }
             $resul['response']=$model->save();
-            $resul['id']=$model->id;
+            $resul['renglon_id']=$model->id;
 
 
         }else{
@@ -2692,6 +2692,7 @@ class OrderController extends BaseController
     }
 
     /**
+     * @deprecated
      * elimina un pedido a un nuevo pedido
      **/
     public function removeOrderSubstitute(Request $req){
@@ -2746,6 +2747,10 @@ class OrderController extends BaseController
                 }else{
                     $paso= false;
                 }
+            }
+            if(sizeof($model->items()->where('tipo_origen_id', '21')->where('doc_origen_id', $aux->id)->get()) > 0){
+                $tem['asignado']=true;
+
             }
 
             if($paso){
@@ -2851,6 +2856,10 @@ class OrderController extends BaseController
                     $paso= false;
                 }
             }
+            if(sizeof($model->items()->where('tipo_origen_id', '23')->where('doc_origen_id', $aux->id)->get()) > 0){
+                $tem['asignado']=true;
+
+            }
 
             if($paso){
 
@@ -2955,6 +2964,10 @@ class OrderController extends BaseController
                     $paso= false;
                 }
             }
+            if(sizeof($model->items()->where('tipo_origen_id', '22')->where('doc_origen_id', $aux->id)->get()) > 0){
+                $tem['asignado']=true;
+
+            }
 
             if($paso){
 
@@ -3038,9 +3051,9 @@ class OrderController extends BaseController
      */
     public function getOrderSustitute(Request $req){
 
-        $instace= $this->getDocumentIntance($req->tipo);
-        $model= $instace->findOrFail($req->id);
-        $docIts= $instace->findOrFail($req->doc_id)->items()->get();
+        $doc= $this->getDocumentIntance($req->tipo);
+        $model= $doc->findOrFail($req->id);
+        $docIts= $doc->findOrFail($req->doc_id)->items()->get();
 
         $prov= Provider::findOrFail($model->prov_id);
         $mone=Monedas::findOrFail($model->prov_moneda_id);
@@ -3109,15 +3122,19 @@ class OrderController extends BaseController
             // $prod = $item;
             $prod['id']= $item->id;
             $prod['producto_id']= $item->producto_id;
+            //$prod['asignadoOtro']= [];
             $prod['codigo']= $item->codigo;
             $prod['descripcion']= $item->descripcion;
+            $prod['doc_id']= $item->doc_id;
             $prod['cantidad']= $item->cantidad;
             $prod['saldo']= $item->saldo;
             $prod['cod_fabrica']= $produc->cod_fabrica;
             $prod ['documento'] = $tipos->where('id', $item->tipo_origen_id )[0]->descripcion;
             $prod['asignado']= false;
+
             if(sizeof($docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id))){
                 $prod['asignado']= true;
+                $prod['renglon_id']= $docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id)->first()->id;
             }
 
             $prods[]=$prod;
@@ -3413,6 +3430,7 @@ class OrderController extends BaseController
     }
 
     /**
+     * @deprecated
      * agrega un contra pedido al documento
      *
      */
@@ -4713,7 +4731,7 @@ class OrderController extends BaseController
             $model->monto = $req->monto;
         }
         if($req->has('tasa')){
-            $model->tasa = $req->tasa;
+            $model->tasa = floatval( $req->tasa);
         }
         if($req->has('pais_id')){
             $model->pais_id = ($req->pais_id."" == "-1") ? null:$req->pais_id;

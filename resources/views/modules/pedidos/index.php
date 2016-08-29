@@ -2587,7 +2587,7 @@
                             </div>
                         </div>
                     </form>
-                    <form layout="row" ng-init="tbl_pediSutitut.order= 'asignado' ">
+                    <form layout="row" ng-init="tbl_pediSutitut.order= 'cod_producto' ">
                         <div active-left></div>
                         <div layout="row" flex>
                             <div flex="5" ></div>
@@ -2656,7 +2656,7 @@
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | filter :tbl_pediSutitut.filter:strict | orderBy :tbl_pediSutitut.order   ">
                                     <div flex="5" class="cellEmpty" >
                                         <md-switch class="md-primary"
-                                                   ng-disabled="( formBlock )" ng-model="item.asignado">
+                                                   ng-disabled="( formBlock )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
                                         </md-switch>
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
