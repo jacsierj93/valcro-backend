@@ -4879,15 +4879,18 @@ class OrderController extends BaseController
     private function generateProviderQuery($campo, $condicion){
         $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_compra_orden where tbl_proveedor.id= prov_id and tbl_compra_orden.deleted_at is null
-             and tbl_compra_orden.fecha_aprob_gerencia is null and tbl_compra_orden.fecha_aprob_compra is null ),0) "
+             and tbl_compra_orden.fecha_aprob_gerencia is null and tbl_compra_orden.fecha_aprob_compra is null
+             and tbl_compra_orden.fecha_sustitucion is null  and tbl_compra_orden.comentario_cancelacion is null  ),0) "
             ." + "
             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_pedido where tbl_proveedor.id= prov_id  and tbl_pedido.deleted_at is null
-             and tbl_pedido.fecha_aprob_gerencia is null and tbl_pedido.fecha_aprob_compra is null  ),0) "
+             and tbl_pedido.fecha_aprob_gerencia is null and tbl_pedido.fecha_aprob_compra is null
+             and tbl_pedido.fecha_sustitucion is null and tbl_pedido.comentario_cancelacion is null  ),0) "
             ." + "
             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.deleted_at is null
-             and tbl_solicitud.fecha_aprob_gerencia is null and tbl_solicitud.fecha_aprob_compra is null ),0) "
+             and tbl_solicitud.fecha_aprob_gerencia is null and tbl_solicitud.fecha_aprob_compra is null
+             and tbl_solicitud.fecha_sustitucion is null and tbl_solicitud.comentario_cancelacion is null),0) "
             .""
         ;
         return $q;

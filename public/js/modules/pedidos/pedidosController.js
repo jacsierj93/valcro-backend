@@ -7,7 +7,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
     // controlers
-    $scope.formBlock = true;
+   /* $scope.formBlock = true;
+    $scope.formGlobal = "new";
+    $scope.isCopyable = false;*/
+    $scope.Docsession = {isCopyable:false,global:"new", block:true};
+
     $scope.email= {};
     $scope.email.destinos =[];
     $scope.email.content =[];
@@ -18,7 +22,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.providerProds= [];
     $scope.docsSustitos= [];
     $scope.estadosDoc=[];
-    $scope.formGlobal = "new";
     $scope.isTasaFija= true;
     $scope.skiPro = [];
     $scope.navCtrl = Accion.create();
@@ -233,7 +236,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.toEditHead= function(id,val){
         //console.log("id "+id +" val "+ val);
-        if($scope.formGlobal != 'new'){
+        if( $scope.Docsession.global != 'new'){
             setGetOrder.change("document",id,val);
         }
 
@@ -361,7 +364,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     });
 
     $scope.allowEdit = function(){
-        if($scope.formBlock){
+
+        if($scope.Docsession.block){
             $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder modificar",[],{autohidden:autohidden});
 
         }
@@ -414,7 +418,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
 
     $scope.updateForm = function () {
-        $scope.formBlock = false;
+        $scope.Docsession.block=false;
+
+        //$scope.formBlock = false;
         Order.postMod({type:$scope.formMode.mod,mod:"Update"},{id: $scope.document.id},function(){
             $scope.isTasaFija=true;
             var mo= jQuery("#"+$scope.layer).find("md-content");
@@ -422,7 +428,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             mo[0].focus();
         });
         setGetOrder.change("document","final_id", undefined);
-        $scope.formGlobal='upd';
+        $scope.Docsession.global='upd';
     };
     /***@deprecated **/
 
@@ -433,7 +439,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.cancelDoc = function(){
 
-        $scope.formBlock= false;
+        $scope.Docsession.block = false;
+
+        //$scope.formBlock= false;
         $scope.LayersAction({search:{name:"detalleDoc", before: function(){
             $scope.document.estado_id=3;// se cambia el estado a cancelado
             $scope.gridView =4;
@@ -500,10 +508,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             //$scope.document.id = response.id;
             setGetOrder.reload({id:response.id,tipo: $scope.formMode.value});
             $scope.NotifAction("ok","Nueva version creada",[],{autohidden:autohidden});
-            $scope.formBlock=false;
+            $scope.Docsession.block= false;
+
+           // $scope.formBlock=false;
             $scope.navCtrl.value="detalleDoc";
             $scope.navCtrl.estado=true;
             setGetOrder.change("document", 'id', response.id);
+            filesService.close();
+            filesService.clear();
+            filesService.setFolder("orders");
+
 
 
         });
@@ -1041,7 +1055,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
     $scope.openImport = function(){
 
-        if($scope.formBlock ){
+
+        if($scope.Docsession.block ){
             $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:autohidden});
         }else{
 
@@ -1089,14 +1104,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.newDoc= function(formMode){
 
         $scope.formMode=formMode;
-        $scope.formGlobal="new";
+        $scope.Docsession.global="new";
+        $scope.Docsession.isCopyableable = false;
+
         setGetOrder.clear();
         if($scope.provSelec.id){
             $scope.document.prov_id=$scope.provSelec.id;
         }
         $scope.navCtrl.value="detalleDoc";
         $scope.navCtrl.estado= true;
-        $scope.formBlock=false;
+
+        $scope.Docsession.bloc=false;
+       // $scope.formBlock=false;
         $scope.document.tipo=formMode.value;
     };
 
@@ -1193,6 +1212,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         switch($scope.module.layer){
             case "resumenPedido":
                 setGetOrder.setOrder(angular.copy($scope.resumen));
+                $scope.Docsession.isCopyableable = true;
+
                 $scope.formMode= $scope.forModeAvilable.getXname($scope.resumen.documento);
                 $scope.navCtrl.value = "detalleDoc" ;
                 $scope.navCtrl.estado= true;
@@ -1232,11 +1253,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
                 break;
             case "agrPed":
+
                 if($scope.document.productos.kitchenBox.length == 0
                     && $scope.document.productos.contraPedido.length == 0
                     && $scope.document.productos.kitchenBox.length  == 0
                     && $scope.document.productos.pedidoSusti.length  == 0
-                    && !$scope.formBlock
+                    && !$scope.Docsession.block
                 )
                 {
                     $scope.NotifAction("alert",
@@ -1259,7 +1281,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 break;
             case "finalDoc":
 
-                if($scope.finalDoc.productos.length == 0 && !$scope.formBlock)
+                if($scope.finalDoc.productos.length == 0 && !$scope.Docsession.block)
                 {
                     $scope.NotifAction("alert",
                         "No se ha cargado ningun articulo para la "+$scope.formMode.name+ " ¿desea continuar? "
@@ -1515,7 +1537,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
 
     $scope.isEditItem = function(item) {
-        if (!$scope.formBlock) {
+        if (!$scope.Docsession.block) {
             if (item.tipo_origen_id == 1 || !item.tipo_origen_id){
                 item.edit = true;
                 var mo= jQuery("#prodDtInp"+item.id);
@@ -1971,6 +1993,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.preview=false;
                 $scope.navCtrl.value="detalleDoc";
                 $scope.navCtrl.estado=true;
+                $scope.Docsession.isCopyableable = true;
+
             }
 
         }
@@ -2920,7 +2944,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal && $scope.provSelec.id){
             $scope.document.pais_id = newVal.id;
             $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal.id});
-            if($scope.formGlobal != 'new'){
+            if( $scope.Docsession.global!= 'new'){
                 setGetOrder.change("document","pais_id",newVal.id);
             }
         }
@@ -2933,7 +2957,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal ){
 
             $scope.document.direccion_facturacion_id = newVal.id;
-            if($scope.formGlobal != 'new'){
+            if( $scope.Docsession.global != 'new'){
                 setGetOrder.change("document","direccion_facturacion_id",newVal.id);
             }
         }
@@ -2946,7 +2970,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
             $scope.document.direccion_almacen_id = newVal.id;
             $scope.formData.puertos =  Order.query({type:"AdrressPorts", id: newVal.id});
-            if($scope.formGlobal != 'new'){
+            if( $scope.Docsession.global != 'new'){
                 setGetOrder.change("document","direccion_almacen_id",newVal.id);
             }
         }
@@ -2958,15 +2982,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal ){
 
             $scope.document.prov_moneda_id = newVal.id;
-            if($scope.formGlobal != 'new'){
+            if( $scope.Docsession.global != 'new'){
                 setGetOrder.change("document","prov_moneda_id",newVal.id);
             }
             masters.get({type:'getCoin',id:newVal.id},{}, function(response){
                 var tasa = parseFloat(response.precio_usd);
-                if(!$scope.document.tasa || $scope.formGlobal == "new"){
+                if(!$scope.document.tasa ||  $scope.Docsession.global == "new"){
                     $scope.document.tasa = tasa;
                 }else {
-                    if(tasa != $scope.document.tasa  && !$scope.formBlock){
+                    if(tasa != $scope.document.tasa  && !$scope.Docsession.block){
                         $scope.NotifAction("alert","La tasa fue cambiada segun moneda selecionada ",[],{autohidden:autohidden});
                         $scope.document.tasa = tasa;
                         $scope.isTasaFija= true;
@@ -3268,7 +3292,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         $scope.navCtrl.estado=false;
     });
 
-    $scope.$watch("formBlock",function(newVal){
+    $scope.$watch("Docsession.block",function(newVal){
         if(newVal == true){
             filesService.setAllowUpload(false);
         }else if( newVal == false){
@@ -3299,7 +3323,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.provSelec ={};
                 $scope.ctrl = {};
                 setGetOrder.clear();
-                $scope.formGlobal='new';
+                $scope.Docsession.global='new';
+                $scope.Docsession.isCopyableable = false;
+
 
             },400);
 
@@ -3307,7 +3333,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         if(newVal[1] == "listPedido" || newVal[1] == "menuAgr" ){
             $timeout(function(){
                 $scope.document ={};
-                $scope.formGlobal='new';
+                $scope.Docsession.global='new';
                 setGetOrder.clear();
                 $scope.ctrl.pais_id= null;
                 $scope.ctrl.searchPais= '';
@@ -3319,6 +3345,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.ctrl.searchMonedaSelec= '';
                 $scope.ctrl.condicion_pago_id= null;
                 $scope.ctrl.searchcondPagoSelec= '';
+                $scope.Docsession.isCopyableable = false;
+
 
             },400);
 
@@ -3333,6 +3361,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             },2000);
             $scope.provIndex = null;
             $scope.tempDoc= {};
+            $scope.Docsession.isCopyableable = false;
+
         }
 
         if(newVal[0] == 0 || newVal[0] == 1){
@@ -3341,9 +3371,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             if($scope.layer != "detalleDoc"){
                 $scope.gridView= 1;
                 $scope.imagenes = [];
-                $scope.formBlock = true;
+                $scope.Docsession.block= true;
                 $scope.isTasaFija= true;
                 setGetOrder.restore();
+                $scope.Docsession.isCopyableable = false;
+
             }
 
         }
@@ -3865,6 +3897,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         reload: function(doc){
             doc= (doc) ? doc : {id:order.id, tipo:order.tipo};
             bindin.estado=false;
+            order.id=doc.id;
             Order.get({type:"Document", id:doc.id,tipo: doc.tipo}, {},function(response) {
                 order.emision = DateParse.toDate(response.emision);
                 order.monto = parseFloat(response.monto);
@@ -3902,9 +3935,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                 angular.forEach(response,function(v,k){
                     if(!order[k]){
                         order[k]= v;
-                        /* if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && !angular.isNumber(k)){
-                         change('document',k,v);
-                         }*/
+
                     }
                 });
                 /*angular.forEach(response.productos.contraPedido, function(v,k){

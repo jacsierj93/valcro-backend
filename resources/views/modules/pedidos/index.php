@@ -197,7 +197,7 @@
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && formBlock && !document.aprob_gerencia && !document.aprob_compras && document.id )" ng-click="updateForm()">
+                         ng-show="(module.index > 1 && Docsession.block && !document.aprob_gerencia && !document.aprob_compras && document.id )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
@@ -206,7 +206,7 @@
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="( document.id )"
+                         ng-show="( document.id && Docsession.isCopyableable )"
                          ng-click="copyDoc()">
                         <span style="font-size: 24px"> CP</span>
                     </div>
@@ -1038,7 +1038,7 @@
                                     <label>Titulo</label>
                                     <input  ng-model="document.titulo"
                                             ng-change=" toEditHead('titulo', document.titulo ) "
-                                            ng-disabled="( formBlock )"
+                                            ng-disabled="( Docsession.block )"
                                             required
                                             info="Escriba un titulo para facilitar identificacion del documento"
                                             skip-tab
@@ -1054,7 +1054,7 @@
                                     <label>Pais</label>
                                     <md-autocomplete md-selected-item="ctrl.pais_id"
                                                      info="Selecione el pais de origen de los productos"
-                                                     ng-disabled="( formBlock || !provSelec.id )"
+                                                     ng-disabled="( Docsession.block || !provSelec.id )"
                                                      ng-click="toEditHead('pais_id', document.pais_id)"
                                                      skip-tab
                                                      md-search-text="ctrl.searchPais"
@@ -1074,7 +1074,7 @@
                                         </md-item-template>
                                     </md-autocomplete>
                                     <!-- <md-select ng-model="document.pais_id" md-no-ink
-                                                ng-disabled="( formBlock || !provSelec.id )"
+                                                ng-disabled="( Docsession.block || !provSelec.id )"
                                                 ng-change="toEditHead('pais_id', document.pais_id)"
                                                 info="Selecione el pais de origen de los productos"
                                                 skip-tab
@@ -1092,7 +1092,7 @@
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                     <label>Direccion Facturacion</label>
                                     <md-autocomplete md-selected-item="ctrl.direccion_facturacion_id"
-                                                     ng-disabled="( formBlock || provSelec.id == '' )"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' )"
                                                      ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
                                                      info="Selecione la direccion que debe especificarse en la factura"
                                                      skip-tab
@@ -1113,7 +1113,7 @@
 
                                     <!--<md-select ng-model="document.direccion_facturacion_id"
                                                md-no-ink
-                                               ng-disabled="( formBlock || provSelec.id == '' )"
+                                               ng-disabled="( Docsession.block || provSelec.id == '' )"
                                                ng-change="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
                                                info="Selecione la direccion que debe especificarse en la factura"
                                                id="direccion_facturacion_id"
@@ -1138,7 +1138,7 @@
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()">
                                     <label>Direccion almacen</label>
                                     <md-autocomplete md-selected-item="ctrl.direccion_almacen_id"
-                                                     ng-disabled="( formBlock || provSelec.id == '' )"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' )"
                                                      ng-click="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
                                                      info="Selecione la direccion que debe especificarse en la factura"
                                                      id="direccion_almacen_id"
@@ -1160,7 +1160,7 @@
                                     </md-autocomplete>
                                     <!-- <md-select ng-model="document.direccion_almacen_id"
                                                 md-no-ink
-                                                ng-disabled="( formBlock || !provSelec.id || !document.pais_id  )"
+                                                ng-disabled="( Docsession.block || !provSelec.id || !document.pais_id  )"
                                                 ng-change="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
                                                 info="Seleccione la direccion desde donde se despachara la mercancia"
                                                 id="direccion_almacen_id"
@@ -1185,7 +1185,7 @@
                                     <label>Monto</label>
                                     <input  ng-model="document.monto"
                                             decimal
-                                            ng-disabled="( formBlock )"
+                                            ng-disabled="( Docsession.block )"
                                             required
                                             ng-change="toEditHead('monto', document.monto)"
                                             info="Monto aproximado a pagar"
@@ -1198,7 +1198,7 @@
                                 <md-input-container class="md-block" flex="10" ng-click="allowEdit()">
                                     <label>Moneda</label>
                                     <md-autocomplete md-selected-item="ctrl.prov_moneda_id"
-                                                     ng-disabled="( formBlock)"
+                                                     ng-disabled="( Docsession.block)"
                                                      required
                                                      ng-click="toEditHead('prov_moneda_id', document.prov_moneda_id)"
                                                      info="Seleccione la moneda en la que se realizara el pago"
@@ -1218,7 +1218,7 @@
                                         </md-item-template>
                                     </md-autocomplete>
                                     <!-- <md-select ng-model="document.prov_moneda_id" md-no-ink
-                                                ng-disabled="( formBlock)"
+                                                ng-disabled="( Docsession.block)"
                                                 required
                                                 ng-change="toEditHead('prov_moneda_id', document.prov_moneda_id)"
                                                 info="Seleccione la moneda en la que se realizara el pago"
@@ -1238,7 +1238,7 @@
                                 <md-input-container class="md-block" flex="10" ng-dblclick="editTasa()"  ng-click="allowEdit()">
                                     <label>Tasa</label>
                                     <input  ng-model="document.tasa"
-                                            ng-disabled="( formBlock || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
+                                            ng-disabled="( Docsession.block || document.prov_moneda_id == '' ||  !document.prov_moneda_id)"
                                             ng-readonly="isTasaFija"
                                             required
                                             info="Tasa segun la moneda selecionada"
@@ -1251,7 +1251,7 @@
                                 <md-input-container class="md-block" flex="" ng-click="allowEdit()">
                                     <label>Condicion de pago</label>
                                     <md-autocomplete md-selected-item="ctrl.condicion_pago_id"
-                                                     ng-disabled="( formBlock  || !provSelec.id)"
+                                                     ng-disabled="( Docsession.block  || !provSelec.id)"
                                                      ng-click="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                      md-no-ink
                                                      ng-required ="(formMode.value == 23)"
@@ -1271,7 +1271,7 @@
                                             <span>{{item.titulo}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
-                                    <!--<md-select ng-model="document.condicion_pago_id" ng-disabled="( formBlock  || !provSelec.id)"
+                                    <!--<md-select ng-model="document.condicion_pago_id" ng-disabled="( Docsession.block  || !provSelec.id)"
                                                ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                md-no-ink
                                                ng-required ="(formMode.value == 23)"
@@ -1297,7 +1297,7 @@
 
                                 <md-input-container class="md-block" flex  >
                                     <label>N° Factura:</label>
-                                    <input ng-model="document.nro_factura"  ng-disabled="( formBlock)"
+                                    <input ng-model="document.nro_factura"  ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('nro_factura', document.nro_factura)"
                                            info="Introducir Nro de factura en caso de tenerla"
                                            skip-tab
@@ -1315,7 +1315,7 @@
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
-                                    <input ng-model="document.nro_proforma"  ng-disabled="( formBlock)"
+                                    <input ng-model="document.nro_proforma"  ng-disabled="( Docsession.block)"
                                            ng-required ="(formMode.value == 22 || formMode.value == 23 )"
                                            ng-change="toEditHead('nro_proforma', document.nro_proforma)"
                                            info="Introducir Nro de proforma en caso de tenerla"
@@ -1334,7 +1334,7 @@
                                     <label>Mt3</label>
                                     <input ng-model="document.mt3"  name="mt3"
                                            ng-model="number" decimal
-                                           ng-disabled="( formBlock)"
+                                           ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('mt3', document.mt3)"
                                            info="Metros cubicos"
                                            skip-tab
@@ -1344,7 +1344,7 @@
                                 <md-input-container class="md-block" flex="10" >
                                     <label>Peso</label>
                                     <input ng-model="document.peso" name="peso" decimal
-                                           ng-disabled="( formBlock)"
+                                           ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('peso', document.peso)"
                                            info="Sumatoria de los pesos de productos"
                                            skip-tab
@@ -1361,7 +1361,7 @@
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
-                                    <input ng-model="document.comentario"  ng-disabled="( formBlock)"
+                                    <input ng-model="document.comentario"  ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('nro_proforma', document.nro_proforma)"
                                            info="Algun texto adicional referente al documento"
                                            skip-tab
@@ -1387,7 +1387,7 @@
                                 <md-input-container class="md-block" flex="">
                                     <label>Estatus</label>
                                     <md-select ng-model="document.estado_id"
-                                               ng-disabled="( gridView != 2 ||  formBlock )"
+                                               ng-disabled="( gridView != 2 ||  Docsession.block )"
                                                ng-change="toEditHead('estado_id', document.estado_id)"
                                                skip-tab
                                                id="condicion_pago_id"
@@ -1424,7 +1424,7 @@
 
                                 <div layout="column" flex="20">
                                     <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
-                                                   ng-disabled="(formBlock)"
+                                                   ng-disabled="(Docsession.block)"
                                                    ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
 
                                     ></md-datepicker skip-tab>
@@ -1432,7 +1432,7 @@
 
                                 <md-input-container class="md-block" flex="20">
                                     <label>N° Documento</label>
-                                    <input ng-model="document.nro_doc"  ng-disabled="(formBlock)"
+                                    <input ng-model="document.nro_doc"  ng-disabled="(Docsession.block)"
                                            ng-click="toEditHead('nro_doc', document.nro_doc)"
                                            required
 
@@ -1462,7 +1462,7 @@
                             <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
                                 <label>Motivo de cancelacion </label>
                                 <input  ng-model="document.comentario_cancelacion"
-                                        ng-disabled="(formBlock)"
+                                        ng-disabled="(Docsession.block)"
                                         id="mtvCancelacion"
                                         ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
                                         required
@@ -1554,7 +1554,7 @@
                                     <div layout="row" class="cellGridHolder" >
                                         <div flex="5" class="cellEmpty">
                                             <md-switch class="md-primary" ng-change="addRemoveItem(item)"
-                                                       ng-disabled="( formBlock )" ng-model="item.asignado"> </md-switch>
+                                                       ng-disabled="( Docsession.block )" ng-model="item.asignado"> </md-switch>
                                         </div>
                                         <div flex="10" class="cellSelect"> {{item.cod_producto}}</div>
                                         <div flex class="cellGrid">  {{item.descripcion}}</div>
@@ -1563,7 +1563,7 @@
                                             <input  ng-model="item.saldo"
                                                     ng-change="changeItem(item)"
                                                     decimal
-                                                    ng-disabled="(formBlock || !item.asignado )"
+                                                    ng-disabled="(Docsession.block || !item.asignado )"
                                                     ng-readonly = "!item.edit"
                                                     ng-click="isEditItem(item)"
                                                     id="prodDtInp{{item.id}}"
@@ -1763,7 +1763,7 @@
                                         <div ng-click="tbl_listProducProv.order = '-cantidad' "ng-class="{'filter-select':(tbl_listProducProv.order == '-cantidad')}"><img src="images/TrianguloDown.png" ></div>
                                     </div>
                                     <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center">
-                                        <div ng-click="createProduct(tbl_listProducProv.filter)" style="width: 24px; margin-top:8px;" ng-show="(!formBlock)" ng-disabled="(formBlock)">
+                                        <div ng-click="createProduct(tbl_listProducProv.filter)" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
                                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                                         </div skip-tab >
                                     </div>
@@ -1778,7 +1778,7 @@
                                    ng-mouseenter = "mouseEnterProd(item) " row-select>
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellEmpty cellSelect">
-                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(formBlock)" ng-model="item.asignado"></md-switch>
+                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(Docsession.block)" ng-model="item.asignado"></md-switch>
                                     </div>
                                     <div flex="20" class="cellGrid" > {{item.codigo}}</div>
                                     <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
@@ -1791,7 +1791,7 @@
                                     >
                                         <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
                                                 type="number" range="{{item.asignado}}" minVal="1" maxVal="6" id="p{{item.id}}"
-                                                ng-disabled="(!item.asignado || formBlock) " ng-focus="provRow = item.id "  ng-blur="provRow = '-1'" />
+                                                ng-disabled="(!item.asignado || Docsession.block) " ng-focus="provRow = item.id "  ng-blur="provRow = '-1'" />
                                     </div>
 
 
@@ -1904,7 +1904,7 @@
                         <div flex >
                             <div layout="row" class="cellGridHolder" ng-repeat="item in filterContraPed(formData.contraPedido,tbl_agrContPed.filter) | orderBy: tbl_agrContPed.order">
                                 <div class="cellEmpty" flex="5" ng-click="allowEdit()">
-                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(formBlock)"></md-switch>
+                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(Docsession.block)"></md-switch>
                                 </div>
                                 <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
@@ -2033,7 +2033,7 @@
                             <div flex>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in formData.kitchenBox | filter:tbl_agrKitBoxs.filter:strict | orderBy : tbl_agrKitBoxs.order ">
                                     <div class="cellEmpty" flex="5" ng-click="allowEdit()">
-                                        <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(formBlock)"></md-switch>
+                                        <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(Docsession.block)"></md-switch>
                                     </div>
                                     <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.num_proforma}}</div>
@@ -2156,7 +2156,7 @@
                                     <div flex="5" class="cellEmpty" ng-click="allowEdit()">
                                         <md-switch class="md-primary" ng-model="item.asignado"
                                                    ng-change="changePedidoSustituto(item)"
-                                                   ng-disabled="(formBlock)"></md-switch>
+                                                   ng-disabled="(Docsession.block)"></md-switch>
                                     </div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_proforma}}</div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.emision | date:'dd/MM/yyyy'}}</div>
@@ -2341,7 +2341,7 @@
                                         <md-switch class="md-primary"
                                                    ng-model="item.asignado"
                                                    ng-change="addRemoveCpItem(item)"
-                                                   ng-disabled="(formBlock)"></md-switch>
+                                                   ng-disabled="(Docsession.block)"></md-switch>
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                     <div flex="15" class="cellGrid"> {{item.codigo_fabrica}}</div>
@@ -2656,7 +2656,7 @@
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | filter :tbl_pediSutitut.filter:strict | orderBy :tbl_pediSutitut.order   ">
                                     <div flex="5" class="cellEmpty" >
                                         <md-switch class="md-primary"
-                                                   ng-disabled="( formBlock )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
+                                                   ng-disabled="( Docsession.block )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
                                         </md-switch>
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
