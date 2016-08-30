@@ -846,6 +846,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     /** cerrado de la grilla en modo small**/
     $scope.closeSideFile = function(e){
         if(!angular.element(e.target).is("#ngf-fileInput")){
+            console.log("is open file",$scope.isOpen )
             if($scope.isOpen){
                 filesService.close();
             }
@@ -950,6 +951,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                             $scope.expand=false;
                         }
                         filesService.clear();
+                        $scope.isOpen= false;
                     });
 
 

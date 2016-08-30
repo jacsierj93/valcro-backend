@@ -9,7 +9,7 @@
 namespace app\Libs\Utils;
 
 use App\Libs\Api\RestApi;
-use App\Models\Sistema\FileModel;
+use App\Models\Sistema\Masters\FileModel;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
 use Log;
