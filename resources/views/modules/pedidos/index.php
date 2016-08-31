@@ -211,6 +211,12 @@
                         <span style="font-size: 24px"> CP</span>
                     </div>
 
+                    <div layout="column" layout-align="center center"
+                         ng-show="( document.id  )"
+                         ng-click="openVersions()">
+                        <span style="font-size: 24px"> OLD </span>
+                    </div>
+
                     <!--  <div layout="column" layout-align="center center"
                            ng-click="printTrace()">
                           <span style="font-size: 24px"> TEST</span>
@@ -2678,6 +2684,215 @@
             </md-content>
         </md-sidenav>
 
+        <!-- 14) ########################################## LAYER (5) RESUMEN de version anterior ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenOldDoc" id="resumenOldDoc" >
+
+
+            <md-content  layout="row" flex  >
+                <div layout="column" flex >
+                    <form name="FormPedidoSusProduc" layout="row"  ng-style="(tbl_oldDoc.extend == 0 ) ? {'min-height' : '204px'} : {} " ng-class="{'focused' : (tbl_oldDoc.extend == 0 )}">
+                        <div active-left></div>
+                        <div  layout="column" flex ng-init="tbl_oldDoc.extend = 0 ">
+                            <div class="titulo_formulario" layout="Column" layout-align="start start" class="row" ng-click="tbl_oldDoc.extend = 0 " >
+                                <div>
+                                    Datos de la {{formMode.name}}
+                                </div>
+                            </div>
+                            <div layout="row" class="row" ng-show="tbl_oldDoc.extend == 0 ">
+                                <md-input-container class="md-block" flex >
+                                    <label>Titulo</label>
+                                    <input  ng-model="oldVersionSelect.titulo" ng-disabled="true">
+                                </md-input-container>
+                                <div layout="column" class="md-block" layout-align="center center" >
+                                    <div>Creado: </div>
+                                </div>
+                                <div flex="20" class="md-block" layout="column" layout-align="center center" >
+                                    <div>{{oldVersionSelect.emision | date:'dd/MM/yyyy'}}</div>
+                                </div>
+                            </div>
+                            <div layout="row" class="row" ng-show="tbl_oldDoc.extend == 0 ">
+                                <md-input-container class="md-block" flex="20">
+                                    <label>Pais</label>
+                                    <input ng-model="oldVersionSelect.pais" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex>
+                                    <label>Almacen</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15" >
+                                    <label>Puerto</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+
+
+                            </div>
+                            <div layout="row" class="row" ng-show="tbl_oldDoc.extend == 0 ">
+                                <md-input-container class="md-block" flex="" >
+                                    <label>Dir. Facturación</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="30" >
+                                    <label>Prioridad</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+                                <md-input-container class="md-block" flex="10" >
+                                    <label>Mt3</label>
+                                    <input ng-model="oldVersionSelect.mt3" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="10" >
+                                    <label>Peso</label>
+                                    <input ng-model="oldVersionSelect.peso" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+                            </div>
+                            <div layout="row" class="row" ng-show="tbl_oldDoc.extend == 0 ">
+                                <md-input-container class="md-block" flex="10">
+                                    <label>Monto</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15">
+                                    <label>Moneda</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="10" >
+                                    <label>Tasa</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+                                <md-input-container class="md-block" flex >
+                                    <label>Condicion de pago</label>
+                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                           ng-disabled="true" />
+
+                                </md-input-container>
+
+                            </div>
+
+                        </div>
+                    </form>
+                    <form layout="row" class=""  ng-class="{'focused' : (tbl_oldDoc.extend == 1 )}">
+                        <div active-left></div>
+                        <div layout="row" flex ng-class="{'focused' : (tbl_oldDoc.extend == 1 )}">
+                            <div class="titulo_formulario" layout="column" layout-align="start start" >
+                                <div>
+                                    Productos
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form layout="row" ng-init="tbl_oldDoc.order= 'cod_producto' ">
+                        <div active-left></div>
+                        <div layout="row" flex>
+                            <!--                            <div flex="5" ></div>
+                            -->
+                            <div flex="15" layout="row">
+                                <md-input-container class="md-block" flex >
+                                    <label>Codigo</label>
+                                    <input  ng-model="tbl_oldDoc.filter.cod_producto"
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'cod_producto' " ng-class="{'filter-select':(tbl_oldDoc.order == 'cod_producto')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div ng-click="tbl_oldDoc.order = '-cod_producto' " ng-class="{'filter-select':(tbl_oldDoc.order == '-cod_producto')}"><img src="images/TrianguloDown.png" ></div>
+                                </div>
+
+                            </div>
+                            <div flex="15" layout="row" >
+                                <md-input-container class="md-block" flex >
+                                    <label>Cod. Fabrica</label>
+                                    <input  ng-model="tbl_oldDoc.filter.codigo_fabrica"
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_oldDoc.order == 'codigo_fabrica')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div ng-click="tbl_oldDoc.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_oldDoc.order == '-codigo_fabrica')}"><img src="images/TrianguloDown.png" ></div>
+                                </div>
+                            </div>
+                            <div flex layout="row" >
+                                <md-input-container class="md-block" flex >
+                                    <label>Origen</label>
+                                    <input  ng-model="tbl_oldDoc.filter.documento"
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'documento' " ng-class="{'filter-select':(tbl_oldDoc.order == 'documento')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div ng-click="tbl_oldDoc.order = '-documento' " ng-class="{'filter-select':(tbl_oldDoc.order == '-documento')}"><img src="images/TrianguloDown.png" ></div>
+                                </div>
+                            </div>
+                            <div flex layout="row" >
+                                <md-input-container class="md-block" flex >
+                                    <label>Descripcion</label>
+                                    <input  ng-model="tbl_oldDoc.filter.descripcion"
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'descripcion' " ng-class="{'filter-select':(tbl_oldDoc.order == 'descripcion')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div ng-click="tbl_oldDoc.order = '-descripcion' " ng-class="{'filter-select':(tbl_oldDoc.order == '-descripcion')}"><img src="images/TrianguloDown.png" ></div>
+                                </div>
+                            </div>
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block" flex >
+                                    <label>Cantidad</label>
+                                    <input  ng-model="tbl_oldDoc.filter.saldo"
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'saldo' " ng-class="{'filter-select':(tbl_oldDoc.order == 'saldo')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div ng-click="tbl_oldDoc.order = '-saldo' " ng-class="{'filter-select':(tbl_oldDoc.order == '-saldo')}"><img src="images/TrianguloDown.png" ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form class="gridContent"  layout="row" flex >
+                        <div active-left></div>
+                        <div layout="column" flex>
+                            <div >
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in oldVersionSelect.productos.todos | filter :tbl_oldDoc.filter:strict | orderBy :tbl_oldDoc.order   ">
+                                    <!-- <div flex="5" class="cellEmpty" >
+                                         <md-switch class="md-primary"
+                                                    ng-disabled="( Docsession.block )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
+                                         </md-switch>
+                                     </div>-->
+                                    <div flex="15" class="cellGrid">  {{item.codigo}}</div>
+                                    <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
+                                    <div flex class="cellGrid"> {{item.documento}}</div>
+                                    <div flex class="cellGrid">  {{item.descripcion}}</div>
+                                    <div flex="10" class="cellGrid">{{item.saldo}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                    <div layout="column"  class="row" ng-click=" tbl_oldDoc.extend = ( tbl_oldDoc.extend == 0) ? 1: 0 " ng-show="tbl_oldDoc.productos.length > 0">
+                        <div flex style="border: dashed 1px #f1f1f1; text-align: center" layout="column" layout-align="end none">
+                            <span class="{{ ( tbl_oldDoc.extend == 0) ? 'icon-Up' : 'icon-Above' }}"></span>
+                        </div>
+                    </div>
+                </div>
+            </md-content>
+        </md-sidenav>
+
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
@@ -2690,17 +2905,6 @@
                                     {{formMode.name}}
                                 </div>
                             </div>
-                            <!--<div  flex style="overflow-y:auto; overflow-x: hidden " ng-show="gridViewFinalDoc == 1"
-                                  class="rowRsm"  layout="row"  >
-                                <div layout="row" class="rowRsmTitle" flex="40" >
-                                    <div flex="40"> ID: </div>
-                                    <div flex> {{document.id}} </div>
-                                </div>
-                                <div layout="row" class="rms" flex >
-                                    <div flex="40" > Version: </div>
-                                    <div flex> {{document.version}} </div>
-                                </div>
-                            </div>-->
                             <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                 <div class="rowRsmTitle" flex="40"> Creado: </div>
 
@@ -3014,7 +3218,7 @@
                             </div>
 
                             <div flex layout="row"  >
-                                <md-input-container class="md-block"  flex>
+                                <md-input-container class="md-block"  flex="15">
                                     <label>Cantidad</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
                                            ng-model="tbl_finalDoc.filter.cantidad"
@@ -3420,6 +3624,139 @@
             </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER LISTA DE DOCUMENTOS con versiones antigual del documento ########################################## -->
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="oldDocs" id="oldDocs">
+            <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
+            <md-content  layout="row" flex class="sideNavContent" >
+                <div layout="column" flex>
+                    <form layout="row">
+                        <div active-left  before="verificExit" ></div>
+                        <div layout="row" flex>
+                            <div class="titulo_formulario" style="height: 39px;">
+                                <div>
+                                    Versiones de la  {{formMode.name}} con el titulo {{document.titulo}}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form layout="row" ng-init="tbl_oldDocs.order = '-version'">
+                        <div active-left  before="verificExit" ></div>
+                        <div layout="row" flex>
+
+                            <div flex="10" layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>Version</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_oldDocs.filter.version"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_oldDocs.order = 'version' " ng-class="{'filter-select':(tbl_oldDocs.order == 'version')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_oldDocs.order = '-version' " ng-class="{'filter-select':(tbl_oldDocs.order == '-version')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+                            </div>
+                            <div flex layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>Proveedor</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_oldDocs.filter.proveedor"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_oldDocs.order = 'proveedor' " ng-class="{'filter-select':(tbl_oldDocs.order == 'proveedor')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_oldDocs.order = '-proveedor' " ng-class="{'filter-select':(tbl_oldDocs.order == '-proveedor')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+                            </div>
+                            <div flex layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>Titulo</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_oldDocs.filter.titulo"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_oldDocs.order = 'titulo' " ng-class="{'filter-select':(tbl_oldDocs.order == 'titulo')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_oldDocs.order = '-titulo' " ng-class="{'filter-select':(tbl_oldDocs.order == '-titulo')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+                            </div>
+                            <div flex="10" layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>Fecha</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_oldDocs.filter.emision"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_oldDocs.order = 'emision' " ng-class="{'filter-select':(tbl_oldDocs.order == 'emision')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_oldDocs.order = '-emision' " ng-class="{'filter-select':(tbl_oldDocs.order == '-emision')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+                            </div>
+                            <div flex layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>Monto</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_oldDocs.filter.monto"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_oldDocs.order = 'monto' " ng-class="{'filter-select':(tbl_oldDocs.order == 'monto')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_oldDocs.order = '-monto' " ng-class="{'filter-select':(tbl_oldDocs.order == '-monto')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+                            </div>
+                            <div flex layout="row"  >
+                                <md-input-container class="md-block"  flex>
+                                    <label>Comentario</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="1"
+                                           ng-model="tbl_oldDocs.filter.comentario"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_oldDocs.order = 'comentario' " ng-class="{'filter-select':(tbl_oldDocs.order == 'comentario')}"><img src="images/TrianguloUp.png" ></div>
+                                    <div layout-align="star center" ng-click="tbl_oldDocs.order = '-comentario' " ng-class="{'filter-select':(tbl_oldDocs.order == '-comentario')}"><img src="images/TrianguloDown.png"/></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+                    <form layout="row" class="gridContent">
+                        <div active-left  before="verificExit" ></div>
+                        <div layout="column" flex>
+                            <div flex>
+                                <div ng-repeat="item in filterDocuments(oldDocs, tbl_priorityDocs.filter) | orderBy : tbl_priorityDocs.order "  row-select>
+                                    <div layout="row" class="cellGridHolder" >
+
+
+                                        <div flex="10" class="cellSelect" ng-click="openOld(item)"
+                                             ng-class="{'cellGrid':( oldVersionSelect.id  != item.id) ,'cellSelect-select':( oldVersionSelect.id &&  oldVersionSelect.id  == item.id  )}"
+                                             tabindex="{{$index + 1}}"
+                                        > {{item.version}}</div>
+                                        <div flex class="cellGrid" ng-click="openOld(item)"> {{item.proveedor}}</div>
+                                        <div flex class="cellGrid" ng-click="openOld(item)" > {{item.titulo}}</div>
+                                        <div flex="10" class="cellGrid" ng-click="openOld(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                        <div flex class="cellGrid" ng-click="openOld(item)" > {{item.monto | currency :item.symbol :2}}</div>
+                                        <div flex class="cellGrid"  ng-click="openOld(item)" >{{item.comentario}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div id="expand"></div>
+            </md-content>
+        </md-sidenav>
 
         <!-- ########################################## LAYER LISTA DE PREVIEW HYML ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="htmlViewer" id="htmlViewer">

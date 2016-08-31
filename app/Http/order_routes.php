@@ -61,7 +61,6 @@ $app->post("Order/Order/AddCustomOrder",'Orders\OrderController@addCustomOrderOr
 $app->post("Order/Order/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderOrder'); ///remueve un contra pedido de un pedido
 $app->post("Order/Order/AddkitchenBox",'Orders\OrderController@addkitchenBoxOrder'); ///agrega un kitchen box
 $app->post("Order/Order/RemovekitchenBox",'Orders\OrderController@removekitchenBoxOrder'); ///quita  kitchen box
-$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
 $app->post("Order/Order/SetStatus",'Orders\OrderController@setStatusOrder'); // cambia el estado del documento
 $app->post("Order/Order/AdddRemoveItems",'Orders\OrderController@addRemoveOrderItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
@@ -75,9 +74,12 @@ $app->post("Order/Order/AddAnswer",'Orders\OrderController@AddAnswerOrder'); ///
 $app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesOrder'); /// realiza la aprobacion por comprass
 $app->post("Order/Order/Cancel",'Orders\OrderController@cancelsOrder'); /// cancela el pedido
 $app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrden'); /// cambia un producto item
+$app->post("Order/Order/Restore",'Orders\OrderController@restoreOrden'); /// restaura a una version anterior
 
-$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos ordene que se pude sustituir
-$app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// trae el resumen final de uin pedido
+
+$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
+$app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// trae el resumen final de un pedido
+$app->get("Order/Order/Versions",'Orders\OrderController@getOldOrden'); /// trae todas las versiones que a generado el documento
 
 
 //Orden de compra
@@ -88,7 +90,6 @@ $app->post("Order/Purchase/AddCustomOrder",'Orders\OrderController@addCustomOrde
 $app->post("Order/Purchase/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderPurchase'); // remove el contra pedido
 $app->post("Order/Purchase/AddkitchenBox",'Orders\OrderController@addkitchenBoxPurchase'); /// agrga un kitchen box
 $app->post("Order/Purchase/RemovekitchenBox",'Orders\OrderController@removekitchenBoxPurchase'); ///quita  kitchen box
-$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
 $app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
 $app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
@@ -104,8 +105,11 @@ $app->post("Order/Purchase/AddAnswer",'Orders\OrderController@AddAnswerPurchase'
 $app->post("Order/Purchase/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesPurchase'); // agreaga la aprobacion por compras
 $app->post("Order/Purchase/Cancel",'Orders\OrderController@cancelPurchase'); /// Cancela el documento
 $app->post("Order/Purchase/ProductChange",'Orders\OrderController@changeProductoPurchase'); // cambia el producto
+$app->post("Order/Purchase/Restore",'Orders\OrderController@restorePurchase'); /// restaura a una version anterior
 
-$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las solicitudes que sus sustituibles
+
+$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
+$app->get("Order/Purchase/Versions",'Orders\OrderController@getOldPurchase'); /// trae todas las versiones que a generado el documento
 $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///resumen final de la orden de compra
 
 
@@ -125,13 +129,17 @@ $app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteS
 $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
 $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
-$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
-$app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
 $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
 $app->post("Order/Solicitude/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesSolicitude'); ///agrega la aprobacion de compras
 $app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude'); /// cancela la solicitud
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
+$app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
+
+$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
+$app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
+$app->get("Order/Solicitude/Versions",'Orders\OrderController@getOldSolicitude'); /// trae todas las versiones que a generado el documento
+
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido @deprecated
 
