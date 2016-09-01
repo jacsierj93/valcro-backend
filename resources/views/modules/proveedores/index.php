@@ -451,8 +451,9 @@
                                                  md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
                                                  md-item-text="item.descripcion"
                                                  md-autoselect = "true"
+                                                 md-select-on-focus
                                                  md-no-asterisk
-                                                 md-min-length="0">
+                                                 md-min-length=0>
                                     <input >
                                     <md-item-template>
                                         <span>{{item.descripcion}}</span>
@@ -481,7 +482,8 @@
                                                  md-item-text="item.short_name"
                                                  md-autoselect = "true"
                                                  md-no-asterisk
-                                                 md-min-length="0">
+                                                 md-input-minlength="0"
+                                                 md-min-length=0>
                                     <input >
                                     <md-item-template>
                                         <span>{{item.short_name}}</span>

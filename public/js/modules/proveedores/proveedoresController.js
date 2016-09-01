@@ -650,11 +650,19 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
             consonantes = consonantes.substr(1,consonantes.length-2);
             var patt = new RegExp("^"+first+"["+consonantes+"]"+"+"+last+"$","i");
             if(!patt.test(htmlElem.value)){
+                var focus = null;
+                $timeout(function(){
+                    focus= angular.element(":focus");
+                },100)
+
                 setNotif.addNotif("alert","estas siglas no se parecen a la razon social, estas seguro que son correctas?",
                     [
                         {
                             name:"si, lo estoy",
                             action:function(){
+                                console.log(focus)
+                                angular.element(focus).focus();
+                                focus = null;
                             },
                             default:defaultTime
                         },
@@ -3143,6 +3151,7 @@ MyApp.controller('newCoinController',function($scope,setGetProv,providers,master
 
     $scope.endLayer = saveNewCoin;
 });
+
 MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,masterLists,$timeout,masters) {
      $scope.provider = setGetProv.getProv();
      $scope.prov = setGetProv.getChng();

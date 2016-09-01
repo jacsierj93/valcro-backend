@@ -125,6 +125,9 @@ MyApp.filter('customFind', function() {
 
 MyApp.filter('filtCountry', function() {
     return function(lists, search) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        if(search==""){
+            return lists;
+        }
         return lists.filter(function(val) {
             return val.short_name.toLowerCase().indexOf(search.toLowerCase()) != -1 ;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
@@ -412,7 +415,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }
         }else{
             $timeout(function(){
-                if(!angular.element(elem).parents("md-sidenav.popUp").length>0){
+                if(!angular.element(elem).parents("md-sidenav.popUp").length>0){ //evalua si el sidenav que esta a fnalizar No es un popUp
                     if(!scope.endLayer) {
                         angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
                         angular.element(elem).blur();
@@ -456,6 +459,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             }else{
                 element.bind("keydown",function(e){
                     var elem =this;
+                    console.log("ELEMENT ==>",elem)
                     if(e.which == "13"){
                         skip(elem,scope)
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
