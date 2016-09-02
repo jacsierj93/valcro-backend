@@ -170,6 +170,8 @@ $app->get("Order/OrderSubstitute",'Orders\OrderController@getOrderSustitute'); /
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido @deprecated
 $app->get("Order/test",'Orders\OrderController@test'); ///elimina el pedido @deprecated
 
+$app->get("Order/Email/Gerencia",'Orders\OrderController@emailGerencia'); ///elimina el pedido @deprecated
+
 //deprecated
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
 $app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
