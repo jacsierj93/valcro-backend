@@ -208,7 +208,7 @@
                     <div layout="column" layout-align="center center"
                          ng-show="( document.id && Docsession.isCopyableable )"
                          ng-click="copyDoc()">
-                        <span style="font-size: 24px"> CP</span>
+                        <span class="icon-Copiado" style="font-size: 24px"> </span>
                     </div>
 
                     <div layout="column" layout-align="center center"
@@ -1316,8 +1316,9 @@
                                      info=" Cargar adjuntos de la factura "
 
                                 >
-                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
-                                </div>
+                                    <img src="images/adjunto.png" style="margin 4px;"/>
+<!--                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
+-->                                </div>
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
@@ -1333,7 +1334,8 @@
                                      info="Cargar adjuntos de la proforma "
 
                                 >
-                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
+                                    <img src="images/adjunto.png" style="margin 4px;" />
+<!--                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>-->
 
                                 </div>
                                 <md-input-container class="md-block" flex="10">
@@ -1354,7 +1356,6 @@
                                            ng-change="toEditHead('peso', document.peso)"
                                            info="Sumatoria de los pesos de productos"
                                            skip-tab
-
                                     >
                                 </md-input-container>
 
@@ -2505,30 +2506,27 @@
                             <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
                                 <md-input-container class="md-block" flex="20">
                                     <label>Pais</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.pais" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Almacen</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.dir_almacen" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="15" >
                                     <label>Puerto</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.puerto" md-no-ink
                                            ng-disabled="true" />
-
                                 </md-input-container>
-
-
 
                             </div>
                             <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
                                 <md-input-container class="md-block" flex="" >
                                     <label>Dir. Facturación</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.dir_facturacion" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
@@ -2556,25 +2554,25 @@
                             <div layout="row" class="row" ng-show="tbl_pediSutitut.extend == 0 ">
                                 <md-input-container class="md-block" flex="10">
                                     <label>Monto</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.monto" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="15">
                                     <label>Moneda</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.moneda" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10" >
                                     <label>Tasa</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.tasa" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex >
                                     <label>Condicion de pago</label>
-                                    <input ng-model="pedidoSusPedSelec.prioridad" md-no-ink
+                                    <input ng-model="pedidoSusPedSelec.condicion_pago" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
@@ -2719,13 +2717,13 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Almacen</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.dir_almacen" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="15" >
                                     <label>Puerto</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.puerto" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
@@ -2736,7 +2734,7 @@
                             <div layout="row" class="row" ng-show="tbl_oldDoc.extend == 0 ">
                                 <md-input-container class="md-block" flex="" >
                                     <label>Dir. Facturación</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.dir_facturacion" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
@@ -2764,25 +2762,25 @@
                             <div layout="row" class="row" ng-show="tbl_oldDoc.extend == 0 ">
                                 <md-input-container class="md-block" flex="10">
                                     <label>Monto</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.monto" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="15">
                                     <label>Moneda</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.moneda" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="10" >
                                     <label>Tasa</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.tasa" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>
                                 <md-input-container class="md-block" flex >
                                     <label>Condicion de pago</label>
-                                    <input ng-model="oldVersionSelect.prioridad" md-no-ink
+                                    <input ng-model="oldVersionSelect.condicion_pago" md-no-ink
                                            ng-disabled="true" />
 
                                 </md-input-container>

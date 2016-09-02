@@ -49,6 +49,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
 
@@ -176,7 +177,7 @@ class OrderController extends BaseController
 
     /**
      * trae las notificaciones del sistema
-    */
+     */
     public function getNotifications (){
         $result = [];
         $oldReviewDays = $this->oldReview();
@@ -1303,10 +1304,10 @@ class OrderController extends BaseController
 
         }
 
-       // $newModel->items()->saveMany($newItems);
+        // $newModel->items()->saveMany($newItems);
         $resul['id']= $newModel->id;
-                $resul['doc']= $newModel;
-                $resul['adjs']= $newAtt;
+        $resul['doc']= $newModel;
+        $resul['adjs']= $newAtt;
         $resul['oldItems']= $newItems;
         return $resul;
 
@@ -1705,7 +1706,7 @@ class OrderController extends BaseController
         $resul['new']= $asig;
         $resul['del']= $remo;
         $resul['success']= "Items agregados";
-         $model->destroy($remo);
+        $model->destroy($remo);
 
         return $resul;
     }
@@ -2922,7 +2923,6 @@ class OrderController extends BaseController
     /**
      * obtiene todos las ordenes de compras que son sustituibles
      **/
-
     public function getPurchaseSubstitutes(Request $req){
         $data = array();
         $items = Purchase::where('id','<>', $req->doc_id)
@@ -3150,7 +3150,7 @@ class OrderController extends BaseController
         $docIts= $doc->findOrFail($req->doc_id)->items()->get();
 
         $prov= Provider::findOrFail($model->prov_id);
-        $mone=Monedas::findOrFail($model->prov_moneda_id);
+
         $tipos = SourceType::get();
 
         //para maquinas
@@ -3192,14 +3192,38 @@ class OrderController extends BaseController
             $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
         }
         if($model->prov_moneda_id){
+            $mone=Monedas::findOrFail($model->prov_moneda_id);
+            $tem['symbol']=$mone->simbolo;
             $tem['moneda']=$mone->nombre;
         }
-        if($model->prov_moneda_id){
-            $tem['symbol']=$mone->simbolo;
+        if($model->direccion_facturacion_id != null){
+            $tem['dir_facturacion']= ProviderAddress::findOrFail($model->direccion_facturacion_id)->direccion;
         }
-        if($model->tipo_id != null){
-            $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
+
+        if($model->direccion_almacen_id != null){
+            $tem['dir_almacen']= ProviderAddress::findOrFail($model->direccion_almacen_id)->direccion;
         }
+        if($model->condicion_pago_id != null && $model->condicion_pago_id != 0 ){
+            $aux = ProviderCondPay::findOrFail($model->condicion_pago_id);
+            $items = $aux->getItems()->get();
+            $text='';
+            if(sizeof($items) > 0){
+                foreach( $items  as $aux2){
+                    $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+                }
+            }else{
+                $text = $aux->titulo;
+            }
+            $tem['condicion_pago']= $text;
+
+        }
+        if($model->puerto_id != null){
+            $tem['puerto'] = Ports::findOrFail($model->puerto_id)->Main_port_name;
+        }
+
+
+
+
 
         $tem['nro_proforma']=$model->nro_proforma;
         $tem['nro_factura']=$model->nro_factura;
@@ -3209,6 +3233,8 @@ class OrderController extends BaseController
         $tem['peso']=$model->peso;
         $tem['emision']=$model->emision;
         $tem['monto']=$model->monto;
+
+
         $prods = [];
         foreach($model->items()->get() as $item){
             $produc=Product::findOrFail($item->producto_id);
@@ -3236,8 +3262,6 @@ class OrderController extends BaseController
         }
         $tem['productos'] = $prods;
 
-        /**actualizar cuando este el final**/
-        $tem['almacen']="Desconocido";
 
         // modificar cuando se sepa la logica
         $tem['aero']=1;
@@ -3291,6 +3315,14 @@ class OrderController extends BaseController
     }
 
 
+    /*********************************** Email ***********************************/
+    public function EmailGerencia(Request $req){
+        $data = [];
+        $model = Solicitude::find($req->id);
+
+        $data['titulo'] = "holaMundo";
+        return view("emails/modules/Order/Gerencia/ResumenDoc",$data);
+    }
     /*********************************** CONTRAPEDIDOS ***********************************/
 
     /**
@@ -4997,9 +5029,9 @@ class OrderController extends BaseController
         $prov = Provider::findOrFail($model->prov_id);
         $instance= $this->getDocumentIntance($model->getTipoId());
         $estados = OrderStatus::get();
-        $motivo = OrderReason::get();
+        /*$motivo = OrderReason::get();
         $prioridad = OrderPriority::get();
-        $coin = Monedas::get();
+        $coin = Monedas::get();*/
         //$items[] = $model;
         $aux = $model;
         while($aux->parent_id != null){
@@ -5039,22 +5071,46 @@ class OrderController extends BaseController
             $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
             $tem['img_aprob'] =$aux->fecha_aprob_compra ;
 
-            if($aux->motivo_id){
-                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+
+            if($model->motivo_id){
+                $tem['motivo']=OrderReason::findOrFail($model->motivo_id)->motivo;
             }
-            if($aux->pais_id){
-                $pa =Country::find($aux->pais_id);
-                if($pa != null){
-                    $tem['pais']=$pa->short_name;
+            if($model->pais_id){
+                $tem['pais']=Country::findOrFail($model->pais_id)->short_name;
+            }
+            if($model->prioridad_id){
+                $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
+            }
+            if($model->prov_moneda_id){
+                $mone=Monedas::findOrFail($model->prov_moneda_id);
+                $tem['symbol']=$mone->simbolo;
+                $tem['moneda']=$mone->nombre;
+            }
+            if($model->direccion_facturacion_id != null){
+                $tem['dir_facturacion']= ProviderAddress::findOrFail($model->direccion_facturacion_id)->direccion;
+            }
+
+            if($model->direccion_almacen_id != null){
+                $tem['dir_almacen']= ProviderAddress::findOrFail($model->direccion_almacen_id)->direccion;
+            }
+            if($model->condicion_pago_id != null && $model->condicion_pago_id != 0 ){
+                $aux = ProviderCondPay::findOrFail($model->condicion_pago_id);
+                $items = $aux->getItems()->get();
+                $text='';
+                if(sizeof($items) > 0){
+                    foreach( $items  as $aux2){
+                        $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+                    }
+                }else{
+                    $text = $aux->titulo;
                 }
+                $tem['condicion_pago']= $text;
 
             }
-            if($aux->prioridad_id){
-                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+            if($model->puerto_id != null){
+                $tem['puerto'] = Ports::findOrFail($model->puerto_id)->Main_port_name;
             }
-            if($aux->prov_moneda_id){
-                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
-            }
+
             $tem['productos'] = $this->getProductoItem($aux);
             $tem['nro_proforma']=$aux->nro_proforma;
             $tem['nro_factura']=$aux->nro_factura;
