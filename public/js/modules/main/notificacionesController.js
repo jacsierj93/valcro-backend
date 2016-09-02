@@ -9,11 +9,17 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     $scope.alerts = setNotif.listNotif();
 
     $scope.ok = function(call, val){
-        if(val){
-            call.opc.action(val);
-        }else {
-            call.opc.action();
+        if(call.opc.action){
+            if(val){
+                call.opc.action(val);
+            }else {
+                call.opc.action();
+            }
+        }else{
+            $scope.curFocus.focus();
         }
+
+
 
     };
 
@@ -50,7 +56,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         }
     };
 
-    $scope.curFocus = angular.element("#test");
+    $scope.curFocus = null;
     var names = ["ok","alert","error","info","input"];
     $scope.$watchGroup(['alerts.ok.length','alerts.alert.length','alerts.error.length','alerts.info.length', 'alerts.input.length'], function(newValues,old) {
         var open = false;
@@ -63,6 +69,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
             }
             if(v > 0 ){
                 open = true;
+                $scope.curFocus = angular.element(":focus");
                 $mdSidenav('lyrAlert').open();
                 //return false;
             }

@@ -630,9 +630,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
                         },
                         {
                             name:"esta bien",
-                            action:function(){
-
-                            },
+                            action:null,
                             default:defaultTime
                         },
                     ]
@@ -650,20 +648,15 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
             consonantes = consonantes.substr(1,consonantes.length-2);
             var patt = new RegExp("^"+first+"["+consonantes+"]"+"+"+last+"$","i");
             if(!patt.test(htmlElem.value)){
-                var focus = null;
-                $timeout(function(){
-                    focus= angular.element(":focus");
-                },100)
-
-                setNotif.addNotif("alert","estas siglas no se parecen a la razon social, estas seguro que son correctas?",
+               setNotif.addNotif("alert","estas siglas no se parecen a la razon social, estas seguro que son correctas?",
                     [
                         {
                             name:"si, lo estoy",
-                            action:function(){
+                            action:null,/*function(){
                                 console.log(focus)
                                 angular.element(focus).focus();
                                 focus = null;
-                            },
+                            },*/
                             default:defaultTime
                         },
                         {
@@ -788,9 +781,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                         }
                     },{
                         name: "esta bien",
-                        action: function () {
-
-                        },
+                        action:null,
                         default:defaultTime
                     }
                 ])
@@ -1061,30 +1052,15 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             $scope.valName.departments = {0:"over"};
             //console.log(typeOf());
             angular.forEach(nomVal.name.departments, function (v, k) {
-
                 var fav = {"fav": v.pivot.fav};
                 $scope.valName.departments[v.id] = fav;
             });
-           /* nomVal.name.departments.forEach(function (v, k) {
-                var fav = {"fav": v.pivot.fav};
-                $scope.valName.departments[v.id] = fav;
 
-            })*/
         } else {
-            //$scope.overId = false;
-            //console.log("false",$scope.valName.departments,currentDeps)
+
             if($scope.valName.departments[0] != "current"){
                 $scope.valName.departments = angular.copy(currentDeps);
             }
-
-            //$scope.over({name:{departments:angular.copy(currentDeps)}});
-           /* if($scope.valName.id){
-
-                $scope.overId = false;
-                //$scope.over({name:$filter("customFind")($scope.valcroName,$scope.valName.id,function(current,compare){return current.id==compare})[0]});
-            }else{
-                $scope.valName.departments = Object();
-            }*/
 
         }
 
@@ -1107,6 +1083,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         setGetProv.setComplete("valcroName",nvo);
     });
 
+    var saving = false;
     function saveValcroname(preFav,onSuccess){
 
         if(!$scope.nomvalcroForm.$valid){
@@ -1114,14 +1091,18 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             onSuccess();
             return false;
         }
-        //console.log(preFav)
+
+        if(saving){
+            return false;
+        }
+        saving = false;
         if(preFav.length>0){
             $scope.valName.preFav = preFav;
         }else{
             $scope.valName.preFav = false;
         }
-        //console.log("valname ==> ",$scope.valName);
         providers.put({type: "saveValcroName"}, $scope.valName, function (data) {
+
             $scope.valName.id = data.id;
             setGetProv.addChng($scope.valName,data.action,"valName");
             $scope.nomvalcroForm.$setPristine();
@@ -1156,6 +1137,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             $scope.valcroName = $filter('orderBy')( $scope.valcroName, "departments.fav");
             setGetProv.addChng( $scope.valName,data.action,"valName");
             preFav = [];
+            saving = false;
             onSuccess();
         });
     };
@@ -1224,6 +1206,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                     ],{block:true});
                 }else{
                     /*CLICK EN UN FUERA DEL FORMULARIO, RESETEA EL FORMULARIO Y SALE DEL FOCUS*/
+                    console.log("fuera del folder")
                     saveValcroname(preFav,function(){
                         $scope.isShow = elem;
                         $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
@@ -1242,6 +1225,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
             /*CLICK EN UN LUGAR DEL FORMULARIO, VACIA EL INPUT Y DEVUELVE EL FOCUS*/
             //console.log("cond2");
             if(!(angular.element(a.target).is("[chip],#transition") || angular.element(a.target).parents("#valNameContainer").length>0)){
+                console.log("fuera del folder")
                 saveValcroname(preFav,function(){
                     $scope.nomvalcroForm.$setUntouched();
                     $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
