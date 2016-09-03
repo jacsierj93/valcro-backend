@@ -37,7 +37,7 @@ window.addEventListener("keydown", function(e) {
     }
 }, false);
 
-MyApp.config(function ($provide, $httpProvider, $locationProvider) {
+MyApp.config(function ($provide, $httpProvider) {
 
     $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
@@ -728,8 +728,12 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 }]);
 
 
-MyApp.controller('AppMain', function ($scope,$mdSidenav,$http,$filter,setGetProv, Layers,App) {
+MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGetProv, Layers,App,SYSTEM) {
 
+    console.log("location", location);
+    if(location.pathname.indexOf('External') != -1){
+        location.assign(SYSTEM.PATHAPP+'#home');
+    }
     $scope.accion = App.getAccion();
     $scope.secciones = [
         {

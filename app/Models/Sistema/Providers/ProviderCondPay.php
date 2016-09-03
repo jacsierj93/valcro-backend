@@ -25,5 +25,17 @@ class ProviderCondPay extends Model
         return $this->hasOne('App\Models\Sistema\Masters\Line','id','linea_id');
     }
 
+    public  function getText(){
+        $items = $this->getItems()->get();
+        $text='';
+        if(sizeof($items) > 0){
+            foreach( $items  as $aux2){
+                $text=$text.$aux2->porcentaje.'% al '.$aux2->descripcion.$aux2->dias.' dias';
+            }
+        }else{
+            $text = $this->titulo;
+        }
+        return $text;
+    }
 
 }

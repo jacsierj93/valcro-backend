@@ -57,6 +57,8 @@ class OrderController extends BaseController
 {
 
 
+    private $defaulString = '';
+    private $defaulInt = 0;
     public function __construct()
     {
 
@@ -467,9 +469,7 @@ class OrderController extends BaseController
         return $prov;
     }
 
-    /***
-     * obtiene todos los documentos que pueden ser importado por una solictud
-     */
+
     public  function getEmails(Request $req){
         $data = array();
 
@@ -3179,7 +3179,6 @@ class OrderController extends BaseController
         $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_compra ;
         $tem['img_aprob'] =$model->fecha_aprob_compra ;
 
-
         $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
 
         if($model->motivo_id){
@@ -3318,9 +3317,72 @@ class OrderController extends BaseController
     /*********************************** Email ***********************************/
     public function EmailGerencia(Request $req){
         $data = [];
-        $model = Solicitude::find($req->id);
+        $model = Solicitude::findOrFail($req->id);
+        $items = $model->items()->get();
+        $data['accion']= $req->accion;
+        $data['id'] = $model->id;
+        $data['tipo'] = $model->getTipoId();
+        $data['emision'] =  $this->outputDate($model->emision);
+        $data['version'] = $model->version;
+        $data['documento'] = $model->getTipo();
+        $data['accion'] = 'demo';
+        $data['titulo'] = $model->titulo;
+        $data['proveedor'] = Provider::findOrFail($model->prov_id)->razon_social;
+        $data['responsable'] = $req->session()->get('DATAUSER')['nombre'];
+        $data['correo'] = $req->session()->get('DATAUSER')['email'];
+        $data['nro_proforma'] = ($model->nro_proforma != null) ? $model->nro_proforma : $this->defaulString;
+        $data['nro_factura'] = ($model->nro_factura != null) ? $model->nro_factura : $this->defaulString;
+        $data['monto'] =($model->prov_moneda_id == null) ? $this->defaulString:Monedas::findOrFail($model->prov_moneda_id)->symbolo.$model->monto;
+        $data['pais'] = ($model->pais_id == null) ? $this->defaulString: Country::findOrFail($model->pais_id)->short_name;
+        $data['tasa'] = number_format(floatval($model->tasa),2);
+        $data['comentario'] = $model->comentario;
+        $data['condicion_pago'] = ($model->condicion_pago_id == null ) ? $this->defaulString: ProviderCondPay::findOrFail($model->condicion_pago_id)->getText();
+        $data['mt3'] =  ($model->mt3 == null ) ? $this->defaulInt :  $model->mt3 ;
+        $data['peso'] =  ($model->peso == null ) ? $this->defaulInt :  $model->peso ;
+        if($model->fecha_cancelacion != null || true){
+            $data['cancelado']= true;
+            $data['fecha_cancelacion'] =( $model->cancelacion == null) ? $this->defaulString :  $this->outputDate($model->cancelacion);
+            $data['comentario_cancelacion'] =( $model->comentario_cancelacion == null) ? $this->defaulString :  $model->comentario_cancelacion;
+        }
 
-        $data['titulo'] = "holaMundo";
+        if($model->fecha_aprobacion_compras != null || true){
+            $data['aprob_compras']= true;
+            $data['fecha_aprobacion_compras'] = ( $model->fecha_aprob_compra == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_compra);
+            $data['nro_doc'] = $model->nro_doc;
+        }
+
+        if($model->fecha_aprobacion_gerencia != null || true){
+            $data['aprob_gerencia']= true;
+            $data['fecha_aprobacion_gerencia'] = ( $model->fecha_aprob_gerencia == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_gerencia);
+        }
+
+
+        $data['dir_almacen'] =  ($model->direccion_almacen_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_almacen_id)->direccion ;
+        $data['dir_facturacion'] =  ($model->direccion_facturacion_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_facturacion_id)->direccion ;
+
+        $data['articulos'] = sizeof(($items));
+        $data['articulos_kitchenBox'] =0;
+        $data['articulos_contraPedido'] =0;
+        foreach($items as $aux){
+            $p= $this->getFirstProducto($aux);
+            switch($p->tipo_origen_id){
+                case 2:$data['articulos_contraPedido'] ++;break;
+                case 3:$data['articulos_kitchenBox'] ++;break;
+            }
+        }
+
+        //$data['articulos'] = $model->getItem();
+        //$data['articulos_contraPedido'] = $model->getItem();
+        //$data['articulos_KitchenBox'] = $model->getItem();
+
+
+
+
+
+        //cancelacion
+       //
+
+       // return dd($req->session()->get('DATAUSER'));
         return view("emails/modules/Order/Gerencia/ResumenDoc",$data);
     }
     /*********************************** CONTRAPEDIDOS ***********************************/
@@ -5130,5 +5192,9 @@ class OrderController extends BaseController
 
     private function oldReview(){
         return 30;
+    }
+
+    private function outputDate($databd){
+        return  date_format(date_create($databd),'d-m-Y');
     }
 }

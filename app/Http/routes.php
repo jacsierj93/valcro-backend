@@ -54,21 +54,17 @@ if (Request::is('Order/*'))
     require __DIR__.'/order_routes.php';
 }
 
-//////enrutador para servicios de pedido solicitude
-if (Request::is('Solicitude/*'))
-{
-    require __DIR__.'/order_routes.php';
-}
 
-//////enrutador para servicios de ordenes de compra
-if (Request::is('PurchaseOrder/*'))
-{
-    require __DIR__.'/order_routes.php';
-}
 //////enrutador para servicios de Proveedores
 if (Request::is('provider/*'))
 {
     require __DIR__.'/prov_routes.php';
+}
+//////enrutador para servicios de Proveedores
+if (Request::is('External/*'))
+{
+
+    require __DIR__.'/external_routes.php';
 }
 
 //////enrutador para servicios de embarques
@@ -77,11 +73,7 @@ if (Request::is('embarques/*'))
     require __DIR__.'/embarques_routes.php';
 }
 
-//////enrutador para servicios de email
-if (Request::is('Email/*'))
-{
-    require __DIR__.'/email_routes.php';
-}
+
 
 //////enrutador para servicios master
 if (Request::is('master/*'))
@@ -200,8 +192,8 @@ $app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'
 $app->get("creditoProv/creditoProvList",'Proveedores\ProveedorController@listLimitCred'); ///obtener lista general
 $app->get("factConvProv/factorProvList",'Proveedores\ProveedorController@listConvPro'); ///obtener lista general
 
-
-
+/*
+                    @deprecated modelo de bootstrap
 ////tipo de provedores
 $app->get('catalogs/providerTypesList', 'Catalogs\ProviderTypesController@getList'); ///lista de tipo de prov
 $app->get('catalogs/providerTypesForm', 'Catalogs\ProviderTypesController@getForm'); ///nuevo tipo prov
@@ -241,28 +233,27 @@ $app->get("contactos/contList",'Proveedores\ProveedorController@listContactos');
 $app->get("getProviderCoin/monedaList",'Proveedores\ProveedorController@listMonedas'); ///obtener lista general de MONEDAS
 $app->get("monedasProv/monedaProvList",'Proveedores\ProveedorController@Monedas'); ///obtener lista general
 
-//******Maestro de tipos de pago******/
+//Maestro de tipos de pago
 $app->get('catalogs/PayTypesList', 'Catalogs\PayTypesController@getList'); ///lista de tiempo aproximado de transito
 $app->get('catalogs/PayTypesForm', 'Catalogs\PayTypesController@getForm'); ///nuevo tiempo aproximado d transito
 $app->post("catalogs/PayTypesSave",'Catalogs\PayTypesController@saveOrUpdate'); ///guardar tiempo apro. transito
 $app->post("catalogs/PayTypesDel",'Catalogs\PayTypesController@delete'); ///borrar tiempo aprox. trans.
 
 
-//******Maestro de tipo de docuemnto de compra******/
+//Maestro de tipo de docuemnto de compra
 $app->get('catalogs/PurchasingDocumentTypeList', 'Catalogs\PurchasingDocumentTypeController@getList'); ///lista
 $app->get('catalogs/PurchasingDocumentTypeForm', 'Catalogs\PurchasingDocumentTypeController@getForm'); ///form
 $app->post("catalogs/PurchasingDocumentTypeSave",'Catalogs\PurchasingDocumentTypeController@saveOrUpdate'); ///guardar o editar
 $app->post("catalogs/PurchasingDocumentTypeDel",'Catalogs\PurchasingDocumentTypeController@delete'); ///borrar
 
 
-//******Orden de compra******/
+//Orden de compra
 $app->get('catalogs/PurchasingOrderList', 'Purchases\PurchasingOrderController@getList'); ///lista
 $app->get('catalogs/PurchasingOrderForm', 'Purchases\PurchasingOrderController@getForm'); ///form
 $app->post("catalogs/PurchasingOrderSave",'Purchases\PurchasingOrderController@saveOrUpdate'); ///guardar o editar
 $app->post("catalogs/PurchasingOrderDel",'Purchases\PurchasingOrderController@delete'); ///borrar
 
 
-/******Pedidos *****/
 $app->get('catalogs/OrderProviderList', 'Purchases\OrderController@getListForm'); ///view for
 $app->get('catalogs/OrderForm', 'Purchases\OrderController@getForm'); ///form
 $app->post("catalogs/OrderSave",'Purchases\OrderController@saveOrUpdate'); ///guardar o editar
@@ -276,4 +267,4 @@ $app->post("catalogs/ProviderCoins",'Purchases\OrderController@getProviderCoins'
 $app->post("catalogs/ProviderProduct",'Purchases\PurchasingOrderController@getProviderProduct'); ///getProductos de provedor
 $app->post("catalogs/ProviderAdressStore",'Purchases\OrderController@getProviderAdressStore'); ///getProductos de provedor
 $app->post("catalogs/ProviderPaymentCondition",'Purchases\OrderController@getProviderPaymentCondition'); ///getProductos de provedor
-
+*/
