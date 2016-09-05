@@ -1527,11 +1527,11 @@
                             <div layout="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>De (Dias)</label>
-                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from" required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20">
                                     <label>A (Dias)</label>
-                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to">
+                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to" required>
                                 </md-input-container>
 
                                 <md-input-container class="md-block" flex>
@@ -1960,6 +1960,9 @@
 
                 </div>
             </md-content>
+            <div class="showNext"   style="width: 16px;" ng-mouseover="showNext(true,'END')">
+
+            </div>
         </md-sidenav>
 
         <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">

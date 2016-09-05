@@ -205,17 +205,15 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                 id = id||null;
                 if(setGetProv.haveChang()){
                     $scope.LayersAction({open:{name:"layer5"}});
-
-                    setNotif.addNotif("alert", "ha realizado cambios en el proveedor desea aceptarlos?", [
+                    setNotif.addNotif("alert", "ha realizado estos cambios en el proveedor. ¿son correctos?", [
                         {
-                            name: "SI",
+                            name: "Estoy de acuerdo",
                             action: function () {
                                 yes(id);
-                            },
-                            default:defaultTime
+                            }
                         },
                         {
-                            name: "NO",
+                            name: "Dejame Cambiarlos",
                             action: function () {
                             }
                         }
@@ -1207,23 +1205,22 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
                 }else{
                     /*CLICK EN UN FUERA DEL FORMULARIO, RESETEA EL FORMULARIO Y SALE DEL FOCUS*/
                     console.log("fuera del folder")
-                    saveValcroname(preFav,function(){
-                        $scope.isShow = elem;
-                        $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
-                        valcroName = {};
-                        $scope.nomvalcroForm.$setUntouched();
-                    });
-                    /*$scope.isShow = elem;
-                    $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
-                    valcroName = {};
-                    $scope.nomvalcroForm.$setUntouched();*/
+                    $timeout(function(){
+                        saveValcroname(preFav,function(){
+                            $scope.isShow = elem;
+                            $scope.valName={id:false,name:"",departments:{0:"current"},fav:"",prov_id:$scope.prov.id || 0};
+                            valcroName = {};
+                            $scope.nomvalcroForm.$setUntouched();
+                        });
+                    },500);
+
+
                 }
 
             }
 
         }else{
             /*CLICK EN UN LUGAR DEL FORMULARIO, VACIA EL INPUT Y DEVUELVE EL FOCUS*/
-            //console.log("cond2");
             if(!(angular.element(a.target).is("[chip],#transition") || angular.element(a.target).parents("#valNameContainer").length>0)){
                 console.log("fuera del folder")
                 saveValcroname(preFav,function(){
@@ -2579,7 +2576,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
     };
 });
 
-MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$filter,masterLists,setNotif) {
+MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$filter,masterLists,setNotif,$timeout) {
     $scope.id="transTimeController";
     $scope.prov = setGetProv.getProv();
     var paises = masterLists.getCountries();
@@ -2601,22 +2598,36 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
         }
 
         if(!$scope.timeTrans.$valid && !$scope.timeTrans.$pristine){
+            var prefocus = angular.element(":focus");
+
+            $timeout(function(){
+                angular.element("[name='timeTrans']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
                     onSuccess();
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
+
                 }
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    //console.log($scope.timeProd);
+                    angular.element("[name='timeTrans']").find(".ng-invalid").first().focus()
                 }
             }]);
             return false;
         }
 
-        if($scope.ttr.from >= $scope.ttr.to && !exeption){
-            setNotif.addNotif("alert", "tal ves quisiste decir de:<b>"+$scope.ttr.to+"</b> a "+$scope.ttr.from+"</b>",[{
+        if($scope.ttr.from >= $scope.ttr.to && (parseInt($scope.ttr.from>=0) && parseInt($scope.ttr.to>=0)) && !exeption){
+            setNotif.addNotif("alert", "tal ves quisiste decir de: "+$scope.ttr.to+" a "+$scope.ttr.from,[{
                 name:"si, cambialos",
                 action:function(){
                     var aux = $scope.ttr.to;
@@ -2676,6 +2687,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
                     time = {};
                     currentOrig = {};
                     exeption = false;
+                    $scope.timeTrans.$setPristine();
                     $scope.timeTrans.$setUntouched();
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
