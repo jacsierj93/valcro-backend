@@ -26,7 +26,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.previewHtmlDoc ="";
     $scope.layer= undefined;
     $scope.index= 0;
-    $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[]};
+    $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[] , direcciones:[]};
     $scope.formDataContraP ={};
     $scope.ctrl = setGetOrder.getObjs();
 
@@ -500,53 +500,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     };
 
-    $scope.createProduct = function(item){
-
-        console.log('items ', item);
-        if(item && item.saldo  && item.descripcion){
-            var copy= angular.copy(item);
-            copy.prov_id =$scope.provSelec.id;
-            Order.post({type:"CreateTemp"},copy,function(response){
-                var aux ={asignado:false,cantidad:parseFloat(response.cantidad),saldo:parseFloat(response.saldo),codigo:response.codigo,codigo_fabrica :response.codigo_fabrica,
-                    descripcion :response.descripcion,id: response.id,otre:null,puntoCompra:false,stock:0,tipo_producto:response.tipo_producto,
-                    tipo_producto_id:response.tipo_producto};
-                $scope.providerProds.push(aux);
-                $timeout(function(){
-                    aux.asignado= true;
-                    console.log("asignando", aux);
-                    $scope.changeProducto(aux);
-                    item.saldo ="";
-                    item.despcripcion ="";
-                    item.codigo_fabrica ="";
-                    item.codigo ="";
-                    item.cantidad ="";
-
-                },0);
-
-            });
-        }else{
-            if(!item){
-                $scope.NotifAction("error","Por favor ingrese una cantidad y una descripcion valida del producto que desea crear",[],{autohidden:autohidden});
-                $timeout(function(){
-                    angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
-                },0);
-            }else{
-                if(!item.saldo){
-                    $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
-                    $timeout(function(){
-                        angular.element.find("#listProducProv #listProducProSaldo ")[0].focus();
-                    },0);
-                }else if(!item.descripcion){
-                    $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
-                    $timeout(function(){
-                        angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
-                    },0);
-                }
-            }
-
-
-        }
-    };
 
     $scope.copyDoc = function() {
 
@@ -2282,6 +2235,80 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
 
     };
+
+/***  Crear producto ***/
+
+$scope.isOpencreateProd = false;
+    $scope.createProduct = function(item){
+
+        console.log('items ', item);
+        if(item && item.saldo  && item.descripcion){
+            var copy= angular.copy(item);
+            copy.prov_id =$scope.provSelec.id;
+            Order.post({type:"CreateTemp"},copy,function(response){
+                var aux ={asignado:false,cantidad:parseFloat(response.cantidad),saldo:parseFloat(response.saldo),codigo:response.codigo,codigo_fabrica :response.codigo_fabrica,
+                    descripcion :response.descripcion,id: response.id,otre:null,puntoCompra:false,stock:0,tipo_producto:response.tipo_producto,
+                    tipo_producto_id:response.tipo_producto};
+                $scope.providerProds.push(aux);
+                $timeout(function(){
+                    aux.asignado= true;
+                    console.log("asignando", aux);
+                    $scope.changeProducto(aux);
+                    item = {};
+
+                },0);
+
+            });
+        }else{
+            if(!item){
+                $scope.NotifAction("error","Por favor ingrese una cantidad y una descripcion valida del producto que desea crear",[],{autohidden:autohidden});
+                $timeout(function(){
+                    angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
+                },0);
+            }else{
+                if(!item.saldo){
+                    $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
+                    $timeout(function(){
+                        angular.element.find("#listProducProv #listProducProSaldo ")[0].focus();
+                    },0);
+                }else if(!item.descripcion){
+                    $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
+                    $timeout(function(){
+                        angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
+                    },0);
+                }
+            }
+
+
+        }
+    };
+
+    $scope.openCreateProduct = function(){
+        console.log("is poen, ",$scope.isOpencreateProd);
+        if(!$scope.isOpencreateProd){
+            console.log("open , ",$scope.isOpencreateProd);
+            $mdSidenav("createProd").open().then(function(){
+                console.log("iabierto, ",$scope.isOpencreateProd);
+                $scope.isOpencreateProd = true;
+            });
+        }
+    };
+    $scope.CloseCreateProduct = function(e){
+        if($scope.isOpencreateProd
+            && jQuery(e.target).parents("#lyrAlert").length == 0
+            && jQuery(e.target).parents("#noti-button").length == 0
+        ){
+            $mdSidenav("createProd").close().then(function(){
+                $scope.isOpencreateProd= false;
+                if($scope.createdProd.$valid){
+                    $scope.createProduct(angular.copy($scope.createProd));
+
+                }
+                $scope.createProd ={};
+                $scope.createdProd.$setPristine();
+            });
+        }
+    };
     /*************Notificaciones ******/
     $scope.openNotis  = function(){
         if($scope.module.index== 0){
@@ -2325,12 +2352,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
     });
 
-    /*    $scope.uploadAnswer = function(data){
-     console.log("this", data);
-     console.log("scope", $scope);
-
-     }*/
-
 
 
     $scope.updateProv= function(){
@@ -2340,7 +2361,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             });
         });
     };
-
 
     /****** **************************import  ***************************************/
 
@@ -3030,7 +3050,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                     $scope.formData.paises=response;
                 });
                 Order.query({type:"ProviderPaymentCondition", prov_id:newVal.id},{}, function(response){
-                    $scope.formData.condicionPago=response;
+                    angular.forEach(response, function(v){
+                        $scope.formData.condicionPago.push(v);
+                    })
+                   // $scope.formData.condicionPago=response;
                 });
                 $timeout(function(){
                     var elem=angular.element("#prov"+newVal.id);
@@ -3427,7 +3450,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             $timeout(function(){
                 $scope.document ={};
                 $scope.provSelec ={};
-                $scope.ctrl = {};
                 setGetOrder.clear();
                 $scope.Docsession.global='new';
                 $scope.Docsession.isCopyableable = false;
@@ -3442,15 +3464,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                 $scope.Docsession.global='new';
                 setGetOrder.clear();
                 $scope.ctrl.pais_id= null;
-                $scope.ctrl.searchPais= '';
+                $scope.ctrl.searchPais= undefined;
                 $scope.ctrl.direccion_facturacion_id= null;
-                $scope.ctrl.searchdirFact= '';
+                $scope.ctrl.searchdirFact= undefined;
                 $scope.ctrl.direccion_almacen_id= null;
-                $scope.ctrl.searchdirAlmacenSelec= '';
+                $scope.ctrl.searchdirAlmacenSelec= undefined;
                 $scope.ctrl.prov_moneda_id= null;
-                $scope.ctrl.searchMonedaSelec= '';
+                $scope.ctrl.searchMonedaSelec= undefined;
                 $scope.ctrl.condicion_pago_id= null;
-                $scope.ctrl.searchcondPagoSelec= '';
+                $scope.ctrl.searchcondPagoSelec= undefined;
                 $scope.Docsession.isCopyableable = false;
 
 
@@ -3467,6 +3489,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             },2000);
             $scope.provIndex = null;
             $scope.tempDoc= {};
+            $scope.Docsession.isCopyableable = false;
+            $scope.ctrl.pais_id= null;
+            $scope.ctrl.searchPais=undefined ;
+            $scope.ctrl.direccion_facturacion_id= null;
+            $scope.ctrl.searchdirFact= undefined;
+            $scope.ctrl.direccion_almacen_id= null;
+            $scope.ctrl.searchdirAlmacenSelec= undefined;
+            $scope.ctrl.prov_moneda_id= null;
+            $scope.ctrl.searchMonedaSelec= undefined;
+            $scope.ctrl.condicion_pago_id= null;
+            $scope.ctrl.searchcondPagoSelec= undefined;
             $scope.Docsession.isCopyableable = false;
 
         }
@@ -3602,7 +3635,24 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     };
 
+    $scope.doClick = function (name){
+        $timeout( function(){
+            var obj= angular.element(name);
+            console.log("click in", obj);
+            obj.click();
+        }, 100);
 
+    };
+
+    $scope.clearAuto = function(text, value){
+        console.log(" text ", text);
+        console.log(" value ", value);
+        $timeout(function(){
+            if(text != value){
+                text='';
+            }
+        }, 100)
+    };
     function loadPedidosProvedor(id, callback){
         $scope.provDocs = [];
         Order.query({type:"OrderProvOrder", id:id}, {},function(response){
@@ -4131,14 +4181,13 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
  * @param data el array de objetos
  * @param compare el valor a evaluar
  * @param key clave que corresponde al json
- *
+ *@return un array de resultados
  * **/
 MyApp.filter('stringKey', function() {
 
-    return function(data,compare, key) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
-
+    return function(data,compare, key) {
         return (!data) ? [] :data.filter(function(val) {
-            return (!compare || !val || !val[key] ) ? false: val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
+            return (!val[key] || !compare || compare.length == 0 ) ? true:  val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
         });
     }
 });
@@ -4175,4 +4224,26 @@ MyApp.directive('decimal', function () {
     };
 });
 
+MyApp.directive('autoCompleteRequired', function ($timeout) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attributes){
+            $timeout(function(){
+                var input= element.find("input[type='search']");
+                console.log("input ", input);
+                input.bind("blur", function(){
+                    console.log("val in blur", input.val());
+                    console.log("val in model", input.val());
+                    console.log("eval", input.val());
+
+                });
+                /*angular.element(element[0].querySelector("input.md-input")).bind("blur", function(){
+                    $timeout(function() {
+                        scope.$eval(attributes.mdBlur);
+                    }, 100);
+                });*/
+            },0);
+        }
+    };
+});
 
