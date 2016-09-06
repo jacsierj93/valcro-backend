@@ -516,7 +516,8 @@ MyApp.directive('info', function($timeout,setNotif) {
 
     return {
         restrict: 'A',
-        link: function(scope, element, attrs) {
+        require: '?ngModel',
+        link: function(scope, element, attrs,model) {
             element.bind("blur", function(e) {
                 $timeout(function() {
                     setNotif.hideByContent("info",attrs.info);
@@ -543,7 +544,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                    console.log(scope)
+                    console.log(scope, element, attrs,model)
 /*                    this.select();
                     if(attrs.info){
                         $timeout(function() {
@@ -585,7 +586,7 @@ MyApp.directive('info', function($timeout,setNotif) {
 MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 
     return {
-        require: 'ngModel',
+        require: '?ngModel',
         link: function(scope, elm, attrs, ctrl) {
             //var targ = attrs.integer;
             ctrl.$asyncValidators.duplicate = function(modelValue, viewValue) {
