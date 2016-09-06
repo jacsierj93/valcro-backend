@@ -1017,7 +1017,12 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="true">
+                                                     md-require-match
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
+                                                     md-search-text-change ="clearAuto( ctrl.searchProveedor,item.razon_social )"
+                                    >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
                                         </md-item-template>
@@ -1069,10 +1074,10 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="true"
+                                                     md-require-match
                                                      md-no-cache="true"
-                                                     md-escape-options="test()"
-                                                     vlc-autocomplete
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
 
                                     >
                                         <md-item-template>
@@ -1110,32 +1115,17 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="true"
+                                                     md-require-match
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
+
                                     >
                                         <md-item-template>
                                             <span>{{item.direccion}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
 
-                                    <!--<md-select ng-model="document.direccion_facturacion_id"
-                                               md-no-ink
-                                               ng-disabled="( Docsession.block || provSelec.id == '' )"
-                                               ng-change="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
-                                               info="Selecione la direccion que debe especificarse en la factura"
-                                               id="direccion_facturacion_id"
-                                               skip-tab
-                                               id="direccion_facturacion_id"
-
-
-
-                                    >
-                                        <md-option ng-repeat="dir in formData.direccionesFact" value="{{dir.id}}" skip-tab>
-                                            {{dir.direccion}}
-                                        </md-option>
-                                        <md-option  value="-1" >
-                                            Nueva Direccion de facturacion
-                                        </md-option>
-                                    </md-select>-->
                                 </md-input-container>
 
                             </div>
@@ -1158,7 +1148,10 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="true"
+                                                     md-require-match
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
                                     >
                                         <md-item-template>
                                             <span>{{item.direccion}}</span>
@@ -1195,6 +1188,7 @@
                                             required
                                             ng-change="toEditHead('monto', document.monto)"
                                             info="Monto aproximado a pagar"
+
                                             skip-tab
 
 
@@ -1217,7 +1211,11 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="true"
+                                                     md-require-match
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
+
                                     >
                                         <md-item-template>
                                             <span>{{item.nombre}}</span>
@@ -1256,22 +1254,24 @@
 
                                 <md-input-container class="md-block" flex="" ng-click="allowEdit()">
                                     <label>Condicion de pago</label>
-                                    <md-autocomplete md-selected-item="ctrl.condicion_pago_id"
-                                                     ng-disabled="( Docsession.block  || !provSelec.id)"
+                                    <md-autocomplete md-selected-item = "ctrl.condicion_pago_id"
+                                                     ng-disabled = "( Docsession.block  || !provSelec.id)"
                                                      ng-click="toEditHead('condicion_pago_id', document.condicion_pago_id)"
-                                                     md-no-ink
-                                                     ng-required ="(formMode.value == 23)"
                                                      info="Seleccione una condicion para la realizacion del pago"
+                                                     ng-required ="(formMode.value == 23 )"
+
                                                      skip-tab
-                                                     id="condicion_pago_id"
-                                                     md-search-text="ctrl.searchcondPagoSelec"
-                                                     md-auto-select="true"
-                                                     md-items="item in formData.condicionPago | stringKey : ctrl.searchcondPagoSelec : 'titulo' "
+                                                     md-input-name = "autocomplete"
+                                                     md-search-text = "ctrl.searchcondPagoSelec"
+                                                     md-items = "item in formData.condicionPago | stringKey : ctrl.searchcondPagoSelec : 'titulo' "
                                                      md-item-text="item.titulo"
-                                                     md-autoselect = "true"
-                                                     md-no-asterisk
                                                      md-min-length="0"
                                                      md-require-match="true"
+                                                     md-input-minlength="0"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
+
                                     >
                                         <md-item-template>
                                             <span>{{item.titulo}}</span>
@@ -1751,7 +1751,7 @@
                                 </div>
 
                                 <div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )">
-                                    <md-switch class="md-primary" ng-model="tbl_listProducProv.filter.puntoCompra" ng-disabled="true"></md-switch>
+                                  <!--  <md-switch class="md-primary" ng-model="tbl_listProducProv.filter.puntoCompra" ng-disabled="true"></md-switch>-->
                                 </div>
 
                                 <div layout="row" flex="15">
@@ -1770,7 +1770,7 @@
                                         <div ng-click="tbl_listProducProv.order = '-cantidad' "ng-class="{'filter-select':(tbl_listProducProv.order == '-cantidad')}"><img src="images/TrianguloDown.png" ></div>
                                     </div>
                                     <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center">
-                                        <div ng-click="createProduct(tbl_listProducProv.filter)" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
+                                        <div ng-click="openCreateProduct()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
                                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                                         </div skip-tab >
                                     </div>
@@ -3957,6 +3957,57 @@
                             <div style="width: 16px"  layout-align=" center left " layout="column"></div>
                         </div>
                     </div>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
+        <!-- ########################################## LAYER crear nuevo producto ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="createProd" id="createProd"
+        >
+            <md-content   layout="row" flex class="cntLayerHolder" layout-padding >
+                <div  layout="column" flex="" class="layerColumn"   click-out="CloseCreateProduct($event)" >
+                    <form layout="row" class="focused" name="createdProd" >
+                        <div layout="column" flex>
+                            <div class="titulo_formulario" >
+                                <div>
+                                    Crear Producto
+                                </div>
+                            </div>
+                            <md-input-container class="md-block"  >
+                                <label>Descripcion</label>
+                                <input ng-model="createProd.descripcion"
+                                        info="Descripción del producto "
+                                       required
+                                       skip-tab
+
+                                />
+                            </md-input-container>
+                            <md-input-container class="md-block"  >
+                                <label>Cantidad</label>
+                                <input ng-model="createProd.saldo"
+                                       decimal info="Cantidad del producto a solicitar "
+                                       required
+                                       skip-tab
+                                       decimal
+
+                                />
+                            </md-input-container>
+                            <md-input-container class="md-block"  >
+                                <label>Cod. Fabrica</label>
+                                <input ng-model="createProd.codigo_fabrica"
+                                       info=" Codigo  de fabrica del producto "
+                                       skip-tab
+                                       ng-keypress="($event.which === 13)? doClick('#createProd :first '): 0 "
+
+                                />
+                            </md-input-container>
+
+                        </div>
+                    </form>
+
                 </div>
 
             </md-content>
