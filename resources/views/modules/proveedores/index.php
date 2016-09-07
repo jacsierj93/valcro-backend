@@ -313,12 +313,15 @@
                                 <md-autocomplete md-selected-item="ctrl.typeProv"
                                                  md-input-name="autocomplete"
                                                  flex
+                                                 required
+                                                 md-require-match="true"
                                                  info="seleccione un tipo de proveedor"
                                                  skip-tab
                                                  id="provType"
                                                  md-search-text="ctrl.searchType"
                                                  ng-disabled="$parent.enabled && prov.id"
-                                                 md-items="item in types | stringKey : ctrl.searchType: 'nombre' "
+                                                 md-items="item in filter = (types | stringKey : ctrl.searchType: 'nombre')"
+                                                 valid = "filter"
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
                                                  md-autoselect = "true"
@@ -443,6 +446,8 @@
                                 <label>Tipo de Direccion</label>
                                 <md-autocomplete md-selected-item="ctrl.dirType"
                                                  flex
+                                                 required
+                                                 required-match="true"
                                                  info="es facturacion o Almacen?"
                                                  skip-tab
                                                  id="dirType"
@@ -1046,7 +1051,7 @@
                                 <md-autocomplete md-selected-item="ctrl.coin"
                                                  flex
                                                  id="credCoin"
-                                                 info="seleccione un tipo de envio"
+                                                 info="la moneda para el limite de credito"
                                                  ng-disabled="$parent.enabled || coins.length<1"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCoin"
@@ -1966,7 +1971,7 @@
         </md-sidenav>
 
         <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
-            <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr)")) ?>
+            <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr,\$event)")) ?>
         </md-sidenav>
 
 
