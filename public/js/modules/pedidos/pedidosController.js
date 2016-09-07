@@ -26,7 +26,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     $scope.previewHtmlDoc ="";
     $scope.layer= undefined;
     $scope.index= 0;
-    $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[] , direcciones:[]};
+    $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[] , direcciones:[], puertos:[]};
     $scope.formDataContraP ={};
     $scope.ctrl = setGetOrder.getObjs();
 
@@ -1459,9 +1459,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
                         ,[],{autohidden:autohidden});
                     var prod= angular.copy(response);
                     prod.cantidad = parseFloat(prod.cantidad);
-                    $scope.providerProds.push(prod);
-
-
                 }
                 item.reng_id=response.reng_id;
                 setGetOrder.change('producto'+item.id,'id',item);
@@ -1476,6 +1473,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
             $timeout(function(){
                 var mo= jQuery("#p"+item.id);
                 mo[0].focus();
+                item.saldo=1;
+                $scope.changeProducto(item);
+
             },100);
 
         }else if(!item.asignado && item.reng_id){
@@ -3071,7 +3071,11 @@ $scope.isOpencreateProd = false;
 
         if(newVal && $scope.provSelec.id){
             $scope.document.pais_id = newVal.id;
-            $scope.formData.direcciones= Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal.id});
+            $scope.formData.direcciones.splice(0,$scope.formData.direcciones.length);
+             Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal.id},{}, function(response){
+
+                 $scope.formData.direcciones = response;
+            });
             if( $scope.Docsession.global!= 'new'){
                 setGetOrder.change("document","pais_id",newVal.id);
             }
@@ -3097,7 +3101,9 @@ $scope.isOpencreateProd = false;
         if(newVal ){
 
             $scope.document.direccion_almacen_id = newVal.id;
-            $scope.formData.puertos =  Order.query({type:"AdrressPorts", id: newVal.id});
+              Order.query({type:"AdrressPorts", direccion_id: newVal.id},{}, function(response){
+                  $scope.formData.puertos = response;
+            });
             if( $scope.Docsession.global != 'new'){
                 setGetOrder.change("document","direccion_almacen_id",newVal.id);
             }
@@ -3139,6 +3145,15 @@ $scope.isOpencreateProd = false;
         }
 
     });
+    $scope.$watch('ctrl.puerto_id', function (newVal) {
+
+        if(newVal ){
+            if(newVal != 0){
+                $scope.document.puerto_id = newVal.id;
+            }
+        }
+
+    });
 
 
     /****** **************************listener ***************************************/
@@ -3172,6 +3187,11 @@ $scope.isOpencreateProd = false;
             if($scope.document.condicion_pago_id){
                 Order.query({type:"ProviderPaymentCondition",id:$scope.document.condicion_pago_id},{}, function(response){
                     $scope.ctrl.condicion_pago_id=response[0];
+                });
+            }
+            if($scope.document.puerto_id){
+                Order.query({type:"AdrressPorts",id:$scope.document.puerto_id},{}, function(response){
+                    $scope.ctrl.puerto_id=response[0];
                 });
             }
 
@@ -3645,8 +3665,7 @@ $scope.isOpencreateProd = false;
     };
 
     $scope.clearAuto = function(text, value){
-        console.log(" text ", text);
-        console.log(" value ", value);
+
         $timeout(function(){
             if(text != value){
                 text='';
@@ -3873,15 +3892,6 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         if(!forms[form][fiel] ){
             forms[form][fiel]= {original:value, v:value, estado:'created',trace:[]};
         }
-        /* if(!forms[form][fiel] && typeof (value) == 'object'){
-         angular.forEach(value, function(v,k){
-         if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
-         forms[form][k]={original:v, v:v, estado:'new',trace:new Array()};
-         }
-
-         });
-         value= angular.copy(value[fiel]);
-         }*/
 
         if(typeof (value) != 'undefined' && forms[form][fiel].estado !='created'){
             if(forms[form][fiel].original != value  ){
@@ -3896,11 +3906,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                 forms[form][fiel].trace.push(value);
                 forms[form][fiel].v= value;
             }
-        }/*else if(typeof (value) == 'object'){
-         forms[form][fiel].v=value[fiel];
-         forms[form][fiel].estado='new';
-         forms[form][fiel].trace=value[fiel];
-         }*/
+        }
         else{
             forms[form][fiel].estado='del';
             forms[form][fiel].trace.push();
@@ -4187,7 +4193,7 @@ MyApp.filter('stringKey', function() {
 
     return function(data,compare, key) {
         return (!data) ? [] :data.filter(function(val) {
-            return (!val[key] || !compare || compare.length == 0 ) ? true:  val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
+            return (!val[key] || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
         });
     }
 });
@@ -4224,26 +4230,23 @@ MyApp.directive('decimal', function () {
     };
 });
 
-MyApp.directive('autoCompleteRequired', function ($timeout) {
+MyApp.directive('auto', function ( ) {
     return {
-        restrict: 'A',
-        link: function(scope, element, attributes){
-            $timeout(function(){
-                var input= element.find("input[type='search']");
-                console.log("input ", input);
-                input.bind("blur", function(){
-                    console.log("val in blur", input.val());
-                    console.log("val in model", input.val());
-                    console.log("eval", input.val());
+        require: 'mdAutocomplete',
 
-                });
-                /*angular.element(element[0].querySelector("input.md-input")).bind("blur", function(){
-                    $timeout(function() {
-                        scope.$eval(attributes.mdBlur);
-                    }, 100);
-                });*/
-            },0);
+        link: function(scope, element, attrs, ctrl) {
+            console.log("ctrl", ctrl)
+            console.log("tsdfgf", this);
+            console.log("scope", scope);
         }
     };
 });
 
+MyApp.directive('autoRequired', function () {
+    return {
+        require: 'ngModel',
+        link: function (scope, elem, attrs,ctrl) {
+            console.log("llego al input ", ctrl);
+        }
+    };
+});

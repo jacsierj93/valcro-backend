@@ -477,15 +477,8 @@ class OrderController extends BaseController
     }
 
     public function  getAddressrPort(Request $req){
-        $data =array();
-        if($req->has('id')){
-            $data = ProviderAddress::findOrfail($req->id)->ports()->get();
-            if(sizeof($data)>0){
-                return $data;
-            }
-        }
+       return  (!$req->has('id')) ? ProviderAddress::findOrfail($req->direccion_id)->ports()->get() : Ports::where('id',$req->id)->get();
 
-        return $data;
     }
 
     /**
@@ -3758,6 +3751,7 @@ class OrderController extends BaseController
         $tem['id']=$model->id;
         $tem['tipo']=$model->getTipoId();
         $tem['pais_id']=$model->pais_id;
+        $tem['puerto_id']=$model->puerto_id;
         $tem['final_id']=$model->final_id;
         $tem['direccion_almacen_id']=$model->direccion_almacen_id;
         $tem['direccion_facturacion_id']=$model->direccion_facturacion_id;
@@ -4945,6 +4939,9 @@ class OrderController extends BaseController
         }
         if($req->has('direccion_almacen_id')){
             $model->direccion_almacen_id = ($req->direccion_almacen_id."" == "-1") ? null :$req->direccion_almacen_id;
+        }
+        if($req->has('puerto_id')){
+            $model->puerto_id = $req->puerto_id;
         }
         /*       if($req->has('condicion_id')){
                    $model->condicion_id = $req->condicion_id;

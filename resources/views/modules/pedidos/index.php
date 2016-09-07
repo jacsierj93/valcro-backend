@@ -229,10 +229,10 @@
                 <div layout="row" flex layout-align="start center ">
 
                 </div>
-                <div style="width: 48px;" layout="column"   layout-align="start stretch" id="noti-button" >
+                <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" >
                     <div class="{{(alerts.length > 0 ) ? 'animation-arrow' : 'animation-arrow-disable'}}" ng-click="openNotis()" id="noti-button"
-                         layout="column" layout-align="center center" style="height: 96px;" >
-                        <img src="images/btn_prevArrow.png" style="" />
+                         layout="column" layout-align="center center"  style=text-align:center; >
+                        <img src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
                     </div>
                 </div>
             </div>
@@ -1010,6 +1010,7 @@
                                                      ng-click="toEditHead('prov_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
+
                                                      md-search-text="ctrl.searchProveedor"
                                                      md-auto-select="true"
                                                      md-items="item in todos | stringKey : ctrl.searchProveedor : 'razon_social' "
@@ -1017,11 +1018,12 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match
+                                                     md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
                                                      md-match-case-insensitive
                                                      md-search-text-change ="clearAuto( ctrl.searchProveedor,item.razon_social )"
+
                                     >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
@@ -1078,7 +1080,6 @@
                                                      md-no-cache="true"
                                                      md-select-on-match
                                                      md-match-case-insensitive
-
                                     >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
@@ -1157,26 +1158,31 @@
                                             <span>{{item.direccion}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
-                                    <!-- <md-select ng-model="document.direccion_almacen_id"
-                                                md-no-ink
-                                                ng-disabled="( Docsession.block || !provSelec.id || !document.pais_id  )"
-                                                ng-change="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
-                                                info="Seleccione la direccion desde donde se despachara la mercancia"
-                                                id="direccion_almacen_id"
-                                                skip-tab
-                                                id="direccion_almacen_id"
-
-
-
-
-                                     >
-                                         <md-option ng-repeat="dir in formData.direcciones" value="{{dir.id}}" skip-tab>
-                                             {{dir.direccion}}
-                                         </md-option>
-                                         <md-option  value="-1" >
-                                             Nuevo Direccion de almacen
-                                         </md-option>
-                                     </md-select>-->
+                                </md-input-container>
+                                <md-input-container class="md-block"  flex ng-click="allowEdit()">
+                                    <label>Puerto</label>
+                                    <md-autocomplete md-selected-item="ctrl.puerto_id"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' )"
+                                                     ng-click="toEditHead('puerto_id', document.puerto_id)"
+                                                     info="Selecione la direccion que debe especificarse en la factura"
+                                                     id="puerto_id"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchPuerto"
+                                                     md-auto-select="true"
+                                                     md-items="item in formData.puertos | stringKey : ctrl.searchPuerto : 'Main_port_name' "
+                                                     md-item-text="item.Main_port_name"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0"
+                                                     md-require-match
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-match-case-insensitive
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.Main_port_name}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
                                 </md-input-container>
                             </div>
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
@@ -2998,6 +3004,19 @@
                                     <div class="rowRsmTitle"> Almacen </div>
                                 </div>
                                 <div class="rms" flex> {{document.almacen}} </div>
+                            </div>
+                            <div layout="row"  class="rowRsm" ng-show="(document.puerto_id && gridViewFinalDoc == 1)">
+                                <div layout="row" flex="40" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'created'"
+                                         layout-align="center center" >
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'upd'" layout-align="center center">
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+                                    <div class="rowRsmTitle"> Puerto </div>
+                                </div>
+                                <div class="rms" flex> {{document.puerto_id}} </div>
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && (document.nro_proforma ||finalDoc.adjProforma.length > 0 ))" >
                                 <div layout="row" flex="40"  >
