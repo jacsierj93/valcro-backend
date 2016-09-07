@@ -1784,7 +1784,7 @@
                             </div>
                         </div>
                     </form>
-                    <form name="listProductoItems" class="gridContent"  layout="row" >
+                    <form name="listProductoItems" class="gridContent"  layout="row" flex >
                         <div active-left ></div>
                         <div  flex >
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order "
