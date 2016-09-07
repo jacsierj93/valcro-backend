@@ -31,7 +31,7 @@ var MyApp = angular.module('MyApp', dependency, function() {
  }]);*/
 window.addEventListener("keydown", function(e) {
     // space and arrow keys
-    console.log("target == ",e)
+
     if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
@@ -419,6 +419,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     if(!scope.endLayer) {
                         angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
                         angular.element(elem).blur();
+                        angular.element(elem).parents("md-content").delay(200).click();
                         angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
                         /*angular.element("[md-component-id='NEXT']").focus();*/
                     }else{
@@ -457,9 +458,10 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     scope.skip = skip;
                 }
             }else{
+
                 element.bind("keydown",function(e){
                     var elem =this;
-                    console.log("ELEMENT ==>",elem)
+                    //console.log("ELEMENT ==>",elem)
                     if(e.which == "13"){
                         skip(elem,scope)
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
@@ -544,27 +546,15 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                    console.log(scope, element, attrs,model);
-                    
-                    if(!scope.$eval(attrs.mdSelectedItem) && scope.$eval(attrs.valid).length==0){
-
+                    if(angular.element(element).parent(".md-input-invalid").length > 0){
+                        if("mathc",model.matches.length>0 && !(model.scope.mdSearchText || angular.element(model.scope.mdSearchText).trim() == "")){
+                            model.scope.selectedItem = model.matches[0];
+                        }else{
+                           model.clear();
+                        }
                     }
-/*                    this.select();
-                    if(attrs.info){
-                        $timeout(function() {
-                            if(old.element!=element[0]){
-                                setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
-                                old.element = element[0];
-                                old.info = attrs.info;
-                            }
-                            $timeout.cancel(ref);
-                            ref = $timeout(function() {
-                                old ={element:"",info:""};
-                            },30000);
-                        }, 0);
-                    }*/
+
                 });
-                //element = element.find("input");
             }else{
                 element.bind("focus", function(e){
                     if(attrs.info){

@@ -117,7 +117,7 @@ MyApp.service("listCoins",function(providers) {
         }
     }
 });
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout,$interval) {
     $scope.expand = false;
     $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
@@ -150,15 +150,45 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         endProvider(chngProv,null,prov);
     };
 
-    $scope.nextLayer = function(to){
+    var interval = null;
+    $scope.block=false;
+    $scope.nextLayer = function(to,e){
+       $timeout(function(){
+           if($scope.block=="wait"){
+               interval = $interval(function(){
+                   if($scope.block=="go"){
+                       $interval.cancel(interval);
+                       $scope.block=false;
+                       stepLayer(to,e)
+                   }else if($scope.block=="reject"){
+                       $interval.cancel(interval);
+                       $scope.block=false;
+                   }
+               },500)
+           }else{
+               stepLayer(to,e)
+           }
+       },500    )
+
+
+    };
+
+    var stepLayer = function(to,e){
         if(to!="END"){
-            $scope.LayersAction({open:{name:to}});
+            if(e.isTrigger){
+                $scope.LayersAction({open:{name:to,after:function(){
+                    angular.element("#"+to).find("form:has([step]:not([disabled]))").first().find("[step]:not([disabled])").first().focus().click();
+                }}});
+            }else{
+                $scope.LayersAction({open:{name:to}});
+            }
+            
         }else{
             endProvider(noProv)
         }
 
         $scope.showNext(false);
-    };
+    }
 
     $scope.prevLayer = function(){
         if($scope.index==1){
@@ -1518,6 +1548,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         }
 
         if(!$scope.provContactosForm.$valid && !$scope.provContactosForm.$pristine){
+            $scope.$parent.block="wait";
             var prefocus = angular.element(":focus");
 
             $timeout(function(){
@@ -1530,6 +1561,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
+                    $scope.$parent.block="go";
                     onSuccess();
                     $timeout(function(){
                         prefocus.click();
@@ -1540,6 +1572,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             },{
                 name:"dejame Corregirlos",
                 action:function(){
+                    $scope.$parent.block="reject";
                     angular.element("[name='provContactosForm']").find(".ng-invalid").first().focus()
                     //console.log($scope.provContactosForm);
                 }
@@ -2742,7 +2775,6 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     var currentOrig = {};
     var saveLimCred = function(onSuccess,onError){
         if((angular.equals(currentOrig,$scope.condHead) && $scope.condHead.id) || ($scope.condHeadFrm.$pristine )){
-            console.log("blancoCOND")
             onError();
             return false;
         }

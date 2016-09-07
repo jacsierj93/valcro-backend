@@ -3,6 +3,10 @@
     outline: 0;
 }
 
+.md-required:after{
+    content:" " !important;
+}
+
 md-sidenav.md-locked-open, md-sidenav.md-locked-open.md-closed, md-sidenav.md-locked-open.md-closed.md-sidenav-left, md-sidenav.md-locked-open.md-closed, md-sidenav.md-locked-open.md-closed.md-sidenav-right, md-sidenav.md-locked-open-remove.md-closed{
     position: absolute;
     display: -webkit-flex;
@@ -149,7 +153,7 @@ md-input-container:not(.md-input-invalid).md-input-focused label {
     border-bottom: 1px solid rgba(0,0,0,0.22) !important;
 }
 
-.focused md-input-container:not(.md-input-focused) .md-input[required]:not([disabled="disabled"]).ng-untouched.ng-empty{
+.focused md-input-container:not(.md-input-focused) .md-input[required]:not([disabled="disabled"]).ng-untouched:not(:valid){
     border-bottom: 1px solid #febd33 !important;
 }
 
@@ -159,7 +163,7 @@ md-input-container:not(.md-input-invalid).md-input-focused label {
     border-bottom: 1px solid rgba(0,0,0,0.22) ;
 }
 
-.focused md-input-container:not(.md-input-focused) md-select[required]:not([disabled="disabled"]).ng-untouched.ng-empty .md-select-value{
+.focused md-input-container:not(.md-input-focused) md-select[required]:not([disabled="disabled"]).ng-untouched .md-select-value{
     border-bottom: 1px solid #febd33 !important;
 }
 
