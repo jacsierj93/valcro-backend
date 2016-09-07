@@ -516,7 +516,7 @@ MyApp.directive('info', function($timeout,setNotif) {
 
     return {
         restrict: 'A',
-        require: '?ngModel',
+        require: '?mdAutocomplete',
         link: function(scope, element, attrs,model) {
             element.bind("blur", function(e) {
                 $timeout(function() {
@@ -544,7 +544,11 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                    console.log(scope, element, attrs,model)
+                    console.log(scope, element, attrs,model);
+                    
+                    if(!scope.$eval(attrs.mdSelectedItem) && scope.$eval(attrs.valid).length==0){
+
+                    }
 /*                    this.select();
                     if(attrs.info){
                         $timeout(function() {

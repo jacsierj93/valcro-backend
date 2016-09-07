@@ -313,12 +313,15 @@
                                 <md-autocomplete md-selected-item="ctrl.typeProv"
                                                  md-input-name="autocomplete"
                                                  flex
+                                                 required
+                                                 md-require-match="true"
                                                  info="seleccione un tipo de proveedor"
                                                  skip-tab
                                                  id="provType"
                                                  md-search-text="ctrl.searchType"
                                                  ng-disabled="$parent.enabled && prov.id"
-                                                 md-items="item in types | stringKey : ctrl.searchType: 'nombre' "
+                                                 md-items="item in filter = (types | stringKey : ctrl.searchType: 'nombre')"
+                                                 valid = "filter"
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
                                                  md-autoselect = "true"
