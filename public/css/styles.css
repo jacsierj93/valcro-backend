@@ -349,8 +349,22 @@ md-switch.md-focused:not([disabled]):not(.md-checked) .md-thumb:before {
 md-chips.md-default-theme, md-chips{
     padding: 0px 8px 0px 0px;
     height: 30px;
-    margin-top: 10px;
+    /*margin-top: 10px;*/
 }
+
+.md-chips md-chip{
+    margin: 0px 8px 0 0;
+    height: 24px;
+    line-height: 24px;
+    font-size: 14px;
+}
+.md-chips md-chip .md-chip-remove{
+    height: 24px;
+    line-height: 24px;
+}
+
+
+
 form.focused md-chips.md-default-theme .md-chips, form.focused md-chips .md-chips{
     box-shadow: 0 1px rgba(0,0,0,0.22)
 }

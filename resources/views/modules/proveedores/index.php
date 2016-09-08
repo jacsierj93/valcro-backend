@@ -356,6 +356,8 @@
                                 <label>Tipo de Envio</label>
                                 <md-autocomplete md-selected-item="ctrl.typeSend"
                                                  flex
+                                                 required
+                                                 md-require-match="true"
                                                  id="provTypesend"
                                                  info="seleccione un tipo de envio"
                                                  ng-disabled="$parent.enabled && prov.id"
@@ -579,13 +581,16 @@
                             </md-input-container>
                             <div ng-click="book()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom"> A </div>
 
-                            <md-input-container class="md-block" flex>
+                            <md-input-container class="md-block" flex="25">
                                 <label>Pais de Residencia</label>
                                 <md-autocomplete md-selected-item="ctrl.pais"
                                                  flex
                                                  id="paisCont"
+                                                 md-selected-item-change="provContactosForm.$setDirty();cnt.pais = ctrl.pais.id"
                                                  info="pais de residencia del contacto (no es el mismo de direcciones)"
                                                  skip-tab
+                                                 required
+                                                 md-require-match="true"
                                                  md-search-text="ctrl.searchCountry"
                                                  md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
@@ -601,15 +606,43 @@
 
                             </md-input-container>
 
-                            <div layout="row" flex="30">
-                                <md-input-container flex>
-                                    <label>Idiomas</label>
-                                    <md-select id="langCont" skip-tab info="marque cada idioma que hable este contacto"  ng-model="cnt.languaje" multiple="" ng-disabled=" $parent.enabled || cnt.isAgent==1" md-no-ink>
-                                        <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
+                            <div style="height:100%; max-width:200px; width:auto">
+                                <vlc-group>
 
-                                    </md-select>
-                                </md-input-container>
+                                     <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="lang in languaje | filterSearch: cnt.languaje">
+                                         {{lang.lang.substring(0,2)}}
+                                     </span>
+                                </vlc-group>
+
                             </div>
+                            <md-input-container flex>
+                                <label>Idiomas</label>
+                                <md-autocomplete md-selected-item="ctrl.lang"
+                                                 flex
+                                                 skip-tab
+                                                 id="langCont"
+                                                 ng-required="(cnt.languaje.length==0)"
+                                                
+                                                 info="marque cada idioma que hable este contacto"
+                                                 md-search-text="ctrl.searchLang"
+                                                 md-items="item in languaje | stringKey : ctrl.searchLang: 'lang' | filterSelect: cnt.languaje"
+                                                 md-item-text="item.lang"
+                                                 md-no-asterisk
+                                                 ng-disabled="$parent.enabled || cnt.isAgent==1"
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.lang}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+
+                                <!--<label>Idiomas</label>
+                                <md-select id="langCont" ng-model="cnt.languaje" multiple="" ng-disabled=" $parent.enabled || cnt.isAgent==1" md-no-ink>
+                                    <md-option ng-value="lang.id" ng-repeat="lang in languaje">{{lang.lang}}</md-option>
+
+                                </md-select>-->
+                            </md-input-container>
                         </div>
                         <div class="row" layout="row">
 

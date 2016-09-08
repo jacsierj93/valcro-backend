@@ -1435,20 +1435,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     $scope.$watch('ctrl.pais.id',function(nvo,old)
     {
-        $scope.cnt.pais = nvo;
-        /*if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
-            setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
-                name:"si",
-                action:function(){
 
-                }
-            },{
-                name:"no",
-                action:function(){
-                    console.log($scope.provContactosForm);
-                }
-            }]);
-        }*/
         var preVal = angular.element("#contTelf").find("input").val();
         if(preVal){
             if(preVal!=""){
@@ -1459,6 +1446,40 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         }
         //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
     });
+
+    $scope.$watch('ctrl.lang.id',function(nvo,old)
+    {
+        if(nvo){
+            $scope.cnt.languaje.unshift(nvo);
+            $scope.cnt.languaje.length
+            $scope.ctrl.searchLang = null;
+            $scope.provContactosForm.$setDirty();
+        }
+
+        /*if($filter("customFind")($scope.dirAssign,nvo,function(x,e){return x.pais_id == e;}).length==0 && $scope.provContactosForm.$dirty){
+         setNotif.addNotif("alert", "este pais no coincide con ninguno de las direcciones esta seguro?",[{
+         name:"si",
+         action:function(){
+
+         }
+         },{
+         name:"no",
+         action:function(){
+         console.log($scope.provContactosForm);
+         }
+         }]);
+         }*/
+       /* var preVal = angular.element("#contTelf").find("input").val();
+        if(preVal){
+            if(preVal!=""){
+                angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
+            }else{
+                angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+            }
+        }*/
+        //$scope.cnt.contTelf.valor = (nvo!=0 && $scope.cnt.contTelf.valor=="")?$scope.cnt.contTelf.valor.replace(prev,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone):$scope.cnt.contTelf.valor;
+    });
+
     $scope.$watch('contacts.length',function(nvo){
         setGetProv.setComplete("contact",nvo);
     });

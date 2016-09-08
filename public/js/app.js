@@ -546,8 +546,9 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                    if(angular.element(element).parent(".md-input-invalid").length > 0){
-                        if("mathc",model.matches.length>0 && !(model.scope.mdSearchText || angular.element(model.scope.mdSearchText).trim() == "")){
+                    //if(angular.element(element).parent(".md-input-invalid").length > 0){
+                    if(!model.scope.selectedItem){
+                        if("mathc",model.matches.length>0 && !(model.scope.mdSearchText || model.scope.mdSearchText == "")){
                             model.scope.selectedItem = model.matches[0];
                         }else{
                            model.clear();
