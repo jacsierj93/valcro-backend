@@ -127,8 +127,9 @@ class DocumentController extends BaseController
         }
 
 
+        /////que no hayan terminado de ser procesados y que tengan saldo a favor
         if ($type == "new") {
-            $abonos = $abonos->where("estatus", 1); ///sin usar
+            $abonos = $abonos->where("estatus", 1)->where("saldo",">",0); 
         }
 
 
@@ -177,7 +178,6 @@ class DocumentController extends BaseController
     /********************************************************************************
      * ******************************OPERACIONES CRUD*****************************************
      *********************************************************************************/
-
 
     public function abonoSaveOrUpdate(Request $req)
     {
