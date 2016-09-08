@@ -5,6 +5,7 @@
  * User: laptoHPWhite
  * Date: 27/06/2016
  * Time: 11:29
+ * @deprecated
  */
 namespace App\Models\Sistema\Providers;
 use App\Quotation;

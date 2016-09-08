@@ -28,6 +28,7 @@ use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Product\ProductType;
+use App\Models\Sistema\Providers\ContactField;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Providers\ProviderCondPay;
@@ -470,10 +471,8 @@ class OrderController extends BaseController
     }
 
 
-    public  function getEmails(Request $req){
-        $data = array();
-
-        return $data;
+    public  function getProviderEmails(Request $req){
+        return ContactField::where('prov_id',$req->prov_id)->where('campo', 'email')->get();
     }
 
     public function  getAddressrPort(Request $req){
@@ -3308,7 +3307,7 @@ class OrderController extends BaseController
 
 
     /*********************************** Email ***********************************/
-    public function EmailGerencia(Request $req){
+    public function EmailSummaryDoc(Request $req){
         $data = [];
         $model = Solicitude::findOrFail($req->id);
         $items = $model->items()->get();
@@ -3376,8 +3375,43 @@ class OrderController extends BaseController
        //
 
        // return dd($req->session()->get('DATAUSER'));
-        return view("emails/modules/Order/Gerencia/ResumenDoc",$data);
+        return view("emails/modules/Order/Internal/ResumenDoc",$data);
     }
+
+
+    public function EmailEstimate(Request $req){
+        $data = [];
+        $model = Solicitude::findOrFail($req->id);
+
+        $data['id'] = $model->id;
+        $data['emision'] =  $this->outputDate($model->emision);
+        $data['titulo'] = $model->titulo;
+        $data['responsable'] = $req->session()->get('DATAUSER')['nombre'];
+        $data['correo'] = $req->session()->get('DATAUSER')['email'];
+
+        $data['texto'] ="Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
+        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
+        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
+        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
+        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
+        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
+        veedor ingles, ";
+        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $prod = [];
+        foreach($items as $aux){
+            $temp= array();
+
+            $p= Product::find($aux->producto_id);
+            $temp['id']=$aux->id;
+            $temp['codigo_fabrica']=$p->codigo_fabrica;
+            $temp['descripcion']=$aux->descripcion;
+            $temp['cantidad']=$aux->cant;
+            $prod[]= $temp;
+        }
+        $data['articulos'] =$prod;
+        return view("emails.modules.Order.External.ProviderEstimate",$data);
+    }
+
     /*********************************** CONTRAPEDIDOS ***********************************/
 
     /**
