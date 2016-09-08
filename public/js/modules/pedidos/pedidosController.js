@@ -1,5 +1,5 @@
 
-MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
+MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     ,$filter,$location,App, Order,masters,providers,
                                            Upload,Layers,setGetOrder, DateParse, Accion,filesService,SYSTEM) {
 
@@ -532,31 +532,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         console.log("tet", test);
         console.log("escope", $scope);
     };
-    $scope.simulateClick = function (id) {
-        var a = angular.element(document).find(id);
-        a.click();
-    };
 
-    $scope.consoleTest = function(text){
-        console.log("console test", text);
-    };
-
-    $scope.cancelClose = function(){
-        console.log("entrp al cancel");
-        return false;
-    };
-    $scope.printTrace = function(){
-        /*       if($scope.previewHtmltext == "Introdusca texto "){
-         $scope.previewHtmltext="";
-         }
-
-         $scope.previewHtmlDoc ="";
-         $http.get("Order/test").success(function (response) { $scope.previewHtmlDoc = response;});
-
-         $scope.LayersAction({open:{name:"htmlViewer"}});*/
+    $scope.demo = function(){
+        $scope.openSendMail();
 
 
     };
+    /********************************************DEBUGGIN ********************************************/
 
     $scope.buildfinalDoc = function(){
         var final={};
@@ -1098,7 +1080,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     $scope.openEmail= function(){
         $scope.LayersAction({open:{name:"email"}});
-        $http.get("Email/ProviderEmails").success(function (response) { $scope.email.contactos = response});
+
     };
 
     $scope.newDoc= function(formMode){
@@ -1338,14 +1320,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
     };
     /*********************************************** EVENTOS CHANGE ***********************************************/
 
-    $scope.onchangePeditem=  function (item){
-        if(item.asignado){
-            $http.post("Order/EditOrdenItem", item)
-                .success(function (response) {
-
-                });
-        }
-    };
 
     $scope.changeContraP = function (item) {
         if(item.import){
@@ -1819,64 +1793,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
 
     };
 
-    /**
-     * @deprecated**/
-    $scope.changePedidoSustitutoItem = function (item) {
-        item.pedido_id = $scope.document.id;
-        if(item.asignado){
-            if ($scope.FormPedidoSusProduc.$valid) {
-                $http.post("Order/AddOrderSubstituteItem", item)
-                    .success(function (response) {
-                        if (item.renglon_id == null) {
-                            $scope.NotifAction("info",
-                                "Asignado"
-                                ,[
-                                    {name: 'Ok',
-                                        action:function(){}
-                                    }
-                                ],{autohidden:2000});
-                        }
-                        item.renglon_id= response.renglon_id;
-                    });
-            }else
-            // if(item.renglon_id == null)
-            {
-                $scope.NotifAction("warn",
-                    "El saldo anterior supera la cantidad inicial "
-                    ,[
-                        {name: 'Ok',
-                            action:function(){}
-                        }
-                    ],{autohidden:2000});
-                $http.post("Order/AddOrderSubstituteItem", item)
-                    .success(function (response) {
-                        item.renglon_id= response.renglon_id;
-                    });
-            }
-        }else {
-            $scope.NotifAction("alert",
-                "Se eliminara el Pedido a sustituir ¿Desea continuar?"
-                ,[
-                    {name: 'Ok',
-                        action:function(){
-                            $http.post("Order/RemoveOrdenItem", {id: item.renglon_id,pedido_id:$scope.document.id})
-                                .success(function (response) {
-                                    $scope.NotifAction("info",
-                                        "Removido"
-                                        ,[
-                                            {name: 'Ok',
-                                                action:function(){}
-                                            }
-                                        ],{autohidden:2000});
-                                });
-                        }
-                    },{name: 'Cancel',
-                        action:function(){}
-                    }
-                ]);
-        }
-
-    };
     /*********************************************** EVENTOS FOCUS LOST ***********************************************/
 
 
@@ -2179,6 +2095,20 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         ],{block:true});
     };
 
+
+
+    /****** ************************** Enviar email ***************************************/
+    $scope.isOpenSend = false;
+    $scope.openSendMail = function(){
+
+        if(!$mdSidenav("sendEmail").isOpen()){
+            $mdSidenav("sendEmail").open().then(function(){
+                $scope.isOpenSend = true;
+            });
+        }
+
+    };
+
     /****** ************************** agregar respuesta ***************************************/
     $scope.addAnswer={};
     $scope.addAnswer.adjs =[];
@@ -2235,6 +2165,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$http,$mdSidenav,$timeout
         }
 
     };
+
 
 /***  Crear producto ***/
 
@@ -3664,14 +3595,6 @@ $scope.isOpencreateProd = false;
 
     };
 
-    $scope.clearAuto = function(text, value){
-
-        $timeout(function(){
-            if(text != value){
-                text='';
-            }
-        }, 100)
-    };
     function loadPedidosProvedor(id, callback){
         $scope.provDocs = [];
         Order.query({type:"OrderProvOrder", id:id}, {},function(response){
@@ -3704,6 +3627,33 @@ $scope.isOpencreateProd = false;
     }
 
 });
+
+
+MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order', function($scope,$mdSidenav, setGetOrder,Order){
+
+    $scope.bind =setGetOrder.bind();
+    $scope.destinos =[];
+    $scope.correosProvider = [];
+    $scope.$watch('$parent.provSelec.id', function(newval,oldVal){
+        if(newval){
+            $scope.correosProvider = Order.query({type:'ProviderEmails',prov_id:newval});
+        }
+    });
+    $scope.close = function(e){
+        if(jQuery(e.target).parents("#lyrAlert").length == 0
+            && jQuery(e.target).parents("#sendEmail").length == 0
+            && jQuery(e.target).parents("#noti-button").length == 0
+            && $scope.$parent.isOpenSend
+
+        ){
+            $mdSidenav("sendEmail").close().then(function(){
+                $scope.$parent.isOpenSend = false;
+            });
+        }
+
+    }
+}]);
+
 
 MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
 
@@ -3870,6 +3820,8 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
         return false;
     }
 });
+
+
 
 /*
  Servicio que almacena la informacion del docuemnto y monitoriza cambios

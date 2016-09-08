@@ -22,6 +22,7 @@ $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); //
 //otros modulos
 $app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountry'); ///obtiene las direcciones de facturacion
 $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry'); ///obtiene las direcciones de almacen
+$app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene las direcciones de almacen
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated
@@ -170,7 +171,8 @@ $app->get("Order/OrderSubstitute",'Orders\OrderController@getOrderSustitute'); /
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido @deprecated
 $app->get("Order/test",'Orders\OrderController@test'); ///elimina el pedido @deprecated
 
-$app->get("Order/Email/Gerencia",'Orders\OrderController@emailGerencia'); ///elimina el pedido @deprecated
+$app->get("Order/Email/Summary",'Orders\OrderController@EmailSummaryDoc'); ///
+$app->get("Order/Email/Estimate",'Orders\OrderController@EmailEstimate'); ///
 
 //deprecated
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id

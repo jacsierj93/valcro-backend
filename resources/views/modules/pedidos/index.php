@@ -31,24 +31,6 @@
                                 <input  type="text" ng-model="filterProv.pais"  tabindex="-1" >
                             </md-input-container>
 
-                            <!--<md-autocomplete style="background-color: transparent; margin-top: 0px !important;"
-                                             class="filter"
-                                             md-selected-item="filterProv.pais"
-                                             md-search-text="texto"
-                                             md-items="item in paises | filter : texto "
-                                             md-item-text="item"
-                                             md-no-asterisk
-                                             md-input-id ="autoFilter"
-
-                                             placeholder="Pais">
-                                <md-item-template>
-                                    <span >{{item}}</span>
-                                </md-item-template>
-                                <md-not-found>
-                                    No hay resultados
-                                </md-not-found>
-                            </md-autocomplete>-->
-
                             <div layout="row" class="dotRow" style="height: 24px;">
                                 <div flex layout layout-align="center center" ng-click="filterProv.f100 = !filterProv.f100  ">
                                     <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f100 ,'dot-filter100':!filterProv.f100}" >
@@ -212,9 +194,15 @@
                     </div>
 
                     <div layout="column" layout-align="center center"
-                         ng-show="( document.id  )"
+                         ng-show="( document.id &&  document.version && document.version > 1  )"
                          ng-click="openVersions()">
                         <span style="font-size: 24px"> OLD </span>
+                    </div>
+
+                    <div layout="column" layout-align="center center"
+
+                         ng-click="demo()">
+                        <span style="font-size: 24px"> TEst </span>
                     </div>
 
                     <!--  <div layout="column" layout-align="center center"
@@ -929,15 +917,7 @@
                     <div style="background-color: #0a0a0a; width: 100%; height: 36px; min-height: 36px;">
                         <div style="margin: 8px; color: white;">Mensaje Nuevo</div>
                     </div>
-                    <!--<md-contact-chips ng-model="email.destinarios "
-                                      md-contacts="ContactosSearch($query)"
-                                      md-contact-name="name"
-                                      md-contact-image="image"
-                                      md-contact-email="email"
-                                       md-require-match="false"
-                                      md-transform-chip="transformChip($chip)"
-                                      md-highlight-flags="i" filter-selected="true" placeholder="Para">
-                    </md-contact-chips>-->
+
                     <md-chips ng-model="email.destinos"
                               md-transform-chip="transformChip($chip)"
                               style="  height: 48px;">
@@ -1021,8 +1001,6 @@
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
-                                                     md-search-text-change ="clearAuto( ctrl.searchProveedor,item.razon_social )"
 
                                     >
                                         <md-item-template>
@@ -1079,7 +1057,6 @@
                                                      md-require-match
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
                                     >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
@@ -1119,7 +1096,6 @@
                                                      md-require-match
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
 
                                     >
                                         <md-item-template>
@@ -1152,7 +1128,6 @@
                                                      md-require-match
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
                                     >
                                         <md-item-template>
                                             <span>{{item.direccion}}</span>
@@ -1177,7 +1152,6 @@
                                                      md-require-match
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
                                     >
                                         <md-item-template>
                                             <span>{{item.Main_port_name}}</span>
@@ -1220,7 +1194,6 @@
                                                      md-require-match
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
 
                                     >
                                         <md-item-template>
@@ -1276,32 +1249,12 @@
                                                      md-input-minlength="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-match-case-insensitive
 
                                     >
                                         <md-item-template>
                                             <span>{{item.titulo}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
-                                    <!--<md-select ng-model="document.condicion_pago_id" ng-disabled="( Docsession.block  || !provSelec.id)"
-                                               ng-change="toEditHead('condicion_pago_id', document.condicion_pago_id)"
-                                               md-no-ink
-                                               ng-required ="(formMode.value == 23)"
-                                               info="Seleccione una condicion para la realizacion del pago"
-                                               skip-tab
-                                               id="condicion_pago_id"
-
-
-
-                                    >
-                                        <md-option ng-repeat="conPago in formData.condicionPago" value="{{conPago.id}}" skip-tab>
-                                            {{conPago.titulo}}
-                                        </md-option>
-
-                                        <md-option  value="-1" >
-                                            Nueva Condicion de pago
-                                        </md-option>
-                                    </md-select>-->
                                 </md-input-container>
 
                             </div>
@@ -1323,8 +1276,7 @@
 
                                 >
                                     <img src="images/adjunto.png" style="margin 4px;"/>
-<!--                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
--->                                </div>
+                                    -->                                </div>
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
@@ -1341,8 +1293,6 @@
 
                                 >
                                     <img src="images/adjunto.png" style="margin 4px;" />
-<!--                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>-->
-
                                 </div>
                                 <md-input-container class="md-block" flex="10">
                                     <label>Mt3</label>
@@ -1366,11 +1316,7 @@
                                 </md-input-container>
 
                             </div>
-                            <!--                            <div ng-show="( gridView != 5 )"  layout="row" class="row" >
 
-
-
-                                                        </div>-->
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
@@ -1707,9 +1653,7 @@
                         <div active-left ></div>
                         <div layout="column" flex>
                             <div layout="row" class="headGridHolder" ng-init="tbl_listProducProv.order = 'id' ">
-                                <div flex="5" class="">
-                                    <!--                            <md-switch class="md-primary" ng-model="productoSearch.asignado" ></md-switch>
-                                    -->                        </div>
+                                <div flex="5" class=""></div>
 
                                 <div layout="row" flex="20">
                                     <md-input-container class="md-block"  flex>
@@ -1756,9 +1700,7 @@
                                     </div>
                                 </div>
 
-                                <div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )">
-                                  <!--  <md-switch class="md-primary" ng-model="tbl_listProducProv.filter.puntoCompra" ng-disabled="true"></md-switch>-->
-                                </div>
+                                <div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )"></div>
 
                                 <div layout="row" flex="15">
                                     <md-input-container class="md-block" flex>
@@ -2808,8 +2750,6 @@
                     <form layout="row" ng-init="tbl_oldDoc.order= 'cod_producto' ">
                         <div active-left></div>
                         <div layout="row" flex>
-                            <!--                            <div flex="5" ></div>
-                            -->
                             <div flex="15" layout="row">
                                 <md-input-container class="md-block" flex >
                                     <label>Codigo</label>
@@ -2873,11 +2813,6 @@
                         <div layout="column" flex>
                             <div >
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in oldVersionSelect.productos.todos | filter :tbl_oldDoc.filter:strict | orderBy :tbl_oldDoc.order   ">
-                                    <!-- <div flex="5" class="cellEmpty" >
-                                         <md-switch class="md-primary"
-                                                    ng-disabled="( Docsession.block )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
-                                         </md-switch>
-                                     </div>-->
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                     <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
                                     <div flex class="cellGrid"> {{item.documento}}</div>
@@ -3077,10 +3012,7 @@
                                 </div>
                                 <div class="rms"> {{document.moneda}} </div>
                             </div>
-                            <!-- <div layout="row"  class="rowRsm" ng-show="(document.productos.todos.length > 0  && gridViewFinalDoc == 1)">
-                                 <div class="rowRsmTitle" flex="40"> Productos: </div>
-                                 <div class="rms" flex> {{document.productos.todos.length}} </div>
-                             </div>-->
+
                         </div>
                     </form>
                     <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
@@ -3275,26 +3207,6 @@
                     </form>
 
                 </div>
-                <!--   <form layout="row" flex  >
-                       <div active-left ng-show="isOpenexcepAddCP"> </div>
-                       <div layout="column" flex>
-                           <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
-                               <div>
-                                   Productos
-                               </div>
-                           </div>
-                           <div flex layout="column">
-                            <div flex class="gridContent" >
-                                   <div flex >
-
-                                   </div>
-
-                               </div>
-
-                           </div>
-                       </div>
-                   </form>-->
-
                 <div   id="expand"></div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
 
@@ -3449,7 +3361,6 @@
                                             </div>
                                         </div>
                                         <div flex="5" class="cellSelect"  tabindex="{{$index + 1}}" > {{item.id}}</div>
-                                        <!-- <div flex="15" class="cellGrid"> {{item.documento}}</div>-->
                                         <div flex class="cellGrid"> {{item.proveedor}}</div>
                                         <div flex class="cellGrid" > {{item.titulo}}</div>
                                         <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
@@ -3981,6 +3892,70 @@
             </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER send correo ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="sendEmail" id="sendEmail"
+        >
+            <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderSendMail"    >
+                <div class="activeleft"></div>
+                <div  layout="column" flex class="layerColumn"   click-out="close($event, $parent.isOpenSend)">
+                    <div layout="row" style="min-height: 36px;" >
+                        <div class="titulo_formulario" layout="column" flex layout-align="start start">
+                            <div>
+                                Enviar Correo
+                            </div>
+                        </div>
+
+                    </div>
+                    <form>
+                        <md-tabs  md-no-ink flex>
+                            <md-tab label="Correos" md-no-ink flex>
+                                <md-content flex>
+                                    <md-chips ng-model="destinos"
+                                              md-transform-chip="transformChip($chip)"
+
+                                    >
+                                        <md-autocomplete
+                                            md-search-text="emailToText"
+                                            md-items=" item in correosProvider"
+                                            md-item-text="item.valor"
+                                            placeholder="Para:"
+                                        >
+                                            <span md-highlight-text="emailToText">{{item.valor}}</span>
+                                        </md-autocomplete>
+
+                                        <md-chip-template>
+                                            <strong>{{$chip.valor}}</strong>
+                                        </md-chip-template>
+                                    </md-chips>
+                                </md-content>
+                            </md-tab>
+                            <md-tab label="Texto" md-no-ink >
+                                <md-content flex>
+                                    <div laypu="column" flex style="padding-right: 8px,">
+                                        <md-input-container class="md-block" flex >
+                                            <label>Texto</label>
+                                    <textarea ng-model="texto"
+                                              info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
+                                    ></textarea>
+
+                                        </md-input-container>
+                                    </div>
+                                </md-content>
+                            </md-tab>
+                        </md-tabs>
+                    </form>
+                    <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="allowUpload.val">
+                        <div  class="drop-box">
+                            Enviar
+                        </div>
+                    </div>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
         <!-- ########################################## LAYER crear nuevo producto ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
@@ -3998,7 +3973,7 @@
                             <md-input-container class="md-block"  >
                                 <label>Descripcion</label>
                                 <input ng-model="createProd.descripcion"
-                                        info="Descripción del producto "
+                                       info="Descripción del producto "
                                        required
                                        skip-tab
 
