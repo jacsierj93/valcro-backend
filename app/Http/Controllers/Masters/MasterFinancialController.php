@@ -10,7 +10,7 @@
 
 namespace app\Http\Controllers\Masters;
 
-use App\Models\Sistema\Monedas;
+use App\Models\Sistema\Masters\Monedas;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
 

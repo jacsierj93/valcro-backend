@@ -30,7 +30,7 @@ class DocumentCP extends Model
     /**@return Proveedor de pago */
     public function proveedor()
     {
-        return $this->belongsTo('App\Models\Sistema\Provider', 'prov_id');
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
     }
 
     /**tipo de documento
@@ -62,7 +62,7 @@ class DocumentCP extends Model
     ////foreing key
     public function moneda()
     {
-        return $this->belongsTo('App\Models\Sistema\Monedas', 'moneda_id');
+        return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'moneda_id');
     }
     
 

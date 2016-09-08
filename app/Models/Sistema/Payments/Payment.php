@@ -35,13 +35,13 @@ class Payment extends Model
     /**@return BankAccountProvidert  de provedor* */
     public function cuentaBancariaProveedor()
     {
-        return $this->belongsTo('App\Models\Sistema\BankAccountProvider', 'prov_cuenta_id');
+        return $this->belongsTo('App\Models\Sistema\Providers\BankAccount', 'prov_cuenta_id');
     }
 
     ////foreing key
     public function moneda()
     {
-        return $this->belongsTo('App\Models\Sistema\Monedas', 'moneda_id');
+        return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'moneda_id');
     }
 
 

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Payments;
 
 use App\Http\Controllers\Masters\MasterFinancialController;
-use App\Models\Sistema\BankAccountProvider;
+use App\Models\Sistema\Providers\BankAccount;
 use App\Models\Sistema\Payments\DocumentCP;
 use App\Models\Sistema\Payments\Payment;
 use App\Models\Sistema\Payments\PaymentType;
-use App\Models\Sistema\Provider;
+use App\Models\Sistema\Providers\Provider;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Session;
@@ -195,7 +195,7 @@ class PaymentController extends BaseController
     {
 
         $provid = Session::get("PROVID"); ///setea sesion del proveedor actual
-        $data = BankAccountProvider::where("prov_id", $provid)->get();
+        $data = BankAccount::where("prov_id", $provid)->get();
         return $data;
 
     }
