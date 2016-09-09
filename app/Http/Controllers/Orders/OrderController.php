@@ -50,6 +50,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
@@ -60,10 +61,12 @@ class OrderController extends BaseController
 
     private $defaulString = '';
     private $defaulInt = 0;
-    public function __construct()
+    private $request ;
+    public function __construct(Request $req)
     {
 
         $this->middleware('auth');
+        $this->request= $req;
     }
 
     /*********************** SYSTEM ************************/
@@ -476,7 +479,7 @@ class OrderController extends BaseController
     }
 
     public function  getAddressrPort(Request $req){
-       return  (!$req->has('id')) ? ProviderAddress::findOrfail($req->direccion_id)->ports()->get() : Ports::where('id',$req->id)->get();
+        return  (!$req->has('id')) ? ProviderAddress::findOrfail($req->direccion_id)->ports()->get() : Ports::where('id',$req->id)->get();
 
     }
 
@@ -3307,109 +3310,90 @@ class OrderController extends BaseController
 
 
     /*********************************** Email ***********************************/
-    public function EmailSummaryDoc(Request $req){
-        $data = [];
-        $model = Solicitude::findOrFail($req->id);
-        $items = $model->items()->get();
-        $data['accion']= $req->accion;
-        $data['id'] = $model->id;
-        $data['tipo'] = $model->getTipoId();
-        $data['emision'] =  $this->outputDate($model->emision);
-        $data['version'] = $model->version;
-        $data['documento'] = $model->getTipo();
-        $data['accion'] = 'demo';
-        $data['titulo'] = $model->titulo;
-        $data['proveedor'] = Provider::findOrFail($model->prov_id)->razon_social;
-        $data['responsable'] = $req->session()->get('DATAUSER')['nombre'];
-        $data['correo'] = $req->session()->get('DATAUSER')['email'];
-        $data['nro_proforma'] = ($model->nro_proforma != null) ? $model->nro_proforma : $this->defaulString;
-        $data['nro_factura'] = ($model->nro_factura != null) ? $model->nro_factura : $this->defaulString;
-        $data['monto'] =($model->prov_moneda_id == null) ? $this->defaulString:Monedas::findOrFail($model->prov_moneda_id)->symbolo.$model->monto;
-        $data['pais'] = ($model->pais_id == null) ? $this->defaulString: Country::findOrFail($model->pais_id)->short_name;
-        $data['tasa'] = number_format(floatval($model->tasa),2);
-        $data['comentario'] = $model->comentario;
-        $data['condicion_pago'] = ($model->condicion_pago_id == null ) ? $this->defaulString: ProviderCondPay::findOrFail($model->condicion_pago_id)->getText();
-        $data['mt3'] =  ($model->mt3 == null ) ? $this->defaulInt :  $model->mt3 ;
-        $data['peso'] =  ($model->peso == null ) ? $this->defaulInt :  $model->peso ;
-        if($model->fecha_cancelacion != null || true){
-            $data['cancelado']= true;
-            $data['fecha_cancelacion'] =( $model->cancelacion == null) ? $this->defaulString :  $this->outputDate($model->cancelacion);
-            $data['comentario_cancelacion'] =( $model->comentario_cancelacion == null) ? $this->defaulString :  $model->comentario_cancelacion;
-        }
 
-        if($model->fecha_aprobacion_compras != null || true){
-            $data['aprob_compras']= true;
-            $data['fecha_aprobacion_compras'] = ( $model->fecha_aprob_compra == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_compra);
-            $data['nro_doc'] = $model->nro_doc;
-        }
+    public function EmailSummaryDocSolicitude(Request $req){
+        $data =$this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
+        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
+        return view("emails/modules/Order/Internal/ResumenDoc",$data);
+    }
+    public function EmailSummaryDocOrder(Request $req){
+        $data =$this->parseDocToSummaryEmail(Order::findOrFail($req->id));
+        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
 
-        if($model->fecha_aprobacion_gerencia != null || true){
-            $data['aprob_gerencia']= true;
-            $data['fecha_aprobacion_gerencia'] = ( $model->fecha_aprob_gerencia == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_gerencia);
-        }
-
-
-        $data['dir_almacen'] =  ($model->direccion_almacen_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_almacen_id)->direccion ;
-        $data['dir_facturacion'] =  ($model->direccion_facturacion_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_facturacion_id)->direccion ;
-
-        $data['articulos'] = sizeof(($items));
-        $data['articulos_kitchenBox'] =0;
-        $data['articulos_contraPedido'] =0;
-        foreach($items as $aux){
-            $p= $this->getFirstProducto($aux);
-            switch($p->tipo_origen_id){
-                case 2:$data['articulos_contraPedido'] ++;break;
-                case 3:$data['articulos_kitchenBox'] ++;break;
-            }
-        }
-
-        //$data['articulos'] = $model->getItem();
-        //$data['articulos_contraPedido'] = $model->getItem();
-        //$data['articulos_KitchenBox'] = $model->getItem();
-
-
-
-
-
-        //cancelacion
-       //
-
-       // return dd($req->session()->get('DATAUSER'));
+        return view("emails/modules/Order/Internal/ResumenDoc",$data);
+    }
+    public function EmailSummaryDocPurchase(Request $req){
+        $data =$this->parseDocToSummaryEmail(Purchase::findOrFail($req->id));
+        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
         return view("emails/modules/Order/Internal/ResumenDoc",$data);
     }
 
+    public function EmailEstimateSolicitude(Request $req)
+    {
+        $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        return view("emails.modules.Order.External.ProviderEstimate", $data);
+    }
+    public function EmailEstimateOrder(Request $req)
+    {
+        $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        return view("emails.modules.Order.External.ProviderEstimate", $data);
+    }
+    public function EmailEstimatePurchase(Request $req)
+    {
+        $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        return view("emails.modules.Order.External.ProviderEstimate", $data);
+    }
 
-    public function EmailEstimate(Request $req){
-        $data = [];
-        $model = Solicitude::findOrFail($req->id);
 
-        $data['id'] = $model->id;
-        $data['emision'] =  $this->outputDate($model->emision);
-        $data['titulo'] = $model->titulo;
-        $data['responsable'] = $req->session()->get('DATAUSER')['nombre'];
-        $data['correo'] = $req->session()->get('DATAUSER')['email'];
+    public function sendSolicitude(Request $req){
 
-        $data['texto'] ="Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
-        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
-        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
-        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
-        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
-        veedor ingles, Una texto para enviar al provedore que puede contener muchas lines, tine que ser lo bastante descriptivo y en lenguaje nativo del pro
-        veedor ingles, ";
-        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
-        $prod = [];
-        foreach($items as $aux){
-            $temp= array();
+        $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
+            $m->to("luisnavarro.dg@gmail.com", "Luis navarro");
+            $m->cc("meqh1992@gmail.com", "Luis Navarro");
+            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
+            if($req->has('sistema')){
+                $m->from('systema_valcro@gmail.com');
+            }else{
+                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
+            }
+        });
+        $resul =[];
+        $resul['accion']= 'send';
+        return $resul;
+    }
+    public function sendOrder(Request $req){
 
-            $p= Product::find($aux->producto_id);
-            $temp['id']=$aux->id;
-            $temp['codigo_fabrica']=$p->codigo_fabrica;
-            $temp['descripcion']=$aux->descripcion;
-            $temp['cantidad']=$aux->cant;
-            $prod[]= $temp;
-        }
-        $data['articulos'] =$prod;
-        return view("emails.modules.Order.External.ProviderEstimate",$data);
+        $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
+            $m->to("luisnavarro.dg@gmail.com", "Luis Navarro");
+            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
+            if($req->has('sistema')){
+                $m->from('systema_valcro@gmail.com');
+            }else{
+                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
+            }
+        });
+
+        $resul =[];
+        $resul['accion']= 'send';
+        return $resul;
+
+    }
+    public function sendPurchase(Request $req){
+
+        $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
+            $m->to("luisnavarro.dg@gmail.com", "Luis Navarro");
+            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
+            if($req->has('sistema')){
+                $m->from('systema_valcro@gmail.com');
+            }else{
+                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
+            }
+        });
+        $resul =[];
+        $resul['accion']= 'send';
     }
 
     /*********************************** CONTRAPEDIDOS ***********************************/
@@ -4427,100 +4411,6 @@ class OrderController extends BaseController
     }
 
     /**
-     * obtiene todos los producto de un pedido
-     * @param obj Order
-     * @return array de productos
-     */
-    private function getProductoItem($order){
-
-        $items= $order->items()->get();
-        $origen = SourceType::get();
-        $contra=Collection::make(Array());
-        $kitchen= Collection::make(Array());
-        $pediSus= Collection::make(Array());
-        $all= Collection::make(Array());
-        $prod_prov = Product::where('prov_id', $order->prov_id)->get();
-
-        /** contra pedido*/
-        foreach($items->where('tipo_origen_id', '2') as $aux){
-            if(!$contra->contains($aux->doc_origen_id)){
-                $contra->push(CustomOrder::find($aux->doc_origen_id));
-            }
-
-        }
-        /** kitceh box*/
-        foreach($items->where('tipo_origen_id', '3') as $aux){
-            $kitchen->push(KitchenBox::find($aux->origen_item_id));
-        }
-
-        /** importados */
-        foreach($items->where('tipo_origen_id', ''.$order->getTipoId()) as $aux){
-            $first= $this->getFirstProducto($aux);
-            switch($first->tipo_origen_id){
-                case 2:
-                    $tem= CustomOrder::findOrFail($first->doc_origen_id);
-                    $tem['sustitute'] = $aux->doc_origen_id;
-                    $contra->push($tem);
-                    break;
-                case 3:
-                    $kitchen->push($aux);
-                    $tem= KitchenBox::findOrFail($first->doc_origen_id);
-                    $tem['sustituto'] = $aux->doc_origen_id;
-                    break;
-            }
-            if(!$pediSus->contains($aux->doc_origen_id)){
-                $pediSus[]=$order::find($aux->doc_origen_id);
-            }
-
-        }
-
-        /** todos */
-        foreach($items as $aux){
-            $tem = array();
-            $tem['id']= $aux->id;
-            $tem['cantidad']= $aux->cantidad;
-            $tem['saldo']= $aux->saldo;
-            $tem['descripcion']= $aux->descripcion;
-            $tem['tipo_origen_id']= $aux->tipo_origen_id;
-            $tem['origen_item_id']= $aux->origen_item_id;
-            $tem['doc_origen_id']= $aux->doc_origen_id;
-            $tem['doc_id']= $aux->doc_id;
-            $tem['producto_id']= $aux->producto_id;
-            $tem['cod_producto']= $aux->id;
-            $tem['codigo_fabrica']=$prod_prov->where('id',''.$aux->producto_id)->first()->codigo_fabrica;
-            $tem['documento']=  $origen->where('id', $aux->tipo_origen_id)->first()->descripcion;
-
-            $tem['asignado']= true;
-            //$tem['origen']= MasterOrderController::getTypeProduct($aux)['descripcion'];
-            $all->push($tem);
-        }
-
-        $data['contraPedido'] = $contra;
-        $data['kitchenBox'] = $kitchen;
-        $data['pedidoSusti'] = $pediSus;
-        $data['todos'] = $all;
-        return $data;
-    }
-
-
-    /**
-     * obtiene los paises donde un provedor tiene paises
-     */
-    private function getCountryProvider($id){
-        $model=  ProviderAddress::where('prov_id',$id)->get();
-        $data= Collection::make(array());
-        foreach($model as $aux){
-            if(!$data->contains($aux->pais_id)){
-                $p=Country::find($aux->pais_id);
-                $data->push($p);
-            }
-
-        }
-        return $data;
-    }
-
-
-    /**
      * Obtiene las ordenes de compra de un provedor
      ***/
     public function getProviderOrder(Request $req){
@@ -4910,6 +4800,99 @@ class OrderController extends BaseController
     /*************************************** private *****************************************/
 
 
+    /**
+     * obtiene todos los producto de un pedido
+     * @param obj Order
+     * @return array de productos
+     */
+    private function getProductoItem($order){
+
+        $items= $order->items()->get();
+        $origen = SourceType::get();
+        $contra=Collection::make(Array());
+        $kitchen= Collection::make(Array());
+        $pediSus= Collection::make(Array());
+        $all= Collection::make(Array());
+        $prod_prov = Product::where('prov_id', $order->prov_id)->get();
+
+        /** contra pedido*/
+        foreach($items->where('tipo_origen_id', '2') as $aux){
+            if(!$contra->contains($aux->doc_origen_id)){
+                $contra->push(CustomOrder::find($aux->doc_origen_id));
+            }
+
+        }
+        /** kitceh box*/
+        foreach($items->where('tipo_origen_id', '3') as $aux){
+            $kitchen->push(KitchenBox::find($aux->origen_item_id));
+        }
+
+        /** importados */
+        foreach($items->where('tipo_origen_id', ''.$order->getTipoId()) as $aux){
+            $first= $this->getFirstProducto($aux);
+            switch($first->tipo_origen_id){
+                case 2:
+                    $tem= CustomOrder::findOrFail($first->doc_origen_id);
+                    $tem['sustitute'] = $aux->doc_origen_id;
+                    $contra->push($tem);
+                    break;
+                case 3:
+                    $kitchen->push($aux);
+                    $tem= KitchenBox::findOrFail($first->doc_origen_id);
+                    $tem['sustituto'] = $aux->doc_origen_id;
+                    break;
+            }
+            if(!$pediSus->contains($aux->doc_origen_id)){
+                $pediSus[]=$order::find($aux->doc_origen_id);
+            }
+
+        }
+
+        /** todos */
+        foreach($items as $aux){
+            $tem = array();
+            $tem['id']= $aux->id;
+            $tem['cantidad']= $aux->cantidad;
+            $tem['saldo']= $aux->saldo;
+            $tem['descripcion']= $aux->descripcion;
+            $tem['tipo_origen_id']= $aux->tipo_origen_id;
+            $tem['origen_item_id']= $aux->origen_item_id;
+            $tem['doc_origen_id']= $aux->doc_origen_id;
+            $tem['doc_id']= $aux->doc_id;
+            $tem['producto_id']= $aux->producto_id;
+            $tem['cod_producto']= $aux->id;
+            $tem['codigo_fabrica']=$prod_prov->where('id',''.$aux->producto_id)->first()->codigo_fabrica;
+            $tem['documento']=  $origen->where('id', $aux->tipo_origen_id)->first()->descripcion;
+
+            $tem['asignado']= true;
+            //$tem['origen']= MasterOrderController::getTypeProduct($aux)['descripcion'];
+            $all->push($tem);
+        }
+
+        $data['contraPedido'] = $contra;
+        $data['kitchenBox'] = $kitchen;
+        $data['pedidoSusti'] = $pediSus;
+        $data['todos'] = $all;
+        return $data;
+    }
+
+
+    /**
+     * obtiene los paises donde un provedor tiene paises
+     */
+    private function getCountryProvider($id){
+        $model=  ProviderAddress::where('prov_id',$id)->get();
+        $data= Collection::make(array());
+        foreach($model as $aux){
+            if(!$data->contains($aux->pais_id)){
+                $p=Country::find($aux->pais_id);
+                $data->push($p);
+            }
+
+        }
+        return $data;
+    }
+
     private function getDocumentIntance($tipo){
         switch($tipo){
             case 21:
@@ -5056,6 +5039,8 @@ class OrderController extends BaseController
         return $newModel;
     }
 
+
+    /**@deprecated*/
     private  function  transferItem($oldItem, $newItem){
         //$newItem->final_id =$oldItem->final_id;
         $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
@@ -5227,5 +5212,80 @@ class OrderController extends BaseController
 
     private function outputDate($databd){
         return  date_format(date_create($databd),'d-m-Y');
+    }
+
+    private function parseDocToSummaryEmail($model){
+        $data = [];
+        $items = $model->items()->get();
+        $data['id'] = $model->id;
+        $data['tipo'] = $model->getTipoId();
+        $data['emision'] =  $this->outputDate($model->emision);
+        $data['version'] = $model->version;
+        $data['documento'] = $model->getTipo();
+        $data['titulo'] = $model->titulo;
+        $data['proveedor'] = Provider::findOrFail($model->prov_id)->razon_social;
+        $data['responsable'] =$this->request->session()->get('DATAUSER')['nombre'];
+        $data['correo'] = $this->request->session()->get('DATAUSER')['email'];
+        $data['nro_proforma'] = ($model->nro_proforma != null) ? $model->nro_proforma : $this->defaulString;
+        $data['nro_factura'] = ($model->nro_factura != null) ? $model->nro_factura : $this->defaulString;
+        $data['monto'] =($model->prov_moneda_id == null) ? $this->defaulString:Monedas::findOrFail($model->prov_moneda_id)->symbolo.$model->monto;
+        $data['pais'] = ($model->pais_id == null) ? $this->defaulString: Country::findOrFail($model->pais_id)->short_name;
+        $data['tasa'] = number_format(floatval($model->tasa),2);
+        $data['comentario'] = $model->comentario;
+        $data['condicion_pago'] = ($model->condicion_pago_id == null ) ? $this->defaulString: ProviderCondPay::findOrFail($model->condicion_pago_id)->getText();
+        $data['mt3'] =  ($model->mt3 == null ) ? $this->defaulInt :  $model->mt3 ;
+        $data['peso'] =  ($model->peso == null ) ? $this->defaulInt :  $model->peso ;
+        $data['fecha_cancelacion'] =( $model->cancelacion == null) ? $this->defaulString :  $this->outputDate($model->cancelacion);
+        $data['comentario_cancelacion'] =( $model->comentario_cancelacion == null) ? $this->defaulString :  $model->comentario_cancelacion;
+        $data['fecha_aprobacion_compras'] = ( $model->fecha_aprob_compra == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_compra);
+        $data['nro_doc'] = $model->nro_doc;
+        $data['fecha_aprobacion_gerencia'] = ( $model->fecha_aprob_gerencia == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_gerencia);
+
+        $data['aprob_compras']=  ($model->fecha_aprobacion_compras != null)? true : false;
+        $data['cancelado']= ($model->cancelacion != null)? true : false;;
+        $data['aprob_gerencia']= ($model->fecha_aprobacion_gerencia != null)? true : false;
+        $data['dir_almacen'] =  ($model->direccion_almacen_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_almacen_id)->direccion ;
+        $data['dir_facturacion'] =  ($model->direccion_facturacion_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_facturacion_id)->direccion ;
+
+        $data['articulos'] = sizeof(($items));
+        $data['articulos_kitchenBox'] =0;
+        $data['articulos_contraPedido'] =0;
+        foreach($items as $aux){
+            $p= $this->getFirstProducto($aux);
+            switch($p->tipo_origen_id){
+                case 2:$data['articulos_contraPedido'] ++;break;
+                case 3:$data['articulos_kitchenBox'] ++;break;
+            }
+        }
+
+        return $data;
+
+    }
+
+    private function parseDocToEstimateEmail($model, $texto){
+        $data = [];
+
+        $data['id'] = $model->id;
+        $data['emision'] = $this->outputDate($model->emision);
+        $data['titulo'] = $model->titulo;
+        $data['responsable'] = $this->request->session()->get('DATAUSER')['nombre'];
+        $data['correo'] = $this->request->session()->get('DATAUSER')['email'];
+
+        $data['texto'] = $texto;
+        $items = $model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $prod = [];
+        foreach ($items as $aux) {
+            $temp = array();
+
+            $p = Product::find($aux->producto_id);
+            $temp['id'] = $aux->id;
+            $temp['codigo_fabrica'] = $p->codigo_fabrica;
+            $temp['descripcion'] = $aux->descripcion;
+            $temp['cantidad'] = $aux->cant;
+            $prod[] = $temp;
+        }
+        $data['articulos'] = $prod;
+        return $data;
+
     }
 }

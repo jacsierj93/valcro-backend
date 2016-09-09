@@ -534,7 +534,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     };
 
     $scope.demo = function(){
-        $scope.openSendMail();
+        $scope.OpenContactMail();
+
 
 
     };
@@ -1114,14 +1115,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             }
         }
     }
-    $scope.transformChip = function(chip) {
 
-        if (angular.isObject(chip)) {
-            return chip;
-        }
-
-        return { email: chip}
-    }
 
     $scope.selecContraP = function (item) {
         $scope.contraPedSelec ={};
@@ -1958,18 +1952,61 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
 
     $scope.saveFinal = function(){
-        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
 
-            if (response.success) {
-                $scope.updateProv();
-                $scope.NotifAction("ok","Finalizado",[
-                    {name:"Ok",default:2, action: function(){
-                        $scope.LayersAction({close:{first:true, search:true}});
-                        filesService.close();
+        $scope.NotifAction("alert","¿Que desea hacer?",[
 
-                    }}
-                ],{block:true});
-            }});
+            {name:"Previsualizar",default:4, action: function(){
+
+
+            }},
+            {name:"Enviar ", action: function(){
+
+                $scope.OpenContactMail();
+
+            }},
+            {name:"Guardar y enviar texto ", action: function(){
+                $scope.openSendMail();
+
+            }},
+            {name:"Solo Guardar", action: function(){
+                $scope.LayersAction({close:{first:true, search:true}});
+                filesService.close();
+
+            }}
+        ],{block:true});
+
+        /*if($scope.Docsession.global == 'new'){
+         $scope.NotifAction("alert","¿Que desea hacer?",[
+         {name:"Previsualizar",default:2, action: function(){
+         $scope.LayersAction({close:{first:true, search:true}});
+         filesService.close();
+
+         }},
+         {name:"Enviar ",default:2, action: function(){
+         $scope.LayersAction({close:{first:true, search:true}});
+         filesService.close();
+
+         }},
+         {name:"Guardar y enviar ",default:2, action: function(){
+         $scope.LayersAction({close:{first:true, search:true}});
+         filesService.close();
+
+         }}
+         ],{block:true});
+
+         }*/
+        /*    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+
+         if (response.success) {
+         $scope.updateProv();
+         $scope.NotifAction("ok","Finalizado",[
+         {name:"Ok",default:2, action: function(){
+         $scope.LayersAction({close:{first:true, search:true}});
+         filesService.close();
+
+         }}
+         ],{block:true});
+         }});*/
 
 
     };
@@ -2097,17 +2134,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
 
 
-    /****** ************************** Enviar email ***************************************/
-    $scope.isOpenSend = false;
-    $scope.openSendMail = function(){
 
-        if(!$mdSidenav("sendEmail").isOpen()){
-            $mdSidenav("sendEmail").open().then(function(){
-                $scope.isOpenSend = true;
-            });
-        }
-
-    };
 
     /****** ************************** agregar respuesta ***************************************/
     $scope.addAnswer={};
@@ -2167,9 +2194,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     };
 
 
-/***  Crear producto ***/
+    /***  Crear producto ***/
 
-$scope.isOpencreateProd = false;
+    $scope.isOpencreateProd = false;
     $scope.createProduct = function(item){
 
         console.log('items ', item);
@@ -2984,7 +3011,7 @@ $scope.isOpencreateProd = false;
                     angular.forEach(response, function(v){
                         $scope.formData.condicionPago.push(v);
                     })
-                   // $scope.formData.condicionPago=response;
+                    // $scope.formData.condicionPago=response;
                 });
                 $timeout(function(){
                     var elem=angular.element("#prov"+newVal.id);
@@ -3003,9 +3030,9 @@ $scope.isOpencreateProd = false;
         if(newVal && $scope.provSelec.id){
             $scope.document.pais_id = newVal.id;
             $scope.formData.direcciones.splice(0,$scope.formData.direcciones.length);
-             Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal.id},{}, function(response){
+            Order.query({type:"StoreAddress", prov_id:$scope.provSelec.id, pais_id:newVal.id},{}, function(response){
 
-                 $scope.formData.direcciones = response;
+                $scope.formData.direcciones = response;
             });
             if( $scope.Docsession.global!= 'new'){
                 setGetOrder.change("document","pais_id",newVal.id);
@@ -3032,8 +3059,8 @@ $scope.isOpencreateProd = false;
         if(newVal ){
 
             $scope.document.direccion_almacen_id = newVal.id;
-              Order.query({type:"AdrressPorts", direccion_id: newVal.id},{}, function(response){
-                  $scope.formData.puertos = response;
+            Order.query({type:"AdrressPorts", direccion_id: newVal.id},{}, function(response){
+                $scope.formData.puertos = response;
             });
             if( $scope.Docsession.global != 'new'){
                 setGetOrder.change("document","direccion_almacen_id",newVal.id);
@@ -3630,28 +3657,126 @@ $scope.isOpencreateProd = false;
 
 
 MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order', function($scope,$mdSidenav, setGetOrder,Order){
-
+/*
     $scope.bind =setGetOrder.bind();
+    $scope.isOpenSend= false;
     $scope.destinos =[];
     $scope.correosProvider = [];
-    $scope.$watch('$parent.provSelec.id', function(newval,oldVal){
-        if(newval){
-            $scope.correosProvider = Order.query({type:'ProviderEmails',prov_id:newval});
+    $scope.emailToText='';
+    $scope.$watchGroup(['$parent.provSelec.id','$parent.isOpenSend'], function(newval,oldVal){
+        if(newval[0] && [newval[1]]){
+            $scope.correosProvider = Order.query({type:'ProviderEmails',prov_id:newval[0]});
         }
     });
+
+    /!****** ************************** Enviar email ***************************************!/
+    $scope.isOpenSend = false;
+    $scope.$parent.openSendMail = function(){
+
+        if(!$mdSidenav("sendEmail").isOpen()){
+            $mdSidenav("sendEmail").open().then(function(){
+                $scope.isOpenSend = true;
+            });
+        }
+
+    };
+    $scope.transformChip = function(chip) {
+
+        if (angular.isObject(chip)) {
+            return chip;
+        }
+
+        return { email: chip}
+    };
     $scope.close = function(e){
         if(jQuery(e.target).parents("#lyrAlert").length == 0
             && jQuery(e.target).parents("#sendEmail").length == 0
             && jQuery(e.target).parents("#noti-button").length == 0
-            && $scope.$parent.isOpenSend
+            && $scope.isOpenSend
 
         ){
             $mdSidenav("sendEmail").close().then(function(){
-                $scope.$parent.isOpenSend = false;
+                $scope.isOpenSend = false;
+                $scope.correosProvider.splice(0,  $scope.correosProvider.splice.length());
+                $scope.destinos.splice(0,  $scope.destinos.splice.length());
+                $scope.emailToText='';
             });
         }
 
+    }*/
+}]);
+
+
+MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav, setGetOrder,Order, IsEmail, SYSTEM){
+
+    // $scope.bind =setGetOrder.bind();
+    $scope.isOpen= false;
+    $scope.destinos =[];
+    $scope.correosProvider = [];
+    $scope.emailToText='';
+    $scope.useMailSyte= false;
+
+    $scope.transformChip = function(chip) {
+        if (angular.isObject(chip)) {
+            return chip;
+        }
+        if(IsEmail(chip)!= null){
+            return {valor:chip};
+        }
+
+        return null;
+    };
+    $scope.$watchGroup(['$parent.provSelec.id','isOpen'], function(newval,oldVal){
+        if(newval[0] && [newval[1]]){
+            $scope.correosProvider = Order.query({type:'ProviderEmails',prov_id:newval[0]});
+        }
+    });
+
+    $scope.$parent.OpenContactMail = function(){
+        $mdSidenav("addEMail").open().then(function(){
+            $scope.isOpen= true;
+        });
+    };
+
+    $scope.close = function(e){
+        if(jQuery(e.target).parents("#lyrAlert").length == 0
+            && jQuery(e.target).parents("#addEMail").length == 0
+            && jQuery(e.target).parents("#noti-button").length == 0
+            && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
+            && $scope.isOpen
+
+        ){
+            $mdSidenav("addEMail").close().then(function(){
+                $scope.isOpen = false;
+                $scope.correosProvider.splice(0,  $scope.correosProvider.length());
+                $scope.destinos.splice(0,  $scope.destinos.length);
+                $scope.emailToText='';
+                $scope.useMailSyte= false;
+            });
+        }
+
+    };
+
+    $scope.send = function(){
+            Order.postMod({type:$scope.formMode.mod, mod:"Send"},{id:$scope.document.id},{},function(){
+                    $scope.$parent.NotifAction('ok','Enviado',[],{autohidden:SYSTEM.noti_autohidden});
+                    $scope.$parent.LayersAction({close:{first:true, search:true}});
+                    $mdSidenav("addEMail").close().then(function(){
+                        $scope.isOpen = false;
+                        $scope.correosProvider.splice(0,  $scope.correosProvider.length());
+                        $scope.destinos.splice(0,  $scope.destinos.length);
+                        $scope.emailToText='';
+                        $scope.useMailSyte= false;
+                    });
+
+
+            });
     }
+}]);
+
+
+MyApp.controller('OrderMailPreview',['$scope','$mdSidenav','setGetOrder','Order', function($scope,$mdSidenav, setGetOrder,Order){
+
 }]);
 
 
@@ -4082,6 +4207,17 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
     };
 });
 
+
+MyApp.service('IsEmail', function() {
+        return function (text){
+            var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}$");
+
+            if(!reg.test(text)){
+               return null;
+            }
+            return text
+        }
+  });
 /**
  *
  * Servicio encargado de la realizacion de peticiones del modulo de pedidos

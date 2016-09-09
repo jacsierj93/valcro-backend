@@ -1276,7 +1276,7 @@
 
                                 >
                                     <img src="images/adjunto.png" style="margin 4px;"/>
-                                    -->                                </div>
+                                                             </div>
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
@@ -3908,7 +3908,7 @@
                         </div>
 
                     </div>
-                    <form>
+                    <form flex>
                         <md-tabs  md-no-ink flex>
                             <md-tab label="Correos" md-no-ink flex>
                                 <md-content flex>
@@ -3933,7 +3933,7 @@
                             </md-tab>
                             <md-tab label="Texto" md-no-ink >
                                 <md-content flex>
-                                    <div laypu="column" flex style="padding-right: 8px,">
+                                    <div laypu="column" flex style="padding-right: 8px" flex>
                                         <md-input-container class="md-block" flex >
                                             <label>Texto</label>
                                     <textarea ng-model="texto"
@@ -3949,6 +3949,65 @@
                     <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="allowUpload.val">
                         <div  class="drop-box">
                             Enviar
+                        </div>
+                    </div>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
+        <!-- ########################################## LAYER add contactos para correo ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="addEMail" id="addEMail"
+        >
+            <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderContactMail"    >
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                    <form flex layout="row" class="focused">
+                        <div class="activeleft"></div>
+                        <div layout="column" flex>
+                            <div layout="row" style="min-height: 36px;" >
+                                <div class="titulo_formulario" layout="column" flex layout-align="start start">
+                                    <div>
+                                        Enviar Correo
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div layout="row" class="row">
+                                <md-switch class="md-primary" ng-change="addRemoveItem(item)"
+                                           ng-model="useMailSyte"> </md-switch>
+                                <div flex style="padding-top: 12px;">
+                                    <span style="margin-left: 8px;">Usar systema@valcro.co</span>
+                                </div>
+
+
+                            </div>
+                        <md-content flex>
+                            <md-chips ng-model="destinos"
+                                      md-transform-chip="transformChip($chip)"
+                            >
+                                <md-autocomplete
+                                    md-search-text="emailToText"
+                                    md-items=" item in correosProvider"
+                                    md-item-text="item.valor"
+                                    placeholder="Para:"
+                                >
+                                    <span md-highlight-text="emailToText">{{item.valor}}</span>
+                                </md-autocomplete>
+
+                                <md-chip-template>
+                                    <strong>{{$chip.valor}}</strong>
+                                </md-chip-template>
+                            </md-chips>
+                        </md-content>
+                        </div>
+                    </form>
+                    <div  class="blue-btn " ng-click="send()" >
+                        <div layout="row" class="layout-row " aria-hidden="true">
+                            <div >
+                                Enviar
+                            </div>
                         </div>
                     </div>
                 </div>

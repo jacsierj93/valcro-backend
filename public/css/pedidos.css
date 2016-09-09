@@ -100,12 +100,12 @@ div[ng-click] * {
     width: 100%;
 }
 .cell-filter-order > div {
-   height: 50%;
+    height: 50%;
     width: 100%;
 }
 
 .cell-filter-order > div > div{
-  padding-top: 4px;
+    padding-top: 4px;
 }
 .cell-filter-order > div:not(.filter-select) > img{
     display: none;
@@ -185,14 +185,14 @@ div[ng-click] * {
     padding-top: 8px;
 }
 md-sidenav .md-sidenav-right.md-locked-open{
-   /* position: absolute;*/
+    /* position: absolute;*/
 }
 .form-head{
     min-height: 40px;
     height: 40px;
 }
 .form-body{
-   margin-bottom: 8px;
+    margin-bottom: 8px;
 }
 
 .form-row{
@@ -249,9 +249,9 @@ md-sidenav .md-sidenav-right.md-locked-open{
     color: #CCCCCC;
 }
 
- .rowRsm{
-     height: 28px;
- }
+.rowRsm{
+    height: 28px;
+}
 
 .rowRsmTitle{
 }
@@ -278,7 +278,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
     width: 94px;
     margin: 2px;
     /*background-color: aliceblue;*/
-    }
+}
 
 .required{
     border-color: rgb(221,44,0);
@@ -320,6 +320,19 @@ md-sidenav .md-sidenav-right.md-locked-open{
     background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
     text-decoration: none;
 }
+
+/** boton blue de ini layers */
+.blue-btn{
+    background-color: rgb(141, 205, 241);
+    color: white;
+    border: solid 1px #4eb8f3;
+}
+.blue-btn div{
+    padding: 8px;text-align: center;
+}
+.blue-btn div div{
+    text-align: center;  width: 100%; padding: 2px;
+}
 .date-row {
     color: #c3c3c3;
     min-width: 200px;
@@ -332,9 +345,6 @@ md-sidenav .md-sidenav-right.md-locked-open{
     border-bottom: 1px dotted #c3c3c3;
 
 }
-.resalt{
-    background-color: #3cb0fd;
-}
 md-autocomplete{
     min-width: 0 !important;
 }
@@ -343,10 +353,7 @@ md-autocomplete > md-autocomplete-wrap{
     box-shadow : none !important;
 }
 
-/*md-autocomplete input:not(.md-input) {
-    padding : 0 !important;
-    height: auto !important;
-}*/
+
 #autoFilter{
     padding: 0 0 0 4px !important;
 }
