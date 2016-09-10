@@ -324,7 +324,7 @@
                                                  valid = "filter"
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
-                                                 md-autoselect = "true"
+
                                                  md-min-length="0">
                                     <input >
                                     <md-item-template>
@@ -337,7 +337,20 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Razon Social</label>
-                                <input skip-tab info="indique el nombre del proveedor" ng-disabled="$parent.enabled && prov.id" autocomplete="off" ng-blur="check('razon_social')" duplicate="list" field="razon_social" name="razon_social" maxlength="80" ng-minlength="3" required md-no-asterisk ng-model="dtaPrv.description">
+                                <input skip-tab
+                                       info="indique el nombre del proveedor"
+                                       ng-disabled="$parent.enabled && prov.id"
+                                       autocomplete="off" ng-blur="check('razon_social')"
+                                       duplicate="list"
+                                       duplicate-msg="ya existe un proveedor con esta razon social"
+                                       field="razon_social"
+                                       name="razon_social"
+                                       maxlength="80"
+                                       ng-minlength="3"
+                                       required
+                                       md-no-asterisk
+                                       ng-model="dtaPrv.description"
+                                >
                                 <!--ng-disabled="($parent.enabled || (toCheck && projectForm.description.$valid))"-->
                                 <!--INICIO DE DIRECTIVA PARA FUNCION DE SOLO CHEQUEO (SKIP RED TO RED)-->
                                 <!--<div ng-messages="projectForm.description.$error" ng-hide>
@@ -348,7 +361,21 @@
 
                             <md-input-container class="md-block" flex="10" ng-click="inputSta(true)">
                                 <label>Siglas</label>
-                                <input skip-tab info="minimo 3 letras maximo 4" alpha autocomplete="off" ng-blur="check('siglas')" duplicate="list" field="siglas" maxlength="6" ng-minlength="3" required name="siglas" ng-model="dtaPrv.siglas" ng-disabled="$parent.enabled && prov.id">
+                                <input skip-tab
+                                       info="minimo 3 letras maximo 4"
+                                       alpha
+                                       autocomplete="off"
+                                       ng-blur="check('siglas')"
+                                       duplicate="list"
+                                       duplicate-msg="ya existe un proveedor con estas siglas"
+                                       field="siglas"
+                                       maxlength="6"
+                                       ng-minlength="3"
+                                       required
+                                       name="siglas"
+                                       ng-model="dtaPrv.siglas"
+                                       ng-disabled="$parent.enabled && prov.id"
+                                >
 
                             </md-input-container>
 
@@ -359,13 +386,14 @@
                                                  required
                                                  md-require-match="true"
                                                  id="provTypesend"
+                                                 md-selected-item-change="dtaPrv.envio = ctrl.typeSend.id; (!onSet)?projectForm.$setDirty():true"
                                                  info="seleccione un tipo de envio"
                                                  ng-disabled="$parent.enabled && prov.id"
                                                  skip-tab
                                                  md-search-text="ctrl.searchSend"
                                                  md-items="item in envios | stringKey : ctrl.searchSend: 'nombre' "
                                                  md-item-text="item.nombre"
-                                                 md-autoselect = "true"
+              
                                                  md-no-asterisk
                                                  md-min-length="0">
                                     <input >
@@ -457,7 +485,7 @@
                                                  ng-disabled="$parent.enabled"
                                                  md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
                                                  md-item-text="item.descripcion"
-                                                 md-autoselect = "true"
+
                                                  md-select-on-focus
                                                  md-no-asterisk
                                                  md-min-length=0>
@@ -481,13 +509,15 @@
                                 <label>Pais</label>
                                 <md-autocomplete md-selected-item="ctrl.selPais"
                                                  flex
+                                                 require
+                                                 require-match="true"
                                                  id="dirPais"
                                                  info="indica el pais de la direccion"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCountry"
                                                  md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
-                                                 md-autoselect = "true"
+                                                
                                                  md-no-asterisk
                                                  md-input-minlength="0"
                                                  md-min-length=0>
@@ -594,7 +624,7 @@
                                                  md-search-text="ctrl.searchCountry"
                                                  md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
-                                                 md-autoselect = "true"
+
                                                  md-no-asterisk
                                                  ng-disabled="$parent.enabled || cnt.isAgent==1"
                                                  md-min-length="0">
@@ -608,7 +638,6 @@
 
                             <div style="height:100%; max-width:200px; width:auto">
                                 <vlc-group>
-
                                      <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="lang in languaje | filterSearch: cnt.languaje">
                                          {{lang.lang.substring(0,2)}}
                                      </span>
@@ -655,7 +684,7 @@
                             </md-chips>
 
                             <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[13,32]">
-                                <input phone placeholder="Telefonos Contacto">
+                                <input phone placeholder="Telefonos Contacto" id="contactPhone">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
@@ -874,7 +903,8 @@
                                                  md-search-text="ctrl.searchCountry"
                                                  md-items="item in countries | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
-                                                 md-autoselect = "true"
+                                                 require
+                                                 require-match="true"
                                                  md-no-asterisk
                                                  ng-disabled="$parent.enabled"
                                                  md-min-length="0">
@@ -901,7 +931,8 @@
                                                  md-search-text="ctrl.searchState"
                                                  md-items="item in states | stringKey : ctrl.searchState: 'local_name'"
                                                  md-item-text="item.local_name"
-                                                 md-autoselect = "true"
+                                                 require
+                                                 require-match="true"
                                                  md-no-asterisk
                                                  name="state"
                                                  ng-disabled="$parent.enabled || states.length==0"
@@ -928,7 +959,8 @@
                                                  md-search-text="ctrl.searchCity"
                                                  md-items="item in cities | stringKey : ctrl.searchCity: 'local_name'"
                                                  md-item-text="item.local_name"
-                                                 md-autoselect = "true"
+                                                 require
+                                                 require-match="true"
                                                  md-no-asterisk
                                                  name="state"
                                                  ng-disabled="$parent.enabled || cities.length==0"
@@ -1090,7 +1122,8 @@
                                                  md-search-text="ctrl.searchCoin"
                                                  md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' "
                                                  md-item-text="item.nombre"
-                                                 md-autoselect = "true"
+                                                 require
+                                                 require-match="true"
                                                  md-no-asterisk
                                                  md-min-length="0">
                                     <input >
@@ -1117,7 +1150,8 @@
                                                  md-search-text="ctrl.searchLine"
                                                  md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
                                                  md-item-text="item.linea"
-                                                 md-autoselect = "true"
+
+                                                 require-match="true"
                                                  md-no-asterisk
                                                  md-min-length="0">
                                     <input >
@@ -1194,7 +1228,8 @@
                                                      md-search-text="ctrl.searchLine"
                                                      md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
                                                      md-item-text="item.linea"
-                                                     md-autoselect = "true"
+
+                                                     require-match="true"
                                                      md-no-asterisk
                                                      md-min-length="0">
                                         <input >
@@ -1352,7 +1387,7 @@
                 <form name="provConv" layout="row" ng-controller="convController" global  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex>
-                        <div class="titulo_formulario" ng-click="$parent.openPopUp('excepFactor')" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
                             <div>
                                 Factor de Conversión
                             </div>
@@ -1380,19 +1415,60 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                                     <label>Moneda</label>
+                                    <md-autocomplete md-selected-item="ctrl.coin"
+                                                     flex
+                                                     id="convCoin"
+                                                     md-selected-item-change="provConv.$setDirty();conv.coin = ctrl.coin.id"
+                                                     info="moneda de este factor"
+                                                     skip-tab
+                                                     required
+                                                     md-require-match="true"
+                                                     md-search-text="ctrl.searchCoin"
+                                                     md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre'"
+                                                     md-item-text="item.nombre"
+
+                                                     md-no-asterisk
+                                                     ng-disabled="$parent.enabled || coins.length < 1"
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                  <!--  <label>Moneda</label>
                                     <md-select id="convCoin" skip-tab ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.coin" name="state" required md-no-ink>
                                         <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select id="convLine" skip-tab ng-model="conv.line" ng-disabled="$parent.enabled"ñ md-no-ink>
+                                    <md-autocomplete md-selected-item="ctrl.line"
+                                                     flex
+                                                     id="convCoin"
+                                                     md-selected-item-change="provConv.$setDirty();conv.line = ctrl.line.id"
+                                                     info="linea que aplica el factor"
+                                                     skip-tab
+                                                     required
+                                                     md-require-match="true"
+                                                     md-search-text="ctrl.searchLine"
+                                                     md-items="item in lines | stringKey : ctrl.searchLine: 'linea'"
+                                                     md-item-text="item.linea"
+
+                                                     md-no-asterisk
+                                                     ng-disabled="$parent.enabled"
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.linea}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                    <!--<md-select id="convLine" skip-tab ng-model="conv.line" ng-disabled="$parent.enabled"ñ md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                             </div>
                             <div layout="column" ng-show="isShow && !isShowMore && factors.length>0" class="row" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1448,19 +1524,59 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20" ng-controller="provCoins">
                                     <label>Moneda</label>
+                                    <md-autocomplete md-selected-item="ctrl.coin"
+                                                     flex
+                                                     id="pointCoin"
+                                                     md-selected-item-change="provPoint.$setDirty();pnt.coin = ctrl.coin.id"
+                                                     info="moneda del punto"
+                                                     skip-tab
+                                                     required
+                                                     md-require-match="true"
+                                                     md-search-text="ctrl.searchCoin"
+                                                     md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre'"
+                                                     md-item-text="item.nombre"
+
+                                                     md-no-asterisk
+                                                     ng-disabled="$parent.enabled || coins.length < 1"
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                    <!--<label>Moneda</label>
                                     <md-select id="pointCoin" skip-tab ng-disabled="$parent.enabled || coins.length < 1" ng-model="pnt.coin" required md-no-ink>
                                         <md-option ng-repeat="coin in coins" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Linea</label>
-                                    <md-select id="pointLine" skip-tab ng-model="pnt.line" ng-disabled="$parent.enabled" required md-no-ink>
+                                    <md-autocomplete md-selected-item="ctrl.line"
+                                                     flex
+                                                     id="pointLine"
+                                                     md-selected-item-change="provPoint.$setDirty();pnt.line = ctrl.line.id"
+                                                     info="linea a la cual aplica este punto"
+                                                     skip-tab
+                                                     required
+                                                     md-require-match="true"
+                                                     md-search-text="ctrl.searchLine"
+                                                     md-items="item in lines | stringKey : ctrl.searchLine: 'linea'"
+                                                     md-item-text="item.linea"
+
+                                                     md-no-asterisk
+                                                     ng-disabled="$parent.enabled"
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.linea}}</span>
+                                        </md-item-template>
+                                   <!-- <md-select id="pointLine" skip-tab ng-model="pnt.line" ng-disabled="$parent.enabled" required md-no-ink>
                                         <md-option ng-repeat="line in lines" value="{{line.id}}">
                                             {{line.linea}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                             </div>
                             <div layout="column" ng-show="isShow && !isShowMore && points.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1516,11 +1632,30 @@
 
                             <md-input-container class="md-block" flex   >
                                 <label>Linea</label>
-                                <md-select id="timePLine" skip-tab ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
+                                <md-autocomplete md-selected-item="ctrl.line"
+                                                 flex
+                                                 id="timePLine"
+                                                 md-selected-item-change="timeProd.$setDirty();tp.line = ctrl.line.id"
+                                                 info="linea a cual aplica este tiempo de produccion"
+                                                 skip-tab
+                                                 required
+                                                 md-require-match="true"
+                                                 md-search-text="ctrl.searchLine"
+                                                 md-items="item in lines | stringKey : ctrl.searchLine: 'linea'"
+                                                 md-item-text="item.linea"
+
+                                                 md-no-asterisk
+                                                 ng-disabled="$parent.enabled"
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.linea}}</span>
+                                    </md-item-template>
+                                <!--<md-select id="timePLine" skip-tab ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
                                     <md-option ng-repeat="line in lines" value="{{line.id}}">
                                         {{line.linea}}
                                     </md-option>
-                                </md-select>
+                                </md-select>-->
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="isShow && !isShowMore && timesP.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1574,11 +1709,31 @@
 
                                 <md-input-container class="md-block" flex>
                                     <label>Pais</label>
-                                    <md-select id="paistimeP" skip-tab ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
+                                    <md-autocomplete md-selected-item="ctrl.pais"
+                                                     flex
+                                                     id="paistimeP"
+                                                     info="pais de residencia del contacto (no es el mismo de direcciones)"
+                                                     md-selected-item-change="timeTrans.$setDirty();ttr.country = ctrl.pais.id"
+                                                     skip-tab
+                                                     required
+                                                     md-require-match="true"
+                                                     md-search-text="ctrl.searchCountry"
+                                                     md-items="item in provCountries | stringKey : ctrl.searchCountry: 'short_name'"
+                                                     md-item-text="item.short_name"
+
+                                                     md-no-asterisk
+                                                     ng-disabled="$parent.enabled"
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.short_name}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                    <!--<md-select id="paistimeP" skip-tab ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
                                         <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
                                             {{country.pais.short_name}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                             </div>
                             <div layout="column" ng-show="isShow && !isShowMore && timesT.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1989,9 +2144,6 @@
                         </div>
                         <div ng-repeat="(k,point) in prov.point">
 
-                            <div layout="column" ng-class="{'title_del' :point.action =='del','title_upd' :point.action =='upd','title_new' :point.action =='new'}">
-                                {{point.datos.nombreCont}}
-                            </div>
 
                         </div>
                     </div>

@@ -440,6 +440,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
                 });
 
             }else{
+                fullProv = {};
                 prov.id = false;prov.description = "";prov.siglas = "";prov.type = "";prov.envio = "";prov.contraped = false;prov.created =true;
                 itemsel = {};
             }
@@ -571,6 +572,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     $scope.inputSta = function(inp){
         $scope.toCheck = true;
     };
+    $scope.onSet = setGetProv.isSetting
 
     $scope.filTipo = function(elem,text){
         return elem.nombre.toLowerCase().indexOf(text.toLowerCase()) != -1;
@@ -602,21 +604,10 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     });
 
     $scope.$watch("ctrl.typeSend.id",function(nvo){
-        if(!$scope.projectForm.$pristine){
-            if(nvo==1){
-                setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:function(){
-                    $scope.dtaPrv.envio = nvo;
-                    $scope.projectForm.$setDirty();
-                },default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
-                    document.getElementsByName("provTypesend")[0].click();
+        if(nvo==1){
+                setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:null,default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
+                    angular.element("#provTypesend").find("input").focus();
                 }}]);
-            }else if(nvo){
-                $scope.dtaPrv.envio = nvo;
-                $timeout(function(){
-                    $scope.projectForm.$setDirty();
-                },100)
-
-            }
         }
 
 
@@ -637,14 +628,13 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
     var lawletters = new RegExp(["S.L.U.","S.L.","CO","LTD.","LLC","S.A.","LDA","S.P.A.","s.p.a.","LIMITED","CORP.","S.A.E","S.L.","S.R.L.","S.A.S","INC.","INC","GMBH CO.KG","NV","CO."].join("| ")+"$");
     $scope.check = function(elem){
+        
         var htmlElem = document.getElementsByName(elem)[0];
         if($scope.projectForm[elem].$error.duplicate){
             setNotif.addNotif("error","existe un Proveedor con el mismo nombre o siglas",[{name:"corregir!",action:function(){
                 htmlElem.focus();
             }}],{block:true});
-        }else{
-            setNotif.hideByContent("error","existe un Proveedor con el mismo nombre o siglas");
-        };
+        }
 
         if(elem == "razon_social" && htmlElem.value!=""){
             if(!lawletters.test(htmlElem.value.toUpperCase())){
@@ -774,7 +764,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 {
                     name: "corregir",
                     action: function () {
-                        document.getElementsByName("dirPais")[0].focus();
+                        angular.element("#dirPais").find("input").focus();
                     }
                 },{
                     name: "esta bien",
@@ -929,8 +919,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                             dirSel = {};
                             $scope.direccionesForm.$setUntouched();
                             $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
-                            $scope.ctrl.searchCountry = "";
-                            $scope.ctrl.searchType = "";
+                            $scope.ctrl.searchCountry = undefined;
+                            $scope.ctrl.searchType = undefined;
                             setNotif.addNotif("ok", "Direccion borrada", [
                             ],{autohidden:3000});
                         });
@@ -954,7 +944,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 saveAddress(function(){
                     asignPort.setPorts(false);
                     $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
-                    $scope.ctrl.searchCountry = "";
+                    $scope.ctrl.searchCountry = undefined;
+                    $scope.ctrl.searchType = undefined;
                     currentOrig = {};
                     $scope.direccionesForm.$setPristine();
                     $scope.direccionesForm.$setUntouched();
@@ -1485,6 +1476,27 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     });
 
     var chipCont = {};
+
+    angular.element("#contTelf").find("input").on("keyup",function(e){
+        console.log("holaaaa")
+        if(angular.element(this).val().indexOf($scope.ctrl.pais.area_code)==-1){
+            setNotif.addNotif("alert","el codigo de area no coincide con el del pais seleccionado",[{
+                name:"corregir",
+                action:function(){
+                    var preVal = angular.element("#contTelf").find("input").val();
+                    if(preVal){
+                        if(preVal!=""){
+                            angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$scope.ctrl.pais.area_code));
+                        }else{
+                            angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.ctrl.pais.area_code));
+                        }
+                    }
+                }
+            }]);
+        }else{
+            setNotif.hideByContent("alert","el codigo de area no coincide con el del pais seleccionado");
+        }
+    });
     $scope.editChip = function(chip,event){
         chipCont = chip;
         //
@@ -2128,7 +2140,7 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
     };
 });
 
-MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif) {
+MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout) {
     $scope.id="creditCtrl";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2273,7 +2285,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
 
 });
 
-MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetProv,$filter,listCoins,masterLists,setNotif) {
+MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout) {
     $scope.id = "convController";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2345,7 +2357,10 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
                         $scope.factors.splice(elem.$index,1);
                         $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
                         factor = {};
+                        $scope.ctrl.searchLine = undefined;
+                        $scope.ctrl.searchCoin = undefined;
                         $scope.provConv.$setUntouched();
+                        $scope.provConv.$setPristine();
                         setNotif.addNotif("ok", "Factor Borrado", [
                         ],{autohidden:3000});
                     });
@@ -2369,6 +2384,8 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
         $scope.conv.gain = factor.ganancia;
         $scope.conv.disc = factor.descuento;
         $scope.conv.line = factor.linea_id;
+        $scope.ctrl.line = factor.linea;
+        $scope.ctrl.coin = factor.moneda;
         currentOrig = angular.copy($scope.conv);
         setGetProv.addToRllBck($scope.conv,"factConv")
     };
@@ -2379,14 +2396,21 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
             if(!elem) {
                 saveConv(function(){
                     $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
+
                     factor = {};
                     currentOrig = {};
-                    $scope.provConv.$setUntouched();
-                    $scope.provConv.$setPristine();
+
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     }
+                    $timeout(function(){
+                        $scope.ctrl.searchLine = undefined;
+                        $scope.ctrl.searchCoin = undefined;
+                        $scope.provConv.$setUntouched();
+                        $scope.provConv.$setPristine();
+                    },500)
+
                 })
 
             }else{
@@ -2405,7 +2429,7 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
 
 });
 
-MyApp.controller('provPointController', function ($scope,providers,setGetProv,listCoins,masterLists,$filter,setNotif    ) {
+MyApp.controller('provPointController', function ($scope,providers,setGetProv,listCoins,masterLists,$filter,setNotif,$timeout) {
     $scope.id = "provPointController";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2474,7 +2498,10 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
                         setGetProv.addChng($scope.pnt,data.action,"point");
                         $scope.points.splice(elem.$index,1);
                         $scope.pnt = {id: false, cost: "", coin: "", line:"", id_prov: $scope.prov.id};
+                        $scope.ctrl.searchLine = undefined;
+                        $scope.ctrl.searchCoin = undefined;
                         $scope.provPoint.$setUntouched();
+                        $scope.provPoint.$setPristine();
                         point = {};
                         setNotif.addNotif("ok", "punto Borrado", [
                         ],{autohidden:3000});
@@ -2496,6 +2523,8 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
         $scope.pnt.id_prov = point.prov_id;
         $scope.pnt.cost = point.costo;
         $scope.pnt.line = point.linea_id;
+        $scope.ctrl.coin = point.moneda;
+        $scope.ctrl.line = point.linea;
         currentOrig = angular.copy($scope.pnt);
         setGetProv.addToRllBck($scope.pnt,"factConv")
     };
@@ -2506,14 +2535,19 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
             if(!elem) {
                 savePoint(function(){
                     $scope.pnt = {id: false, cost: "", coin: "", line:"", id_prov: $scope.prov.id};
-                    $scope.provPoint.$setUntouched();
-                    $scope.provPoint.$setPristine();
+
                     point = {};
                     currentOrig = {};
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     }
+                    $timeout(function(){
+                        $scope.ctrl.searchLine = undefined;
+                        $scope.ctrl.searchCoin = undefined;
+                        $scope.provPoint.$setUntouched();
+                        $scope.provPoint.$setPristine();
+                    },500)
                 })
 
             }else{
@@ -2531,7 +2565,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
     };
 });
 
-MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,masterLists,$filter,setNotif) {
+MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,masterLists,$filter,setNotif,$timeout) {
     $scope.id = 'prodTimeController';
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2606,12 +2640,17 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
                     $scope.tp = {id:false,from:"",to:"",line:"",id_prov: $scope.prov.id};
                     time = {};
                     currentOrig = {};
-                    $scope.timeProd.$setPristine();
-                    $scope.timeProd.$setUntouched();
+
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     }
+                    $timeout(function(){
+                        $scope.ctrl.searchLine = undefined;
+
+                        $scope.timeProd.$setPristine();
+                        $scope.timeProd.$setUntouched();
+                    },500)
 
                 })
 
@@ -2741,12 +2780,16 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
                     time = {};
                     currentOrig = {};
                     exeption = false;
-                    $scope.timeTrans.$setPristine();
-                    $scope.timeTrans.$setUntouched();
+
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     };
+                    $timeout(function(){
+                        $scope.ctrl.searchCountry = undefined;
+                        $scope.timeTrans.$setPristine();
+                        $scope.timeTrans.$setUntouched();
+                    },500)
                 });
 
             }
@@ -2776,7 +2819,7 @@ MyApp.service("setgetCondition",function(){
     }
 });
 
-MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetProv,providers,$filter,setgetCondition,setNotif) {
+MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetProv,providers,$filter,setgetCondition,setNotif,$timeout) {
     $scope.id="condPayList";
     $scope.lines = masterLists.getLines();
     $scope.prov = setGetProv.getProv();
@@ -2908,6 +2951,9 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                         $scope.condHeadFrm.$setUntouched();
                         setNotif.addNotif("ok", "Condicion Borrada", [
                         ],{autohidden:3000});
+                        $scope.ctrl.searchLine = undefined;
+                        $scope.condHeadFrm.$setUntouched();
+
                     });
                 }
             },
@@ -2944,12 +2990,18 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     }
+                    $timeout(function(){
+                        $scope.ctrl.searchLine = undefined;
+
+                        $scope.condHeadFrm.$setUntouched();
+                        $scope.condHeadFrm.$setPristine();
+                    },500)
                 })
 
             }else{
                 if(!$scope.isShow){
                     $scope.condHead.title = $scope.conditions.length+1;
-                    console.log($scope.lines)
+
                     $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
                 }
 

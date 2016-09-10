@@ -548,10 +548,12 @@ MyApp.directive('info', function($timeout,setNotif) {
                 element.on("blur","input", function(e) {
                     //if(angular.element(element).parent(".md-input-invalid").length > 0){
                     if(!model.scope.selectedItem){
-                        if("mathc",model.matches.length>0 && !(model.scope.mdSearchText || model.scope.mdSearchText == "")){
+
+                        if(model.matches.length > 0 && (model.scope.searchText!=undefined && model.scope.searchText != "")){
                             model.scope.selectedItem = model.matches[0];
                         }else{
-                           model.clear();
+                            console.log("waqui")
+                            model.scope.searchText = undefined;
                         }
                     }
 
@@ -600,10 +602,10 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 
                     if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].toUpperCase() == compare.toUpperCase() && (scope.localId !=current.id)}).length<1) {
                         // it is valid
-                        setNotif.hideByContent("alert","este nombre Vacro ya existe");
+                        setNotif.hideByContent("alert",attrs.duplicateMsg);
                         def.resolve();
                     }else{
-                        setNotif.addNotif("alert","este nombre Vacro ya existe",[]);
+                        setNotif.addNotif("alert",attrs.duplicateMsg,[]);
 
                         def.reject();
                     }

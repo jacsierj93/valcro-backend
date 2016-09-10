@@ -170,7 +170,7 @@ MyApp.service("setNotif",function($filter,$timeout){
             return list;
         },
         addNotif : function(obj,mnsg,opcs,param){
-            if($filter("customFind")(list[obj],mnsg,function(current,compare){return current.content == compare}).length<=0) {
+            if($filter("customFind")(list[obj],mnsg,function(current,compare){return current.content == compare}).length<=0 && list.error.length == 0) {
                 var Self = this;
                 var uid = Math.random();
 
