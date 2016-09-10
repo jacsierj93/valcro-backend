@@ -76,11 +76,14 @@ $app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurch
 $app->post("Order/Order/Cancel",'Orders\OrderController@cancelsOrder'); /// cancela el pedido
 $app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrden'); /// cambia un producto item
 $app->post("Order/Order/Restore",'Orders\OrderController@restoreOrden'); /// restaura a una version anterior
+$app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
 
 
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
 $app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// trae el resumen final de un pedido
 $app->get("Order/Order/Versions",'Orders\OrderController@getOldOrden'); /// trae todas las versiones que a generado el documento
+$app->get("Order/Order/EmailEstimate",'Orders\OrderController@EmailEstimateOrder'); ///trau preview del  presupuesto a enviar al provedor
+$app->get("Order/Order/EmailSummary",'Orders\OrderController@EmailSummaryDocDocOrder'); ///trau preview de el resumen del documento
 
 
 //Orden de compra
@@ -107,11 +110,15 @@ $app->post("Order/Purchase/ApprovedPurchases",'Orders\OrderController@ApprovedPu
 $app->post("Order/Purchase/Cancel",'Orders\OrderController@cancelPurchase'); /// Cancela el documento
 $app->post("Order/Purchase/ProductChange",'Orders\OrderController@changeProductoPurchase'); // cambia el producto
 $app->post("Order/Purchase/Restore",'Orders\OrderController@restorePurchase'); /// restaura a una version anterior
+$app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// envia la solicitud al proveedor
 
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
 $app->get("Order/Purchase/Versions",'Orders\OrderController@getOldPurchase'); /// trae todas las versiones que a generado el documento
 $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///resumen final de la orden de compra
+$app->get("Order/Purchase/EmailEstimate",'Orders\OrderController@EmailEstimatePurchase'); ///trau preview del  presupuesto a enviar al provedor
+$app->get("Order/Purchase/EmailSummary",'Orders\OrderController@EmailSummaryDocPurchase'); ///trau preview del  presupuesto a enviar al provedor
+
 
 
 // solicitudes
@@ -136,10 +143,13 @@ $app->post("Order/Solicitude/ApprovedPurchases",'Orders\OrderController@Approved
 $app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude'); /// cancela la solicitud
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
+$app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
 $app->get("Order/Solicitude/Versions",'Orders\OrderController@getOldSolicitude'); /// trae todas las versiones que a generado el documento
+$app->get("Order/Solicitude/EmailEstimate",'Orders\OrderController@EmailEstimateSolicitude'); ///trau preview del  presupuesto a enviar al provedor
+$app->get("Order/Solicitude/EmailSummary",'Orders\OrderController@EmailSummaryDocSolicitude'); ///trau preview del  presupuesto a enviar al provedor
 
 
 $app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido @deprecated
@@ -171,8 +181,6 @@ $app->get("Order/OrderSubstitute",'Orders\OrderController@getOrderSustitute'); /
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido @deprecated
 $app->get("Order/test",'Orders\OrderController@test'); ///elimina el pedido @deprecated
 
-$app->get("Order/Email/Summary",'Orders\OrderController@EmailSummaryDoc'); ///
-$app->get("Order/Email/Estimate",'Orders\OrderController@EmailEstimate'); ///
 
 //deprecated
 $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
