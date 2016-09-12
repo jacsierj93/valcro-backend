@@ -444,14 +444,14 @@
                                     <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" duplicateMsg="este nombre Vacro ya existe" field="nombre" ng-minlength="3" required name="name" id="name" ng-model="valName.name" ng-disabled="$parent.enabled">
                                 </md-input-container>
                                 <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
-                                <div class="iconValName">
-                                    <span ng-repeat="dep in deps" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive" style="font-size: 18px; margin-left: 8px; color:black"></span>
-                                </div>
+                                <vlc-group class="iconValName" skip-tab>
+                                    <span ng-repeat="dep in deps" icon-group info="{{dep.desc}}" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this,$event)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive iconInput" style="font-size: 18px; margin-left: 8px; color:black"></span>
+                                </vlc-group>
                             </div>
                             <!--<md-input-container class="md-block" style="float:left; width:1px" ng-click="inputSta(true)">
 
-                            </md-input-container>--> <div skip-tab tabindex="-1" info="" style="float:left; width:8px; cursor:none; border:none"></div>
-                            <div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
+                            </md-input-container>--> <!--<div skip-tab tabindex="-1" info="" style="float:left; width:8px; cursor:none; border:none"></div>-->
+                            <div ng-repeat="name in valcroName | orderBy:order:true" icon-group  chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>
                         </div>
                     </div>
                     </div>
@@ -616,7 +616,7 @@
                                 <md-autocomplete md-selected-item="ctrl.pais"
                                                  flex
                                                  id="paisCont"
-                                                 md-selected-item-change="provContactosForm.$setDirty();cnt.pais = ctrl.pais.id"
+                                                 md-selected-item-change="cnt.pais = ctrl.pais.id; (!setting)?provContactosForm.$setDirty():true;"
                                                  info="pais de residencia del contacto (no es el mismo de direcciones)"
                                                  skip-tab
                                                  required
@@ -683,7 +683,7 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip)"  md-separator-keys="[13,32]">
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip,$event)"  md-separator-keys="[13,32]">
                                 <input phone placeholder="Telefonos Contacto" id="contactPhone">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -1228,7 +1228,6 @@
                                                      md-search-text="ctrl.searchLine"
                                                      md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
                                                      md-item-text="item.linea"
-
                                                      require-match="true"
                                                      md-no-asterisk
                                                      md-min-length="0">
@@ -1297,19 +1296,38 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>%</label>
-                            <input type="number" autocomplete="off" type="number" max="{{max}}"  ng-disabled="$parent.enabled || max<=0" ng-model="condItem.percent" required>
+                            <input type="number" id ="condItemPerc" md-autofocus skip-tab autocomplete="off" type="number" max="{{max}}"  ng-disabled="$parent.enabled || max<=0" ng-model="condItem.percent" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Dias</label>
-                            <input type="number" autocomplete="off" ng-disabled="$parent.enabled || max<=0" ng-model="condItem.days" required>
+                            <input type="number" skip-tab autocomplete="off" ng-disabled="$parent.enabled || max<=0" ng-model="condItem.days" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex>
                             <label>Condicion</label>
-                            <md-select ng-disabled="$parent.enabled || max<=0" ng-model="condItem.condit" ng-disabled="$parent.enabled" required md-no-ink>
+                            <md-autocomplete md-selected-item="ctrl.cond"
+                                             flex
+                                             skip-tab
+                                             id="condItem"
+                                             ng-required="(cnt.languaje.length==0)"
+                                             md-item-change="itemCondForm.setDirty();condItem.condit = ctrl.cond.id"
+                                             info="condicion que aplica"
+                                             md-search-text="ctrl.searchCond"
+                                             md-items="item in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},] | stringKey : ctrl.searchCond: 'name'"
+                                             md-item-text="item.name"
+                                             md-no-asterisk
+                                             ng-disabled="$parent.enabled || max<=0"
+                                             md-min-length="0">
+                                <input >
+                                <md-item-template>
+                                    <span>{{item.name}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+
+                           <!-- <md-select skip-tab ng-disabled="$parent.enabled || max<=0" ng-model="condItem.condit" ng-disabled="$parent.enabled" required md-no-ink>
                                 <md-option ng-repeat="cond in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},]" value="{{cond.name}}">
                                     {{cond.name}}
                                 </md-option>
-                            </md-select>
+                            </md-select>-->
                         </md-input-container>
                     </div>
                     <div id="grid">
@@ -1773,11 +1791,11 @@
                         <div layout="row">
                             <md-input-container skip-tab class="md-block" flex="40">
                                 <label>Referencia</label>
-                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.ref">
+                                <input autocomplete="off" required ng-disabled="$parent.enabled" ng-model="lp.ref">
                             </md-input-container>
                             <div style="width:100px; padding: 3px;">
                                 <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">listas</span>
-                                <div ng-click="openAdj()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
+                                <div ng-click="openAdj($event)" ng-class="{'ng-disable':$parent.enabled}" skip-tab class="vlc-buttom" style="float:left">
                                     {{lp.adjs.length || 0}}
                                 </div>
                             </div>

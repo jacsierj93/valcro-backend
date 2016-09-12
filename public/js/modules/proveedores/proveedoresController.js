@@ -1024,15 +1024,18 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     $scope.deps = [
         {
             id:1,
-            icon:"icon-CarritoCompra"
+            icon:"icon-CarritoCompra",
+            desc:"Ventas"
         },
         {
             id:2,
-            icon:"icon-Aereo"
+            icon:"icon-Aereo",
+            desc:"Compras / importacion"
         },
         {
             id:3,
-            icon:"icon-TransTerrestre"
+            icon:"icon-TransTerrestre",
+            desc:"Almacen"
         }
     ];
     var valcroName = {};
@@ -1321,65 +1324,65 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
         ],{autohidden:3000});
     };
 
-    $scope.setDepa = function(dep){
-        if(!$scope.nomvalcroForm.$valid){
-            return false;
-        }
-        if($scope.valName.departments[dep.dep.id]){
-            var favFn = unsetFav;
-            if($scope.valName.departments[dep.dep.id].fav==1){
-                favFn = unsetFav;
-                fav = true;
-            }else{
-                favFn = setFav;
-                fav = false;
+    $scope.setDepa = function(dep,e){
+        if(e.keyCode==32 || e.type=="click") {
+            if (!$scope.nomvalcroForm.$valid) {
+                return false;
             }
-            setNotif.addNotif("alert", "que desea hacer?", [
-                {
-                    name: (fav)?"Quitar Favorito":"volver favorito",
-                    action: function () {
-                        $timeout(function(){
-                            favFn(dep.dep);
-                        },10);
-                    }
-                },
-                {
-                    name: "desvincular",
-                    action: function () {
-                        var temp = {};
-                        var i = 0;
-                        angular.forEach($scope.valName.departments, function (k, v) {
-                            if(v>0){
-                                if (parseInt(v) != parseInt(dep.dep.id)) {
-                                    temp[v] = k;
-                                }
-                                if (i == Object.keys($scope.valName.departments).length - 1) {
-                                    $scope.valName.departments = temp;
-                                }
-                            }
-
-                            i++;
-                        });
-                        currentDeps =$scope.valName.departments
-                        setNotif.addNotif("ok", "departamento desvinculado", [
-                        ],{autohidden:3000});
-                    }
-                },
-                {
-                    name: "no",
-                    action: function () {
-                    }
+            if ($scope.valName.departments[dep.dep.id]) {
+                var favFn = unsetFav;
+                if ($scope.valName.departments[dep.dep.id].fav == 1) {
+                    favFn = unsetFav;
+                    fav = true;
+                } else {
+                    favFn = setFav;
+                    fav = false;
                 }
-            ]);
-        }else{
-            var fav = {fav:0};
-            $scope.valName.departments[dep.dep.id]=fav;
-            //saveValcroname();
-            setNotif.addNotif("ok", "departamento añadido", [
-            ],{autohidden:3000});
-        }
+                setNotif.addNotif("alert", "que desea hacer?", [
+                    {
+                        name: (fav) ? "Quitar Favorito" : "volver favorito",
+                        action: function () {
+                            $timeout(function () {
+                                favFn(dep.dep);
+                            }, 10);
+                        }
+                    },
+                    {
+                        name: "desvincular",
+                        action: function () {
+                            var temp = {};
+                            var i = 0;
+                            angular.forEach($scope.valName.departments, function (k, v) {
+                                if (v > 0) {
+                                    if (parseInt(v) != parseInt(dep.dep.id)) {
+                                        temp[v] = k;
+                                    }
+                                    if (i == Object.keys($scope.valName.departments).length - 1) {
+                                        $scope.valName.departments = temp;
+                                    }
+                                }
 
-        $scope.nomvalcroForm.$setDirty();
+                                i++;
+                            });
+                            currentDeps = $scope.valName.departments
+                            setNotif.addNotif("ok", "departamento desvinculado", [], {autohidden: 3000});
+                        }
+                    },
+                    {
+                        name: "no",
+                        action: function () {
+                        }
+                    }
+                ]);
+            } else {
+                var fav = {fav: 0};
+                $scope.valName.departments[dep.dep.id] = fav;
+                //saveValcroname();
+                setNotif.addNotif("ok", "departamento añadido", [], {autohidden: 3000});
+            }
+
+            $scope.nomvalcroForm.$setDirty();
+        }
     };
 
 
@@ -1477,18 +1480,25 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     var chipCont = {};
 
-    angular.element("#contTelf").find("input").on("keyup",function(e){
-        console.log("holaaaa")
-        if(angular.element(this).val().indexOf($scope.ctrl.pais.area_code)==-1){
+    angular.element("#contTelf").on("focus","input",function(e){
+        if(angular.element("#contTelf").find("input").val()==""){
+            angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
+        }
+
+    });
+
+
+    angular.element("#contTelf").on("keyup","input",function(e){
+        if(angular.element(this).val().indexOf($scope.ctrl.pais.area_code.phone)==-1 && (e.keyCode != 32 && e.keyCode != 13)){
             setNotif.addNotif("alert","el codigo de area no coincide con el del pais seleccionado",[{
                 name:"corregir",
                 action:function(){
                     var preVal = angular.element("#contTelf").find("input").val();
                     if(preVal){
                         if(preVal!=""){
-                            angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$scope.ctrl.pais.area_code));
+                            angular.element("#contTelf").find("input").val(preVal.replace(/\(\+[0-9\-]+\)/,$scope.ctrl.pais.area_code.phone));
                         }else{
-                            angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.ctrl.pais.area_code));
+                            angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.ctrl.pais.area_code.phone));
                         }
                     }
                 }
@@ -1549,10 +1559,24 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if (angular.isObject(chip)) {
             return chip;
         }
+
         var reg = new RegExp("^\\(?\\+[0-9]{1,3}\\-?[0-9]{0,3}[\\)\\-\\s]{1}[0-9\\-]{10}$");
         if(!reg.test(chip)){
-            setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
-            ],{autohidden:3000});
+            $timeout(function(){
+                if(angular.element(":focus").parents("#contTelf").length>0){
+                    if(chip!="" && chip != $scope.ctrl.pais.area_code.phone){
+                        setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
+                        ],{autohidden:5000});
+                    }else{
+                        setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
+                        ],{autohidden:5000});
+                        angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
+                    }
+                }
+
+            },500)
+
+
             return null ;
         }
         if(Object.keys(chipCont).length==0){
@@ -1687,23 +1711,26 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     /*setea el contacto del grid para edicion en el formulario
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
+    $scope.setting = false;
     $scope.toEdit = function(element){
+        $scope.setting = true;
         contact = element.cont;
         //console.log(contact)
         contact.prov_id = $scope.prov.id;
-        $scope.ctrl['pais'] = contact.country;
+        $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[contact.pais_id])[0]
+       // $scope.ctrl['pais'] = contact.country;
         setGetContac.setContact(contact);
         currentOrig = angular.copy($scope.cnt);
         setGetProv.addToRllBck($scope.cnt,"contProv")
+        $scope.setting = false;
     };
 
     /*muestra u oculta la franaj de ver mas en los form, en el click y clickout (focus,focusout)*/
     $scope.showGrid = function(elem,event){
+        $scope.setting = true;
         if((jQuery(event.target).parents("#contactBook").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
-
             if(!elem){
                 saveContact(function(){
-//                    console.log("BORRADO")
                     contact = {};
                     setGetContac.setContact(false);
                     $scope.ctrl.searchCountry = "";
@@ -1721,7 +1748,10 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 if($scope.dirAssign.length>0 && !$scope.isShow && $scope.provContactosForm.$pristine){
                     var def = $scope.dirAssign[0];
                     setGetContac.setContact({pais_id:def.pais_id});
-                    angular.element("#contTelf").find("input").val($filter("filterSearch")($scope.paises,[def.pais_id])[0].area_code.phone);
+                    $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[def.pais_id])[0];
+                    $timeout(function(){
+                        $scope.setting = false;
+                    },500)
                 }
             }
 
@@ -2844,6 +2874,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         }
 
         if(!$scope.condHeadFrm.$valid && !$scope.condHeadFrm.$pristine){
+            $scope.$parent.block="wait";
             var prefocus = angular.element(":focus");
             $timeout(function(){
                 angular.element("[name='condHeadFrm']").click();
@@ -2853,9 +2884,13 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
 
             },0);
 
+
+
+
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
+                    $scope.$parent.block="go"
                     onError();
                     $timeout(function(){
                         prefocus.click();
@@ -2865,6 +2900,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
             },{
                 name:"dejame Corregirlos",
                 action:function(){
+                    $scope.$parent.block="reject";
                     angular.element("[name='condHeadFrm']").find(".ng-invalid").first().focus()
                 }
             }]);
@@ -2891,36 +2927,14 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                 setGetProv.addChng($scope.condHead,data.action,"payCond");
                 onSuccess()
             });
-            /*providers.put({type:"saveBank"},$scope.bnk,function(data){
-                $scope.bnk.id = data.id;
-                $scope.bankInfoForm.$setPristine();
-                account.prov_id = $scope.bnk.id_prov;
-                account.banco = $scope.bnk.bankName;
-                account.beneficiario = $scope.bnk.bankBenef;
-                account.dir_beneficiario = $scope.bnk.bankBenefAddr;
-                account.dir_banco = $scope.bnk.bankAddr;
-                account.swift = $scope.bnk.bankSwift;
-                account.cuenta = $scope.bnk.bankIban;
-                account.ciudad_id = $scope.bnk.ciudad;
-                if(data.action=="new"){
-                    account.id = $scope.bnk.id;
-                    $scope.accounts.unshift(account);
-                    setNotif.addNotif("ok", "nueva info bancaria", [
-                    ],{autohidden:3000});
-                }else{
-                    setNotif.addNotif("ok", "Datos Actualizados", [
-                    ],{autohidden:3000});
-                }
-                setGetProv.addChng($scope.bnk,data.action,"infoBank");
-                onSuccess()
-            });*/
+
         }else{
-            //console.log("invalid")
+
         }
 
     };
 
-    $scope.endLayer = function(){
+    $scope.endLayer = function(nextfn,elem){
         saveLimCred(function(){
             $scope.openFormCond();
         },function(){
@@ -2933,6 +2947,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                 $scope.isShowMore = false;
                 $scope.$parent.expand = false;
             }
+            nextfn(elem);
         })
 
     };
@@ -3017,7 +3032,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     };
 });
 
-MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif) {
+MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,$timeout) {
     $scope.closeCondition = function(){
         $mdSidenav("payCond").close();
     };
@@ -3081,12 +3096,36 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
             }
         }
     }
+
+    $scope.endLayer = function(callFn){
+
+        if(($scope.condItem.days=="" && $scope.condItem.percent==0.00 && $scope.condItem.condit=="") /*|| calcMax()==0*/){
+            angular.element("#conLin").click().focus();
+            $mdSidenav("payCond").close();
+            $timeout(function(){
+                callFn(angular.element("#conLin"));
+            })
+
+        }else{
+
+            $scope.condItem = {id:false,days:"",percent:0.00,condit:"",id_head:$scope.head.id||0};
+            $scope.ctrl.searchCond=undefined;
+            item = {};
+            $scope.itemCondForm.$setUntouched();
+            angular.element("#condItemPerc").focus();
+        }
+    }
 });
 
 MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService,setNotif ){
     $scope.id="priceListController";
     filesService.setFolder("prov");
-    $scope.openAdj = filesService.open;
+    $scope.openAdj = function(e){
+        if(e.keyCode==32 || e.type=="click"){
+            filesService.open();
+        }
+
+    }
 
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){
@@ -3137,15 +3176,31 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
         }
 
         if(!$scope.provPrecList.$valid && !$scope.provPrecList.$pristine){
+            $scope.$parent.block="wait";
+            var prefocus = angular.element(":focus");
+            $timeout(function(){
+                angular.element("[name='condHeadFrm']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
+
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
-                    onSuccess();
+                    $scope.$parent.block="go"
+                    onError();
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
                 }
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    //console.log($scope.provPrecList);
+                    $scope.$parent.block="reject";
+                    angular.element("[name='provPrecList']").find(".ng-invalid").first().focus()
                 }
             }]);
             return false;
@@ -3160,7 +3215,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
                 setNotif.addNotif("ok", "lista de precios cargada", [
                 ],{autohidden:3000});
             }else{
-                setNotif.addNotif("ok", "se modifico la lista d precios", [
+                setNotif.addNotif("ok", "se modifico la lista de precios", [
                 ],{autohidden:3000});
             }
             setGetProv.addChng($scope.lp,data.action,"priceList");

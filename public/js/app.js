@@ -32,8 +32,15 @@ var MyApp = angular.module('MyApp', dependency, function() {
 window.addEventListener("keydown", function(e) {
     // space and arrow keys
 
-    if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1) {
-        e.preventDefault();
+    if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1 ) {
+        if(angular.element(e.target).is("input")) {
+            if ([38, 40, 27, 9].indexOf(e.keyCode) > -1){
+                e.preventDefault();
+            }
+        }else{
+            e.preventDefault();
+        }
+
     }
 }, false);
 
@@ -266,24 +273,7 @@ MyApp.directive('decimal', function () {
         }
     };
 });
-/*
-MyApp.directive('decimal', function () {
-    return {
-        require: 'ngModel',
-        link: function (scope, elem, attrs,ctrl) {
-            ctrl.$validators.decimal = function(modelValue, viewValue) {
-                if(viewValue === undefined || viewValue=="" || viewValue==null){
-                    return true;
-                }
-                elem[0].value = viewValue.replace(/([a-z]|[A-Z]| )+/,"")
 
-                var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
-
-                return !(num === null)
-            };
-        }
-    };
-});*/
 
 MyApp.directive('chip', function ($timeout) {
     return {
@@ -393,6 +383,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
             },50);
         }else if(angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").length>0){
+
             if(!scope.endLayer) {
                 var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
                 var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
@@ -404,6 +395,10 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         } else if (angular.element(nextFrm[0]).is("vlc-group")) {
                             $timeout(function () {
                                 angular.element(nextFrm[0]).find("span").first().focus();
+                            }, 0);
+                        }else if(angular.element(nextFrm[0]).is("md-autocomplete")) {
+                            $timeout(function () {
+                                angular.element(nextFrm[0]).find("input").focus();
                             }, 0);
                         } else {
                             angular.element(nextFrm[0]).focus();
@@ -423,11 +418,22 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
                         /*angular.element("[md-component-id='NEXT']").focus();*/
                     }else{
-                        scope.endLayer();
+                        scope.endLayer(function(){
+                            angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
+                            angular.element(elem).blur();
+                            angular.element(elem).parents("md-content").delay(200).click();
+                            angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
+                        },elem);
                     }
                 }else{
+                    
                     if(scope.endLayer){
-                        scope.endLayer();
+                        scope.endLayer(function(elem){
+                            angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
+                            angular.element(elem).blur();
+                            angular.element(elem).parents("md-content").delay(200).click();
+                            angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
+                        });
                     }
                 }
             },0)
