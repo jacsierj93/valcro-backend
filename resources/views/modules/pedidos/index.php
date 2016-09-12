@@ -1276,7 +1276,7 @@
 
                                 >
                                     <img src="images/adjunto.png" style="margin 4px;"/>
-                                                             </div>
+                                </div>
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
@@ -3909,48 +3909,59 @@
 
                     </div>
                     <form flex>
-                        <md-tabs  md-no-ink flex>
+                        <md-tabs  md-no-ink flex layout="column" style="height: 100%" md-dynamic-height>
                             <md-tab label="Correos" md-no-ink flex>
-                                <md-content flex>
-                                    <md-chips ng-model="destinos"
-                                              md-transform-chip="transformChip($chip)"
+                                <md-content  layout="column" flex>
+                                    <div layout="row" class="row">
+                                        <md-switch class="md-primary"
+                                                   ng-model="useMailSyte">
+                                        </md-switch>
+                                        <div flex style="padding-top: 12px;">
+                                            <span style="margin-left: 8px;">Usar systema@valcro.co</span>
+                                        </div>
+                                    </div>
+                                    <md-content flex>
+                                        <md-chips ng-model="destinos"
+                                                  md-transform-chip="transformChip($chip)"
 
-                                    >
-                                        <md-autocomplete
-                                            md-search-text="emailToText"
-                                            md-items=" item in correosProvider"
-                                            md-item-text="item.valor"
-                                            placeholder="Para:"
                                         >
-                                            <span md-highlight-text="emailToText">{{item.valor}}</span>
-                                        </md-autocomplete>
+                                            <md-autocomplete
+                                                md-search-text="emailToText"
+                                                md-items=" item in correosProvider"
+                                                md-item-text="item.valor"
+                                                placeholder="Para:"
+                                            >
+                                                <span md-highlight-text="emailToText">{{item.valor}}</span>
+                                            </md-autocomplete>
 
-                                        <md-chip-template>
-                                            <strong>{{$chip.valor}}</strong>
-                                        </md-chip-template>
-                                    </md-chips>
+                                            <md-chip-template>
+                                                <strong>{{$chip.valor}}</strong>
+                                            </md-chip-template>
+                                        </md-chips>
+                                    </md-content>
                                 </md-content>
                             </md-tab>
-                            <md-tab label="Texto" md-no-ink >
-                                <md-content flex>
-                                    <div laypu="column" flex style="padding-right: 8px" flex>
-                                        <md-input-container class="md-block" flex >
-                                            <label>Texto</label>
+                            <md-tab  md-no-ink flex layout="column" >
+                                <md-tab-label>
+
+                                    <span class="icon-Eliminar" style="font-size: 16px"></span>
+
+                                </md-tab-label>
+                                <md-tab-body>
+                                <md-content flex style="    padding-right: 4px;">
+                                    <md-input-container class="md-block" flex >
+                                        <label>Texto</label>
                                     <textarea ng-model="texto"
                                               info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
                                     ></textarea>
 
-                                        </md-input-container>
-                                    </div>
+                                    </md-input-container>
                                 </md-content>
+                                </md-tab-body>
                             </md-tab>
                         </md-tabs>
                     </form>
-                    <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="allowUpload.val">
-                        <div  class="drop-box">
-                            Enviar
-                        </div>
-                    </div>
+
                 </div>
 
             </md-content>
@@ -3972,35 +3983,39 @@
                                         Enviar Correo
                                     </div>
                                 </div>
-
                             </div>
                             <div layout="row" class="row">
-                                <md-switch class="md-primary" ng-change="addRemoveItem(item)"
-                                           ng-model="useMailSyte"> </md-switch>
+                                <md-switch class="md-primary"
+                                           ng-model="useMailSyte">
+                                </md-switch>
                                 <div flex style="padding-top: 12px;">
                                     <span style="margin-left: 8px;">Usar systema@valcro.co</span>
                                 </div>
-
-
                             </div>
-                        <md-content flex>
-                            <md-chips ng-model="destinos"
-                                      md-transform-chip="transformChip($chip)"
-                            >
-                                <md-autocomplete
-                                    md-search-text="emailToText"
-                                    md-items=" item in correosProvider"
-                                    md-item-text="item.valor"
-                                    placeholder="Para:"
+                            <div layout="row" class="row" style="padding-right: 4px;">
+                                <md-input-container flex>
+                                    <label>Asunto:</label>
+                                    <input  type="text" ng-model="asunto" ng-min-length="1"/>
+                                </md-input-container>
+                            </div>
+                            <md-content flex style="padding-right: 12px;">
+                                <md-chips ng-model="destinos"
+                                          md-transform-chip="transformChip($chip)"
                                 >
-                                    <span md-highlight-text="emailToText">{{item.valor}}</span>
-                                </md-autocomplete>
+                                    <md-autocomplete
+                                        md-search-text="emailToText"
+                                        md-items=" item in correosProvider"
+                                        md-item-text="item.valor"
+                                        placeholder="Para:"
+                                    >
+                                        <span md-highlight-text="emailToText">{{item.valor}}</span>
+                                    </md-autocomplete>
 
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}</strong>
-                                </md-chip-template>
-                            </md-chips>
-                        </md-content>
+                                    <md-chip-template>
+                                        <strong>{{$chip.valor}}</strong>
+                                    </md-chip-template>
+                                </md-chips>
+                            </md-content>
                         </div>
                     </form>
                     <div  class="blue-btn " ng-click="send()" >

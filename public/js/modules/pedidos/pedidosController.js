@@ -367,16 +367,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
         }
     };
-    $scope.sendEmail = function(){
-        $scope.NotifAction("ok","Enviado",[
-            {
-                name:"ok",
-                action: function(){
-                    $scope.LayersAction({close:true});
-                }
-            }
-        ],{block:true});
-    };
 
     /***
      * indicador de progreso
@@ -534,7 +524,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     };
 
     $scope.demo = function(){
-        $scope.OpenContactMail();
+        $scope.openSendMail();
 
 
 
@@ -3656,66 +3646,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 });
 
 
-MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order', function($scope,$mdSidenav, setGetOrder,Order){
-/*
-    $scope.bind =setGetOrder.bind();
-    $scope.isOpenSend= false;
-    $scope.destinos =[];
-    $scope.correosProvider = [];
-    $scope.emailToText='';
-    $scope.$watchGroup(['$parent.provSelec.id','$parent.isOpenSend'], function(newval,oldVal){
-        if(newval[0] && [newval[1]]){
-            $scope.correosProvider = Order.query({type:'ProviderEmails',prov_id:newval[0]});
-        }
-    });
-
-    /!****** ************************** Enviar email ***************************************!/
-    $scope.isOpenSend = false;
-    $scope.$parent.openSendMail = function(){
-
-        if(!$mdSidenav("sendEmail").isOpen()){
-            $mdSidenav("sendEmail").open().then(function(){
-                $scope.isOpenSend = true;
-            });
-        }
-
-    };
-    $scope.transformChip = function(chip) {
-
-        if (angular.isObject(chip)) {
-            return chip;
-        }
-
-        return { email: chip}
-    };
-    $scope.close = function(e){
-        if(jQuery(e.target).parents("#lyrAlert").length == 0
-            && jQuery(e.target).parents("#sendEmail").length == 0
-            && jQuery(e.target).parents("#noti-button").length == 0
-            && $scope.isOpenSend
-
-        ){
-            $mdSidenav("sendEmail").close().then(function(){
-                $scope.isOpenSend = false;
-                $scope.correosProvider.splice(0,  $scope.correosProvider.splice.length());
-                $scope.destinos.splice(0,  $scope.destinos.splice.length());
-                $scope.emailToText='';
-            });
-        }
-
-    }*/
-}]);
-
-
-MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav, setGetOrder,Order, IsEmail, SYSTEM){
+MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order','IsEmail','SYSTEM','emails', function($scope,$mdSidenav, setGetOrder,Order, IsEmail, SYSTEM, emails){
 
     // $scope.bind =setGetOrder.bind();
     $scope.isOpen= false;
     $scope.destinos =[];
-    $scope.correosProvider = [];
     $scope.emailToText='';
     $scope.useMailSyte= false;
-
+    $scope.correosProvider =emails.getEmails();
     $scope.transformChip = function(chip) {
         if (angular.isObject(chip)) {
             return chip;
@@ -3726,15 +3664,62 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order'
 
         return null;
     };
-    $scope.$watchGroup(['$parent.provSelec.id','isOpen'], function(newval,oldVal){
-        if(newval[0] && [newval[1]]){
-            $scope.correosProvider = Order.query({type:'ProviderEmails',prov_id:newval[0]});
+
+    $scope.$parent.openSendMail = function(){
+        $mdSidenav("sendEmail").open().then(function(){
+            $scope.isOpen= true;
+            Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
+                $scope.correosProvider= response;
+            });
+        });
+    };
+
+    $scope.close = function(e){
+        if(jQuery(e.target).parents("#lyrAlert").length == 0
+            && jQuery(e.target).parents("#sendEmail").length == 0
+            && jQuery(e.target).parents("#noti-button").length == 0
+            && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
+            && $scope.isOpen
+
+        ){
+            $mdSidenav("sendEmail").close().then(function(){
+                $scope.isOpen = false;
+                $scope.destinos.splice(0,  $scope.destinos.length);
+                $scope.emailToText='';
+                $scope.useMailSyte= false;
+            });
         }
-    });
+
+    };
+
+}]);
+
+
+MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order','IsEmail','SYSTEM','emails', function($scope,$mdSidenav, setGetOrder,Order, IsEmail, SYSTEM, emails){
+
+    // $scope.bind =setGetOrder.bind();
+    $scope.isOpen= false;
+    $scope.destinos =[];
+    $scope.emailToText='';
+    $scope.useMailSyte= false;
+    $scope.correosProvider =[];
+    $scope.transformChip = function(chip) {
+        if (angular.isObject(chip)) {
+            return chip;
+        }
+        if(IsEmail(chip)!= null){
+            return {valor:chip};
+        }
+
+        return null;
+    };
 
     $scope.$parent.OpenContactMail = function(){
         $mdSidenav("addEMail").open().then(function(){
             $scope.isOpen= true;
+            Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
+                $scope.correosProvider= response;
+            });
         });
     };
 
@@ -3748,7 +3733,6 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order'
         ){
             $mdSidenav("addEMail").close().then(function(){
                 $scope.isOpen = false;
-                $scope.correosProvider.splice(0,  $scope.correosProvider.length());
                 $scope.destinos.splice(0,  $scope.destinos.length);
                 $scope.emailToText='';
                 $scope.useMailSyte= false;
@@ -3758,7 +3742,13 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order'
     };
 
     $scope.send = function(){
-            Order.postMod({type:$scope.formMode.mod, mod:"Send"},{id:$scope.document.id},{},function(){
+        if($scope.destinos.length == 0){
+            $scope.NotifAction("error","Por favor selecione al menos un destinatario",[],{autohidden:SYSTEM.noti_autohidden});
+
+        }else{
+            Order.postMod({type:$scope.formMode.mod, mod:"Send"},
+                {id:$scope.document.id, to:$scope.destinos,local:$scope.useMailSyte, subject:$scope.asunto},
+                function(){
                     $scope.$parent.NotifAction('ok','Enviado',[],{autohidden:SYSTEM.noti_autohidden});
                     $scope.$parent.LayersAction({close:{first:true, search:true}});
                     $mdSidenav("addEMail").close().then(function(){
@@ -3770,7 +3760,9 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order'
                     });
 
 
-            });
+                });
+        }
+
     }
 }]);
 
@@ -4207,6 +4199,24 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
     };
 });
 
+MyApp.service('emails', function(){
+    var email = [];
+
+    return {
+        getEmails : function(){
+            return email;
+
+        },
+        setEmails : function (data){
+            email.splice(0,email.length);
+            angular.forEach(data, function(v){
+               email.push(v);
+            });
+        }, clear: function(){
+            email.splice(0,email.length);
+        }
+    }
+});
 
 MyApp.service('IsEmail', function() {
         return function (text){

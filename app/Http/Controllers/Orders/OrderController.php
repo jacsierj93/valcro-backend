@@ -3348,15 +3348,19 @@ class OrderController extends BaseController
     public function sendSolicitude(Request $req){
 
         $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
-            $m->to("luisnavarro.dg@gmail.com", "Luis navarro");
-            $m->cc("meqh1992@gmail.com", "Luis Navarro");
-            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
-            if($req->has('sistema')){
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
+
+            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
+            if($req->has('local')){
                 $m->from('systema_valcro@gmail.com');
             }else{
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
             }
+            /*foreach($req->to as $aux){
+                $m->to($aux['valor'],$data['proveedor']);
+            }*/
+
+
         });
         $resul =[];
         $resul['accion']= 'send';
@@ -3368,7 +3372,7 @@ class OrderController extends BaseController
         Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
             $m->to("luisnavarro.dg@gmail.com", "Luis Navarro");
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
-            if($req->has('sistema')){
+            if($req->has('local')){
                 $m->from('systema_valcro@gmail.com');
             }else{
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
@@ -5269,6 +5273,7 @@ class OrderController extends BaseController
         $data['emision'] = $this->outputDate($model->emision);
         $data['titulo'] = $model->titulo;
         $data['responsable'] = $this->request->session()->get('DATAUSER')['nombre'];
+        $data['proveedor'] = Provider::findOrFail($model->prov_id);
         $data['correo'] = $this->request->session()->get('DATAUSER')['email'];
 
         $data['texto'] = $texto;
