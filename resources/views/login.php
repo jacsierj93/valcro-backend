@@ -20,11 +20,12 @@
     <?= HTML::script("components/angular-aria/angular-aria.js") ?>
     <?= HTML::script("components/angular-messages/angular-messages.js") ?>
     <?= HTML::script("components/angular-material/angular-material.js") ?>
-    <?= HTML::script("components/angular-clickout/angular-clickout.min.js") ?>
     <?= HTML::script("components/angular-ui-mask/dist/mask.js") ?>
     <?= HTML::script("components/angular-input-masks/angular-input-masks-standalone.min.js") ?>
     <?= HTML::script("components/angular-sanitize/angular-sanitize.min.js") ?>
 
+    <!--    custom click-out library, more ifo in file-->
+    <?= HTML::script('js/modules/main/vlcClickOut.js') ?>
     <!--    demo file upload-->
     <?= HTML::script("components/ng-file-upload/ng-file-upload.min.js") ?>
 
@@ -50,21 +51,23 @@
         </div>
         <div flex>
         </div>
-        <form id="lgnForm" name="lgnForm" ng-controller="login" layout="row">
-            <md-input-container>
-                <label style="color: #ffffff">Usuario</label>
-                <input ng-model="user.usr" skip-tab name="usr" autocomplete="off" style="color: #ffffff"
-                      
-                >
-            </md-input-container>
-            <md-input-container>
-                <label style="color: #ffffff">Clave</label>
-                <input ng-model="user.pss" skip-tab name="pss" type="password" style="color: #ffffff"
-                       ng-keypress="($event.which === 13)? lgn(): 0 "
-                >
-            </md-input-container>
-            <div class="btnHolder" layout layout-align="center center">
-                <i class="fa fa-angle-right" ng-click="lgn()"></i>
+        <form id="lgnForm" name="lgnForm" ng-controller="login" layout="column" layout-align="center center">
+            <div class="row" layout="row">
+                <md-input-container>
+                    <label style="color: #ffffff">Usuario</label>
+                    <input ng-model="user.usr" skip-tab name="usr" autocomplete="off" style="color: #ffffff"
+
+                    >
+                </md-input-container>
+                <md-input-container>
+                    <label style="color: #ffffff">Clave</label>
+                    <input ng-model="user.pss" skip-tab name="pss" type="password" style="color: #ffffff"
+                           ng-keypress="($event.which === 13)? lgn(): 0 "
+                    >
+                </md-input-container>
+                <div class="btnHolder" style="height: auto" layout layout-align="center center">
+                    <i class="fa fa-angle-right" ng-click="lgn()"></i>
+                </div>
             </div>
         </form>
     </div>
