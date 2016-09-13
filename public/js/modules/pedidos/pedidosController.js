@@ -3646,7 +3646,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 });
 
 
-MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order','IsEmail','SYSTEM','emails', function($scope,$mdSidenav, setGetOrder,Order, IsEmail, SYSTEM, emails){
+MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','setGetOrder','Order','IsEmail','SYSTEM','emails', function($scope,$mdSidenav,$timeout, setGetOrder,Order, IsEmail, SYSTEM, emails){
 
     // $scope.bind =setGetOrder.bind();
     $scope.isOpen= false;
@@ -3674,11 +3674,18 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order','I
         });
     };
 
+    $scope.change = function(to){
+        $scope.tab_select = to;
+        switch (to){
+            case '1': $timeout(function(){angular.element("#sendEmail #destinos input")[0].focus()},200); break;
+            case '2': $timeout(function(){angular.element("#sendEmail #textEmail")[0].focus()},200); break;
+        }
+    };
     $scope.close = function(e){
         if(jQuery(e.target).parents("#lyrAlert").length == 0
             && jQuery(e.target).parents("#sendEmail").length == 0
             && jQuery(e.target).parents("#noti-button").length == 0
-            && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
+            && jQuery(e.target).parents(".md-chip-remove").length == 0
             && $scope.isOpen
 
         ){
@@ -3695,7 +3702,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','setGetOrder','Order','I
 }]);
 
 
-MyApp.controller('OrderContactMail',['$scope','$mdSidenav','setGetOrder','Order','IsEmail','SYSTEM','emails', function($scope,$mdSidenav, setGetOrder,Order, IsEmail, SYSTEM, emails){
+MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','setGetOrder','Order','IsEmail','SYSTEM','emails', function($scope,$mdSidenav, $timeout,setGetOrder,Order, IsEmail, SYSTEM, emails){
 
     // $scope.bind =setGetOrder.bind();
     $scope.isOpen= false;

@@ -345,6 +345,12 @@ md-sidenav .md-sidenav-right.md-locked-open{
     border-bottom: 1px dotted #c3c3c3;
 
 }
+
+.tab-select{
+    color: rgb(84, 180, 234);
+    border-bottom: solid 1px rgb(84, 180, 234);
+}
+
 md-autocomplete{
     min-width: 0 !important;
 }

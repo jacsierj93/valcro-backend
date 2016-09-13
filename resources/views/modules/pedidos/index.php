@@ -3898,9 +3898,10 @@
                     md-disable-backdrop="true" md-component-id="sendEmail" id="sendEmail"
         >
             <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderSendMail"    >
-                <div class="activeleft"></div>
-                <div  layout="column" flex class="layerColumn"   click-out="close($event, $parent.isOpenSend)">
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
                     <div layout="row" style="min-height: 36px;" >
+                        <div class="activeleft"></div>
+
                         <div class="titulo_formulario" layout="column" flex layout-align="start start">
                             <div>
                                 Enviar Correo
@@ -3908,60 +3909,70 @@
                         </div>
 
                     </div>
-                    <form flex>
-                        <md-tabs  md-no-ink flex layout="column" style="height: 100%" md-dynamic-height>
-                            <md-tab label="Correos" md-no-ink flex>
-                                <md-content  layout="column" flex>
-                                    <div layout="row" class="row">
-                                        <md-switch class="md-primary"
-                                                   ng-model="useMailSyte">
-                                        </md-switch>
-                                        <div flex style="padding-top: 12px;">
-                                            <span style="margin-left: 8px;">Usar systema@valcro.co</span>
-                                        </div>
+                    <div layou="row" layout="row" ng-init="tab_select = 1">
+                        <div class="activeleft"></div>
+                        <div flex ng-click="change('1')"  ng-class="{'tab-select': (tab_select == 1)}"> Destinos</div>
+                        <div flex  ng-click="change('2')" ng-class="{'tab-select': (tab_select == 2)}" >Redactar</div>
+                    </div>
+                    <div layout="row" flex>
+                        <div class="activeleft"></div>
+                        <div  layou="column" flex >
+                            <div ng-show="tab_select == 1" layout="column" style="height: 100%;">
+                                <div layout="row" class="row">
+                                    <md-switch class="md-primary"
+                                               ng-model="useMailSyte">
+                                    </md-switch>
+                                    <div flex style="padding-top: 12px;">
+                                        <span style="margin-left: 8px;">Usar systema@valcro.co</span>
                                     </div>
-                                    <md-content flex>
-                                        <md-chips ng-model="destinos"
-                                                  md-transform-chip="transformChip($chip)"
+                                </div>
+                                <div flex class="gridContent">
+                                    <md-chips ng-model="destinos"
+                                              md-transform-chip="transformChip($chip)"
+                                              md-enable-chip-edit="true"
 
+                                    >
+                                        <md-autocomplete
+                                            md-search-text="emailToText"
+                                            md-items=" item in correosProvider"
+                                            md-item-text="item.valor"
+                                            placeholder="Para:"
+                                            id="destinos"
                                         >
-                                            <md-autocomplete
-                                                md-search-text="emailToText"
-                                                md-items=" item in correosProvider"
-                                                md-item-text="item.valor"
-                                                placeholder="Para:"
-                                            >
-                                                <span md-highlight-text="emailToText">{{item.valor}}</span>
-                                            </md-autocomplete>
+                                            <span md-highlight-text="emailToText">{{item.valor}}</span>
+                                        </md-autocomplete>
 
-                                            <md-chip-template>
-                                                <strong>{{$chip.valor}}</strong>
-                                            </md-chip-template>
-                                        </md-chips>
-                                    </md-content>
-                                </md-content>
-                            </md-tab>
-                            <md-tab  md-no-ink flex layout="column" >
-                                <md-tab-label>
+                                        <md-chip-template>
+                                            <strong>{{$chip.valor}}</strong>
+                                        </md-chip-template>
+                                    </md-chips>
+                                </div>
+                            </div>
+                            <div ng-show="tab_select == 2" layout="column" style="height: 100%;">
+                                <div flex  class="gridcontent">
+                                    <div>
 
-                                    <span class="icon-Eliminar" style="font-size: 16px"></span>
-
-                                </md-tab-label>
-                                <md-tab-body>
-                                <md-content flex style="    padding-right: 4px;">
-                                    <md-input-container class="md-block" flex >
-                                        <label>Texto</label>
+                                        <md-input-container class="md-block" flex >
+                                            <label></label>
                                     <textarea ng-model="texto"
                                               info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
+                                              id="textEmail"
                                     ></textarea>
 
-                                    </md-input-container>
-                                </md-content>
-                                </md-tab-body>
-                            </md-tab>
-                        </md-tabs>
-                    </form>
+                                        </md-input-container>
+                                    </div>
+                                </div>
+                            </div>
 
+                        </div>
+                    </div>
+                    <div  class="blue-btn " ng-click="send()" >
+                        <div layout="row" class="layout-row " aria-hidden="true">
+                            <div >
+                                Enviar
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </md-content>

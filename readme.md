@@ -15,6 +15,9 @@ this is because cause errors on close notifications
 in angular-material.js line 18019 change function onKeyDown(ev) for return always true
 this disabled close sidenav when key ESC is pressed
 
+[miguel]
+in angular-material.js comment line 22884 (materials 1.1.1) because core $mdUtil undefined, this caused error in focus nextTick
+line code =  this.$mdUtil.nextTick(this.onFocus.bind(this));
 
 ## Official Documentation
 
