@@ -190,12 +190,33 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         $scope.showNext(false);
     }
 
-    $scope.prevLayer = function(){
+    var backLayer = function(){
         if($scope.index==1){
             endProvider(noProv);
         }else{
             $scope.LayersAction({close:true});
         }
+    }
+
+
+    $scope.prevLayer = function(){
+        $timeout(function() {
+            if ($scope.block == "wait") {
+                interval = $interval(function(){
+                    if($scope.block=="go"){
+                        $interval.cancel(interval);
+                        $scope.block=false;
+                        //backLayer();
+                    }else if($scope.block=="reject"){
+                        $interval.cancel(interval);
+                        $scope.block=false;
+                    }
+                },500)
+            }else{
+                backLayer();
+            }
+        },500)
+
 
     };
 
@@ -604,7 +625,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
     });
 
     $scope.$watch("ctrl.typeSend.id",function(nvo){
-        if(nvo==1){
+        if(nvo==1 && $scope.projectForm.$dirty){
                 setNotif.addNotif("alert","un proveedor, solo aereo es muy extraño... estas seguro?",[{name:"Si, si lo estoy",action:null,default:defaultTime},{name:"No, dejame cambiarlo",action:function(){
                     angular.element("#provTypesend").find("input").focus();
                 }}]);
@@ -721,6 +742,10 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.id = "provAddrsControllers";
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
     var dirSel = {};
+    var preId = null;
+    var currentOrig = {};
+    var lryOpen = false;
+    $scope.setting = false;
     $scope.tipos = masterLists.getTypeDir();
     $scope.paises = masterLists.getCountries();
     $scope.ports = masterLists.getPorts();
@@ -735,7 +760,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         setGetProv.setComplete("address",nvo);
     });
 
-    var preId = null;
+
     $scope.$watch('dir.ports.length', function(nvo,old) {
         if(preId==$scope.dir.id){
             //$scope.dir.ports = $scope.svPort.ports;
@@ -745,7 +770,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         }
     });
 
-    var lryOpen = false;
+
     $scope.openPorts = function(){
       $mdSidenav("portsLyr").open().then(function(){
           lryOpen = true;
@@ -818,24 +843,29 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     });
 
 
-    var currentOrig = {};
+
 
     $scope.toEdit = function(addrs){
-        dirSel = addrs.add;
-        $scope.dir.id = dirSel.id;
-        $scope.dir.id_prov = dirSel.prov_id;
-        $scope.dir.direccProv = dirSel.direccion;
-        //$scope.dir.tipo = dirSel.tipo_dir;
-        $scope.ctrl['selPais'] = dirSel.pais;
-        $scope.ctrl['dirType'] = dirSel.tipo;
-       // $scope.dir.pais = dirSel.pais_id;
-        asignPort.setCountry(dirSel.pais_id);
-        $scope.dir.provTelf = dirSel.telefono;
-        $scope.dir.ports = dirSel.ports;
-        asignPort.setPorts(dirSel.ports);
-        $scope.dir.zipCode = parseInt(dirSel.codigo_postal);
-        currentOrig = angular.copy($scope.dir);
-        setGetProv.addToRllBck($scope.dir,"dirProv");
+
+        saveAddress(function(dirSel){
+            $scope.setting = true;
+            $scope.dir.id = dirSel.id;
+            $scope.dir.id_prov = dirSel.prov_id;
+            $scope.dir.direccProv = dirSel.direccion;
+            //$scope.dir.tipo = dirSel.tipo_dir;
+            $scope.ctrl['selPais'] = dirSel.pais;
+            $scope.ctrl['dirType'] = dirSel.tipo;
+            // $scope.dir.pais = dirSel.pais_id;
+            asignPort.setCountry(dirSel.pais_id);
+            $scope.dir.provTelf = dirSel.telefono;
+            $scope.dir.ports = dirSel.ports;
+            asignPort.setPorts(dirSel.ports);
+            $scope.dir.zipCode = parseInt(dirSel.codigo_postal);
+            currentOrig = angular.copy($scope.dir);
+            setGetProv.addToRllBck($scope.dir,"dirProv");
+            $timeout(function(){$scope.setting = false;},100)
+        },addrs.add)
+
     };
 
    /* /!*escuah el estatus del formulario y guarda cuando este valido*!/
@@ -845,10 +875,10 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         }
     });*/
 
-    var saveAddress = function(onSuccess){
-
+    var saveAddress = function(onSuccess,elem){
+        var next = elem || false;
         if((angular.equals(currentOrig,$scope.dir) && $scope.dir ) || ($scope.direccionesForm.$pristine )){
-            onSuccess();
+            onSuccess(next);
             return false;
         }
         if(!$scope.direccionesForm.$valid && !$scope.direccionesForm.$pristine){
@@ -864,7 +894,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
-                    onSuccess();
+                    onSuccess(next);
                     $timeout(function(){
                         prefocus.click();
                         prefocus.focus();
@@ -901,7 +931,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                 setNotif.addNotif("ok", "Datos Actualizados", [
                 ],{autohidden:3000});
             }
-            onSuccess();
+            onSuccess(next);
         });
     };
 
@@ -938,7 +968,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     };
 
     $scope.showGrid = function(elem,event){
-        if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
+        $scope.setting=true;
+        //if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
             $scope.isShow = elem;
             if(!elem) {
                 saveAddress(function(){
@@ -960,7 +991,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                     lryOpen = false;
                 });
             }
-        }
+            $timeout(function(){$scope.setting = false;},100)
+        //}
     };
 
     $scope.viewExtend = function(sel){
@@ -1201,7 +1233,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
     $scope.showGrid = function(elem,a){
         if(!elem){
-            if(jQuery(a.target).parents("#lyrAlert").length==0 && jQuery(a.target).parents("#nomValLyr").length==0){
+            //if(jQuery(a.target).parents("#lyrAlert").length==0 && jQuery(a.target).parents("#nomValLyr").length==0){
                 if($scope.valName.id && Object.keys($scope.valName.departments).length<=0){
                     //console.log("cond1");
                     /*CLICK EN UN FUERA DEL FORMULARIO, CON DATOS EN INPUT, VERIFICA Y RESETEA EL FORMUALRIO Y SALE DEL FOCUS*/
@@ -1241,7 +1273,7 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
 
                 }
 
-            }
+            //}
 
         }else{
             /*CLICK EN UN LUGAR DEL FORMULARIO, VACIA EL INPUT Y DEVUELVE EL FOCUS*/
@@ -1419,6 +1451,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.languaje = masterLists.getLanguaje();
     $scope.allContact = setGetContac.getList();
     $scope.cargos = masters.query({type:"cargoContact"});
+    $scope.setting =  false;
 
     $scope.$watch('prov.id',function(nvo){
         $scope.contacts = setGetProv.getContacts();//(nvo)?providers.query({type: "contactProv", id_prov: $scope.prov.id || 0}):[];
@@ -1597,10 +1630,10 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var contact = {}; //var auxiliar para manejar los datos del grid contra los del scope editado
     var currentOrig = {};
 
-    var saveContact = function(onSuccess){
-
+    var saveContact = function(onSuccess,elm){
+        var next = elm||false;
         if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
-            onSuccess();
+            onSuccess(next);
             return false;
         }
 
@@ -1619,7 +1652,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 name:"descartalos",
                 action:function(){
                     $scope.$parent.block="go";
-                    onSuccess();
+                    onSuccess(next);
                     $timeout(function(){
                         prefocus.click();
                         prefocus.focus();
@@ -1661,7 +1694,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 ],{autohidden:3000});
             };
             setGetProv.addChng($scope.cnt,data.action,"contProv");
-            onSuccess();
+            onSuccess(next);
 
         });
     };
@@ -1711,24 +1744,26 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     /*setea el contacto del grid para edicion en el formulario
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
-    $scope.setting = false;
     $scope.toEdit = function(element){
-        $scope.setting = true;
-        contact = element.cont;
-        //console.log(contact)
-        contact.prov_id = $scope.prov.id;
-        $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[contact.pais_id])[0]
-       // $scope.ctrl['pais'] = contact.country;
-        setGetContac.setContact(contact);
-        currentOrig = angular.copy($scope.cnt);
-        setGetProv.addToRllBck($scope.cnt,"contProv")
-        $scope.setting = false;
+        saveContact(function(element){
+            $scope.setting = true;
+            contact = element.cont;
+            //console.log(contact)
+            contact.prov_id = $scope.prov.id;
+            $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[contact.pais_id])[0]
+            // $scope.ctrl['pais'] = contact.country;
+            setGetContac.setContact(contact);
+            currentOrig = angular.copy($scope.cnt);
+            setGetProv.addToRllBck($scope.cnt,"contProv")
+            $timeout(function(){$scope.setting = false;},500)
+        },element)
+
     };
 
     /*muestra u oculta la franaj de ver mas en los form, en el click y clickout (focus,focusout)*/
     $scope.showGrid = function(elem,event){
         $scope.setting = true;
-        if((jQuery(event.target).parents("#contactBook").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
+        //if((jQuery(event.target).parents("#contactBook").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
             if(!elem){
                 saveContact(function(){
                     contact = {};
@@ -1749,15 +1784,13 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     var def = $scope.dirAssign[0];
                     setGetContac.setContact({pais_id:def.pais_id});
                     $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[def.pais_id])[0];
-                    $timeout(function(){
-                        $scope.setting = false;
-                    },500)
+
                 }
             }
-
+            //$timeout(function(){$scope.setting = false;},500)
             $scope.isShow = elem;
 
-        }
+       // }
     };
 
     /*muestra u oculta los grid y pide el colapsado de los demas form */
@@ -1860,10 +1893,220 @@ MyApp.service("setGetContac",function(providers,setGetProv,$filter){
     }
 });
 
-MyApp.controller('coinController', function ($scope,masters,providers,setGetProv,listCoins,masterLists,$filter,setNotif) {
+MyApp.controller('bankInfoController', function ($scope,masters,masterLists,providers,setGetProv,setNotif,$filter,$timeout,$q) {
+    $scope.id = "bankInfoController";
+    $scope.prov = setGetProv.getProv();
+    $scope.countries = masterLists.getCountries();
+    $scope.setting = false;
+    /*$scope.cities = masters.query({ type:"getCities"});*/
+    $scope.$watch('prov.id',function(nvo){
+        $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
+        $scope.accounts = setGetProv.getBanks();
+    });
+    $scope.$watch('accounts.length',function(nvo){
+        setGetProv.setComplete("bank",nvo);
+    });
+
+    $scope.querySearch = function(search){
+        if(search){
+
+            var results = $filter("customFind")($scope.cities,search,function(c,v){
+                return c.local_name.toLowerCase().indexOf(v)!==-1;
+            });
+            var deferred = $q.defer();
+            $timeout(function () { deferred.resolve( results ); },2000, false);
+            return deferred.promise;
+        }else{
+
+            return [];
+        }
+
+    };
+
+    $scope.$watch('ctrl.pais.id', function(nvo) {
+        //$scope.bnk.pais = nvo;
+        $scope.states = (nvo)?masters.query({ type:"getStates",id:nvo||0}):[];
+    });
+    $scope.$watch('ctrl.state.id', function(nvo) {
+        //$scope.bnk.est = nvo;
+        $scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
+    });
+    /*$scope.$watch('ctrl.city.id', function(nvo) {
+        $scope.bnk.ciudad = nvo;
+        //$scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
+    });*/
+
+    var account = {};
+
+    /*escuha el estatus del formulario y guarda cuando este valido*/
+   /* $scope.$watchGroup(['bankInfoForm.$valid','bankInfoForm.$pristine'], function(nuevo) {
+
+        if(nuevo[0] && !nuevo[1]) {
+
+
+        }
+    });*/
+
+
+
+    var saveBank = function(onSuccess,elem){
+        var next = elem || false;
+        if((angular.equals(currentOrig,$scope.bnk) && $scope.bnk.id) || ($scope.bankInfoForm.$pristine )){
+//            console.log("blanco")
+            onSuccess(next);
+            return false;
+        }
+
+        if(!$scope.bankInfoForm.$valid && !$scope.bankInfoForm.$pristine){
+            $scope.$parent.block="wait";
+            var prefocus = angular.element(":focus");
+            $timeout(function(){
+                angular.element("[name='bankInfoForm']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
+
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
+                name:"descartalos",
+                action:function(){
+                    $scope.$parent.block="go";
+                    onSuccess(next);
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
+                }
+            },{
+                name:"dejame Corregirlos",
+                action:function(){
+                    $scope.$parent.block="reject";
+                    angular.element("[name='bankInfoForm']").find(".ng-invalid").first().focus()
+                }
+            }]);
+
+        }
+
+        if($scope.bankInfoForm.$valid && !$scope.bankInfoForm.$pristine){
+            providers.put({type:"saveBank"},$scope.bnk,function(data){
+                $scope.bnk.id = data.id;
+                $scope.bankInfoForm.$setPristine();
+                account.prov_id = $scope.bnk.id_prov;
+                account.banco = $scope.bnk.bankName;
+                account.beneficiario = $scope.bnk.bankBenef;
+                account.dir_beneficiario = $scope.bnk.bankBenefAddr;
+                account.dir_banco = $scope.bnk.bankAddr;
+                account.swift = $scope.bnk.bankSwift;
+                account.cuenta = $scope.bnk.bankIban;
+                account.ciudad_id = $scope.bnk.ciudad;
+                if(data.action=="new"){
+                    account.id = $scope.bnk.id;
+                    $scope.accounts.unshift(account);
+                    setNotif.addNotif("ok", "nueva info bancaria", [
+                    ],{autohidden:3000});
+                }else{
+                    setNotif.addNotif("ok", "Datos Actualizados", [
+                    ],{autohidden:3000});
+                }
+                setGetProv.addChng($scope.bnk,data.action,"infoBank");
+                onSuccess(next)
+            });
+        }else{
+            //console.log("invalid")
+        }
+
+    };
+
+    $scope.rmBank = function(elem){
+        setNotif.addNotif("alert", "desea eliminar esta informacion bancaria", [
+            {
+                name: "SI",
+                action: function () {
+                    bnk = elem.account;
+                    providers.put({type:"delBank"},bnk,function(data){
+                        setGetProv.addChng($scope.bnk,data.action,"infoBank");
+                        $scope.accounts.splice(elem.$index,1);
+                        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                        account={};
+                        $scope.bankInfoForm.$setUntouched();
+                        setNotif.addNotif("ok", "Informacion Eliminada", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: function () {
+                }
+            }
+        ]);
+    };
+
+    var currentOrig = {};
+    $scope.toEdit = function(acc){
+
+        saveBank(function(account){
+            $scope.setting=true;
+            $scope.bnk.id = account.id;
+            $scope.bnk.id_prov = account.prov_id;
+            $scope.bnk.bankName = account.banco;
+            $scope.bnk.bankBenef = account.beneficiario;
+            $scope.bnk.bankBenefAddr = account.dir_beneficiario;
+            $scope.bnk.bankAddr = account.dir_banco;
+            $scope.bnk.bankSwift = account.swift;
+            $scope.bnk.bankIban = account.cuenta;
+            $scope.bnk.pais = account.pais.id;
+            $scope.ctrl.pais = account.pais;
+            $scope.bnk.est = account.estado.id;
+            $scope.ctrl.state = account.estado;
+            $scope.bnk.ciudad = account.ciudad_id;
+            $scope.ctrl.city = account.ciudad;
+            currentOrig = angular.copy($scope.bnk);
+            setGetProv.addToRllBck($scope.bnk,"infoBank")
+            $timeout(function(){$scope.setting = false;},100)
+        },acc.account)
+
+    };
+
+    $scope.showGrid = function(elem,event){
+       $scope.setting = true;
+            if(!elem) {
+                saveBank(function(){
+                    $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
+                    $scope.ctrl = {searchCity:"",searchCountry:"",searchState:""};
+                    account={};
+                    currentOrig = {};
+                    $scope.bankInfoForm.$setPristine();
+                    $scope.bankInfoForm.$setUntouched();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                })
+            }else{
+                if(!$scope.isShow){
+                    $scope.bnk.bankBenef = $scope.prov.description;
+                    $scope.bnk.bankBenefAddr = $filter("customFind")(setGetProv.getAddress(),["1","3"],function(c,v){
+                        return v.indexOf(c.tipo.id)!==-1;
+                    })[0].direccion || "";
+                }
+            }
+            $timeout(function(){$scope.setting = false;},100)
+            $scope.isShow = elem;
+       // }
+    };
+    $scope.viewExtend = function(sel){
+        $scope.isShowMore = sel;
+        $scope.$parent.expand =(sel)?"bankInfoController":false;
+    };
+});
+
+MyApp.controller('coinController', function ($scope,masters,providers,setGetProv,listCoins,masterLists,$filter,setNotif,$timeout) {
     $scope.id="coinController";
     $scope.prov = setGetProv.getProv();
     $scope.coins =masterLists.getAllCoins();
+    $scope.setting = false;
     $scope.$watch('prov.id',function(nvo){
         if(nvo){
             listCoins.setProv(nvo);
@@ -1878,7 +2121,9 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     });
     $scope.$watchGroup(['provMoneda.$valid','provMoneda.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
+            $scope.setting = true;
             providers.put({type: "saveCoin"}, $scope.cn, function (data) {
+                $scope.ctrl.searchCoin = undefined;
                 $scope.provMoneda.$setPristine();
                 var newCoin = $filter("filterSearch")($scope.coins,[$scope.cn.coin])[0];
                 newCoin.pivot = {prov_id:$scope.cn.prov_id};
@@ -1888,18 +2133,22 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
                 setNotif.addNotif("ok", "Moneda cargada", [
                 ],{autohidden:3000});
                 setGetProv.addChng($scope.cn,data.action,"provCoin");
+                $timeout(function(){$scope.setting = false;},100)
             })
         }
     });
     var coin = {};
     var currentOrig = {};
     $scope.toEdit = function(coin){
+        $scope.setting = true;
         coin = coin.coinSel;
         $scope.cn.id=coin.id;
         $scope.cn.coin=coin.id;
         $scope.cn.coin=$scope.prov.id;
+        $scope.ctrl.coin = $scope.coin;
         currentOrig = angular.copy($scope.cn);
         setGetProv.addToRllBck($scope.cn,"provCoin")
+        $timeout(function(){$scope.setting = false;},100)
     };
 
     $scope.rmCoin = function(elem){
@@ -1946,234 +2195,42 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     }
 
     $scope.showGrid = function(elem,event){
-        if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
-            $scope.isShow = elem;
-            /*if(!elem) {
-                saveAddress(function(){
-                    asignPort.setPorts(false);
-                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
-                    $scope.ctrl.searchCountry = "";
-                    currentOrig = {};
-                    $scope.direccionesForm.$setPristine();
-                    $scope.direccionesForm.$setUntouched();
-                    if($scope.$parent.expand==$scope.id){
-                        $scope.isShowMore = elem;
-                        $scope.$parent.expand = false;
-                    }
-                });
-            }
-            if(lryOpen){
-                $mdSidenav("portsLyr").close().then(function(){
-                    lryOpen = false;
-                });
-            }*/
+        $scope.setting = true;
+        if(!elem){
+            $scope.ctrl.searchCoin = undefined;
         }
+        //if((jQuery(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents("md-sidenav.popUp").length==0)) {
+        $scope.isShow = elem;
+        $timeout(function(){$scope.setting = false;},100)
+        /*if(!elem) {
+         saveAddress(function(){
+         asignPort.setPorts(false);
+         $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+         $scope.ctrl.searchCountry = "";
+         currentOrig = {};
+         $scope.direccionesForm.$setPristine();
+         $scope.direccionesForm.$setUntouched();
+         if($scope.$parent.expand==$scope.id){
+         $scope.isShowMore = elem;
+         $scope.$parent.expand = false;
+         }
+         });
+         }
+         if(lryOpen){
+         $mdSidenav("portsLyr").close().then(function(){
+         lryOpen = false;
+         });
+         }*/
+        // }
     };
 
-});
-
-MyApp.controller('bankInfoController', function ($scope,masters,masterLists,providers,setGetProv,setNotif,$filter,$timeout,$q) {
-    $scope.id = "bankInfoController";
-    $scope.prov = setGetProv.getProv();
-    $scope.countries = masterLists.getCountries();
-    /*$scope.cities = masters.query({ type:"getCities"});*/
-    $scope.$watch('prov.id',function(nvo){
-        $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad:"",idProv: $scope.prov.id||0};
-        $scope.accounts = setGetProv.getBanks();
-    });
-    $scope.$watch('accounts.length',function(nvo){
-        setGetProv.setComplete("bank",nvo);
-    });
-
-    $scope.querySearch = function(search){
-        if(search){
-
-            var results = $filter("customFind")($scope.cities,search,function(c,v){
-                return c.local_name.toLowerCase().indexOf(v)!==-1;
-            });
-            var deferred = $q.defer();
-            $timeout(function () { deferred.resolve( results ); },2000, false);
-            return deferred.promise;
-        }else{
-
-            return [];
-        }
-
-    };
-
-    $scope.$watch('ctrl.pais.id', function(nvo) {
-        $scope.bnk.pais = nvo;
-        $scope.states = (nvo)?masters.query({ type:"getStates",id:nvo||0}):[];
-    });
-    $scope.$watch('ctrl.state.id', function(nvo) {
-        $scope.bnk.est = nvo;
-        $scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
-    });
-    $scope.$watch('ctrl.city.id', function(nvo) {
-        $scope.bnk.ciudad = nvo;
-        //$scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
-    });
-
-    var account = {};
-
-    /*escuha el estatus del formulario y guarda cuando este valido*/
-   /* $scope.$watchGroup(['bankInfoForm.$valid','bankInfoForm.$pristine'], function(nuevo) {
-
-        if(nuevo[0] && !nuevo[1]) {
-
-
-        }
-    });*/
-
-
-
-    var saveBank = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.bnk) && $scope.bnk.id) || ($scope.bankInfoForm.$pristine )){
-//            console.log("blanco")
-            onSuccess();
-            return false;
-        }
-
-        if(!$scope.bankInfoForm.$valid && !$scope.bankInfoForm.$pristine){
-            var prefocus = angular.element(":focus");
-            $timeout(function(){
-                angular.element("[name='bankInfoForm']").click();
-                $timeout(function(){
-                    angular.element(":focus").blur();
-                })
-
-            },0);
-
-            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
-                name:"descartalos",
-                action:function(){
-                    onSuccess();
-                    $timeout(function(){
-                        prefocus.click();
-                        prefocus.focus();
-                    },10)
-                }
-            },{
-                name:"dejame Corregirlos",
-                action:function(){
-                    angular.element("[name='bankInfoForm']").find(".ng-invalid").first().focus()
-                }
-            }]);
-
-        }
-
-        if($scope.bankInfoForm.$valid && !$scope.bankInfoForm.$pristine){
-            providers.put({type:"saveBank"},$scope.bnk,function(data){
-                $scope.bnk.id = data.id;
-                $scope.bankInfoForm.$setPristine();
-                account.prov_id = $scope.bnk.id_prov;
-                account.banco = $scope.bnk.bankName;
-                account.beneficiario = $scope.bnk.bankBenef;
-                account.dir_beneficiario = $scope.bnk.bankBenefAddr;
-                account.dir_banco = $scope.bnk.bankAddr;
-                account.swift = $scope.bnk.bankSwift;
-                account.cuenta = $scope.bnk.bankIban;
-                account.ciudad_id = $scope.bnk.ciudad;
-                if(data.action=="new"){
-                    account.id = $scope.bnk.id;
-                    $scope.accounts.unshift(account);
-                    setNotif.addNotif("ok", "nueva info bancaria", [
-                    ],{autohidden:3000});
-                }else{
-                    setNotif.addNotif("ok", "Datos Actualizados", [
-                    ],{autohidden:3000});
-                }
-                setGetProv.addChng($scope.bnk,data.action,"infoBank");
-                onSuccess()
-            });
-        }else{
-            //console.log("invalid")
-        }
-
-    };
-
-    $scope.rmBank = function(elem){
-        setNotif.addNotif("alert", "desea eliminar esta informacion bancaria", [
-            {
-                name: "SI",
-                action: function () {
-                    bnk = elem.account;
-                    providers.put({type:"delBank"},bnk,function(data){
-                        setGetProv.addChng($scope.bnk,data.action,"infoBank");
-                        $scope.accounts.splice(elem.$index,1);
-                        $scope.bnk={id:false,bankName:"",bankBenef:"",dirBenef:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
-                        account={};
-                        $scope.bankInfoForm.$setUntouched();
-                        setNotif.addNotif("ok", "Informacion Eliminada", [
-                        ],{autohidden:3000});
-                    });
-                }
-            },
-            {
-                name: "NO",
-                action: function () {
-                }
-            }
-        ]);
-    };
-
-    var currentOrig = {};
-    $scope.toEdit = function(acc){
-        account = acc.account;
-        $scope.bnk.id = account.id;
-        $scope.bnk.id_prov = account.prov_id;
-        $scope.bnk.bankName = account.banco;
-        $scope.bnk.bankBenef = account.beneficiario;
-        $scope.bnk.bankBenefAddr = account.dir_beneficiario;
-        $scope.bnk.bankAddr = account.dir_banco;
-        $scope.bnk.bankSwift = account.swift;
-        $scope.bnk.bankIban = account.cuenta;
-        $scope.bnk.pais = account.pais.id;
-        $scope.ctrl.pais = account.pais;
-        $scope.bnk.est = account.estado.id;
-        $scope.ctrl.state = account.estado;
-        $scope.bnk.ciudad = account.ciudad_id;
-        $scope.ctrl.city = account.ciudad;
-        currentOrig = angular.copy($scope.bnk);
-        setGetProv.addToRllBck($scope.bnk,"infoBank")
-    };
-
-    $scope.showGrid = function(elem,event){
-        if(jQuery(event.target).parents("#lyrAlert").length==0) {
-            if(!elem) {
-                saveBank(function(){
-                    $scope.bnk={id:false,bankName:"",bankBenef:"",bankBenefAddr:"",bankAddr:"",bankSwift:"",bankIban:"", pais:"",est:"",ciudad_id:"",idProv: $scope.prov.id};
-                    $scope.ctrl = {searchCity:"",searchCountry:"",searchState:""};
-                    account={};
-                    currentOrig = {};
-                    $scope.bankInfoForm.$setPristine();
-                    $scope.bankInfoForm.$setUntouched();
-                    if($scope.$parent.expand==$scope.id){
-                        $scope.isShowMore = elem;
-                        $scope.$parent.expand = false;
-                    }
-                })
-            }else{
-                if(!$scope.isShow){
-                    $scope.bnk.bankBenef = $scope.prov.description;
-                    $scope.bnk.bankBenefAddr = $filter("customFind")(setGetProv.getAddress(),["1","3"],function(c,v){
-                        return v.indexOf(c.tipo.id)!==-1;
-                    })[0].direccion || "";
-                }
-            }
-            $scope.isShow = elem;
-        }
-    };
-    $scope.viewExtend = function(sel){
-        $scope.isShowMore = sel;
-        $scope.$parent.expand =(sel)?"bankInfoController":false;
-    };
 });
 
 MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout) {
     $scope.id="creditCtrl";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
+    $scope.setting = false;
     $scope.$watch('prov.id',function(nvo){
         $scope.cred = {id:false,coin:"",amount:"",line:"",id_prov: $scope.prov.id||0};
         $scope.limits =  setGetProv.getLimits();
@@ -2182,39 +2239,57 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     $scope.$watch('limits.length',function(nvo){
         setGetProv.setComplete("limits",nvo);
     });
-    $scope.$watch('ctrl.coin.id',function(nvo){
+    /*$scope.$watch('ctrl.coin.id',function(nvo){
         $scope.cred.coin = nvo;
     });
     $scope.$watch('ctrl.line.id',function(nvo){
         $scope.cred.line = nvo;
-    });
+    });*/
     var credit = {};
 
     var currentOrig = {};
-    var saveCredit = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.cred) && $scope.cred ) || ($scope.provCred.$pristine )){
-            onSuccess();
+    var saveCredit = function(onSuccess,elem){
+        var next = elem || false;
+        if((angular.equals(currentOrig,$scope.cred) && $scope.cred.id ) || ($scope.provCred.$pristine )){
+            onSuccess(next);
             return false;
         }
 
         if(!$scope.provCred.$valid && !$scope.provCred.$pristine){
+            var prefocus = angular.element(":focus");
+
+            $scope.$parent.block="wait";
+            $timeout(function(){
+                angular.element("[name='provCred']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
-                    onSuccess();
+                    $scope.$parent.block="go";
+                    onSuccess(next);
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
                 }
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    //console.log($scope.provCred);
+                    $scope.$parent.block="reject";
+                    angular.element("[name='provCred']").find(".ng-invalid").first().focus()
                 }
             }]);
-
+            return false;
         }
 
         providers.put({type:"saveLim"},$scope.cred,function(data){
             $scope.cred.id = data.id;
             $scope.provCred.$setPristine();
+            $scope.setting = true;
             credit.moneda_id = $scope.cred.coin;
             credit.moneda = $filter("filterSearch")($scope.coins,[$scope.cred.coin])[0];
             credit.limite = $scope.cred.amount;
@@ -2235,7 +2310,8 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
                 ],{autohidden:3000});
             }
             setGetProv.addChng($scope.cred,data.action,"limCred");
-            onSuccess();
+            $timeout(function(){$scope.setting=false;},100)
+            onSuccess(next);
         });
     };
 
@@ -2265,48 +2341,59 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     };
     $scope.toEdit = function(cred){
         //console.log(cred)
-        credit = cred.lim;
-        $scope.cred.id = credit.id;
-        $scope.cred.id_prov = credit.prov_id;
-        $scope.cred.coin = credit.moneda_id;
-        $scope.cred.amount = credit.limite;
-        $scope.cred.line = credit.linea_id;
-        $scope.ctrl.coin=credit.moneda;
-        $scope.ctrl.line=credit.line;
-        currentOrig = angular.copy($scope.bnk);
-        setGetProv.addToRllBck($scope.bnk,"limCred");
+        //credit = cred.lim;
+        saveCredit(function(credit){
+            $scope.setting = true;
+            $scope.cred.id = credit.id;
+            $scope.cred.id_prov = credit.prov_id;
+            $scope.cred.coin = credit.moneda_id;
+            $scope.cred.amount = credit.limite;
+            $scope.cred.line = credit.linea_id;
+            $scope.ctrl.coin=credit.moneda;
+            $scope.ctrl.line=credit.line;
+            currentOrig = angular.copy($scope.bnk);
+            setGetProv.addToRllBck($scope.bnk,"limCred");
+            $timeout(function(){$scope.setting=false;},100)
+        },cred.lim);
+
     };
 
     $scope.showGrid = function(elem,event){
-        if(jQuery(event.target).parents("#lyrAlert").length==0) {
-            if(!elem) {
-                    saveCredit(function(){
-                        clearForm(elem);
-                    })
-            }else{
-                if(!$scope.isShow){
-                    $scope.cred.line = 0;
-                }
-            }
-            $scope.isShow = elem;
+
+        // if(jQuery(event.target).parents("#lyrAlert").length==0) {
+        if(!elem) {
+                saveCredit(function(elem){
+                    $scope.setting=true;
+                    $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
+                    $scope.ctrl.searchLine = undefined;
+                    $scope.ctrl.searchCoin = undefined;
+                    credit = {};
+                    currentOrig = {};
+                    $scope.provCred.$setUntouched();
+                    $scope.provCred.$setPristine();
+                    if($scope.$parent.expand==$scope.id){
+                        $scope.isShowMore = elem;
+                        $scope.$parent.expand = false;
+                    }
+                    $timeout(function(){$scope.setting=false;},500)
+                },elem)
         }else{
-            $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
+            if(!$scope.isShow){
+                $scope.setting = true;
+                $scope.cred.line = 0;
+                $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
+                $timeout(function(){$scope.setting=false;},500)
+            }
+
         }
+
+        $scope.isShow = elem;
+
     };
 
-    var clearForm = function(elem){
-        $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
-        $scope.ctrl.searchLine = "";
-        $scope.ctrl.searchCoin = "";
-        credit = {};
-        currentOrig = {};
-        $scope.provCred.$setUntouched();
-        $scope.provCred.$setPristine();
-        if($scope.$parent.expand==$scope.id){
-            $scope.isShowMore = elem;
-            $scope.$parent.expand = false;
-        }
-    };
+    /*var clearForm = function(elem){
+
+    };*/
 
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
@@ -2320,6 +2407,7 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
     $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",id_prov: $scope.prov.id||0};
+    $scope.setting = false;
     $scope.$watch('prov.id',function(nvo){
         $scope.coins = (nvo)?listCoins.getCoins():[];
         $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id||0};
@@ -2330,22 +2418,39 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
     });
     var factor = {};
     var currentOrig = {};
-    var saveConv = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.conv) && $scope.conv ) || ($scope.provConv.$pristine )){
-            onSuccess();
+    var saveConv = function(onSuccess,elem){
+        var next = elem || false;
+        if((angular.equals(currentOrig,$scope.conv) && $scope.conv.id ) || ($scope.provConv.$pristine )){
+            onSuccess(next);
             return false;
         }
 
         if(!$scope.provConv.$valid && !$scope.provConv.$pristine){
+            var prefocus = angular.element(":focus");
+
+            $scope.$parent.block="wait";
+            $timeout(function(){
+                angular.element("[name='provConv']").click();
+                $timeout(function(){
+                    angular.element(":focus").blur();
+                })
+
+            },0);
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
-                    onSuccess();
+                    $scope.$parent.block="go";
+                    onSuccess(next);
+                    $timeout(function(){
+                        prefocus.click();
+                        prefocus.focus();
+                    },10)
                 }
             },{
                 name:"dejame Corregirlos",
                 action:function(){
-                    //console.log($scope.provConv);
+                    $scope.$parent.block="reject";
+                    angular.element("[name='provConv']").find(".ng-invalid").first().focus();
                 }
             }]);
             return false;
@@ -2373,7 +2478,8 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
                 ],{autohidden:3000});
             }
             setGetProv.addChng($scope.conv,data.action,"factConv");
-            onSuccess();
+            onSuccess(next);
+
         });
     };
     $scope.rmConv = function(elem){
@@ -2405,51 +2511,60 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
     };
 
     $scope.toEdit = function(fact){
-        factor = fact.factor;
-        $scope.conv.id = factor.id;
-        $scope.conv.id_prov = factor.prov_id;
-        $scope.conv.coin = factor.moneda_id;
-        $scope.conv.freight = factor.flete;
-        $scope.conv.expens = factor.gastos;
-        $scope.conv.gain = factor.ganancia;
-        $scope.conv.disc = factor.descuento;
-        $scope.conv.line = factor.linea_id;
-        $scope.ctrl.line = factor.linea;
-        $scope.ctrl.coin = factor.moneda;
-        currentOrig = angular.copy($scope.conv);
-        setGetProv.addToRllBck($scope.conv,"factConv")
+        //actor = fact.factor;
+        saveConv(function(factor) {
+            $scope.setting = true;
+            $scope.conv.id = factor.id;
+            $scope.conv.id_prov = factor.prov_id;
+            $scope.conv.coin = factor.moneda_id;
+            $scope.conv.freight = factor.flete;
+            $scope.conv.expens = factor.gastos;
+            $scope.conv.gain = factor.ganancia;
+            $scope.conv.disc = factor.descuento;
+            $scope.conv.line = factor.linea_id;
+            $scope.ctrl.line = factor.linea;
+            $scope.ctrl.coin = factor.moneda;
+            currentOrig = angular.copy($scope.conv);
+            setGetProv.addToRllBck($scope.conv, "factConv");
+            $timeout(function(){$scope.setting=false;},500)
+        },fact.factor)
     };
 
     $scope.showGrid = function(elem,event){
-        if((angular.element(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents(".popUp").length==0)) {
+        //if((angular.element(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents(".popUp").length==0)) {
+        $scope.setting=true;
+        if(!elem) {
+            saveConv(function(){
 
-            if(!elem) {
-                saveConv(function(){
-                    $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
+                $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
 
-                    factor = {};
-                    currentOrig = {};
+                factor = {};
+                currentOrig = {};
 
-                    if($scope.$parent.expand==$scope.id){
-                        $scope.isShowMore = elem;
-                        $scope.$parent.expand = false;
-                    }
-                    $timeout(function(){
-                        $scope.ctrl.searchLine = undefined;
-                        $scope.ctrl.searchCoin = undefined;
-                        $scope.provConv.$setUntouched();
-                        $scope.provConv.$setPristine();
-                    },500)
-
-                })
-
-            }else{
-                if(!$scope.isShow){
-                    $scope.conv.line = 0;
+                if($scope.$parent.expand==$scope.id){
+                    $scope.isShowMore = elem;
+                    $scope.$parent.expand = false;
                 }
+                $timeout(function(){
+                    $scope.ctrl.searchLine = undefined;
+                    $scope.ctrl.searchCoin = undefined;
+                    $scope.provConv.$setUntouched();
+                    $scope.provConv.$setPristine();
+                    $timeout(function(){$scope.setting=false;},500)
+                },500)
+
+
+            })
+
+        }else{
+            if(!$scope.isShow){
+                //$scope.setting=true;
+                $scope.conv.line = 0;
+                $timeout(function(){$scope.setting=false;},500)
             }
-            $scope.isShow = elem;
         }
+        $scope.isShow = elem;
+        //}
     };
 
     $scope.viewExtend = function(sel){
@@ -2463,6 +2578,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
     $scope.id = "provPointController";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
+    $scope.setting = false;
     $scope.$watch('prov.id',function(nvo){
         $scope.coins = (nvo)?listCoins.getCoins():[];
         $scope.pnt = {id:false,cost:"",coin:"",line:"",id_prov: $scope.prov.id||0};
@@ -2853,23 +2969,25 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     $scope.id="condPayList";
     $scope.lines = masterLists.getLines();
     $scope.prov = setGetProv.getProv();
+    $scope.setting = false;
     $scope.$watch('prov.id',function(nvo) {
         $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
         $scope.conditions = setGetProv.getPayCond();//(nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
     });
 
-    $scope.$watch('ctrl.line.id',function(nvo) {
+   /* $scope.$watch('ctrl.line.id',function(nvo) {
         $scope.condHead.line = nvo;
-    });
+    });*/
     $scope.openFormCond = function(){
         setgetCondition.setTitle(cond);
         $mdSidenav("payCond").open();
     };
     var cond = {};
     var currentOrig = {};
-    var saveLimCred = function(onSuccess,onError){
+    var saveLimCred = function(onSuccess,onError,elem){
+        var next = elem || false;
         if((angular.equals(currentOrig,$scope.condHead) && $scope.condHead.id) || ($scope.condHeadFrm.$pristine )){
-            onError();
+            onError(next);
             return false;
         }
 
@@ -2884,14 +3002,11 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
 
             },0);
 
-
-
-
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
                 name:"descartalos",
                 action:function(){
                     $scope.$parent.block="go"
-                    onError();
+                    onError(next);
                     $timeout(function(){
                         prefocus.click();
                         prefocus.focus();
@@ -2904,19 +3019,19 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                     angular.element("[name='condHeadFrm']").find(".ng-invalid").first().focus()
                 }
             }]);
-
+            return false;
         }
 
         if($scope.condHeadFrm.$valid && !$scope.condHeadFrm.$pristine){
             providers.put({type:"saveHeadCond"},$scope.condHead,function(data){
                 $scope.condHead.id = data.id;
                 $scope.condHeadFrm.$setPristine();
+                cond.id = $scope.condHead.id;
                 cond.titulo = $scope.condHead.title;
                 cond.linea_id = $scope.condHead.line;
                 cond.prov_id = $scope.condHead.id_prov;
                 cond.line =  $filter("filterSearch")($scope.lines,[$scope.condHead.line])[0];
                 if(data.action=="new"){
-                    cond.id = $scope.condHead.id;
                     $scope.conditions.unshift(cond);
                     setNotif.addNotif("ok", "nueva condicion de pago", [
                     ],{autohidden:3000});
@@ -2925,7 +3040,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                     ],{autohidden:3000});
                 }
                 setGetProv.addChng($scope.condHead,data.action,"payCond");
-                onSuccess()
+                onSuccess(next)
             });
 
         }else{
@@ -2948,7 +3063,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                 $scope.$parent.expand = false;
             }
             nextfn(elem);
-        })
+        },elem)
 
     };
 
@@ -2981,22 +3096,29 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     };
 
     $scope.toEdit = function(element){
-        cond = element.condition;
-        $scope.condHead.id = cond.id;
-        $scope.condHead.id_prov = cond.prov_id;
-        $scope.condHead.title = cond.titulo;
-        $scope.condHead.line = cond.linea_id;
-        $scope.ctrl.line = cond.line;
-        currentOrig = angular.copy($scope.condHead);
-        setGetProv.addToRllBck($scope.condHead,"payCond")
+        $scope.setting = true;
+        saveLimCred(function(){
+            $scope.openFormCond();
+        },function(cond){
+            $scope.condHead.id = cond.id;
+            $scope.condHead.id_prov = cond.prov_id;
+            $scope.condHead.title = cond.titulo;
+            $scope.condHead.line = cond.linea_id;
+            $scope.ctrl.line = cond.line;
+            currentOrig = angular.copy($scope.condHead);
+            setGetProv.addToRllBck($scope.condHead,"payCond")
+            $timeout(function(){$scope.setting=false;},500)
+        },element.condition);
+
     };
 
     $scope.showGrid = function(elem,event){
-        if((jQuery(event.target).parents("#payCond").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
+        //if((jQuery(event.target).parents("#payCond").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
             if(!elem){
                 saveLimCred(function() {
                     $scope.openFormCond();
                 },function() {
+                    $scope.setting = true;
                     $scope.condHead = {id: false, title: "", line: "", id_prov: $scope.prov.id || 0};
                     cond = {};
                     currentOrig = {};
@@ -3010,20 +3132,22 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
 
                         $scope.condHeadFrm.$setUntouched();
                         $scope.condHeadFrm.$setPristine();
+                        $timeout(function(){$scope.setting=false;},500)
                     },500)
                 })
 
             }else{
                 if(!$scope.isShow){
+                    $scope.setting = true;
                     $scope.condHead.title = $scope.conditions.length+1;
-
                     $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
+                    $timeout(function(){$scope.setting=false;},500)
                 }
 
 
             }
             $scope.isShow = elem;
-        }
+        //}
     };
 
     $scope.viewExtend = function(sel){

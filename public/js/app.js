@@ -1,4 +1,6 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages'/*,'ngSanitize'*/,'clickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages'/*,'ngSanitize'*/,'vlcClickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
+
+
 var MyApp = angular.module('MyApp', dependency, function() {
 
 });
@@ -33,7 +35,7 @@ window.addEventListener("keydown", function(e) {
     // space and arrow keys
 
     if([37, 38, 39, 40,27,9].indexOf(e.keyCode) > -1 ) {
-        if(angular.element(e.target).is("input")) {
+        if(angular.element(e.target).is("input") || angular.element(e.target).is("textarea")) {
             if ([38, 40, 27, 9].indexOf(e.keyCode) > -1){
                 e.preventDefault();
             }
@@ -389,6 +391,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
                 $timeout(function () {
                     angular.element(next).click();
+                    angular.element(":focus").blur();
                     $timeout(function () {
                         if (angular.element(nextFrm[0]).is("md-select")) {
                             angular.element(nextFrm[0]).focus().click();
@@ -403,7 +406,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         } else {
                             angular.element(nextFrm[0]).focus();
                         }
-                    }, 50)
+                    }, 500)
                 }, 0);
             }else{
                 scope.endLayer();
@@ -558,7 +561,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                         if(model.matches.length > 0 && (model.scope.searchText!=undefined && model.scope.searchText != "")){
                             model.scope.selectedItem = model.matches[0];
                         }else{
-                            console.log("waqui")
+
                             model.scope.searchText = undefined;
                         }
                     }
@@ -1275,6 +1278,7 @@ MyApp.controller('ListProv', function ($scope,$http) {
 }*/
 
 /******************* Agregado por miguel, convertidor de date de la base de datos  *******************/
+
 /** obj date javascrip
  * probado con  campo 'datetime' de base de datos
  * @param string del campo

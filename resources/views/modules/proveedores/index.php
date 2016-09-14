@@ -340,7 +340,8 @@
                                 <input skip-tab
                                        info="indique el nombre del proveedor"
                                        ng-disabled="$parent.enabled && prov.id"
-                                       autocomplete="off" ng-blur="check('razon_social')"
+                                       autocomplete="off" 
+                                       ng-blur="check('razon_social')"
                                        duplicate="list"
                                        duplicate-msg="ya existe un proveedor con esta razon social"
                                        field="razon_social"
@@ -393,7 +394,6 @@
                                                  md-search-text="ctrl.searchSend"
                                                  md-items="item in envios | stringKey : ctrl.searchSend: 'nombre' "
                                                  md-item-text="item.nombre"
-              
                                                  md-no-asterisk
                                                  md-min-length="0">
                                     <input >
@@ -479,13 +479,13 @@
                                                  required
                                                  required-match="true"
                                                  info="es facturacion o Almacen?"
+                                                 md-selected-item-change="dir.tipo = ctrl.dirType.id; (!setting)?direccionesForm.$setDirty():true"
                                                  skip-tab
                                                  id="dirType"
                                                  md-search-text="ctrl.searchType"
                                                  ng-disabled="$parent.enabled"
                                                  md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
                                                  md-item-text="item.descripcion"
-
                                                  md-select-on-focus
                                                  md-no-asterisk
                                                  md-min-length=0>
@@ -512,6 +512,7 @@
                                                  require
                                                  require-match="true"
                                                  id="dirPais"
+                                                 md-selected-item-change="dir.pais = ctrl.selPais.id; (!setting)?direccionesForm.$setDirty():true"
                                                  info="indica el pais de la direccion"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCountry"
@@ -636,9 +637,9 @@
 
                             </md-input-container>
 
-                            <div style="height:100%; max-width:200px; width:auto">
-                                <vlc-group>
-                                     <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="lang in languaje | filterSearch: cnt.languaje">
+                            <div style="height:100%; max-width:200px; width:auto; overflow-x: auto;">
+                                <vlc-group style="display:block; height: 100%; width: {{filt.length * 42}}px">
+                                     <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="lang in languaje | filterSearch: cnt.languaje as filt">
                                          {{lang.lang.substring(0,2)}}
                                      </span>
                                 </vlc-group>
@@ -890,7 +891,7 @@
                         <div  class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Nombre del Banco</label>
-                                <input skip-tab name="bankName" autocomplete="off" ng-model="bnk.bankName" required/>
+                                <input skip-tab name="bankName" autocomplete="off" ng-model="bnk.bankName" required ng-disabled = "$parent.enabled"/>
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="20">
@@ -899,11 +900,12 @@
                                                  flex
                                                  id="bankPais"
                                                  info="pais de residencia del contacto (no es el mismo de direcciones)"
+                                                 md-selected-item-change="bnk.pais = ctrl.pais.id; (!setting)?bankInfoController.$setDirty():true"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCountry"
                                                  md-items="item in countries | stringKey : ctrl.searchCountry: 'short_name'"
                                                  md-item-text="item.short_name"
-                                                 require
+                                                 required
                                                  require-match="true"
                                                  md-no-asterisk
                                                  ng-disabled="$parent.enabled"
@@ -929,13 +931,15 @@
                                                  info="estado del pais"
                                                  skip-tab
                                                  md-search-text="ctrl.searchState"
+                                                 md-selected-item-change="bnk.est = ctrl.state.id; (!setting)?bankInfoController.$setDirty():true"
                                                  md-items="item in states | stringKey : ctrl.searchState: 'local_name'"
                                                  md-item-text="item.local_name"
-                                                 require
+                                                 required
                                                  require-match="true"
                                                  md-no-asterisk
                                                  name="state"
-                                                 ng-disabled="$parent.enabled || states.length==0"
+                                                 ng-disabled = "$parent.enabled"
+                                                 ng-readonly="states.length==0"
                                                  md-min-length="0">
                                     <input >
                                     <md-item-template>
@@ -957,13 +961,15 @@
                                                  info="seleccione la ciudad"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCity"
+                                                 md-selected-item-change="bnk.ciudad = ctrl.city.id; (!setting)?bankInfoController.$setDirty():true"
                                                  md-items="item in cities | stringKey : ctrl.searchCity: 'local_name'"
                                                  md-item-text="item.local_name"
-                                                 require
+                                                 required
                                                  require-match="true"
                                                  md-no-asterisk
                                                  name="state"
-                                                 ng-disabled="$parent.enabled || cities.length==0"
+                                                 ng-disabled = "$parent.enabled"
+                                                 ng-readonly="cities.length==0"
                                                  md-min-length="0">
                                     <input >
                                     <md-item-template>
@@ -982,30 +988,30 @@
 
                         <md-input-container class="md-block row">
                             <label>Direccion del banco</label>
-                            <input skip-tab name="bankAddr" autocomplete="off" ng-model="bnk.bankAddr" required/>
+                            <input skip-tab name="bankAddr" autocomplete="off" ng-model="bnk.bankAddr" required ng-disabled = "$parent.enabled"/>
 
                         </md-input-container>
 
                         <div layout="row" class="row">
                             <md-input-container class="md-block row" flex>
                                 <label>Beneficiario</label>
-                                <input skip-tab name="bankBenf" autocomplete="off" ng-model="bnk.bankBenef" required/>
+                                <input skip-tab name="bankBenf" autocomplete="off" ng-model="bnk.bankBenef" required ng-disabled = "$parent.enabled"/>
 
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>SWIF</label>
-                                <input skip-tab name="bankSwif" number autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
+                                <input skip-tab name="bankSwif" alpha autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
 
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>IBAN</label>
-                                <input skip-tab name="bankIban" number autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
+                                <input skip-tab name="bankIban" alpha autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
 
                             </md-input-container>
                         </div>
                         <md-input-container class="md-block row">
                             <label>Direccion Beneficiario</label>
-                            <input skip-tab name="bankBenfAddr" required autocomplete="off" ng-model="bnk.bankBenefAddr" required/>
+                            <input skip-tab name="bankBenfAddr" required autocomplete="off" ng-model="bnk.bankBenefAddr" required ng-disabled = "$parent.enabled"/>
 
                         </md-input-container>
 
@@ -1053,16 +1059,17 @@
                             <div layout="row" class="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>{{(coins.length == filt.length)?'no quedan monedas':'Monedas'}}</label>
-                                    <!--<md-autocomplete md-selected-item="cn.coin"
+                                    <md-autocomplete md-selected-item="ctrl.coin"
                                                      flex
                                                      id="selCoin"
                                                      info="seleccione las monedas"
                                                      skip-tab
-                                                     required
                                                      md-search-text="ctrl.searchCoin"
+                                                     md-selected-item-change="cn.coin = ctrl.coin.id; (!setting)?provMoneda.$setDirty():true"
                                                      md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' | filterSelect: filt"
                                                      md-item-text="item.nombre"
-                                                     md-autoselect = "true"
+                                                     require
+                                                     require-match="true"
                                                      md-no-asterisk
                                                      name="state"
                                                      ng-disabled="(coins.length == filt.length) || $parent.enabled"
@@ -1071,13 +1078,13 @@
                                         <md-item-template>
                                             <span>{{item.nombre}}</span>
                                         </md-item-template>
-                                    </md-autocomplete>-->
-                                    <md-select id="selCoin" ng-model="cn.coin" name="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink info="seleccione las monedas"
+                                    </md-autocomplete>
+                                    <!--<md-select id="selCoin" ng-model="cn.coin" name="state" ng-disabled="(coins.length == filt.length) || $parent.enabled" required md-no-ink info="seleccione las monedas"
                                                skip-tab>
                                         <md-option ng-repeat="coin in coins | filterSelect: filt" value="{{coin.id}}">
                                             {{coin.nombre}}
                                         </md-option>
-                                    </md-select>
+                                    </md-select>-->
                                 </md-input-container>
                                 <div ng-click="createCoin()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom">*</div>
                                 <!--<div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>-->
@@ -1118,6 +1125,7 @@
                                                  id="credCoin"
                                                  info="la moneda para el limite de credito"
                                                  ng-disabled="$parent.enabled || coins.length<1"
+                                                 md-selected-item-change="cred.coin = ctrl.coin.id; (!setting)?provCred.$setDirty():true"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCoin"
                                                  md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' "
@@ -1146,6 +1154,7 @@
                                                  id="credLine"
                                                  info="seleccione una Linea"
                                                  ng-disabled="$parent.enabled || coins.length<1"
+                                                 md-selected-item-change="cred.line = ctrl.line.id; (!setting)?provCred.$setDirty():true"
                                                  skip-tab
                                                  md-search-text="ctrl.searchLine"
                                                  md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
@@ -1224,6 +1233,7 @@
                                                      id="conLine"
                                                      info="seleccione una Linea"
                                                      ng-disabled="$parent.enabled"
+                                                     md-selected-item-change="condHead.line = ctrl.line.id; (!setting)?condHeadFrm.$setDirty():true"
                                                      skip-tab
                                                      md-search-text="ctrl.searchLine"
                                                      md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
@@ -1309,7 +1319,7 @@
                                              skip-tab
                                              id="condItem"
                                              ng-required="(cnt.languaje.length==0)"
-                                             md-item-change="itemCondForm.setDirty();condItem.condit = ctrl.cond.id"
+                                             md-item-change="condItem.condit = ctrl.cond.id;(!ctrl.cond)?itemCondForm.setDirty():true"
                                              info="condicion que aplica"
                                              md-search-text="ctrl.searchCond"
                                              md-items="item in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},] | stringKey : ctrl.searchCond: 'name'"
