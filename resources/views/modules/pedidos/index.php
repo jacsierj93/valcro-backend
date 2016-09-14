@@ -100,7 +100,7 @@
             </div>
 
             <div id="listado" flex  style="overflow-y:auto;"  >
-                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
+                <div class="boxList"  layout="column" flex ng-repeat="item in todos | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
@@ -910,55 +910,152 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER EMAIL ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="email" id="email">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; font-family: Roboto, 'Helvetica Neue', sans-serif;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="email" id="email">
             <!--  ########################################## CONTENDOR  EMAIL ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent">
-                <div  layout="column" flex="" >
-                    <div style="background-color: #0a0a0a; width: 100%; height: 36px; min-height: 36px;">
-                        <div style="margin: 8px; color: white;">Mensaje Nuevo</div>
-                    </div>
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="MailCtrl">
+                <div  layout="column" flex >
+                    <form name="mail" layout="row" flex class="focused">
+                        <div active-left ></div>
+                        <div layout="column" flex>
+                            <div layout="row" >
+                                <div class="titulo_formulario">
+                                    <div>
+                                        Envio de Correo
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start" class="mail-option">
 
-                    <md-chips ng-model="email.destinos"
-                              md-transform-chip="transformChip($chip)"
-                              style="  height: 48px;">
-                        <md-autocomplete
-                            md-search-text="emailToText"
-                            md-items="item in searchEmails(emailToText)"
-                            md-item-text="item.email"
-                            placeholder="Para:">
-                            <span md-highlight-text="direccionesFactsearchText">{{item.email}}</span>
+                                    <div layout="row" style="width: 28px" ng-click=" showHead = !showHead " >
+                                        <span>{{(showHead) ? '/' : '()'}}</span>
+                                    </div>
+                                    <div layout="row" style="width: 20px" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
+                                         Cc
+                                    </div>
+                                    <div layout="row" style="width: 28px" ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
+                                         Cco
+                                    </div>
+                                </div>
+                            </div>
+                            <div  flex layout="column" layout-align="start none">
+                                <div layout="row" class="row">
+                                    <md-switch class="md-primary"
+                                               ng-model="usePersonal">
+                                    </md-switch>
+                                    <div flex style="padding-top: 12px;">
+                                        <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
+                                    </div>
+                                </div>
+                                <md-chips ng-model="to"
+                                          required
+                                          md-transform-chip="transformChip($chip)"
+                                          style="height: inherit;"
+                                          ng-show="showHead "
+                                          md-on-add =" addEmail($chip) "
+                                          md-on-remove =" removeEmail($chip) "
+                                          ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                          >
+                                    <md-autocomplete
+                                        md-search-text="searchDestinos"
+                                        md-items="item in correos  | stringKey : searchDestinos : 'valor' | customFind : destinos : isAddMail "
+                                        md-item-text="item.valor"
+                                        placeholder="Para:">
+                                        <span >{{item.valor}} </span>
 
-                        </md-autocomplete>
 
-                        <md-chip-template>
-                            <strong>{{$chip.email}}</strong>
-                        </md-chip-template>
-                    </md-chips>
-                    <input  ng-model="email.asunto" placeholder="Asunto" style="border-top: 0; border-left: 0; border-right:0 ;">
-                    <div flex layout="column" style="padding: 2px;">
-                        <md-content   >
-                            <div contenteditable
-                                 ng-model="emailText"
-                                 strip-br="true"
-                                 required style="min-height: 20px; width: 100%;"></div>
-                        </md-content>
-                        <div></div>
-                    </div>
 
-                    <div layout="row"
-                         style="background-color: #f5f5f5;width: 100%; min-height: 44px; height: 44px;">
-                        <div  layout="column" layout-align="center center"   style="width: 80px;" ng-click="sendEmail()">
-                            <div class="btn">Enviar</div>
+                                    </md-autocomplete>
+                                    <md-chip-template>
+                                        <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                    </md-chip-template>
+                                </md-chips>
+                                <md-chips ng-model="cc"
+                                          md-transform-chip="transformChip($chip)"
+                                          style="height: inherit;"
+                                          ng-show="(showHead && showCc)"
+                                          md-on-add =" addEmail($chip) "
+                                          md-on-remove =" removeEmail($chip) "
+                                          ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                >
+                                    <md-autocomplete
+                                        md-search-text="searchCc"
+                                        md-items="item in correos | stringKey : searchCc : 'valor' | customFind : destinos : isAddMail  "
+                                        md-item-text="item.valor"
+                                        placeholder="Cc:">
+                                        <span >{{item.valor}} </span>
+
+                                    </md-autocomplete>
+                                    <md-chip-template>
+                                        <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                    </md-chip-template>
+                                </md-chips>
+                                <md-chips ng-model="cco"
+                                          md-transform-chip="transformChip($chip)"
+                                          md-item-text="item.valor"
+                                          style="height: inherit;"
+                                          ng-show="(showHead && showCco)"
+                                          md-on-add =" addEmail($chip) "
+                                          md-on-remove =" removeEmail($chip) "
+                                          ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                >
+                                    <md-autocomplete
+                                        md-search-text="searchCco"
+                                        md-items="item in correos | stringKey : searchCco : 'valor' | customFind : destinos : isAddMail "
+                                        md-item-text="item.valor"
+                                        placeholder="Cco:">
+                                        <span >{{item.valor}} </span>
+                                    </md-autocomplete>
+                                    <md-chip-template>
+                                        <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                    </md-chip-template>
+                                </md-chips>
+                                <div layout="row" class="row-min" style="padding-right: 4px;" ng-show="showHead">
+                                    <md-input-container flex>
+                                        <label>Asunto:</label>
+                                        <input  ng-model="asunto" required >
+                                    </md-input-container>
+                                </div>
+                                <div layout="row" flex class="gridContent">
+                                    <div style="height: 100%; width: 100%; padding: 0 4px 4px 0;" layout="column" >
+                                        <div flex>
+                                            <md-input-container class="md-block" flex >
+                                                <label> Texto</label>
+                                <textarea ng-model="texto"
+                                          id="textarea"
+                                          required
+                                ></textarea>
+
+                                            </md-input-container>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div  layout="column"
-                              layout-align="center center"
-                              class="btnOptEmail">
-                            <div>A</div>
+                    </form>
+                    <div layout="row" layout-align="start center">
+                        <div  class="blue-btn " ng-click="send()" style="width: 80px;  ">
+                            <div layout="row" class="layout-row " aria-hidden="true" style="padding: 3px;">
+                                <div >
+                                    Enviar
+                                </div>
+                            </div>
+                        </div>
+                        <div layout="row" flex class="mail-attaments" layout-align="end center">
+                            <div layout layout-align="center center"  >
+                                A
+                            </div>
+                            <div layout layout-align="center center"  >
+                                A
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </md-content>
         </md-sidenav>
+
+
 
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detalleDoc" id="detalleDoc">
@@ -3934,7 +4031,7 @@
                                     >
                                         <md-autocomplete
                                             md-search-text="emailToText"
-                                            md-items=" item in correosProvider"
+                                            md-items=" item in correosProvider | stringKey : emailToText : 'valor'  "
                                             md-item-text="item.valor"
                                             placeholder="Para:"
                                             id="destinos"

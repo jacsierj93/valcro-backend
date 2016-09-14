@@ -48,6 +48,8 @@ use App\Models\Sistema\Solicitude\SolicitudeAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeItem;
 use Carbon\Carbon;
 use DB;
+use Log;
+
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -3311,17 +3313,24 @@ class OrderController extends BaseController
 
     /*********************************** Email ***********************************/
 
+    public function getEmails (Request $req){
+        $query = ContactField::selectRaw('valor,tbl_proveedor.id, razon_social')->leftJoin('tbl_proveedor','tbl_contacto_campo.prov_id','=','tbl_proveedor.id')->where('campo', 'email');
+        return $query->get();
+    }
+
     public function EmailSummaryDocSolicitude(Request $req){
         $data =$this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
         $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
         return view("emails/modules/Order/Internal/ResumenDoc",$data);
     }
+
     public function EmailSummaryDocOrder(Request $req){
         $data =$this->parseDocToSummaryEmail(Order::findOrFail($req->id));
         $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
 
         return view("emails/modules/Order/Internal/ResumenDoc",$data);
     }
+
     public function EmailSummaryDocPurchase(Request $req){
         $data =$this->parseDocToSummaryEmail(Purchase::findOrFail($req->id));
         $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
@@ -3333,17 +3342,18 @@ class OrderController extends BaseController
         $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
         return view("emails.modules.Order.External.ProviderEstimate", $data);
     }
+
     public function EmailEstimateOrder(Request $req)
     {
         $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
         return view("emails.modules.Order.External.ProviderEstimate", $data);
     }
+
     public function EmailEstimatePurchase(Request $req)
     {
         $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
         return view("emails.modules.Order.External.ProviderEstimate", $data);
     }
-
 
     public function sendSolicitude(Request $req){
 
@@ -3366,6 +3376,7 @@ class OrderController extends BaseController
         $resul['accion']= 'send';
         return $resul;
     }
+
     public function sendOrder(Request $req){
 
         $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
@@ -3384,6 +3395,7 @@ class OrderController extends BaseController
         return $resul;
 
     }
+
     public function sendPurchase(Request $req){
 
         $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
@@ -3398,6 +3410,39 @@ class OrderController extends BaseController
         });
         $resul =[];
         $resul['accion']= 'send';
+    }
+
+    public function sendMail(Request $req){
+        $destinos = [];
+        $adjuntos = [];
+        try {
+        Mail::raw($req->texto, function ($m) use($req, $destinos, $adjuntos){
+            $m->subject($req->asunto);
+            if($req->local){
+                $m->from('systema_valcro@gmail.com');
+            }else{
+                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
+            }
+            foreach($req->to  as $aux){
+                $m->to($aux['valor'],$aux['razon_social']);
+                $destinos=[$aux['valor']];
+            }
+            foreach($req->cc  as $aux){
+                $m->cc($aux['valor'],$aux['razon_social']);
+                $destinos=[$aux['valor']];
+
+            }
+            foreach($req->cco  as $aux){
+                $m->bcc($aux['valor'],$aux['razon_social']);
+                $destinos=[$aux['valor']];
+
+            }
+        });
+        }catch (\Exception $e) {
+            Log::error($e);
+        }
+        $response =['accion'=>'send', 'destinos'=>$req->to[0]['valor']];
+        return $response;
     }
 
     /*********************************** CONTRAPEDIDOS ***********************************/

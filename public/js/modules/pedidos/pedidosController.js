@@ -1069,10 +1069,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
     };
 
-    $scope.openEmail= function(){
-        $scope.LayersAction({open:{name:"email"}});
 
-    };
 
     $scope.newDoc= function(formMode){
 
@@ -1959,8 +1956,21 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
             }},
             {name:"Solo Guardar", action: function(){
-                $scope.LayersAction({close:{first:true, search:true}});
-                filesService.close();
+
+                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+
+                    if (response.success) {
+                        $scope.updateProv();
+                        $scope.NotifAction("ok","Finalizado",[
+                            {name:"Ok",default:2, action: function(){
+                                $scope.LayersAction({close:{first:true, search:true}});
+                                filesService.close();
+
+                            }}
+                        ],{block:true});
+                    }});
+
+
 
             }}
         ],{block:true});
@@ -3779,6 +3789,73 @@ MyApp.controller('OrderMailPreview',['$scope','$mdSidenav','setGetOrder','Order'
 }]);
 
 
+MyApp.controller('MailCtrl',['$scope','SYSTEM','IsEmail','Order', function($scope,SYSTEM,IsEmail, Order){
+    $scope.destinos =[];
+    $scope.cc =[];
+    $scope.cco =[];
+    $scope.correos = [];
+    $scope.transformChip = function(chip) {
+        if (angular.isObject(chip)) {
+            return chip;
+        }
+        if(IsEmail(chip)!= null){
+            return {valor:chip,razon_social:'new'};
+        }
+
+        return null;
+    };
+    $scope.$parent.openEmail= function(){
+        $scope.to =[];
+        $scope.cc =[];
+        $scope.cco =[];
+        $scope.correos = [];
+        $scope.usePersonal= true;
+        $scope.showHead =true;
+
+        $scope.$parent.LayersAction({open:{name:"email", after: function(){
+            Order.query({type:'Emails'},{},function(response){
+                $scope.correos = response;
+                $scope.usePersonal= true;
+                $scope.to =[];
+                $scope.cc =[];
+                $scope.cco =[];
+                $scope.asunto="";
+                $scope.texto="";
+            });
+        }}});
+
+    };
+
+    $scope.addEmail = function(chip){
+        $scope.destinos.push(chip.valor+chip.razon_social);
+        console.log('$scope.destinos',$scope.destinos);
+
+    };
+
+    $scope.removeEmail = function(chip){
+        var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
+        $scope.destinos.splice(index,1);
+    };
+    $scope.isAddMail = function(val){
+            return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
+    };
+
+    $scope.send = function(){
+        if($scope.to.length == 0){
+            $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
+        }
+        else if(!$scope.mail.$valid){
+            $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
+
+        }else{
+            Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
+                $scope.$parent.LayersAction({close:true});
+            });
+        }
+    }
+
+
+}]);
 MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
 
     $scope.accion= Layers.getAccion();
@@ -4217,7 +4294,7 @@ MyApp.service('emails', function(){
         setEmails : function (data){
             email.splice(0,email.length);
             angular.forEach(data, function(v){
-               email.push(v);
+                email.push(v);
             });
         }, clear: function(){
             email.splice(0,email.length);
@@ -4226,15 +4303,15 @@ MyApp.service('emails', function(){
 });
 
 MyApp.service('IsEmail', function() {
-        return function (text){
-            var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}$");
+    return function (text){
+        var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}$");
 
-            if(!reg.test(text)){
-               return null;
-            }
-            return text
+        if(!reg.test(text)){
+            return null;
         }
-  });
+        return text
+    }
+});
 /**
  *
  * Servicio encargado de la realizacion de peticiones del modulo de pedidos
