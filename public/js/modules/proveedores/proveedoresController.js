@@ -117,7 +117,7 @@ MyApp.service("listCoins",function(providers) {
         }
     }
 });
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout,$interval) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout,$interval,saveForm) {
     $scope.expand = false;
     $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
@@ -151,18 +151,19 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     var interval = null;
-    $scope.block=false;
+    $scope.block=saveForm.isBlock();
     $scope.nextLayer = function(to,e){
        $timeout(function(){
-           if($scope.block=="wait"){
+           if(saveForm.isBlock()=="wait"){
                interval = $interval(function(){
-                   if($scope.block=="go"){
+                   if(saveForm.isBlock()=="go"){
                        $interval.cancel(interval);
-                       $scope.block=false;
-                       stepLayer(to,e)
-                   }else if($scope.block=="reject"){
+                       saveForm.setBlock(false);
+                       //stepLayer(to,e)
+                   }else if(saveForm.isBlock()=="reject"){
                        $interval.cancel(interval);
-                       $scope.block=false;
+                       saveForm.setBlock(false);
+                       //$scope.block=false;
                    }
                },500)
            }else{
@@ -201,15 +202,15 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     $scope.prevLayer = function(){
         $timeout(function() {
-            if ($scope.block == "wait") {
+            if (saveForm.isBlock() == "wait") {
                 interval = $interval(function(){
-                    if($scope.block=="go"){
+                    if(saveForm.isBlock()=="go"){
                         $interval.cancel(interval);
-                        $scope.block=false;
+                        saveForm.setBlock(false);
                         //backLayer();
-                    }else if($scope.block=="reject"){
+                    }else if(saveForm.isBlock()=="reject"){
                         $interval.cancel(interval);
-                        $scope.block=false;
+                        saveForm.setBlock(false);
                     }
                 },500)
             }else{
@@ -738,7 +739,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
 });
 //###########################################################################################3
-MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,masterLists,$filter,setNotif,$timeout,$mdSidenav,asignPort)   {
+MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,masterLists,$filter,setNotif,$timeout,$mdSidenav,asignPort,saveForm)   {
     $scope.id = "provAddrsControllers";
     $scope.prov = setGetProv.getProv(); //obtiene en local los datos del proveedor actual
     var dirSel = {};
@@ -771,11 +772,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     });
 
 
-    $scope.openPorts = function(){
-      $mdSidenav("portsLyr").open().then(function(){
-          lryOpen = true;
-      });
-    };
+
 
     /*filter para que funcione el md-autocomplete de tipo de direccion*/
     $scope.filTipo = function(elem,text){
@@ -876,63 +873,45 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     });*/
 
     var saveAddress = function(onSuccess,elem){
-        var next = elem || false;
-        if((angular.equals(currentOrig,$scope.dir) && $scope.dir ) || ($scope.direccionesForm.$pristine )){
-            onSuccess(next);
-            return false;
-        }
-        if(!$scope.direccionesForm.$valid && !$scope.direccionesForm.$pristine){
-            var prefocus = angular.element(":focus");
-            $timeout(function(){
-                angular.element("[name='direccionesForm']").click();
-                $timeout(function(){
-                    angular.element(":focus").blur();
-                })
-
-            },0);
-
-            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
-                name:"descartalos",
-                action:function(){
-                    onSuccess(next);
-                    $timeout(function(){
-                        prefocus.click();
-                        prefocus.focus();
-                    },10)
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.direccionesForm,
+                model:$scope.dir,
+                list:dirSel,
+                save:function(onSuccess,list,next){
+                    dirSel = list;
+                    providers.put({type:"saveProvAddr"},$scope.dir,function(data){
+                        $scope.dir.id = data.id;
+                        setGetProv.addChng($scope.dir,data.action,"dirProv");
+                        $scope.direccionesForm.$setPristine();
+                        dirSel.id = $scope.dir.id;
+                        dirSel.direccion =  $scope.dir.direccProv;
+                        dirSel.tipo_dir=$scope.dir.tipo;
+                        dirSel.tipo=$filter("filterSearch")($scope.tipos,[$scope.dir.tipo])[0];
+                        dirSel.pais_id=$scope.dir.pais;
+                        dirSel.pais=$filter("filterSearch")($scope.paises,[$scope.dir.pais])[0];
+                        dirSel.telefono = $scope.dir.provTelf;
+                        dirSel.ports = $scope.dir.ports;
+                        dirSel.codigo_postal = $scope.dir.zipCode;
+                        if(data.action=="new"){
+                            $scope.address.unshift(dirSel);
+                            setNotif.addNotif("ok", "Nueva Direccion!", [
+                            ],{autohidden:3000});
+                        }else{
+                            //$scope.address.unshift(dirSel);
+                            setNotif.addNotif("ok", "Datos Actualizados", [
+                            ],{autohidden:3000});
+                        }
+                        onSuccess(next);
+                    });
                 }
-            },{
-                name:"dejame Corregirlos",
-                action:function(){
-                    angular.element("[name='direccionesForm']").find(".ng-invalid").first().focus()
-                }
-            }]);
-            return false;
-        }
-
-        providers.put({type:"saveProvAddr"},$scope.dir,function(data){
-            $scope.dir.id = data.id;
-            setGetProv.addChng($scope.dir,data.action,"dirProv");
-            $scope.direccionesForm.$setPristine();
-            dirSel.id = $scope.dir.id;
-            dirSel.direccion =  $scope.dir.direccProv;
-            dirSel.tipo_dir=$scope.dir.tipo;
-            dirSel.tipo=$filter("filterSearch")($scope.tipos,[$scope.dir.tipo])[0];
-            dirSel.pais_id=$scope.dir.pais;
-            dirSel.pais=$filter("filterSearch")($scope.paises,[$scope.dir.pais])[0];
-            dirSel.telefono = $scope.dir.provTelf;
-            dirSel.ports = $scope.dir.ports;
-            dirSel.codigo_postal = $scope.dir.zipCode;
-            if(data.action=="new"){
-                $scope.address.unshift(dirSel);
-                setNotif.addNotif("ok", "Nueva Direccion!", [
-                ],{autohidden:3000});
-            }else{
-                //$scope.address.unshift(dirSel);
-                setNotif.addNotif("ok", "Datos Actualizados", [
-                ],{autohidden:3000});
             }
-            onSuccess(next);
-        });
+        );
+
+        
     };
 
     $scope.rmAddres = function(elem){
@@ -986,11 +965,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
                     }
                 });
             }
-            if(lryOpen){
-                $mdSidenav("portsLyr").close().then(function(){
-                    lryOpen = false;
-                });
-            }
+            
             $timeout(function(){$scope.setting = false;},100)
         //}
     };
@@ -1443,7 +1418,7 @@ MyApp.controller('nomValAssign', function ($scope,setGetProv,valcroNameDetail,$m
     }
 });
 
-MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout) {
+MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,setGetContac,masters,masterLists,$filter,setNotif,$timeout,saveForm) {
     $scope.id = "contactProv";
     $scope.prov = setGetProv.getProv();
     $scope.cnt = setGetContac.getContact();
@@ -1569,7 +1544,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             setNotif.addNotif("alert", "este email ya existe en la libreta de contactos", [
             ],{autohidden:3000});
             if(!$scope.cnt.id){
-                $mdSidenav("contactBook").open();
+                $scope.$parent.openPopUp('contactBook')
             }
             return null;
         }
@@ -1631,72 +1606,47 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var currentOrig = {};
 
     var saveContact = function(onSuccess,elm){
-        var next = elm||false;
-        if((angular.equals(currentOrig,$scope.cnt) && $scope.cnt.id ) || ($scope.provContactosForm.$pristine)){
-            onSuccess(next);
-            return false;
-        }
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elm,
+                form:$scope.provContactosForm,
+                model:$scope.cnt,
+                list:contact,
+                save:function(onSuccess,list,next){
+                    contact = list;
+                    providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
+                        $scope.cnt.id = data.id;
 
-        if(!$scope.provContactosForm.$valid && !$scope.provContactosForm.$pristine){
-            $scope.$parent.block="wait";
-            var prefocus = angular.element(":focus");
+                        contact.id = $scope.cnt.id;
+                        contact.nombre = $scope.cnt.nombreCont;
+                        contact.pais_id = $scope.cnt.pais;
+                        contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
+                        contact.responsabilidades =  $scope.cnt.responsability;
+                        contact.direccion = $scope.cnt.dirOff;
+                        contact.agente = $scope.cnt.isAgent;
+                        contact.prov_id = $scope.cnt.prov_id;
+                        contact.languages = $scope.cnt.languaje;
+                        contact.cargos = $scope.cnt.cargo;
 
-            $timeout(function(){
-                angular.element("[name='provContactosForm']").click();
-                $timeout(function(){
-                    angular.element(":focus").blur();
-                })
+                        if (data.action == "new") {
+                            $scope.cnt.autoSave = false;
+                            $scope.contacts.unshift(contact);
+                            setGetContac.addUpd(contact,angular.copy($scope.prov));
+                            setNotif.addNotif("ok", "contacto añadido", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "contacto Actualizado", [
+                            ],{autohidden:3000});
+                        };
+                        setGetProv.addChng($scope.cnt,data.action,"contProv");
+                        onSuccess(next);
 
-            },0);
-            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
-                name:"descartalos",
-                action:function(){
-                    $scope.$parent.block="go";
-                    onSuccess(next);
-                    $timeout(function(){
-                        prefocus.click();
-                        prefocus.focus();
-                    },10)
-
+                    });
                 }
-            },{
-                name:"dejame Corregirlos",
-                action:function(){
-                    $scope.$parent.block="reject";
-                    angular.element("[name='provContactosForm']").find(".ng-invalid").first().focus()
-                    //console.log($scope.provContactosForm);
-                }
-            }]);
-            return false;
-        }
-        providers.put({type: "saveContactProv"}, $scope.cnt, function (data) {
-            $scope.cnt.id = data.id;
-
-            contact.id = $scope.cnt.id;
-            contact.nombre = $scope.cnt.nombreCont;
-            contact.pais_id = $scope.cnt.pais;
-            contact.pais = $filter("filterSearch")($scope.paises, [$scope.cnt.pais])[0];
-            contact.responsabilidades =  $scope.cnt.responsability;
-            contact.direccion = $scope.cnt.dirOff;
-            contact.agente = $scope.cnt.isAgent;
-            contact.prov_id = $scope.cnt.prov_id;
-            contact.languages = $scope.cnt.languaje;
-            contact.cargos = $scope.cnt.cargo;
-
-            if (data.action == "new") {
-                $scope.cnt.autoSave = false;
-                $scope.contacts.unshift(contact);
-                setGetContac.addUpd(contact,angular.copy($scope.prov));
-                setNotif.addNotif("ok", "contacto añadido", [
-                ],{autohidden:3000});
-            }else{
-                setNotif.addNotif("ok", "contacto Actualizado", [
-                ],{autohidden:3000});
-            };
-            setGetProv.addChng($scope.cnt,data.action,"contProv");
-            onSuccess(next);
-
-        });
+            }
+        );
     };
 
     /*seteado de Cargos para el contacto (tipo departamento nombre valcro*/
@@ -1745,37 +1695,40 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     /*setea el contacto del grid para edicion en el formulario
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
     $scope.toEdit = function(element){
-        saveContact(function(element){
-            $scope.setting = true;
-            contact = element.cont;
-            //console.log(contact)
+        saveContact(function(contact){
+            //$scope.setting = true;
+            console.log("elemento")
+            $scope.provContactosForm.$setUntouched();
+            $scope.provContactosForm.$setPristine();
             contact.prov_id = $scope.prov.id;
             $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[contact.pais_id])[0]
-            // $scope.ctrl['pais'] = contact.country;
             setGetContac.setContact(contact);
             currentOrig = angular.copy($scope.cnt);
             setGetProv.addToRllBck($scope.cnt,"contProv")
-            $timeout(function(){$scope.setting = false;},500)
-        },element)
+
+        },element.cont)
 
     };
 
     /*muestra u oculta la franaj de ver mas en los form, en el click y clickout (focus,focusout)*/
     $scope.showGrid = function(elem,event){
-        $scope.setting = true;
+        //$scope.setting = true;
         //if((jQuery(event.target).parents("#contactBook").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
             if(!elem){
                 saveContact(function(){
+                    console.log("ENTROOOOOOOOOOOO")
+                    $scope.provContactosForm.$setUntouched();
+                    $scope.provContactosForm.$setPristine();
                     contact = {};
                     setGetContac.setContact(false);
                     $scope.ctrl.searchCountry = "";
-                    $scope.provContactosForm.$setUntouched();
-                    $scope.provContactosForm.$setPristine();
+
                     angular.element("#contTelf").find("input").val("");
                     if($scope.$parent.expand==$scope.id){
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     }
+                    //$timeout(function(){$scope.setting = false;},500)
                 });
 
 
@@ -1784,7 +1737,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                     var def = $scope.dirAssign[0];
                     setGetContac.setContact({pais_id:def.pais_id});
                     $scope.ctrl['pais'] = $filter("filterSearch")($scope.paises,[def.pais_id])[0];
-
+                    $timeout(function(){$scope.setting = false;},500)
+                    console.log($scope.provContactosForm)
                 }
             }
             //$timeout(function(){$scope.setting = false;},500)
@@ -1797,11 +1751,6 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
         $scope.$parent.expand =(sel)?"contactProv":false; // setea en "expand" del $scope padre (AppController) con el "$scope.id" asignado a este controller, los demas forma collapsan autoamtico
-    };
-
-    /*abre el sidenav de contactos creados*/
-    $scope.book=function(){
-        $mdSidenav("contactBook").open();
     };
 
 
@@ -2402,7 +2351,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
 
 });
 
-MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout) {
+MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout,saveForm) {
     $scope.id = "convController";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2418,69 +2367,45 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
     });
     var factor = {};
     var currentOrig = {};
+
     var saveConv = function(onSuccess,elem){
-        var next = elem || false;
-        if((angular.equals(currentOrig,$scope.conv) && $scope.conv.id ) || ($scope.provConv.$pristine )){
-            onSuccess(next);
-            return false;
-        }
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.provConv,
+                model:$scope.conv,
+                list:factor,
+                save:function(onSuccess,list,next){
+                    factor = list;
+                    providers.put({type:"saveConv"},$scope.conv,function(data){
+                        $scope.conv.id = data.id;
+                        factor.prov_id = $scope.conv.id_prov
+                        factor.moneda_id = $scope.conv.coin;
+                        factor.moneda = $filter("filterSearch")($scope.coins,[$scope.conv.coin])[0];
+                        factor.flete = $scope.conv.freight ;
+                        factor.gastos = $scope.conv.expens;
+                        factor.ganancia = $scope.conv.gain;
+                        factor.descuento = $scope.conv.disc;
+                        factor.linea_id = $scope.conv.line;
+                        factor.linea = $scope.ctrl.line;
+                        if(data.action=="new"){
+                            factor.id =  $scope.conv.id;
+                            $scope.factors.unshift(factor);
+                            setNotif.addNotif("ok", "factor creado", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "factor Actualizado", [
+                            ],{autohidden:3000});
+                        }
+                        setGetProv.addChng($scope.conv,data.action,"factConv");
+                        onSuccess(next);
 
-        if(!$scope.provConv.$valid && !$scope.provConv.$pristine){
-            var prefocus = angular.element(":focus");
-
-            $scope.$parent.block="wait";
-            $timeout(function(){
-                angular.element("[name='provConv']").click();
-                $timeout(function(){
-                    angular.element(":focus").blur();
-                })
-
-            },0);
-            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
-                name:"descartalos",
-                action:function(){
-                    $scope.$parent.block="go";
-                    onSuccess(next);
-                    $timeout(function(){
-                        prefocus.click();
-                        prefocus.focus();
-                    },10)
+                    });
                 }
-            },{
-                name:"dejame Corregirlos",
-                action:function(){
-                    $scope.$parent.block="reject";
-                    angular.element("[name='provConv']").find(".ng-invalid").first().focus();
-                }
-            }]);
-            return false;
-        }
-
-        providers.put({type:"saveConv"},$scope.conv,function(data){
-            $scope.conv.id = data.id;
-
-            factor.prov_id = $scope.conv.id_prov
-            factor.moneda_id = $scope.conv.coin;
-            factor.moneda = $filter("filterSearch")($scope.coins,[$scope.conv.coin])[0];
-            factor.flete = $scope.conv.freight ;
-            factor.gastos = $scope.conv.expens;
-            factor.ganancia = $scope.conv.gain;
-            factor.descuento = $scope.conv.disc;
-            factor.linea_id = $scope.conv.line;
-            factor.linea = $filter("filterSearch")($scope.lines,[$scope.conv.line])[0];
-            if(data.action=="new"){
-                factor.id =  $scope.conv.id;
-                $scope.factors.unshift(factor);
-                setNotif.addNotif("ok", "factor creado", [
-                ],{autohidden:3000});
-            }else{
-                setNotif.addNotif("ok", "factor Actualizado", [
-                ],{autohidden:3000});
             }
-            setGetProv.addChng($scope.conv,data.action,"factConv");
-            onSuccess(next);
-
-        });
+        )
     };
     $scope.rmConv = function(elem){
         setNotif.addNotif("alert", "desea eliminar este Factor de conversion", [
@@ -2532,10 +2457,10 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
 
     $scope.showGrid = function(elem,event){
         //if((angular.element(event.target).parents("#lyrAlert").length==0) && (angular.element(event.target).parents(".popUp").length==0)) {
-        $scope.setting=true;
+        //$scope.setting=true;
         if(!elem) {
             saveConv(function(){
-
+                setting=true;
                 $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
 
                 factor = {};
@@ -2558,9 +2483,9 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
 
         }else{
             if(!$scope.isShow){
-                //$scope.setting=true;
+                $scope.setting=true;
                 $scope.conv.line = 0;
-                $timeout(function(){$scope.setting=false;},500)
+                $timeout(function(){$scope.setting=false;},1000)
             }
         }
         $scope.isShow = elem;
@@ -2574,7 +2499,7 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
 
 });
 
-MyApp.controller('provPointController', function ($scope,providers,setGetProv,listCoins,masterLists,$filter,setNotif,$timeout) {
+MyApp.controller('provPointController', function ($scope,providers,setGetProv,listCoins,masterLists,$filter,setNotif,$timeout,saveForm) {
     $scope.id = "provPointController";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2587,50 +2512,44 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
 
     var point = {};
     var currentOrig = {};
-    var savePoint = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.pnt) && $scope.pnt ) || ($scope.provPoint.$pristine )){
-            onSuccess();
-            return false;
-        }
+    var savePoint = function(onSuccess,elem)    {
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.provPoint,
+                model:$scope.pnt,
+                list:point,
+                save:function(onSuccess,list,next){
+                    point = list;
+                    providers.put({type:"savePoint"},$scope.pnt,function(data){
+                        $scope.pnt.id = data.id;
 
-        if(!$scope.provPoint.$valid && !$scope.provPoint.$pristine){
-            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
-                name:"descartalos",
-                action:function(){
-                    onSuccess();
+                        point.moneda_id = $scope.pnt.coin;
+                        point.prov_id = $scope.pnt.id_prov;
+                        point.costo = $scope.pnt.cost;
+                        point.linea_id = $scope.pnt.line;
+                        point.moneda = $filter("filterSearch")($scope.coins,[$scope.pnt.coin])[0];
+                        point.linea = $filter("filterSearch")($scope.lines,[$scope.pnt.line])[0];
+                        if(data.action=="new"){
+                            point.id = $scope.pnt.id;
+                            $scope.points.unshift(point);
+                            setNotif.addNotif("ok", "nuevo valor del punto guardado", [
+                            ],{autohidden:3000});
+
+                        }else{
+                            setNotif.addNotif("ok", "Punto Actualizado", [
+                            ],{autohidden:3000});
+                        }
+                        currentOrig = {};
+                        setGetProv.addChng($scope.pnt,data.action,"point");
+                        onSuccess();
+                    });
                 }
-            },{
-                name:"dejame Corregirlos",
-                action:function(){
-                    //console.log($scope.provPoint);
-                }
-            }]);
-            return false;
-        }
-
-        providers.put({type:"savePoint"},$scope.pnt,function(data){
-            $scope.pnt.id = data.id;
-
-            point.moneda_id = $scope.pnt.coin;
-            point.prov_id = $scope.pnt.id_prov;
-            point.costo = $scope.pnt.cost;
-            point.linea_id = $scope.pnt.line;
-            point.moneda = $filter("filterSearch")($scope.coins,[$scope.pnt.coin])[0];
-            point.linea = $filter("filterSearch")($scope.lines,[$scope.pnt.line])[0];
-            if(data.action=="new"){
-                point.id = $scope.pnt.id;
-                $scope.points.unshift(point);
-                setNotif.addNotif("ok", "nuevo valor del punto guardado", [
-                ],{autohidden:3000});
-
-            }else{
-                setNotif.addNotif("ok", "Punto Actualizado", [
-                ],{autohidden:3000});
             }
-            currentOrig = {};
-            setGetProv.addChng($scope.pnt,data.action,"point");
-            onSuccess();
-        });
+        );
+
 
     };
 
@@ -2663,16 +2582,19 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
     };
 
     $scope.toEdit = function(element){
-        point = element.point;
-        $scope.pnt.id = point.id;
-        $scope.pnt.coin = point.moneda_id;
-        $scope.pnt.id_prov = point.prov_id;
-        $scope.pnt.cost = point.costo;
-        $scope.pnt.line = point.linea_id;
-        $scope.ctrl.coin = point.moneda;
-        $scope.ctrl.line = point.linea;
-        currentOrig = angular.copy($scope.pnt);
-        setGetProv.addToRllBck($scope.pnt,"factConv")
+        //point = element.point;
+        savePoint(function(point){
+            $scope.pnt.id = point.id;
+            $scope.pnt.coin = point.moneda_id;
+            $scope.pnt.id_prov = point.prov_id;
+            $scope.pnt.cost = point.costo;
+            $scope.pnt.line = point.linea_id;
+            $scope.ctrl.coin = point.moneda;
+            $scope.ctrl.line = point.linea;
+            currentOrig = angular.copy($scope.pnt);
+            setGetProv.addToRllBck($scope.pnt,"factConv")
+        },element.point)
+
     };
 
     $scope.showGrid = function(elem,event){
@@ -2711,7 +2633,7 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
     };
 });
 
-MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,masterLists,$filter,setNotif,$timeout) {
+MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,masterLists,$filter,setNotif,$timeout,saveForm) {
     $scope.id = 'prodTimeController';
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2725,8 +2647,40 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
     var time = {};
     var currentOrig = {};
 
-    var saveTimeProd = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.tp) && $scope.tp ) || ($scope.timeProd.$pristine )){
+    var saveTimeProd = function(onSuccess,elem){
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.timeProd,
+                model:$scope.tp,
+                list:time,
+                save:function(onSuccess,list,next){
+                    time = list;
+                    providers.put({type:"saveProdTime"},$scope.tp,function(data){
+                        $scope.tp.id = data.id;
+                        $scope.timeProd.$setPristine();
+                        time.min_dias = $scope.tp.from;
+                        time.max_dias = $scope.tp.to;
+                        time.linea_id = $scope.tp.line;
+                        time.lines =  $filter("filterSearch")($scope.lines,[$scope.tp.line])[0];
+                        if(data.action=="new"){
+                            time.id = $scope.tp.id;
+                            $scope.timesP.unshift(time);
+                            setNotif.addNotif("ok", "nuevo tiempo de produccion", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "tiempo de produccion actualizado", [
+                            ],{autohidden:3000});
+                        }
+                        setGetProv.addChng($scope.tp,data.action,"timeProd");
+                        onSuccess(next);
+                    });
+                }
+            }
+        );
+        /*if((angular.equals(currentOrig,$scope.tp) && $scope.tp ) || ($scope.timeProd.$pristine )){
             onSuccess();
             return false;
         }
@@ -2764,18 +2718,21 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
             }
             setGetProv.addChng($scope.tp,data.action,"timeProd");
             onSuccess();
-        });
+        });*/
     };
 
     $scope.toEdit = function(element){
-        time = element.time;
-        $scope.tp.id = time.id;
-        $scope.tp.id_prov = time.prov_id;
-        $scope.tp.from = time.min_dias;
-        $scope.tp.to = time.max_dias;
-        $scope.tp.line = time.linea_id;
-        currentOrig = angular.copy($scope.tp);
-        setGetProv.addToRllBck($scope.tp,"timeProd")
+        //time = element.time;
+        saveTimeProd(function(){
+            $scope.tp.id = time.id;
+            $scope.tp.id_prov = time.prov_id;
+            $scope.tp.from = time.min_dias;
+            $scope.tp.to = time.max_dias;
+            $scope.tp.line = time.linea_id;
+            currentOrig = angular.copy($scope.tp);
+            setGetProv.addToRllBck($scope.tp,"timeProd")
+        },element.time)
+
     };
 
     $scope.showGrid = function(elem,event){
@@ -2830,91 +2787,54 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     var time = {};
     var currentOrig = {};
     var exeption = false;
-    var saveTimeTrans = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.ttr) && $scope.ttr ) || ($scope.timeTrans.$pristine )){
-            onSuccess();
-            return false;
-        }
+    var saveTimeTrans = function(onSuccess,elem){
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.timeTrans,
+                model:$scope.ttr,
+                list:time,
+                save:function(onSuccess,list,next){
+                    time = list;
+                    providers.put({type:"saveTransTime"},$scope.ttr,function(data){
+                        $scope.ttr.id = data.id;
+                        $scope.timeTrans.$setPristine();
+                        time.min_dias = $scope.ttr.from;
+                        time.max_dias = $scope.ttr.to;
+                        time.id_pais = $scope.ttr.country;
+                        time.country =  $filter("filterSearch")(paises,[$scope.ttr.country])[0];
+                        if(data.action=="new"){
+                            time.id = $scope.ttr.id;
+                            $scope.timesT.unshift(time);
+                            setNotif.addNotif("ok", "nuevo tiempo de Transito", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "se ha actualizado el Tiempo de Transito", [
+                            ],{autohidden:3000});
+                        }
+                        setGetProv.addChng($scope.ttr,data.action,"timeTrans");
+                        onSuccess(next);
 
-        if(!$scope.timeTrans.$valid && !$scope.timeTrans.$pristine){
-            var prefocus = angular.element(":focus");
-
-            $timeout(function(){
-                angular.element("[name='timeTrans']").click();
-                $timeout(function(){
-                    angular.element(":focus").blur();
-                })
-
-            },0);
-            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??",[{
-                name:"descartalos",
-                action:function(){
-                    onSuccess();
-                    $timeout(function(){
-                        prefocus.click();
-                        prefocus.focus();
-                    },10)
-
+                    });
                 }
-            },{
-                name:"dejame Corregirlos",
-                action:function(){
-                    angular.element("[name='timeTrans']").find(".ng-invalid").first().focus()
-                }
-            }]);
-            return false;
-        }
-
-        if($scope.ttr.from >= $scope.ttr.to && (parseInt($scope.ttr.from>=0) && parseInt($scope.ttr.to>=0)) && !exeption){
-            setNotif.addNotif("alert", "tal ves quisiste decir de: "+$scope.ttr.to+" a "+$scope.ttr.from,[{
-                name:"si, cambialos",
-                action:function(){
-                    var aux = $scope.ttr.to;
-                    $scope.ttr.to = $scope.ttr.from;
-                    $scope.ttr.from = aux;
-                    saveTimeTrans();
-                }
-            },{
-                name:"No, esta bien asi",
-                action:function(){
-                    exeption = true;
-                    saveTimeTrans(onSuccess);
-                }
-            }]);
-            return false;
-        }
-
-        providers.put({type:"saveTransTime"},$scope.ttr,function(data){
-            $scope.ttr.id = data.id;
-            $scope.timeTrans.$setPristine();
-            time.min_dias = $scope.ttr.from;
-            time.max_dias = $scope.ttr.to;
-            time.id_pais = $scope.ttr.country;
-            time.country =  $filter("filterSearch")(paises,[$scope.ttr.country])[0];
-            if(data.action=="new"){
-                time.id = $scope.ttr.id;
-                $scope.timesT.unshift(time);
-                setNotif.addNotif("ok", "nuevo tiempo de Transito", [
-                ],{autohidden:3000});
-            }else{
-                setNotif.addNotif("ok", "se ha actualizado el Tiempo de Transito", [
-                ],{autohidden:3000});
             }
-            setGetProv.addChng($scope.ttr,data.action,"timeTrans");
-            onSuccess();
+        );
 
-        });
     };
 
     $scope.toEdit = function(element){
-        time = element.time;
-        $scope.ttr.id = time.id;
-        $scope.ttr.id_prov = time.prov_id;
-        $scope.ttr.from = time.min_dias;
-        $scope.ttr.to = time.max_dias;
-        $scope.ttr.country = time.id_pais;
-        currentOrig = angular.copy($scope.ttr);
-        setGetProv.addToRllBck($scope.ttr,"timeTrans")
+        saveTimeTrans(function (){
+            $scope.ttr.id = time.id;
+            $scope.ttr.id_prov = time.prov_id;
+            $scope.ttr.from = time.min_dias;
+            $scope.ttr.to = time.max_dias;
+            $scope.ttr.country = time.id_pais;
+            currentOrig = angular.copy($scope.ttr);
+            setGetProv.addToRllBck($scope.ttr,"timeTrans")
+        },element.time)
+
     };
 
     $scope.showGrid = function(elem,event){
@@ -3293,8 +3213,37 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
         setGetProv.addToRllBck($scope.lp,"priceList")
     };
 
-    var saveList = function(onSuccess){
-        if((angular.equals(currentOrig,$scope.lp) && $scope.lp ) || ($scope.provPrecList.$pristine )){
+    var saveList = function(onSuccess,elem){
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.provPrecList,
+                model:$scope.lp,
+                list:list,
+                save:function(onSuccess,list,next){
+                    list = list;
+                    providers.put({type:"savePriceList"},$scope.lp,function(data){
+                        $scope.lp.id = data.id;
+                        list.referencia=$scope.lp.ref;
+                        if(data.action=="new"){
+                            list.id = $scope.lp.id;
+                            $scope.lists.unshift(list);
+                            setNotif.addNotif("ok", "lista de precios cargada", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "se modifico la lista de precios", [
+                            ],{autohidden:3000});
+                        }
+                        setGetProv.addChng($scope.lp,data.action,"priceList");
+                        onSuccess();
+                    });
+                }
+            }
+        );
+
+        /*if((angular.equals(currentOrig,$scope.lp) && $scope.lp ) || ($scope.provPrecList.$pristine )){
             onSuccess();
             return false;
         }
@@ -3344,7 +3293,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
             }
             setGetProv.addChng($scope.lp,data.action,"priceList");
             onSuccess();
-        });
+        });*/
     };
 
 
@@ -3516,3 +3465,101 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
     };
      //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
  });
+
+MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
+    var foreign = {
+        currentOrig : {},
+        onSuccess : null,
+        onFail:null,
+        elem:{},
+        form:null,
+        model:null,
+        saveFn : null,
+        elList : {}
+    };
+    var block = false;
+    var next = false;
+    var genericSave = function() {
+        next = foreign.elem || false;
+
+        if ((angular.equals(foreign.currentOrig, foreign.model) && foreign.model.id ) || (foreign.form.$pristine )) {
+            if(foreign.onFail){
+                foreign.onFail(next);
+            }else{
+                foreign.onSuccess(next);
+            }
+            return false;
+        }
+
+        if (!foreign.form.$valid && !foreign.form.$pristine) {
+            var prefocus = angular.element(":focus");
+            block = "wait";
+            $timeout(function () {
+                angular.element("[name='"+foreign.form.$name+"']").click();
+                $timeout(function () {
+                    angular.element(":focus").blur();
+                })
+
+            }, 0);
+            setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??", [{
+                name: "descartalos",
+                action: function () {
+                    block = "go";
+                    if(foreign.onFail){
+                        foreign.onFail(next);
+                    }else{
+                        foreign.onSuccess(next);
+                    }
+                    $timeout(function () {
+                        if(!next){
+                            prefocus.click();
+                        }
+                        prefocus.focus();
+                    }, 10)
+                    $timeout(function(){block=false;},400)
+                }
+            }, {
+                name: "dejame Corregirlos",
+                action: function () {
+                    block = "reject";
+                    angular.element("[name='"+foreign.form.$name+"']").find(".ng-invalid").first().focus();
+                    $timeout(function(){block=false;},400)
+                }
+
+            }]);
+            return false;
+
+
+
+        }
+        foreign.saveFn(foreign.onSuccess,foreign.elList,next);
+    }
+
+    return {
+        execute:function(param){
+            if(!block){
+                foreign.currentOrig = param.orig;
+                foreign.onSuccess = param.success;
+                foreign.onFail = param.fail || null;
+                foreign.elem = param.elem;
+                foreign.form = param.form;
+                foreign.model = param.model;
+                foreign.saveFn = param.save;
+                foreign.elList = param.list;
+                genericSave();
+            }
+
+        },
+
+        isBlock : function(){
+            return block;
+        },
+        setBlock:function(valor){
+            block = valor;
+        }
+    }
+});
+
+
+
+

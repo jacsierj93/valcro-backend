@@ -479,7 +479,7 @@
                                                  required
                                                  required-match="true"
                                                  info="es facturacion o Almacen?"
-                                                 md-selected-item-change="dir.tipo = ctrl.dirType.id; (!setting)?direccionesForm.$setDirty():true"
+                                                 md-selected-item-change="dir.tipo = ctrl.dirType.id"
                                                  skip-tab
                                                  id="dirType"
                                                  md-search-text="ctrl.searchType"
@@ -512,7 +512,7 @@
                                                  require
                                                  require-match="true"
                                                  id="dirPais"
-                                                 md-selected-item-change="dir.pais = ctrl.selPais.id; (!setting)?direccionesForm.$setDirty():true"
+                                                 md-selected-item-change="dir.pais = ctrl.selPais.id"
                                                  info="indica el pais de la direccion"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCountry"
@@ -540,7 +540,7 @@
                             </md-input-container>
                             <div style="width:100px; padding: 3px;" ng-show="dir.tipo==2 || dir.tipo==3">
                                 <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">puertos</span>
-                                <div ng-click="openPorts()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
+                                <div ng-click="$parent.openPopUp('portsLyr')" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
                                     {{dir.ports.length || 0}}
                                 </div>
                             </div>
@@ -610,14 +610,14 @@
                                 <label>Nombre y Apellido</label>
                                 <input skip-tab info="Nombre del contacto" autocomplete="off" ng-disabled="$parent.enabled || cnt.isAgent==1" name="nombreCont" maxlength="55" ng-minlength="3" required md-no-asterisk ng-model="cnt.nombreCont" >
                             </md-input-container>
-                            <div ng-click="book()" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom"> A </div>
+                            <div ng-click="$parent.openPopUp('contactBook')" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom"> A </div>
 
                             <md-input-container class="md-block" flex="25">
                                 <label>Pais de Residencia</label>
                                 <md-autocomplete md-selected-item="ctrl.pais"
                                                  flex
                                                  id="paisCont"
-                                                 md-selected-item-change="cnt.pais = ctrl.pais.id; (!setting)?provContactosForm.$setDirty():true;"
+                                                 md-selected-item-change="cnt.pais = ctrl.pais.id;"
                                                  info="pais de residencia del contacto (no es el mismo de direcciones)"
                                                  skip-tab
                                                  required
@@ -784,7 +784,7 @@
                 </div>
             </md-content>
         </md-sidenav>
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="contactBook" id="contactBook" click-out="closePopUp('contactBook',$event)">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addressBook">
                 <input type="hidden" md-autofocus>
                 <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
@@ -805,12 +805,12 @@
                 </div>
             </md-content>
         </md-sidenav>
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="portsLyr" id="portsLyr">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="portsLyr" id="portsLyr" click-out="closePopUp('portsLyr',$event)">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="portsControllers">
                 <input type="hidden" md-autofocus>
                 <div layout="column" flex style="overflow-x: hidden;">
                     <div class="titulo_formulario" layout="column" layout-align="start start">
-                        <div ng-click="closeNomValLyr()">
+                        <div>
                             Puertos
                         </div>
                     </div>
@@ -1555,7 +1555,7 @@
                                     <md-autocomplete md-selected-item="ctrl.coin"
                                                      flex
                                                      id="pointCoin"
-                                                     md-selected-item-change="provPoint.$setDirty();pnt.coin = ctrl.coin.id"
+                                                     md-selected-item-change="pnt.coin = ctrl.coin.id"
                                                      info="moneda del punto"
                                                      skip-tab
                                                      required
@@ -1584,7 +1584,7 @@
                                     <md-autocomplete md-selected-item="ctrl.line"
                                                      flex
                                                      id="pointLine"
-                                                     md-selected-item-change="provPoint.$setDirty();pnt.line = ctrl.line.id"
+                                                     md-selected-item-change="pnt.line = ctrl.line.id"
                                                      info="linea a la cual aplica este punto"
                                                      skip-tab
                                                      required
@@ -1600,11 +1600,6 @@
                                         <md-item-template>
                                             <span>{{item.linea}}</span>
                                         </md-item-template>
-                                   <!-- <md-select id="pointLine" skip-tab ng-model="pnt.line" ng-disabled="$parent.enabled" required md-no-ink>
-                                        <md-option ng-repeat="line in lines" value="{{line.id}}">
-                                            {{line.linea}}
-                                        </md-option>
-                                    </md-select>-->
                                 </md-input-container>
                             </div>
                             <div layout="column" ng-show="isShow && !isShowMore && points.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1636,7 +1631,6 @@
                         </div>
                     </div>
                 </form>
-                <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
 
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
                 <form name="timeProd" layout="row" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id}" click-out="showGrid(false,$event)">
@@ -1663,7 +1657,7 @@
                                 <md-autocomplete md-selected-item="ctrl.line"
                                                  flex
                                                  id="timePLine"
-                                                 md-selected-item-change="timeProd.$setDirty();tp.line = ctrl.line.id"
+                                                 md-selected-item-change="tp.line = ctrl.line.id"
                                                  info="linea a cual aplica este tiempo de produccion"
                                                  skip-tab
                                                  required
@@ -1671,7 +1665,6 @@
                                                  md-search-text="ctrl.searchLine"
                                                  md-items="item in lines | stringKey : ctrl.searchLine: 'linea'"
                                                  md-item-text="item.linea"
-
                                                  md-no-asterisk
                                                  ng-disabled="$parent.enabled"
                                                  md-min-length="0">
@@ -1679,11 +1672,7 @@
                                     <md-item-template>
                                         <span>{{item.linea}}</span>
                                     </md-item-template>
-                                <!--<md-select id="timePLine" skip-tab ng-disabled="$parent.enabled" ng-model="tp.line" name="state" ng-disabled="$parent.enabled" md-no-ink>
-                                    <md-option ng-repeat="line in lines" value="{{line.id}}">
-                                        {{line.linea}}
-                                    </md-option>
-                                </md-select>-->
+
                             </md-input-container>
                         </div>
                         <div layout="column" ng-show="isShow && !isShowMore && timesP.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1734,21 +1723,19 @@
                                     <label>A (Dias)</label>
                                     <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to" required>
                                 </md-input-container>
-
                                 <md-input-container class="md-block" flex>
                                     <label>Pais</label>
                                     <md-autocomplete md-selected-item="ctrl.pais"
                                                      flex
                                                      id="paistimeP"
                                                      info="pais de residencia del contacto (no es el mismo de direcciones)"
-                                                     md-selected-item-change="timeTrans.$setDirty();ttr.country = ctrl.pais.id"
+                                                     md-selected-item-change="ttr.country = ctrl.pais.id"
                                                      skip-tab
                                                      required
                                                      md-require-match="true"
                                                      md-search-text="ctrl.searchCountry"
                                                      md-items="item in provCountries | stringKey : ctrl.searchCountry: 'short_name'"
                                                      md-item-text="item.short_name"
-
                                                      md-no-asterisk
                                                      ng-disabled="$parent.enabled"
                                                      md-min-length="0">
@@ -1757,11 +1744,7 @@
                                             <span>{{item.short_name}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
-                                    <!--<md-select id="paistimeP" skip-tab ng-disabled="$parent.enabled" ng-model="ttr.country" name="state" ng-disabled="$parent.enabled" md-no-ink required>
-                                        <md-option ng-repeat="country in provCountries" value="{{country.pais.id}}">
-                                            {{country.pais.short_name}}
-                                        </md-option>
-                                    </md-select>-->
+
                                 </md-input-container>
                             </div>
                             <div layout="column" ng-show="isShow && !isShowMore && timesT.length>0" class="showMoreDiv" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1809,11 +1792,7 @@
                                     {{lp.adjs.length || 0}}
                                 </div>
                             </div>
-                            <!--<md-input-container class="md-block" flex="20" ng-click="openAdj()">
-                                <label>Archivo</label>
 
-                                <input autocomplete="off" ng-disabled="$parent.enabled" ng-model="lp.file">
-                            </md-input-container>-->
                         </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && lists.length>0" class="row" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
