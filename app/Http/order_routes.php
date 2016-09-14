@@ -22,7 +22,9 @@ $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); //
 //otros modulos
 $app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountry'); ///obtiene las direcciones de facturacion
 $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry'); ///obtiene las direcciones de almacen
-$app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene las direcciones de almacen
+$app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene los correo de un proveedor
+$app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
+$app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///obtiene todos los correos
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated
