@@ -5,14 +5,14 @@
     <table style="border-spacing: 0px;margin: auto;padding: 0;width: 600px;">
         <tbody>
         <tr style="margin: 0;padding: 0px">
-            <td height="5" width="5" style="color: rgb(140,140,140);margin: 0;padding: 0; background-image: url('http://valcro.com.ve/mailer/images/sdw_top_left.jpg)')"></td>
-            <td height="5" style="color: rgb(140,140,140);background: repeat-x;margin: 0;padding: 0; background-image: url('http://valcro.com.ve/mailer/images/sdw_top_center.jpg')" ></td>
+            <td height="5" width="5" style="color: rgb(140,140,140);margin: 0;padding: 0;"></td>
+            <td height="5" style="color: rgb(140,140,140);background: repeat-x;margin: 0;padding: 0; " ></td>
             <td height="5" width="5" style="color: rgb(140,140,140);margin: 0;padding: 0;background-image: url('http://valcro.com.ve/mailer/images/sdw_top_right.jpg)')" ></td>
         </tr>
         <tr style="margin: 0;padding: 0px">
             <td width="5" style="color: rgb(140,140,140);background: repeat-y;margin: 0;padding: 0; background-image: url('http://valcro.com.ve/mailer/images/sdw_left_center.jpg')"></td>
             <td style="color: rgb(140,140,140);margin: 0;padding: 0px">
-                <table style="">
+                <table style="width: 100%;">
                     <tbody>
                     <tr style="margin: 0;padding: 0px">
                         <td style="color: rgb(140,140,140);margin: 0;padding: 12px">
@@ -37,7 +37,7 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
+                                            <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                                 {{$texto}}
                                             </p>
                                         </td>
@@ -49,7 +49,7 @@
                                     <tbody>
                                     <tr>
                                         <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;">
+                                            <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;">
                                                 {{$titulo}}
                                             </p>
                                         </td>
@@ -90,9 +90,9 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding: 0 0 0 8px ;border-top: 1px solid #e8e8e8">
                                     <tbody>
                                     <tr style="color: rgb(140,140,140); height: 32px;font-weight: bold;">
-                                        <td>Codigo </td>
-                                        <td>Descripcion</td>
-                                        <td>Cantidad</td>
+                                        <td style="text-align: left;">Codigo </td>
+                                        <td style="text-align: left;">Descripcion</td>
+                                        <td style="text-align: left;">Cantidad</td>
                                     </tr>
                                     @for ($i = 0; $i < sizeof($articulos); $i++)
                                         <tr style="height: 32px;font-weight: normal; font-size: 13px; @if($i % 2 == 0)  color: #000000;background: rgb(241,241,241) @endif">

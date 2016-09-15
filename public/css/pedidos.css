@@ -275,7 +275,6 @@ md-sidenav .md-sidenav-right.md-locked-open{
 
 
 .docButton{
-    width: 94px;
     margin: 2px;
     /*background-color: aliceblue;*/
 }
@@ -359,7 +358,25 @@ md-sidenav .md-sidenav-right.md-locked-open{
     border-bottom: solid 1px rgb(84, 180, 234);
 }
 .row-min{
-    height: 30px; ;
+    height: 30px;
+}
+
+.text-box{
+    padding: 8px 4px 0 0;
+    overflow-y: auto;
+    margin-bottom: 4px;
+}
+
+.text-box > div{
+    height: 100%; width: 100%;
+    padding: 0 4px 4px 0;
+}
+
+.text-box > div > textarea{
+    border: none;
+    height: 100%;
+    width: 100%;
+    resize: none
 }
 
 md-autocomplete{

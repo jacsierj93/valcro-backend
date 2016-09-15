@@ -24,7 +24,7 @@ $app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountr
 $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry'); ///obtiene las direcciones de almacen
 $app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene los correo de un proveedor
 $app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
-$app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///obtiene todos los correos
+$app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el correo
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated

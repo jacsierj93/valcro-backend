@@ -993,18 +993,31 @@ class OrderController extends BaseController
      **/
     public function addAttachmentsSolicitude (Request $req){
         $resul= array();
-        $model = Solicitude::findOrFail($req->id);
         $attacs= array();
+        $id=null;
+        if(!$req->has('id')){
+            if($req->has('tempId')){
+                $id= $req->tempId;
+            }else{
+                $id=uniqid('', true);
+            }
+        }
         foreach($req->adjuntos  as $aux){
             $attac=  new SolicitudeAttachment();
             $attac->archivo_id = $aux['id'];
-            $attac->doc_id = $model->id;
+            $attac->uid= $id;
+            if($req->has('id')){
+                $attac->doc_id = $req->id;
+            }
             $attac->documento = strtoupper($aux['documento']);
+            $attac->save();
             $attacs[]= $attac;
+
         }
+
         $resul['accion']= "new";
         $resul['items']= $attacs;
-        $resul['response']= $model->attachments()->saveMany($attacs);
+        $resul['id']=$id;
         return $resul;
     }
 
@@ -1013,18 +1026,29 @@ class OrderController extends BaseController
      **/
     public function addAttachmentsOrder(Request $req){
         $resul= array();
-        $model = Order::findOrFail($req->id);
+        $id=null;
         $attacs= array();
+
+        if(!$req->has('id')){
+            if($req->has('tempId')){
+                $id= $req->tempId;
+            }else{
+                $id=uniqid('', true);
+            }
+        }
         foreach($req->adjuntos  as $aux){
             $attac=  new OrderAttachment();
             $attac->archivo_id = $aux['id'];
-            $attac->doc_id = $model->id;
-            $attac->documento = strtoupper($aux['documento']);
+            $attac->uid= $id;
+            if($req->has('id')){
+                $attac->doc_id = $req->id;
+            }            $attac->documento = strtoupper($aux['documento']);
+            $attac->save();
             $attacs[]= $attac;
         }
         $resul['accion']= "new";
         $resul['items']= $attacs;
-        $resul['response']= $model->attachments()->saveMany($attacs);
+        $result['id']=$id;
         return $resul;
     }
 
@@ -1034,18 +1058,30 @@ class OrderController extends BaseController
      **/
     public function addAttachmentsPurchase(Request $req){
         $resul= array();
-        $model = Purchase::findOrFail($req->id);
+        $id=null;
         $attacs= array();
+        if(!$req->has('id')){
+            if($req->has('tempId')){
+                $id= $req->tempId;
+            }else{
+                $id=uniqid('', true);
+            }
+        }
         foreach($req->adjuntos  as $aux){
             $attac=  new PurchaseAttachment();
             $attac->archivo_id = $aux['id'];
-            $attac->doc_id = $model->id;
+            $attac->uid= $id;
+            if($req->has('id')){
+                $attac->doc_id = $req->id;
+            }
+
             $attac->documento = strtoupper($aux['documento']);
+            $attac->save();
             $attacs[]= $attac;
         }
         $resul['accion']= "new";
         $resul['items']= $attacs;
-        $resul['response']= $model->attachments()->saveMany($attacs);
+        $resul['id'];
         return $resul;
     }
 
@@ -3340,7 +3376,7 @@ class OrderController extends BaseController
     public function EmailEstimateSolicitude(Request $req)
     {
         $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        return view("emails.modules.Order.External.ProviderEstimate", $data);
+        return  ['body'=>View::make("emails.modules.Order.External.ProviderEstimate", $data)->render()];
     }
 
     public function EmailEstimateOrder(Request $req)
@@ -3361,14 +3397,18 @@ class OrderController extends BaseController
         Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
 
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
-            if($req->has('local')){
-                $m->from('systema_valcro@gmail.com');
-            }else{
+            if(!$req->has('local')){
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
             }
-            /*foreach($req->to as $aux){
-                $m->to($aux['valor'],$data['proveedor']);
-            }*/
+            foreach($req->to as $aux){
+                $m->to($aux['valor'],$data['proveedor']['razon_social']);
+            }
+            foreach($req->cc as $aux){
+                $m->cc($aux['valor'],$data['proveedor']['razon_social']);
+            }
+            foreach($req->cco as $aux){
+                $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
+            }
 
 
         });
@@ -3380,16 +3420,24 @@ class OrderController extends BaseController
     public function sendOrder(Request $req){
 
         $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
-            $m->to("luisnavarro.dg@gmail.com", "Luis Navarro");
-            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
-            if($req->has('local')){
-                $m->from('systema_valcro@gmail.com');
-            }else{
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
+
+            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
+            if(!$req->has('local')){
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
             }
-        });
+            foreach($req->to as $aux){
+                $m->to($aux['valor'],$data['proveedor']['razon_social']);
+            }
+            foreach($req->cc as $aux){
+                $m->cc($aux['valor'],$data['proveedor']['razon_social']);
+            }
+            foreach($req->cco as $aux){
+                $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
+            }
 
+
+        });
         $resul =[];
         $resul['accion']= 'send';
         return $resul;
@@ -3399,45 +3447,48 @@ class OrderController extends BaseController
     public function sendPurchase(Request $req){
 
         $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req){
-            $m->to("luisnavarro.dg@gmail.com", "Luis Navarro");
-            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto');
-            if($req->has('sistema')){
-                $m->from('systema_valcro@gmail.com');
-            }else{
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
+
+            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
+            if(!$req->has('local')){
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
+            }
+            foreach($req->to as $aux){
+                $m->to($aux['valor'],$data['proveedor']['razon_social']);
+            }
+            foreach($req->cc as $aux){
+                $m->cc($aux['valor'],$data['proveedor']['razon_social']);
+            }
+            foreach($req->cco as $aux){
+                $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
             }
         });
         $resul =[];
         $resul['accion']= 'send';
+        return $resul;
     }
 
     public function sendMail(Request $req){
-        $destinos = [];
         $adjuntos = [];
         try {
-        Mail::raw($req->texto, function ($m) use($req, $destinos, $adjuntos){
-            $m->subject($req->asunto);
-            if($req->local){
-                $m->from('systema_valcro@gmail.com');
-            }else{
-                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
-            }
-            foreach($req->to  as $aux){
-                $m->to($aux['valor'],$aux['razon_social']);
-                $destinos=[$aux['valor']];
-            }
-            foreach($req->cc  as $aux){
-                $m->cc($aux['valor'],$aux['razon_social']);
-                $destinos=[$aux['valor']];
+            Mail::raw($req->texto, function ($m) use($req, $adjuntos){
+                $m->subject($req->asunto);
+                if(!$req->has('local')){
+                    $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
+                }
 
-            }
-            foreach($req->cco  as $aux){
-                $m->bcc($aux['valor'],$aux['razon_social']);
-                $destinos=[$aux['valor']];
+                foreach($req->to  as $aux){
+                    $m->to($aux['valor'],($aux['razon_social'] == 'new') ? '': $aux['razon_social']);
+                }
+                foreach($req->cc  as $aux){
+                    $m->cc($aux['valor'],($aux['razon_social'] == 'new') ? '': $aux['razon_social']);
 
-            }
-        });
+                }
+                foreach($req->cco  as $aux){
+                    $m->bcc($aux['valor'],($aux['razon_social'] == 'new') ? '': $aux['razon_social']);
+
+                }
+            });
         }catch (\Exception $e) {
             Log::error($e);
         }
@@ -4614,17 +4665,17 @@ class OrderController extends BaseController
                 $result["action"]="edit";
             }
             $model= $this->setDocItem($model, $req);
-
-            if($req->has("close")){
-                $model->final_id=
-                    "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
-                    ."-a".sizeof($model->attachments()->get());
-            }
             $model->save();
             $result['id']= $model->id;
             $result['user']= $model->usuario_id;
-
-
+            if($req->has('tempId')){
+                $tempAtt= SolicitudeAttachment::where('uid',$req->tempId)->get();
+               foreach($tempAtt as $aux){
+                   $aux->doc_id=$model->id;
+                   $aux->uid= null;
+                   $aux->save();
+               }
+            }
 
         }
 
@@ -4650,29 +4701,23 @@ class OrderController extends BaseController
         }else{
             $result = array("success" => "Registro guardado con éxito","action"=>"new");
             $model = new Purchase();
-            $aux = $this->setDocItem($model, $req);
             //////////condicion para editar
             if ($req->has('id')) {
                 $model = $model->findOrFail($req->id);
                 $result["action"]="edit";
             }
-            if ($req->has('copy')) {
-                $aux = new Purchase();
-                $aux = $this->setDocItem($aux, $req);
-                $aux->version = $model->version+1;
-            }
 
 
-            if($req->has("close")){
-                $model->final_id=
-                    "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
-                    ."-a".sizeof($model->attachments()->get())
-                ;
-                $cps =$model->builtPaymentDocs();
-                $result['sub']= $cps;
-            }
             $model= $this->setDocItem($model, $req);
             $model->save();
+            if($req->has('tempId')){
+                $tempAtt=PurchaseAttachment::where('uid',$req->tempId)->get();
+                foreach($tempAtt as $aux){
+                    $aux->doc_id=$model->id;
+                    $aux->uid= null;
+                    $aux->save();
+                }
+            }
             $result['id']= $model->id;
 
         }
@@ -4716,11 +4761,13 @@ class OrderController extends BaseController
             }
             $model = $this->setDocItem($model,$req);
 
-            if($req->has("close")){
-                $result["action2"]="close";
-                $model->final_id=
-                    "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
-                    ."-a".sizeof($model->attachments()->get());
+            if($req->has('tempId')){
+                $tempAtt=OrderItem::where('uid',$req->tempId)->get();
+                foreach($tempAtt as $aux){
+                    $aux->doc_id=$model->id;
+                    $aux->uid= null;
+                    $aux->save();
+                }
             }
 
             $result['response']= $model->save();
@@ -5009,9 +5056,7 @@ class OrderController extends BaseController
         if($req->has('puerto_id')){
             $model->puerto_id = $req->puerto_id;
         }
-        /*       if($req->has('condicion_id')){
-                   $model->condicion_id = $req->condicion_id;
-               }*/
+
         if($req->has('mt3')){
             $model->mt3 = $req->mt3;
         }
