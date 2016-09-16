@@ -451,7 +451,7 @@ class OrderController extends BaseController
      * traue a los provedores
      */
     public function getProvider(Request $req){
-        $rawn = "id, razon_social ,(select sum(monto)
+        $rawn = "id, razon_social ,contrapedido,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
          where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
 
@@ -588,13 +588,25 @@ class OrderController extends BaseController
     public function  ApprovedPurchasesSolicitude(Request $req){
 
         $response = [];
+
         $model = Solicitude::findOrFail($req->id);
+        $sendEmail = ($model->fecha_aprob_compra == null && ($model->nro_doc == null || $model->nro_doc == ''));
         $model->fecha_aprob_compra= $req->fecha_aprob_compra;
         $model->nro_doc= $req->nro_doc;
         $response['response']=$model->save();
-
-        $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        $response['accion']=  'upd';
         $response['success']='Solicitud aprobada';
+
+        if($sendEmail){
+            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
+                ,'cc'=>[],'ccb'=>[]
+                ,'asunto'=>'Notificacion de Aprobacion por compras '];
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion']=$sender['asunto'];
+            $this->sendNotificacion($data,$sender);
+            $response['email'] ="true";
+        };
+
         return $response;
 
     }
@@ -602,12 +614,27 @@ class OrderController extends BaseController
 
         $response = [];
         $model = Order::findOrFail($req->id);
+
         $model->fecha_aprob_compra= $req->fecha_aprob_compra;
+        $sendEmail = ($model->fecha_aprob_compra == null && ($model->nro_doc == null || $model->nro_doc == ''));
+
         $model->nro_doc= $req->nro_doc;
+
         $response['response']=$model->save();
 
         $response['success']='Pedido aprobado';
-        $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        $response['accion']=  'upd';
+
+        if($sendEmail){
+            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
+                ,'cc'=>[],'ccb'=>[]
+                ,'asunto'=>'Notificacion de Aprobacion por compras '];
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion']=$sender['asunto'];
+
+            $this->sendNotificacion($data,$sender);
+            $response['email'] ="true";
+        };
         return $response;
 
     }
@@ -615,13 +642,25 @@ class OrderController extends BaseController
 
         $response = [];
         $model = Purchase::findOrFail($req->id);
+
         $model->fecha_aprob_compra= $req->fecha_aprob_compra;
+        $sendEmail = ($model->fecha_aprob_compra == null && ($model->nro_doc == null || $model->nro_doc == ''));
         $model->nro_doc= $req->nro_doc;
         $response['response']=$model->save();
 
         $response['success']='ODC aprobada';
 
         $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        if($sendEmail){
+            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
+                ,'cc'=>[],'ccb'=>[]
+                ,'asunto'=>'Notificacion de Aprobacion por compras '];
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion']=$sender['asunto'];
+
+            $this->sendNotificacion($data,$sender);
+            $response['email'] ="true";
+        };
         return $response;
 
     }
@@ -633,11 +672,23 @@ class OrderController extends BaseController
 
         $response = [];
         $model = Solicitude::findOrFail($req->id);
+        $sendEmail = ($model->comentario_cancelacion== null);
+
         $model->comentario_cancelacion= $req->comentario_cancelacion;
         $response['response']=$model->save();
 
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
         $response['success']='Solicitud Cancelada';
+        if($sendEmail){
+            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
+                ,'cc'=>[],'ccb'=>[],
+                'asunto'=>'Notificacion de Cancelacion  '];
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion']=$sender['asunto'];
+
+            $this->sendNotificacion($data,$sender);
+            $response['email'] ="true";
+        };
         return $response;
 
     }
@@ -645,11 +696,21 @@ class OrderController extends BaseController
 
         $response = [];
         $model = Order::findOrFail($req->id);
+        $sendEmail = ($model->comentario_cancelacion== null);
+
         $model->comentario_cancelacion= $req->comentario_cancelacion;
         $response['response']=$model->save();
 
         $response['success']='Pedido Cancelado';
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        if($sendEmail){
+            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
+                ,'cc'=>[],'ccb'=>[],'asunto'=>'Notificacion de Cancelacion'];
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion']=$sender['asunto'];
+            $this->sendNotificacion($data,$sender);
+            $response['email'] ="true";
+        };
         return $response;
 
     }
@@ -657,12 +718,20 @@ class OrderController extends BaseController
 
         $response = [];
         $model = Purchase::findOrFail($req->id);
+        $sendEmail = ($model->comentario_cancelacion== null);
         $model->comentario_cancelacion= $req->comentario_cancelacion;
         $response['response']=$model->save();
-
         $response['success']='ODC Cancelada';
-
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        if($sendEmail){
+            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
+                ,'cc'=>[],'ccb'=>[],'asunto'=>'Notificacion de Cancelacion por compras '];
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion']=$sender['asunto'];
+
+            $this->sendNotificacion($data,$sender);
+            $response['email'] ="true";
+        };
         return $response;
 
     }
@@ -1081,7 +1150,7 @@ class OrderController extends BaseController
         }
         $resul['accion']= "new";
         $resul['items']= $attacs;
-        $resul['id'];
+        $resul['id']=$id;
         return $resul;
     }
 
@@ -3382,13 +3451,13 @@ class OrderController extends BaseController
     public function EmailEstimateOrder(Request $req)
     {
         $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        return view("emails.modules.Order.External.ProviderEstimate", $data);
+        return  ['body'=>View::make("emails.modules.Order.External.ProviderEstimate", $data)->render()];
     }
 
     public function EmailEstimatePurchase(Request $req)
     {
         $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        return view("emails.modules.Order.External.ProviderEstimate", $data);
+        return  ['body'=>View::make("emails.modules.Order.External.ProviderEstimate", $data)->render()];
     }
 
     public function sendSolicitude(Request $req){
@@ -5335,7 +5404,7 @@ class OrderController extends BaseController
         $data['nro_doc'] = $model->nro_doc;
         $data['fecha_aprobacion_gerencia'] = ( $model->fecha_aprob_gerencia == null) ? $this->defaulString :  $this->outputDate($model->fecha_aprob_gerencia);
 
-        $data['aprob_compras']=  ($model->fecha_aprobacion_compras != null)? true : false;
+        $data['aprob_compras']=  ($model->fecha_aprobacion_compras != null )? true : false;
         $data['cancelado']= ($model->cancelacion != null)? true : false;;
         $data['aprob_gerencia']= ($model->fecha_aprobacion_gerencia != null)? true : false;
         $data['dir_almacen'] =  ($model->direccion_almacen_id == null ) ?$this->defaulString:  ProviderAddress::findOrFail($model->direccion_almacen_id)->direccion ;
@@ -5382,5 +5451,23 @@ class OrderController extends BaseController
         $data['articulos'] = $prod;
         return $data;
 
+    }
+
+    private function sendNotificacion($data,$sender){
+        Mail::send("emails.modules.Order.Internal.ResumenDoc",$data, function ($m) use( $data, $sender){
+            $m->subject($sender['asunto']);
+            foreach($sender['to'] as $aux)
+            {
+                $m->to($aux['email'], $aux['name']);
+            }
+            foreach($sender['cc'] as $aux)
+            {
+                $m->cc($aux['email'], $aux['name']);
+            }
+            foreach($sender['ccb'] as $aux)
+            {
+                $m->ccb($aux['email'], $aux['name']);
+            }
+        });
     }
 }

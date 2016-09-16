@@ -389,6 +389,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
                     if($scope.document.id){
                         setGetOrder.reload();
+                        console.log("recargando");
                     }else{
                         $scope.Docsession.Temuid= response.id;
                     }
@@ -564,6 +565,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         final.contraPedido = cp;
         final.kitchenBox = kit;
         final.pedidoSusti = sus;
+        console.log("final ", final);
         return final;
     };
 
@@ -1284,7 +1286,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     ,[],{autohidden:autohidden});
 
                 var inval = angular.element(" form[name=FormHeadDocument] .ng-invalid");
-                console.log("inval", inval);
                 inval[0].focus();
 
             }
@@ -1312,6 +1313,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
 
     $scope.changeContraP = function (item) {
+        console.log("proveedore", $scope.provSelec.contrapedido);
         if(item.import){
             $scope.NotifAction("error",
                 "Este Contra pedido fue agregado a partir de otra solicitud "
@@ -1911,7 +1913,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         //init();
         var aux= angular.copy(doc);
         if (segurity('editPedido')) {
-            //$scope.document = aux;;
             setGetOrder.setOrder(aux);
             setGetOrder.setState("select");
             $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
@@ -1946,70 +1947,60 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
     };
 
-
     $scope.saveFinal = function(){
 
         $scope.NotifAction("alert","¿Que desea hacer?",[
-
-            {name:"Previsualizar",default:4, action: function(){
-
-
-            }},
-            {name:"Enviar ", action: function(){
-
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                    if (response.success) {
-                        $scope.OpenContactMail(function(){
-                            $scope.updateProv(function(){
-                                $scope.LayersAction({close:{first:true, search:true}});
-                                filesService.close();
+            {name:"Cancelar", action: function(){}},
+            {name:($scope.Docsession.global== 'new') ? 'Enviar ': 'Re-enviar', action: function(){
+                $scope.OpenContactMail(function(){
+                    $scope.updateProv(function(){
+                        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                            if (response.success) {
                                 $scope.NotifAction("ok","Realizado",[
                                     {name:"Ok",default:2, action: function(){
 
 
                                     }}
-                                ],{block:true})
-                            });
+                                ],{block:true});
+                                $scope.LayersAction({close:{first:true, search:true, before:function(){
+                                    $timeout(function(){
+                                        angular.element("#"+$scope.layer).click();
+                                    },0);
+                                }}});
+                            }});
 
-                        });
-                    }});
+                    });
+
+                });
             }},
-            {name:"Guardar y enviar texto ", action: function(){
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                    if (response.success) {
-                        $scope.updateProv();
-                        $scope.openSendMail(function(){
+            {name:"Guardar y redactar un correo ", action: function(){
+                $scope.openSendMail(function(){
+                    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                        if (response.success) {
                             $scope.updateProv();
                             $scope.NotifAction("ok","Finalizado",[
                                 {name:"Ok",default:2, action: function(){
-                                    $scope.LayersAction({close:{first:true, search:true}});
+                                    $scope.LayersAction({close:{first:true, search:true, before:function(){
+                                        $timeout(function(){
+                                            angular.element("#"+$scope.layer).click();
+                                        },0);
+                                    }}});
                                     filesService.close();
+
                                 }}
                             ],{block:true});
-                        });
-                    }});
-
-
-            }},
-            {name:"Solo Guardar", action: function(){
-
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-
-                    if (response.success) {
-                        $scope.updateProv();
-                        $scope.NotifAction("ok","Finalizado",[
-                            {name:"Ok",default:2, action: function(){
-                                $scope.LayersAction({close:{first:true, search:true}});
-                                filesService.close();
-
-                            }}
-                        ],{block:true});
-                    }});
-
-
-
+                        }});
+                })
             }}
         ],{block:true});
+    };
+
+    $scope.toSideNave = function(model,to){
+        console.log("to", to);
+         if(!Object.isArray(to)){
+           var ele= angular.element("#"+to);
+             ele.click();
+         }
     };
 
     /******************     excepciones       **********/
@@ -3297,8 +3288,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                                         $scope.finalDoc.productos= response.productos;
                                         $scope.finalDoc.adjProforma = $filter("customFind")(response.adjuntos,'PROFORMA',function(current,compare){return current.documento==compare});
                                         $scope.finalDoc.adjFactura = $filter("customFind")(response.adjuntos,'FACTURA',function(current,compare){return current.documento==compare});
-                                        console.log("finalDoc", $scope.finalDoc);
-                                        console.log("document final", $scope.document);
                                     });
                                     setGetOrder.setState("built")
                                 }
@@ -4146,32 +4135,50 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
 
     var change = function(form,fiel, value){
 
+        var exist= true;
+
         if(!forms[form]){
             forms[form]={};
+            exist=false;
         }
 
         if(!forms[form][fiel] ){
-            forms[form][fiel]= {original:value, v:value, estado:'created',trace:[]};
-        }
+            if(typeof (value) == 'object'){
+                angular.forEach(value, function(v2,k2){
+                    if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+                        forms[form][fiel][k2]= {original:v2, v:v2, estado:'created',trace:[]};
+                    }
+                })
+            }else {
+                forms[form][fiel]= {original:value, v:value, estado:'created',trace:[]};
 
-        if(typeof (value) != 'undefined' && forms[form][fiel].estado !='created'){
-            if(forms[form][fiel].original != value  ){
+            }
+            exist=false;
+            console.log("creado  item")
+        };
+
+        if( exist){
+            if(typeof (value) == 'undefined'){
+                forms[form][fiel].estado='del';
+                forms[form][fiel].trace.push();
+            }else if(forms[form][fiel].original != value  ){
                 forms[form][fiel].v= value;
                 forms[form][fiel].trace.push(value);
                 forms[form][fiel].estado='upd';
 
 
             }else
-            if(forms[form][fiel].original == value && forms[form][fiel].estado !='created' ){
+            if(forms[form][fiel].original == value ){
                 forms[form][fiel].estado='new';
                 forms[form][fiel].trace.push(value);
                 forms[form][fiel].v= value;
+            }else{
+                console.log("no se que hacer  form",form );
+                console.log("no se que hacer  field",fiel );
+                console.log("no se que hacer  value",value );
             }
         }
-        else{
-            forms[form][fiel].estado='del';
-            forms[form][fiel].trace.push();
-        }
+
 
     };
     return {
@@ -4312,7 +4319,6 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                         });
                     });
                     bindin.estado=true;
-                    //console.log("formas", forms);
                 })
             }
         },
@@ -4538,6 +4544,25 @@ MyApp.directive('autoRequired', function () {
         require: 'ngModel',
         link: function (scope, elem, attrs,ctrl) {
             console.log("llego al input ", ctrl);
+        }
+    };
+});
+
+MyApp.directive('alert', function(setNotif) {
+
+    return {
+        scope: {
+            alert: '=',
+            alertShow:'='
+        },
+        link: function(scope, element){
+            element.on("focus","input", function(e) {
+                if(scope.alert[scope.alertShow]){
+                    setNotif.addNotif("alert",scope.alert[scope.alertShow],[],{autohidden:5000});
+                }
+            });
+
+
         }
     };
 });

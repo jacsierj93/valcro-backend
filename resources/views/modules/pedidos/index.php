@@ -403,7 +403,7 @@
                             </div>
                         </div>
                     </form>
-                    <form layout="row"  class="gridContent">
+                    <form  flex layout="row"  class="gridContent">
                         <div active-left before="verificExit" ></div>
                         <div layout="column" flex>
                             <div   ng-repeat="item in filterDocuments(docImports, tbl_listImport.filter) | orderBy : tbl_listImport.order" >
@@ -415,7 +415,7 @@
                                         <div style="width: 16px; height: 16px; border-radius: 50%"
                                              class="emit{{item.diasEmit}}"></div>                                    </div>
                                     <div flex="15" class="cellGrid" ng-click="docImport(item)" > {{item.nro_factura}}</div>
-                                    <div flex class="cellGrid" ng-click="docImport(item)" > {{item.monto | currency :item.symbol :2}}</div>
+                                    <div flex class="cellGrid" ng-click="docImport(item)" > {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                     <div flex class="cellGrid" ng-click="docImport(item)" >{{item.comentario}}</div>
                                 </div>
                             </div>
@@ -687,7 +687,7 @@
                                     <div  ng-show="item.maritimo == 1 " ><?/*= HTML::image("images/maritimo.png") */?></div>
                                 </div>-->
                                     <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.nro_factura}}</div>
-                                    <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.monto | currency :item.symbol :2}}</div>
+                                    <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                     <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)">{{item.comentario}}</div>
                                     <div style="width: 80px; text-align: -webkit-center;"  class="cellEmpty "
                                          layout-align="center center" layout="row"
@@ -1107,7 +1107,6 @@
                                                      ng-click="toEditHead('prov_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
-
                                                      md-search-text="ctrl.searchProveedor"
                                                      md-auto-select="true"
                                                      md-items="item in todos | stringKey : ctrl.searchProveedor : 'razon_social' "
@@ -1119,13 +1118,13 @@
                                                      md-no-cache="true"
                                                      md-select-on-match
 
+
                                     >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
                                         </md-item-template>
-                                        <md-not-found  ng-click="redirect({})">
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
                                           No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
-
                                         </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
@@ -1162,10 +1161,10 @@
 
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row"  >
 
-                                <md-input-container class="md-block" flex="30" ng-click="allowEdit()">
+                                <md-input-container class="md-block" flex="40" ng-click="allowEdit()"  alert="{'none':'No hay data para '+provSelec.razon_social} " alert-show="(formData.paises.length > 0) ? '': 'none'" >
                                     <label>Pais</label>
                                     <md-autocomplete md-selected-item="ctrl.pais_id"
-                                                     info="Selecione el pais de origen de los productos"
+                                                     info="'Selecione el pais de origen de los productos'"
                                                      ng-disabled="( Docsession.block || !provSelec.id )"
                                                      ng-click="toEditHead('pais_id', document.pais_id)"
                                                      skip-tab
@@ -1175,36 +1174,24 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match =""
                                                      md-no-cache="true"
-                                                     md-select-on-match="(formData.paises.length > 0)"
+
+
                                     >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
                                         </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                           No se encontro el país {{ctrl.searchPais}}. {{provSelec.razon_social}},¿Desea asignarlo?
+                                        </md-not-found>
                                     </md-autocomplete>
-                                    <!-- <md-select ng-model="document.pais_id" md-no-ink
-                                                ng-disabled="( Docsession.block || !provSelec.id )"
-                                                ng-change="toEditHead('pais_id', document.pais_id)"
-                                                info="Selecione el pais de origen de los productos"
-                                                skip-tab
-                                                id="pais_id"
-
-                                     >
-                                         <md-option ng-repeat="item in formData.paises" value="{{item.id}}">
-                                             {{item.short_name}}
-                                         </md-option>
-                                         <md-option  value="-1" >
-                                             Nuevo Pais
-                                         </md-option>
-                                     </md-select>-->
                                 </md-input-container>
-                                <md-input-container class="md-block"  flex ng-click="allowEdit()">
+                                <md-input-container class="md-block"  flex ng-click="allowEdit()" alert="{'none':'No se le han creado direciones de facturacion a '+provSelec.razon_social} " alert-show="(formData.direccionesFact.length > 0) ? '': 'none'" >
                                     <label>Direccion Facturacion</label>
                                     <md-autocomplete md-selected-item="ctrl.direccion_facturacion_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' )"
                                                      ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
-                                                     info="Selecione la direccion que debe especificarse en la factura"
+                                                     info="Selecione la direccion que debe especificarse en la factura "
                                                      skip-tab
                                                      id="direccion_facturacion_id"
                                                      md-search-text="ctrl.searchdirFact"
@@ -1214,7 +1201,6 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="(formData.direccionesFact.length > 0)"
                                                      md-no-cache="true"
                                                      md-select-on-match
 
@@ -1222,19 +1208,22 @@
                                         <md-item-template>
                                             <span>{{item.direccion}}</span>
                                         </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                            No se encontro la dirección {{ctrl.direccion_facturacion_id}}. ¿Desea crearla?
+                                        </md-not-found>
                                     </md-autocomplete>
 
                                 </md-input-container>
 
                             </div>
-                            <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row">
+                            <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
 
-                                <md-input-container class="md-block"  flex ng-click="allowEdit()">
+                                <md-input-container class="md-block"  flex ng-click="allowEdit()"  alert="{'none':'No se la han asignado direcciones de almacen a'+provSelec.razon_social} " alert-show="(formData.direcciones.length > 0) ? '': 'none'">
                                     <label>Direccion almacen</label>
                                     <md-autocomplete md-selected-item="ctrl.direccion_almacen_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' )"
                                                      ng-click="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
-                                                     info="Selecione la direccion que debe especificarse en la factura"
+                                                     info="'Selecione la direccion que debe especificarse en la factura"
                                                      id="direccion_almacen_id"
                                                      skip-tab
                                                      id="direccion_almacen_id"
@@ -1246,21 +1235,23 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="(formData.direcciones.length > 0)"
                                                      md-no-cache="true"
                                                      md-select-on-match
                                     >
                                         <md-item-template>
                                             <span>{{item.direccion}}</span>
                                         </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                            No se encontro la direccion  {{ctrl.direccion_almacen_id}}. ¿Desea crearla?
+                                        </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
-                                <md-input-container class="md-block"  flex ng-click="allowEdit()">
+                                <md-input-container class="md-block"  flex ng-click="allowEdit()" alert="{'none':'No se le han asignado puertos a'+provSelec.razon_social} " alert-show="(formData.puertos.length > 0) ? '': 'none'">
                                     <label>Puerto</label>
                                     <md-autocomplete md-selected-item="ctrl.puerto_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' )"
                                                      ng-click="toEditHead('puerto_id', document.puerto_id)"
-                                                     info="Selecione la direccion que debe especificarse en la factura"
+                                                     info=" Selecione la direccion que debe especificarse en la factura "
                                                      id="puerto_id"
                                                      skip-tab
                                                      md-search-text="ctrl.searchPuerto"
@@ -1270,13 +1261,16 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="formData.puertos.length > 0"
                                                      md-no-cache="true"
                                                      md-select-on-match
                                     >
                                         <md-item-template>
                                             <span>{{item.Main_port_name}}</span>
                                         </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                            No se encontro el puerto  {{ctrl.puerto_id}}. ¿Desea asignarlo?
+                                        </md-not-found>
+
                                     </md-autocomplete>
                                 </md-input-container>
                             </div>
@@ -1289,20 +1283,17 @@
                                             required
                                             ng-change="toEditHead('monto', document.monto)"
                                             info="Monto aproximado a pagar"
-
                                             skip-tab
-
-
                                     >
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="10" ng-click="allowEdit()">
+                                <md-input-container class="md-block" flex="10" ng-click="allowEdit()" alert="{'none':'No se le han asignado monedas a'+provSelec.razon_social} " alert-show="(formData.monedas.length > 0) ? '': 'none'">
                                     <label>Moneda</label>
                                     <md-autocomplete md-selected-item="ctrl.prov_moneda_id"
                                                      ng-disabled="( Docsession.block)"
                                                      required
                                                      ng-click="toEditHead('prov_moneda_id', document.prov_moneda_id)"
-                                                     info="Seleccione la moneda en la que se realizara el pago"
+                                                     info="Seleccione la moneda en la que se realizara el pago': 'No se le han asignado monedas a '+provSelec.razon_social"
                                                      id="prov_moneda_id"
                                                      skip-tab
                                                      md-search-text="ctrl.searchMonedaSelec"
@@ -1312,31 +1303,16 @@
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="(formData.monedas.length > 0)"
                                                      md-no-cache="true"
                                                      md-select-on-match
-
                                     >
                                         <md-item-template>
                                             <span>{{item.nombre}}</span>
                                         </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                            No se encontro la moneda {{ctrl.prov_moneda_id}}. ¿Desea asignarla?
+                                        </md-not-found>
                                     </md-autocomplete>
-                                    <!-- <md-select ng-model="document.prov_moneda_id" md-no-ink
-                                                ng-disabled="( Docsession.block)"
-                                                required
-                                                ng-change="toEditHead('prov_moneda_id', document.prov_moneda_id)"
-                                                info="Seleccione la moneda en la que se realizara el pago"
-                                                id="prov_moneda_id"
-                                                skip-tab
-
-                                     >
-                                         <md-option ng-repeat="moneda in formData.monedas" value="{{moneda.id}}" skip-tab >
-                                             {{moneda.nombre}}
-                                         </md-option>
-                                         <md-option  value="-1" >
-                                             Nuevo Moneda
-                                         </md-option>
-                                     </md-select>-->
                                 </md-input-container>
 
                                 <md-input-container class="md-block" flex="10" ng-dblclick="editTasa()"  ng-click="allowEdit()">
@@ -1352,29 +1328,29 @@
                                     >
                                 </md-input-container>
 
-                                <md-input-container class="md-block" flex="" ng-click="allowEdit()">
+                                <md-input-container class="md-block" flex="" ng-click="allowEdit()" alert="{'none':'No se le ha asignado condiciones de pago a '+provSelec.razon_social} " alert-show="(formData.condicionPago.length > 0) ? '': 'none'">
                                     <label>Condicion de pago</label>
                                     <md-autocomplete md-selected-item = "ctrl.condicion_pago_id"
                                                      ng-disabled = "( Docsession.block  || !provSelec.id)"
                                                      ng-click="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                      info="Seleccione una condicion para la realizacion del pago"
                                                      ng-required ="(formMode.value == 23 )"
-
                                                      skip-tab
                                                      md-input-name = "autocomplete"
                                                      md-search-text = "ctrl.searchcondPagoSelec"
                                                      md-items = "item in formData.condicionPago | stringKey : ctrl.searchcondPagoSelec : 'titulo' "
                                                      md-item-text="item.titulo"
                                                      md-min-length="0"
-                                                     md-require-match="(formData.condicionPago.length > 0)"
                                                      md-input-minlength="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-
                                     >
                                         <md-item-template>
                                             <span>{{item.titulo}}</span>
                                         </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                            No se encontro la condicion de pago {{ctrl.condicion_pago_id}}. ¿Desea crearla?
+                                        </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
 
@@ -1387,16 +1363,12 @@
                                            ng-change="toEditHead('nro_factura', document.nro_factura)"
                                            info="Introducir Nro de factura en caso de tenerla"
                                            skip-tab
-
-
-
                                     >
                                 </md-input-container>
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
-                                     info=" Cargar adjuntos de la factura "
-
-                                >
-                                    <img src="images/adjunto.png" style="margin 4px;"/>
+                                <div class="adj-box">
+                                    <div ng-click="openAdj('Factura')"  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
+                                        {{ (document.adjuntos | stringKey :'factura': 'documento' ).length || 0 }}
+                                    </div>
                                 </div>
 
                                 <md-input-container class="md-block" flex >
@@ -1409,11 +1381,10 @@
 
                                     >
                                 </md-input-container>
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Proforma')"
-                                     info="Cargar adjuntos de la proforma "
-
-                                >
-                                    <img src="images/adjunto.png" style="margin 4px;" />
+                                <div  class="adj-box">
+                                    <div ng-click="openAdj('Proforma')" class="vlc-buttom" ng-class="{'ng-disable':Docsession.block}" skip-tab  style="float:left">
+                                        {{ (document.adjuntos | stringKey :'proforma' : 'documento' ).length || 0 }}
+                                    </div>
                                 </div>
                                 <md-input-container class="md-block" flex="10">
                                     <label>Mt3</label>
@@ -1519,9 +1490,10 @@
                                     >
                                 </md-input-container>
 
-                                <div layout="column" layout-align="center center" ng-click="openAdj('Factura')"
-                                     info=" Cargar adjuntos de la aprobacion " >
-                                    <span class="icon-Adjuntar" style="font-size: 24px"></span>
+                                <div class="adj-box">
+                                    <div ng-click="openAdj('AprobCompras')"  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
+                                        {{ (document.adjuntos | stringKey :'AprobCompras': 'documento' ).length || 0 }}
+                                    </div>
                                 </div>
 
                             </div>
@@ -1975,7 +1947,7 @@
                             </div>
                         </div>
                     </form>
-                    <form name="addContraPedidos" class="gridContent" layout="row" >
+                    <form flex name="addContraPedidos" class="gridContent" layout="row" >
                         <div active-left></div>
                         <div flex >
                             <div layout="row" class="cellGridHolder" ng-repeat="item in filterContraPed(formData.contraPedido,tbl_agrContPed.filter) | orderBy: tbl_agrContPed.order">
@@ -1985,7 +1957,7 @@
                                 <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
                                 <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha_aprox_entrega | date:'dd/MM/yyyy' }}</div>
-                                <div flex="15" class="cellGrid" ng-click="selecContraP(item)"> {{item.monto}}</div>
+                                <div flex="15" class="cellGrid" ng-click="selecContraP(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.comentario}}</div>
 
                             </div>
@@ -2103,7 +2075,7 @@
                         </div>
 
                     </form>
-                    <form name="KitchenBoxs" class="gridContent" layout="row">
+                    <form flex name="KitchenBoxs" class="gridContent" layout="row">
                         <div active-left></div>
                         <div   layout="column" flex>
                             <div flex>
@@ -2114,7 +2086,7 @@
                                     <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.num_proforma}}</div>
                                     <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.img_proforma}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.monto}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.precio}}</div>
                                     <div flex class="cellGrid"  ng-click="selecKitchenBox(item)" > {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
                                 </div>
@@ -2237,7 +2209,7 @@
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_proforma}}</div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.emision | date:'dd/MM/yyyy'}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_factura}}</div>
-                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.monto}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                     <div flex class="cellGrid">{{item.comentario}}</div>
                                 </div>
                             </div>
@@ -2957,12 +2929,22 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
                 <div flex="30"layout="column" id="headFinalDoc"  >
+                    <!--    a -->
                     <form layout="row" >
                         <div active-left> </div>
                         <div layout="column" flex>
-                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 1">
-                                <div>
-                                    {{formMode.name}}
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 1" >
+                                        <div>
+                                            {{formMode.name}}
+                                        </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+
+                                    >
+                                    </md-switch>
                                 </div>
                             </div>
                             <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1">
@@ -3136,15 +3118,27 @@
 
                         </div>
                     </form>
+                    <!--    b -->
+
                     <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
                         <div active-left> </div>
-                        <div layout="column" flex>
-                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 2">
-                                <div>
-                                    ContraPedido
+                        <div layout="column" flex >
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario"ng-click=" gridViewFinalDoc = 2">
+                                    <div>
+                                        ContraPedido
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+
+                                    >
+                                    </md-switch>
                                 </div>
                             </div>
-                            <div flex ng-show="gridViewFinalDoc == 2">
+
+                            <div flex ng-show="gridViewFinalDoc == 2" >
                                 <md-content style="margin: 4px;">
 
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contraPedido" layout-align="space-between center" >
@@ -3164,15 +3158,27 @@
                                     </div>
                                 </md-content>
                             </div>
+
                         </div>
 
                     </form>
+                    <!--   c -->
+
                     <form   layout="row" ng-show="document.productos.kitchenBox.length > 0" >
                         <div active-left> </div>
                         <div layout="column" flex>
-                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 3">
-                                <div>
-                                    KitchenBox
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 3" >
+                                    <div>
+                                       KitchenBox
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+
+                                    >
+                                    </md-switch>
                                 </div>
                             </div>
                             <div flex ng-show="gridViewFinalDoc == 3">
@@ -3198,12 +3204,23 @@
 
                         </div>
                     </form>
+                    <!--    d -->
+
                     <form   layout="row" ng-show="document.productos.pedidoSusti.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex>
-                            <div class="titulo_formulario" style="height:39px;" ng-click=" gridViewFinalDoc = 4">
-                                <div>
-                                    {{formMode.name}}
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 4" >
+                                    <div>
+                                        {{formMode.name}}
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+
+                                    >
+                                    </md-switch>
                                 </div>
                             </div>
                             <div flex ng-show="gridViewFinalDoc == 4">
@@ -3485,7 +3502,7 @@
                                         <div flex class="cellGrid"> {{item.proveedor}}</div>
                                         <div flex class="cellGrid" > {{item.titulo}}</div>
                                         <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
-                                        <div flex class="cellGrid" > {{item.monto | currency :item.symbol :2}}</div>
+                                        <div flex class="cellGrid" > {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                         <div flex class="cellGrid" >{{item.comentario}}</div>
                                     </div>
                                 </div>
@@ -3654,7 +3671,7 @@
                                         <div flex class="cellGrid" ng-click="openTempDoc(item)"> {{item.proveedor}}</div>
                                         <div flex class="cellGrid" ng-click="openTempDoc(item)" > {{item.titulo}}</div>
                                         <div flex="10" class="cellGrid" ng-click="openTempDoc(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
-                                        <div flex class="cellGrid" ng-click="openTempDoc(item)" > {{item.monto | currency :item.symbol :2}}</div>
+                                        <div flex class="cellGrid" ng-click="openTempDoc(item)" > {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                         <div flex class="cellGrid"  ng-click="openTempDoc(item)" >{{item.comentario}}</div>
                                         <div style="width: 80px;"  class="cellEmpty " ng-click="sideaddAnswer(this, item)"
                                              layout-align="center center" layout="column" >
@@ -3794,7 +3811,7 @@
                                         <div flex class="cellGrid" ng-click="openOld(item)"> {{item.proveedor}}</div>
                                         <div flex class="cellGrid" ng-click="openOld(item)" > {{item.titulo}}</div>
                                         <div flex="10" class="cellGrid" ng-click="openOld(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
-                                        <div flex class="cellGrid" ng-click="openOld(item)" > {{item.monto | currency :item.symbol :2}}</div>
+                                        <div flex class="cellGrid" ng-click="openOld(item)" > {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                         <div flex class="cellGrid"  ng-click="openOld(item)" >{{item.comentario}}</div>
                                     </div>
                                 </div>
@@ -4068,7 +4085,7 @@
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="35" class="cellGrid" >{{item.cantidad}} </div>
                                     <div flex="33" class="cellGrid"> {{item.dias}}</div>
-                                    <div flex class="cellGrid"> {{item.monto}}</div>
+                                    <div flex class="cellGrid"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                 </div>
                             </div>
 

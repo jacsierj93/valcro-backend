@@ -379,6 +379,13 @@ md-sidenav .md-sidenav-right.md-locked-open{
     resize: none
 }
 
+.adj-box{
+    padding: 3px;
+}
+
+.adj-box  span{
+    float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;
+}
 md-autocomplete{
     min-width: 0 !important;
 }
