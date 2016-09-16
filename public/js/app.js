@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','ngSanitize','vlcClickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages',/*'ngSanitize'*/,'vlcClickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
 
 
 var MyApp = angular.module('MyApp', dependency, function() {
@@ -370,9 +370,10 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
 
         if(list.index(elem)<list.length-1){
+            console.log(angular.element(list[list.index(elem)+1]))
             $timeout(function(){
-                if(angular.element(list[list.index(elem)+1]).is("md-select")){
-                    angular.element(list[list.index(elem)+1]).focus().click();
+                if(angular.element(list[list.index(elem)+1]).hasClass("autoclick")){
+                    angular.element(list[list.index(elem)+1]).focus().  click();
                 }else if(angular.element(list[list.index(elem)+1]).is("vlc-group")) {
                     $timeout(function(){
                         angular.element(list[list.index(elem)+1]).find("span").first().focus();
@@ -380,6 +381,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
                     angular.element(list[list.index(elem)+1]).find("input").focus().click();
                 }else{
+                    console.log("aqui")
                     angular.element(list[list.index(elem)+1]).focus();
                 }
 
@@ -417,14 +419,14 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     if(!scope.endLayer) {
                         angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
                         angular.element(elem).blur();
-                        angular.element(elem).parents("md-content").delay(200).click();
+                        //angular.element(elem).parents("md-content").delay(200).click();
                         angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
                         /*angular.element("[md-component-id='NEXT']").focus();*/
                     }else{
                         scope.endLayer(function(){
                             angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
                             angular.element(elem).blur();
-                            angular.element(elem).parents("md-content").delay(200).click();
+                            //angular.element(elem).parents("md-content").delay(200).click();
                             angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
                         },elem);
                     }
@@ -434,7 +436,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         scope.endLayer(function(elem){
                             angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
                             angular.element(elem).blur();
-                            angular.element(elem).parents("md-content").delay(200).click();
+                            //angular.element(elem).parents("md-content").delay(200).click();
                             angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
                         });
                     }
@@ -451,6 +453,9 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             //console.log(attrs)
             if(attrs["skipTab"] != "off"){
                 element.attr("step","");
+            }
+            if(attrs["skipTab"] == "autoClik"){
+                element.addClass("autoclick");
             }
             element.removeAttr("skip-tab");
             if(angular.element(element).is("div")){
@@ -570,6 +575,7 @@ MyApp.directive('info', function($timeout,setNotif) {
             }else{
                 element.bind("focus", function(e){
                     if(attrs.info){
+                        console.log(attrs.info)
                         $timeout(function() {
                             if(old.element!=element[0]){
                                 setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
@@ -609,6 +615,7 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 
                     // Mock a delayed response
 
+                    modelValue = modelValue.toString();
                     if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].toUpperCase() == compare.toUpperCase() && (scope.localId !=current.id)}).length<1) {
                         // it is valid
                         setNotif.hideByContent("alert",attrs.duplicateMsg);

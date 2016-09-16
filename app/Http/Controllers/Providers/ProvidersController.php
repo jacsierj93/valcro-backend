@@ -115,21 +115,41 @@ class ProvidersController extends BaseController
         $data->limites = $data->limitCredit()->get();
         foreach ($data->limites as $lim){
             $lim->moneda = Monedas::find($lim->moneda_id);
-            $lim->line = (Line::find($lim->linea_id))? Line::find($lim->linea_id): array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            if($lim->linea_id){
+                $lim->line = Line::find($lim->linea_id);
+            }else{
+                $lim->line = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            }
+            //$lim->line = (Line::find($lim->linea_id))? Line::find($lim->linea_id): array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->factors = $data->convertFact()->get();
         foreach($data->factors as $fact){
             $fact->moneda;
-            $fact->linea = ($fact->linea)?$fact->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            if($fact->linea_id){
+                $fact->linea;
+            }else{
+                $fact->linea = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            }
+            //$fact->linea = ($fact->linea)?$fact->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->points = $data->points()->get();
         foreach($data->points as $pnt){
             $pnt->moneda;
-            $pnt->linea = ($pnt->linea)?$pnt->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            if($pnt->linea_id){
+                $pnt->linea;
+            }else{
+                $pnt->linea = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            }
+            //$pnt->linea = ($pnt->linea)?$pnt->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->prodTime = $data->prodTime()->get();
         foreach ($data->prodTime as $time) {
-            $time->lines = ($time->linea)?$time->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            if($time->linea_id){
+                $time->lines;
+            }else{
+                $pnt->lines = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            }
+            //$time->lines = ($time->linea)?$time->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->transTime = $data->transTime()->get();
         foreach ($data->prodTime as $time) {
@@ -138,7 +158,13 @@ class ProvidersController extends BaseController
         $data->payCondition = $data->getPaymentCondition()->get();
         foreach ($data->payCondition as $cond) {
             $cond['items'] = $cond->getItems()->get();
-            $cond->line = ($cond->linea)?$cond->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo") ;
+            if($cond->linea_id){
+                $cond->line;
+            }else{
+                $cond->line = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+            }
+            //= $cond->linea;//($cond->linea)?$cond->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo") ;
+            //if($cond['line']==null){$cond['line']=array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");};
         }
         $data->listPrice = $data->listPrice()->get();
         foreach ($data->listPrice as $list) {
@@ -568,6 +594,8 @@ class ProvidersController extends BaseController
 
     public function saveHeadCond(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        $conds = [];
+
         if($req->id){
             $cond = ProviderCondPay::find($req->id);
             $result['action']="upd";
@@ -579,6 +607,28 @@ class ProvidersController extends BaseController
         $cond->prov_id = $req->id_prov;
 
         $cond->save();
+
+
+        foreach($req->items as $item ){
+            $newItem =true;
+            if($item['id']){
+                $it = ProviderCondPayItem::find($item['id']);
+                $newItem =false;
+            }else{
+                $it = new ProviderCondPayItem();
+            }
+            $it->porcentaje = $item['porcentaje'];
+            $it->dias = $item['dias'];
+            $it->descripcion = $item['id_condicion'];
+            $it->id_condicion = $cond->id;
+
+            $it->save();
+            if($newItem){
+                $conds[] = ($it->id);
+            }
+
+        }
+        $result['items']=$conds;
         $result['id']=$cond->id;
         return $result;
     }

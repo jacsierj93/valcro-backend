@@ -1125,7 +1125,7 @@
                                                  id="credCoin"
                                                  info="la moneda para el limite de credito"
                                                  ng-disabled="$parent.enabled || coins.length<1"
-                                                 md-selected-item-change="cred.coin = ctrl.coin.id; (!setting)?provCred.$setDirty():true"
+                                                 md-selected-item-change="cred.coin = ctrl.coin.id;"
                                                  skip-tab
                                                  md-search-text="ctrl.searchCoin"
                                                  md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' "
@@ -1154,7 +1154,7 @@
                                                  id="credLine"
                                                  info="seleccione una Linea"
                                                  ng-disabled="$parent.enabled || coins.length<1"
-                                                 md-selected-item-change="cred.line = ctrl.line.id; (!setting)?provCred.$setDirty():true"
+                                                 md-selected-item-change="cred.line = ctrl.line.id"
                                                  skip-tab
                                                  md-search-text="ctrl.searchLine"
                                                  md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
@@ -1233,7 +1233,7 @@
                                                      id="conLine"
                                                      info="seleccione una Linea"
                                                      ng-disabled="$parent.enabled"
-                                                     md-selected-item-change="condHead.line = ctrl.line.id; (!setting)?condHeadFrm.$setDirty():true"
+                                                     md-selected-item-change="condHead.line = ctrl.line.id"
                                                      skip-tab
                                                      md-search-text="ctrl.searchLine"
                                                      md-items="item in lines | stringKey : ctrl.searchLine: 'linea' "
@@ -1252,10 +1252,13 @@
                                         </md-option>
                                     </md-select>-->
                                 </md-input-container>
-                                <div style="width:24px;">
-                                    <?= HTML::image("images/menu.png","",array("ng-click"=>"openFormCond()","ng-show"=>"(condHead.id)")) ?>
+                                <div style="width:24px;" ng-click="openFormCond($event)" skip-tab="autoClik" info="">
+                                    <?= HTML::image("images/menu.png","") ?>
                                 </div>
+
+                                <input style="width:1px; border:0px solid transparent" readonly skip-tab info="pulse enter denuevo para continuar" />
                             </div>
+
                             <div layout="column" ng-show="(isShow && !isShowMore) && conditions.length>0" class="row" ng-click="viewExtend(true)">
                                 <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                             </div>
@@ -1292,10 +1295,10 @@
 
             </div>
         </md-sidenav>
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="payCondItemController" style="margin-left:24px">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="payCond" id="payCond" >
+            <md-content ng-controller="payCondItemController" click-out="closeCondition()" class="cntLayerHolder" layout="column" layout-padding flex   style="margin-left:24px">
                 <input type="hidden" md-autofocus>
-                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click="closeCondition()">
+                <div class="titulo_formulario" layout="column" layout-align="start start" >
                     <div>
                         {{head.title}} <i>({{head.line}})</i>
                     </div>
@@ -1306,7 +1309,7 @@
                     <div layout="row">
                         <md-input-container class="md-block" flex="20">
                             <label>%</label>
-                            <input type="number" id ="condItemPerc" md-autofocus skip-tab autocomplete="off" type="number" max="{{max}}"  ng-disabled="$parent.enabled || max<=0" ng-model="condItem.percent" required>
+                            <input type="number" id ="condItemPerc" md-autofocus skip-tab autocomplete="off" type="number" ng-max="max"  ng-disabled="$parent.enabled || max<=0" ng-model="condItem.percent" required>
                         </md-input-container>
                         <md-input-container class="md-block" flex="20">
                             <label>Dias</label>
@@ -1319,7 +1322,7 @@
                                              skip-tab
                                              id="condItem"
                                              ng-required="(cnt.languaje.length==0)"
-                                             md-item-change="condItem.condit = ctrl.cond.id;(!ctrl.cond)?itemCondForm.setDirty():true"
+                                             md-selected-item-change="condItem.condit = ctrl.cond.id;"
                                              info="condicion que aplica"
                                              md-search-text="ctrl.searchCond"
                                              md-items="item in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},] | stringKey : ctrl.searchCond: 'name'"
@@ -1446,7 +1449,7 @@
                                     <md-autocomplete md-selected-item="ctrl.coin"
                                                      flex
                                                      id="convCoin"
-                                                     md-selected-item-change="provConv.$setDirty();conv.coin = ctrl.coin.id"
+                                                     md-selected-item-change="conv.coin = ctrl.coin.id"
                                                      info="moneda de este factor"
                                                      skip-tab
                                                      required
@@ -1475,7 +1478,7 @@
                                     <md-autocomplete md-selected-item="ctrl.line"
                                                      flex
                                                      id="convCoin"
-                                                     md-selected-item-change="provConv.$setDirty();conv.line = ctrl.line.id"
+                                                     md-selected-item-change="conv.line = ctrl.line.id"
                                                      info="linea que aplica el factor"
                                                      skip-tab
                                                      required

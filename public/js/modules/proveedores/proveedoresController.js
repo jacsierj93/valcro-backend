@@ -153,13 +153,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     var interval = null;
     $scope.block=saveForm.isBlock();
     $scope.nextLayer = function(to,e){
+        console.log(e)
        $timeout(function(){
            if(saveForm.isBlock()=="wait"){
                interval = $interval(function(){
                    if(saveForm.isBlock()=="go"){
                        $interval.cancel(interval);
                        saveForm.setBlock(false);
-                       //stepLayer(to,e)
+                       if(e.isTrigger){
+                           stepLayer(to,e)
+                       }
+                       //
                    }else if(saveForm.isBlock()=="reject"){
                        $interval.cancel(interval);
                        saveForm.setBlock(false);
@@ -324,12 +328,27 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     setGetContac.setList();
 
     var activesPopUp = [];
-    $scope.closePopUp = function(sideNav,event){
-        idx = activesPopUp.indexOf(sideNav)
+    $scope.closePopUp = function(sideNav,fn){
+        idx = activesPopUp.indexOf(sideNav);
         if(idx != -1){
+            if(fn.before){
+                pre = fn.before();
+            }else{
+                pre = true;
+            }
+
+            if(!pre){
+                return false;
+            }
+            //after = fn.after || null;
+
             //console.log(idx);
             $mdSidenav(sideNav).close().then(function(){
+                console.log("after")
                 activesPopUp.splice(idx,1);
+                if(fn.after){
+                    fn.after();
+                }
             });
             //console.log(activesPopUp);
         };
@@ -2175,7 +2194,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
 
 });
 
-MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout) {
+MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,listCoins,masterLists,setNotif,$timeout,saveForm) {
     $scope.id="creditCtrl";
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
@@ -2198,7 +2217,49 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
 
     var currentOrig = {};
     var saveCredit = function(onSuccess,elem){
-        var next = elem || false;
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.provCred,
+                model:$scope.cred,
+                list:credit,
+
+                save:function(onSuccess,list,next){
+                    credit = list;
+                    providers.put({type:"saveLim"},$scope.cred,function(data){
+                        $scope.cred.id = data.id;
+                        $scope.provCred.$setPristine();
+                        $scope.setting = true;
+                        credit.moneda_id = $scope.cred.coin;
+                        credit.moneda = $filter("filterSearch")($scope.coins,[$scope.cred.coin])[0];
+                        credit.limite = $scope.cred.amount;
+                        credit.linea_id = $scope.cred.line;
+                        credit.line = $filter("filterSearch")($scope.lines,[$scope.cred.line])[0];
+                        if($scope.cred.amount >= $scope.prov.limCred){
+                            $scope.prov.limCred = $scope.cred.amount;
+                            setGetProv.updateItem($scope.prov);
+                        }
+
+                        if(data.action=="new"){
+                            credit.id= $scope.cred.id;
+                            $scope.limits.unshift(credit);
+                            setNotif.addNotif("ok", "nuevo limite de credito", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "Limite de Credito Actualizado", [
+                            ],{autohidden:3000});
+                        }
+                        setGetProv.addChng($scope.cred,data.action,"limCred");
+                        $timeout(function(){$scope.setting=false;},100)
+                        onSuccess(next);
+                    });
+                }
+            }
+        );
+
+        /*var next = elem || false;
         if((angular.equals(currentOrig,$scope.cred) && $scope.cred.id ) || ($scope.provCred.$pristine )){
             onSuccess(next);
             return false;
@@ -2261,7 +2322,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
             setGetProv.addChng($scope.cred,data.action,"limCred");
             $timeout(function(){$scope.setting=false;},100)
             onSuccess(next);
-        });
+        });*/
     };
 
     $scope.rmCredit = function(elem){
@@ -2292,7 +2353,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         //console.log(cred)
         //credit = cred.lim;
         saveCredit(function(credit){
-            $scope.setting = true;
+            //$scope.setting = true;
             $scope.cred.id = credit.id;
             $scope.cred.id_prov = credit.prov_id;
             $scope.cred.coin = credit.moneda_id;
@@ -2302,7 +2363,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
             $scope.ctrl.line=credit.line;
             currentOrig = angular.copy($scope.bnk);
             setGetProv.addToRllBck($scope.bnk,"limCred");
-            $timeout(function(){$scope.setting=false;},100)
+            //$timeout(function(){$scope.setting=false;},100)
         },cred.lim);
 
     };
@@ -2312,7 +2373,7 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
         // if(jQuery(event.target).parents("#lyrAlert").length==0) {
         if(!elem) {
                 saveCredit(function(elem){
-                    $scope.setting=true;
+                    //$scope.setting=true;
                     $scope.cred = {id: false, coin: "", amount: "", line: "", id_prov: $scope.prov.id};
                     $scope.ctrl.searchLine = undefined;
                     $scope.ctrl.searchCoin = undefined;
@@ -2324,14 +2385,14 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
                         $scope.isShowMore = elem;
                         $scope.$parent.expand = false;
                     }
-                    $timeout(function(){$scope.setting=false;},500)
+                    //$timeout(function(){$scope.setting=false;},500)
                 },elem)
         }else{
             if(!$scope.isShow){
-                $scope.setting = true;
+                //$scope.setting = true;
                 $scope.cred.line = 0;
                 $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
-                $timeout(function(){$scope.setting=false;},500)
+                //$timeout(function(){$scope.setting=false;},500)
             }
 
         }
@@ -2460,7 +2521,7 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
         //$scope.setting=true;
         if(!elem) {
             saveConv(function(){
-                setting=true;
+                //setting=true;
                 $scope.conv = {id:false,freight:"",expens:"",gain:"",disc:"",coin:"",line:"",id_prov: $scope.prov.id};
 
                 factor = {};
@@ -2475,7 +2536,7 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
                     $scope.ctrl.searchCoin = undefined;
                     $scope.provConv.$setUntouched();
                     $scope.provConv.$setPristine();
-                    $timeout(function(){$scope.setting=false;},500)
+                    //$timeout(function(){$scope.setting=false;},500)
                 },500)
 
 
@@ -2483,9 +2544,9 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
 
         }else{
             if(!$scope.isShow){
-                $scope.setting=true;
+                //$scope.setting=true;
                 $scope.conv.line = 0;
-                $timeout(function(){$scope.setting=false;},1000)
+               // $timeout(function(){$scope.setting=false;},1000)
             }
         }
         $scope.isShow = elem;
@@ -2772,7 +2833,7 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
     };
 });
 
-MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$filter,masterLists,setNotif,$timeout) {
+MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$filter,masterLists,setNotif,$timeout,saveForm) {
     $scope.id="transTimeController";
     $scope.prov = setGetProv.getProv();
     var paises = masterLists.getCountries();
@@ -2871,41 +2932,98 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
 
 MyApp.service("setgetCondition",function(){
     var title = {id_cond:"",title:"",line:""};
+    var form = null;
 
     return {
         getTitle:function(){
             return title;
         },
-        setTitle:function(cond){
+        getForm : function(){
+          return form;
+        },
+        setTitle:function(cond,frm){
             title.id = cond.id;
-            title.title = cond.titulo;
-            title.line = cond.line.linea;
+            title.title = cond.title;
+            //title.line = cond.line.linea;
             title.items = cond.items;
+            form = frm;
         }
     }
 });
 
-MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetProv,providers,$filter,setgetCondition,setNotif,$timeout) {
+MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetProv,providers,$filter,setgetCondition,setNotif,$timeout,saveForm) {
     $scope.id="condPayList";
     $scope.lines = masterLists.getLines();
     $scope.prov = setGetProv.getProv();
     $scope.setting = false;
     $scope.$watch('prov.id',function(nvo) {
-        $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+        $scope.condHead = {id:false,title:"",line:"",items:[],id_prov:$scope.prov.id||0};
         $scope.conditions = setGetProv.getPayCond();//(nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
     });
 
    /* $scope.$watch('ctrl.line.id',function(nvo) {
         $scope.condHead.line = nvo;
     });*/
-    $scope.openFormCond = function(){
-        setgetCondition.setTitle(cond);
-        $mdSidenav("payCond").open();
+    $scope.openFormCond = function(e){
+        console.log(e);
+        if((e.isTrigger && $scope.condHead.items.length>0 &&  $scope.condHeadFrm.$pristine)|| e.keyCode==13){
+            if(e.isTrigger){
+                angular.element(":focus").blur();
+                angular.element("form[name='condHeadFrm']").find("[step]").last().focus();
+            }
+           return false;
+        }else{
+            setgetCondition.setTitle($scope.condHead,$scope.condHeadFrm);
+            $scope.$parent.openPopUp("payCond")
+        }
+
     };
     var cond = {};
     var currentOrig = {};
-    var saveLimCred = function(onSuccess,onError,elem){
-        var next = elem || false;
+    //var auxItem = 0;
+    var saveConvHead = function(onSuccess,elem){
+
+        saveForm.execute(
+            {
+                orig:currentOrig,
+                success:onSuccess,
+                elem:elem,
+                form:$scope.condHeadFrm,
+                model:$scope.condHead,
+                list:cond,
+                valid:function(){
+                    //console.log($scope.condHead.items)
+                    return $scope.condHead.items.length>0
+                },
+                save:function(onSuccess,list,next){
+                    contact = list;
+                    providers.put({type:"saveHeadCond"},$scope.condHead,function(data){
+                        $scope.condHead.id = data.id;
+                        $scope.condHeadFrm.$setPristine();
+                        var auxItem = $filter("filterSearch")(cond.items||[],[false]);
+                        for(i=0; i>auxItem.length;i++){
+                            auxItem[i].id=data.items[i];
+                        }
+                        cond.id = $scope.condHead.id;
+                        cond.titulo = $scope.condHead.title;
+                        cond.linea_id = $scope.condHead.line;
+                        cond.prov_id = $scope.condHead.id_prov;
+                        cond.line =  $filter("filterSearch")($scope.lines,[$scope.condHead.line])[0];
+                        if(data.action=="new"){
+                            $scope.conditions.unshift(cond);
+                            setNotif.addNotif("ok", "nueva condicion de pago", [
+                            ],{autohidden:3000});
+                        }else{
+                            setNotif.addNotif("ok", "Datos Actualizados", [
+                            ],{autohidden:3000});
+                        }
+                        setGetProv.addChng($scope.condHead,data.action,"payCond");
+                        onSuccess(next)
+                    });
+                }
+            }
+        );
+        /*var next = elem || false;
         if((angular.equals(currentOrig,$scope.condHead) && $scope.condHead.id) || ($scope.condHeadFrm.$pristine )){
             onError(next);
             return false;
@@ -2966,14 +3084,11 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
         }else{
 
         }
-
+*/
     };
 
-    $scope.endLayer = function(nextfn,elem){
-        saveLimCred(function(){
-            $scope.openFormCond();
-        },function(){
-            $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
+/*    $scope.endLayer = function(nextfn,elem){
+        saveConvHead(  $scope.condHead = {id:false,title:"",line:"",id_prov:$scope.prov.id||0};
             $scope.ctrl.searchLine = "";
             cond = {};
             currentOrig = {};
@@ -2985,7 +3100,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
             nextfn(elem);
         },elem)
 
-    };
+    };*/
 
 
     $scope.rmCond = function(elem){
@@ -3016,14 +3131,15 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     };
 
     $scope.toEdit = function(element){
-        $scope.setting = true;
-        saveLimCred(function(){
-            $scope.openFormCond();
-        },function(cond){
+        //$scope.setting = true;
+        saveConvHead(function(condit){
+            console.log(condit)
+            cond = condit;
             $scope.condHead.id = cond.id;
             $scope.condHead.id_prov = cond.prov_id;
             $scope.condHead.title = cond.titulo;
             $scope.condHead.line = cond.linea_id;
+            $scope.condHead.items = cond.items;
             $scope.ctrl.line = cond.line;
             currentOrig = angular.copy($scope.condHead);
             setGetProv.addToRllBck($scope.condHead,"payCond")
@@ -3035,11 +3151,9 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     $scope.showGrid = function(elem,event){
         //if((jQuery(event.target).parents("#payCond").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
             if(!elem){
-                saveLimCred(function() {
-                    $scope.openFormCond();
-                },function() {
-                    $scope.setting = true;
-                    $scope.condHead = {id: false, title: "", line: "", id_prov: $scope.prov.id || 0};
+                saveConvHead(function() {
+                    //$scope.setting = true;
+                    $scope.condHead = {id: false, title: "", line: "",items:[], id_prov: $scope.prov.id || 0};
                     cond = {};
                     currentOrig = {};
                     $scope.condHeadFrm.$setUntouched();
@@ -3049,19 +3163,18 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                     }
                     $timeout(function(){
                         $scope.ctrl.searchLine = undefined;
-
                         $scope.condHeadFrm.$setUntouched();
                         $scope.condHeadFrm.$setPristine();
-                        $timeout(function(){$scope.setting=false;},500)
+                        //$timeout(function(){$scope.setting=false;},500)
                     },500)
                 })
 
             }else{
                 if(!$scope.isShow){
-                    $scope.setting = true;
+                    //$scope.setting = true;
                     $scope.condHead.title = $scope.conditions.length+1;
-                    $scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
-                    $timeout(function(){$scope.setting=false;},500)
+                    //$scope.ctrl.line = $filter("filterSearch")($scope.lines,["0"])[0];
+                    //$timeout(function(){$scope.setting=false;},500)
                 }
 
 
@@ -3078,18 +3191,35 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
 
 MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,$filter,$mdSidenav,setgetCondition,setNotif,$timeout) {
     $scope.closeCondition = function(){
-        $mdSidenav("payCond").close();
+
+        $scope.$parent.closePopUp("payCond",{
+            before:function(){
+                var x = $scope.max == 0;
+                if(!x){
+                    setNotif.addNotif("error","los items no suman un 100% en total",[]);
+                    angular.element("[name='itemCondForm']").find("step").first().focus();
+                }
+                return x;
+            },
+            after:function(){
+                console.log(angular.element("form[name='condHeadFrm']").find("[step]").last())
+                angular.element("form[name='condHeadFrm']").find("[step]").last().focus();
+            }
+        })
+       // $mdSidenav("payCond").close().then();
     };
     $scope.head = setgetCondition.getTitle();
-    $scope.$watch('head.id',function(nvo) {
-        $scope.condItem = {id:false,days:"",percent:0.00,condit:"",id_head:$scope.head.id||0};
+
+    $scope.$watch('head.title',function(nvo) {
+        $scope.condItem = {id:false,days:"",percent:"",condit:"",id_head:$scope.head.id||0};
         $scope.conditions = $scope.head.items || [];
+        $scope.formHead = setgetCondition.getForm();
         calcMax();
     });
 
 
     var item = {};
-    $scope.$watchGroup(['itemCondForm.$valid','itemCondForm.$pristine'], function(nuevo) {
+/*    $scope.$watchGroup(['itemCondForm.$valid','itemCondForm.$pristine'], function(nuevo) {
         if (nuevo[0] && !nuevo[1]) {
             providers.put({type:"saveItemCond"},$scope.condItem,function(data){
                 $scope.condItem.id = data.id;
@@ -3106,27 +3236,31 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
                 }
             });
         }
-    });
+    });*/
 
-    $scope.max = 100;
+
 
     var calcMax = function(){
-        var max = 100;
+        $scope.max = 100;
         angular.forEach($scope.conditions,function(v,k){
-            if($scope.condItem.id != v.id){
-                max-= parseFloat(v.porcentaje);
-            }
+            //if($scope.condItem.dias != v.days){
+                console.log("entr",v.porcentaje)
+                $scope.max-= parseFloat(v.porcentaje);
+            //}
         });
-        $scope.max = max;
+        //$scope.maxconsole.log( $scope.max )
+        //$scope.max = max;
+        //return max;
     };
 
     $scope.toEdit = function(element){
         item = element.condition;
+        $scope.condItem.modif = true;
         $scope.condItem.id = item.id;
         $scope.condItem.days = item.dias;
         $scope.condItem.percent = parseFloat(item.porcentaje);
         $scope.condItem.condit = item.descripcion;
-        $scope.condItem.id_head = $scope.head.id;
+        //$scope.condItem.id_head = $scope.head.id;
         calcMax();
     };
 
@@ -3143,25 +3277,56 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
 
     $scope.endLayer = function(callFn){
 
-        if(($scope.condItem.days=="" && $scope.condItem.percent==0.00 && $scope.condItem.condit=="") /*|| calcMax()==0*/){
-            angular.element("#conLin").click().focus();
-            $mdSidenav("payCond").close();
-            $timeout(function(){
-                callFn(angular.element("#conLin"));
-            })
 
-        }else{
+            if($scope.itemCondForm.$valid && $scope.itemCondForm.$dirty){
+                console.log($scope.formHead.$setDirty())
+                $scope.formHead.$setDirty();
+                item.id = $scope.condItem.id;
+                item.porcentaje = $scope.condItem.percent;
+                item.dias = $scope.condItem.days;
+                item.descripcion =  $scope.ctrl.cond.name;
+                item.id_condicion = $scope.condItem.condit;
+                if(!$scope.condItem.modif){
+                    $scope.conditions.unshift(item);
+                    setNotif.addNotif("ok", "nuevo Item cargado", [
+                    ],{autohidden:3000});
+                }else{
+                    setNotif.addNotif("ok", "item modificado", [
+                    ],{autohidden:3000});
+                }
+                $scope.condItem = {id:false,days:"",percent:"",condit:"",id_head:$scope.head.id||0};
+                $scope.ctrl.searchCond=undefined;
+                item = {};
+                calcMax();
 
-            $scope.condItem = {id:false,days:"",percent:0.00,condit:"",id_head:$scope.head.id||0};
-            $scope.ctrl.searchCond=undefined;
-            item = {};
-            $scope.itemCondForm.$setUntouched();
-            angular.element("#condItemPerc").focus();
-        }
+                $scope.itemCondForm.$setPristine();
+                $scope.itemCondForm.$setUntouched();
+                console.log($scope.max)
+                $timeout(function(){
+                    if($scope.max==0){
+                        $scope.closeCondition();
+                    }else{
+                        angular.element("#condItemPerc").focus();
+                    }
+                },500)
+
+
+            }else{
+                setNotif.addNotif("error", "los datos son invalidos", [
+                ],{autohidden:3000});
+                if($scope.itemCondForm.$dirty){
+                    angular.element("[name='itemCondForm']").find(".ng-invalid").first().focus();
+                }else{
+                    angular.element("#condItemPerc").focus();
+                }
+
+            }
+
+
     }
 });
 
-MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService,setNotif ){
+MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService,setNotif,saveForm ){
     $scope.id="priceListController";
     filesService.setFolder("prov");
     $scope.openAdj = function(e){
@@ -3466,7 +3631,7 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
      //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
  });
 
-MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
+MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter){
     var foreign = {
         currentOrig : {},
         onSuccess : null,
@@ -3475,6 +3640,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
         form:null,
         model:null,
         saveFn : null,
+        valid: null,
         elList : {}
     };
     var block = false;
@@ -3483,15 +3649,18 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
         next = foreign.elem || false;
 
         if ((angular.equals(foreign.currentOrig, foreign.model) && foreign.model.id ) || (foreign.form.$pristine )) {
-            if(foreign.onFail){
-                foreign.onFail(next);
-            }else{
-                foreign.onSuccess(next);
-            }
+
+            foreign.onSuccess(next);
+            //}
             return false;
         }
 
-        if (!foreign.form.$valid && !foreign.form.$pristine) {
+
+        var isValid = (foreign.valid)?foreign.valid():true;
+
+        console.log(foreign.form,isValid);
+
+        if (!foreign.form.$valid && !foreign.form.$pristine || (!isValid && foreign.form.$dirty)) {
             var prefocus = angular.element(":focus");
             block = "wait";
             $timeout(function () {
@@ -3501,6 +3670,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
                 })
 
             }, 0);
+            console.log("falla",foreign.form.$name)
             setNotif.addNotif("alert", "los datos no son validos para guardarlos, que debo hacer??", [{
                 name: "descartalos",
                 action: function () {
@@ -3533,7 +3703,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
 
         }
         foreign.saveFn(foreign.onSuccess,foreign.elList,next);
-    }
+    };
 
     return {
         execute:function(param){
@@ -3546,6 +3716,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif){
                 foreign.model = param.model;
                 foreign.saveFn = param.save;
                 foreign.elList = param.list;
+                foreign.valid = (param.valid)?param.valid:null;
                 genericSave();
             }
 
