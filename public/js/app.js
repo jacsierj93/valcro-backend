@@ -734,7 +734,6 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
                 location.replace(PATHAPP +'#home');
             }
         }, function errorCallback(response) {
-            console.log(response);
         });
 
     };
@@ -744,7 +743,6 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 
 MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGetProv, Layers,App,SYSTEM) {
 
-    console.log("location", location);
     if(location.pathname.indexOf('External') != -1){
         location.assign(SYSTEM.PATHAPP+'#home');
     }
@@ -868,7 +866,6 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     /** cerrado de la grilla en modo small**/
     $scope.closeSideFile = function(e){
         if(!angular.element(e.target).is("#ngf-fileInput")){
-            console.log("is open file",$scope.isOpen )
             if($scope.isOpen){
                 filesService.close();
             }
@@ -1308,7 +1305,7 @@ MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
     PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/",
-    noti_autohidden :1500
+    noti_autohidden :3000
 });
 
 

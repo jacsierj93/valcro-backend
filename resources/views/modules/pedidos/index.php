@@ -16,6 +16,9 @@
                         <img ng-src="images/Down.png">
                         <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
+                    <md-tooltip md-direction="right">
+                        Click para desplegar opciones
+                    </md-tooltip>
                 </div>
 
                 <div layout="column" flex="" tabindex="-1"  style="padding: 0px 4px 0px 4px;" tabindex="-1">
@@ -24,6 +27,7 @@
                             <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
                                 <label>Razon  Social</label>
                                 <input  type="text" ng-model="filterProv.razon_social"  tabindex="-1" >
+
                             </md-input-container>
 
                             <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
@@ -177,39 +181,42 @@
 
                     <div layout="column" ng-show="(module.index < 1 || module.layer == 'listPedido' )" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
+                        <md-tooltip >
+                            Crear un nuevo documento
+                        </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-show="(module.index > 1 && Docsession.block && !document.aprob_gerencia && !document.aprob_compras && document.id )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
+                        <md-tooltip >
+                            Actualizar la  {{formMode.name}}
+                        </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-show="(module.index > 1 && document.estado_id != 3 && document.id)"
                          ng-click="cancelDoc()">
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
+                        <md-tooltip>
+                            Cancelar la {{formMode.name}}
+                        </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-show="( document.id && Docsession.isCopyableable )"
                          ng-click="copyDoc()">
                         <span class="icon-Copiado" style="font-size: 24px"> </span>
+                        <md-tooltip >
+                            Crear una copia de la {{formMode.name}} (Sin adjuntos)
+                        </md-tooltip>
                     </div>
 
                     <div layout="column" layout-align="center center"
                          ng-show="( document.id &&  document.version && document.version > 1  )"
                          ng-click="openVersions()">
                         <span style="font-size: 24px"> OLD </span>
+                        <md-tooltip >
+                            Ver las versiones anteriores de la {{formMode.name}}
+                        </md-tooltip>
                     </div>
-
-                    <div layout="column" layout-align="center center"
-
-                         ng-click="demo()">
-                        <span style="font-size: 24px"> TEst </span>
-                    </div>
-
-                    <!--  <div layout="column" layout-align="center center"
-                           ng-click="printTrace()">
-                          <span style="font-size: 24px"> TEST</span>
-                      </div>-->
-
 
                 </div>
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
@@ -222,6 +229,9 @@
                          layout="column" layout-align="center center"  style=text-align:center; >
                         <img src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
                     </div>
+                    <md-tooltip>
+                       {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
+                    </md-tooltip>
                 </div>
             </div>
 
@@ -1657,7 +1667,7 @@
                                 </div>
 
 
-                                <div  ng-click="openSide('agrContPed')" style="width:24px;">
+                                <div id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
                                     <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
 
                                 </div>
@@ -1680,6 +1690,7 @@
                                     KitchenBoxs
                                 </div>
                                 <div
+                                    id="btnAgrKitchen"
                                     ng-click="openSide('agrKitBoxs')"
                                     style="width:24px;">
                                     <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
@@ -1704,6 +1715,7 @@
                                     {{formMode.name}} a Sustituir
                                 </div>
                                 <div
+                                    id="btnAgrPedSusti"
                                     ng-click="openSide('agrPedPend')"
                                     style="width: 24px;">
                                     <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
@@ -2941,7 +2953,7 @@
                                 </div>
                                 <div flex layout="row"  layout-align="end start">
                                     <md-switch class="md-primary"
-                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave(ctrlZHead,['#detalleDoc div.activeleft '])" ng-disabled="( Docsession.block )"
 
                                     >
                                     </md-switch>
@@ -3131,8 +3143,7 @@
                                 </div>
                                 <div flex layout="row"  layout-align="end start">
                                     <md-switch class="md-primary"
-                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
-
+                                               ng-model="ctrlZCp" ng-change ="toSideNave(ctrlZCp,['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])" ng-disabled="( Docsession.block )"
                                     >
                                     </md-switch>
                                 </div>
@@ -3143,7 +3154,7 @@
 
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contraPedido" layout-align="space-between center" >
                                         <div layout="row"  flex>
-                                            <div  layout="column" ng-show="item.id.estado == 'new' && item.id.trace.length > 0"
+                                            <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
                                             </div>
@@ -3175,7 +3186,7 @@
                                 </div>
                                 <div flex layout="row"  layout-align="end start">
                                     <md-switch class="md-primary"
-                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave(ctrlZCp,['#agrPed div.activeleft ','#agrPed div#btnAgrKitchen'])" ng-disabled="( Docsession.block )"
 
                                     >
                                     </md-switch>
@@ -3185,7 +3196,7 @@
                                 <md-content style="margin: 4px;">
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.kitchenBox" layout-align="space-between center" >
                                         <div layout="row" >
-                                            <div  layout="column" ng-show="item.id.estado == 'new' && item.id.trace.length > 0"
+                                            <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
                                             </div>
@@ -3217,7 +3228,7 @@
                                 </div>
                                 <div flex layout="row"  layout-align="end start">
                                     <md-switch class="md-primary"
-                                               ng-model="ctrlZHead" ng-change ="toSideNave('detalleDoc')" ng-disabled="( Docsession.block )"
+                                               ng-model="ctrlZHead" ng-change ="toSideNave(ctrlZCp,['#agrPed div.activeleft ','#agrPed div#btnAgrPedSusti'])" ng-disabled="( Docsession.block )"
 
                                     >
                                     </md-switch>
@@ -3228,7 +3239,7 @@
 
                                     <div layout="row" class="cellGridHolder "  ng-repeat=" item in finalDoc.pedidoSusti" layout-align="space-between center" >
                                         <div layout="row"  flex >
-                                            <div  layout="column" ng-show="item.id.estado == 'new' && item.id.trace.length > 0"
+                                            <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
                                             </div>
@@ -3327,7 +3338,9 @@
                             <div flex >
                                 <div  ng-repeat="item in finalDoc.productos | filter:tbl_finalDoc.filter:strict |orderBy : tbl_finalDoc  "  >
                                     <div layout="row" class="cellGridHolder" >
-                                        <div flex="20" class="cellSelect" ng-class="{'cellSelect':( finalProdSelec.id  != item.id) ,'cellSelect-select':(finalProdSelec.id  == item.id )}" > {{item.codigo}}</div>
+                                        <div flex="20" class="cellSelect" ng-class="{'cellSelect':( finalProdSelec.id  != item.id) ,'cellSelect-select':(finalProdSelec.id  == item.id )}" >
+                                            {{item.codigo}}
+                                        </div>
                                         <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
                                         <div flex class="cellGrid" > {{item.descripcion}}</div>
                                         <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
@@ -4259,6 +4272,7 @@
                                                   id="textarea"
                                                   required
                                                   flex
+                                                  placeholder="Texto"
 
                                         ></textarea>
                                     <div >
@@ -4277,7 +4291,7 @@
                         </div>
                     </div>
                 </div>
-
+                <loader ng-show="inProgress"></loader>
             </md-content>
         </md-sidenav>
 
@@ -4392,6 +4406,7 @@
                         </div>
                     </div>
                 </div>
+                <loader ng-show="inProgress"></loader>
 
             </md-content>
         </md-sidenav>
@@ -4456,7 +4471,7 @@
                     z-index: 100;"
             layout="column" layout-align="center center" class="md-sidenav-right"
             md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
-            ng-mouseleave="showNext(false)" ng-click="next()" >
+            ng-mouseleave="showNext(false)" ng-click="next()" click-out="showNext(false)">
             <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
 

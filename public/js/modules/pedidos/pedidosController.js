@@ -28,10 +28,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     $scope.index= 0;
     $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[] , direcciones:[], puertos:[]};
     $scope.formDataContraP ={};
-    $scope.ctrl = setGetOrder.getObjs();
 
     filesService.setFolder('orders');
-    $scope.getObj = setGetOrder.getObj;
     $scope.filesProcess = filesService.getProcess();
 
     $scope.forModeAvilable={
@@ -409,7 +407,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     $scope.allowEdit = function(){
 
         if($scope.Docsession.block){
-            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder modificar",[],{autohidden:autohidden});
+            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder modificar",[],{autohidden:2500});
 
         }
     };
@@ -462,8 +460,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
     $scope.updateForm = function () {
         $scope.Docsession.block=false;
-
-        //$scope.formBlock = false;
+        $scope.Docsession.isCopyableable=false;
         Order.postMod({type:$scope.formMode.mod,mod:"Update"},{id: $scope.document.id},function(){
             $scope.isTasaFija=true;
             var mo= jQuery("#"+$scope.layer).find("md-content");
@@ -500,13 +497,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     $scope.copyDoc = function() {
 
         Order.postMod({type:$scope.formMode.mod, mod:"Copy"},{id:$scope.document.id}, function(response){
-            //setGetOrder.setOrder();
-            //$scope.document.id = response.id;
             setGetOrder.reload({id:response.id,tipo: $scope.formMode.value});
             $scope.NotifAction("ok","Nueva version creada",[],{autohidden:autohidden});
             $scope.Docsession.block= false;
-
-            // $scope.formBlock=false;
             $scope.navCtrl.value="detalleDoc";
             $scope.navCtrl.estado=true;
             setGetOrder.change("document", 'id', response.id);
@@ -565,7 +558,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         final.contraPedido = cp;
         final.kitchenBox = kit;
         final.pedidoSusti = sus;
-        console.log("final ", final);
         return final;
     };
 
@@ -1052,8 +1044,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                 Order.postMod({type:$scope.formMode.mod, mod:"Save"},doc, function(response){
                     $scope.document.id = response.id;
                     setGetOrder.setOrder({id:response.id,tipo:$scope.formMode.value});
-                    /*setGetOrder.addForm('document',$scope.document);
-                     setGetOrder.setState('select');*/
+                    setGetOrder.setState('select');
                     $scope.navCtrl.value="listImport";
                     $scope.navCtrl.estado=true;
 
@@ -1793,13 +1784,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         $scope.provIndex= angular.copy(p.$index);
         if( $scope.module.index == 0){
             $scope.LayersAction({open:{name:"listPedido", after:function(){
-                setGetOrder.setObj('prov_id',prov);
                 $scope.ctrl.provSelec = prov;
                 loadPedidosProvedor(prov.id);
             }}});
         }else if($scope.module.layer == "listPedido" ){
             $scope.ctrl.provSelec = prov;
-            setGetOrder.setObj('prov_id',prov);
 
             loadPedidosProvedor(prov.id);
         }else  if($scope.module.layer != "listPedido" && !$scope.provSelec.id){
@@ -1807,7 +1796,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             $scope.LayersAction({close:{init:true, after: function(){
                 $scope.LayersAction({open:{name:"listPedido", after:function(){
                     $scope.ctrl.provSelec = prov;
-                    setGetOrder.setObj('prov_id',prov);
                     loadPedidosProvedor(prov.id);
                 }}});
             }}});
@@ -1919,6 +1907,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             $scope.preview=false;
             $scope.navCtrl.value="detalleDoc";
             $scope.navCtrl.estado=true;
+            $scope.Docsession.global='upd';
         }
 
 
@@ -1950,45 +1939,50 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     $scope.saveFinal = function(){
 
         $scope.NotifAction("alert","¿Que desea hacer?",[
-            {name:"Cancelar", action: function(){}},
-            {name:($scope.Docsession.global== 'new') ? 'Enviar ': 'Re-enviar', action: function(){
+            {name:"No guardar cambios", action: function(){}},
+            {name:($scope.Docsession.global == 'new') ? 'Enviar ': 'Re-enviar', action: function(){
                 $scope.OpenContactMail(function(){
-                    $scope.updateProv(function(){
-                        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                            if (response.success) {
+                    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                        if (response.success) {
+                            $timeout(function(){
+                                var layer=angular.element("#"+$scope.layer);
+                                layer[0].click();
+
+                            },0);
+
+                            $scope.updateProv(function(){
                                 $scope.NotifAction("ok","Realizado",[
-                                    {name:"Ok",default:2, action: function(){
-
-
+                                    {name:"Ok", action: function(){
+                                        $scope.LayersAction({close:{first:true, search:true}});
                                     }}
                                 ],{block:true});
-                                $scope.LayersAction({close:{first:true, search:true, before:function(){
-                                    $timeout(function(){
-                                        angular.element("#"+$scope.layer).click();
-                                    },0);
-                                }}});
-                            }});
 
-                    });
+                            });
 
+                        }});
                 });
             }},
             {name:"Guardar y redactar un correo ", action: function(){
                 $scope.openSendMail(function(){
                     Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
                         if (response.success) {
-                            $scope.updateProv();
-                            $scope.NotifAction("ok","Finalizado",[
-                                {name:"Ok",default:2, action: function(){
-                                    $scope.LayersAction({close:{first:true, search:true, before:function(){
-                                        $timeout(function(){
-                                            angular.element("#"+$scope.layer).click();
-                                        },0);
-                                    }}});
-                                    filesService.close();
+                            $timeout(function(){
+                                var layer=angular.element("#"+$scope.layer);
+                                console.log("layer")
+                                layer[0].click();
 
-                                }}
-                            ],{block:true});
+                            },0);
+
+                            $scope.updateProv(function(){
+                                $scope.NotifAction("ok","Realizado",[
+                                    {name:"Ok", action: function(){
+                                        $scope.LayersAction({close:{first:true, search:true}});
+
+                                    }}
+                                ],{block:true});
+
+                            });
+
                         }});
                 })
             }}
@@ -1997,10 +1991,18 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
     $scope.toSideNave = function(model,to){
         console.log("to", to);
-         if(!Object.isArray(to)){
-           var ele= angular.element("#"+to);
-             ele.click();
-         }
+        var index=400 ;
+        model=false;
+        angular.forEach(to, function(v){
+            $timeout(function(){
+                var clicker=angular.element(v);
+                console.log("layer",clicker)
+                clicker[0].click();
+
+            },index);
+            index = index + 400;
+        });
+
     };
 
     /******************     excepciones       **********/
@@ -2305,11 +2307,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
     $scope.updateProv= function(calback){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
+
             angular.forEach($scope.provSelec,function(v,k){
                 $scope.provSelec[k] = response[k];
             });
             if(calback){
-
+                calback();
             }
         });
     };
@@ -2554,17 +2557,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                                     });
                                 });
                             }
-                            /*Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(){
-                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id}, function(){
-                             $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){
-                             $scope.LayersAction({close:true});
-                             setGetOrder.reload({id:$scope.document.id,tipo:$scope.formMode.value});
 
-                             }} ] ,{block:true});
-
-                             });
-
-                             });*/
                         }
                     }
                     ,{name:"Dejarme elegir ",
@@ -2672,8 +2665,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                                                             console.log("asignando "+ k,v )
                                                             console.log("new doc ",$scope.document );
                                                         });
-                                                        console.log("new doc ",$scope.document );
-
                                                         Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.document, function(){
                                                             Order.postMod({type:$scope.formMode.mod, mod:"SetParent"},{princ_id: $scope.document.id,doc_parent_id:doc.id},function(){
                                                                 $scope.NotifAction("ok","Realizado",[{name:"Ok",default:2, action: function(){
@@ -3408,14 +3399,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
 
-        if($scope.layer){
-            /* var form =  angular.element("#"+$scope.layer).find("form:first");
-             console.log("form", form);
-             if(form){
-             form.focus();
-             }*/
-        }
-        //
         if( newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs" ){
             $timeout(function(){
                 $scope.document ={};
@@ -3491,13 +3474,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         if(newVal[1] == "agrPed" || newVal[1] == "newVal" || newVal[1] == "finalDoc" || newVal[1] == "detalleDoc"){
             if($scope.document.id != '' && typeof($scope.document.id) !== 'undefined' && setGetOrder.getState() != 'load'){
                 setGetOrder.reload();
+                setGetOrder.setState('load');
             }
         }
 
-        if(newVal[1] == "unclosetDoc"){
-            setGetOrder.restore();
-            $scope.document={};
-        }
     });
 
     /******************************** GUARDADOS ***************************************/
@@ -3610,7 +3590,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     $scope.doClick = function (name){
         $timeout( function(){
             var obj= angular.element(name);
-            console.log("click in", obj);
             obj.click();
         }, 100);
 
@@ -3659,6 +3638,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','setGetOrder'
     $scope.isOpen= false;
     $scope.destinos =[];
     $scope.emailToText='';
+    $scope.inProgress=false;
     $scope.transformChip = function(chip) {
         if (angular.isObject(chip)) {
             return chip;
@@ -3713,8 +3693,6 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','setGetOrder'
 
     $scope.addEmail = function(chip){
         $scope.destinos.push(chip.valor+chip.razon_social);
-        console.log('$scope.destinos',$scope.destinos);
-
     };
 
     $scope.removeEmail = function(chip){
@@ -3733,10 +3711,12 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','setGetOrder'
             $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
 
         }else{
+            $scope.inProgress=true;
             Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
                 if( $scope.calback){
                     $scope.calback();
                 }
+                $scope.inProgress=false;
             });
         }
     }
@@ -3756,6 +3736,7 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','setGetOrd
     $scope.emailToText='';
     $scope.useMailSyte= false;
     $scope.correosProvider =[];
+    $scope.inProgress= false;
     $scope.transformChip = function(chip) {
         if (angular.isObject(chip)) {
             return chip;
@@ -3810,7 +3791,6 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','setGetOrd
 
     $scope.addEmail = function(chip){
         $scope.destinos.push(chip.valor+chip.razon_social);
-        console.log('$scope.destinos',$scope.destinos);
 
     };
 
@@ -3827,15 +3807,15 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','setGetOrd
             $scope.NotifAction("error","Por favor selecione al menos un destinatario",[],{autohidden:SYSTEM.noti_autohidden});
 
         }else{
+            $scope.inProgress= true;
             Order.postMod({type:$scope.formMode.mod, mod:"Send"},
                 {id:$scope.document.id, to:$scope.to, cc:$scope.cc, cco:$scope.cco,local:$scope.usePersonal, asunto:$scope.asunto},
                 function(){
-                    $scope.$parent.NotifAction('ok','Enviado',[],{autohidden:SYSTEM.noti_autohidden});
-                    $scope.$parent.LayersAction({close:{first:true, search:true}});
                     $mdSidenav("addEMail").close().then(function(){
                         $scope.isOpen = false;
                         if( $scope.calback){
                             $scope.calback();
+                            delete $scope.calback;
                         }
                     });
 
@@ -3859,8 +3839,7 @@ MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order', func
 
     $scope.loadPreview = function(){
         Order.htmlMod({type:$scope.$parent.formMode.mod, mod:'EmailEstimate',id:$scope.$parent.document.id},{},function(response){
-            console.log("response", response);
-           $scope.template= $sce.trustAsHtml(response.body);
+            $scope.template= $sce.trustAsHtml(response.body);
         });
 
     }
@@ -3868,14 +3847,12 @@ MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order', func
     $scope.$watch('titulo', function(newVal){
         if(newVal ){
             var ele= angular.element("#previewEmail #templateContent #titulo ");
-            console.log(" ele", ele);
             ele.html(newVal);
         }
     });
     $scope.$watch('descripcion', function(newVal){
         if(newVal){
             var ele= angular.element("#previewEmail #templateContent #descripcion ");
-            console.log(" ele", ele);
             ele.html(newVal);
         }
     });
@@ -3924,8 +3901,6 @@ MyApp.controller('MailCtrl',['$scope','SYSTEM','IsEmail','Order', function($scop
 
     $scope.addEmail = function(chip){
         $scope.destinos.push(chip.valor+chip.razon_social);
-        console.log('$scope.destinos',$scope.destinos);
-
     };
 
     $scope.removeEmail = function(chip){
@@ -3971,7 +3946,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
             if(arg.search){
                 search(arg.search, module);
             }else {
-                console.log("error parametro no implemtnado")
             }
 
         }
@@ -4144,17 +4118,16 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
 
         if(!forms[form][fiel] ){
             if(typeof (value) == 'object'){
+
                 angular.forEach(value, function(v2,k2){
                     if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
-                        forms[form][fiel][k2]= {original:v2, v:v2, estado:'created',trace:[]};
+                        forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
                     }
-                })
-            }else {
-                forms[form][fiel]= {original:value, v:value, estado:'created',trace:[]};
-
+                });
+            }else{
+                forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
             }
             exist=false;
-            console.log("creado  item")
         };
 
         if( exist){
@@ -4173,9 +4146,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                 forms[form][fiel].trace.push(value);
                 forms[form][fiel].v= value;
             }else{
-                console.log("no se que hacer  form",form );
-                console.log("no se que hacer  field",fiel );
-                console.log("no se que hacer  value",value );
+
             }
         }
 
@@ -4234,23 +4205,8 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         },
         getInternalState: function(){
             return interno;
-        },
-        getObjs : function(){
-            return  data;
-        },
-        getObj : function(key){
-            switch (key){
-                case 'prov_moneda_id':return   providers.query({type: "provCoins", id_prov: order.prov_moneda_id});
-                default:
-                    return $q(function(){console.log("no implemte")},function(){console.log("no resolve")});
-            }
         }
         ,
-        setObj : function(key,value){
-            data[key]= null;
-            data[key]= value;
-        },
-
         setOrder : function(doc){
             // order={};
             if(doc.id && doc.tipo){
@@ -4355,26 +4311,12 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                 angular.forEach(response.productos.todos, function(v){
                     order.productos.todos.push(v);
                 });
-
-
-
-
-
                 angular.forEach(response,function(v,k){
                     if(typeof (order[k]) == 'string' ){
                         order[k]= v;
 
                     }
                 });
-                /*angular.forEach(response.productos.contraPedido, function(v,k){
-                 change('contraPedido'+ v.id,k,v);
-                 });
-                 angular.forEach(response.productos.kitchenBox, function(v,k){
-                 change('kitchenBox'+ v.id,k,v);
-                 });
-                 angular.forEach(response.productos.pedidoSusti, function(v,k){
-                 change('pedidoSusti'+ v.id,k,v);
-                 });*/
                 bindin.estado=true;
 
             });
@@ -4504,8 +4446,6 @@ MyApp.directive('decimal', function () {
         link: function (scope, elem, attrs,ctrl) {
 
             elem.bind("keydown",function(e){
-                console.log("key ", key);
-
                 var key = window.Event ? e.which : e.keyCode;
 
                 if(!((key >= 48 && key <= 57) || (key==8)  || (key==16)  ||
@@ -4527,24 +4467,16 @@ MyApp.directive('decimal', function () {
     };
 });
 
-MyApp.directive('auto', function ( ) {
-    return {
-        require: 'mdAutocomplete',
+MyApp.directive('loader', function() {
 
-        link: function(scope, element, attrs, ctrl) {
-            console.log("ctrl", ctrl)
-            console.log("tsdfgf", this);
-            console.log("scope", scope);
-        }
-    };
-});
-
-MyApp.directive('autoRequired', function () {
     return {
-        require: 'ngModel',
-        link: function (scope, elem, attrs,ctrl) {
-            console.log("llego al input ", ctrl);
-        }
+        replace: true,
+        transclude: true,
+        link: function(scope, element){
+            element.addClass("loader");
+            element.removeAttr("loader");
+        },
+        templateUrl:"modules/home/loader"
     };
 });
 
