@@ -2076,6 +2076,42 @@
 
                         </div>
                     </div>
+
+                    <div>
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                            <div>
+                               Monedas
+                            </div>
+                            <md-switch ng-hide="!has(prov.provCoin)" md-no-ink ng-model="isEdit.provCoin" ng-change="toForm('provCoin')" aria-label="No Ink Effects">
+                                <!-- editar-->
+                            </md-switch>
+                        </div>
+                        <div>
+                            <span ng-show="!has(prov.provCoin)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        </div>
+                        <!--<div layout="row" >
+                            <div flex></div><div ng-click="toForm('nomvalcroForm')">edit</div>
+                        </div>-->
+                        <md-content flex style="max-height: 200px;">
+                            <div ng-repeat="(k,coin) in prov.provCoin" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
+
+                                <div layout="column"  ><!--ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}"-->
+                                    <div layout="row" flex="grow">
+                                        <div ng-show="coin.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
+                                        <div ng-show="coin.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
+                                        <div ng-show="coin.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
+                                        <div flex>
+                                            {{getDato(coin.datos.coin,'coins','nombre')}}
+
+                                        </div>
+                                            
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </md-content>
+                    </div>
                     <div>
                         <div class="titulo_formulario" layout="row" layout-align="start start" flex >
                             <div>
@@ -2090,8 +2126,15 @@
                         </div>
                         <div ng-repeat="(k,lim) in prov.limCred">
 
-                            <div layout="column" ng-class="{'title_del' :lim.action =='del','title_upd' :lim.action =='upd','title_new' :lim.action =='new'}">
-                                {{lim.datos.nombreCont}}
+                            <div layout="row" >
+                                <div flex>
+                                    {{getDato(lim.datos.line,'lines','line')}}
+                                </div>
+                                <div flex>
+                                    {{lim.datos.amount}} {{getDato(lim.datos.coin,'coins','simbolo')}}
+                                </div>
+
+
                             </div>
 
                         </div>
@@ -2111,7 +2154,7 @@
                         <div ng-repeat="(k,conv) in prov.factConv">
 
                             <div layout="column" ng-class="{'title_del' :conv.action =='del','title_upd' :conv.action =='upd','title_new' :conv.action =='new'}">
-                                {{conv.datos.nombreCont}}
+                                {{conv.datos.conv}}
                             </div>
 
                         </div>

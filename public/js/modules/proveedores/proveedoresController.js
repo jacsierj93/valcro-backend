@@ -863,8 +863,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
     $scope.toEdit = function(addrs){
 
-        saveAddress(function(dirSel){
-            $scope.setting = true;
+        saveAddress(function(el){
+            dirSel = el;
             $scope.dir.id = dirSel.id;
             $scope.dir.id_prov = dirSel.prov_id;
             $scope.dir.direccProv = dirSel.direccion;
@@ -879,7 +879,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             $scope.dir.zipCode = parseInt(dirSel.codigo_postal);
             currentOrig = angular.copy($scope.dir);
             setGetProv.addToRllBck($scope.dir,"dirProv");
-            $timeout(function(){$scope.setting = false;},100)
+
         },addrs.add)
 
     };
@@ -2100,7 +2100,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
                 $scope.filt = listCoins.getIdCoins();
                 setNotif.addNotif("ok", "Moneda cargada", [
                 ],{autohidden:3000});
-                setGetProv.addChng($scope.cn,data.action,"provCoin");
+                setGetProv.addChng($scope.cn,"new","provCoin");
                 $timeout(function(){$scope.setting = false;},100)
             })
         }
@@ -2352,8 +2352,8 @@ MyApp.controller('creditCtrl', function ($scope,providers,setGetProv,$filter,lis
     $scope.toEdit = function(cred){
         //console.log(cred)
         //credit = cred.lim;
-        saveCredit(function(credit){
-            //$scope.setting = true;
+        saveCredit(function(el){
+            credit = el;
             $scope.cred.id = credit.id;
             $scope.cred.id_prov = credit.prov_id;
             $scope.cred.coin = credit.moneda_id;
@@ -2426,6 +2426,7 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
     $scope.$watch('factors.length',function(nvo){
         setGetProv.setComplete("factors",nvo);
     });
+
     var factor = {};
     var currentOrig = {};
 
@@ -2439,7 +2440,9 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
                 model:$scope.conv,
                 list:factor,
                 save:function(onSuccess,list,next){
-                    factor = list;
+                    console.log(factor)
+                    //factor = foreign.elList;
+                    //console.log(list)
                     providers.put({type:"saveConv"},$scope.conv,function(data){
                         $scope.conv.id = data.id;
                         factor.prov_id = $scope.conv.id_prov
@@ -2497,8 +2500,9 @@ MyApp.controller('convController', function ($scope,$mdSidenav,providers,setGetP
     };
 
     $scope.toEdit = function(fact){
-        //actor = fact.factor;
-        saveConv(function(factor) {
+
+        saveConv(function(el) {
+            factor = el;
             $scope.setting = true;
             $scope.conv.id = factor.id;
             $scope.conv.id_prov = factor.prov_id;
@@ -3553,6 +3557,8 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
      foraneos.typeDir = masterLists.getTypeDir();
      foraneos.countries = masterLists.getCountries();
      foraneos.ports = masterLists.getPorts();
+     foraneos.coins = masterLists.getAllCoins();
+     foraneos.lines = masterLists.getLines();
      foraneos.depsValcroName = [
          {
              id:"1",

@@ -7,7 +7,7 @@
     z-index: 99;
     background: transparent;
     cursor: default;
-" ng-show="block">
+" ng-show="(block>0)">
 
 </div>
 <md-sidenav md-on-close="curFocus[0].focus()" layout="row" style="top: calc(100% - 120px); height: 72px; margin-bottom:24px; width: calc(100% - {{264 + (24*$parent.index)}}px); z-index:100" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">

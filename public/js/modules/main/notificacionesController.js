@@ -28,7 +28,9 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         $scope.alerts[target].splice($scope.selected[target],1);
 
         if(curr.param && "block" in curr.param){
-            $scope.block = false;
+
+            //$scope.block = false;
+            $scope.block--;
         }
     };
 
@@ -85,7 +87,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     });
 
     /*comiensan las funciones para la configuracion de parametros de las notificaciones*/
-    $scope.block = false;
+    $scope.block = 0;
     $scope.invoiceParams = function(notif){
 
         if(params = notif.param){
@@ -102,14 +104,14 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
             if("block" in params){
                 angular.element(":focus").blur();
-                $scope.block = notif.type;
+                //$scope.block = notif.type;
+                $scope.block++;
                 $timeout(function(){
                     angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first().focus();
                 },10);
 
             }
             if("inputTitle" in params){
-                console.log(" title")
                 $scope.inputTitle = params.inputTitle;
             }
 
@@ -140,8 +142,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         //console.log(def);
     };
     $scope.shakeOnBlock = function(){
-        console.log("shake");
-        console.log(angular.element("#"+$scope.block));
+
 
         angular.element("#"+$scope.block).addClass("shake");
         $timeout(function(){
