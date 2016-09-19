@@ -31,17 +31,8 @@
 .dot-filter0:hover{ border: 1px solid rgb(84, 180, 234);color:rgb(84, 180, 234);}/** llegada en <=0 */
 
 .dot-attachment{border: 1px solid rgb(84, 180, 234);color:rgb(84, 180, 234);}/** dot para marcar adjuntos **/
-
-
-
 .dot-select{border: 1px solid rgb(84, 180, 234) !important;color:rgb(84, 180, 234) !important;}/** dot que este selecionado**/
-/*.dot-exception{width: 16px;
-    height: 16px;
-    text-align: center;
-    color: #674001;
-    border: 1px solid rgb(255, 244, 76) !important;
-    background-color: rgb(255, 244, 76) !important;
-}*/
+
 
 /** dot que este selecionado**/
 .item-select{ color:rgb(84, 180, 234) !important;} /**item selecionado */

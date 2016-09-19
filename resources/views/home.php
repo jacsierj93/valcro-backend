@@ -77,7 +77,20 @@
     </div>
 
 </div>
+<div id="blockXLevel"  style="
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: transparent;
+    cursor: default;
+    width: 100%;
+    height: 100%;
+    z-index:{{level}}
+" ng-show="block">
+
+</div>
 <div ng-controller="LayersCtrl"></div>
+
 
 <?= HTML::script('js/app.js') ?>
 <?= HTML::script('js/appTemp.js') ?>
