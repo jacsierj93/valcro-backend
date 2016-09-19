@@ -230,7 +230,7 @@
                         <img src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
                     </div>
                     <md-tooltip>
-                       {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
+                        {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
                     </md-tooltip>
                 </div>
             </div>
@@ -417,7 +417,7 @@
                         <div active-left before="verificExit" ></div>
                         <div layout="column" flex>
                             <div   ng-repeat="item in filterDocuments(docImports, tbl_listImport.filter) | orderBy : tbl_listImport.order" >
-                                <div layout="row" class="cellGridHolder" ng-click="docImport(item)" >
+                                <div layout="row" class="cellGridHolder" >
                                     <div flex class="cellGrid" ng-click="docImport(item)"> {{item.titulo}}</div>
                                     <div flex="15" class="cellGrid" ng-click="docImport(item)"> {{item.nro_proforma}}</div>
                                     <div flex="10" class="cellGrid" ng-click="docImport(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
@@ -920,7 +920,7 @@
                     <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.solicitud)">
                         <img src="images/solicitud_icon_48x48.gif" width="48" height="48"/>
                         <md-tooltip md-direction="right">
-                           Solicitud
+                            Solicitud
                         </md-tooltip>
                     </div>
                     <div class="docButton" layout="column" flex ng-click="newDoc(forModeAvilable.proforma)">
@@ -1085,8 +1085,6 @@
             </md-content>
         </md-sidenav>
 
-
-
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detalleDoc" id="detalleDoc">
 
@@ -1134,7 +1132,7 @@
                                             <span>{{item.razon_social}}</span>
                                         </md-item-template>
                                         <md-not-found  ng-click="redirect({module:'proveedores'})">
-                                          No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
+                                            No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
                                         </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
@@ -1192,14 +1190,14 @@
                                             <span>{{item.short_name}}</span>
                                         </md-item-template>
                                         <md-not-found  ng-click="redirect({module:'proveedores'})">
-                                           No se encontro el país {{ctrl.searchPais}}. {{provSelec.razon_social}},¿Desea asignarlo?
+                                            No se encontro el país {{ctrl.searchPais}}. {{provSelec.razon_social}},¿Desea asignarlo?
                                         </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()" alert="{'none':'No se le han creado direciones de facturacion a '+provSelec.razon_social} " alert-show="(formData.direccionesFact.length > 0) ? '': 'none'" >
                                     <label>Direccion Facturacion</label>
                                     <md-autocomplete md-selected-item="ctrl.direccion_facturacion_id"
-                                                     ng-disabled="( Docsession.block || provSelec.id == '' )"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id)"
                                                      ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
                                                      info="Selecione la direccion que debe especificarse en la factura "
                                                      skip-tab
@@ -1231,7 +1229,7 @@
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()"  alert="{'none':'No se la han asignado direcciones de almacen a'+provSelec.razon_social} " alert-show="(formData.direcciones.length > 0) ? '': 'none'">
                                     <label>Direccion almacen</label>
                                     <md-autocomplete md-selected-item="ctrl.direccion_almacen_id"
-                                                     ng-disabled="( Docsession.block || provSelec.id == '' )"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id  || ctrl.pais_id ==  null )"
                                                      ng-click="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
                                                      info="'Selecione la direccion que debe especificarse en la factura"
                                                      id="direccion_almacen_id"
@@ -1259,7 +1257,7 @@
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()" alert="{'none':'No se le han asignado puertos a'+provSelec.razon_social} " alert-show="(formData.puertos.length > 0) ? '': 'none'">
                                     <label>Puerto</label>
                                     <md-autocomplete md-selected-item="ctrl.puerto_id"
-                                                     ng-disabled="( Docsession.block || provSelec.id == '' )"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id || ctrl.direccion_almacen_id == null)"
                                                      ng-click="toEditHead('puerto_id', document.puerto_id)"
                                                      info=" Selecione la direccion que debe especificarse en la factura "
                                                      id="puerto_id"
@@ -1300,7 +1298,7 @@
                                 <md-input-container class="md-block" flex="10" ng-click="allowEdit()" alert="{'none':'No se le han asignado monedas a'+provSelec.razon_social} " alert-show="(formData.monedas.length > 0) ? '': 'none'">
                                     <label>Moneda</label>
                                     <md-autocomplete md-selected-item="ctrl.prov_moneda_id"
-                                                     ng-disabled="( Docsession.block)"
+                                                     ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id )"
                                                      required
                                                      ng-click="toEditHead('prov_moneda_id', document.prov_moneda_id)"
                                                      info="Seleccione la moneda en la que se realizara el pago': 'No se le han asignado monedas a '+provSelec.razon_social"
@@ -1659,20 +1657,22 @@
                 <div active-left></div>
                 <div layout="row" flex>
                     <div layout="column" flex>
-                        <form>
-                            <div class="titulo_formulario md-block"  layout="row"  >
-
-                                <div>
-                                    Contrapedidos
-                                </div>
-
-
-                                <div id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
-                                    <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-
+                        <div layout="row" style="padding: 0 8px 0 0;">
+                            <div layout=""  layout-align="center center">
+                                <div layout layout-align="center center" class="circle" >
+                                    {{document.productos.contraPedido.length}}
                                 </div>
                             </div>
-                        </form>
+                            <div flex class="titulo_formulario md-block"  layout="row"  >
+                                <div flex>
+                                    Contrapedidos
+                                </div>
+                            </div>
+                            <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+
+                            </div>
+                        </div>
                         <form  layout="column" class="gridContent" flex  style="margin-left: 8px; margin-top: 8px;">
                             <div >
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.contraPedido">
@@ -1684,19 +1684,27 @@
                         </form>
                     </div>
                     <div layout="column" flex>
-                        <form>
-                            <div class="titulo_formulario md-block"   layout="row" >
-                                <div>
-                                    KitchenBoxs
-                                </div>
-                                <div
-                                    id="btnAgrKitchen"
-                                    ng-click="openSide('agrKitBoxs')"
-                                    style="width:24px;">
-                                    <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                        <div layout="row">
+                            <div  layout layout-align="center center">
+                                <div layout layout-align="center center" class="circle" >
+                                    {{document.productos.kitchenBox.length}}
                                 </div>
                             </div>
-                        </form>
+                            <div flex class="titulo_formulario md-block"   layout="row" >
+
+                                <div flex>
+                                    KitchenBoxs
+                                </div>
+
+                            </div>
+                            <div
+                                layout="column" layout-align="center center"
+                                id="btnAgrKitchen"
+                                ng-click="openSide('agrKitBoxs')"
+                                style="width:24px;">
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                            </div>
+                        </div>
                         <form  layout="column" class="gridContent" flex  style="margin-top: 8px;">
                             <div>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.kitchenBox" ng-class="{resalt : overSusitu == item.sustituto }">
@@ -1709,19 +1717,26 @@
                     </div>
 
                     <div layout="column" flex>
-                        <form>
-                            <div class="titulo_formulario md-block"  layout="row" >
-                                <div>
-                                    {{formMode.name}} a Sustituir
-                                </div>
-                                <div
-                                    id="btnAgrPedSusti"
-                                    ng-click="openSide('agrPedPend')"
-                                    style="width: 24px;">
-                                    <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                        <div layout="row">
+                            <div layout layout-align="center center">
+                                <div layout layout-align="center center" class="circle" >
+                                    {{document.productos.pedidoSusti.length}}
                                 </div>
                             </div>
-                        </form>
+                            <div flex class="titulo_formulario md-block"  layout="row" >
+                                <div flex>
+                                    {{formMode.name}} a Sustituir
+                                </div>
+                            </div>
+                            <div
+                                layout="column" layout-align="center center"
+                                id="btnAgrPedSusti"
+                                ng-click="openSide('agrPedPend')"
+                                style="width: 24px;">
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                            </div>
+                        </div>
+
                         <form  layout="column" class="gridContent" flex  style="margin-top: 8px;">
                             <div>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.pedidoSusti" ng-mouseover = "overSusitu =  item.id">
@@ -2941,15 +2956,14 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
                 <div flex="30"layout="column" id="headFinalDoc"  >
-                    <!--    a -->
                     <form layout="row" >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="row">
                                 <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 1" >
-                                        <div>
-                                            {{formMode.name}}
-                                        </div>
+                                    <div>
+                                        {{formMode.name}}
+                                    </div>
                                 </div>
                                 <div flex layout="row"  layout-align="end start">
                                     <md-switch class="md-primary"
@@ -3130,8 +3144,6 @@
 
                         </div>
                     </form>
-                    <!--    b -->
-
                     <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex >
@@ -3173,15 +3185,13 @@
                         </div>
 
                     </form>
-                    <!--   c -->
-
                     <form   layout="row" ng-show="document.productos.kitchenBox.length > 0" >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="row">
                                 <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 3" >
                                     <div>
-                                       KitchenBox
+                                        KitchenBox
                                     </div>
                                 </div>
                                 <div flex layout="row"  layout-align="end start">
@@ -3215,8 +3225,6 @@
 
                         </div>
                     </form>
-                    <!--    d -->
-
                     <form   layout="row" ng-show="document.productos.pedidoSusti.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex>
@@ -3957,8 +3965,8 @@
                         </div>
                     </form>
                     <div flex style="overflow: auto; padding: 8px;">
-                            <div id="templateContent" ng-bind-html="template" flex="">
-                            </div>
+                        <div id="templateContent" ng-bind-html="template" flex="">
+                        </div>
 
 
                     </div>
@@ -4204,6 +4212,7 @@
                                       md-on-remove =" removeEmail($chip) "
                                       ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
                                       ng-show="showHead"
+                                      skip-tab
                             >
                                 <md-autocomplete
                                     md-search-text="searchDestinos"
@@ -4226,6 +4235,7 @@
                                       md-on-add =" addEmail($chip) "
                                       md-on-remove =" removeEmail($chip) "
                                       ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                      skip-tab
                             >
                                 <md-autocomplete
                                     md-search-text="searchCc"
@@ -4247,6 +4257,7 @@
                                       md-on-add =" addEmail($chip) "
                                       md-on-remove =" removeEmail($chip) "
                                       ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                      skip-tab
                             >
                                 <md-autocomplete
                                     md-search-text="searchCco"
@@ -4283,7 +4294,7 @@
 
                         </div>
                     </form>
-                    <div  class="blue-btn " ng-click="send()" >
+                    <div  class="blue-btn " ng-click="send()"  skip-tab >
                         <div layout="row" class="layout-row " aria-hidden="true">
                             <div >
                                 Enviar
@@ -4321,20 +4332,22 @@
                                 </div>
                             </div>
                             <div layout="row" class="row">
-                                 <md-switch class="md-primary"
-                                            ng-model="usePersonal">
-                                 </md-switch>
-                                 <div flex style="padding-top: 12px;">
-                                     <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
-                                 </div>
-                             </div>
+                                <md-switch class="md-primary"
+                                           ng-model="usePersonal">
+                                </md-switch>
+                                <div flex style="padding-top: 12px;">
+                                    <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
+                                </div>
+                            </div>
                             <md-chips ng-model="to"
+                                      id="toaddEMail"
                                       required
                                       md-transform-chip="transformChip($chip)"
                                       style="height: inherit;"
                                       md-on-add =" addEmail($chip) "
                                       md-on-remove =" removeEmail($chip) "
                                       ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                      skip-tab
                             >
                                 <md-autocomplete
                                     md-search-text="searchDestinos"
@@ -4357,6 +4370,7 @@
                                       md-on-add =" addEmail($chip) "
                                       md-on-remove =" removeEmail($chip) "
                                       ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                      skip-tab
                             >
                                 <md-autocomplete
                                     md-search-text="searchCc"
@@ -4378,6 +4392,7 @@
                                       md-on-add =" addEmail($chip) "
                                       md-on-remove =" removeEmail($chip) "
                                       ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                      skip-tab
                             >
                                 <md-autocomplete
                                     md-search-text="searchCco"
@@ -4393,12 +4408,12 @@
                             <div layout="row" class="row-min" style="padding-right: 4px;" >
                                 <md-input-container flex>
                                     <label>Asunto:</label>
-                                    <input  ng-model="asunto" required >
+                                    <input  ng-model="asunto" required skip-tab >
                                 </md-input-container>
                             </div>
                         </div>
                     </form>
-                    <div  class="blue-btn " ng-click="send()" >
+                    <div   skip-tab class="blue-btn " ng-click="send()" >
                         <div layout="row" class="layout-row " aria-hidden="true">
                             <div >
                                 Enviar

@@ -370,7 +370,6 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
 
         if(list.index(elem)<list.length-1){
-            console.log(angular.element(list[list.index(elem)+1]))
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).hasClass("autoclick")){
                     angular.element(list[list.index(elem)+1]).focus().  click();
@@ -381,7 +380,6 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
                     angular.element(list[list.index(elem)+1]).find("input").focus().click();
                 }else{
-                    console.log("aqui")
                     angular.element(list[list.index(elem)+1]).focus();
                 }
 
@@ -575,7 +573,6 @@ MyApp.directive('info', function($timeout,setNotif) {
             }else{
                 element.bind("focus", function(e){
                     if(attrs.info){
-                        console.log(attrs.info)
                         $timeout(function() {
                             if(old.element!=element[0]){
                                 setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
@@ -746,6 +743,10 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
     if(location.pathname.indexOf('External') != -1){
         location.assign(SYSTEM.PATHAPP+'#home');
     }
+
+    $scope.bindBlock=App.getBindBloc();
+
+
     $scope.accion = App.getAccion();
     $scope.secciones = [
         {
@@ -799,6 +800,13 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
                 var mnew=  angular.copy($filter("customFind")($scope.secciones,data.module,function(current,compare){return current.key==compare})[0]);
                 $scope.seccLink(mnew);
             }
+        }
+    });
+    $scope.$watch('bindBlock.estado' , function(newval){
+        if(newval){
+            $scope.block= App.getBindBloc().value.block;
+            $scope.level= App.getBindBloc().value.level;
+            App.getBindBloc().estado=false;
         }
     });
 
@@ -1024,6 +1032,11 @@ MyApp.service('App' ,[function(){
 
     var accion ={estado :false,value:{}};
     var msm ={};
+
+    var bindBloc = {
+        estado:false,
+        value:{}
+    };
     return {
 
         getAccion : function(){
@@ -1041,7 +1054,17 @@ MyApp.service('App' ,[function(){
         },
         clearMsm : function(){
             msm= {}
+        },
+        getBlock: bindBloc.block,
+        getLevel: bindBloc.level,
+        setBlock: function(data){
+            bindBloc.estado=true;
+            bindBloc.value=data;
+        },
+        getBindBloc: function(){
+           return bindBloc;
         }
+
     }
 
 

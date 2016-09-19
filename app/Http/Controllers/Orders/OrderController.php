@@ -1717,30 +1717,31 @@ class OrderController extends BaseController
         $asig= array();
         $remo= array();
         $model= Solicitude::findOrFail($req->doc_id);
-        /*foreach($req->items  as $aux){
-            /*if($req->asignado){
+        foreach($req->items  as $aux){
+            if($req->asignado){
                 $item = new SolicitudeItem();
-//                $item->tipo_origen_id = $aux->tipo_origen_id;
-//                $item->doc_id = $req->doc_id;
-//                $item->origen_item_id= $aux->origen_item_id;
-//                $item->doc_origen_id= $aux->doc_origen_id;
-//                $item->cantidad= $aux->cantidad;
-//                $item->saldo= $aux->saldo;
-//                $item->producto_id= $aux->producto_id;
-//                $item->descripcion= $aux->descripcion;
-//                $item->save();
-//                $asig[]=$item;
+                $item->tipo_origen_id = $aux->tipo_origen_id;
+                $item->doc_id = $req->doc_id;
+                $item->origen_item_id= $aux->origen_item_id;
+                $item->doc_origen_id= $aux->doc_origen_id;
+                $item->cantidad= $aux->cantidad;
+                $item->saldo= $aux->saldo;
+                $item->producto_id= $aux->producto_id;
+                $item->descripcion= $aux->descripcion;
+                $item->save();
+                $asig[]=$item;
 
             }else{
                 $remo[]= $aux->id;
                 $resul['accionSub']= "del";
-            }*/
-        //}
+
+            }
+        }
 
         $resul['new']= $asig;
         $resul['del']= $remo;
         $resul['success']= "Items agregados";
-        $model->destroy($remo);
+        $model->item()->destroy($remo);
 
         return $resul;
     }
@@ -1933,7 +1934,7 @@ class OrderController extends BaseController
         $resul = array();
         $model = Order::findOrFail($req->id);
         $status = OrderStatus::findOrfail($req->estado_id);
-        $model->estado->id = $req->estado_id;
+        $model->estado_id = $req->estado_id;
         $model->save();
         $resul['success']='Estado actualizado';
         $resul['accion']='upd';
@@ -1947,7 +1948,7 @@ class OrderController extends BaseController
         $resul = array();
         $model = Purchase::findOrFail($req->id);
         $status = OrderStatus::findOrfail($req->estado_id);
-        $model->estado->id =$req->estado_id;
+        $model->estado_id = $req->estado_id;
         $model->save();
         $resul['accion']='upd';
         $resul['success']='Estado actualizado';
