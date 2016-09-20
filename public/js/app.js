@@ -370,9 +370,10 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
 
         if(list.index(elem)<list.length-1){
+
             $timeout(function(){
                 if(angular.element(list[list.index(elem)+1]).hasClass("autoclick")){
-                    angular.element(list[list.index(elem)+1]).focus().  click();
+                    angular.element(list[list.index(elem)+1]).focus().click();
                 }else if(angular.element(list[list.index(elem)+1]).is("vlc-group")) {
                     $timeout(function(){
                         angular.element(list[list.index(elem)+1]).find("span").first().focus();
@@ -380,6 +381,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
                     angular.element(list[list.index(elem)+1]).find("input").focus().click();
                 }else{
+
                     angular.element(list[list.index(elem)+1]).focus();
                 }
 
@@ -573,6 +575,7 @@ MyApp.directive('info', function($timeout,setNotif) {
             }else{
                 element.bind("focus", function(e){
                     if(attrs.info){
+                        console.log(attrs.info)
                         $timeout(function() {
                             if(old.element!=element[0]){
                                 setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
@@ -731,6 +734,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
                 location.replace(PATHAPP +'#home');
             }
         }, function errorCallback(response) {
+            console.log(response);
         });
 
     };
