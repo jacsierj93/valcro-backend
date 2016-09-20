@@ -157,7 +157,7 @@
                     </div>
 
                     <div style="height:40px;" layout="row" layout-align="space-between center">
-                        <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
+                        <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>i
 
                         <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
                             <div >{{item.puntoCompra}}</div>
@@ -1082,6 +1082,8 @@
                         </div>
                     </div>
                 </div>
+                <loader ng-show="inProgress"></loader>
+
             </md-content>
         </md-sidenav>
 

@@ -3623,6 +3623,8 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','App','setGet
             $scope.asunto='';
             $scope.text='';
             $scope.FormSendMail.$setPristine();
+            $scope.FormSendMail.$setUntouched();
+
 
             Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
                 $scope.correosProvider= response;
@@ -3725,6 +3727,8 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','set
             $scope.correos = [];
             $scope.usePersonal= true;
             $scope.FormaddEMail.$setPristine();
+            $scope.FormaddEMail.$setUntouched();
+
             $scope.asunto='';
             $scope.text='';
             Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
@@ -3836,6 +3840,7 @@ MyApp.controller('MailCtrl',['$scope','SYSTEM','IsEmail','Order', function($scop
     $scope.cc =[];
     $scope.cco =[];
     $scope.correos = [];
+    $scope.inProgress=false;
     $scope.transformChip = function(chip) {
         if (angular.isObject(chip)) {
             return chip;
@@ -3853,12 +3858,14 @@ MyApp.controller('MailCtrl',['$scope','SYSTEM','IsEmail','Order', function($scop
         $scope.correos = [];
         $scope.usePersonal= true;
         $scope.showHead =true;
+        $scope.mail.$setPristine();
 
         $scope.$parent.LayersAction({open:{name:"email", after: function(){
             Order.query({type:'Emails'},{},function(response){
                 $scope.correos = response;
                 $scope.usePersonal= true;
                 $scope.mail.$setPristine();
+                $scope.mail.$setUntouched();
                 $scope.to =[];
                 $scope.cc =[];
                 $scope.cco =[];
@@ -3889,7 +3896,9 @@ MyApp.controller('MailCtrl',['$scope','SYSTEM','IsEmail','Order', function($scop
             $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
 
         }else{
+            $scope.inProgress=true;
             Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
+                $scope.inProgress=false;
                 $scope.$parent.LayersAction({close:true});
             });
         }
