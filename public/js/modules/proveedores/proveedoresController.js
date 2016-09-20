@@ -122,6 +122,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
     $scope.chang = setGetProv.getChng();
+    $scope.secBlock = false;//bloquea el resto de la app
     $scope.$watch('prov.id',function(nvo,old) {
         if(nvo && $scope.prov.new){
             $scope.prov.new = false;
@@ -147,13 +148,15 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         cb1: true
     };
     $scope.setProv = function(prov,indx){
+        if(prov.item.id == $scope.prov.id){
+            return false;
+        }
         endProvider(chngProv,null,prov);
     };
 
     var interval = null;
     $scope.block=saveForm.isBlock();
     $scope.nextLayer = function(to,e){
-        console.log(e)
        $timeout(function(){
            if(saveForm.isBlock()=="wait"){
                interval = $interval(function(){
@@ -340,11 +343,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             if(!pre){
                 return false;
             }
-            //after = fn.after || null;
-
-            //console.log(idx);
             $mdSidenav(sideNav).close().then(function(){
-                console.log("after")
+
                 activesPopUp.splice(idx,1);
                 if(fn.after){
                     fn.after();
@@ -354,10 +354,22 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         };
     };
 
-    $scope.openPopUp = function(sideNav){
+    $scope.openPopUp = function(sideNav,fn){
         if(activesPopUp.indexOf(sideNav)==-1){
+            if(fn && fn.before){
+                pre = fn.before();
+            }else{
+                pre = true;
+            }
+
+            if(!pre){
+                return false;
+            }
             $mdSidenav(sideNav).open().then(function(){
                 activesPopUp.push(sideNav);
+                if(fn.after){
+                    fn.after();
+                }
             })
         }
 
@@ -667,7 +679,7 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
         }
     });
 
-    var lawletters = new RegExp(["S.L.U.","S.L.","CO","LTD.","LLC","S.A.","LDA","S.P.A.","s.p.a.","LIMITED","CORP.","S.A.E","S.L.","S.R.L.","S.A.S","INC.","INC","GMBH CO.KG","NV","CO."].join("| ")+"$");
+    var lawletters = new RegExp(["SLU.","SL.","CO","LTD","LLC","SA","LDA","SPA","LIMITED","CORP.","S.A.E","S.L.","S.R.L.","S.A.S","INC.","INC","GMBH CO.KG","NV","CO."].join("| ")+"$","gi");
     $scope.check = function(elem){
         
         var htmlElem = document.getElementsByName(elem)[0];
@@ -699,13 +711,18 @@ MyApp.controller('DataProvController', function ($scope,setGetProv,$mdToast,prov
 
         if(elem == "siglas" && htmlElem.value!=""){
             //console.log($scope.dtaPrv);
-            var nomProv = $scope.dtaPrv.description.replace(lawletters, "");
+            var nomProv = $scope.dtaPrv.description.replace(/[\,\.\;]/gi, "");
+            console.log(nomProv)
+            nomProv = nomProv.toUpperCase().replace(lawletters, "");
+            console.log(nomProv)
+            var first = nomProv[0];
             var consonantes = nomProv.replace(/[aeiou ]/gi,"");
-            var first = consonantes[0];
+            //var first = consonantes[0];
             var primero = new RegExp(first,"g");
             var last = consonantes.replace(primero,"").substr(-1)
-            consonantes = consonantes.substr(1,consonantes.length-2);
+            consonantes = consonantes.substr(0,consonantes.length-2);
             var patt = new RegExp("^"+first+"["+consonantes+"]"+"+"+last+"$","i");
+            console.log(patt)
             if(!patt.test(htmlElem.value)){
                setNotif.addNotif("alert","estas siglas no se parecen a la razon social, estas seguro que son correctas?",
                     [
@@ -772,7 +789,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.svPort = asignPort.getPorts();
     /*escucha cambios en el proveedor seleccionado y carga las direcciones correspondiente*/
     $scope.$watch('prov.id',function(nvo){
-        $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+        $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:$scope.svPort.ports,  id: false, id_prov: $scope.prov.id};
         $scope.address = setGetProv.getAddress()//(nvo)?providers.query({type: "dirList", id_prov: $scope.prov.id || 0}):[];
         $scope.isShow = false;
     });
@@ -820,12 +837,15 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
         $scope.dir.pais = nvo;
         asignPort.setCountry(nvo);
-        var preVal = angular.element("#dirPhone").val();
-        if(preVal){
-            angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
-        }else{
-            angular.element("#dirPhone").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+        if(nvo){
+            var preVal = angular.element("#dirPhone").val();
+            if(preVal){
+                angular.element("#dirPhone").val(preVal.replace(/\(\+[0-9\-]+\)/,$filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone))
+            }else{
+                angular.element("#dirPhone").val($filter("filterSearch")($scope.paises,[nvo])[0].area_code.phone);
+            }
         }
+
 
     });
 
@@ -972,7 +992,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             if(!elem) {
                 saveAddress(function(){
                     asignPort.setPorts(false);
-                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:[],  id: false, id_prov: $scope.prov.id};
+                    asignPort.setCountry(false);
+                    $scope.dir = {direccProv: "", tipo: "", pais: 0, provTelf: "",ports:$scope.svPort.ports,  id: false, id_prov: $scope.prov.id};
                     $scope.ctrl.searchCountry = undefined;
                     $scope.ctrl.searchType = undefined;
                     currentOrig = {};
@@ -2648,8 +2669,8 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
 
     $scope.toEdit = function(element){
         //time = element.time;
-        saveTimeProd(function(time){
-            console.log(time)
+        saveTimeProd(function(el){
+            time = el;
             $scope.tp.id = time.id;
             $scope.tp.id_prov = time.prov_id;
             $scope.tp.from = time.min_dias;
@@ -2693,6 +2714,33 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
         }
     };
 
+    $scope.rmTimeProd = function(elem){
+        setNotif.addNotif("alert", "desea Borrar este Tiempo de Produccion", [
+            {
+                name: "SI",
+                action: function () {
+                    time = elem.time;
+                    providers.put({type:"delProdTime"},time,function(data){
+                        setGetProv.addChng($scope.tp,data.action,"timeProd");
+                        $scope.timesP.splice(elem.$index,1);
+                        $scope.tp = {id:false,from:"",to:"",line:"",id_prov: $scope.prov.id};
+                        $scope.ctrl.searchLine = undefined;
+                        $scope.timeProd.$setPristine();
+                        $scope.timeProd.$setUntouched();
+                        time = {};
+                        currentOrig = {};
+                        setNotif.addNotif("ok", "Tiempo Borrado", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: null
+            }
+        ]);
+    };
+
     $scope.viewExtend = function(sel){
         $scope.isShowMore = sel;
         $scope.$parent.expand =(sel)?"prodTimeController":false;
@@ -2702,10 +2750,15 @@ MyApp.controller('prodTimeController', function ($scope,providers,setGetProv,mas
 MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$filter,masterLists,setNotif,$timeout,saveForm) {
     $scope.id="transTimeController";
     $scope.prov = setGetProv.getProv();
-    var paises = masterLists.getCountries();
+    $scope.paises = masterLists.getCountries();
+
+    $scope.filtCountrys = function(foreignCountry,assignCountrys){
+        return  $filter("customFind")(assignCountrys,foreignCountry,function(current,local){ return parseInt(current.pais_id)==parseInt(local.id)}).length>0;
+    };
     $scope.$watch('prov.id',function(nvo){
         $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
-        $scope.provCountries =(nvo)?providers.query({type:"provCountries",id_prov:$scope.prov.id||0}):[];
+        $scope.assignAddres = setGetProv.getAddress();
+        //console.log("provCountry",$scope.assignAddres)
         $scope.timesT =  setGetProv.getTransTime();
     });
     $scope.$watch('timesT.length',function(nvo){
@@ -2731,7 +2784,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
                         time.min_dias = $scope.ttr.from;
                         time.max_dias = $scope.ttr.to;
                         time.id_pais = $scope.ttr.country;
-                        time.country =  $filter("filterSearch")(paises,[$scope.ttr.country])[0];
+                        time.country = $scope.ctrl.pais;
                         if(data.action=="new"){
                             time.id = $scope.ttr.id;
                             $scope.timesT.unshift(time);
@@ -2752,8 +2805,8 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     };
 
     $scope.toEdit = function(element){
-        saveTimeTrans(function (time){
-            console.log(time);
+        saveTimeTrans(function (el){
+            time = el;
             $scope.ttr.id = time.id;
             $scope.ttr.id_prov = time.prov_id;
             $scope.ttr.from = time.min_dias;
@@ -2764,6 +2817,33 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
             setGetProv.addToRllBck($scope.ttr,"timeTrans")
         },element.time)
 
+    };
+
+    $scope.rmTimeTrans = function(elem){
+        setNotif.addNotif("alert", "desea Borrar este Tiempo de Produccion", [
+            {
+                name: "SI",
+                action: function () {
+                    time = elem.time;
+                    providers.put({type:"delTransTime"},time,function(data){
+                        setGetProv.addChng($scope.ttr,data.action,"timeTrans");
+                        $scope.timesT.splice(elem.$index,1);
+                        $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id};
+                        $scope.ctrl.searchCountry = undefined;
+                        $scope.timeTrans.$setPristine();
+                        $scope.timeTrans.$setUntouched();
+                        time = {};
+                        currentOrig = {};
+                        setNotif.addNotif("ok", "Tiempo Borrado", [
+                        ],{autohidden:3000});
+                    });
+                }
+            },
+            {
+                name: "NO",
+                action: null
+            }
+        ]);
     };
 
     $scope.showGrid = function(elem,event){
@@ -2907,6 +2987,7 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
                         ],{autohidden:3000});
                         $scope.ctrl.searchLine = undefined;
                         $scope.condHeadFrm.$setUntouched();
+                        setGetProv.addChng($scope.condHead,data.action,"payCond");
 
                     });
                 }
@@ -2991,7 +3072,8 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
                 return x;
             },
             after:function(){
-                console.log(angular.element("form[name='condHeadFrm']").find("[step]").last())
+                $scope.$parent.secBlock = false;
+                //console.log(angular.element("form[name='condHeadFrm']").find("[step]").last())
                 angular.element("form[name='condHeadFrm']").find("[step]").last().focus();
             }
         })
@@ -3292,7 +3374,7 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
 
      $scope.getDato = function(id,find,field){
          if(id!=0){
-             return $filter("filterSearch")(foraneos[find],[id])[0][field];
+             return $filter("filterSearch")(foraneos[find],[parseInt(id)])[0][field];
          }else{
              return [];
          }

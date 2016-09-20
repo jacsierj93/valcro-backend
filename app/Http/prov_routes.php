@@ -57,3 +57,5 @@ $app->post("provider/delLimCred",'Providers\ProvidersController@delLimCred');//d
 $app->post("provider/delFactor",'Providers\ProvidersController@delConvFact');//desvicula un contacto de un proveedor
 $app->post("provider/delCondition",'Providers\ProvidersController@delHeadCondition');//desvicula un contacto de un proveedor
 $app->post("provider/delPoint",'Providers\ProvidersController@delPoint');//desvicula un contacto de un proveedor
+$app->post("provider/delProdTime",'Providers\ProvidersController@delProdTime');//desvicula un contacto de un proveedor
+$app->post("provider/delTransTime",'Providers\ProvidersController@delTransTime');//desvicula un contacto de un proveedor

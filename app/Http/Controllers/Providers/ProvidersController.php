@@ -776,6 +776,12 @@ class ProvidersController extends BaseController
         return $result;
     }
 
+    public function delProdTime(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        ProdTime::destroy($req->id);
+        return $result;
+    }
+
     public function getTimeTrans($id){
         if((bool)$id) {
             $times = Provider::find($id)->transTime()->get();
@@ -803,6 +809,12 @@ class ProvidersController extends BaseController
 
         $time->save();
         $result['id']=$time->id;
+        return $result;
+    }
+
+    public function delTransTime(request $req){
+        $result = array("success" => "Registro desvinculado con éxito", "action" => "del","id"=>"$req->id");
+        TiemAproTran::destroy($req->id);
         return $result;
     }
 

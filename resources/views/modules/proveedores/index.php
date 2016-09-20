@@ -551,7 +551,7 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="30">
                                 <label>Telefono</label>
-                                <input skip-tab id="dirPhone" phone info="telefono de oficina" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                <input skip-tab id="dirPhone" phone info="telefono de oficina ej (+58)0001234567" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
                             </md-input-container>
 
                         </div>
@@ -1000,12 +1000,12 @@
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>SWIF</label>
-                                <input skip-tab name="bankSwif" alpha autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
+                                <input skip-tab name="bankSwif" autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankSwift" required/>
 
                             </md-input-container>
                             <md-input-container class="md-block" flex="20">
                                 <label>IBAN</label>
-                                <input skip-tab name="bankIban" alpha autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
+                                <input skip-tab name="bankIban" autocomplete="off" ng-disabled="$parent.enabled" ng-model="bnk.bankIban" required/>
 
                             </md-input-container>
                         </div>
@@ -1495,11 +1495,7 @@
                                             <span>{{item.linea}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
-                                    <!--<md-select id="convLine" skip-tab ng-model="conv.line" ng-disabled="$parent.enabled"ñ md-no-ink>
-                                        <md-option ng-repeat="line in lines" value="{{line.id}}">
-                                            {{line.linea}}
-                                        </md-option>
-                                    </md-select>-->
+
                                 </md-input-container>
                             </div>
                             <div layout="column" ng-show="isShow && !isShowMore && factors.length>0" class="row" style="height: 40px" ng-click="viewExtend(true)" >
@@ -1543,9 +1539,6 @@
                             <div>
                                 Puntos
                             </div>
-                            <!--<div style="width:24px">
-                                <span class="icon-Agregar"></span>
-                            </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand" class="area-form">
                             <div layout="row" class="row">
@@ -1727,18 +1720,16 @@
                                     <md-autocomplete md-selected-item="ctrl.pais"
                                                      flex
                                                      id="paistimeP"
-                                                     info="pais de residencia del contacto (no es el mismo de direcciones)"
+                                                     info="pais de origen"
                                                      md-selected-item-change="ttr.country = ctrl.pais.id"
                                                      skip-tab
-                                                     required
                                                      md-require-match="true"
                                                      md-search-text="ctrl.searchCountry"
-                                                     md-items="item in provCountries | stringKey : ctrl.searchCountry: 'short_name'"
+                                                     md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name' | customFind:assignAddres:filtCountrys"
                                                      md-item-text="item.short_name"
                                                      md-no-asterisk
                                                      ng-disabled="$parent.enabled"
                                                      md-min-length="0">
-                                        <input >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
                                         </md-item-template>
@@ -1758,6 +1749,7 @@
                                 <div id="grid" >
                                     <md-content flex ng-repeat="time in timesT" ng-click="toEdit(this)">
                                         <div layout="row" layout-wrap class="cellGridHolder">
+                                            <div ng-show="(time.id==ttr.id)" style="width: 32px" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmTimeTrans(this)"></div>
                                             <div flex="20" class="cellGrid"> {{time.min_dias}}</div>
                                             <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{time.max_dias}}</div>
                                             <div flex class="cellGrid">{{time.country.short_name}}</div>
@@ -1814,12 +1806,11 @@
                             </div>
                         </div>
                     </div>
-                    </div>
                 </form>
             </md-content>
-                <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
-                </div>
-            </md-sidenav>
+            <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
+            </div>
+        </md-sidenav>
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="excepFactor" id="excepFactor" click-out="closePopUp('excepFactor',$event)">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex >
                 <input type="hidden" md-autofocus>
@@ -1853,43 +1844,46 @@
                 <div active-left></div>
                 <div flex layout="column">
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-click="has()">
+                        <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-click="has()" class="row">
                             <div>
                                 Datos Proveedor
                             </div>
                         </div>
-                        <div>
+                        <div class="row">
                             <span ng-show="!has(prov.dataProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
                         <div ng-repeat="(k,finalProv) in prov.dataProv" >
-                            <div layout="column">
+                            <div layout="column" class="row">
                                 {{finalProv.datos.description}}
                             </div>
-                            <div layout="row">
-                                <div style="width: 32px">
-                                    <span ng-show="(finalProv.datos.contraped)" style="font-size: 23px" class="icon-contrapedidos" style="font-size: 24px"></span>
-                                </div>
+                            <div layout="row" class="row">
+
                                 <div flex>
                                     {{finalProv.datos.siglas}}
                                 </div>
+                                <div style="width: 32px">
+                                    <span ng-class="{'iconActive':finalProv.datos.contraped,'iconInactive':!finalProv.datos.contraped}" style="font-size: 23px" class="icon-contrapedidos" style="font-size: 24px"></span>
+                                </div>
+                                <div flex="10">
+                                    <span ng-show="(finalProv.datos.envio==1 || finalProv.datos.envio==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
+                                    <span ng-show="(finalProv.datos.envio==2 || finalProv.datos.envio==3)" style="font-size: 23px" class="icon-Barco" /></span>
+
+                                </div>
 
                             </div>
-                            <div layout="row">
+                     <!--       <div layout="row" class="row">
                                 <div>
                                     <span ng-show="(finalProv.datos.envio==1 || finalProv.datos.envio==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
                                     <span ng-show="(finalProv.datos.envio==2 || finalProv.datos.envio==3)" style="font-size: 23px" class="icon-Barco" /></span>
 
                                 </div>
-                                <div>
 
-                                </div>
-
-                            </div>
+                            </div>-->
                         </div>
                     </div>
 
                     <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                        <div class="titulo_formulario" layout="row" layout-align="start start" flex class="row" >
                             <div>
                                 Nombres Valcro
                             </div>
@@ -1898,7 +1892,7 @@
                             </md-switch>
                         </div>
                         <div>
-                            <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                            <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;" class="row"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
                         <!--<div layout="row" >
                             <div flex></div><div ng-click="toForm('nomvalcroForm')">edit</div>
@@ -1906,7 +1900,7 @@
                         <md-content flex style="max-height: 200px;">
                             <div ng-repeat="(k,name) in prov.valName" style="border-bottom: 1px solid #f1f1f1; height: 32px;">
 
-                                <div layout="column" ng-click="checkSimil(name,'name')" ><!--ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}"-->
+                                <div layout="column" ng-click="checkSimil(name,'name')"  class="row"><!--ng-class="{'title_del' :name.action =='del','title_upd' :name.action =='upd','title_new' :name.action =='new'}"-->
                                     <div layout="row" flex="grow">
                                         <div ng-show="name.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
                                         <div ng-show="name.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
@@ -2115,7 +2109,7 @@
 
                             <div layout="row" >
                                 <div flex>
-                                    {{getDato(lim.datos.line,'lines','line')}}
+                                    {{getDato(lim.datos.line,'lines','linea')}}
                                 </div>
                                 <div flex>
                                     {{lim.datos.amount}} {{getDato(lim.datos.coin,'coins','simbolo')}}
@@ -2140,8 +2134,12 @@
                         </div>
                         <div ng-repeat="(k,cond) in prov.payCond">
 
-                            <div layout="column">
-                                {{cond.datos}}
+                            <div layout="column" class="row">
+                                condicion de pago {{cond.datos.title}} para la linea {{getDato(cond.datos.line,'lines','linea')}} :
+                            </div>
+                            <div ng-repeat="(k1,item) in cond.datos.items"  layout="row" style="height: 24px">
+                                <div style="width:50px"></div>
+                                <div style="font-size:12px" flex>{{item.porcentaje}}% a los {{item.dias}} dias, {{item.descripcion}}</div>
                             </div>
 
                         </div>
@@ -2165,7 +2163,7 @@
                         <div ng-repeat="(k,conv) in prov.factConv">
 
                             <div layout="column" ng-class="{'title_del' :conv.action =='del','title_upd' :conv.action =='upd','title_new' :conv.action =='new'}">
-                                {{conv.datos.conv}}
+                                {{conv.datos}}
                             </div>
 
                         </div>
@@ -2182,10 +2180,14 @@
                         <div>
                             <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,point) in prov.point">
+                        <div ng-repeat="(k,point) in prov.point" flex="column">
 
-                            <div layout="column">
-                                {{point.datos}}
+                            <div layout="row">
+
+                                <div flex>
+                                    {{point.datos.cost}} {{getDato(point.datos.coin,'coins','nombre')}} para la linea {{point(cond.datos.line,'lines','linea')}}
+                                </div>
+
                             </div>
 
                         </div>
@@ -2252,6 +2254,17 @@
         <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
             <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr,\$event)")) ?>
         </md-sidenav>
+
+<!--    <div id="blockSection" style="
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 99;
+        background: transparent;
+        cursor: default;
+    " ng-show="(secBlock)"></div>-->
 
 
         <!-- 8) ########################################## BOTON Next ########################################## -->
