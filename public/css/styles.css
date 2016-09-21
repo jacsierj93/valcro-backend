@@ -60,7 +60,7 @@ form {
     padding: 0 !important;
     min-height: 40px;
 }
-form:not(:last-child){
+form:visible:not(:last-child){
     background-image: url("../images/shadowUp.jpg");
     background-position: bottom;
     background-repeat: repeat-x;
@@ -1097,6 +1097,11 @@ div.activeleft{
 }
 .white{
     background-color: #fff;
+}
+
+.resumCell{
+    border-bottom: 1px solid #f1f1f1;
+    margin-right: 8px;
 }
 
 md-progress-linear ._md-bar,md-progress-linear .md-bar{

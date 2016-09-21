@@ -1844,13 +1844,13 @@
                 <div active-left></div>
                 <div flex layout="column">
                     <div>
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex ng-click="has()" class="row">
+                        <div class="titulo_formulario row" layout="column" layout-align="start start" flex ng-click="has()">
                             <div>
                                 Datos Proveedor
                             </div>
                         </div>
-                        <div class="row">
-                            <span ng-show="!has(prov.dataProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.dataProv)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
                         <div ng-repeat="(k,finalProv) in prov.dataProv" >
                             <div layout="column" class="row">
@@ -1883,7 +1883,7 @@
                     </div>
 
                     <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex class="row" >
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Nombres Valcro
                             </div>
@@ -1891,8 +1891,8 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.valName)" style="margin:8px; font-size: 12px; color:#ccc;" class="row"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div ng-show="!has(prov.valName)" class="row">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;" class="row"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
                         <!--<div layout="row" >
                             <div flex></div><div ng-click="toForm('nomvalcroForm')">edit</div>
@@ -1920,7 +1920,7 @@
                     </div>
 
                     <div layout="column">
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex>
                             <div>
                                 Direcciones
                             </div>
@@ -1928,20 +1928,20 @@
                                <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.dirProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div ng-show="!has(prov.dirProv)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
                         <!--<div layout="row" ng-hide="!has(prov.dirProv)">
                             <div flex></div>
                         </div>-->
                         <md-content flex>
-                            <div ng-repeat="(k,dir) in prov.dirProv" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
+                            <div ng-repeat="(k,dir) in prov.dirProv" class="resumCell" >
 
                                 <div layout="column" >
                                     <div ng-show="name.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
                                     <div ng-show="name.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
                                     <div ng-show="name.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
-                                    <div layout="row">
+                                    <div layout="row" class="row">
                                         <div flex="30">
                                             {{getDato(dir.datos.tipo,'typeDir','descripcion')}}
                                         </div>
@@ -1952,13 +1952,13 @@
                                             </md-tooltip>
                                         </div>
                                     </div>
-                                    <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                    <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;" class="row">
                                         <span style="font-weight: bolder">Direccion :</span>{{dir.datos.direccProv}}
                                         <md-tooltip >
                                             {{dir.datos.direccProv}}
                                         </md-tooltip>
                                     </div>
-                                    <div layout="row">
+                                    <div layout="row" class="row">
                                         <span style="font-weight: bolder">postal :</span>
                                         <div flex="30">
                                              {{dir.datos.zipCode}}
@@ -1967,7 +1967,7 @@
                                             {{dir.datos.provTelf}}
                                         </div>
                                     </div>
-                                    <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                    <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;" class="row">
                                         <p style="float: left" ng-repeat="port in dir.datos.ports">{{getDato(port,'ports','Main_port_name')}}; </p>
                                        <!-- <md-tooltip ng-bind="myText">
 
@@ -1980,7 +1980,7 @@
                     </div>
 
                     <div layout="column">
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex="5" >
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Contactos
                             </div>
@@ -1988,21 +1988,21 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.contProv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div ng-show="!has(prov.contProv)" class="row">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
                         <!--<div layout="row" ng-hide="!has(prov.contProv)">
                             <div flex></div><div ng-click="toForm('provContactosForm')">edit</div>
                         </div>-->
                         <md-content flex>
-                            <div ng-repeat="(k,cont) in prov.contProv" layout="column" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
-                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                            <div ng-repeat="(k,cont) in prov.contProv" layout="column" class="resumCell" style="border-bottom: 1px solid #f1f1f1; height: 128px; margin-right: 8px;">
+                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;" class="row">
                                     <span style="font-weight: bolder">Nombre :</span>{{cont.datos.nombreCont}}
                                     <md-tooltip >
                                         {{cont.datos.nombreCont}}
                                     </md-tooltip>
                                 </div>
-                                <div flex class="collapseResum">
+                                <div flex class="collapseResum" class="row">
                                     <span style="font-weight: bolder">Email :</span>
                                     <span ng-repeat="mail in cont.datos.emailCont">{{mail.valor}},
                                         <md-tooltip >
@@ -2017,7 +2017,7 @@
                                         {{cont.datos.emailCont}}
                                     </md-tooltip>
                                 </div>-->
-                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
+                                <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;" class="row">
                                     <span style="font-weight: bolder">Telf :
                                         <span ng-repeat="tlf in cont.datos.contTelf">{{tlf.valor}},
                                             <md-tooltip >
@@ -2034,8 +2034,8 @@
 
                 </div>
                 <div  flex="33" layout="column">
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex>
                             <div>
                                 Info Bancaria
                             </div>
@@ -2043,33 +2043,35 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.infoBank)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.infoBank)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,bnk) in prov.infoBank" layout="column">
-                            <div layout="column" class="collapseResum">
-                                {{bnk.datos.bankBenef}}
-                                <md-tooltip >
+                        <md-content>
+                            <div ng-repeat="(k,bnk) in prov.infoBank" layout="column" class="resumCell">
+                                <div layout="column" class="collapseResum" class="row">
                                     {{bnk.datos.bankBenef}}
-                                </md-tooltip>
-                            </div>
-                            <div layout="column" class="collapseResum">
-                                {{bnk.datos.bankIban}}
-                                <md-tooltip >
+                                    <md-tooltip >
+                                        {{bnk.datos.bankBenef}}
+                                    </md-tooltip>
+                                </div>
+                                <div layout="column" class="collapseResum" class="row">
                                     {{bnk.datos.bankIban}}
-                                </md-tooltip>
-                            </div>
-                            <div layout="column" class="collapseResum">
-                                {{bnk.datos.bankBenefAddr}}
-                                <md-tooltip >
+                                    <md-tooltip >
+                                        {{bnk.datos.bankIban}}
+                                    </md-tooltip>
+                                </div>
+                                <div layout="column" class="collapseResum" class="row">
                                     {{bnk.datos.bankBenefAddr}}
-                                </md-tooltip>
+                                    <md-tooltip >
+                                        {{bnk.datos.bankBenefAddr}}
+                                    </md-tooltip>
+                                </div>
+    
                             </div>
-
-                        </div>
+                        </md-content>
                     </div>
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Monedas
                             </div>
@@ -2077,24 +2079,26 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.provCoin)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div ng-show="!has(prov.provCoin)" class="row">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,coin) in prov.provCoin">
-
-                            <div layout="row">
-                                <div ng-show="coin.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
-                                <div ng-show="coin.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
-                                <div ng-show="coin.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
-                                <div flex>
-                                    {{getDato(coin.datos.coin,'coins','nombre')}}
+                        <md-content>
+                            <div ng-repeat="(k,coin) in prov.provCoin" class="resumCell">
+    
+                                <div layout="row" class="row">
+                                    <div ng-show="coin.action =='new'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Agregar"></span></div>
+                                    <div ng-show="coin.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
+                                    <div ng-show="coin.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
+                                    <div flex>
+                                        {{getDato(coin.datos.id,'coins','nombre')}}
+                                    </div>
                                 </div>
+    
                             </div>
-
-                        </div>
+                        </md-content>
                     </div>
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex>
                             <div>
                                 Limite de Credito
                             </div>
@@ -2102,12 +2106,12 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.limCred)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.limCred)" >
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,lim) in prov.limCred">
+                        <md-content >
 
-                            <div layout="row" >
+                            <div layout="row"  class="row" ng-repeat="(k,lim) in prov.limCred">
                                 <div flex>
                                     {{getDato(lim.datos.line,'lines','linea')}}
                                 </div>
@@ -2115,13 +2119,12 @@
                                     {{lim.datos.amount}} {{getDato(lim.datos.coin,'coins','simbolo')}}
                                 </div>
 
-
                             </div>
 
-                        </div>
+                        </md-content>
                     </div>
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Condiciones de Pago
                             </div>
@@ -2129,27 +2132,27 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.payCond)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.payCond)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,cond) in prov.payCond">
-
-                            <div layout="column" class="row">
-                                condicion de pago {{cond.datos.title}} para la linea {{getDato(cond.datos.line,'lines','linea')}} :
+                        <md-content>
+                            <div layout="column" ng-repeat="(k,cond) in prov.payCond" class="resumCell">
+                                <div class="row">
+                                    condicion de pago {{cond.datos.title}} para la linea {{getDato(cond.datos.line,'lines','linea')}} :
+                                </div>
+                                <div ng-repeat="(k1,item) in cond.datos.items"  layout="row" style="height: 24px">
+                                    <div style="width:50px"></div>
+                                    <div style="font-size:12px" flex>{{item.porcentaje}}% a los {{item.dias}} dias, {{item.descripcion}}</div>
+                                </div>
                             </div>
-                            <div ng-repeat="(k1,item) in cond.datos.items"  layout="row" style="height: 24px">
-                                <div style="width:50px"></div>
-                                <div style="font-size:12px" flex>{{item.porcentaje}}% a los {{item.dias}} dias, {{item.descripcion}}</div>
-                            </div>
-
-                        </div>
+                        </md-content>
                     </div>
 
 
                 </div>
                 <div   flex="33" layout="column">
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Factor de conversion
                             </div>
@@ -2157,19 +2160,29 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.factConv)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.factConv)">
+                            <span  style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,conv) in prov.factConv">
+                        <md-content>
 
-                            <div layout="column" ng-class="{'title_del' :conv.action =='del','title_upd' :conv.action =='upd','title_new' :conv.action =='new'}">
-                                {{conv.datos}}
+                            <div layout="column"  ng-repeat="(k,conv) in prov.factConv" class="resumCell">
+                                <div class="row" flex>
+                                    para la moneda {{getDato(conv.datos.coin,'coins','nombre')}} con la linea {{getDato(conv.datos.line,'lines','linea')}}
+                                </div>
+                                <div style="width:50px"></div>
+                                <div style="font-size:12px" flex>FLETE: <span style="font-weight:bolder;">{{conv.datos.freight}}%</span></div>
+                                <div style="width:50px"></div>
+                                <div style="font-size:12px" flex>GASTOS: <span style="font-weight:bolder;">{{conv.datos.expens}}%</span></div>
+                                <div style="width:50px"></div>
+                                <div style="font-size:12px" flex>GANANCIA: <span style="font-weight:bolder;">{{conv.datos.gain}}%</span></div>
+                                <div style="width:50px"></div>
+                                <div style="font-size:12px" flex>DESUENTO: <span style="font-weight:bolder;">{{conv.datos.disc}}%</span></div>
                             </div>
 
-                        </div>
+                        </md-content>
                     </div>
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Puntos
                             </div>
@@ -2177,71 +2190,74 @@
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div ng-show="!has(prov.point)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,point) in prov.point" flex="column">
+                        <md-content  layout="column">
 
-                            <div layout="row">
+                            <div layout="row" class="resumCell" ng-repeat="(k,point) in prov.point" class="row">
 
                                 <div flex>
-                                    {{point.datos.cost}} {{getDato(point.datos.coin,'coins','nombre')}} para la linea {{point(cond.datos.line,'lines','linea')}}
+                                    {{point.datos.cost}} {{getDato(point.datos.coin,'coins','nombre')}} para la linea {{getDato(cond.datos.line,'lines','linea')}}
                                 </div>
 
                             </div>
 
-                        </div>
+                        </md-content>
                     </div>
-                    <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                    <div layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex>
                             <div>
                                 Tiempos de Produccion
                             </div>
-                            <md-switch ng-hide="!has(prov.point)" md-no-ink ng-model="isEdit.provPoint" ng-change="toForm('provPoint')" aria-label="No Ink Effects">
+                            <md-switch ng-hide="!has(prov.timeProd)" md-no-ink ng-model="isEdit.timeProd" ng-change="toForm('timeProd')" aria-label="No Ink Effects">
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.timeProd)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,point) in prov.point">
-
-
-                        </div>
+                        <md-content>
+                            <div  layout="row" class="resumCell" ng-repeat="(k,tp) in prov.timeProd">
+                                entre {{tp.datos.from}} y {{tp.datos.to}} dias para la linea {{getDato(tp.datos.line,'lines','linea')}}
+                            </div>
+                        </md-content>
                     </div>
                     <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex >
                             <div>
                                 Tiempos de Transito
                             </div>
-                            <md-switch ng-hide="!has(prov.point)" md-no-ink ng-model="isEdit.provPoint" ng-change="toForm('provPoint')" aria-label="No Ink Effects">
+                            <md-switch ng-hide="!has(prov.timeTrans)" md-no-ink ng-model="isEdit.timeTrans" ng-change="toForm('timeTrans')" aria-label="No Ink Effects">
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.timeTrans)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,point) in prov.point">
+                        <md-content >
+                            <div  layout="row" class="resumCell" ng-repeat="(k,tt) in prov.timeTrans">
+                                entre {{tt.datos.from}} y {{tt.datos.to}} dias desde {{getDato(tt.datos.country,'countries','short_name')}}
+                            </div>
 
-
-                        </div>
+                        </md-content>
                     </div>
                     <div>
-                        <div class="titulo_formulario" layout="row" layout-align="start start" flex >
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" flex>
                             <div>
-                                Listas de Precio
+                                Lista de precios
                             </div>
-                            <md-switch ng-hide="!has(prov.point)" md-no-ink ng-model="isEdit.provPoint" ng-change="toForm('provPoint')" aria-label="No Ink Effects">
+                            <md-switch ng-hide="!has(prov.priceList)" md-no-ink ng-model="isEdit.priceList" ng-change="toForm('priceList')" aria-label="No Ink Effects">
                                 <!-- editar-->
                             </md-switch>
                         </div>
-                        <div>
-                            <span ng-show="!has(prov.point)" style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
+                        <div class="row" ng-show="!has(prov.priceList)">
+                            <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <div ng-repeat="(k,point) in prov.point">
+                        <md-content ng-repeat="(k,list) in prov.priceList">
+                            {{list.datos}}
 
-
-                        </div>
+                        </md-content>
                     </div>
 
                 </div>

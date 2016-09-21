@@ -29,8 +29,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
         if(curr.param && "block" in curr.param){
 
-            //$scope.block = false;
-            $scope.block--;
+            $scope.block = false;
+            //$scope.block--;
         }
     };
 
@@ -104,8 +104,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
             if("block" in params){
                 angular.element(":focus").blur();
-                //$scope.block = notif.type;
-                $scope.block++;
+                $scope.block = notif.type;
+                //$scope.block++;
                 $timeout(function(){
                     angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first().focus();
                 },10);
