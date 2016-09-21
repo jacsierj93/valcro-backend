@@ -372,6 +372,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 
 .adj-box{
     padding: 3px;
+    margin: -1px 0 0 -11px
 }
 
 .adj-box  span{
