@@ -104,7 +104,7 @@
             </div>
 
             <div id="listado" flex  style="overflow-y:auto;"  >
-                <div class="boxList"  layout="column" flex ng-repeat="item in todos | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
+                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
@@ -226,13 +226,15 @@
                         </md-tooltip>
                     </div>
 
+
+
                 </div>
                 <!-- ########################################## FILTROS CABECERA ########################################## -->
 
                 <div layout="row" flex layout-align="start center ">
 
                 </div>
-                <!--<div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" >
+                <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show="module.index == 0">
                     <div class="{{(alerts.length > 0 ) ? 'animation-arrow' : 'animation-arrow-disable'}}" ng-click="openNotis()" id="noti-button"
                          layout="column" layout-align="center center"  style=text-align:center; >
                         <img src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
@@ -240,7 +242,14 @@
                     <md-tooltip>
                         {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
                     </md-tooltip>
-                </div>-->
+                </div>
+
+                <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show="module.layer == 'detalleDoc'">
+                    Cl
+                    <md-tooltip>
+                        {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
+                    </md-tooltip>
+                </div>
             </div>
 
 
@@ -1299,7 +1308,7 @@
                                                      ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id )"
                                                      required
                                                      ng-click="toEditHead('prov_moneda_id', document.prov_moneda_id)"
-                                                     info="Seleccione la moneda en la que se realizara el pago': 'No se le han asignado monedas a '+provSelec.razon_social"
+                                                     info="Seleccione la moneda en la que se realizara el pago "
                                                      id="prov_moneda_id"
                                                      skip-tab
                                                      md-search-text="ctrl.searchMonedaSelec"
@@ -1466,7 +1475,7 @@
                         </div>
 
                     </form>
-                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row"ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" >
+                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" ng-blur="saveAprobCompras()" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex class="row" >
@@ -1479,19 +1488,24 @@
 
                             <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
 
-                                <div  style="height: 30px;margin-top: 9px;  color: #999999;" >
-                                    Fecha de Aprobación
+
+                                <div layout="row" class="date-row" flex="60">
+                                    <div layout="column" class="md-block" layout-align="center center"  >
+                                        <div>Fecha Aprobación: </div>
+                                    </div>
+                                    <div class="md-block" layout="column" layout-align="center center" >
+                                        <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
+                                                       ng-disabled="(Docsession.block)"
+                                                       skip-tab
+                                                       required
+                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
+
+                                        ></md-datepicker >
+                                    </div>
                                 </div>
 
-                                <div layout="column" flex="20">
-                                    <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
-                                                   ng-disabled="(Docsession.block)"
-                                                   ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
 
-                                    ></md-datepicker skip-tab>
-                                </div>
-
-                                <md-input-container class="md-block" flex="20">
+                                <md-input-container class="md-block" >
                                     <label>N° Documento</label>
                                     <input ng-model="document.nro_doc"  ng-disabled="(Docsession.block)"
                                            ng-click="toEditHead('nro_doc', document.nro_doc)"
@@ -1509,7 +1523,7 @@
                             </div>
                         </div>
                     </form>
-                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
+                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) "  ng-blur="saveCancelDoc()" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex class="row" >
@@ -4150,6 +4164,7 @@
                                           info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
                                           required
                                           id="textarea"
+                                          skip-tab
                                 ></textarea>
 
                                 </md-input-container>
@@ -4279,13 +4294,13 @@
                             <div layout="row" class="row-min" style="padding-right: 4px;" ng-show="showHead" >
                                 <md-input-container flex>
                                     <label>Asunto:</label>
-                                    <input  ng-model="asunto" required >
+                                    <input  ng-model="asunto" required  skip-tab  >
                                 </md-input-container>
                             </div>
                             <div layout="row" flex class="text-box" >
 
                                 <div style="" layout="column" >
-                                        <textarea ng-model="texto"
+                                        <textarea ng-model="texto"  skip-tab
                                                   id="textarea"
                                                   required
                                                   flex
