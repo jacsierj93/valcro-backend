@@ -58,7 +58,7 @@
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
             <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos | customFind : filterProv : filterList" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created))}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos | customFind : filterProv : filterList" id="prov{{item.id}}" ng-click="setProv(this,$index)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created)), 'reserved':(item.reserved)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'0' | number:2}}</div>
                     <div style="height:40px;">
@@ -297,7 +297,7 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <input type="hidden" md-autofocus>
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" layout="row" ng-controller="DataProvController" global ng-class="{'focused':isShow}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
+                <form name="projectForm" layout="row" ng-controller="DataProvController" global ng-class="{'focused':isShow, 'required':!prov.id,'modified':$parent.changeForm('dataProv')>0}}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
@@ -427,7 +427,7 @@
                 </form>
 
                 <!-- 18) ########################################## FORMULARIO "Nombres Valcro" ########################################## -->
-                <form name="nomvalcroForm" layout="row" ng-controller="valcroNameController" global ng-class="{'focused':isShow,'preNew':!prov.id}"  ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)" >
+                <form name="nomvalcroForm" layout="row" ng-controller="valcroNameController" global ng-class="{'focused':isShow,'preNew':!prov.id,'modified':$parent.changeForm('valName')>0}"  ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)" >
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
@@ -443,7 +443,7 @@
                                     <label>Nombre...</label>
                                     <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" duplicateMsg="este nombre Vacro ya existe" field="nombre" ng-minlength="3" required name="name" id="name" ng-model="valName.name" ng-disabled="$parent.enabled">
                                 </md-input-container>
-                                <span class="icon-Lupa" style="width:24px;" ng-click="openCoinc()" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
+                                <span class="icon-Lupa" style="width:24px;" ng-click="$parent.openPopUp('nomValLyr')" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
                                 <vlc-group class="iconValName" skip-tab>
                                     <span ng-repeat="dep in deps" icon-group info="{{dep.desc}}" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this,$event)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive iconInput" style="font-size: 18px; margin-left: 8px; color:black"></span>
                                 </vlc-group>
@@ -458,13 +458,13 @@
                 </form>
                 <!--<div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 19) ########################################## FORMULARIO "Direcciones del Proveedor" ########################################## -->
-                <form name="direccionesForm" layout="row" ng-controller="provAddrsController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':address.length==0}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="direccionesForm" layout="row" ng-controller="provAddrsController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':address.length==0,'modified':$parent.changeForm('dirProv')>0}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex layout="column">
 
                         <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                             <div>
-                                Direcciones
+                                Direcciones <i>{{($parent.changeForm('dirProv')>0)?$parent.changeForm('dirProv'):''}}</i>
                             </div>
                             <!--<div style="width:24px">
                                 <span class="icon-Agregar"></span>
@@ -592,12 +592,12 @@
                 </form>
                 <!--div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
-                <form name="provContactosForm" layout="row"  ng-controller="contactProv" global ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="provContactosForm" layout="row"  ng-controller="contactProv" global ng-class="{'focused':isShow,'preNew':!prov.id,'modified':$parent.changeForm('contProv')>0}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit)}">
                             <div>
-                                Contactos Proveedor
+                                Contactos Proveedor <i>{{($parent.changeForm('contProv')>0)?$parent.changeForm('contProv'):''}}</i>
                             </div>
                             <!--<div style="width:24px">
                                 <span class="icon-Agregar"></span>
@@ -763,7 +763,7 @@
             </div>
 
         </md-sidenav>
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr">
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="nomValLyr" id="nomValLyr" click-out="closePopUp('nomValLyr',$event)">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="nomValAssign">
                 <input type="hidden" md-autofocus>
                 <div layout="column" flex style="overflow-x: hidden;">
@@ -1047,7 +1047,7 @@
                 </form>
 
                 <!-- ########################################## FORMULARIO MONEDAS ########################################## -->
-                <form name="provMoneda" layout="row"  ng-controller="coinController"  ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="provMoneda" layout="row"  ng-controller="coinController"  ng-class="{'focused':isShow,'preNew':!prov.id, 'required':coinAssign.length==0}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="row" layout-align="start start" class="row" ng-class="{'onlyread' : (!$parent.edit)}">
@@ -1066,7 +1066,7 @@
                                                      skip-tab
                                                      md-search-text="ctrl.searchCoin"
                                                      md-selected-item-change="cn.coin = ctrl.coin.id; (!setting)?provMoneda.$setDirty():true"
-                                                     md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' | filterSelect: filt"
+                                                     md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' | customFind:coinAssign:check "
                                                      md-item-text="item.nombre"
                                                      require
                                                      require-match="true"
@@ -1625,7 +1625,7 @@
                 </form>
 
                 <!-- ########################################## FORMULARIO TIEMPO PRODUCCION ########################################## -->
-                <form name="timeProd" layout="row" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id}" click-out="showGrid(false,$event)">
+                <form name="timeProd" layout="row" ng-click="showGrid(true,$event)" ng-controller="prodTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':timesP.length==0}" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex>
                         <div class="titulo_formulario" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
@@ -1697,7 +1697,7 @@
                 </form>
 
                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                <form name="timeTrans" layout="row" ng-controller="transTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
+                <form name="timeTrans" layout="row" ng-controller="transTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':timesT.length==0}" ng-click="showGrid(true,$event)" click-out="showGrid(false,$event)">
                     <div active-left></div>
                     <div flex>
                         <div class="titulo_formulario row" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">

@@ -775,6 +775,12 @@ form.required .titulo_formulario>div{
 form.required .titulo_formulario{
     color: #febd33;
 }
+form.modified .titulo_formulario>div{
+    border-bottom-color: #05ce7c;
+}
+form.modified .titulo_formulario{
+    color: #05ce7c;
+}
 
 .cntLayerHolder {
     padding: 10px 0px 24px 0px !important; /*modificado por jacsiel 07/06/2016*/
@@ -1102,6 +1108,10 @@ div.activeleft{
 .resumCell{
     border-bottom: 1px solid #f1f1f1;
     margin-right: 8px;
+}
+
+.reserved{
+    opacity:0.5;
 }
 
 md-progress-linear ._md-bar,md-progress-linear .md-bar{

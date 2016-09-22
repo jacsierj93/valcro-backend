@@ -178,6 +178,30 @@ class ProvidersController extends BaseController
         return json_encode($data);
     }
 
+    public function reservedProv(request $prv){
+        $usr = $prv->session()->get('DATAUSER');
+
+        Provider::where("reserved",$usr['id'])->update(array('reserved' => null));
+
+
+        if($prv->prov && $prv->set){
+            $prov =  Provider::findOrFail($prv->prov);
+            $prov->reserved = $usr['id'];
+            $prov->save();
+        }
+
+
+    }
+
+    public function editedProv(request $prv){
+        $usr = $prv->session()->get('DATAUSER');
+        if($prv->prov){
+            $prov =  Provider::findOrFail($prv->prov);
+            $prov->edited = ($prv->set)?$usr['id']:null;
+            $prov->save();
+            dd($prv->set==true);
+        }
+    }
 
     public function saveOrUpdateProv(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");

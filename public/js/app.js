@@ -386,7 +386,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 }
 
             },50);
-        }else if(angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").length>0){
+        }else if(angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))").length>0){
 
             if(!scope.endLayer) {
                 var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
@@ -945,7 +945,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                    // progress=evt.loaded;
                     uploaded = parseInt(100.0 * evt.loaded / evt.total)
 
-                    $scope.progress = ($scope.cola.terminados.length != $scope.cola.total)?(($scope.cola.terminados.length*100) + uploaded) / $scope.cola.total:($scope.cola.terminados.length*100)/$scope.cola.total;
+                    //$scope.progress = ($scope.cola.terminados.length != $scope.cola.total)?(($scope.cola.terminados.length*100) + uploaded) / $scope.cola.total:($scope.cola.terminados.length*100)/$scope.cola.total;
 
                     //console.log(uploaded,"progreso",$scope.progress)
                 }).success(function (data, status, headers, config) {

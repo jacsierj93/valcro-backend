@@ -117,7 +117,7 @@ MyApp.service("listCoins",function(providers) {
         }
     }
 });
-MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout,$interval,saveForm) {
+MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters,masterLists,setGetContac,setNotif,Layers,$timeout,$interval,saveForm,providers) {
     $scope.expand = false;
     $scope.isSetting = setGetProv.isSetting();
     $scope.prov=setGetProv.getProv();
@@ -130,6 +130,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             $scope.edit = true;
         }
     });
+
+    $scope.changeForm = setGetProv.getChngByForm;
 
 
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
@@ -229,8 +231,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     var chngProv = function(prov){
-
-
         setGetProv.cancelNew();
         $scope.edit = false;
         $scope.enabled = true;
@@ -268,7 +268,10 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                         {
                             name: "Estoy de acuerdo",
                             action: function () {
+                                providers.put({type:"editProv"},{prov:$scope.prov.id,set:false});
+                                providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:false});
                                 yes(id);
+
                             }
                         },
                         {
@@ -278,11 +281,15 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                         }
                     ]);
                 }else{
+                    providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:false});
                     yes(id);
                 }
             },1000);
         }else{
+            console.log("else")
+            providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:false});
             yes(id);
+
         }
 
     };
@@ -314,9 +321,27 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.editProv = function(){
-        $scope.edit = true;
-        $scope.enabled =false;
-        $scope.LayersAction({open:{name:"layer1"}});
+        if($scope.prov.reserved){
+            setNotif.addNotif("alert", "Este proveedor esta siendo usado por otro usuario en estos momentos, desea reclamarlo para usted", [{
+                name: "si,dejamelo a mi",
+                action: function () {
+                    $scope.edit = true;
+                    $scope.enabled =false;
+                    $scope.LayersAction({open:{name:"layer1"}});
+                    providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:true});
+                }
+            }, {
+                name: "no, continuare en modo lectura",
+                action: null
+
+            }]);
+        }else{
+            $scope.edit = true;
+            $scope.enabled =false;
+            $scope.LayersAction({open:{name:"layer1"}});
+            providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:true});
+        }
+
     };
 
     $scope.showNext = function(status,to){
@@ -467,6 +492,17 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var onSet = {setting:false};
+    var hasChange = function(){
+
+        var i = 1;
+        x = false;
+        angular.forEach(changes,function(v,k){
+            if(Object.keys(v).length>0){
+                x=true;
+            }
+        });
+        return x;
+    };
     return {
         getProv: function () {
             return prov;
@@ -480,7 +516,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
                 id = itemsel.id;
                 providers.get({type:"getProv"},{id:id},function(data){
                     fullProv = data;
-                    //console.log(fullProv);
+                    console.log(data);
                     prov.id = data.id;
                     prov.description = data.razon_social;
                     prov.siglas = data.siglas;
@@ -488,6 +524,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
                     prov.envio = data.tipo_envio_id;
                     prov.contraped = (data.contrapedido==1)?true:false;
                     prov.created = false;
+                    prov.reserved = data.reserved;
                     rollBack.dataProv[parseInt(prov.id)] = angular.copy(prov);
                     onSet.setting = false;
                 });
@@ -554,21 +591,24 @@ MyApp.service("setGetProv",function($http,providers,$q){
             }else{
                 delete changes[form][parseInt(val.id)];
             }
+            console.log(hasChange())
+            if(hasChange()){
+                providers.put({type:"editProv"},{prov:prov.id,set:true});
+            }else{
+                console.log("entraaa")
+                providers.put({type:"editProv"},{prov:prov.id,set:false});
+            }
+
         },
         getChng : function(){
             return changes;
-         },
-        haveChang : function(){
-
-            var i = 1;
-            x = false;
-            angular.forEach(changes,function(v,k){
-                if(Object.keys(v).length>0){
-                    x=true;
-                }
-            });
-            return x;
         },
+        getChngByForm : function(form){
+            //console.log(Object.keys(changes[form]).length)
+            return Object.keys(changes[form]).length;
+
+        },
+        haveChang : hasChange,
         getNomVal : function(){
             return fullProv.nomValc || [];
         },
@@ -883,7 +923,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
 
     $scope.toEdit = function(addrs){
 
-        saveAddress(function(dirSel){
+        saveAddress(function(elem){
+            dirSel = elem;
             $scope.setting = true;
             $scope.dir.id = dirSel.id;
             $scope.dir.id_prov = dirSel.prov_id;
@@ -1729,9 +1770,8 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     /*setea el contacto del grid para edicion en el formulario
     en el caso de contactos lo setea mediante el servicio "setGetContact"*/
     $scope.toEdit = function(element){
-        saveContact(function(contact){
-            //$scope.setting = true;
-            console.log("elemento")
+        saveContact(function(elem){
+            contact = elem
             $scope.provContactosForm.$setUntouched();
             $scope.provContactosForm.$setPristine();
             contact.prov_id = $scope.prov.id;
@@ -2093,6 +2133,10 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     $scope.$watch('coinAssign.length',function(nvo){
         setGetProv.setComplete("coin",nvo);
     });
+
+    $scope.check=function(current,list){
+        return $filter("filterSearch")(list,[current.id]).length==0;
+    };
     $scope.$watchGroup(['provMoneda.$valid','provMoneda.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1] && !angular.equals(currentOrig, $scope.cn)) {
             //$scope.setting = true;

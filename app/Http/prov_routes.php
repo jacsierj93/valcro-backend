@@ -12,6 +12,8 @@ $app->get('provider/listFiles','Providers\ProvidersController@getFiles');
 $app->get('provider/getImg','Providers\ProvidersController@getFile');
 
 $app->get("provider/provList",'Providers\ProvidersController@getList'); ///obtener lista general de proveedores
+$app->post("provider/reservedProv",'Providers\ProvidersController@reservedProv'); ///marca el proveedor como reservado para edicion
+$app->post("provider/editProv",'Providers\ProvidersController@editedProv'); ///guarda datos basicos de un prov
 $app->post("provider/saveProv",'Providers\ProvidersController@saveOrUpdateProv'); ///guarda datos basicos de un prov
 $app->post("provider/getProv",'Providers\ProvidersController@getProv'); ///obtener datos especificos de un prov
 $app->post("provider/saveProvAddr",'Providers\ProvidersController@saveProvDir'); ///guardar direccion de proveedor
