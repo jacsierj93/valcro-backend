@@ -23,6 +23,7 @@
                     </div>
                 </div>
                 <div flex="" style="overflow: auto; padding: 0px 4px 4px 4px; overflow: auto;">
+                    progreso: {{progress}}
                     <div class="imgItem" ng-repeat="item in pitures " ng-click="selectImg(item)">
                         <img ng-src="images/thumbs/{{item.thumb}}"/>
                     </div>

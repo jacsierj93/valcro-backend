@@ -2094,10 +2094,10 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         setGetProv.setComplete("coin",nvo);
     });
     $scope.$watchGroup(['provMoneda.$valid','provMoneda.$pristine'], function(nuevo) {
-        if(nuevo[0] && !nuevo[1]) {
+        if(nuevo[0] && !nuevo[1] && !angular.equals(currentOrig, $scope.cn)) {
             //$scope.setting = true;
             providers.put({type: "saveCoin"}, $scope.cn, function (data) {
-
+                $scope.cn.id = $scope.cn.coin;
                 $scope.provMoneda.$setPristine();
                 var newCoin = $filter("filterSearch")($scope.coins,[$scope.cn.coin])[0];
                 newCoin.pivot = {prov_id:$scope.cn.prov_id};
@@ -2115,7 +2115,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
     var coin = {};
     var currentOrig = {};
     $scope.toEdit = function(coin){
-        $scope.setting = true;
+        //$scope.setting = true;
         coin = coin.coinSel;
         $scope.cn.id=coin.id;
         $scope.cn.coin=coin.id;
@@ -2123,7 +2123,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         $scope.ctrl.coin = $scope.coin;
         currentOrig = angular.copy($scope.cn);
         setGetProv.addToRllBck($scope.cn,"provCoin")
-        $timeout(function(){$scope.setting = false;},100)
+       // $timeout(function(){$scope.setting = false;},100)
     };
 
     $scope.rmCoin = function(elem){
@@ -2136,7 +2136,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
                         setGetProv.addChng($scope.cn,data.action,"provCoin");
                         $scope.coinAssign.splice(elem.$index,1);
                         $scope.filt.splice($scope.filt.indexOf(elem.coinSel.id),1);
-                        $scope.cn = {coin:"",prov_id:$scope.prov.id||0};
+                        $scope.cn = {id:"",coin:"",prov_id:$scope.prov.id||0};
                         $scope.provMoneda.$setUntouched();
 
                         setNotif.addNotif("ok", "Moneda Eliminada", [
@@ -3373,10 +3373,11 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
 
 
      $scope.getDato = function(id,find,field){
-         if(id!=0){
-             return $filter("filterSearch")(foraneos[find],[parseInt(id)])[0][field];
+         if(id && id!=0){
+             //console.log(id,find,field,$filter("filterSearch")(foraneos[find],[id.toString()])[0])
+             return $filter("filterSearch")(foraneos[find],[id.toString()])[0][field];
          }else{
-             return [];
+             return "Todas";
          }
 
      };
@@ -3461,7 +3462,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter
 
         var isValid = (foreign.valid)?foreign.valid():true;
 
-        console.log(foreign.form,isValid);
+        //console.log(foreign.form,isValid);
 
         if (!foreign.form.$valid && !foreign.form.$pristine || (!isValid && foreign.form.$dirty)) {
             var prefocus = angular.element(":focus");

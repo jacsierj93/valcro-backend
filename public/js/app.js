@@ -118,7 +118,7 @@ MyApp.filter('filterSelect', function() {
 MyApp.filter('filterSearch', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
         return arr1.filter(function(val) {
-            return (arr2.indexOf(""+val.id) !== -1 || arr2.indexOf(val.id) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+            return (arr2.indexOf(val.id.toString()) !== -1 || arr2.indexOf(val.id) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
     }
 });
@@ -541,22 +541,41 @@ MyApp.directive('info', function($timeout,setNotif) {
 
             });
 
+            var showInfo = function(){
+                if(attrs.info){
+                    $timeout(function() {
+                        if(old.element!=element[0]){
+                            setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                            old.element = element[0];
+                            old.info = attrs.info;
+                        }
+                        $timeout.cancel(ref);
+                        ref = $timeout(function() {
+                            old = {element:"",info:""};
+                        },30000);
+                    }, 0);
+                }
+            };
+
+            if(element.is("span")){
+                element.on("mouseover", function(e) {
+                    $timeout(function(){
+                        showInfo();
+                    },700);
+
+                });
+
+                element.on("mouseleave", function(e) {
+                    $timeout(function() {
+                        setNotif.hideByContent("info",attrs.info);
+                    }, 0);
+                });
+            };
+
             if(element.is("md-autocomplete")){
                 element.on("focus","input", function(e) {
                     this.select();
-                    if(attrs.info){
-                        $timeout(function() {
-                            if(old.element!=element[0]){
-                                setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
-                                old.element = element[0];
-                                old.info = attrs.info;
-                            }
-                            $timeout.cancel(ref);
-                            ref = $timeout(function() {
-                                old ={element:"",info:""};
-                            },30000);
-                        }, 0);
-                    }
+                    showInfo();
                 });
 
                 element.on("blur","input", function(e) {
@@ -574,20 +593,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
             }else{
                 element.bind("focus", function(e){
-                    if(attrs.info){
-                        console.log(attrs.info)
-                        $timeout(function() {
-                            if(old.element!=element[0]){
-                                setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
-                                old.element = element[0];
-                                old.info = attrs.info;
-                            }
-                            $timeout.cancel(ref);
-                            ref = $timeout(function() {
-                                old ={element:"",info:""};
-                            },30000);
-                        }, 0);
-                    }
+                    showInfo();
                 })
             }
 
@@ -847,6 +853,8 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
     $scope.module = Layers.getModule();
     $scope.moduleAccion = Layers.getAccion();
     $scope.cola = filesService.getProcess();
+    $scope.uploading = false;
+    $scope.progress = 0;
     $scope.allowUpload = filesService.allowUpload();
     filesService.setAllowUpload(false);
     $scope.inLayer = "";
@@ -934,7 +942,12 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                     url: 'master/files/upload',
                     data :{ folder:filesService.getFolder(),file: file}
                 }).progress(function (evt) {
-                    uploadNow = parseInt(100.0 * evt.loaded / evt.total);
+                   // progress=evt.loaded;
+                    uploaded = parseInt(100.0 * evt.loaded / evt.total)
+
+                    $scope.progress = ($scope.cola.terminados.length != $scope.cola.total)?(($scope.cola.terminados.length*100) + uploaded) / $scope.cola.total:($scope.cola.terminados.length*100)/$scope.cola.total;
+
+                    //console.log(uploaded,"progreso",$scope.progress)
                 }).success(function (data, status, headers, config) {
                     $scope.pitures.push(data);
                     $scope.cola.terminados.push(data);
@@ -942,6 +955,9 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                     $scope.cola.estado = "error";
                 });
             }
+
+            $scope.uploading = 0;
+
         }
     };
 
@@ -1080,6 +1096,7 @@ MyApp.service('filesService' ,function(Upload){
     var isOpen= false;
     var titulo ="Adjuntos";
     var folder ="";
+    var progress = "";
     var process = {
         total : 0 ,
         terminados: [],
@@ -1155,6 +1172,9 @@ MyApp.service('filesService' ,function(Upload){
                 .error(!(data.error) ? function(){} : data.error);
 
 
+        },
+        getProgress : function(){
+            return progress;
         }
 
 
