@@ -72,6 +72,7 @@ form:not(:last-child){
 
 .row {
     height: 40px;
+    padding-right: 4px;
 }
 
 /*==================================================*/

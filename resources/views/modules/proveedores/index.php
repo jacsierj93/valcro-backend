@@ -104,7 +104,7 @@
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
-                <div class="loadArea" ng-class="{'loading':(list2()==0)}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+                <div class="loadArea" ng-class="{'loading':list2()==0}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
                     <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; ">
                         P
                     </div>
@@ -719,7 +719,7 @@
                                 <input skip-tab info="direccion oficina (no es la misma de direcciones del proveedor)" autocomplete="off" name="cntcDirOfc" maxlength="200" ng-model="cnt.dirOff" ng-minlength="3" ng-disabled=" $parent.enabled">
                             </md-input-container>
                         </div>
-                        <div layout="row">
+                        <div class="row" layout="row">
                             <md-input-container class="md-block" flex>
                                 <label>Notas</label>
                                 <input style="max-height: 80px;" skip-tab info="alguna informaciona adicional para el contacto" autocomplete="off" name="cntNotes" ng-model="cnt.notes" ng-minlength="3" ng-disabled=" $parent.enabled "/>
@@ -1781,7 +1781,7 @@
                                 </md-input-container>
                                 <div style="width:100px; padding: 3px;">
                                     <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">listas</span>
-                                    <div ng-click="openAdj($event)" ng-class="{'ng-disable':$parent.enabled}" skip-tab class="vlc-buttom" style="float:left">
+                                    <div ng-click="openAdj($event)" ng-class="{'ng-disable':$parent.enabled}" skip-tab="autoClik" class="vlc-buttom" style="float:left">
                                         {{lp.adjs.length || 0}}
                                     </div>
                                 </div>
@@ -2283,7 +2283,7 @@
         z-index: 89;
         background: rgba(255,255,255,0.2);
         cursor: default;
-    " ng-show="secBlock"></div>
+    " ng-show="secBlock" ng-show="list2()==0"></div>
 
 
         <!-- 8) ########################################## BOTON Next ########################################## -->

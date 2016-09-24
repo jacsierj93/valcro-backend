@@ -150,11 +150,12 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
     $scope.isBlocked = function(){
         return ($filter('customFind')($scope.alerts.alert,'block',function (x,z){
-            return (z in x.param);
+            return (x.param && z in x.param);
         }).length>0
             ||
         $filter('customFind')($scope.alerts.error,'block',function (x,z){
-            return (z in x.param);
+            
+            return (x.param && z in x.param);
         }).length>0)
 
     };
