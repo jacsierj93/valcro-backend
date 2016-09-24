@@ -87,21 +87,22 @@ div[ng-click] * {
     display: block;
 }
 
-.cell-filter-order *{
+/*@derecated*/
+/*.cell-filter-order *{
     width: 100%;
 }
 .cell-filter-order > div {
     height: 50%;
     width: 100%;
-}
+}*/
 
-.cell-filter-order > div > div{
+/*.cell-filter-order > div > div{
     padding-top: 4px;
-}
-.cell-filter-order > div:not(.filter-select) > img{
+}*/
+/*.cell-filter-order > div:not(.filter-select) > img{
     display: none;
-}
-.cell-filter-order > div:hover > img{
+}*/
+/*.cell-filter-order > div:hover > img{
     display: block ;
 }
 
@@ -111,7 +112,7 @@ div[ng-click] * {
 
 .filter-select *{
     display: block ;
-}
+}*/
 
 
 
@@ -372,6 +373,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 
 .adj-box{
     padding: 3px;
+    margin: -1px 0 0 -11px
 }
 
 .adj-box  span{

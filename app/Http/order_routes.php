@@ -26,6 +26,8 @@ $app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); //
 $app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
 $app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el correo
 
+//$app->get("Order/CloseAction",'Orders\OrderController@closeAction'); ///obtiene los correo de un proveedor
+
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated
 $app->get("Order/OrderProvList",'Orders\OrderController@getProviderList'); ///lista de todos los proveedores
@@ -79,6 +81,7 @@ $app->post("Order/Order/Cancel",'Orders\OrderController@cancelsOrder'); /// canc
 $app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrden'); /// cambia un producto item
 $app->post("Order/Order/Restore",'Orders\OrderController@restoreOrden'); /// restaura a una version anterior
 $app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
+$app->post("Order/Order/CloseAction",'Orders\OrderController@closeAction'); /// define que acion se debe realizar para cerrar la accion
 
 
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
@@ -113,6 +116,8 @@ $app->post("Order/Purchase/Cancel",'Orders\OrderController@cancelPurchase'); ///
 $app->post("Order/Purchase/ProductChange",'Orders\OrderController@changeProductoPurchase'); // cambia el producto
 $app->post("Order/Purchase/Restore",'Orders\OrderController@restorePurchase'); /// restaura a una version anterior
 $app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// envia la solicitud al proveedor
+$app->post("Order/Purchase/Create",'Orders\OrderController@CreatePurchase'); /// envia la solicitud al proveedor
+$app->post("Order/Purchase/CloseAction",'Orders\OrderController@closeAction'); /// define que acion se debe realizar para cerrar la accion
 
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
@@ -146,6 +151,9 @@ $app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude');
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
+$app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
+$app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeAction'); /// define que acion se debe realizar para cerrar la accion
+
 
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd

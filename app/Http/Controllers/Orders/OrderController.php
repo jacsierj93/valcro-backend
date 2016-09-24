@@ -46,6 +46,7 @@ use App\Models\Sistema\Solicitude\SolicitudeAnswer;
 use App\Models\Sistema\Solicitude\SolicitudeAnswerAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeItem;
+use App\Models\Sistema\User;
 use Carbon\Carbon;
 use DB;
 use Log;
@@ -143,35 +144,32 @@ class OrderController extends BaseController
 
 
         $docsUnclose[0] = Solicitude::whereNull("final_id")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
             ->whereNull('cancelacion')
             ->get();
 
         $docsUnclose[1] = Order::whereNull("final_id")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
+
             ->whereNull('cancelacion')
             ->get();
         $docsUnclose[2] = Purchase::whereNull("final_id")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-//            ->whereNull('cancelacion')
             ->get();
         foreach($docsUnclose as $docs){
             foreach($docs  as $aux){
+                $prov = Provider::find($aux->prov_id);
                 $temp= array();
                 $temp['id']=$aux->id;
                 $temp['documento'] = $aux->getTipo();
                 $temp['tipo'] = $aux->getTipoId();
                 $temp['titulo'] = $aux->titulo;
+                $temp['fecha_envio'] = $aux->fecha_envio;
                 $temp['monto'] = $aux->monto;
+                $temp['uid'] = $aux->uid;
 
                 $temp['symbol'] = ($aux->prov_moneda_id !=null && $aux->prov_moneda_id != 0 ) ? $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo : '';
                 $temp['emision'] = $aux->emision;
                 $temp['comentario'] = $aux->comentario;
                 $temp['prov_id'] = $aux->prov_id;
-                $temp['proveedor'] = Provider::findOrFail($aux->prov_id)->razon_social;
+                $temp['proveedor'] = ($prov == null ) ?  '':$prov->razon_social;
                 $temp['productos'] = $this->getProductoItem($aux);
 
 
@@ -268,6 +266,27 @@ class OrderController extends BaseController
 
     }
 
+    /** trae la informacion de usuario la session **/
+
+    public  function closeAction(Request $req){
+        $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
+            ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
+        $model= Solicitude::findOrFail($req->id);
+        if($user->cargo_id == '8') {
+            return ['action' => 'question'];
+        }
+        if($req->accion == 'new'){
+            return ['action'=>'save'];
+        }
+        if($req->accion == 'upd'){
+            if($model->fecha_envio == null){
+                return ['action'=>'send'];
+            }else{
+                return ['action'=>'writer'];
+            }
+        }
+        return ['action'=>'no'];
+    }
     /*********************** PROVIDER ************************/
 
     /**
@@ -582,6 +601,30 @@ class OrderController extends BaseController
         return $data;
 
     }
+
+    /*********************** Create  ************************/
+    public  function CreateSolicitude(Request $req){
+        $model= Solicitude::findOrFail($req->id);
+        $response =[];
+        $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
+            ,'cc'=>[],'ccb'=>[]
+            ,'asunto'=>'Notificacion de creacion de solicitud'];
+
+        $data =$this->parseDocToSummaryEmail($model);
+        $data['accion']=$sender['asunto'];
+        $this->sendNotificacion($data,$sender);
+
+        $response['success']= 'enviado';
+        $response['to']= $sender['to'];
+        $response['cc']= $sender['cc'];
+        $response['ccb']= $sender['ccb'];
+        $response['noti']=$req->session()->get('DATAUSER')['email'];
+        return $response;
+
+
+
+    }
+
 
     /*********************** Approved Purchases ************************/
 
@@ -976,7 +1019,7 @@ class OrderController extends BaseController
         $atts =$model->attachments()->get();
         foreach($items as $aux){
             $temp= array();
-            $p= $provProd->where('id',$aux->producto_id)->first();
+            $p= $provProd->where('id',$aux->producto_id.'')->first();
             $temp['id']=$aux->id;
             $temp['producto_id']=$aux->producto_id;
             $temp['codigo']=$p->codigo;
@@ -986,9 +1029,7 @@ class OrderController extends BaseController
             $temp['extra']= $p;
             $prod[]= $temp;
         }
-        if($model->prov_id != null){
-            // $data['proveedor'] ;
-        }
+
 
         $data['adjuntos']= $atts;
         $data['productos']= $prod;
@@ -3463,8 +3504,9 @@ class OrderController extends BaseController
 
     public function sendSolicitude(Request $req){
 
-        $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
+        $model = Solicitude::findOrFail($req->id);
+        $data = $this->parseDocToEstimateEmail($model,($req->has('texto')) ? $req->texto : '');
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data, $model){
 
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
             if(!$req->has('local')){
@@ -3479,6 +3521,8 @@ class OrderController extends BaseController
             foreach($req->cco as $aux){
                 $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
             }
+            $model->fecha_envio= Carbon::now();
+            $model->save();
 
 
         });
@@ -3489,8 +3533,9 @@ class OrderController extends BaseController
 
     public function sendOrder(Request $req){
 
-        $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
+        $model= Order::findOrFail($req->id);
+        $data = $this->parseDocToEstimateEmail($model,($req->has('texto')) ? $req->texto : 'Confirmacion de proforma ');
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data, $model){
 
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
             if(!$req->has('local')){
@@ -3505,6 +3550,8 @@ class OrderController extends BaseController
             foreach($req->cco as $aux){
                 $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
             }
+            $model->fecha_envio= Carbon::now();
+            $model->save();
 
 
         });
@@ -3516,8 +3563,9 @@ class OrderController extends BaseController
 
     public function sendPurchase(Request $req){
 
-        $data = $this->parseDocToEstimateEmail(Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data){
+        $model= Purchase::findOrFail($req->id);
+        $data = $this->parseDocToEstimateEmail($model, Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data, $model){
 
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
             if(!$req->has('local')){
@@ -3532,6 +3580,9 @@ class OrderController extends BaseController
             foreach($req->cco as $aux){
                 $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
             }
+            $model->fecha_envio= Carbon::now();
+            $model->save();
+
         });
         $resul =[];
         $resul['accion']= 'send';
@@ -3932,13 +3983,14 @@ class OrderController extends BaseController
     public function getDocument(Request $req){
         $model = $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->id);
-        $prov= Provider::findOrFail($model->prov_id);
-        $adjs = array();
+        $prov= Provider::find($model->prov_id);
+        $objs =[];
         //para maquinas
         $tem = array();
         $tem['id']=$model->id;
         $tem['tipo']=$model->getTipoId();
         $tem['pais_id']=$model->pais_id;
+        $tem['fecha_envio']=$model->fecha_envio;
         $tem['puerto_id']=$model->puerto_id;
         $tem['final_id']=$model->final_id;
         $tem['direccion_almacen_id']=$model->direccion_almacen_id;
@@ -3952,10 +4004,11 @@ class OrderController extends BaseController
         $tem['estado_id']=$model->estado_id;
         $tem['doc_parent_id']=$model->doc_parent_id;
         $tem['doc_parent_origen_id']=$model->doc_parent_origen_id;
+        $tem['uid']=$model->uid;
         // pra humanos
         $tem['comentario']=$model->comentario;
         $tem['tasa']=$model->tasa;
-        $tem['proveedor']=$prov->razon_social;
+        $tem['proveedor']=($prov != null)? $prov->razon_social: '';
         $tem['documento']= $model->type;
         $tem['titulo']= $model->titulo;
         $tem['diasEmit']=$model->daysCreate();
@@ -3997,12 +4050,16 @@ class OrderController extends BaseController
         $tem['emision']=$model->emision;
         $tem['monto']=$model->monto;
         $tem['productos'] =$this->getProductoItem($model);
+        $objs['prov_id']=$prov;
+        $objs['prov_moneda_id'] = Monedas::find($model->prov_moneda_id);
+        $objs['direccion_facturacion_id'] = ProviderAddress::find($model->direccion_facturacion_id);
+        $objs['direccion_almacen_id'] = ProviderAddress::find($model->direccion_almacen_id);
+        $objs['pais_id'] = Country::find($model->pais_id);
+        $objs['condicion_pago_id'] =  ProviderCondPay::find($model->condicion_pago_id);
+        $objs['puerto_id'] = Ports::find($model->puerto_id);
 
-        /*      foreach( as $aux){
-                  $at= array();
-                  $at['id']= $aux->id
-                  {id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
-              }*/
+
+
 
         /**actualizar cuando este el final**/
         $tem['almacen']="Desconocido";
@@ -4035,6 +4092,8 @@ class OrderController extends BaseController
 
         }
         $tem['adjuntos'] = $atts;
+
+        $tem['objs']=$objs;
 
         return $tem;
 
@@ -4718,80 +4777,74 @@ class OrderController extends BaseController
     public function saveSolicitude(Request $req)
     {
 
-        //////////validation
+        $result =  [];
+        $result["action"]="new";
+        $model = new Solicitude();
+        $uid=null;
+
+        if ($req->has('id')) {
+            $model = $model->findOrFail($req->id);
+            $result["action"]="edit";
+        }
         $validator = Validator::make($req->all(), [
+            'prov_id' => 'required',
+            'titulo' => 'required',
+            'tasa' => 'required',
+            'prov_moneda_id' => 'required'
 
         ]);
-        if ($validator->fails()) { ///ups... erorres
-
+        if ($validator->fails()) {
             $result = array("error" => "errores en campos de formulario");
+            if($model->uid == null){
+                $model->uid =uniqid('', true);
+            }
 
         }else{
-            $result = array("success" => "Solicitud guarda con éxito","action"=>"new");
-            $model = new Solicitude();
-            //////////condicion para editar
-            if ($req->has('id')) {
-                $model = $model->findOrFail($req->id);
-                $result["action"]="edit";
-            }
-            $model= $this->setDocItem($model, $req);
-            $model->save();
-            $result['id']= $model->id;
-            $result['user']= $model->usuario_id;
-            if($req->has('tempId')){
-                $tempAtt= SolicitudeAttachment::where('uid',$req->tempId)->get();
-               foreach($tempAtt as $aux){
-                   $aux->doc_id=$model->id;
-                   $aux->uid= null;
-                   $aux->save();
-               }
-            }
-
-        }
-
-
+            $result['success']= "Registro guardado con éxito";
+            $model->uid= null;
+         }
+        $model= $this->setDocItem($model, $req);
+        $model->save();
+        $result['id']= $model->id;
+        $result['user']= $model->usuario_id;
+        $result['uid']=$model->uid ;
         return $result;
 
     }
 
 
 
-    public function savePurchaseOrder(Request $req)
-    {
+    public function savePurchaseOrder(Request $req){
 
-        //////////validation
+        $result =  [];
+        $result["action"]="new";
+        $model = new Purchase();
+        $uid=null;
+
+        if ($req->has('id')) {
+            $model = $model->findOrFail($req->id);
+            $result["action"]="edit";
+        }
         $validator = Validator::make($req->all(), [
             'prov_id' => 'required'
 
         ]);
-        if ($validator->fails()) { ///ups... erorres
-
+        if ($validator->fails()) {
             $result = array("error" => "errores en campos de formulario");
+            if($model->uid == null){
+                $uid=uniqid('', true);
+            }else{
+
+            }
 
         }else{
-            $result = array("success" => "Registro guardado con éxito","action"=>"new");
-            $model = new Purchase();
-            //////////condicion para editar
-            if ($req->has('id')) {
-                $model = $model->findOrFail($req->id);
-                $result["action"]="edit";
-            }
-
-
-            $model= $this->setDocItem($model, $req);
-            $model->save();
-            if($req->has('tempId')){
-                $tempAtt=PurchaseAttachment::where('uid',$req->tempId)->get();
-                foreach($tempAtt as $aux){
-                    $aux->doc_id=$model->id;
-                    $aux->uid= null;
-                    $aux->save();
-                }
-            }
-            $result['id']= $model->id;
-
+            $result['success']= "Registro guardado con éxito";
         }
-
+        $model= $this->setDocItem($model, $req);
+        $model->save();
+        $result['id']= $model->id;
+        $result['user']= $model->usuario_id;
+        $result['uid']=$model->uid ;
 
         return $result;
 
@@ -4807,44 +4860,35 @@ class OrderController extends BaseController
      ******/
     public function saveOrder(Request $req)
     {
+        $result =  [];
+        $result["action"]="new";
+        $model = new Order();
+        $uid=null;
 
-        $result= array();
-        //////////validation
+        if ($req->has('id')) {
+            $model = $model->findOrFail($req->id);
+            $result["action"]="edit";
+        }
         $validator = Validator::make($req->all(), [
             'prov_id' => 'required'
+
         ]);
+        if ($validator->fails()) {
+            $result = array("error" => "errores en campos de formulario");
+            if($model->uid == null){
+                $uid=uniqid('', true);
+            }else{
 
-        if ($validator->fails()) { ///ups... erorres
-
-            $result['error'] =  "errores en campos de formulario";
-
-        } else {  ///ok
-//
-            $result['success'] = "Order guardada con éxito!";
-            $result['action'] = "new";
-            $model = new Order();
-            //////////condicion para editar
-//            //////////condicion para editar
-            if ($req->has('id')) {
-                $model = $model->findOrFail($req->id);
-                $result["action"]="upd";
-            }
-            $model = $this->setDocItem($model,$req);
-
-            if($req->has('tempId')){
-                $tempAtt=OrderItem::where('uid',$req->tempId)->get();
-                foreach($tempAtt as $aux){
-                    $aux->doc_id=$model->id;
-                    $aux->uid= null;
-                    $aux->save();
-                }
             }
 
-            $result['response']= $model->save();
-            $result['id']=$model->id;
-
-
+        }else{
+            $result['success']= "Registro guardado con éxito";
         }
+        $model= $this->setDocItem($model, $req);
+        $model->save();
+        $result['id']= $model->id;
+        $result['user']= $model->usuario_id;
+        $result['uid']=$model->uid ;
 
         return $result;
 
@@ -5027,7 +5071,7 @@ class OrderController extends BaseController
             $tem['doc_id']= $aux->doc_id;
             $tem['producto_id']= $aux->producto_id;
             $tem['cod_producto']= $aux->id;
-            $tem['codigo_fabrica']=$prod_prov->where('id',''.$aux->producto_id)->first()->codigo_fabrica;
+            //$tem['codigo_fabrica']=$prod_prov->where('id',''.$aux->producto_id)->first()->codigo_fabrica;
             $tem['documento']=  $origen->where('id', $aux->tipo_origen_id)->first()->descripcion;
 
             $tem['asignado']= true;
