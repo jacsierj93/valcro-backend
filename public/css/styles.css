@@ -60,7 +60,7 @@ form {
     padding: 0 !important;
     min-height: 40px;
 }
-form:visible:not(:last-child){
+form:not(:last-child){
     background-image: url("../images/shadowUp.jpg");
     background-position: bottom;
     background-repeat: repeat-x;
@@ -446,18 +446,18 @@ md-chips .md-chips.md-focused {
     top: 0 !important;
 }
 .alertBox md-tabs:not(.md-no-tab-content):not(.md-dynamic-height){
-    min-height: 72px !important;
+    min-height: 120px !important;
 }
 .alertBox md-tab-content{
-    height: 72px;
+    height: 120px;
 }
 .alertBox md-tab-content>div{
-    height: 72px;
+    height: 120px;
 }
 
 .alertPrevArrow{
     width: 16px;
-    height: 72px;
+    height: 120px;
     cursor: pointer;
     background-image: url("../images/alert_prev_arrow.png");
     background-repeat: no-repeat;
@@ -465,42 +465,51 @@ md-chips .md-chips.md-focused {
 }
 .alertNextArrow{
     width: 16px;
-    height: 72px;
+    height: 120px;
     cursor: pointer;
     background-image: url("../images/alert_next_arrow.png");
     background-repeat: no-repeat;
     background-position: center center;
 }
 .alertOkColor{
-    background-color:rgba(255,239,0,0.7);
+    /*background-color:rgba(255,239,0,0.7);*/
+    background-color:rgb(255,239,0);
 }
 .alertAlertColor{
-    background-color: rgba(245,171,0,0.7);
+    /*background-color: rgba(245,171,0,0.7);*/
+    background-color: rgb(245,171,0);
 }
 .alertErrorColor{
-    background-color: rgba(255,50,0,0.7);
+   /* background-color: rgba(255,50,0,0.7);*/
+    background-color: rgb(255,50,0);
 }
 .alertInfoColor{
-    background-color: rgba(0,0,0,0.5);
+    /*background-color: rgba(0,0,0,0.5);*/
+    background-color: #575756;
+    color:white;
 }
 .alertContainer{
     background-color: transparent;
-    height: 72px;
+    height: 120px;
 }
 .alertItem{
-    height: 72px;
+    height: 120px;
 }
 .alertTextContent{
     overflow-y: auto;
-    height: 39px;
+    height: 84px;
     width: 100%;
     text-align: center;
+    vertical-align: middle;
     padding-top: 8px;
+    font-size: 18px;
 }
 .alertTextOpcs{
-    height: 24px;
+    height: 36px;
     width: 100%;
     text-align: center;
+    font-size: 18px;
+    font-weight: bolder;
 
 }
 

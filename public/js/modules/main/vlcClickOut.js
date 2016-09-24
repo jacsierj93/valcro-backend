@@ -20,7 +20,7 @@
                     angular.element($window).on('click', function (event) {
                         if (element[0].contains(event.target)) return;
 
-
+                        //console.log(event)
                         //start Jacsiel Code*/
                             /*the follow, if, is add for especific exceptions in LAMBU system,
                                 on click in .popUp class (this is a class of layer with extra informations
@@ -28,7 +28,10 @@
                                 or click in md-autocomplete-suggestions tht is of elements of virtual-list create by md-autocomplete
                                 thesse cases, click out is disabled for default, and return void
                              */
-                        if((angular.element(event.target).parents(".popUp").length>0) || (angular.element(event.target).parents("#lyrAlert").length>0) || (angular.element(event.target).parents(".md-autocomplete-suggestions").length>0)) return;
+                        if((angular.element(event.target).parents(".popUp").length>0) || (angular.element(event.target).parents("#lyrAlert").length>0) || (angular.element(event.target).parents(".md-autocomplete-suggestions").length>0)){
+                            //console.log("igonrado==>",angular.element(event.target))
+                            return;
+                        }
                         /*end Jacsiel code*/
                         clickOutHandler(scope, {$event: event});
                         scope.$apply();

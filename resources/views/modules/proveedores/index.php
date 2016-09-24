@@ -104,7 +104,7 @@
                 </div>
 
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
-                <div class="loadArea" ng-class="{'loading':!todos.$resolved}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+                <div class="loadArea" ng-class="{'loading':(list2()==0)}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
                     <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; ">
                         P
                     </div>
@@ -297,7 +297,7 @@
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <input type="hidden" md-autofocus>
                 <!-- 17) ########################################## FORMULARIO "Datos Basicos del Proveedor" ########################################## -->
-                <form name="projectForm" layout="row" ng-controller="DataProvController" global ng-class="{'focused':isShow, 'required':!prov.id,'modified':$parent.changeForm('dataProv')>0}}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
+                <form name="projectForm" layout="row" ng-controller="DataProvController" global ng-class="{'focused':isShow, 'required':!prov.id,'modified':$parent.changeForm('dataProv')>0}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; projectForm.$setUntouched()">
                     <div active-left></div>
                     <div flex layout="column">
                         <div class="titulo_formulario" layout="column" layout-align="start start" ng-class="{'onlyread' : (!$parent.edit && prov.id)}">
@@ -471,7 +471,7 @@
                             </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand" flex layout="column" class="area-form">
-                        <div layout="row" class="row">
+                        <div layout="row" flex class="row">
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo de Direccion</label>
                                 <md-autocomplete md-selected-item="ctrl.dirType"
@@ -555,12 +555,12 @@
                             </md-input-container>
 
                         </div>
-
-                        <md-input-container class="md-block">
-                            <label>Direccion</label>
-                            <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
-                        </md-input-container>
-
+                        <div layout="row" flex class="row">
+                            <md-input-container class="md-block" flex>
+                                <label>Direccion</label>
+                                <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                            </md-input-container>
+                        </div>
                         <div layout="column" ng-show="(isShow && !isShowMore) && address.length>0" class="row showMore" ng-click="viewExtend(true)">
                             <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
                         </div>
@@ -676,7 +676,7 @@
                         </div>
                         <div class="row" layout="row">
 
-                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
+                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-add-on-blur="true" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
@@ -684,7 +684,7 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip,$event)"  md-separator-keys="[13,32]">
+                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " md-add-on-blur="true" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip,$event)"  md-separator-keys="[13,32]">
                                 <input phone placeholder="Telefonos Contacto" id="contactPhone">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
@@ -2254,8 +2254,11 @@
                         <div class="row" ng-show="!has(prov.priceList)">
                             <span style="margin:8px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                         </div>
-                        <md-content ng-repeat="(k,list) in prov.priceList">
-                            {{list.datos}}
+                        <md-content>
+                            <div ng-repeat="(k,list) in prov.priceList" layout="row">
+                                <div flex>{{list.datos.ref}}</div>
+                                <div style="width: 32px" class="vlc-buttom">{{list.datos.adjs.length}}</div>
+                            </div>
 
                         </md-content>
                     </div>
@@ -2271,16 +2274,16 @@
             <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr,\$event)")) ?>
         </md-sidenav>
 
-<!--    <div id="blockSection" style="
+    <div id="blockSection" style="
         position: absolute;
         height: 100%;
         width: 100%;
         top: 0px;
         left: 0px;
-        z-index: 99;
-        background: transparent;
+        z-index: 89;
+        background: rgba(255,255,255,0.2);
         cursor: default;
-    " ng-show="(secBlock)"></div>-->
+    " ng-show="secBlock"></div>
 
 
         <!-- 8) ########################################## BOTON Next ########################################## -->

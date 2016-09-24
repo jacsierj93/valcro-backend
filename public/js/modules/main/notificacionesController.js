@@ -142,12 +142,21 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         //console.log(def);
     };
     $scope.shakeOnBlock = function(){
-
-
         angular.element("#"+$scope.block).addClass("shake");
         $timeout(function(){
             angular.element("#"+$scope.block).removeClass("shake");
         },1000);
+    };
+
+    $scope.isBlocked = function(){
+        return ($filter('customFind')($scope.alerts.alert,'block',function (x,z){
+            return (z in x.param);
+        }).length>0
+            ||
+        $filter('customFind')($scope.alerts.error,'block',function (x,z){
+            return (z in x.param);
+        }).length>0)
+
     };
 /*
     $scope.$watch("alerts.input.length", function(newVal){

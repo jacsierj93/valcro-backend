@@ -5,19 +5,19 @@
     top: 0px;
     left: 0px;
     z-index: 99;
-    background: transparent;
+    background: rgba(255,255,255,0.2);
     cursor: default;
-" ng-show="(block)">
+" ng-show="(isBlocked())">
 
 </div>
-<md-sidenav md-on-close="curFocus[0].focus()" layout="row" style="top: calc(100% - 120px); height: 72px; margin-bottom:24px; width: calc(100% - {{264 + (24*$parent.index)}}px); z-index:100" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert">
+<md-sidenav md-on-close="curFocus[0].focus()" layout="row" style="top: calc(100% - 168px); height: 120px; margin-bottom:36px; width: calc(100% - {{264 + (24*$parent.index)}}px); z-index:100" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="lyrAlert" id="lyrAlert" style="overflow: hidden">
     <!-- OK   ############################################################################################## -->
     <input id="test" type="hidden" md-autofocus> <!-- set autofocus a campo hidden para evitar perdida de focus en campo actual-->
     <div class="alertBox alertOkColor" flex ng-show="alerts.ok.length > 0" layout="row" id="ok">
         <div class="alertPrevArrow" ng-click="alertPrev('ok')" ng-show="alerts.ok.length > 1"></div>
         <md-tabs class="alertContainer" layout="column" md-selected="selected.ok" flex>
             <md-tab label="{{tab.title}}" layout="column" class="alertItem" flex ng-repeat="tab in alerts.ok">
-                <div class="alertTextContent" style="">
+                <div class="alertTextContent" layout="column" layout-align="center center">
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
@@ -32,16 +32,16 @@
         </div>
     </div>
     <!-- ALERT ############################################################################################## -->
-    <div class="alertBox alertAlertColor" flex ng-show="alerts.alert.length > 0" layout="row" id="alert">
+    <div class="alertBox alertAlertColor" flex ng-show="alerts.alert.length > 0" layout="row" id="alert" style="overflow: hidden">
         <div class="alertPrevArrow" ng-click="alertPrev('alert')" ng-show="alerts.alert.length > 1"></div>
         <md-tabs class="alertContainer" layout="column" md-selected="selected.alert" flex>
             <md-tab label="{{tab.title}}" layout="column" class="alertItem" ng-class="{'toBlock':tab.param.block}" ng-repeat="tab in alerts.alert" md-on-select="launchParam(this)">
-                <div class="alertTextContent" style="">
+                <div class="alertTextContent" layout="column" layout-align="center center" >
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
                     <div flex layout="row" ng-repeat="opc in tab.opcs" autotrigger="{{opc.$$hashKey}}" tabindex="0" ng-click="closeThis('alert');ok(this)" skip-notif>
-                        <div style="width:32px" ng-show="opc.default"><span class="icon-Tiempo" >{{opc.count}}</span></div>
+                        <div ng-show="opc.default"><span class="icon-Tiempo" >{{opc.count}}</span></div>
                         <div flex>{{opc.name}}</div>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
         <div class="alertPrevArrow" ng-click="alertPrev('error')" ng-show="alerts.error.length > 1"></div>
         <md-tabs class="alertContainer"  md-selected="selected.error" flex>
             <md-tab label="{{tab.title}}" class="alertItem" ng-class="{'toBlock':tab.param.block}" ng-repeat="tab in alerts.error">
-                <div class="alertTextContent" style="">
+                <div class="alertTextContent" layout-align="center center">
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
@@ -75,7 +75,7 @@
         <div class="alertPrevArrow" ng-click="alertPrev('info')" ng-show="alerts.info.length > 1"></div>
         <md-tabs class="alertContainer" md-selected="selected.info" flex>
             <md-tab label="{{tab.title}}" class="alertItem" ng-repeat="tab in alerts.info">
-                <div class="alertTextContent" style="">
+                <div class="alertTextContent"  layout="column" layout-align="center center">
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">

@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages',/*'ngSanitize'*/,'vlcClickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ui.mask', 'ui.utils.masks','ngFileUpload'];
 
 
 var MyApp = angular.module('MyApp', dependency, function() {
@@ -47,6 +47,11 @@ window.addEventListener("keydown", function(e) {
 }, false);
 
 MyApp.config(function ($provide, $httpProvider) {
+
+/*    localStorageServiceProvider
+        .setStorageType('localStorage')
+        .setDefaultToCookie(false);
+    */
 
     $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
