@@ -1580,52 +1580,55 @@
 
                             </div>
                             <div flex="10" layout="row">
-                                <md-input-container class="md-block" flex >
-                                    <label>Codigo</label>
-                                    <input  ng-model="tbl_dtDoc.filter.cod_producto"
-                                    >
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_dtDoc.order = 'cod_producto' "><img ng-src="{{(tbl_dtDoc.order == 'cod_producto') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_dtDoc.order = '-cod_producto' "><img ng-src="{{(tbl_dtDoc.order == '-cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
 
+                                <md-input-container class="md-block" flex >
+                                    <label>Codigo</label>
+                                    <input  ng-model="tbl_dtDoc.filter.cod_producto"
+                                    >
+                                </md-input-container>
+
                             </div>
 
                             <div flex layout="row">
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_dtDoc.order = 'descripcion' "><img ng-src="{{(tbl_dtDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_dtDoc.order = '-descripcion' " ><img ng-src="{{(tbl_dtDoc.order == '-descripcion') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Descripcion</label>
                                     <input  ng-model="tbl_dtDoc.filter.descripcion"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'descripcion' "><img ng-src="{{(tbl_dtDoc.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-descripcion' " ><img ng-src="{{(tbl_dtDoc.order == '-descripcion') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                             <div flex layout="row">
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_dtDoc.order = 'documento' " ><img ng-src="{{(tbl_dtDoc.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_dtDoc.order = '-documento' " ><img ng-src="{{(tbl_dtDoc.order == '-documento') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Documento</label>
                                     <input  ng-model="tbl_dtDoc.filter.documento"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'documento' " ><img ng-src="{{(tbl_dtDoc.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-documento' " ><img ng-src="{{(tbl_dtDoc.order == '-documento') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                             <div flex="10" layout="row">
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_dtDoc.order = 'saldo' " ><img ng-src="{{(tbl_dtDoc.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_dtDoc.order = '-saldo' "><img ng-src="{{(tbl_dtDoc.order == '-saldo') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
                                 <md-input-container class="md-block" flex >
                                     <label>Cantidad</label>
                                     <input  ng-model="tbl_dtDoc.filter.saldo"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'saldo' " ><img ng-src="{{(tbl_dtDoc.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-saldo' "><img ng-src="{{(tbl_dtDoc.order == '-saldo') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                         </div>
