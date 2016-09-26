@@ -77,11 +77,11 @@ $app->post("Order/Order/Update",'Orders\OrderController@UpdateOrder'); ///retira
 $app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); /// crea una copia sin adjuntos
 $app->post("Order/Order/AddAnswer",'Orders\OrderController@AddAnswerOrder'); /// agrega una respuesta tipo snoze a al a proforma
 $app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesOrder'); /// realiza la aprobacion por comprass
-$app->post("Order/Order/Cancel",'Orders\OrderController@cancelsOrder'); /// cancela el pedido
+$app->post("Order/Order/Cancel",'Orders\OrderController@cancelOrder'); /// cancela el pedido
 $app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrden'); /// cambia un producto item
 $app->post("Order/Order/Restore",'Orders\OrderController@restoreOrden'); /// restaura a una version anterior
 $app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
-$app->post("Order/Order/CloseAction",'Orders\OrderController@closeAction'); /// define que acion se debe realizar para cerrar la accion
+$app->post("Order/Order/CloseAction",'Orders\OrderController@closeActionOrder'); /// define que acion se debe realizar para cerrar la accion
 
 
 $app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
@@ -117,7 +117,7 @@ $app->post("Order/Purchase/ProductChange",'Orders\OrderController@changeProducto
 $app->post("Order/Purchase/Restore",'Orders\OrderController@restorePurchase'); /// restaura a una version anterior
 $app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// envia la solicitud al proveedor
 $app->post("Order/Purchase/Create",'Orders\OrderController@CreatePurchase'); /// envia la solicitud al proveedor
-$app->post("Order/Purchase/CloseAction",'Orders\OrderController@closeAction'); /// define que acion se debe realizar para cerrar la accion
+$app->post("Order/Purchase/CloseAction",'Orders\OrderController@closeActionPurchase'); /// define que acion se debe realizar para cerrar la accion
 
 
 $app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
@@ -152,7 +152,7 @@ $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProduc
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
-$app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeAction'); /// define que acion se debe realizar para cerrar la accion
+$app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 
 
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles

@@ -217,6 +217,14 @@
                         </md-tooltip>
                     </div>
 
+                    <div layout="column"
+                         ng-show="(!document.doc_parent_id && provSelec.id && module.layer == 'detalleDoc')"
+                         layout-align="center center" ng-click="openImport()">
+                        <span class="icon-Importar" style="font-size: 24px"></span>
+                        <md-tooltip >
+                           Importar desde {{forModeAvilable.getXValue(formMode.value - 1 ) > 21 ? 'una': 'un' }}  {{ forModeAvilable.getXValue(formMode.value - 1 ).name}}
+                        </md-tooltip>
+                    </div>
                     <div layout="column" layout-align="center center"
                          ng-show="( document.id &&  document.version && document.version > 1  )"
                          ng-click="openVersions()">
@@ -229,7 +237,6 @@
 
 
                 </div>
-                <!-- ########################################## FILTROS CABECERA ########################################## -->
 
                 <div layout="row" flex layout-align="start center ">
 
@@ -289,11 +296,11 @@
                     </form>
                     <form layout="row">
                         <div active-left ></div>
-                        <div layout="row" flex ng-init="tbl_listImport.order = 'id'" >
+                        <div layout="row" flex ng-init="tbl_listImport.order = 'id'" style="padding-right: 4px;" >
                             <div flex layout="row" >
                                 <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_listImport.order = 'titulo' " ><img ng-src="{{(tbl_listImport.order == 'titulo') ?'images/TrianguloUp.png' : 'Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-titulo' " ><img ng-src="{{(tbl_listImport.order == '-titulo')? 'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                    <div ng-click="tbl_listImport.order = 'titulo' " ><img ng-src="{{(tbl_listImport.order == 'titulo') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
+                                    <div ng-click="tbl_listImport.order = '-titulo' " ><img ng-src="{{(tbl_listImport.order == '-titulo')? 'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
                                 </div>
                                 <md-input-container flex>
                                     <label>Titulo</label>
@@ -307,7 +314,7 @@
                             <div flex="15" layout="row" >
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_listImport.order = 'nro_proforma' " ><img ng-src="{{(tbl_listImport.order == 'nro_proforma') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png' }}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-nro_proforma' " ><img ng-src="{{(tbl_listImport.order == '-nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                    <div ng-click="tbl_listImport.order = '-nro_proforma' " ><img ng-src="{{(tbl_listImport.order == '-nro_proforma') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
                                 </div>
 
                                 <md-input-container flex>
@@ -319,6 +326,10 @@
                                 </md-input-container>
                             </div>
                             <div flex="10" layout="row">
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_listImport.order = 'emision' " ><img ng-src="{{(tbl_listImport.order == 'emision') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
+                                    <div ng-click="tbl_listImport.order = '-emision' " ><img ng-src="{{(tbl_listImport.order == '-emision') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Emision</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -326,15 +337,12 @@
                                            skip-tab
                                     >
                                 </md-input-container >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_listImport.order = 'emision' " ><img ng-src="{{(tbl_listImport.order == 'emision') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-emision' " ><img ng-src="{{(tbl_listImport.order == '-emision') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
+
                             </div>
                             <div style="width: 80px;" layout="row">
                                 <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_listImport.order = 'diasEmit' " ><img ng-src=":{{(tbl_listImport.order == 'diasEmit') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-diasEmit' " ><img ng-src="{{(tbl_listImport.order == '-diasEmit') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                    <div ng-click="tbl_listImport.order = 'diasEmit' " ><img ng-src="{{(tbl_listImport.order == 'diasEmit') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
+                                    <div ng-click="tbl_listImport.order = '-diasEmit' " ><img ng-src="{{(tbl_listImport.order == '-diasEmit') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
                                 </div>
                                 <md-input-container class="md-block"  flex>
                                     <label></label>
@@ -394,7 +402,7 @@
                             <div flex="15" layout="row">
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_listImport.order = 'nro_factura' " ><img ng-src="{{(tbl_listImport.order == 'nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-nro_factura' " ><img ng-src="{{(tbl_listImport.order == '-nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                    <div ng-click="tbl_listImport.order = '-nro_factura' " ><img ng-src="{{(tbl_listImport.order == '-nro_factura') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
                                 </div>
 
                                 <md-input-container class="md-block"  flex>
@@ -408,7 +416,7 @@
                             <div flex layout="row">
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div  ng-click="tbl_listImport.order = 'monto' " ><img ng-src="{{(tbl_listImport.order == 'monto') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-monto' "><img ng-src="{{(tbl_listImport.order == '-monto') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                    <div ng-click="tbl_listImport.order = '-monto' "><img ng-src="{{(tbl_listImport.order == '-monto') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
                                 </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
@@ -421,7 +429,7 @@
                             <div flex layout="row">
                                 <div class="cell-filter-order" layout-align="center center"  >
                                     <div  ng-click="tbl_listImport.order = 'comentario' " ><img ng-src="{{(tbl_listImport.order == 'comentario') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="tbl_listImport.order = '-comentario' "><img ng-src="{{(tbl_listImport.order == '-comentario') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                    <div ng-click="tbl_listImport.order = '-comentario' "><img ng-src="{{(tbl_listImport.order == '-comentario') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}"/></div>
                                 </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Comentario</label>
@@ -1115,11 +1123,7 @@
                         <div active-left></div>
                         <div layout="column" flex ng-init=" tbl_dtDoc.extend = 0" >
                             <div layout="row" class="row" >
-                                <div layout="column"
-                                     ng-hide="document.doc_parent_id != null || document.doc_parent_id || !provSelec.id"
-                                     layout-align="center center" ng-click="openImport()">
-                                    <span class="icon-Importar" style="font-size: 24px"></span>
-                                </div>
+
                                 <div class="titulo_formulario" layout="column" layout-align="start start"  ng-click=" gridView = 1 ; tbl_dtDoc.extend = 0 ;">
                                     <div>
                                         Datos de {{formMode.name}}
@@ -1308,6 +1312,7 @@
                                             ng-change="toEditHead('monto', document.monto)"
                                             info="Monto aproximado a pagar"
                                             skip-tab
+                                            type="text"
                                     >
                                 </md-input-container>
 
@@ -1484,7 +1489,7 @@
                         </div>
 
                     </form>
-                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" ng-blur="saveAprobCompras()" >
+                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras(): 0" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex class="row" >
@@ -1524,7 +1529,7 @@
                                 </md-input-container>
 
                                 <div class="adj-box">
-                                    <div ng-click="openAdj('AprobCompras')"  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
+                                    <div ng-click="openAdj('AprobCompras')" id="adj-nro-doc" class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
                                         {{ (document.adjuntos | stringKey :'AprobCompras': 'documento' ).length || 0 }}
                                     </div>
                                 </div>
@@ -1532,9 +1537,9 @@
                             </div>
                         </div>
                     </form>
-                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) "  ng-blur="saveCancelDoc()" >
+                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
                         <div active-left></div>
-                        <div layout="column" flex>
+                        <div layout="column" flex  >
                             <div layout="row" flex class="row" >
 
                                 <div class="titulo_formulario" layout="column"  id="docCancel" layout-align="start start" ng-click=" gridView = 4">
@@ -1551,13 +1556,14 @@
                                         id="mtvCancelacion"
                                         ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
                                         required
+                                        ng-blur="saveCancelDoc()"
 
                                 >
                             </md-input-container>
 
                         </div>
                     </form>
-                    <form layout="row" ng-class="{focused: (gridView == 5)}" ng-show="tbl_dtDoc.extend == 0 && Docsession.global == 'upd' && document.productos.todos.length > 0 ">
+                    <form layout="row" ng-class="{focused: (gridView == 5)}" ng-show="tbl_dtDoc.extend == 0 && document.productos.todos.length > 0 ">
                         <div active-left></div>
                         <div layout="row"  flex class="row" >
                             <div layout-align="center center" layout="column">
@@ -1805,6 +1811,11 @@
                         <!----FILTROS ---->
                         <div active-left ></div>
                         <div class="titulo_formulario md-block"  layout="row" >
+                            <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center">
+                                <div ng-click="openCreateProduct()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
+                                    <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                                </div skip-tab >
+                            </div>
                             <div>
                                 Productos
                             </div>
@@ -1818,6 +1829,11 @@
                                 <div flex="5" class=""></div>
 
                                 <div layout="row" flex="20">
+                                    <div class="cell-filter-order" layout-align="center center" >
+                                        <div ng-click="tbl_listProducProv.order = 'codigo' " ><img ng-src="{{(tbl_listProducProv.order == 'codigo') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                        <div ng-click="tbl_listProducProv.order = '-codigo' " ><img ng-src="{{(tbl_listProducProv.order == '-codigo') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                    </div>
+
                                     <md-input-container class="md-block"  flex>
                                         <label>Codigo</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
@@ -1825,13 +1841,13 @@
                                                skip-tab
                                         >
                                     </md-input-container>
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'codigo' " ><img ng-src="{{(tbl_listProducProv.order == 'codigo') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-codigo' " ><img ng-src="{{(tbl_listProducProv.order == '-codigo') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
                                 </div>
 
                                 <div layout="row" flex="20">
+                                    <div class="cell-filter-order" layout-align="center center" >
+                                        <div ng-click="tbl_listProducProv.order = 'codigo_fabrica' "><img ng-src="{{(tbl_listProducProv.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                        <div ng-click="tbl_listProducProv.order = '-codigo_fabrica' " ><img ng-src="{{(tbl_listProducProv.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                    </div>
                                     <md-input-container class="md-block" flex>
                                         <label>Cod. Fabrica</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
@@ -1840,12 +1856,13 @@
 
                                         >
                                     </md-input-container>
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'codigo_fabrica' "><img ng-src="{{(tbl_listProducProv.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-codigo_fabrica' " ><img ng-src="{{(tbl_listProducProv.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
                                 </div>
                                 <div layout="row" flex >
+                                    <div class="cell-filter-order" layout-align="center center" >
+                                        <div ng-click="tbl_listProducProv.order = 'descripcion' " ><img ng-src="{{(tbl_listProducProv.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                        <div ng-click="tbl_listProducProv.order = '-descripcion' "><img ng-src="{{(tbl_listProducProv.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                    </div>
+
                                     <md-input-container class="md-block" flex >
                                         <label>Descripcion</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
@@ -1856,15 +1873,16 @@
 
                                         >
                                     </md-input-container>
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'descripcion' " ><img ng-src="{{(tbl_listProducProv.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-descripcion' "><img ng-src="{{(tbl_listProducProv.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
                                 </div>
 
                                 <div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )"></div>
 
                                 <div layout="row" flex="15">
+                                    <div class="cell-filter-order" layout-align="center center" >
+                                        <div ng-click="tbl_listProducProv.order = 'cantidad' " ><img ng-src="{{(tbl_listProducProv.order == 'cantidad') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                        <div ng-click="tbl_listProducProv.order = '-cantidad' "><img ng-src="{{(tbl_listProducProv.order == '-cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                    </div>
+
                                     <md-input-container class="md-block" flex>
                                         <label>Cantidad</label>
                                         <input type="text"
@@ -1875,22 +1893,14 @@
 
                                         >
                                     </md-input-container>
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'cantidad' " ><img ng-src="{{(tbl_listProducProv.order == 'cantidad') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-cantidad' "><img ng-src="{{(tbl_listProducProv.order == '-cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
-                                    <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center">
-                                        <div ng-click="openCreateProduct()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
-                                            <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-                                        </div skip-tab >
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
                     </form>
                     <form name="listProductoItems" class="gridContent"  layout="row" flex >
                         <div active-left ></div>
-                        <div  flex >
+                        <div  flex layout="column">
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order  as filterProductProv"
                                    ng-mouseenter = "mouseEnterProd(item) " row-select>
                                 <div layout="row" class="cellGridHolder" >
@@ -1916,10 +1926,11 @@
                                 </div>
                             </div>
 
+                            <div layout="column" layout-align="center center" ng-show="filterProductProv.length == 0 " flex>
+                                No hay datos para mostrar
+                            </div>
                         </div>
-                        <div layout="column" layout-align="center center" ng-show="filterProductProv.length == 0 " flex>
-                            No hay datos para mostrar
-                        </div>
+
                     </form>
                 </div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
@@ -1947,6 +1958,11 @@
                         <div layout="row" flex>
                             <div flex="5" layout="row"  ></div>
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_agrContPed.order = 'fecha' " ><img ng-src="{{(tbl_agrContPed.order == 'fecha')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_agrContPed.order = '-fecha' "><img ng-src="{{(tbl_agrContPed.order == '-fecha')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Fecha</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -1954,13 +1970,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'fecha' " ><img ng-src="{{(tbl_agrContPed.order == 'fecha')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-fecha' "><img ng-src="{{(tbl_agrContPed.order == '-fecha')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                             <div flex layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_agrContPed.order = 'titulo' " ><img ng-src="{{(tbl_agrContPed.order == 'titulo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_agrContPed.order = '-titulo' "><img ng-src="{{(tbl_agrContPed.order == '-titulo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Titulo</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -1968,13 +1985,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'titulo' " ><img ng-src="{{(tbl_agrContPed.order == 'titulo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-titulo' "><img ng-src="{{(tbl_agrContPed.order == '-titulo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_agrContPed.order = 'fecha_aprox_entrega' "><img ng-src="{{(tbl_agrContPed.order == 'fecha_aprox_entrega')? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_agrContPed.order = '-fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrContPed.order == '-fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Entrega</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -1982,13 +2000,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'fecha_aprox_entrega' "><img ng-src="{{(tbl_agrContPed.order == 'fecha_aprox_entrega')? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrContPed.order == '-fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                             <div flex="15" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_agrContPed.order = 'monto' " ><img ng-src="{{(tbl_agrContPed.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_agrContPed.order = '-monto' "><img ng-src="{{(tbl_agrContPed.order == '-monto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -1996,14 +2015,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'monto' " ><img ng-src="{{(tbl_agrContPed.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-monto' "><img ng-src="{{(tbl_agrContPed.order == '-monto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
 
                             <div flex="" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_agrContPed.order = 'comentario' "> <img ng-src="{{(tbl_agrContPed.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_agrContPed.order = '-comentario' " ><img ng-src="{{(tbl_agrContPed.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Comentario</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2011,10 +2031,6 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'comentario' "> <img ng-src="{{(tbl_agrContPed.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-comentario' " ><img ng-src="{{(tbl_agrContPed.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
 
                             </div>
                         </div>
@@ -2058,6 +2074,11 @@
                             <div flex="5"></div>
 
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'fecha' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'fecha') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-fecha' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-fecha') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label> Fecha </label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2065,13 +2086,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'fecha' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'fecha') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-fecha' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-fecha') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                             <div flex="15" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'num_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'num_proforma')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-num_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-num_proforma')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Proforma </label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2079,14 +2101,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'num_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'num_proforma')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-num_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-num_proforma')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'img_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'img_proforma')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-img_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-img_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Adjunto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2094,14 +2117,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'img_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'img_proforma')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-img_proforma' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-img_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex="15" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'monto' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'monto') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-monto' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-monto') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2109,14 +2132,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'monto' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'monto') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-monto' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-monto') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex="15" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'precio' "><img ng-src="{{(tbl_agrKitBoxs.order == 'precio')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-precio' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-precio') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Precio</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2124,13 +2148,13 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'precio' "><img ng-src="{{(tbl_agrKitBoxs.order == 'precio')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-precio' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-precio') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                             <div flex layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Precio</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2138,10 +2162,6 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrKitBoxs.order = 'fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrKitBoxs.order == 'fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrKitBoxs.order = '-fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrKitBoxs.order == '-fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                         </div>
@@ -2193,6 +2213,11 @@
                             <div flex="5"></div>
 
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'nro_proforma' " ><img ng-src="{{(tbl_agrPedPend.order == 'nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-nro_proforma' " ><img ng-src="{{(tbl_agrPedPend.order == '-nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Proforma</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2200,14 +2225,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'nro_proforma' " ><img ng-src="{{(tbl_agrPedPend.order == 'nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-nro_proforma' " ><img ng-src="{{(tbl_agrPedPend.order == '-nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'emision' " ><img ng-src="{{(tbl_agrPedPend.order == 'emision')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-emision' " ><img ng-src="{{(tbl_agrPedPend.order == '-emision')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Fecha</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2215,14 +2241,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'emision' " ><img ng-src="{{(tbl_agrPedPend.order == 'emision')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-emision' " ><img ng-src="{{(tbl_agrPedPend.order == '-emision')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex="15" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'nro_factura' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'nro_factura')}"><img ng-src="{{(tbl_agrPedPend.order == 'nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-nro_factura' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-nro_factura')}"><img ng-src="{{(tbl_agrPedPend.order == '-nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Factura</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2230,14 +2257,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'nro_factura' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'nro_factura')}"><img ng-src="{{(tbl_agrPedPend.order == 'nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-nro_factura' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-nro_factura')}"><img ng-src="{{(tbl_agrPedPend.order == '-nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex="10" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'monto' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'monto')}"><img ng-src="{{(tbl_agrPedPend.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-monto' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-monto')}"><img ng-src="{{(tbl_agrPedPend.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2245,13 +2273,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'monto' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'monto')}"><img ng-src="{{(tbl_agrPedPend.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-monto' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-monto')}"><img ng-src="{{(tbl_agrPedPend.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                             <div flex layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'comentario' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'comentario')}"><img ng-src="{{(tbl_agrPedPend.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-comentario' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-comentario')}"><img ng-src="{{(tbl_agrPedPend.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Comentario</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -2259,10 +2288,6 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'comentario' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'comentario')}"><img ng-src="{{(tbl_agrPedPend.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-comentario' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-comentario')}"><img ng-src="{{(tbl_agrPedPend.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                         </div>
@@ -2401,54 +2426,59 @@
                             <div flex="5" ></div>
 
                             <div flex="15" layout="row" >
-                                <md-input-container class="md-block" flex >
-                                    <label>Codigo</label>
-                                    <input  ng-model="tbl_resumenContraPedido.filter.cod_producto">
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_resumenContraPedido.order = 'cod_producto' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == 'cod_producto')}"><img ng-src="{{(tbl_resumenContraPedido.order == 'cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_resumenContraPedido.order = '-cod_producto' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == '-cod_producto')}"><img ng-src="{{(tbl_resumenContraPedido.order == '-cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
+
+                                <md-input-container class="md-block" flex >
+                                    <label>Codigo</label>
+                                    <input  ng-model="tbl_resumenContraPedido.filter.cod_producto">
+                                </md-input-container>
                             </div>
                             <div flex="15" layout="row">
-                                <md-input-container class="md-block" flex >
-                                    <label> Cod. Fabrica</label>
-                                    <input  ng-model="tbl_resumenContraPedido.filter.codigo_fabrica">
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_resumenContraPedido.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == 'codigo_fabrica')}"><img ng-src="{{(tbl_resumenContraPedido.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_resumenContraPedido.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == '-codigo_fabrica')}"><img ng-src="{{(tbl_resumenContraPedido.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
+
+                                <md-input-container class="md-block" flex >
+                                    <label> Cod. Fabrica</label>
+                                    <input  ng-model="tbl_resumenContraPedido.filter.codigo_fabrica">
+                                </md-input-container>
                             </div>
                             <div flex layout="row" >
-                                <md-input-container class="md-block" flex >
-                                    <label> Descripción </label>
-                                    <input  ng-model="tbl_resumenContraPedido.filter.descripcion">
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_resumenContraPedido.order = 'descripcion' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == 'descripcion')}"><img ng-src="{{(tbl_resumenContraPedido.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_resumenContraPedido.order = '-descripcion' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == '-descripcion')}"><img ng-src="{{(tbl_resumenContraPedido.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
+
+                                <md-input-container class="md-block" flex >
+                                    <label> Descripción </label>
+                                    <input  ng-model="tbl_resumenContraPedido.filter.descripcion">
+                                </md-input-container>
                             </div>
                             <div flex="10" layout="row">
-                                <md-input-container class="md-block" flex >
-                                    <label> Cantidad </label>
-                                    <input  ng-model="tbl_resumenContraPedido.filter.saldo">
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_resumenContraPedido.order = 'saldo' " ><img ng-src="{{(tbl_resumenContraPedido.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_resumenContraPedido.order = '-saldo' "><img ng-src="{{(tbl_resumenContraPedido.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
+
+                                <md-input-container class="md-block" flex >
+                                    <label> Cantidad </label>
+                                    <input  ng-model="tbl_resumenContraPedido.filter.saldo">
+                                </md-input-container>
                             </div>
                             <div flex layout="row">
-                                <md-input-container class="md-block" flex >
-                                    <label> Comentario </label>
-                                    <input  ng-model="tbl_resumenContraPedido.filter.comentario">
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_resumenContraPedido.order = 'comentario' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == 'comentario')}"><img ng-src="{{(tbl_resumenContraPedido.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_resumenContraPedido.order = '-comentario' " ng-class="{'filter-select':(tbl_resumenContraPedido.order == '-comentario')}"><img ng-src="{{(tbl_resumenContraPedido.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
+
+                                <md-input-container class="md-block" flex >
+                                    <label> Comentario </label>
+                                    <input  ng-model="tbl_resumenContraPedido.filter.comentario">
+                                </md-input-container>
                             </div>
                         </div>
                     </form>
@@ -2709,38 +2739,41 @@
                         <div layout="row" flex>
                             <div flex="5" ></div>
                             <div flex="15" layout="row">
-                                <md-input-container class="md-block" flex >
-                                    <label>Codigo</label>
-                                    <input  ng-model="tbl_pediSutitut.filter.cod_producto"
-                                    >
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_pediSutitut.order = 'cod_producto' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'cod_producto')}"><img ng-src="{{(tbl_pediSutitut.order == 'cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_pediSutitut.order = '-cod_producto' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-cod_producto')}"><img ng-src="{{(tbl_pediSutitut.order == '-cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
 
+                                <md-input-container class="md-block" flex >
+                                    <label>Codigo</label>
+                                    <input  ng-model="tbl_pediSutitut.filter.cod_producto"
+                                    >
+                                </md-input-container>
+
                             </div>
                             <div flex="15" layout="row" >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_pediSutitut.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'codigo_fabrica')}"><img ng-src="{{(tbl_pediSutitut.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_pediSutitut.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-codigo_fabrica')}"><img ng-src="{{(tbl_pediSutitut.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Cod. Fabrica</label>
                                     <input  ng-model="tbl_pediSutitut.filter.codigo_fabrica"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'codigo_fabrica')}"><img ng-src="{{(tbl_pediSutitut.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-codigo_fabrica')}"><img ng-src="{{(tbl_pediSutitut.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                             <div flex layout="row" >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_pediSutitut.order = 'documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'documento')}"><img ng-src="{{(tbl_pediSutitut.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_pediSutitut.order = '-documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-documento')}"><img ng-src="{{(tbl_pediSutitut.order == '-documento')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Origen</label>
                                     <input  ng-model="tbl_pediSutitut.filter.documento"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'documento')}"><img ng-src="{{(tbl_pediSutitut.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-documento')}"><img ng-src="{{(tbl_pediSutitut.order == '-documento')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                             <div flex layout="row" >
                                 <md-input-container class="md-block" flex >
@@ -2754,15 +2787,16 @@
                                 </div>
                             </div>
                             <div flex="10" layout="row">
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_pediSutitut.order = 'saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'saldo')}"><img ng-src="{{(tbl_pediSutitut.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_pediSutitut.order = '-saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-saldo')}"><img ng-src="{{(tbl_pediSutitut.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Cantidad</label>
                                     <input  ng-model="tbl_pediSutitut.filter.saldo"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'saldo')}"><img ng-src="{{(tbl_pediSutitut.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-saldo')}"><img ng-src="{{(tbl_pediSutitut.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                         </div>
                     </form>
@@ -2916,60 +2950,65 @@
                         <div active-left></div>
                         <div layout="row" flex>
                             <div flex="15" layout="row">
-                                <md-input-container class="md-block" flex >
-                                    <label>Codigo</label>
-                                    <input  ng-model="tbl_oldDoc.filter.cod_producto"
-                                    >
-                                </md-input-container>
                                 <div class="cell-filter-order" layout-align="center center" >
                                     <div ng-click="tbl_oldDoc.order = 'cod_producto' " ng-class="{'filter-select':(tbl_oldDoc.order == 'cod_producto')}"><img ng-src="{{(tbl_oldDoc.order == 'cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
                                     <div ng-click="tbl_oldDoc.order = '-cod_producto' " ng-class="{'filter-select':(tbl_oldDoc.order == '-cod_producto')}"><img ng-src="{{(tbl_oldDoc.order == '-cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
 
+                                <md-input-container class="md-block" flex >
+                                    <label>Codigo</label>
+                                    <input  ng-model="tbl_oldDoc.filter.cod_producto"
+                                    >
+                                </md-input-container>
+
                             </div>
                             <div flex="15" layout="row" >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_oldDoc.order == 'codigo_fabrica')}"><img ng-src="{{(tbl_oldDoc.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_oldDoc.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_oldDoc.order == '-codigo_fabrica')}"><img ng-src="{{(tbl_oldDoc.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Cod. Fabrica</label>
                                     <input  ng-model="tbl_oldDoc.filter.codigo_fabrica"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_oldDoc.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_oldDoc.order == 'codigo_fabrica')}"><img ng-src="{{(tbl_oldDoc.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_oldDoc.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_oldDoc.order == '-codigo_fabrica')}"><img ng-src="{{(tbl_oldDoc.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                             <div flex layout="row" >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'documento' " ng-class="{'filter-select':(tbl_oldDoc.order == 'documento')}"><img ng-src="{{(tbl_oldDoc.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_oldDoc.order = '-documento' " ng-class="{'filter-select':(tbl_oldDoc.order == '-documento')}"><img ng-src="{{(tbl_oldDoc.order == '-documento')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Origen</label>
                                     <input  ng-model="tbl_oldDoc.filter.documento"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_oldDoc.order = 'documento' " ng-class="{'filter-select':(tbl_oldDoc.order == 'documento')}"><img ng-src="{{(tbl_oldDoc.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_oldDoc.order = '-documento' " ng-class="{'filter-select':(tbl_oldDoc.order == '-documento')}"><img ng-src="{{(tbl_oldDoc.order == '-documento')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                             <div flex layout="row" >
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'descripcion' " ng-class="{'filter-select':(tbl_oldDoc.order == 'descripcion')}"><img ng-src="{{(tbl_oldDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_oldDoc.order = '-descripcion' " ng-class="{'filter-select':(tbl_oldDoc.order == '-descripcion')}"><img ng-src="{{(tbl_oldDoc.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Descripcion</label>
                                     <input  ng-model="tbl_oldDoc.filter.descripcion"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_oldDoc.order = 'descripcion' " ng-class="{'filter-select':(tbl_oldDoc.order == 'descripcion')}"><img ng-src="{{(tbl_oldDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_oldDoc.order = '-descripcion' " ng-class="{'filter-select':(tbl_oldDoc.order == '-descripcion')}"><img ng-src="{{(tbl_oldDoc.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                             <div flex="10" layout="row">
+                                <div class="cell-filter-order" layout-align="center center" >
+                                    <div ng-click="tbl_oldDoc.order = 'saldo' " ng-class="{'filter-select':(tbl_oldDoc.order == 'saldo')}"><img ng-src="{{(tbl_oldDoc.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div ng-click="tbl_oldDoc.order = '-saldo' " ng-class="{'filter-select':(tbl_oldDoc.order == '-saldo')}"><img ng-src="{{(tbl_oldDoc.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
+                                </div>
+
                                 <md-input-container class="md-block" flex >
                                     <label>Cantidad</label>
                                     <input  ng-model="tbl_oldDoc.filter.saldo"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_oldDoc.order = 'saldo' " ng-class="{'filter-select':(tbl_oldDoc.order == 'saldo')}"><img ng-src="{{(tbl_oldDoc.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_oldDoc.order = '-saldo' " ng-class="{'filter-select':(tbl_oldDoc.order == '-saldo')}"><img ng-src="{{(tbl_oldDoc.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                             </div>
                         </div>
                     </form>
@@ -3327,6 +3366,11 @@
                     <form layout="row" ng-init="tbl_finalDoc.order = 'codigo'">
                         <div layout="row" flex>
                             <div flex="20" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'codigo' " ><img ng-src="{{(tbl_finalDoc.order == 'codigo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-codigo' " ><img ng-src="{{(tbl_finalDoc.order == '-codigo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Codigo</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -3334,13 +3378,14 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'codigo' " ><img ng-src="{{(tbl_finalDoc.order == 'codigo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-codigo' " ><img ng-src="{{(tbl_finalDoc.order == '-codigo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                             <div flex="20" layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'codigo_fabrica' " ><img ng-src="{{(tbl_finalDoc.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-codigo_fabrica' "><img ng-src="{{(tbl_finalDoc.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Cod. Fabrica</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -3348,14 +3393,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'codigo_fabrica' " ><img ng-src="{{(tbl_finalDoc.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-codigo_fabrica' "><img ng-src="{{(tbl_finalDoc.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'descripcion' " ><img ng-src="{{(tbl_finalDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-descripcion' " ><img ng-src="{{(tbl_finalDoc.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex>
                                     <label>Descripion</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -3363,14 +3409,15 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'descripcion' " ><img ng-src="{{(tbl_finalDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-descripcion' " ><img ng-src="{{(tbl_finalDoc.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
 
                             <div flex layout="row"  >
+                                <div class="cell-filter-order" layout-align="center center" layout="column" >
+                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'cantidad' " ><img ng-src="{{(tbl_finalDoc.order == 'cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
+                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-cantidad' "><img ng-src="{{(tbl_finalDoc.order == '-cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
+                                </div>
+
                                 <md-input-container class="md-block"  flex="15">
                                     <label>Cantidad</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
@@ -3378,10 +3425,6 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'cantidad' " ><img ng-src="{{(tbl_finalDoc.order == 'cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-cantidad' "><img ng-src="{{(tbl_finalDoc.order == '-cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
 
                             </div>
                             <div  style="width: 80px;" ng-show="formMode.value == 23" ></div>

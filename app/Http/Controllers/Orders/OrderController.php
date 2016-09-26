@@ -266,12 +266,50 @@ class OrderController extends BaseController
 
     }
 
-    /** trae la informacion de usuario la session **/
 
-    public  function closeAction(Request $req){
+    public  function closeActionSolicitude(Request $req){
         $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
             ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
         $model= Solicitude::findOrFail($req->id);
+        if($user->cargo_id == '8') {
+            return ['action' => 'question'];
+        }
+        if($req->accion == 'new'){
+            return ['action'=>'save'];
+        }
+        if($req->accion == 'upd'){
+            if($model->fecha_envio == null){
+                return ['action'=>'send'];
+            }else{
+                return ['action'=>'writer'];
+            }
+        }
+        return ['action'=>'no'];
+    }
+
+    public  function closeActionOrder(Request $req){
+        $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
+            ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
+        $model= Order::findOrFail($req->id);
+        if($user->cargo_id == '8') {
+            return ['action' => 'question'];
+        }
+        if($req->accion == 'new'){
+            return ['action'=>'save'];
+        }
+        if($req->accion == 'upd'){
+            if($model->fecha_envio == null){
+                return ['action'=>'send'];
+            }else{
+                return ['action'=>'writer'];
+            }
+        }
+        return ['action'=>'no'];
+    }
+    public  function closeActionPurchase(Request $req){
+        $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
+            ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
+        $model= Purchase::findOrFail($req->id);
         if($user->cargo_id == '8') {
             return ['action' => 'question'];
         }
@@ -465,7 +503,6 @@ class OrderController extends BaseController
         return $data;
     }
 
-
     /**
      * traue a los provedores
      */
@@ -493,7 +530,6 @@ class OrderController extends BaseController
 
         return $prov;
     }
-
 
     public  function getProviderEmails(Request $req){
         return ContactField::where('prov_id',$req->prov_id)->where('campo', 'email')->get();
@@ -599,6 +635,10 @@ class OrderController extends BaseController
         }
 
         return $data;
+
+    }
+
+    public function  getProviderContact(Request $req){
 
     }
 
@@ -718,6 +758,7 @@ class OrderController extends BaseController
         $sendEmail = ($model->comentario_cancelacion== null);
 
         $model->comentario_cancelacion= $req->comentario_cancelacion;
+        $model->final_id=$this->getFinalId($model);
         $response['response']=$model->save();
 
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
@@ -742,6 +783,8 @@ class OrderController extends BaseController
         $sendEmail = ($model->comentario_cancelacion== null);
 
         $model->comentario_cancelacion= $req->comentario_cancelacion;
+        $model->final_id=$this->getFinalId($model);
+
         $response['response']=$model->save();
 
         $response['success']='Pedido Cancelado';
@@ -763,6 +806,8 @@ class OrderController extends BaseController
         $model = Purchase::findOrFail($req->id);
         $sendEmail = ($model->comentario_cancelacion== null);
         $model->comentario_cancelacion= $req->comentario_cancelacion;
+        $model->final_id=$this->getFinalId($model);
+
         $response['response']=$model->save();
         $response['success']='ODC Cancelada';
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
@@ -4826,19 +4871,22 @@ class OrderController extends BaseController
             $result["action"]="edit";
         }
         $validator = Validator::make($req->all(), [
-            'prov_id' => 'required'
-
+            'prov_id' => 'required',
+            'titulo' => 'required',
+            'tasa' => 'required',
+            'prov_moneda_id' => 'required',
+            'nro_proforma' => 'required',
+            'condicion_pago_id'=> 'required'
         ]);
         if ($validator->fails()) {
             $result = array("error" => "errores en campos de formulario");
             if($model->uid == null){
-                $uid=uniqid('', true);
-            }else{
-
+                $model->uid =uniqid('', true);
             }
 
         }else{
             $result['success']= "Registro guardado con éxito";
+            $model->uid= null;
         }
         $model= $this->setDocItem($model, $req);
         $model->save();
@@ -4870,19 +4918,22 @@ class OrderController extends BaseController
             $result["action"]="edit";
         }
         $validator = Validator::make($req->all(), [
-            'prov_id' => 'required'
+            'prov_id' => 'required',
+             'titulo' => 'required',
+            'tasa' => 'required',
+            'prov_moneda_id' => 'required',
+            'nro_proforma' => 'required'
 
         ]);
-        if ($validator->fails()) {
+        if ($validator->fails() && sizeof($model->attachments()->where('documento','PROFORMA')->get()) == 0 ) {
             $result = array("error" => "errores en campos de formulario");
             if($model->uid == null){
-                $uid=uniqid('', true);
-            }else{
-
+                $model->uid =uniqid('', true);
             }
 
         }else{
             $result['success']= "Registro guardado con éxito";
+            $model->uid= null;
         }
         $model= $this->setDocItem($model, $req);
         $model->save();
@@ -5274,7 +5325,14 @@ class OrderController extends BaseController
             if($aux->tipo_origen_id == 2 || $aux->tipo_origen_id == 3 || $aux->tipo_origen_id == 1){
                 break;
             }
-            $aux = $model->findOrFail($aux->origen_item_id);
+            if($aux->tipo_origen_id  = 21){
+                $aux = Solicitude::findOrFail($aux->origen_item_id);
+            }else  if($aux->tipo_origen_id  = 22){
+                $aux = OrderItem::findOrFail($aux->origen_item_id);
+            }else{
+                $aux = Purchase::findOrFail($aux->origen_item_id);
+            }
+
             $i = $i +1;
             $traza[]= $aux;
         }
