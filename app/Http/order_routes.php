@@ -22,8 +22,12 @@ $app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); //
 //otros modulos
 $app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountry'); ///obtiene las direcciones de facturacion
 $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry'); ///obtiene las direcciones de almacen
-$app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene los correo de un proveedor
+$app->get("Order/ProviderContacts",'Orders\OrderController@getProviderContacts'); ///obtiene los contactos de un proveedor
+$app->get("Order/MailLenguaje",'Orders\OrderController@getPrefeLangXcontacts'); ///el lenguaje prof segun contactos proveedor
 $app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
+
+$app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene los correo de un proveedor @depreccated
+
 $app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el correo
 
 //$app->get("Order/CloseAction",'Orders\OrderController@closeAction'); ///obtiene los correo de un proveedor

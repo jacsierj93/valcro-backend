@@ -27,8 +27,10 @@ use App\Models\Sistema\Order\OrderType;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Masters\Ports;
+use App\Models\Sistema\Masters\Language;
 use App\Models\Sistema\Product\ProductType;
 use App\Models\Sistema\Providers\ContactField;
+use App\Models\Sistema\Providers\Contactos;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Providers\ProviderCondPay;
@@ -65,6 +67,12 @@ class OrderController extends BaseController
     private $defaulString = '';
     private $defaulInt = 0;
     private $request ;
+    private $emailTemplate =['ProviderEstimate'=>[
+        'default'=>'emails.modules.Order.External.ProviderEstimate',
+        'es'=>'emails.modules.Order.External.es.ProviderEstimate',
+        'en'=>'emails.modules.Order.External.en.ProviderEstimate'
+    ]];
+
     public function __construct(Request $req)
     {
 
@@ -638,9 +646,41 @@ class OrderController extends BaseController
 
     }
 
-    public function  getProviderContact(Request $req){
+    public function  getProviderContacts(Request $req){
+        $resut=[];
+        $lang = Collection::make([]);
+        $contacts = Provider::findOrFail($req->prov_id)->contacts()->get();
+        $es=Language::findOrFail(27);
+        $en=Language::findOrFail(186);
+        $eval=[];
 
+        $default=$es;
+
+        foreach($contacts as $contc){
+            $eml['nombre']= $contc->nombre;
+            $eml['id']= $contc->id;
+            $eml['email']=$contc->campos()->where('campo', 'email')->get() ;
+            $ls= $contc->idiomas()->get();
+            $eml['idiomas']=$ls;
+
+            foreach( $ls as $l){
+                $eval[]=$l;
+                if(array_key_exists($l->iso_lang,$this->emailTemplate['ProviderEstimate'])){
+                    }else{
+                    if(strpos($l->iso_lang ,'es')){
+                        $lang->push($es);
+                    }else{
+                        $lang->push($en);
+                        $default =$en;
+                    }
+                }
+            }
+            $resut[]=$eml;
+        }
+
+        return ['contactos'=>$resut,'idiomas'=>$lang->unique()->values(), 'default'=>$default, 'eval'=>$eval, 'all'=>$lang];
     }
+
 
     /*********************** Create  ************************/
     public  function CreateSolicitude(Request $req){
@@ -3532,13 +3572,16 @@ class OrderController extends BaseController
     public function EmailEstimateSolicitude(Request $req)
     {
         $data = $this->parseDocToEstimateEmail(Solicitude::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
+
         return  ['body'=>View::make("emails.modules.Order.External.ProviderEstimate", $data)->render()];
     }
 
     public function EmailEstimateOrder(Request $req)
     {
+        $template = $this->gettemplate('ProviderEstimate', $req->lang);
+
         $data = $this->parseDocToEstimateEmail(Order::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        return  ['body'=>View::make("emails.modules.Order.External.ProviderEstimate", $data)->render()];
+        return  ['body'=>View::make($template['template'], $data)->render(), 'metodo'=>$template['metodo']];
     }
 
     public function EmailEstimatePurchase(Request $req)
@@ -3636,7 +3679,6 @@ class OrderController extends BaseController
 
     public function sendMail(Request $req){
         $adjuntos = [];
-        try {
             Mail::raw($req->texto, function ($m) use($req, $adjuntos){
                 $m->subject($req->asunto);
                 if(!$req->has('local')){
@@ -3655,9 +3697,7 @@ class OrderController extends BaseController
 
                 }
             });
-        }catch (\Exception $e) {
-            Log::error($e);
-        }
+
         $response =['accion'=>'send', 'destinos'=>$req->to[0]['valor']];
         return $response;
     }
@@ -5572,5 +5612,24 @@ class OrderController extends BaseController
                 $m->ccb($aux['email'], $aux['name']);
             }
         });
+    }
+
+    private function gettemplate($name, $leng, $default = true){
+
+        if(array_key_exists($name,$this->emailTemplate)){
+
+            $template =$this->emailTemplate[$name];
+            if(array_key_exists($leng,$template)){
+                return ['template'=>$template[$leng], 'metodo'=>'exact'];
+            }else{
+                if(strlen($name) > 2){
+                    if(array_key_exists(substr($leng,0,2),$template)){
+                        return ['template'=>$template[substr($leng,0,2)], 'metodo'=>'aprox'];
+                    }
+                }
+            }
+
+        }
+        return ['template'=>$template['default'], 'metodo'=>'default'];
     }
 }

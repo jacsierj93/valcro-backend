@@ -1307,6 +1307,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     $scope.navCtrl.value = "close";
                     $scope.navCtrl.estado= true;
                 }
+                break;
+            case "previewEmail":
+                $scope.sendPreviewEmail();
 
 
         }
@@ -1967,6 +1970,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         }
     };
 
+    /**@deprecated*/
     $scope.saveWithContactMail= function(){
         $scope.OpenContactMail(function(issend){
             if(issend){
@@ -1991,10 +1995,38 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
         });
     };
+    /**@deprecated*/
 
     $scope.saveWithSenMail= function (){
         $scope.openSendMail(function(isSend){
             if(isSend){
+                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                    if (response.success) {
+                        $timeout(function(){
+                            var layer=angular.element("#"+$scope.layer);
+                            layer[0].click();
+
+                        },0);
+
+                        $scope.updateProv(function(){
+                            $scope.NotifAction("ok","Realizado",[
+                                {name:"Ok", action: function(){
+                                    $scope.LayersAction({close:{first:true, search:true}});
+
+                                }}
+                            ],{block:true});
+
+                        });
+
+                    }});
+            }
+        });
+    };
+
+    $scope.saveWithPreview= function (){
+        $scope.openMailPreview(function(isSend){
+            if(isSend){
+                console.log("llamado a calback");
                 Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
                     if (response.success) {
                         $timeout(function(){
@@ -2033,16 +2065,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             if(response.action){
                 if(response.action == 'question'){
                     $scope.NotifAction("alert", "¿Que desea hacer?",[
-                        {name:"Enviar", action:$scope.saveWithContactMail},
-                        {name:"Enviar he incluir un texto",action:$scope.saveWithSenMail},
+                        {name:"Enviar", action:$scope.saveWithPreview},
                         {name:"Solo Guardar",action:$scope.saveDoc}
                     ],{block:true});
                 }else if(response.action == 'save' ){
                     $scope.saveDoc();
                 }else if(response.action == 'send'){
-                    $scope.saveWithContactMail();
+                    $scope.saveWithPreview();
                 }else if(response.action == 'writer'){
-                    $scope.saveWithSenMail();
+                    $scope.saveWithPreview();
                 }
             }
         });
@@ -3861,36 +3892,93 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','set
 }]);
 
 
-MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order', function($scope,$sce, setGetOrder,Order){
+MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEmail','SYSTEM', function($scope,$sce, setGetOrder,Order,IsEmail,SYSTEM){
 
     $scope.isLoad= false;
-    $scope.provLengujes = [];
-    $scope.$parent.openMailPreview = function(){
+    $scope.template ={};
+    $scope.idiomas =[];
+    $scope.idioma= null;
+    $scope.contactos =[];
+    $scope.correos =[];
+    $scope.to =[];
+    $scope.cc =[];
+    $scope.cco =[];
+    $scope.destinos = [];
+
+    $scope.$parent.openMailPreview = function( calback){
+        if(calback){
+            $scope.calback = calback;
+        }else{
+            delete  $scope.calback;
+        }
         $scope.$parent.LayersAction({open:{name:'previewEmail' ,before: function(){
-            $scope.loadPreview();
+
+            console.log("parent", $scope.$parent);
+            Order.get({type:"ProviderContacts", prov_id: $scope.$parent.document.prov_id},{}, function(response){
+                console.log("response contact",  response);
+                $scope.idiomas= response.idiomas;
+                $scope.idioma=response.default;
+                $scope.contactos = response.contactos;
+                $scope.correos.splice(0,$scope.correos.length);
+                angular.forEach(response.contactos, function(cv){
+                    angular.forEach(cv.email, function(ev){
+                        $scope.correos.push({nombre:cv.nombre,valor:ev.valor,id:cv.id})
+                    });
+                });
+
+                $scope.loadPreview();
+            });
         }}});
 
     };
 
-    $scope.loadPreview = function(){
-        Order.htmlMod({type:$scope.$parent.formMode.mod, mod:'EmailEstimate',id:$scope.$parent.document.id},{},function(response){
-            $scope.template= $sce.trustAsHtml(response.body);
-        });
+    $scope.transformChip = function (chip){
+        if (angular.isObject(chip)) {
+            console.log("es chipc", chip);
+            return chip;
+        }
+        if(IsEmail(chip)!= null){
+            return {nombre:'new',valor:chip};
+        }
+        return null;
 
     };
 
-    $scope.$watch('titulo', function(newVal){
-        if(newVal ){
-            var ele= angular.element("#previewEmail #templateContent #titulo ");
-            ele.html(newVal);
+    $scope.addEmail = function(chip){
+        $scope.destinos.push(chip.valor+chip.nombre);
+    };
+    $scope.removeEmail = function(chip){
+        var index = $scope.destinos.indexOf(chip.valor+chip.nombre);
+        $scope.destinos.splice(index,1);
+    };
+    $scope.isAddMail = function(val){
+        return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
+    };
+    $scope.loadPreview = function(){
+        Order.htmlMod({type:$scope.$parent.formMode.mod, mod:'EmailEstimate',id:$scope.$parent.document.id, lang:$scope.idioma.iso_lang},{},function(response){
+            $scope.template= $sce.trustAsHtml(response.body);
+        });
+    };
+    $scope.exitValidate = function(){
+        return true;
+    }
+    $scope.$parent.sendPreviewEmail = function(){
+        if($scope.to.length == 0){
+            $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
+        }else{
+            $scope.inProgress=true;
+            var html = angular.element("#templateContent");
+            console.log("html",html.html());
+            console.log("text",html.text());
+            Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:html.html(), to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
+                $scope.inProgress=false;
+                if($scope.calback){
+                    $scope.calback();
+                }
+            });
         }
-    });
-    $scope.$watch('descripcion', function(newVal){
-        if(newVal){
-            var ele= angular.element("#previewEmail #templateContent #descripcion ");
-            ele.html(newVal);
-        }
-    });
+    }
+
 }]);
 
 /**

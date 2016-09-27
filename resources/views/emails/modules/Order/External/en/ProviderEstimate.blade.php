@@ -21,11 +21,11 @@
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td align="center" width="20%" style="color: rgb(140,140,140);margin: 0;padding: 10px 10px 10px 0; text-align: left;">
                                             <img width="150px"  style="margin: 0;padding: 0" src='http://valcro.com.ve/images/logo-head.png' ></td>
-                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">Emision:
+                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">Created:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px">
                                                 {{$emision}}
                                             </p></td>
-                                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro.
+                                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Number:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                                 {{$id}}
                                             </p></td>

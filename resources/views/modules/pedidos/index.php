@@ -233,6 +233,15 @@
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
                     </div>
+                    <div layout="column" layout-align="center center"
+                         ng-show="( document.id )"
+                         ng-click="openMailPreview()">
+                        <span style="font-size: 24px"> TEst </span>
+                        <md-tooltip >
+                            Ver las versiones anteriores de la {{formMode.name}}
+                        </md-tooltip>
+                    </div>
+
 
 
 
@@ -3939,8 +3948,8 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="previewEmail" id="previewEmail">
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderMailPreview" >
                 <div layout="column" flex>
-                    <form layout="row"  >
-                        <div active-left   ></div>
+                    <form layout="row"  class="focused" >
+                        <div active-left  before="exitValidate"  ></div>
                         <div layout="column" flex>
                             <div class="activeleft"></div>
                             <div layout="column" style="margin-bottom: 8px;">
@@ -3962,6 +3971,28 @@
                                         </div>
                                     </div>
                                 </div>
+                                <md-input-container class="md-block" flex="" ng-click="allowEdit()" alert="{'none':'No se le ha asignado condiciones de pago a '+provSelec.razon_social} " alert-show="(formData.condicionPago.length > 0) ? '': 'none'">
+                                    <label>Lenguaje</label>
+                                    <md-autocomplete md-selected-item = "idioma"
+                                                     info="Selecione el idioma para el correo"
+                                                     md-input-name = "autocomplete"
+                                                     md-search-text = "idiomaText"
+                                                     md-items = "item in idiomas | stringKey : idiomaText : 'lang' "
+                                                     md-item-text="item.lang"
+                                                     md-min-length="0"
+                                                     md-input-minlength="0"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.lang}}</span>
+                                        </md-item-template>
+                                        <md-not-found  ng-click="redirect({module:'proveedores'})">
+                                            No se encontro la condicion de pago {{ctrl.searchcondPagoSelec}}. ¿Desea crearla?
+                                        </md-not-found>
+                                    </md-autocomplete>
+                                </md-input-container>
+
                                 <div layout="row" class="row">
                                     <md-switch class="md-primary"
                                                ng-model="usePersonal">
@@ -3978,23 +4009,21 @@
                                           md-on-remove =" removeEmail($chip) "
                                           ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
                                           ng-show="showHead"
+                                          skitp-tab
 
                                 >
                                     <md-autocomplete
-                                        md-search-text="searchDestinos"
-                                        md-items="item in correos  | stringKey : searchDestinos : 'valor' | customFind : destinos : isAddMail "
+                                        md-search-text="searchTo"
+                                        md-items="item in correos | filter : searchTo  | customFind : destinos : isAddMail "
                                         md-item-text="item.valor"
                                         placeholder="Para:">
-                                        <span >{{item.valor}} </span>
-
-
-
+                                        <span >{{item.nombre}}/{{item.valor}} </span>
                                     </md-autocomplete>
                                     <md-chip-template>
-                                        <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                        <strong>{{$chip.nombre}}/{{$chip.valor}} </strong>
                                     </md-chip-template>
                                 </md-chips>
-                                <md-chips ng-model="cc"
+                           <!--     <md-chips ng-model="cc"
                                           md-transform-chip="transformChip($chip)"
                                           style="height: inherit;"
                                           ng-show="(showHead && showCc)"
@@ -4033,18 +4062,7 @@
                                     <md-chip-template>
                                         <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
                                     </md-chip-template>
-                                </md-chips>
-                                <div layout="row" class="row" ng-show="!showHead">
-                                    <md-input-container flex>
-                                        <label>Titulo</label>
-                                        <input ng-model="titulo" >
-                                    </md-input-container>
-                                </div><div layout="row" class="row" ng-show="!showHead">
-                                    <md-input-container flex>
-                                        <label>Descripción</label>
-                                        <input ng-model="descripcion">
-                                    </md-input-container>
-                                </div>
+                                </md-chips>-->
                                 <div layout="row" class="row-min" style="padding-right: 4px;" ng-show="showHead" >
                                     <md-input-container flex>
                                         <label>Asunto:</label>
@@ -4055,14 +4073,16 @@
 
                         </div>
                     </form>
+                    <div flex layout="row" >
+
                     <div flex style="overflow: auto; padding: 8px;">
                         <div id="templateContent" ng-bind-html="template" flex="">
                         </div>
-
-
+                    </div>
                     </div>
                 </div>
-
+                <loader ng-show="inProgress"></loader>
+                <div  style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
         </md-sidenav>
 
