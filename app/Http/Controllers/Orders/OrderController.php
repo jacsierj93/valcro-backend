@@ -76,8 +76,7 @@ class OrderController extends BaseController
 
     private $profile  =['gerente'=>'6', 'trabajador'=>'10' ,'jefe'=>'9'];
     private $departamentos  =['compras'=>'17', 'propetario'=>'18' ,'auditoria'=>'22'];
-    private $permisos = [] ;
-    private $user;
+    private $user = null;
 
 
     public function __construct(Request $req)
@@ -85,78 +84,20 @@ class OrderController extends BaseController
 
         $this->middleware('auth');
         $this->request= $req;
+        if($this->user == null){
+            $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
+                ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
+        }
     }
 
     /*********************** SYSTEM ************************/
 
     public function getPermision(){
-        $user= User::findOrFail( $this->request->session()->get('DATAUSER')['id']);
-        $this->permisos =[];
-        $this->permisos['doc'] =[];
-        $this->permisos['other_doc'] =[];
-        // permison sobre documentos
-        if($user->cargo_id == $this->profile['trabajador']){
-            $this->permisos['doc']['create']=true ;
-            $this->permisos['doc']['update']=true ;
-            $this->permisos['doc']['view']=true ;
-            $this->permisos['doc']['aprob_compras']=false ;
-            $this->permisos['doc']['aprob_gerencia']=false ;
-            $this->permisos['other_doc']['view']=false ;
-            $this->permisos['other_doc']['update']=false ;
-            $this->permisos['other_doc']['cancel']=false ;
-            $this->permisos['other_doc']['aprob']=false ;
-            $this->permisos['other_doc_update']['view']=false ;
-            $this->permisos['other_doc_update']['update']=false ;
-            $this->permisos['other_doc_update']['cancel']=false ;
-            $this->permisos['other_doc_update']['aprob']=false ;
-
-            $this->permisos['metodo']='work' ;
-
-        }
-       /* else
-        if($user->cago_id == $this->profile['gerente']){
-            $this->permisos['doc']['create']=true ;
-            $this->permisos['doc']['update']=true ;
-            $this->permisos['doc']['aprob']=true ;
-            $this->permisos['doc']['cancel']=true ;
-
-            $this->permisos['other_doc']['create']=true ;
-            $this->permisos['other_doc']['view']=true ;
-            $this->permisos['other_doc']['update']=true ;
-            $this->permisos['other_doc']['cancel']=true ;
-            $this->permisos['other_doc']['aprob']=true ;
-            $this->permisos['metodo']='ger' ;
-
-        }else
-        if($user->cago_id ==  $this->profile['jefe']){
-            $this->permisos['doc']['create']=true ;
-            $this->permisos['doc']['update']=true ;
-            $this->permisos['doc']['aprob']=true ;
-            $this->permisos['doc']['cancel']=true ;
-
-            $this->permisos['other_doc']['create']=true ;
-            $this->permisos['other_doc']['view']=true ;
-            $this->permisos['other_doc']['update']=true ;
-            $this->permisos['other_doc']['cancel']=true ;
-            $this->permisos['other_doc']['aprob']=true ;
-            $this->permisos['metodo']='vox' ;
-
+        if($this->user->departamento_id == 22){
+            return ['created'=>false];
         }else{
-            $this->permisos['doc']['create']=false ;
-            $this->permisos['doc']['edit']=false ;
-            $this->permisos['doc']['view']=true ;
-
-            $this->permisos['other_doc']['view']=false ;
-            $this->permisos['other_doc']['update']=false ;
-            $this->permisos['other_doc']['cancel']=false ;
-            $this->permisos['other_doc']['aprob']=false ;
-            $this->permisos['metodo'][]='default' ;
-        }*/
-        $this->user =$user;
-
-        //$user  = User::selectRaw('tbl_user.nombre, tbl_user.apellido, tbl_user.email')->where()->get();
-        $this->user =$user;
-        return  $this->permisos;
+            return ['created'=>true, 'profile'=>$this->user];
+        }
     }
 
     /**
@@ -219,22 +160,22 @@ class OrderController extends BaseController
         $monedas = Monedas::get();
 
 
-        $docsUnclose[0] = Solicitude::whereNull("final_id")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-            ->whereNull('cancelacion')
-            ->get();
+        $docsUnclose[0] = Solicitude::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->whereNull('cancelacion');
+        $docsUnclose[1] = Order::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->whereNull('cancelacion');
+        $docsUnclose[2] = Purchase::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->whereNull('cancelacion');
 
-        $docsUnclose[1] = Order::whereNull("final_id")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-            ->whereNull('cancelacion')
-            ->get();
-        $docsUnclose[2] = Purchase::whereNull("final_id")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-            ->whereNull('cancelacion')
-            ->get();
+     /* if($this->user->cargo_id == $this->profile['trabajador']){
+          $docsUnclose[0] = $docsUnclose[0]->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+          $docsUnclose[1] =$docsUnclose[1]->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+          $docsUnclose[2] =$docsUnclose[2]->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+
+      }*/
+        $docsUnclose[0] = $docsUnclose[0]->get();
+        $docsUnclose[1] = $docsUnclose[1]->get();
+        $docsUnclose[2] = $docsUnclose[2]->get();
         foreach($docsUnclose as $docs){
             foreach($docs  as $aux){
                 $prov = Provider::find($aux->prov_id);
@@ -275,7 +216,6 @@ class OrderController extends BaseController
         $aux= Solicitude::selectRaw("count(id) as cantidad")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->get();
 
         if($aux[0][0] > 0){
@@ -285,7 +225,6 @@ class OrderController extends BaseController
         $aux= Order::selectRaw("count(id)")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->get();
 
         if($aux[0][0] > 0){
@@ -297,25 +236,27 @@ class OrderController extends BaseController
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
             ->get();
 
+
         if($aux[0][0] > 0){
             $result[] = array('titulo'=>'Ordenes de compra con mas de '. $oldReviewDays. " dias sin revisar ", 'key'=>'priorityDocs','cantidad' =>$aux[0][0]);
         }
 
+        // sin culminar
         $aux=  Solicitude::selectRaw("count(id)")
             ->whereNull("final_id")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion')
-            ->get();
+        ->where('edit_usuario_id',$req->session()->get('DATAUSER')['id']);
 
+        $aux= $aux->get();
         if($aux[0][0] > 0){
             $result[] = array('titulo'=>"Solicitudes sin culminar", 'key'=>'unclosetDoc','cantidad'=>$aux[0][0]);
         }
 
         $aux=  Order::selectRaw("count(id)")
             ->whereNull("final_id")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion')
-            ->get();
+            ->where('edit_usuario_id',$req->session()->get('DATAUSER')['id']);
+        $aux= $aux->get();
 
         if($aux[0][0] > 0){
             $result[] = array('titulo'=>"Proformas sin culminar",'key'=>'unclosetDoc', 'cantidad'=>$aux[0][0]);
@@ -323,11 +264,9 @@ class OrderController extends BaseController
 
         $aux=  Purchase::selectRaw("count(id)")
             ->whereNull("final_id")
-            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
-
             ->whereNull('cancelacion')
-            ->get();
-
+            ->where('edit_usuario_id',$req->session()->get('DATAUSER')['id']);
+        $aux= $aux->get();
         if($aux[0][0] > 0){
             $result[] = array('titulo'=>"Ordenes de compra sin culminar",'key'=>'unclosetDoc','cantidad'=>$aux[0][0]);
         }
@@ -341,56 +280,58 @@ class OrderController extends BaseController
 
 
     public  function closeActionSolicitude(Request $req){
-        $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
-            ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
         $model= Solicitude::findOrFail($req->id);
-
-        if($user->cargo_id == '8') {
+        if($this->user->cargo_id == $this->profile['gerente']) {
             return ['action' => 'question'];
-        }
-        if($user->cargo_id ==  $this->profile['trabajador']){
-            return ['action' => 'save'];
-        }
-        return ['action'=>'no'];
-    }
 
-    public  function closeActionOrder(Request $req){
-        $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
-            ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
-        $model= Order::findOrFail($req->id);
-        if($user->cargo_id == '8') {
-            return ['action' => 'question'];
         }
-        if($req->accion == 'new'){
-            return ['action'=>'save'];
-        }
-        if($req->accion == 'upd'){
-            if($model->fecha_envio == null){
-                return ['action'=>'send'];
-            }else{
-                return ['action'=>'writer'];
+        else if($this->user->cargo_id ==  $this->profile['jefe']){
+          $userCreate = User::findOrFail($model->usuario_id);
+            if($userCreate->cargo_id == $this->profile['trabajador'] ){
+                if($model->fecha_aprob_compras != null ){
+                    $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    if(sizeof($notif->where('clave','aprob_compras')->get()) == 0){
+                        return ['action' => 'send'];
+                    }
+                }
             }
+
         }
-        return ['action'=>'no'];
+         return ['action' => 'save'];
+    }
+    public  function closeActionOrder(Request $req){
+        $model= Order::findOrFail($req->id);
+        if($this->user->cargo_id == $this->profile['gerente']) {
+            return ['action' => 'question'];
+        }
+        else if($this->user->cargo_id ==  $this->profile['jefe']){
+            $userCreate = User::findOrFail($model->usuario_id);
+            $userModif = User::findOrFail($model->edit_usuario_id);
+            if($userCreate->cargo_id == $this->profile['trabajador'] ){
+                if($model->fecha_aprob_compras != null && $userModif->cargo_id == $this->profile['gerente']){
+                    return ['action' => 'send'];
+                }
+            }
+
+        }
+        return ['action' => 'save'];
     }
     public  function closeActionPurchase(Request $req){
-        $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
-            ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
         $model= Purchase::findOrFail($req->id);
-        if($user->cargo_id == '8') {
+        if($this->user->cargo_id == $this->profile['gerente']) {
             return ['action' => 'question'];
         }
-        if($req->accion == 'new'){
-            return ['action'=>'save'];
-        }
-        if($req->accion == 'upd'){
-            if($model->fecha_envio == null){
-                return ['action'=>'send'];
-            }else{
-                return ['action'=>'writer'];
+        else if($this->user->cargo_id ==  $this->profile['jefe']){
+            $userCreate = User::findOrFail($model->usuario_id);
+            $userModif = User::findOrFail($model->edit_usuario_id);
+            if($userCreate->cargo_id == $this->profile['trabajador'] ){
+                if($model->fecha_aprob_compras != null && $userModif->cargo_id == $this->profile['jefe']){
+                    return ['action' => 'send'];
+                }
             }
+
         }
-        return ['action'=>'no'];
+        return ['action' => 'save'];
     }
     /*********************** PROVIDER ************************/
 
@@ -617,10 +558,10 @@ class OrderController extends BaseController
         $prov= Provider::findOrFail($req->id);
 
         $docs= Collection::make(array());
-        $solic= $prov->solicitude()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);
-        $odc=  $prov->purchase()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);
-        $order=  $prov->Order()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);;
-        if(!$this->getPermision()['other_doc']['view']){
+        $solic= $prov->solicitude()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null)->whereNull('uid');
+        $odc=  $prov->purchase()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null)->whereNull('uid');
+        $order=  $prov->Order()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null)->whereNull('uid');
+        if($this->user->cargo_id == $this->profile['trabajador'] ){
             $solic=$solic->where('usuario_id',$req->session()->get('DATAUSER')['id']);
             $odc= $odc->where('usuario_id',$req->session()->get('DATAUSER')['id']);
             $order= $odc ->where('usuario_id',$req->session()->get('DATAUSER')['id']);
@@ -790,22 +731,19 @@ class OrderController extends BaseController
         $response = [];
 
         $model = Solicitude::findOrFail($req->id);
-        $sendEmail = ($model->fecha_aprob_compra == null && ($model->nro_doc == null || $model->nro_doc == ''));
-        $model->fecha_aprob_compra= $req->fecha_aprob_compra;
-        $model->nro_doc= $req->nro_doc;
-        $response['response']=$model->save();
-        $response['accion']=  'upd';
-        $response['success']='Solicitud aprobada';
+        if($req->has("fecha_aprob_compra")&& $req->has("nro_doc")){
+            $model->fecha_aprob_compra= $req->fecha_aprob_compra;
+            $model->nro_doc=$req->nro_doc;
+            $response['accion']=  ($model->fecha_aprob_compra == null ) ? 'new' :'upd';
+        }else{
+            $model->fecha_aprob_compra= null;
+            $response['accion']=  'cancel' ;
+            $model->nro_doc=null;
 
-        if($sendEmail){
-            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
-                ,'cc'=>[],'ccb'=>[]
-                ,'asunto'=>'Notificacion de Aprobacion por compras '];
-            $data =$this->parseDocToSummaryEmail($model);
-            $data['accion']=$sender['asunto'];
-            $this->sendNotificacion($data,$sender);
-            $response['email'] ="true";
-        };
+        }
+        $response['response']=$model->save();
+
+        $response['success']='Solicitud aprobada';
 
         return $response;
 
@@ -816,8 +754,6 @@ class OrderController extends BaseController
         $model = Order::findOrFail($req->id);
 
         $model->fecha_aprob_compra= $req->fecha_aprob_compra;
-        $sendEmail = ($model->fecha_aprob_compra == null && ($model->nro_doc == null || $model->nro_doc == ''));
-
         $model->nro_doc= $req->nro_doc;
 
         $response['response']=$model->save();
@@ -825,16 +761,6 @@ class OrderController extends BaseController
         $response['success']='Pedido aprobado';
         $response['accion']=  'upd';
 
-        if($sendEmail){
-            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
-                ,'cc'=>[],'ccb'=>[]
-                ,'asunto'=>'Notificacion de Aprobacion por compras '];
-            $data =$this->parseDocToSummaryEmail($model);
-            $data['accion']=$sender['asunto'];
-
-            $this->sendNotificacion($data,$sender);
-            $response['email'] ="true";
-        };
         return $response;
 
     }
@@ -844,23 +770,12 @@ class OrderController extends BaseController
         $model = Purchase::findOrFail($req->id);
 
         $model->fecha_aprob_compra= $req->fecha_aprob_compra;
-        $sendEmail = ($model->fecha_aprob_compra == null && ($model->nro_doc == null || $model->nro_doc == ''));
         $model->nro_doc= $req->nro_doc;
         $response['response']=$model->save();
 
         $response['success']='ODC aprobada';
 
         $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
-        if($sendEmail){
-            $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
-                ,'cc'=>[],'ccb'=>[]
-                ,'asunto'=>'Notificacion de Aprobacion por compras '];
-            $data =$this->parseDocToSummaryEmail($model);
-            $data['accion']=$sender['asunto'];
-
-            $this->sendNotificacion($data,$sender);
-            $response['email'] ="true";
-        };
         return $response;
 
     }
@@ -948,6 +863,7 @@ class OrderController extends BaseController
         $resul['action']="upd";
         $model  = Order::findOrFail($req->id);
         $model->final_id = null;
+        $model->edit_usuario_id= $this->user->id;
         $model->save();
         return $resul;
     }
@@ -955,6 +871,8 @@ class OrderController extends BaseController
     public  function PurchaseUpdate(Request $req){
         $resul['action']="upd";
         $model  = Purchase::findOrFail($req->id);
+        $model->edit_usuario_id= $this->user->id;
+
         $model->final_id = null;
         $model->save();
         return $resul;
@@ -963,6 +881,8 @@ class OrderController extends BaseController
     public  function SolicitudeUpdate(Request $req){
         $resul['action']="upd";
         $model  = Solicitude::findOrFail($req->id);
+        $model->edit_usuario_id= $this->user->id;
+
         $model->final_id = null;
         $model->save();
         return $resul;
@@ -4146,7 +4066,6 @@ class OrderController extends BaseController
         $model = $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->id);
         $prov= Provider::find($model->prov_id);
-        $permit= $this->getPermision();
         $objs =[];
         //para maquinas
         $tem = array();
@@ -4258,12 +4177,9 @@ class OrderController extends BaseController
         $tem['adjuntos'] = $atts;
 
         $tem['objs']=$objs;
-        $tem['permit'] = ($model->usuario_id == $req->session()->get('DATAUSER')['id']) ?  $tem['permit'] = $permit['doc']: $tem['other_doc'];
-        $tem['sess']=$req->session()->get('DATAUSER')['id'] ;
-        $tem['user']=$this->user;
 
-        $query = NotificationOrder::where('doc_id', $model->id)->where('doc_tipo', $req->tipo);
-        $tem['permit']['update'] = sizeof($query->where('clave','<>','created')->get()) == 0;
+        $tem['permit'] = $this->getPermisionDoc($model);
+
 
 
         return $tem;
@@ -5071,6 +4987,8 @@ class OrderController extends BaseController
 
     }
 
+    /*************************************** CLOSE *****************************************/
+
     /***/
     public function CloseSolicitude(Request $req)
     {
@@ -5090,16 +5008,32 @@ class OrderController extends BaseController
             'cc' =>[],
             'ccb' =>[]
         ];
-        $noti = new NotificationOrder();
-        $noti->doc_id = $model->id;
-        $noti->doc_tipo = 21;
 
         if(sizeof($notif->where('clave', 'created')->get()) == 0){
+            $noti = new NotificationOrder();
+            $noti->doc_id = $model->id;
+            $noti->doc_tipo = 21;
+            $noti->usuario_id = $this->user->id;
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion'] ="Creacion de solicitud ";
             $noti->send($data,$sender,$noti,"created");
             $result['action'][]="send";
+        }else{
+            if($model->fecha_aprob_compras != null){
+
+            }else{
+                $sender['subject']= "Notificacion de modificacion de solicitud";
+                $noti = new NotificationOrder();
+                $noti->doc_id = $model->id;
+                $noti->doc_tipo = 21;
+                $noti->usuario_id = $this->user->id;
+                $data =$this->parseDocToSummaryEmail($model);
+                $data['accion'] ="Modificacion de solicitud ";
+                $noti->send($data,$sender,$noti,"update");
+                $result['action'][]="update";
+            }
         }
+
         return $result;
     }
 
@@ -5127,6 +5061,8 @@ class OrderController extends BaseController
         $noti = new NotificationOrder();
         $noti->doc_id = $model->id;
         $noti->doc_tipo = 21;
+        $noti->usuario_id = $this->user->id;
+
 
         if(sizeof($notif->where('clave', 'created')->get()) == 0){
             $data =$this->parseDocToSummaryEmail($model);
@@ -5158,6 +5094,7 @@ class OrderController extends BaseController
         $noti = new NotificationOrder();
         $noti->doc_id = $model->id;
         $noti->doc_tipo = 21;
+        $noti->usuario_id = $this->user->id;
 
         if(sizeof($notif->where('clave', 'created')->get()) == 0){
             $data =$this->parseDocToSummaryEmail($model);
@@ -5343,6 +5280,7 @@ class OrderController extends BaseController
         if($model->usuario_id == null){
             $model->usuario_id = $req->session()->get('DATAUSER')['id'];
         }
+        $model->edit_usuario_id =$req->session()->get('DATAUSER')['id'];;
 
         if($req->has('monto')){
             $model->monto = $req->monto;
@@ -5731,6 +5669,8 @@ class OrderController extends BaseController
         $noti->doc_id= $data['id'];
         $noti->doc_tipo = $data['tipo'];
         $noti->clave = $type;
+        $noti->usuario_id = $this->user->id;
+
         return $noti->send($data,$sender,$type);
         /*Mail::send("emails.modules.Order.Internal.ResumenDoc",$data, function ($m) use( $data, $sender, $type){
             $m->subject($sender['asunto']);
@@ -5777,11 +5717,71 @@ class OrderController extends BaseController
         }
         return ['template'=>$template['default'], 'metodo'=>'default'];
     }
+
+    /**obtiene los correos segun el departamento*/
     private function  getEmailDepartment($deparmet){
        return  User::selectRaw('concat(tbl_usuario.nombre, \' \' ,tbl_usuario.apellido) as nombre, tbl_usuario.email as email')
             ->join('tbl_cargo','tbl_cargo.id','=','tbl_usuario.cargo_id')
             ->join('tbl_departamento','tbl_departamento.id','=','tbl_cargo.departamento_id')
             ->where('tbl_cargo.departamento_id',$deparmet)->get();
+    }
+
+    /*
+     * determian los permiso del docuemnto segun las carcateristicas del mismo
+     * **/
+    private function getPermisionDoc($model){
+        $permit=  ['aprobacion_compras'=>false,'aprob_compras'=>false,'update'=>false,'cancel'=>false, 'delete'=>false,'metodo'=>'default'];
+
+        if($this->user->cargo_id == $this->profile['gerente']){
+            return ['aprobacion_compras'=>true,'aprob_compras'=>true,'update'=>true,'cancel'=>true, 'delete'=>true,'metodo'=>'mas alto'];
+
+        }
+        else
+            if($this->user->id === $model->usuario_id){
+                if($model->uid != null){
+                    $permit['update']=true;
+                    $permit['delete']=true;
+                    $permit['delete']="no create";
+
+                }else{
+                    if($this->user->cargo_id == $this->profile['trabajador']){
+                        $notif = NotificationOrder::where('doc_id',$model->id)->where('doc_tipo',$model->getTipoId());
+                        if(sizeof($notif->where('usuario_id','<>',$model->usuario_id)->get()) == 0){
+                            $permit['update']=true;
+                            $permit['metodo']='sin cambios';
+                        }
+                    }else if($this->user->cargo_id == $this->profile['jefe']) {
+                        $noti = User::selectRaw('tbl_usuario.id,tbl_usuario.cargo_id, count(tbl_noti_pedido.id) as noti ')
+                            ->join('tbl_noti_pedido','tbl_noti_pedido.usuario_id','=','tbl_usuario.id' )
+                            ->where('doc_id',$model->id)
+                            ->where('doc_tipo',$model->getTipoId())
+                            ->where('cargo_id',$this->profile['gerente'])
+                            ->groupBy('tbl_usuario.cargo_id')
+                            ->get();
+                        if($noti->noti == 0){
+                            $permit['update'] = true;
+                        }
+                    }
+
+
+                }
+            }else{
+                $user = User::find($model->usuario_id);
+                /*$noti = User::selectRaw('tbl_usuario.id,tbl_usuario.cargo_id, count(tbl_noti_pedido.id) as noti ')
+                    ->join('tbl_noti_pedido','tbl_noti_pedido.usuario_id','=','tbl_usuario.id' )
+                    ->where('doc_id',$model->id)
+                    ->where('doc_tipo',$model->getTipoId())
+                    ->where('cargo_id',$this->profile['gerente'])
+                    ->groupBy('tbl_usuario.cargo_id')
+                    ->get();*/
+
+                if($this->user->cargo_id == $this->profile['jefe'] && $user->cargo_id ==  $this->profile['trabajador']) {
+                    if($model->fecha_aprobacion_compras == null){$permit['aprob_compras']= true;$permit['update']= true;};
+                    if($model->cancelacion == null){$permit['cancel']= true;$permit['update']= true;};
+                }
+
+            }
+        return $permit;
     }
 
 }

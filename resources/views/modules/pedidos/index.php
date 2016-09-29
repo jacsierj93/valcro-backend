@@ -179,7 +179,7 @@
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.doc.create)" layout-align="center center" ng-click="menuAgregar()">
+                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.created)" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
                             Crear un nuevo documento
@@ -1470,9 +1470,10 @@
                                         Aprobacion de Gerente
                                     </div>
                                 </div>
+
                             </div>
 
-                            <div layout="row" ng-show="( gridView == 2 )" class="row" >
+                            <div layout="row" ng-show="( gridView == 2 )" class="row"  id="estatusDoc">
 
                                 <md-input-container class="md-block" flex="">
                                     <label>Estatus</label>
@@ -1495,11 +1496,11 @@
                         </div>
 
                     </form>
-                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="document.permit.aprob_compras && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras(): 0" >
+                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="document.permit.aprob_compras && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras($event): 0" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex class="row" >
-                                <div class="titulo_formulario" layout="column" layout-align="start start" ng-click=" gridView = 3">
+                                <div class="titulo_formulario"  layout="column" layout-align="start start" ng-click=" gridView = 3">
                                     <div>
                                         Aprobación
                                     </div>
@@ -1530,18 +1531,26 @@
                                     <input ng-model="document.nro_doc"  ng-disabled="(Docsession.block)"
                                            ng-click="toEditHead('nro_doc', document.nro_doc)"
                                            required
+                                           skip-tab
 
                                     >
                                 </md-input-container>
 
                                 <div class="adj-box">
-                                    <div ng-click="openAdj('AprobCompras')" id="adj-nro-doc" class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
+                                    <div ng-click="openAdj('AprobCompras')" id="adj-nro-doc" class="vlc-buttom" skip-tab info="Adjuntos para validar la aprobacion por compras" ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
                                         {{ (document.adjuntos | stringKey :'AprobCompras': 'documento' ).length || 0 }}
                                     </div>
                                 </div>
+                                <!--<div layout="column" layout-align="center center"
+                                      >
+                                    <span  style="font-size: 24px">(/)</span>
+                                    <md-tooltip>Cancelar aprobacion
+                                    </md-tooltip>
+                                </div>-->
 
                             </div>
                         </div>
+
                     </form>
                     <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.permit.cancel && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
                         <div active-left></div>
@@ -3525,7 +3534,7 @@
                 </div>
                 <div   id="expand"></div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
-                <loader ng-show="inProgress"></loader>
+                <loader ng-show="inProcess"></loader>
 
             </md-content>
         </md-sidenav>

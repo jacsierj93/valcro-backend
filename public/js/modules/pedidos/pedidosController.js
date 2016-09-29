@@ -1,5 +1,5 @@
 
-MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
+MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     ,$filter,$location,App, Order,masters,providers,
                                            Upload,Layers,setGetOrder, DateParse, Accion,filesService,clickerTime,SYSTEM) {
 
@@ -576,6 +576,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     cp.push(v);
                     if(v.estado != 'new'){
                         $scope.switchBack.contraPedido.change= true;
+                        $scope.switchBack.changeItems.change=true;
                         changeItems= true;
                     }
 
@@ -584,6 +585,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     kit.push(v);
                     if(v.estado != 'new'){
                         $scope.switchBack.kichenBox.change= true;
+                        $scope.switchBack.changeItems.change=true;
+
                         changeItems= true;
                     }
                 }
@@ -592,6 +595,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     sus.push(v);
                     if(v.estado != 'new'){
                         $scope.switchBack.pedidoSusti.change= true;
+                        $scope.switchBack.changeItems.change=true;
+
                         changeItems= true;
                     }
                 }
@@ -602,6 +607,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                 final[k]=v;
                 if(v.estado != 'new'){
                     $scope.switchBack.head.change= true;
+                    $scope.switchBack.changeItems.change=true;
                 }
                 /*if(k = ''){
                  31-05-12
@@ -609,6 +615,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             }
 
         );
+
 
         final.contraPedido = cp;
         final.kitchenBox = kit;
@@ -1319,37 +1326,113 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
 
     };
-
+    var interval = null;
     $scope.showNext = function (status) {
         if (status) {
-            if (!$scope.FormHeadDocument.$valid && $scope.module.layer == 'detalleDoc') {
-                $scope.NotifAction("error",
-                    "Existen campos pendientes por completar, por favor verifica que información le falta."
-                    ,[],{autohidden:autohidden});
+            if($scope.module.layer == 'detalleDoc'){
+                if (!$scope.FormHeadDocument.$valid && $scope.module.layer == 'detalleDoc') {
+                    $scope.NotifAction("error",
+                        "Existen campos pendientes por completar, por favor verifica que información le falta."
+                        ,[],{autohidden:autohidden});
 
-                $timeout(function(){
-                    var inval = angular.element(" form[name=FormHeadDocument] .ng-invalid ");
-                    if(inval[0]){
-                        inval[0].focus();
-                    }else{
-                        inval = angular.element(" form[name=FormHeadDocument] ng-untouched");
-                        console.log(" terro ", inval)
-                        inval[0].focus();
-                    }
-                },0);
+                    $timeout(function(){
+                        var inval = angular.element(" form[name=FormHeadDocument] .ng-invalid ");
+                        if(inval[0]){
+                            inval[0].focus();
+                        }else{
+                            inval = angular.element(" form[name=FormHeadDocument] ng-untouched");
+                            console.log(" terro ", inval)
+                            inval[0].focus();
+                        }
+                    },0);
 
 
+                }else  if($scope.module.layer == 'detalleDoc' && !$scope.FormAprobCompras.$pristine)
+                {
+                    angular.element("#estatusDoc")[0].click();
+                    /*if(interval == null){
+                        $scope.NotifAction("alert",
+                            "¿Esta seguro de cancelar la aprobacion?"
+                            ,[{name:"Si", action:
+                                function (){
+                                    interval = $interval(function(){
+                                        console.log("validando",$scope.sendAprob().isBlock() );
+                                        if($scope.sendAprob().isBlock() == 'waith'){
+                                            $scope.sendAprob().save();
+                                        }
+
+                                        if($scope.sendAprob().isBlock() == 'finish'){
+                                            console.log("ya sali" );
+
+                                            $interval.cancel(interval);
+                                            $mdSidenav("NEXT").open();
+                                            interval= null;
+                                        }
+                                    },500);
+                                }
+
+                            },  {name:"No, dejame corregirlo", action:
+                                function (){
+                                    $timeout(function(){
+                                        var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                                        if(inval[0]){
+                                            inval[0].focus();
+                                        }else{
+                                            inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                                            console.log(" terro ", inval)
+                                            inval[0].focus();
+                                        }
+                                    }, 400);
+                                }
+                            }],{block:true});
+                    }*/
+
+                } else{
+                    $mdSidenav("NEXT").open();
+                }
+                /*else if(!$scope.FormAprobCompras.$valid && !$scope.FormAprobCompras.$pristine ){
+                    $scope.NotifAction("error",
+                        "¿Desea cancelar la aprobacion de la"+$scope.formMode.name+" ?"
+                        ,[{name:"si",
+                            action:function (){
+                                $mdSidenav("NEXT").open();
+                                $scope.document.nro_doc= null;
+                                $scope.document.fecha_aprob_compra= null;
+                                $scope.FormAprobCompras.$setDirty();
+
+                            }
+                        }, {name:"No",
+                            action:function (){
+                                $timeout(function(){
+                                    var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                                    if(inval[0]){
+                                        inval[0].focus();
+                                    }else{
+                                        inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                                        console.log(" terro ", inval)
+                                        inval[0].focus();
+                                    }
+                                },0);
+
+                            }
+                        }],{autohidden:autohidden});
+                }*/
+
+            } else if($scope.module.layer == 'listProducProv'){
+                if (!$scope.listProductoItems.$valid && $scope.module.layer== 'listProducProv') {
+
+                    $scope.NotifAction("error",
+                        "No se pueden asignar productos sin asignarle una cantidad verifique que todos los productos tienen cantidad correctas"
+                        ,[],{autohidden:autohidden});
+
+                } else {
+                    $mdSidenav("NEXT").open();
+                }
             }
-            else
-            if (!$scope.listProductoItems.$valid && $scope.module.layer== 'listProducProv') {
 
-                $scope.NotifAction("error",
-                    "No se pueden asignar productos sin asignarle una cantidad verifique que todos los productos tienen cantidad correctas"
-                    ,[],{autohidden:autohidden});
 
-            } else {
-                $mdSidenav("NEXT").open();
-            }
+
+
 
         } else {
             $mdSidenav("NEXT").close()
@@ -2040,12 +2123,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                         },0);
 
                         $scope.updateProv(function(){
-                            $scope.NotifAction("ok","Realizado",[
-                                {name:"Ok", action: function(){
-                                    $scope.LayersAction({close:{first:true, search:true}});
-
-                                }}
-                            ],{block:true});
+                            $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
+                            $timeout(function(){
+                                $scope.LayersAction({close:{first:true, search:true}});
+                            },1500);
 
                         });
 
@@ -2058,19 +2139,23 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     $scope.saveDoc = function(){
         $scope.inProcess = true;
         App.setBlock({block:true,level:89});
-        Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+        Order.postMod({type:$scope.formMode.mod, mod:"Close"},{id:$scope.document.id}, function(response){
             $scope.inProcess = false;
             App.setBlock({block:false});
-            $scope.NotifAction("ok","Realizado",[
-                {name:"Ok", action: function(){
-                    $scope.LayersAction({close:{first:true, search:true}});
-                }}
-            ],{block:true});
+            $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
+            $timeout(function(){
+                $scope.LayersAction({close:{first:true, search:true}});
+            },1400);
         });
     };
 
     $scope.saveFinal = function(){
-        Order.postMod({type:$scope.formMode.mod, mod:"CloseAction"},{id:$scope.document.id,accion:($scope.Docsession.global == 'upd' )? 'upd': 'new' }, function(response){
+        var accions = {};
+
+        angular.forEach($scope.switchBack, function(v,k){
+            accions[k] = v.change;
+        });
+        Order.postMod({type:$scope.formMode.mod, mod:"CloseAction"},{id:$scope.document.id,accion:accions, seccion:$scope.Docsession.global }, function(response){
             if(response.action){
                 if(response.action == 'question'){
                     $scope.NotifAction("alert", "¿Que desea hacer?",[
@@ -3244,12 +3329,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
                                     $scope.switchBack=  {
                                         head:{model:true,change:false},
-                                        aproba_compras:{model:false,change:false},
-                                        aproba_gerencia:{model:false,change:false},
+                                        aprob_compras:{model:false,change:false},
+                                        aprob_gerencia:{model:false,change:false},
                                         cancelacion:{model:false,change:false},
                                         contraPedido:{model:true,change:false},
                                         kichenBox:{model:true,change:true},
-                                        pedidoSusti:{model:true,change:false}
+                                        pedidoSusti:{model:true,change:false},
+                                        changeItems:{model:true,change:false}
 
                                     };
                                     $scope.finalDoc = $scope.buildfinalDoc();
@@ -3557,76 +3643,69 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     });*/
 
     $scope.$watchGroup(['FormAprobCompras.$valid', 'FormAprobCompras.$pristine'],function(newVal){
-        $scope.saveAprobCompras();
-    });
-    $scope.saveAprobCompras  = function(){
-        if(!$scope.FormAprobCompras.$pristine){
-            if(!$scope.FormAprobCompras.$valid  ){
-                $timeout(function(){
-                    $scope.NotifAction("error", "Por favor, ingrese la fecha de aprobacion, y el numero de documento ",[
-                        {name:"Entendido", action:function(){
-                            var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                            if(inval[0]){
-                                inval[0].focus();
-                            }else{
-                                inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                                inval[0].focus();
-                            }
-                        }}
-                    ],{block:true});
+        if(!newVal[1]){
 
-                },0);
-            }else{
-                var adj= $filter("customFind")($scope.document.adjuntos,"AprobCompras".toUpperCase(),function(current,compare){return current.documento==compare});
-                if(adj.length == 0){
-                    $scope.NotifAction("alert", "Se recomienda agregar un comprobante de aprobacion firmado  ",[
-                        {name:"Permitirme agregarlo ",action:function(){
-                            clickerTime({to:['#adj-nro-doc'], time:5});
-                        }
-                        },
-                        {name:"No puedo agregarlos en estos momentos ",
-                            action:function(){
-                                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document, function(response){
-                                    $scope.FormAprobCompras.$setPristine();
-                                    setGetOrder.change("document", "fecha_aprob_compra", $scope.document.fecha_aprob_compra.toString());
+        }
+       });
+    $scope.Docsession.msmAprobComTrue= false;
+    $scope.Docsession.msmAprobComfalse= false;
 
-                                    if (response.success  && response.accion == 'new') {
-                                        $scope.NotifAction("ok","La "+$scope.formMode.name+" a sido "+" Aprobada ",
-                                            [
-                                                {name:"Ok",action:
-                                                    function(){
-                                                        $scope.LayersAction({close:{init:true, search:true}});
-                                                    }
-                                                }
-                                            ],{autohidden:autohidden});
-                                    }
 
-                                });
-                            }
-                        }
-                    ],{block:true});
+
+    $scope.sendAprob = function(){
+        var state= 'waith';
+        var  saveAprob = function(){
+                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
+                state='finish';
+                if($scope.FormAprobCompras.$valid ){
+                    $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
+
                 }else{
-                    Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document, function(response){
-                        $scope.FormAprobCompras.$setPristine();
-                        setGetOrder.change("document", "fecha_aprob_compra", $scope.document.fecha_aprob_compra.toString());
-
-                        if (response.success  && response.accion == 'new') {
-                            $scope.NotifAction("ok","La "+$scope.formMode.name+" a sido "+" Aprobada ",
-                                [
-                                    {name:"Ok",action:
-                                        function(){
-                                            $scope.LayersAction({close:{init:true, search:true}});
-                                        }
-                                    }
-                                ],{autohidden:autohidden});
+                    $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se a aprobado",[ ],{autohidden:1500});
+                    $timeout(function(){
+                        var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                        if(inval[0]){
+                            inval[0].focus();
+                        }else{
+                            inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                            inval[0].focus();
                         }
-
-                    });
+                    },1500);
                 }
+
+        };
+
+        return  {
+            save : function (){
+                console.log("save");
+                state='load';
+                saveAprob();
+            },
+            isBlock: function(){
+                return state;
             }
         }
 
     };
+
+    $scope.saveAprobCompras  = function(e){
+
+        if(jQuery(e.target).parents("#lyrAlert").length == 0
+            && jQuery(e.target).parents("#noti-button").length == 0
+            && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
+            && jQuery(e.target).parents(".md-calendar-date").length == 0
+            &&  jQuery(e.target).attr("id") != "blockXLevel"){
+            if(!$scope.FormAprobCompras.$pristine){
+                $scope.sendAprob().save();
+            }
+
+        }
+
+
+    }
+
+
+
 
 
     /*********************************  peticiones  carga $http ********************* ************/
