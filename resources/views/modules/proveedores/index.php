@@ -94,6 +94,17 @@
                     <span class="icon-Filtro" style="font-size: 24px"></span>
                     <?/*= HTML::image("images/filtro.png") */?>
                 </div>
+                <div layout="row" layout-align="center right" flex>
+                   <div layout="row" layout-align="right center" ng-repeat="i in [0,1,2,3]" flex>
+                       <div style="height: 5px; background: #ccc;" flex>
+                           <div class="load_area" style="height: 100%; width:0%; background: #5cb85c;" ng-class="{'lineAnimate':line}"></div>
+                       </div>
+                       <span info="{{i}}" class="iconInput iconCircle" style="margin-left: 0px;" ng-click="line=true;">
+                           {{i}}
+                       </span>
+
+                   </div>
+                </div>
             </div>
 
             <div flex layout="row">
@@ -1419,7 +1430,7 @@
                     <div active-left></div>
                     <div flex>
                         <div class="titulo_formulario row" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit || coins.length < 1)}">
-                            <div>
+                            <div ng-dblclick="$parent.openPopUp()">
                                 Factor de Conversión
                             </div>
                             <!--<div style="width:24px">
@@ -1814,7 +1825,7 @@
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="excepFactor" id="excepFactor" click-out="closePopUp('excepFactor',$event)">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex >
                 <input type="hidden" md-autofocus>
-                <md-tabs md-dynamic-height="" md-border-bottom="">
+                <md-tabs md-dynamic-height="" md-border-bottom="" flex="50">
                     <md-tab label="productos">
                         <h1 class="md-display-2">por linea</h1>
                         <h2>sub Linea</h2>
@@ -1834,6 +1845,9 @@
                         </md-content>
                     </md-tab>
                 </md-tabs>
+                <div flex>
+                    grid
+                </div>
             </md-content>
         </md-sidenav>
         <!-- ########################################## LAYER (5) RESUMEN FINAL PROVEEDOR ########################################## -->

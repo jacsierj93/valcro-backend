@@ -1206,6 +1206,21 @@ area para subir los archivos
     border: 2px dashed rgb(84, 180, 234);
 }
 
+@keyframes grown {
+    0%{width:0%}
+   100%{width:100%;}
+
+}
+
+.sel{
+    width: 100%;
+}
+
+.lineAnimate{
+    -webkit-animation: grown 1000ms ease 1;
+    animation: grown 1000ms ease 1;
+}
+
 
 @keyframes shake {
     0% {transform: translateX(0);}
