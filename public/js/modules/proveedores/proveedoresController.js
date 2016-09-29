@@ -124,7 +124,6 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     $scope.chang = setGetProv.getChng();
     $scope.secBlock = false;//bloquea el resto de la app
     $scope.list2 = function(){
-        //console.log(angular.element('.boxList').length)
         return angular.element('.boxList').length
     }
 
@@ -360,28 +359,31 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.editProv = function(){
-        //console.log($scope.prov.reserved)
-        if($scope.prov.reserved==1){
-            setNotif.addNotif("alert", "Este proveedor esta siendo usado por otro usuario en estos momentos, desea reclamarlo para usted", [{
-                name: "si,dejamelo a mi",
-                action: function () {
+        interval = $interval(function(){
+            if($scope.prov.id){
+                $interval.cancel(interval);
+                if($scope.prov.reserved==1){
+                    setNotif.addNotif("alert", "Este proveedor esta siendo usado por otro usuario en estos momentos, desea reclamarlo para usted", [{
+                        name: "si,dejamelo a mi",
+                        action: function () {
+                            $scope.edit = true;
+                            $scope.enabled =false;
+                            $scope.LayersAction({open:{name:"layer1"}});
+                            providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:true});
+                        }
+                    }, {
+                        name: "no, continuare en modo lectura",
+                        action: null
+
+                    }],{block:true});
+                }else{
                     $scope.edit = true;
                     $scope.enabled =false;
                     $scope.LayersAction({open:{name:"layer1"}});
                     providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:true});
                 }
-            }, {
-                name: "no, continuare en modo lectura",
-                action: null
-
-            }],{block:true});
-        }else{
-            $scope.edit = true;
-            $scope.enabled =false;
-            $scope.LayersAction({open:{name:"layer1"}});
-            providers.put({type:"reservedProv"},{prov:$scope.prov.id,set:true});
-        }
-
+            }
+        },100)
     };
 
     $scope.showNext = function(status,to){
@@ -415,9 +417,14 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
                     fn.after();
                 }
             });
-            //console.log(activesPopUp);
         };
     };
+
+    $scope.statusProv = setGetProv.getStatus();
+    $scope.$watch('statusProv.change',function(nvo,old) {
+       console.log("status",$scope.statusProv);
+    });
+
 
     $scope.openPopUp = function(sideNav,fn){
         if(activesPopUp.indexOf(sideNav)==-1){
@@ -529,7 +536,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var fullProv = {};
     var itemsel = {};
     var list = {};
-    var statusProv = {};
+    var statusProv = {change:false};
     var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var onSet = {setting:false};
@@ -601,7 +608,17 @@ MyApp.service("setGetProv",function($http,providers,$q){
             return list;
         },
         setComplete : function(field,value){
-            statusProv[field]=value;
+            if(value>0){
+                statusProv[field]=value;
+            }else{
+                if(field in statusProv){
+                    delete statusProv[field];
+                }
+            }
+            statusProv.change = !statusProv.change;
+        },
+        getStatus : function(){
+            return statusProv;
         },
         isSetting : function(){
             return onSet;
@@ -1995,19 +2012,10 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
         //$scope.bnk.est = nvo;
         $scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
     });
-    /*$scope.$watch('ctrl.city.id', function(nvo) {
-     $scope.bnk.ciudad = nvo;
-     //$scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
-     });*/
-
     var account = {};
-
-
-
     var saveBank = function(onSuccess,elem){
         var next = elem || false;
         if((angular.equals(currentOrig,$scope.bnk) && $scope.bnk.id) || ($scope.bankInfoForm.$pristine )){
-//            console.log("blanco")
             onSuccess(next);
             return false;
         }
