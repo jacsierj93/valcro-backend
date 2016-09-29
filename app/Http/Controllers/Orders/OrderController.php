@@ -9,6 +9,7 @@ use App\Libs\Api\RestApi;
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\Masters\FileModel;
+use App\Models\Sistema\Notifications\NotificationOrder;
 use App\Models\Sistema\Order\OrderAnswer;
 use App\Models\Sistema\Order\OrderAnswerAttachment;
 use App\Models\Sistema\Order\OrderAttachment;
@@ -73,6 +74,12 @@ class OrderController extends BaseController
         'en'=>'emails.modules.Order.External.en.ProviderEstimate'
     ]];
 
+    private $profile  =['gerente'=>'6', 'trabajador'=>'10' ,'jefe'=>'9'];
+    private $departamentos  =['compras'=>'17', 'propetario'=>'18' ,'auditoria'=>'22'];
+    private $permisos = [] ;
+    private $user;
+
+
     public function __construct(Request $req)
     {
 
@@ -81,6 +88,76 @@ class OrderController extends BaseController
     }
 
     /*********************** SYSTEM ************************/
+
+    public function getPermision(){
+        $user= User::findOrFail( $this->request->session()->get('DATAUSER')['id']);
+        $this->permisos =[];
+        $this->permisos['doc'] =[];
+        $this->permisos['other_doc'] =[];
+        // permison sobre documentos
+        if($user->cargo_id == $this->profile['trabajador']){
+            $this->permisos['doc']['create']=true ;
+            $this->permisos['doc']['update']=true ;
+            $this->permisos['doc']['view']=true ;
+            $this->permisos['doc']['aprob_compras']=false ;
+            $this->permisos['doc']['aprob_gerencia']=false ;
+            $this->permisos['other_doc']['view']=false ;
+            $this->permisos['other_doc']['update']=false ;
+            $this->permisos['other_doc']['cancel']=false ;
+            $this->permisos['other_doc']['aprob']=false ;
+            $this->permisos['other_doc_update']['view']=false ;
+            $this->permisos['other_doc_update']['update']=false ;
+            $this->permisos['other_doc_update']['cancel']=false ;
+            $this->permisos['other_doc_update']['aprob']=false ;
+
+            $this->permisos['metodo']='work' ;
+
+        }
+       /* else
+        if($user->cago_id == $this->profile['gerente']){
+            $this->permisos['doc']['create']=true ;
+            $this->permisos['doc']['update']=true ;
+            $this->permisos['doc']['aprob']=true ;
+            $this->permisos['doc']['cancel']=true ;
+
+            $this->permisos['other_doc']['create']=true ;
+            $this->permisos['other_doc']['view']=true ;
+            $this->permisos['other_doc']['update']=true ;
+            $this->permisos['other_doc']['cancel']=true ;
+            $this->permisos['other_doc']['aprob']=true ;
+            $this->permisos['metodo']='ger' ;
+
+        }else
+        if($user->cago_id ==  $this->profile['jefe']){
+            $this->permisos['doc']['create']=true ;
+            $this->permisos['doc']['update']=true ;
+            $this->permisos['doc']['aprob']=true ;
+            $this->permisos['doc']['cancel']=true ;
+
+            $this->permisos['other_doc']['create']=true ;
+            $this->permisos['other_doc']['view']=true ;
+            $this->permisos['other_doc']['update']=true ;
+            $this->permisos['other_doc']['cancel']=true ;
+            $this->permisos['other_doc']['aprob']=true ;
+            $this->permisos['metodo']='vox' ;
+
+        }else{
+            $this->permisos['doc']['create']=false ;
+            $this->permisos['doc']['edit']=false ;
+            $this->permisos['doc']['view']=true ;
+
+            $this->permisos['other_doc']['view']=false ;
+            $this->permisos['other_doc']['update']=false ;
+            $this->permisos['other_doc']['cancel']=false ;
+            $this->permisos['other_doc']['aprob']=false ;
+            $this->permisos['metodo'][]='default' ;
+        }*/
+        $this->user =$user;
+
+        //$user  = User::selectRaw('tbl_user.nombre, tbl_user.apellido, tbl_user.email')->where()->get();
+        $this->user =$user;
+        return  $this->permisos;
+    }
 
     /**
      * trae los documentos que estan si revisar
@@ -95,25 +172,16 @@ class OrderController extends BaseController
         $allDocs[0] = Solicitude::selectRaw("*, datediff( curdate(),ult_revision) as review ")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-            //     ->whereNull('cancelacion')
             ->get();
 
         $allDocs[1] = Order::
         selectRaw("*, datediff( curdate(),ult_revision) as review ")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-            //     ->whereNull('cancelacion')
             ->get();
         $allDocs[2] = Purchase::selectRaw("*, datediff( curdate(),ult_revision) as review ")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-            //     ->whereNull('cancelacion')
             ->get();
 
         foreach($allDocs as $docs){
@@ -145,21 +213,27 @@ class OrderController extends BaseController
     /**
      * trae los documentos que no fueron fnalizados
      */
-    public function getUnClosetDocument(){
+    public function getUnClosetDocument(Request $req){
         $docsUnclose = array();
         $data = array();
         $monedas = Monedas::get();
 
 
         $docsUnclose[0] = Solicitude::whereNull("final_id")
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion')
             ->get();
 
         $docsUnclose[1] = Order::whereNull("final_id")
-
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion')
             ->get();
         $docsUnclose[2] = Purchase::whereNull("final_id")
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
+            ->whereNull('cancelacion')
             ->get();
         foreach($docsUnclose as $docs){
             foreach($docs  as $aux){
@@ -192,7 +266,7 @@ class OrderController extends BaseController
     /**
      * trae las notificaciones del sistema
      */
-    public function getNotifications (){
+    public function getNotifications (Request $req){
         $result = [];
         $oldReviewDays = $this->oldReview();
 
@@ -201,9 +275,7 @@ class OrderController extends BaseController
         $aux= Solicitude::selectRaw("count(id) as cantidad")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-            //     ->whereNull('cancelacion')
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->get();
 
         if($aux[0][0] > 0){
@@ -213,9 +285,7 @@ class OrderController extends BaseController
         $aux= Order::selectRaw("count(id)")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-            //     ->whereNull('cancelacion')
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->get();
 
         if($aux[0][0] > 0){
@@ -225,9 +295,6 @@ class OrderController extends BaseController
         $aux= Purchase::selectRaw("count(id)")
             -> whereNotNull("final_id")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
-            //     ->whereNull('cancelacion')
             ->get();
 
         if($aux[0][0] > 0){
@@ -236,8 +303,7 @@ class OrderController extends BaseController
 
         $aux=  Solicitude::selectRaw("count(id)")
             ->whereNull("final_id")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion')
             ->get();
 
@@ -247,8 +313,7 @@ class OrderController extends BaseController
 
         $aux=  Order::selectRaw("count(id)")
             ->whereNull("final_id")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion')
             ->get();
 
@@ -258,8 +323,8 @@ class OrderController extends BaseController
 
         $aux=  Purchase::selectRaw("count(id)")
             ->whereNull("final_id")
-//            ->where('aprob_compras',0)
-//            ->where('aprob_gerencia',0)
+            ->where('usuario_id',$req->session()->get('DATAUSER')['id'])
+
             ->whereNull('cancelacion')
             ->get();
 
@@ -279,18 +344,12 @@ class OrderController extends BaseController
         $user = User::selectRaw('tbl_usuario.cargo_id , tbl_cargo.departamento_id')
             ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
         $model= Solicitude::findOrFail($req->id);
+
         if($user->cargo_id == '8') {
             return ['action' => 'question'];
         }
-        if($req->accion == 'new'){
-            return ['action'=>'save'];
-        }
-        if($req->accion == 'upd'){
-            if($model->fecha_envio == null){
-                return ['action'=>'send'];
-            }else{
-                return ['action'=>'writer'];
-            }
+        if($user->cargo_id ==  $this->profile['trabajador']){
+            return ['action' => 'save'];
         }
         return ['action'=>'no'];
     }
@@ -386,6 +445,7 @@ class OrderController extends BaseController
     }
 
     /**
+     * deprecated
      * cuentas los provedores que pueden hacer pedidos
      */
     public function countProvider(){
@@ -395,7 +455,7 @@ class OrderController extends BaseController
         return $data;
     }
 
-    /**
+    /**@depreccated
      * traue a los provedores
      */
     public function getProviders(Request $req){
@@ -549,14 +609,31 @@ class OrderController extends BaseController
     }
 
     /**
+     * @see
      * regresa la lista de docuemnts segun id del provedor
      */
     public function getProviderListOrder(Request $req)
     {
-        $data=Array();
         $prov= Provider::findOrFail($req->id);
-        $items = $prov->getOrderDocuments()->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);
-//        $items =$items->where('final_id','!=', null)->all();
+
+        $docs= Collection::make(array());
+        $solic= $prov->solicitude()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);
+        $odc=  $prov->purchase()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);
+        $order=  $prov->Order()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null);;
+        if(!$this->getPermision()['other_doc']['view']){
+            $solic=$solic->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+            $odc= $odc->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+            $order= $odc ->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+        }
+
+        $docs->push($solic->get());
+        $docs->push($odc->get());
+        $docs->push($order->get());
+        $docs=$docs->collapse();
+
+
+        $data=Array();
+        $items = $docs;
         $type = OrderType::get();
         $coin = Monedas::get();
         $motivo = OrderReason::get();
@@ -3592,22 +3669,22 @@ class OrderController extends BaseController
 
     public function sendSolicitude(Request $req){
 
-        $model = Solicitude::findOrFail($req->id);
-        $data = $this->parseDocToEstimateEmail($model,($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data, $model){
+        $model= Solicitude::findOrFail($req->id);
 
-            $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
+        Mail::send('emails.modules.Order.External.Simple',['texto'=>$req->texto], function ($m) use($req, $model){
+
+            $m->subject(($req->has('asunto')) ? $req->asunto :'');
             if(!$req->has('local')){
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
             }
             foreach($req->to as $aux){
-                $m->to($aux['valor'],$data['proveedor']['razon_social']);
+                $m->to($aux['valor'],$aux['nombre']);
             }
             foreach($req->cc as $aux){
-                $m->cc($aux['valor'],$data['proveedor']['razon_social']);
+                $m->cc($aux['valor'],$aux['nombre']);
             }
             foreach($req->cco as $aux){
-                $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
+                $m->bcc($aux['valor'],$aux['nombre']);
             }
             $model->fecha_envio= Carbon::now();
             $model->save();
@@ -3622,21 +3699,20 @@ class OrderController extends BaseController
     public function sendOrder(Request $req){
 
         $model= Order::findOrFail($req->id);
-        $data = $this->parseDocToEstimateEmail($model,($req->has('texto')) ? $req->texto : 'Confirmacion de proforma ');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data, $model){
+        Mail::send('emails.modules.Order.External.Simple',['text'=>$req->texto], function ($m) use($req, $model){
 
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
             if(!$req->has('local')){
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
             }
             foreach($req->to as $aux){
-                $m->to($aux['valor'],$data['proveedor']['razon_social']);
+                $m->to($aux['valor'],$aux['nombre']);
             }
             foreach($req->cc as $aux){
-                $m->cc($aux['valor'],$data['proveedor']['razon_social']);
+                $m->cc($aux['valor'],$aux['nombre']);
             }
             foreach($req->cco as $aux){
-                $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
+                $m->bcc($aux['valor'],$aux['nombre']);
             }
             $model->fecha_envio= Carbon::now();
             $model->save();
@@ -3645,31 +3721,32 @@ class OrderController extends BaseController
         });
         $resul =[];
         $resul['accion']= 'send';
-        return $resul;
+        return $resul;;
 
     }
 
     public function sendPurchase(Request $req){
 
         $model= Purchase::findOrFail($req->id);
-        $data = $this->parseDocToEstimateEmail($model, Purchase::findOrFail($req->id),($req->has('texto')) ? $req->texto : '');
-        Mail::send("emails.modules.Order.External.ProviderEstimate",$data, function ($m) use($req, $data, $model){
+        $data = $this->parseDocToEstimateEmail($model,($req->has('asunto')) ? $req->texto : '');
+        Mail::send('emails.modules.Order.External.Simple',['text'=>$req->texto], function ($m) use($req, $model){
 
             $m->subject(($req->has('asunto')) ? $req->asunto : 'Solicitud de presupuesto & test');
             if(!$req->has('local')){
                 $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
             }
             foreach($req->to as $aux){
-                $m->to($aux['valor'],$data['proveedor']['razon_social']);
+                $m->to($aux['valor'],$aux['nombre']);
             }
             foreach($req->cc as $aux){
-                $m->cc($aux['valor'],$data['proveedor']['razon_social']);
+                $m->cc($aux['valor'],$aux['nombre']);
             }
             foreach($req->cco as $aux){
-                $m->bcc($aux['valor'],$data['proveedor']['razon_social']);
+                $m->bcc($aux['valor'],$aux['nombre']);
             }
             $model->fecha_envio= Carbon::now();
             $model->save();
+
 
         });
         $resul =[];
@@ -4069,6 +4146,7 @@ class OrderController extends BaseController
         $model = $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->id);
         $prov= Provider::find($model->prov_id);
+        $permit= $this->getPermision();
         $objs =[];
         //para maquinas
         $tem = array();
@@ -4133,6 +4211,7 @@ class OrderController extends BaseController
         $tem['mt3']=$model->mt3;
         $tem['peso']=$model->peso;
         $tem['emision']=$model->emision;
+        $tem['usuario_id']=$model->usuario_id;
         $tem['monto']=$model->monto;
         $tem['productos'] =$this->getProductoItem($model);
         $objs['prov_id']=$prov;
@@ -4179,6 +4258,13 @@ class OrderController extends BaseController
         $tem['adjuntos'] = $atts;
 
         $tem['objs']=$objs;
+        $tem['permit'] = ($model->usuario_id == $req->session()->get('DATAUSER')['id']) ?  $tem['permit'] = $permit['doc']: $tem['other_doc'];
+        $tem['sess']=$req->session()->get('DATAUSER')['id'] ;
+        $tem['user']=$this->user;
+
+        $query = NotificationOrder::where('doc_id', $model->id)->where('doc_tipo', $req->tipo);
+        $tem['permit']['update'] = sizeof($query->where('clave','<>','created')->get()) == 0;
+
 
         return $tem;
 
@@ -4989,26 +5075,39 @@ class OrderController extends BaseController
     public function CloseSolicitude(Request $req)
     {
         $result['success'] = "Registro guardado con éxito!";
-        $result['action'] = "new";
+        $result['action'][] = "close";
         $model = Solicitude::findOrFail($req->id);
+        $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
         $model->final_id=
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
         $model->ult_revision = Carbon::now();
         $model->save();
-        //  EmailController::sendEmail("emails.prueba", [],[]);
-        $result['template'] = view("emails.prueba");
-        $result['model']= $model;
-        //dd( $result['template']);
 
+        $sender  =[
+            'subject'=>'Notificacion de creacion de Solicitud',
+            'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+            'cc' =>[],
+            'ccb' =>[]
+        ];
+        $noti = new NotificationOrder();
+        $noti->doc_id = $model->id;
+        $noti->doc_tipo = 21;
 
+        if(sizeof($notif->where('clave', 'created')->get()) == 0){
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Creacion de solicitud ";
+            $noti->send($data,$sender,$noti,"created");
+            $result['action'][]="send";
+        }
         return $result;
-
     }
 
     /***/
     public function ClosePurchase(Request $req)
     {
+        $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+
         $result['success'] = "Registro guardado con éxito!";
         $result['action'] = "new";
         $model = Purchase::findOrFail($req->id);
@@ -5018,15 +5117,30 @@ class OrderController extends BaseController
         $model->ult_revision = Carbon::now();
 
         $model->save();
-        // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
 
+        $sender  =[
+            'subject'=>'Notificacion de creacion de Solicitud',
+            'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+            'cc' =>[],
+            'ccb' =>[]
+        ];
+        $noti = new NotificationOrder();
+        $noti->doc_id = $model->id;
+        $noti->doc_tipo = 21;
 
+        if(sizeof($notif->where('clave', 'created')->get()) == 0){
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Creacion de Orden de compra ";
+            $noti->send($data,$sender,$noti,"created");
+            $result['action'][]="send";
+        }
         return $result;
-
     }
     /***/
     public function CloseOrder(Request $req)
     {
+        $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+
         $result['success'] = "Registro guardado con éxito!";
         $result['action'] = "new";
         $model = Order::findOrFail($req->id);
@@ -5035,9 +5149,22 @@ class OrderController extends BaseController
             ."-a".sizeof($model->attachments()->get());
         $model->ult_revision = Carbon::now();
         $model->save();
-        // $result['template'] = EmailController::sendEmail("emails.prueba", [],[]);
+        $sender  =[
+            'subject'=>'Notificacion de creacion de Solicitud',
+            'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+            'cc' =>[],
+            'ccb' =>[]
+        ];
+        $noti = new NotificationOrder();
+        $noti->doc_id = $model->id;
+        $noti->doc_tipo = 21;
 
-
+        if(sizeof($notif->where('clave', 'created')->get()) == 0){
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Creacion de Pedido";
+            $noti->send($data,$sender,$noti,"created");
+            $result['action'][]="send";
+        }
         return $result;
 
     }
@@ -5213,7 +5340,10 @@ class OrderController extends BaseController
      **/
     private function setDocItem($model, Request $req){
         $model->ult_revision = Carbon::now();
-        $model->usuario_id = $req->session()->get('DATAUSER')['id'];
+        if($model->usuario_id == null){
+            $model->usuario_id = $req->session()->get('DATAUSER')['id'];
+        }
+
         if($req->has('monto')){
             $model->monto = $req->monto;
         }
@@ -5596,8 +5726,13 @@ class OrderController extends BaseController
 
     }
 
-    private function sendNotificacion($data,$sender){
-        Mail::send("emails.modules.Order.Internal.ResumenDoc",$data, function ($m) use( $data, $sender){
+    private function sendNotificacion($data,$sender, $type = null){
+        $noti = new NotificationOrder();
+        $noti->doc_id= $data['id'];
+        $noti->doc_tipo = $data['tipo'];
+        $noti->clave = $type;
+        return $noti->send($data,$sender,$type);
+        /*Mail::send("emails.modules.Order.Internal.ResumenDoc",$data, function ($m) use( $data, $sender, $type){
             $m->subject($sender['asunto']);
             foreach($sender['to'] as $aux)
             {
@@ -5611,7 +5746,17 @@ class OrderController extends BaseController
             {
                 $m->ccb($aux['email'], $aux['name']);
             }
-        });
+            if($type != null){
+                $noti = new NotificationOrder();
+                $noti->doc_id= $data['id'];
+                $noti->doc_tipo = $data['tipo'];
+                switch($type){
+                    case "created";  break;
+                }
+            }
+
+
+        });*/
     }
 
     private function gettemplate($name, $leng, $default = true){
@@ -5632,4 +5777,11 @@ class OrderController extends BaseController
         }
         return ['template'=>$template['default'], 'metodo'=>'default'];
     }
+    private function  getEmailDepartment($deparmet){
+       return  User::selectRaw('concat(tbl_usuario.nombre, \' \' ,tbl_usuario.apellido) as nombre, tbl_usuario.email as email')
+            ->join('tbl_cargo','tbl_cargo.id','=','tbl_usuario.cargo_id')
+            ->join('tbl_departamento','tbl_departamento.id','=','tbl_cargo.departamento_id')
+            ->where('tbl_cargo.departamento_id',$deparmet)->get();
+    }
+
 }

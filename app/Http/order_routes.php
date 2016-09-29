@@ -13,6 +13,7 @@
 $app->get("Order/UnClosetDoc",'Orders\OrderController@getUnClosetDocument'); ///trae los docuemntos que no tengan final id
 $app->get("Order/OldReviewDocs",'Orders\OrderController@getOldReviewDoc'); ///trae los docuemntos que tienen que ser revisados
 $app->get("Order/Notifications",'Orders\OrderController@getNotifications'); ///trae los mensajes del sistema
+$app->get("Order/Permision",'Orders\OrderController@getPermision'); ///trae los mensajes del sistema
 
 //Genericos
 $app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); /// @deprecated

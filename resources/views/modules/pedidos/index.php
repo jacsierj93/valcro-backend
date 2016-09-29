@@ -179,21 +179,21 @@
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" ng-show="(module.index < 1 || module.layer == 'listPedido' )" layout-align="center center" ng-click="menuAgregar()">
+                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.doc.create)" layout-align="center center" ng-click="menuAgregar()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
                             Crear un nuevo documento
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && Docsession.block && !document.aprob_gerencia && !document.aprob_compras && document.id )" ng-click="updateForm()">
+                         ng-show="(module.index > 1 && Docsession.block && document.permit.update )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                         <md-tooltip >
                             Actualizar la  {{formMode.name}}
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="( module.layer == 'delalleDoc' && !FormHeadDocument.$valid )"
+                         ng-show="( module.layer == 'delalleDoc' && !FormHeadDocument.$valid && document.permit.del )"
                          ng-click="delete(document)" >
                         <span class="icon-Eliminar" style="font-size: 24px"></span>
                         <md-tooltip>
@@ -201,7 +201,7 @@
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="( FormHeadDocument.$valid && Docsession.global != 'new')"
+                         ng-show="( FormHeadDocument.$valid && Docsession.global != 'new' && document.permit.cancel)"
                          ng-click="cancelDoc()" >
                         <span  style="font-size: 24px">(/)</span>
                         <md-tooltip>
@@ -209,7 +209,7 @@
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
-                         ng-show="( document.id && Docsession.isCopyableable )"
+                         ng-show="( document.id && Docsession.isCopyableable && document.permit.update)"
                          ng-click="copyDoc()">
                         <span class="icon-Copiado" style="font-size: 24px"> </span>
                         <md-tooltip >
@@ -241,9 +241,6 @@
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
                     </div>
-
-
-
 
                 </div>
 
@@ -1464,7 +1461,7 @@
                             </div>
                         </div>
                     </form>
-                    <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show=" tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
+                    <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
                         <div active-left></div>
                         <div layout="column" flex >
                             <div layout="row" flex class="row">
@@ -1480,7 +1477,7 @@
                                 <md-input-container class="md-block" flex="">
                                     <label>Estatus</label>
                                     <md-select ng-model="document.estado_id"
-                                               ng-disabled="( gridView != 2 ||  Docsession.block )"
+                                               ng-disabled="( gridView != 2 ||  Docsession.block  || !document.permit.aprob_gerencia )"
                                                ng-change="toEditHead('estado_id', document.estado_id)"
                                                skip-tab
                                                id="condicion_pago_id"
@@ -1498,7 +1495,7 @@
                         </div>
 
                     </form>
-                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras(): 0" >
+                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="document.permit.aprob_compras && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras(): 0" >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" flex class="row" >
@@ -1546,7 +1543,7 @@
                             </div>
                         </div>
                     </form>
-                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
+                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.permit.cancel && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
                         <div active-left></div>
                         <div layout="column" flex  >
                             <div layout="row" flex class="row" >
@@ -1657,7 +1654,7 @@
                                     <div layout="row" class="cellGridHolder" >
                                         <div flex="5" class="cellEmpty">
                                             <md-switch class="md-primary" ng-change="addRemoveItem(item)"
-                                                       ng-disabled="( Docsession.block )" ng-model="item.asignado"> </md-switch>
+                                                       ng-disabled="( Docsession.block || !document.permit.update)" ng-model="item.asignado"> </md-switch>
                                         </div>
                                         <div flex="10" class="cellSelect"> {{item.cod_producto}}</div>
                                         <div flex class="cellGrid">  {{item.descripcion}}</div>
@@ -1666,7 +1663,7 @@
                                             <input  ng-model="item.saldo"
                                                     ng-change="changeItem(item)"
                                                     decimal
-                                                    ng-disabled="(Docsession.block || !item.asignado )"
+                                                    ng-disabled="(Docsession.block || !item.asignado || !document.permit.update)"
                                                     ng-readonly = "!item.edit"
                                                     ng-click="isEditItem(item)"
                                                     id="prodDtInp{{item.id}}"
@@ -1884,7 +1881,7 @@
                                     </md-input-container>
                                 </div>
 
-                                <div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )"></div>
+                                <!--<div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )"></div>-->
 
                                 <div layout="row" flex="15">
                                     <div class="cell-filter-order" layout-align="center center" >
@@ -1914,14 +1911,14 @@
                                    ng-mouseenter = "mouseEnterProd(item) " row-select>
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellEmpty cellSelect">
-                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(Docsession.block)" ng-model="item.asignado"></md-switch>
+                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(Docsession.block || !document.permit.update)" ng-model="item.asignado"></md-switch>
                                     </div>
                                     <div flex="20" class="cellGrid" > {{item.codigo}}</div>
                                     <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
                                     <div flex class="cellGrid" > {{item.descripcion}}</div>
-                                    <div flex="10" class="cellGrid" >
+                                    <!--<div flex="10" class="cellGrid" >
                                         <md-switch class="md-primary" ng-disabled="true" ng-model="item.puntoCompra"></md-switch>
-                                    </div>
+                                    </div>-->
                                     <div flex="15" class="cellGrid cellGrid-input {{(provRow ==  item.id) ? 'cellGrid-input-focus' : 'cellGrid-input-no-focus'}}"
 
                                     >
@@ -1934,7 +1931,6 @@
 
                                 </div>
                             </div>
-
                             <div layout="column" layout-align="center center" ng-show="filterProductProv.length == 0 " flex>
                                 No hay datos para mostrar
                             </div>
@@ -2049,7 +2045,7 @@
                         <div flex >
                             <div layout="row" class="cellGridHolder" ng-repeat="item in filterContraPed(formData.contraPedido,tbl_agrContPed.filter) | orderBy: tbl_agrContPed.order">
                                 <div class="cellEmpty" flex="5" ng-click="allowEdit()">
-                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(Docsession.block)"></md-switch>
+                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(Docsession.block || !document.permit.update)"></md-switch>
                                 </div>
                                 <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
                                 <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
@@ -2182,7 +2178,7 @@
                             <div flex>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in formData.kitchenBox | filter:tbl_agrKitBoxs.filter:strict | orderBy : tbl_agrKitBoxs.order ">
                                     <div class="cellEmpty" flex="5" ng-click="allowEdit()">
-                                        <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(Docsession.block)"></md-switch>
+                                        <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeKitchenBox(item)" ng-disabled="(Docsession.block || !document.permit.update)"></md-switch>
                                     </div>
                                     <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
                                     <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.num_proforma}}</div>
@@ -2310,7 +2306,7 @@
                                     <div flex="5" class="cellEmpty" ng-click="allowEdit()">
                                         <md-switch class="md-primary" ng-model="item.asignado"
                                                    ng-change="changePedidoSustituto(item)"
-                                                   ng-disabled="(Docsession.block)"></md-switch>
+                                                   ng-disabled="(Docsession.block || || !document.permit.update)"></md-switch>
                                     </div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_proforma}}</div>
                                     <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.emision | date:'dd/MM/yyyy'}}</div>
@@ -2496,11 +2492,11 @@
                         <div layout="column" flex>
                             <div flex>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in contraPedSelec.productos | filter : tbl_resumenContraPedido.filter:strict | orderBy : tbl_resumenContraPedido.order ">
-                                    <div flex="5" class="cellEmpty">
+                                    <div flex="5" class="cellEmpty" ng-click="allowEdit()">
                                         <md-switch class="md-primary"
                                                    ng-model="item.asignado"
                                                    ng-change="addRemoveCpItem(item)"
-                                                   ng-disabled="(Docsession.block)"></md-switch>
+                                                   ng-disabled="(Docsession.block || || !document.permit.update)"></md-switch>
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                     <div flex="15" class="cellGrid"> {{item.codigo_fabrica}}</div>
@@ -2814,9 +2810,9 @@
                         <div layout="column" flex>
                             <div >
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | filter :tbl_pediSutitut.filter:strict | orderBy :tbl_pediSutitut.order   ">
-                                    <div flex="5" class="cellEmpty" >
+                                    <div flex="5" class="cellEmpty" ng-click="allowEdit()">
                                         <md-switch class="md-primary"
-                                                   ng-disabled="( Docsession.block )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
+                                                   ng-disabled="( Docsession.block || !document.permit.update )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
                                         </md-switch>
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
@@ -3048,7 +3044,7 @@
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" >
-                <div flex="30"layout="column" id="headFinalDoc"  >
+                <div flex="35"layout="column" id="headFinalDoc"  >
                     <form layout="row" >
                         <div active-left> </div>
                         <div layout="column" flex>
@@ -3235,6 +3231,70 @@
 
                         </div>
                     </form>
+                    <form  layout="row" ng-show="finaldoc.fecha_aprob_compras">
+                        <div active-left> </div>
+                        <div layout="column" flex >
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario">
+                                    <div>
+                                       Compras
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="switchBack.aproba_compras.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
+                                               ng-show="(switchBack.aproba_compras.change)"
+
+                                    >
+                                    </md-switch>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                    <form  layout="row" ng-show="finaldoc.fecha_aprob_gerencia">
+                        <div active-left> </div>
+                        <div layout="column" flex >
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario">
+                                    <div>
+                                        Gerencia
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="switchBack.aproba_compras.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
+                                               ng-show="(switchBack.aproba_compras.change)"
+
+                                    >
+                                    </md-switch>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                    <form  layout="row" ng-show="finalDoc.cancelacion">
+                        <div active-left> </div>
+                        <div layout="column" flex >
+                            <div layout="row" class="row">
+                                <div class="titulo_formulario">
+                                    <div>
+                                        Cancelacion
+                                    </div>
+                                </div>
+                                <div flex layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="switchBack.aproba_compras.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
+                                               ng-show="(switchBack.aproba_compras.change)"
+
+                                    >
+                                    </md-switch>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+
                     <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex >
@@ -3253,10 +3313,8 @@
                                     </md-switch>
                                 </div>
                             </div>
-
                             <div flex ng-show="gridViewFinalDoc == 2" >
                                 <md-content style="margin: 4px;">
-
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contraPedido  track by $index " layout-align="space-between center" >
                                         <div layout="row"  flex>
                                             <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
@@ -3467,6 +3525,7 @@
                 </div>
                 <div   id="expand"></div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+                <loader ng-show="inProgress"></loader>
 
             </md-content>
         </md-sidenav>

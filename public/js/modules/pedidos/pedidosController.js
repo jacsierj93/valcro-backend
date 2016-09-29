@@ -4,8 +4,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                                            Upload,Layers,setGetOrder, DateParse, Accion,filesService,clickerTime,SYSTEM) {
 
     var autohidden= SYSTEM.noti_autohidden;
-
-
+    $scope.permit= Order.get({type:"Permision"});
     // controlers
     $scope.Docsession = {isCopyable:false,global:"new", block:true};
 
@@ -305,9 +304,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
         $scope.isOpen = ($scope.isOpen) ? false : true;
     };
 
-    $scope.mouseEnterProd = function(prod){
-        //$scope.productTexto =prod;
-    };
 
     /******************************************** ROLLBACK SETTER **/
 
@@ -373,7 +369,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     /********************************************EVENTOS ********************************************/
 
     $scope.editTasa= function(){
-        if( $scope.isTasaFija){
+        if( $scope.isTasaFija && $scope.document.permit.update){
             $scope.NotifAction("alert","Desea asignar una tasa unica para esta "+$scope.formMode.name,[
                 {
                     name:"No",
@@ -433,9 +429,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
     $scope.allowEdit = function(){
 
-        if($scope.Docsession.block){
-            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder modificar",[],{autohidden:2500});
 
+        if($scope.Docsession.block){
+            if(!$scope.document.permit.update){
+                $scope.NotifAction("error","No tiene para realizar esa accion ",[],{autohidden:2500});
+            }else{
+                $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder modificar",[],{autohidden:2500});
+            }
         }
     };
 
@@ -556,7 +556,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     };
 
     $scope.demo = function(){
-        $scope.openMailPreview();
+        $scope.openMailPreview(function(){alert("dsf");});
 
 
 
@@ -609,6 +609,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             }
 
         );
+
         final.contraPedido = cp;
         final.kitchenBox = kit;
         final.pedidoSusti = sus;
@@ -1919,7 +1920,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
             paso = false;
         }
         if(!paso){
-            $scope.verificExit();
+            if($scope.verificExit()){
+                $scope.LayersAction({close:{search:true}});
+            };
         }else {
             $scope.LayersAction({close:{search:true}});
         }
@@ -2024,7 +2027,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
     };
 
     $scope.saveWithPreview= function (){
-        $scope.openMailPreview(function(isSend){
+        $scope.openMailPreview(
+            function(isSend){
             if(isSend){
                 console.log("llamado a calback");
                 Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
@@ -2047,11 +2051,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
                     }});
             }
-        });
+        }
+        );
     };
 
     $scope.saveDoc = function(){
+        $scope.inProcess = true;
+        App.setBlock({block:true,level:89});
         Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+            $scope.inProcess = false;
+            App.setBlock({block:false});
             $scope.NotifAction("ok","Realizado",[
                 {name:"Ok", action: function(){
                     $scope.LayersAction({close:{first:true, search:true}});
@@ -2072,8 +2081,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
                     $scope.saveDoc();
                 }else if(response.action == 'send'){
                     $scope.saveWithPreview();
-                }else if(response.action == 'writer'){
-                    $scope.saveWithPreview();
+                }else if(response.action == 'close'){
+                    $scope.LayersAction({close:{first:true, search:true}});
+                }else{
+                    console.log("no se que hacer");
                 }
             }
         });
@@ -3233,6 +3244,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout
 
                                     $scope.switchBack=  {
                                         head:{model:true,change:false},
+                                        aproba_compras:{model:false,change:false},
+                                        aproba_gerencia:{model:false,change:false},
+                                        cancelacion:{model:false,change:false},
                                         contraPedido:{model:true,change:false},
                                         kichenBox:{model:true,change:true},
                                         pedidoSusti:{model:true,change:false}
@@ -3892,7 +3906,7 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','set
 }]);
 
 
-MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEmail','SYSTEM', function($scope,$sce, setGetOrder,Order,IsEmail,SYSTEM){
+MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEmail','SYSTEM','App', function($scope,$sce, setGetOrder,Order,IsEmail,SYSTEM, App){
 
     $scope.isLoad= false;
     $scope.template ={};
@@ -3905,8 +3919,9 @@ MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEm
     $scope.cco =[];
     $scope.destinos = [];
 
-    $scope.$parent.openMailPreview = function( calback){
-        if(calback){
+    $scope.$parent.openMailPreview = function(data){
+        if(data){
+            console.log("tienen calbacl");
             $scope.calback = calback;
         }else{
             delete  $scope.calback;
@@ -3967,11 +3982,11 @@ MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEm
             $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
         }else{
             $scope.inProgress=true;
+            App.setBlock({block:true, level:99});
             var html = angular.element("#templateContent");
-            console.log("html",html.html());
-            console.log("text",html.text());
-            Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:html.html(), to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
+            Order.postMod({type:$scope.$parent.formMode.mod,mod:"Send"} ,{id:$scope.$parent.document.id,asunto:$scope.asunto, texto:html.html(), to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
                 $scope.inProgress=false;
+                App.setBlock({block:false, level:0});
                 if($scope.calback){
                     $scope.calback();
                 }
