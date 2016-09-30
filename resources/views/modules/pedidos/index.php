@@ -30,10 +30,10 @@
 
                             </md-input-container>
 
-                            <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                          <!--  <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
                                 <label>Pais</label>
                                 <input  type="text" ng-model="filterProv.pais"  tabindex="-1" >
-                            </md-input-container>
+                            </md-input-container>-->
 
                             <div layout="row" class="dotRow" style="height: 24px;">
                                 <div flex layout layout-align="center center" ng-click="filterProv.f100 = !filterProv.f100  ">
@@ -111,47 +111,49 @@
                 >
 
                     <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
-                    <div layout="column" class="dot-text">
-                        <div id="dot-show{{item.id}}" layout="column" flex ng-show="item.show">
-                            <div layout="row">
-                                <div flex="70">Emitidos: </div>
-                                <div flex>{{item.emit}}</div>
+                    <div layout="column" style="height: 54px;">
+                        <div style="font-size:14px;"  id="dot-show{{item.id}}" layout="column" flex ng-show="item.show">
+                            <spand layout="row" >{{item.text}}</spand>
+                            <div layout="row" style="font-size:12px;">
+                                <div flex="70"  >Emitidos: </div>
+                                <div flex class="text{{item.dias}}">{{item.emit}}</div>
                             </div>
-                            <div layout="row">
-                                <div flex="70">Revisados: </div>
-                                <div flex>{{item.review}}</div>
+
+                            <div layout="row" style="font-size:12px;" >
+                                <div flex="70" >Revisados: </div>
+                                <div style=" font-weight: bolder !important;" flex class="text{{item.dias}}">{{item.review}}</div>
                             </div>
                         </div>
                     </div>
                     <div layout="row" class="dotRow">
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit100,item.review100)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit100,item.review100,100)">
                             <div layout layout-align="center center" class="dot-item emit100" >
-                                +
+                                {{item.emit100}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit90,item.review90)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit90,item.review90,90)">
                             <div layout layout-align="center center" class="dot-item emit90" >
-                                90
+                                {{item.emit90}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) "ng-mouseenter = "showDotData(item,item.emit60,item.review60)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) "ng-mouseenter = "showDotData(item,item.emit60,item.review60,60)">
                             <div layout layout-align="center center" class="dot-item emit60">
-                                60
+                                {{item.emit60}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit30,item.review30)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit30,item.review30,30)">
                             <div layout layout-align="center center" class="dot-item emit30" >
-                                30
+                                {{item.emit30}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit7,item.review7)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit7,item.review7,7)">
                             <div layout layout-align="center center" class="dot-item emit7" >
-                                7
+                                {{item.emit7}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit0,item.review0)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit0,item.review0,0)">
                             <div layout layout-align="center center" class="dot-item emit0">
-                                0
+                                {{item.emit0}}
                             </div>
                         </div>
                     </div>
@@ -1529,7 +1531,7 @@
                                 <md-input-container class="md-block" >
                                     <label>N° Documento</label>
                                     <input ng-model="document.nro_doc"  ng-disabled="(Docsession.block)"
-                                           ng-click="toEditHead('nro_doc', document.nro_doc)"
+                                           ng-change="toEditHead('nro_doc', document.nro_doc)"
                                            required
                                            skip-tab
 
@@ -1696,7 +1698,7 @@
 
                 </div>
                 <div   id="expand"></div>
-                <div style="width: 16px;"   ng-mouseover="showNext(true)"  > </div>
+                <div style="width: 16px;"   ng-mouseover="showNext(true)"  ng-mouseenter="(gridView == 3) ? saveAprobCompras(): 0" > </div>
             </md-content>
 
 

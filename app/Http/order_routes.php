@@ -26,6 +26,7 @@ $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry');
 $app->get("Order/ProviderContacts",'Orders\OrderController@getProviderContacts'); ///obtiene los contactos de un proveedor
 $app->get("Order/MailLenguaje",'Orders\OrderController@getPrefeLangXcontacts'); ///el lenguaje prof segun contactos proveedor
 $app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
+$app->get("Order/Pdf",'Orders\OrderController@testPdf'); ///obtiene las direcciones de almacen
 
 $app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene los correo de un proveedor @depreccated
 

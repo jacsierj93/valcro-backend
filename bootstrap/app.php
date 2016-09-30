@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
- Dotenv::load(__DIR__.'/../');
+Dotenv::load(__DIR__.'/../');
 
 /*
 |--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ $app->middleware([
     Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
     Illuminate\Session\Middleware\StartSession::class,
     Illuminate\View\Middleware\ShareErrorsFromSession::class,
-   // Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
+    // Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
     App\Http\Middleware\VerifyCsrfToken::class,
 ]);
 
@@ -87,12 +87,13 @@ $app->routeMiddleware([
 $app->register('Collective\Html\HtmlServiceProvider');
 $app->register('Collective\Html\InjectVarsServiceProvider');
 $app->register('Intervention\Image\ImageServiceProvider');
+$app->register('Barryvdh\DomPDF\ServiceProvider');
 
 
 
 class_alias('Collective\Html\HtmlFacade', 'Html');
 class_alias('Collective\Html\FormFacade', 'Form');
-class_alias('Intervention\Image\Facades\Image', 'Image');
+class_alias('Barryvdh\DomPDF\Facade', 'PDF');
 
 /*
 |--------------------------------------------------------------------------

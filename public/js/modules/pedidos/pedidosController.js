@@ -256,11 +256,17 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     /********************************************GUI ********************************************/
 
-    $scope.showDotData= function(item,emit,review){
+    $scope.showDotData= function(item,emit,review, dias){
         if(emit && review){
             item.emit= angular.copy(emit);
             item.review= angular.copy(review);
             item.show = true;
+            item.dias=dias;
+            if(dias== 0){
+                item.text = " hoy ";
+            }else{
+                item.text = " hace " + dias+" dias ";
+            }
         }else{
             item.show = false;
         }
@@ -1326,7 +1332,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
     };
-    var interval = null;
     $scope.showNext = function (status) {
         if (status) {
             if($scope.module.layer == 'detalleDoc'){
@@ -1349,44 +1354,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
                 }else  if($scope.module.layer == 'detalleDoc' && !$scope.FormAprobCompras.$pristine)
                 {
-                    angular.element("#estatusDoc")[0].click();
-                    /*if(interval == null){
-                        $scope.NotifAction("alert",
-                            "¿Esta seguro de cancelar la aprobacion?"
-                            ,[{name:"Si", action:
-                                function (){
-                                    interval = $interval(function(){
-                                        console.log("validando",$scope.sendAprob().isBlock() );
-                                        if($scope.sendAprob().isBlock() == 'waith'){
-                                            $scope.sendAprob().save();
-                                        }
-
-                                        if($scope.sendAprob().isBlock() == 'finish'){
-                                            console.log("ya sali" );
-
-                                            $interval.cancel(interval);
-                                            $mdSidenav("NEXT").open();
-                                            interval= null;
-                                        }
-                                    },500);
-                                }
-
-                            },  {name:"No, dejame corregirlo", action:
-                                function (){
-                                    $timeout(function(){
-                                        var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                                        if(inval[0]){
-                                            inval[0].focus();
-                                        }else{
-                                            inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                                            console.log(" terro ", inval)
-                                            inval[0].focus();
-                                        }
-                                    }, 400);
-                                }
-                            }],{block:true});
-                    }*/
-
                 } else{
                     $mdSidenav("NEXT").open();
                 }
@@ -1428,12 +1395,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                 } else {
                     $mdSidenav("NEXT").open();
                 }
+            }else {
+                $mdSidenav("NEXT").open();
             }
-
-
-
-
-
         } else {
             $mdSidenav("NEXT").close()
         }
@@ -3371,8 +3335,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                         break;
                     case  "close":
 
-                        console.log("setGetOrder.getInternalState()", setGetOrder.getInternalState());
-                        console.log("$scope.document.final_id",$scope.document.final_id);
                         if(setGetOrder.getInternalState() == 'new' && $scope.document.final_id){
                             $scope.NotifAction("ok","Sin cambios no se llevara a cabo ninguna accion",[
                                 {name:"ok", default: 2,action:function(){
@@ -3652,16 +3614,16 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
 
+
     $scope.sendAprob = function(){
         var state= 'waith';
         var  saveAprob = function(){
-                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
                 state='finish';
                 if($scope.FormAprobCompras.$valid ){
                     $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
 
                 }else{
-                    $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se a aprobado",[ ],{autohidden:1500});
+                    $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se a aprobado",[/*{name:"Esta", action:function(){}} */],{autohidden:1500});
                     $timeout(function(){
                         var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
                         if(inval[0]){
@@ -3690,19 +3652,77 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     $scope.saveAprobCompras  = function(e){
 
-        if(jQuery(e.target).parents("#lyrAlert").length == 0
-            && jQuery(e.target).parents("#noti-button").length == 0
-            && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
-            && jQuery(e.target).parents(".md-calendar-date").length == 0
-            &&  jQuery(e.target).attr("id") != "blockXLevel"){
-            if(!$scope.FormAprobCompras.$pristine){
-                $scope.sendAprob().save();
+        if(!$scope.FormAprobCompras.$pristine){
+            Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
+            if(e){
+                if(jQuery(e.target).parents("#lyrAlert").length == 0
+                    && jQuery(e.target).parents("#noti-button").length == 0
+                    && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
+                    && jQuery(e.target).parents(".md-calendar-date").length == 0
+                    &&  jQuery(e.target).attr("id") != "blockXLevel"){
+
+                    if($scope.FormAprobCompras.$valid ){
+                        Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
+                        $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
+
+                    }else{
+                        var focus = angular.element(":focus");
+                        $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se puede aprobar ¿Desea cancelar la aprobacion ?",[
+                            {name:"Si", action:function(){
+                                setGetOrder.change("document",'nro_doc',undefined);
+                                setGetOrder.change("document",'fecha_aprob_compra',undefined);
+                                $scope.document.nro_doc= null;
+                                $scope.document.fecha_aprob_compra= null;
+                                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
+                                focus.focus();
+
+                            }},
+                            {name:"No, dejame corregirlos", action:function(){
+                                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
+                                $timeout(function(){
+                                    var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                                    if(inval[0]){
+                                        inval[0].focus();
+                                    }else{
+                                        inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                                        inval[0].focus();
+                                    }
+                                },1500)
+                            }}
+                        ],{block:true});
+
+                    }
+                }
+            }else{
+                if(!$scope.FormAprobCompras.$valid ){
+                    var focus = angular.element(":focus");
+                    $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se puede aprobar ¿Desea cancelar la aprobacion ?",[
+                        {name:"Si", action:function(){
+                            setGetOrder.change("document",'nro_doc',undefined);
+                            setGetOrder.change("document",'fecha_aprob_compra',undefined);
+                            $scope.document.nro_doc= null;
+                            $scope.document.fecha_aprob_compra= null;
+                            $mdSidenav("NEXT").open();
+                            focus.focus();
+                        }},
+                        {name:"No, dejame corregirlos", action:function(){
+                            $mdSidenav("NEXT").close();
+                            $timeout(function(){
+                                var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                                if(inval[0]){
+                                    inval[0].focus();
+                                }else{
+                                    inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                                    inval[0].focus();
+                                }
+
+                            },1500)
+                        }}
+                    ],{block:true});
+                }
             }
-
         }
-
-
-    }
+    };
 
 
 
@@ -4001,7 +4021,7 @@ MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEm
     $scope.$parent.openMailPreview = function(data){
         if(data){
             console.log("tienen calbacl");
-            $scope.calback = calback;
+            $scope.calback = data;
         }else{
             delete  $scope.calback;
         }
@@ -4067,7 +4087,8 @@ MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEm
                 $scope.inProgress=false;
                 App.setBlock({block:false, level:0});
                 if($scope.calback){
-                    $scope.calback();
+                    console.log("calback",response );
+                    $scope.calback(response);
                 }
             });
         }
