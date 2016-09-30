@@ -5,6 +5,7 @@
 
 
 var defaultTime = 15;
+
 MyApp.directive('iconGroup', function ($timeout) {
     return {
         link: function (scope, elem, attrs,ctrl) {
@@ -541,7 +542,6 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var onSet = {setting:false};
     var hasChange = function(){
-
         var i = 1;
         x = false;
         angular.forEach(changes,function(v,k){

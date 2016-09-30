@@ -28,7 +28,7 @@
                                 or click in md-autocomplete-suggestions tht is of elements of virtual-list create by md-autocomplete
                                 thesse cases, click out is disabled for default, and return void
                              */
-                        if((angular.element(event.target).parents(".popUp").length>0) || (angular.element(event.target).parents("#lyrAlert").length>0) || (angular.element(event.target).parents(".md-autocomplete-suggestions").length>0)){
+                        if((angular.element(event.target).parents(".popUp").length>0) || (angular.element(event.target).parents("#lyrAlert").length>0) || (angular.element(event.target).parents(".md-autocomplete-suggestions").length>0) || (angular.element(event.target).parents(".md-datepicker-calendar-pane").length>0)){
                             //console.log("igonrado==>",angular.element(event.target))
                             return;
                         }

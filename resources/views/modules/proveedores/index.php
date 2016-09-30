@@ -94,8 +94,8 @@
                     <span class="icon-Filtro" style="font-size: 24px"></span>
                     <?/*= HTML::image("images/filtro.png") */?>
                 </div>
-                <div layout="row" layout-align="center right" flex>
-                   <div layout="row" layout-align="right center" ng-repeat="i in [0,1,2,3]" flex>
+                <div layout="row" layout-align="center right" flex id="progress_percent">
+                   <div layout="row" layout-align="right center" ng-repeat="i in [0,1,2,3]" flex id="progress_{{i}}">
                        <div style="height: 5px; background: #ccc;" flex>
                            <div class="load_area" style="height: 100%; width:0%; background: #5cb85c;" ng-class="{'lineAnimate':line}"></div>
                        </div>
