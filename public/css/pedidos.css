@@ -9,6 +9,13 @@
 .emit7{ background-color: #00e10b;}/** llegada en <=0 */
 .emit0{ background-color: #00ff00;}/** llegada en <=0 */
 
+.text100{ color: #006837;}/** llegada en <=0 */
+.text90{ color: #00862c;}/** llegada en <=0 */
+.text60{ color: #00a421;}/** llegada en <=0 */
+.text30{ color: #00c316;}/** llegada en <=0 */
+.text7{ color: #00e10b;}/** llegada en <=0 */
+.text0{ color: #00ff00;}/** llegada en <=0 */
+
 .doc-Open100{ border: 1px solid #006837; color: #006837;}/** llegada en <=0 */
 .doc-Open90{ border: 1px solid #00862c;color: #00862c;}/** llegada en <=0 */
 .doc-Open60{ border: 1px solid #00a421;color: #00a421;}/** llegada en <=0 */

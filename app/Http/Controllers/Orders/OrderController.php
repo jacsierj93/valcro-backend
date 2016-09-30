@@ -31,7 +31,6 @@ use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Masters\Language;
 use App\Models\Sistema\Product\ProductType;
 use App\Models\Sistema\Providers\ContactField;
-use App\Models\Sistema\Providers\Contactos;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Providers\ProviderCondPay;
@@ -53,7 +52,7 @@ use App\Models\Sistema\User;
 use Carbon\Carbon;
 use DB;
 use Log;
-
+use PDF;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -88,6 +87,16 @@ class OrderController extends BaseController
             $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
                 ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
         }
+    }
+
+    public function testPdf (Request $req){
+        $data =$this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
+        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
+       $view = View::make("emails/modules/Order/Internal/ResumenDoc",$data)->render();
+        $pdf = new PDF();
+        $pdf->loadHTML("sdfsf");
+        return $pdf->stream();
+
     }
 
     /*********************** SYSTEM ************************/
@@ -281,18 +290,18 @@ class OrderController extends BaseController
 
     public  function closeActionSolicitude(Request $req){
         $model= Solicitude::findOrFail($req->id);
+
         if($this->user->cargo_id == $this->profile['gerente']) {
             return ['action' => 'question'];
 
         }
         else if($this->user->cargo_id ==  $this->profile['jefe']){
+
           $userCreate = User::findOrFail($model->usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
-                if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
-                    if(sizeof($notif->where('clave','aprob_compras')->get()) == 0){
-                        return ['action' => 'send'];
-                    }
+
+                if($model->fecha_aprob_compra != null && $model->fecha_envio == null){
+                    return ['action' => 'send'];
                 }
             }
 
@@ -308,8 +317,11 @@ class OrderController extends BaseController
             $userCreate = User::findOrFail($model->usuario_id);
             $userModif = User::findOrFail($model->edit_usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
-                if($model->fecha_aprob_compras != null && $userModif->cargo_id == $this->profile['gerente']){
-                    return ['action' => 'send'];
+                if($model->fecha_aprob_compras != null ){
+                    $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    if(sizeof($notif->where('clave','send_provider')->get()) == 0){
+                        return ['action' => 'send'];
+                    }
                 }
             }
 
@@ -325,8 +337,11 @@ class OrderController extends BaseController
             $userCreate = User::findOrFail($model->usuario_id);
             $userModif = User::findOrFail($model->edit_usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
-                if($model->fecha_aprob_compras != null && $userModif->cargo_id == $this->profile['jefe']){
-                    return ['action' => 'send'];
+                if($model->fecha_aprob_compras != null ){
+                    $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    if(sizeof($notif->where('clave','send_provider')->get()) == 0){
+                        return ['action' => 'send'];
+                    }
                 }
             }
 
@@ -795,7 +810,7 @@ class OrderController extends BaseController
 
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
         $response['success']='Solicitud Cancelada';
-        if($sendEmail){
+/*        if($sendEmail){
             $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
                 ,'cc'=>[],'ccb'=>[],
                 'asunto'=>'Notificacion de Cancelacion  '];
@@ -804,7 +819,7 @@ class OrderController extends BaseController
 
             $this->sendNotificacion($data,$sender);
             $response['email'] ="true";
-        };
+        };*/
         return $response;
 
     }
@@ -821,14 +836,14 @@ class OrderController extends BaseController
 
         $response['success']='Pedido Cancelado';
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
-        if($sendEmail){
+       /* if($sendEmail){
             $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
                 ,'cc'=>[],'ccb'=>[],'asunto'=>'Notificacion de Cancelacion'];
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion']=$sender['asunto'];
             $this->sendNotificacion($data,$sender);
             $response['email'] ="true";
-        };
+        };*/
         return $response;
 
     }
@@ -843,7 +858,7 @@ class OrderController extends BaseController
         $response['response']=$model->save();
         $response['success']='ODC Cancelada';
         $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
-        if($sendEmail){
+        /*if($sendEmail){
             $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
                 ,'cc'=>[],'ccb'=>[],'asunto'=>'Notificacion de Cancelacion por compras '];
             $data =$this->parseDocToSummaryEmail($model);
@@ -851,7 +866,7 @@ class OrderController extends BaseController
 
             $this->sendNotificacion($data,$sender);
             $response['email'] ="true";
-        };
+        };*/
         return $response;
 
     }
@@ -3608,6 +3623,21 @@ class OrderController extends BaseController
             }
             $model->fecha_envio= Carbon::now();
             $model->save();
+            $sender  =[
+                'subject'=>'Notificacion de creacion de Solicitud',
+                'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+                'cc' =>[],
+                'ccb' =>[]
+            ];
+            $noti = new NotificationOrder();
+            $noti->doc_id = $model->id;
+            $noti->doc_tipo = 21;
+            $noti->usuario_id = $this->user->id;
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Envio al proveedor";
+            $noti->send($data,$sender,$noti,"send_provider");
+
+
 
 
         });
@@ -3636,12 +3666,25 @@ class OrderController extends BaseController
             }
             $model->fecha_envio= Carbon::now();
             $model->save();
+            $sender  =[
+                'subject'=>'Notificacion de creacion de Solicitud',
+                'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+                'cc' =>[],
+                'ccb' =>[]
+            ];
+            $noti = new NotificationOrder();
+            $noti->doc_id = $model->id;
+            $noti->doc_tipo = 21;
+            $noti->usuario_id = $this->user->id;
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Envio al proveedor";
+            $noti->send($data,$sender,$noti,"send_provider");
 
 
         });
         $resul =[];
         $resul['accion']= 'send';
-        return $resul;;
+        return $resul;
 
     }
 
@@ -3666,6 +3709,19 @@ class OrderController extends BaseController
             }
             $model->fecha_envio= Carbon::now();
             $model->save();
+            $sender  =[
+                'subject'=>'Notificacion de creacion de Solicitud',
+                'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+                'cc' =>[],
+                'ccb' =>[]
+            ];
+            $noti = new NotificationOrder();
+            $noti->doc_id = $model->id;
+            $noti->doc_tipo = 21;
+            $noti->usuario_id = $this->user->id;
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Envio al proveedor";
+            $noti->send($data,$sender,$noti,"send_provider");
 
 
         });
@@ -5019,8 +5075,26 @@ class OrderController extends BaseController
             $noti->send($data,$sender,$noti,"created");
             $result['action'][]="send";
         }else{
-            if($model->fecha_aprob_compras != null){
-
+            if($model->fecha_aprob_compra != null){
+                if(sizeof(NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21)->where('clave', 'aprob_compras')->get()) == 0){
+                    $noti = new NotificationOrder();
+                    $noti->doc_id = $model->id;
+                    $noti->doc_tipo = 21;
+                    $noti->usuario_id = $this->user->id;
+                    $data =$this->parseDocToSummaryEmail($model);
+                    $data['accion'] ="Aprobacion de solicitud";
+                    $noti->send($data,$sender,$noti,"aprob_compras");
+                    $result['action'][]="aprob_compras";
+                }else if(sizeof($notif->where('clave', 'aprob_compras')->where('usuario_id', $this->user->id)->get()) > 0){
+                    $noti = new NotificationOrder();
+                    $noti->doc_id = $model->id;
+                    $noti->doc_tipo = 21;
+                    $noti->usuario_id = $this->user->id;
+                    $data =$this->parseDocToSummaryEmail($model);
+                    $data['accion'] ="Desaprobacion de solicitud";
+                    $noti->send($data,$sender,$noti,"cancel_aprob_compras");
+                    $result['action'][]="cancel_aprob_compras";
+                }
             }else{
                 $sender['subject']= "Notificacion de modificacion de solicitud";
                 $noti = new NotificationOrder();
@@ -5730,10 +5804,10 @@ class OrderController extends BaseController
      * determian los permiso del docuemnto segun las carcateristicas del mismo
      * **/
     private function getPermisionDoc($model){
-        $permit=  ['aprobacion_compras'=>false,'aprob_compras'=>false,'update'=>false,'cancel'=>false, 'delete'=>false,'metodo'=>'default'];
+        $permit=  ['aprob_compras'=>false,'update'=>false,'cancel'=>false, 'delete'=>false,'metodo'=>'default'];
 
         if($this->user->cargo_id == $this->profile['gerente']){
-            return ['aprobacion_compras'=>true,'aprob_compras'=>true,'update'=>true,'cancel'=>true, 'delete'=>true,'metodo'=>'mas alto'];
+            return ['aprob_gerencia'=>true,'aprob_compras'=>true,'update'=>true,'cancel'=>true, 'delete'=>true,'metodo'=>'mas alto'];
 
         }
         else
@@ -5758,7 +5832,7 @@ class OrderController extends BaseController
                             ->where('cargo_id',$this->profile['gerente'])
                             ->groupBy('tbl_usuario.cargo_id')
                             ->get();
-                        if($noti->noti == 0){
+                        if(sizeof($noti) == 0){
                             $permit['update'] = true;
                         }
                     }
@@ -5776,8 +5850,8 @@ class OrderController extends BaseController
                     ->get();*/
 
                 if($this->user->cargo_id == $this->profile['jefe'] && $user->cargo_id ==  $this->profile['trabajador']) {
-                    if($model->fecha_aprobacion_compras == null){$permit['aprob_compras']= true;$permit['update']= true;};
-                    if($model->cancelacion == null){$permit['cancel']= true;$permit['update']= true;};
+                    if($model->fecha_aprobacion_compras == null && $model->estado_id == 1){$permit['aprob_compras']= true;$permit['update']= true;};
+                    if($model->cancelacion == null && $model->estado_id == 1){$permit['cancel']= true;$permit['update']= true;};
                 }
 
             }
