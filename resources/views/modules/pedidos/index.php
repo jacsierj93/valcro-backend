@@ -235,14 +235,14 @@
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
                     </div>
-                    <div layout="column" layout-align="center center"
+                   <!-- <div layout="column" layout-align="center center"
                          ng-show="( document.id )"
                          ng-click="openMailPreview()">
                         <span style="font-size: 24px"> TEst </span>
                         <md-tooltip >
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
-                    </div>
+                    </div>-->
 
                 </div>
 
@@ -530,8 +530,7 @@
                         <div layout="row" flex ng-init="docOrder.order == id " tabindex="0">
                             <div class="cellEmpty"> </div>
                             <div layout="row" style="width: 80px;">
-                                <div vlc-grid-order ng-model="docOrder.order" key="documento"></div>
-                                <div  layout-align="center center" layout="column" >
+                                <div class="cell-filter-order"  layout-align="center center" layout="column" >
                                     <div flex ng-click="docOrder.order = 'documento' "><img ng-src="{{(docOrder.order == 'documento') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
                                     <div flex ng-click="docOrder.order = '-documento' "><img ng-src="{{( (docOrder.order == '-documento')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
                                 </div>
@@ -554,8 +553,6 @@
                                     </md-select>
 
                                 </md-input-container>
-
-
                             </div>
 
                             <div flex layout="row">

@@ -87,13 +87,14 @@ $app->routeMiddleware([
 $app->register('Collective\Html\HtmlServiceProvider');
 $app->register('Collective\Html\InjectVarsServiceProvider');
 $app->register('Intervention\Image\ImageServiceProvider');
-$app->register('Barryvdh\DomPDF\ServiceProvider');
+$app->register(\Barryvdh\DomPDF\ServiceProvider::class);
 
 
 
 class_alias('Collective\Html\HtmlFacade', 'Html');
 class_alias('Collective\Html\FormFacade', 'Form');
-class_alias('Barryvdh\DomPDF\Facade', 'PDF');
+
+class_alias(Barryvdh\DomPDF\Facade::class, 'PDF');
 
 /*
 |--------------------------------------------------------------------------
@@ -109,5 +110,7 @@ class_alias('Barryvdh\DomPDF\Facade', 'PDF');
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
 });
+
+$app->configure('dompdf');
 
 return $app;

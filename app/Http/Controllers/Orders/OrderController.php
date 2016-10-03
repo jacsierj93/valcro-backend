@@ -59,7 +59,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
-
+use App;
 class OrderController extends BaseController
 {
 
@@ -81,7 +81,7 @@ class OrderController extends BaseController
     public function __construct(Request $req)
     {
 
-        $this->middleware('auth');
+/*        $this->middleware('auth');*/
         $this->request= $req;
         if($this->user == null){
             $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
@@ -92,14 +92,15 @@ class OrderController extends BaseController
     public function testPdf (Request $req){
         $data =$this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
         $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
-       $view = View::make("emails/modules/Order/Internal/ResumenDoc",$data)->render();
-        $pdf = new PDF();
-        $pdf->loadHTML("sdfsf");
-        return $pdf->stream();
+        $view = View::make("emails/modules/Order/Internal/Simple",$data)->render();
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadHTML($view);
 
-    }
+        return View::make("emails/modules/Order/Internal/Simple",$data);
 
-    /*********************** SYSTEM ************************/
+        }
+
+        /*********************** SYSTEM ************************/
 
     public function getPermision(){
         if($this->user->departamento_id == 22){
@@ -366,12 +367,12 @@ class OrderController extends BaseController
          and fecha_aprob_gerencia != null and estado_id != 3
          ) as contraPedidos ";
 
-        $rawn .= " , (".$this->generateProviderQuery("emision","<=0").") as emit0 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 1 and  7 ").") as emit7 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 7 and  30 ").") as emit30 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 31 and  60 ").") as emit60 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 61 and  90 ").") as emit90 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," > 90 ").") as emit100 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision","<=0").") as emit0 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 1 and  7 ").") as emit7 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 7 and  30 ").") as emit30 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 31 and  60 ").") as emit60 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 61 and  90 ").") as emit90 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," > 90 ").") as emit100 ";
 
         $rawn .= " , (".$this->generateProviderQuery("ult_revision","<=0").") as review0 ";
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 1 and  7 ").") as review7 ";
@@ -535,12 +536,12 @@ class OrderController extends BaseController
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
          where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
 
-        $rawn .= " , (".$this->generateProviderQuery("emision","<=0").") as emit0 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 1 and  7 ").") as emit7 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 7 and  30 ").") as emit30 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 31 and  60 ").") as emit60 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," BETWEEN 61 and  90 ").") as emit90 ";
-        $rawn .= " , (".$this->generateProviderQuery("emision"," > 90 ").") as emit100 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision","<=0").") as emit0 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 1 and  7 ").") as emit7 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 7 and  30 ").") as emit30 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 31 and  60 ").") as emit60 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 61 and  90 ").") as emit90 ";
+        $rawn .= " , (".$this->generateProviderEmit("emision"," > 90 ").") as emit100 ";
 
         $rawn .= " , (".$this->generateProviderQuery("ult_revision","<=0").") as review0 ";
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 1 and  7 ").") as review7 ";
@@ -5353,8 +5354,10 @@ class OrderController extends BaseController
         $model->ult_revision = Carbon::now();
         if($model->usuario_id == null){
             $model->usuario_id = $req->session()->get('DATAUSER')['id'];
+        }if($model->emision == null || !$req->has('emision')){
+            $model->emision =  Carbon::now();
         }
-        $model->edit_usuario_id =$req->session()->get('DATAUSER')['id'];;
+        $model->edit_usuario_id =$req->session()->get('DATAUSER')['id'];
 
         if($req->has('monto')){
             $model->monto = $req->monto;
@@ -5528,20 +5531,32 @@ class OrderController extends BaseController
         ."-a".sizeof($model->attachments()->get());
     }
 
-    private function generateProviderQuery($campo, $condicion){
+    private function generateProviderEmit($campo, $condicion){
         $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_compra_orden where tbl_proveedor.id= prov_id and tbl_compra_orden.deleted_at is null
-             and tbl_compra_orden.fecha_aprob_gerencia is null and tbl_compra_orden.fecha_aprob_compra is null
+             and tbl_compra_orden.fecha_sustitucion is null ),0) "
+            ." + "
+            ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_pedido where tbl_proveedor.id= prov_id  and tbl_pedido.deleted_at is null
+             and tbl_pedido.fecha_sustitucion is null  ),0) "
+            ." + "
+            ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.deleted_at is null
+             and tbl_solicitud.fecha_sustitucion is null),0) "
+            .""
+        ;
+        return $q;
+    }    private function generateProviderQuery($campo, $condicion){
+        $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_compra_orden where tbl_proveedor.id= prov_id and tbl_compra_orden.deleted_at is null
              and tbl_compra_orden.fecha_sustitucion is null  and tbl_compra_orden.comentario_cancelacion is null  ),0) "
             ." + "
             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_pedido where tbl_proveedor.id= prov_id  and tbl_pedido.deleted_at is null
-             and tbl_pedido.fecha_aprob_gerencia is null and tbl_pedido.fecha_aprob_compra is null
              and tbl_pedido.fecha_sustitucion is null and tbl_pedido.comentario_cancelacion is null  ),0) "
             ." + "
             ."IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
             ." tbl_solicitud where tbl_proveedor.id= prov_id and tbl_solicitud.deleted_at is null
-             and tbl_solicitud.fecha_aprob_gerencia is null and tbl_solicitud.fecha_aprob_compra is null
              and tbl_solicitud.fecha_sustitucion is null and tbl_solicitud.comentario_cancelacion is null),0) "
             .""
         ;

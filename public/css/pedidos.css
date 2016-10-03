@@ -94,6 +94,9 @@ div[ng-click] * {
     display: block;
 }
 
+.cell-filter-order > div > img{
+   width: 12px;
+}
 /*@derecated*/
 /*.cell-filter-order *{
     width: 100%;
@@ -113,9 +116,7 @@ div[ng-click] * {
     display: block ;
 }
 
-.cell-filter-order > div:hover > img{
-    display: block ;
-}
+
 
 .filter-select *{
     display: block ;

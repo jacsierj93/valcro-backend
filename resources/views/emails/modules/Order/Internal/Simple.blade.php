@@ -7,7 +7,7 @@
 
 </style>
 <div style="width: 100%;min-height: 100%;margin: 0;padding: 0; font-family: Roboto; max-width: 600px;">
-    <table style="border-spacing: 0;margin: auto;padding: 0; width: 600px; ">
+    <table style="border-spacing: 0;margin: auto;padding: 0; width: 600px; height: 600px; ">
         <tbody>
         <tr style="margin: 0;padding: 0">
             <td height="5" width="5" style="color: rgb(140,140,140);margin: 0;padding: 0; background-image: url('http://valcro.com.ve/mailer/images/sdw_top_left.jpg');" ></td>
