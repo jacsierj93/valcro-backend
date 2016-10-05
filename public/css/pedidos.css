@@ -252,6 +252,12 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .rowRsm{
     height: 28px;
 }
+.rowRsm div{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 
 .rowRsmTitle{
 }

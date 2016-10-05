@@ -1123,7 +1123,9 @@ div.activeleft{
 .reserved{
     opacity:0.5;
 }
-
+.md-sidenav-layer{
+    margin-top:96px; margin-bottom:48px;
+}
 md-progress-linear ._md-bar,md-progress-linear .md-bar{
     background-color:rgb(84, 180, 234) !important;
 }
@@ -1164,6 +1166,7 @@ md-progress-linear ._md-container,md-progress-linear .md-container{
 md-datepicker{
     background-color: transparent;
 }
+
 
 /**********************EDITADO POR MIGUEL 14/05/2016****************************
 *********************************************************************************
