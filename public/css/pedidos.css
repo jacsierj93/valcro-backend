@@ -94,6 +94,9 @@ div[ng-click] * {
     display: block;
 }
 
+.cell-filter-order > div > img{
+   width: 12px;
+}
 /*@derecated*/
 /*.cell-filter-order *{
     width: 100%;
@@ -113,9 +116,7 @@ div[ng-click] * {
     display: block ;
 }
 
-.cell-filter-order > div:hover > img{
-    display: block ;
-}
+
 
 .filter-select *{
     display: block ;
@@ -251,6 +252,12 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .rowRsm{
     height: 28px;
 }
+.rowRsm div{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 
 .rowRsmTitle{
 }
@@ -340,6 +347,17 @@ md-sidenav .md-sidenav-right.md-locked-open{
 }
 
 .date-row > div:last-child > div {
+    border-bottom: 1px dotted #c3c3c3;
+
+}
+.text-row {
+    color: #c3c3c3;
+}
+.text-row-row > div:first-child{
+    margin-right: 4px;
+}
+
+.text-row-row > div:last-child > div {
     border-bottom: 1px dotted #c3c3c3;
 
 }

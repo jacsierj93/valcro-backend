@@ -576,6 +576,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         var sus = [];
         var changeItems= false;
         var carefull=false;
+        console.log("$scope.switchBack",$scope.switchBack)
+        console.log("form",setGetOrder.getForm());
         ///var todos = new Array();
         angular.forEach(setGetOrder.getForm(), function(v,k){
                 if(k.startsWith('contra')){
@@ -584,6 +586,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                         $scope.switchBack.contraPedido.change= true;
                         $scope.switchBack.changeItems.change=true;
                         changeItems= true;
+                        console.log("cambio c", v);
+
                     }
 
                 }else
@@ -592,7 +596,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                     if(v.estado != 'new'){
                         $scope.switchBack.kichenBox.change= true;
                         $scope.switchBack.changeItems.change=true;
-
+                        console.log("cambio k", v);
                         changeItems= true;
                     }
                 }
@@ -602,6 +606,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                     if(v.estado != 'new'){
                         $scope.switchBack.pedidoSusti.change= true;
                         $scope.switchBack.changeItems.change=true;
+                        console.log("cambio p", v);
 
                         changeItems= true;
                     }
@@ -1888,15 +1893,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                 $scope.ctrl.provSelec = prov;
                 loadPedidosProvedor(prov.id);
             }}});
-        }else if($scope.module.layer == "listPedido" ){
-            $scope.ctrl.provSelec = prov;
+        }else if($scope.module.layer == "listPedido"){
 
+            $scope.ctrl.provSelec = prov;
             loadPedidosProvedor(prov.id);
         }else if($scope.module.layer == "detalleDoc"){
             if($scope.document.uid != null){
                 if($scope.ctrl.provSelec == null){
                     $scope.ctrl.provSelec=prov;
-                }else if($scope.ctrl.provSelec.id != prov_id){
+                }else if($scope.ctrl.provSelec.id != prov.prov_id){
                     $scope.ctrl.provSelec=prov;
                 }
             }else{
@@ -2107,6 +2112,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
             $scope.inProcess = false;
             App.setBlock({block:false});
             $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
+            $scope.updateProv();
             $timeout(function(){
                 $scope.LayersAction({close:{first:true, search:true}});
             },1400);
@@ -3296,10 +3302,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                                         aprob_compras:{model:false,change:false},
                                         aprob_gerencia:{model:false,change:false},
                                         cancelacion:{model:false,change:false},
-                                        contraPedido:{model:true,change:false},
-                                        kichenBox:{model:true,change:true},
-                                        pedidoSusti:{model:true,change:false},
-                                        changeItems:{model:true,change:false}
+                                        contraPedido:{model:false,change:false},
+                                        kichenBox:{model:false,change:false},
+                                        pedidoSusti:{model:false,change:false},
+                                        changeItems:{model:false,change:false}
 
                                     };
                                     $scope.finalDoc = $scope.buildfinalDoc();
@@ -3784,8 +3790,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     }
 
 });
-
-
 
 /**
  * controller for mdsidenav mail type popUp, this controller is responsable de send correo option, this is used for send text,

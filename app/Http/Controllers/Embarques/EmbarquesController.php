@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Embarques;
 
 
-use App\Models\Sistema\Embarques\Embarques2;
 //use App\Models\Sistema\NombreValcro;
+use App\Models\Sistema\Providers\Provider;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Session;
@@ -18,8 +18,16 @@ class EmbarquesController extends BaseController
         $this->middleware('auth');
     }
 
+    public  function  getProvList(){
+        $prov  = Provider::get();
+        $data = [];
+
+        return $prov;
+    }
+
+    /**@deprecated */
     public function getEmbarquesList(){
-       $embarques = Embarques2::all();
+       /*$embarques = Embarques2::all();
 
         foreach($embarques AS $embarque){
             $embarque['nombres'] = $embarque->nombres()->get();
@@ -28,7 +36,7 @@ class EmbarquesController extends BaseController
 
 
 
-        return $embarques;
+        return $embarques;*/
     }
 
 
