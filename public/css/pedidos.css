@@ -350,6 +350,17 @@ md-sidenav .md-sidenav-right.md-locked-open{
     border-bottom: 1px dotted #c3c3c3;
 
 }
+.text-row {
+    color: #c3c3c3;
+}
+.text-row-row > div:first-child{
+    margin-right: 4px;
+}
+
+.text-row-row > div:last-child > div {
+    border-bottom: 1px dotted #c3c3c3;
+
+}
 
 .tab-select{
     color: rgb(84, 180, 234);

@@ -176,13 +176,12 @@
         </div>
 
         <div layout="column" flex class="md-whiteframe-1dp">
-
             <div class="botonera" layout="row" layout-align="space-between center">
                 <!-- botonera left -->
                 <div style="width: 240px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.created)" layout-align="center center" ng-click="menuAgregar()">
+                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listShipment') && permit.created)" layout-align="center center" ng-click="OpenShipmentCtrl()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
                             Crear un nuevo documento
@@ -260,8 +259,6 @@
                      </md-tooltip>
                  </div>-->
             </div>
-
-
             <div flex layout="row">
                 <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
                 <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center" ng-click="closeSide()">
@@ -281,7 +278,6 @@
 
             </div>
         </div>
-
 
         <!------------------------------------------- lista de embarques creados ------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="listShipment" id="listShipment"   >
@@ -385,14 +381,14 @@
                         <div layout="column" flex=""   >
                             <div   ng-repeat="item in tbl.data "   id="shipments{{$index}}"  >
                                 <div layout="row" class="cellGridHolder" >
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.titulo}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.id}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.nro_factura}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.carga}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.fecha_llegada_vnz}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.fecha_llegada_tiend}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.flete}}</div>
-                                    <div flex class="cellGrid" ng-click="setShipment(data)">{{data.nacionalizacion}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.nro_factura}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.carga}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.fecha_llegada_vnz}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.fecha_llegada_tiend}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.flete.monto}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.nacionalizacion.monto}}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" flex>
@@ -406,7 +402,7 @@
             </md-content>
         </md-sidenav>
 
-        <!------------------------------------------- lista de embarques creados ------------------------------------------------------------------------->
+        <!------------------------------------------- resumen de embarque de embarques creados ------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="summaryShipment" id="summaryShipment"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "summaryShipmentCtrl" >
                 <div active-left  ></div>
@@ -417,7 +413,7 @@
                                 Embarque:
                             </div>
                         </div>
-                        <div flex> {{$parent.shipment.titulo }}</div>
+                        <div flex layout="column" layout-align="center start"> {{$parent.shipment.titulo }}</div>
                     </div>
                     <div layout="row" flex>
                         <div layout="column" flex="40" >
@@ -557,6 +553,525 @@
                         </div>
                     </div>
                 </div>
+            </md-content>
+        </md-sidenav>
+
+        <!------------------------------------------- detalle de embarques creados ------------------------------------------------------------------------->
+        <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailShipment" id="detailShipment"   >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller= "OpenShipmentCtrl" >
+                <div layout="column" flex>
+                    <form layout="row">
+                        <div active-left  ></div>
+                        <div layout="column" flex>
+                            <div class="titulo_formulario" style="height:39px;">
+                                <div>
+                                    Embarque
+                                </div>
+                            </div>
+                            <div layout="row" class="row" >
+                                <md-input-container class="md-block" flex  >
+                                    <label>Proveedor</label>
+                                    <md-autocomplete md-selected-item="autoCp.provSele.select"
+                                                     info="Seleccione el proveedor del embarque"
+                                                     required
+                                                     ng-disabled="( session.isBlock )"
+                                                     ng-click="$parent.toEditHead('prov_id', provSelect.id)"
+                                                     id="prov_id"
+                                                     skip-tab
+                                                     md-search-text="autoCp.provSele.text"
+                                                     md-auto-select="true"
+                                                     md-items="item in $parent.provs | stringKey : autoCp.provSele.text : 'razon_social' "
+                                                     md-item-text="item.razon_social"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0"
+                                                     md-require-match="true"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.razon_social}}</span>
+                                        </md-item-template>
+                                        <md-not-found >
+                                            No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
+                                        </md-not-found>
+                                    </md-autocomplete>
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15">
+                                    <label>N°</label>
+                                    <input  ng-model="$parent.shipment.id"
+                                            ng-disabled="true"
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div layout="row" class="row" >
+                                <md-input-container flex>
+                                    <label>Titulo</label>
+                                    <input  ng-model="$parent.shipment.titulo"
+                                            ng-change=" toEditHead('titulo', document.titulo ) "
+                                            ng-disabled="( session.isblock )"
+                                            required
+                                            info="Escriba un titulo para facilitar identificacion del documento"
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <div layout="row" class="date-row" >
+                                    <div layout="column" class="md-block" layout-align="center center"  >
+                                        <div>Creado</div>
+                                    </div>
+                                    <md-datepicker ng-model="$parent.shipment.emision"
+                                                   ng-disabled="true"
+                                                   skip-tab
+                                                   required
+                                    ></md-datepicker >
+
+                                </div>
+                            </div>
+                            <div layout="row" class="row" >
+                                <div layout="row" class="date-row" flex="30" >
+                                    <div layout="column" class="md-block" layout-align="center center"  >
+                                        <div>Carga</div>
+                                    </div>
+                                    <md-datepicker ng-model="$parent.shipment.carga"
+                                                   ng-disabled="( session.isBlock )"
+                                                   skip-tab
+                                                   required
+                                                   ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
+                                    ></md-datepicker >
+
+                                </div>
+                                <div layout="row" class="date-row" flex="30" >
+                                    <div layout="column" class="md-block" layout-align="center center"  >
+                                        <div>En Venenzuela</div>
+                                    </div>
+                                    <div class="md-block" layout="column" layout-align="center center" >
+                                        <md-datepicker ng-model="$parent.shipment.fecha_llegada_vnz"
+                                                       ng-disabled="( session.isBlock )"
+                                                       skip-tab
+                                                       required
+                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
+                                        ></md-datepicker >
+                                    </div>
+                                </div>
+                                <div layout="row" class="date-row" flex="30" >
+                                    <div layout="column" class="md-block" layout-align="center center"  >
+                                        <div>En tienda</div>
+                                    </div>
+                                    <div class="md-block" layout="column" layout-align="center center" >
+                                        <md-datepicker ng-model="$parent.shipment.$parent.shipment.fecha_llegada_tiend"
+                                                       ng-disabled="( session.isBlock )"
+                                                       skip-tab
+                                                       required
+                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
+                                        ></md-datepicker >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form layout="row">
+                        <div active-left  ></div>
+                        <div layout="column" flex>
+                            <div layout="row">
+                                <div class="titulo_formulario" style="height:39px;">
+                                    <div>
+                                        Pagos
+                                    </div>
+                                </div>
+                            </div>
+                            <div layout="row" class="row" >
+                                <md-input-container class="md-block" >
+                                    <label>Flete</label>
+                                    <input  ng-model="$parent.shipment.monto"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <md-input-container class="md-block" >
+                                    <label>Terrestre</label>
+                                    <input  ng-model="$parent.shipment.flete.monto_terreste"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <md-input-container class="md-block" >
+                                    <label>Nacionalizacion</label>
+                                    <input  ng-model="$parent.shipment.flete.monto_nacionalizacion"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <md-input-container class="md-block" >
+                                    <label>DUA</label>
+                                    <input  ng-model="$parent.shipment.flete.monto_dua"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div layout="row" class="row" >
+                                <md-input-container class="md-block" flex  >
+                                    <label>Pais</label>
+                                    <md-autocomplete md-selected-item="autoCp.pais_id.select"
+                                                     info="Selecione el pais de origen para el embarque"
+                                                     required
+                                                     ng-disabled="( session.isBlock )"
+                                                     ng-click="$parent.toEditHead('pais_id', provSelect.id)"
+                                                     id="prov_id"
+                                                     skip-tab
+                                                     md-search-text="autoCp.pais_id.text"
+                                                     md-auto-select="true"
+                                                     md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
+                                                     md-item-text="item.razon_social"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.razon_social}}</span>
+                                        </md-item-template>
+                                        <md-not-found >
+                                            No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
+                                        </md-not-found>
+                                    </md-autocomplete>
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="20"  >
+                                    <label>Puerto</label>
+                                    <md-autocomplete md-selected-item="autoCp.puerto_id.select"
+                                                     info="Selecione el pais de origen para el embarque"
+                                                     required
+                                                     ng-disabled="( session.isBlock )"
+                                                     ng-click="$parent.toEditHead('pais_id', provSelect.id)"
+                                                     id="prov_id"
+                                                     skip-tab
+                                                     md-search-text="autoCp.pais_id.text"
+                                                     md-auto-select="true"
+                                                     md-items="item in $parent.puertos | stringKey : autoCp.puerto_id.text : 'main_port_name' "
+                                                     md-item-text="item.razon_social"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.razon_social}}</span>
+                                        </md-item-template>
+                                        <md-not-found >
+                                            No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
+                                        </md-not-found>
+                                    </md-autocomplete>
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15">
+                                    <label>Freigth Forwardes</label>
+                                    <input  ng-model="$parent.shipment.freigth_forwarde"
+                                            ng-disabled="true"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="15">
+                                    <label>Naviera</label>
+                                    <input  ng-model="$parent.shipment.naviera"
+                                            ng-disabled="true"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </form>
+                    <form layout="row">
+                        <div active-left  ></div>
+                        <div layout="column" flex>
+                            <div layout="row">
+                                <div layout="column" layout-align="center center" id="btnAgrCp"  style="width:24px;">
+                                    <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
+                                </div>
+                                <div class="titulo_formulario" style="height:39px;">
+                                    <div>
+                                        Documentos
+                                    </div>
+                                </div>
+                            </div>
+                            <div layout="row" class="row" >
+                                <md-input-container class="md-block" flex >
+                                    <label>MBL</label>
+                                    <input  ng-model="$parent.shipment.mbl"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <md-input-container class="md-block" flex >
+                                    <label>HBL</label>
+                                    <input  ng-model="$parent.shipment.hbl"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                                <md-input-container class="md-block" flex >
+                                    <label>Exp. Aduanal</label>
+                                    <input  ng-model="$parent.shipment.nro_exp_aduana"
+                                            required
+                                            skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </form>
+                    <form layout="row" flex>
+                        <div active-left  ></div>
+                        <div flex layout="column" >
+                            <div layout="row">
+                                <div class="titulo_formulario" style="height:39px;">
+                                    <div>
+                                        Agregados
+                                    </div>
+                                </div>
+                            </div>
+                            <div layout="row" flex>
+                                <div flex layout="column" >
+                                    <div layout="row" layout-align="start center">
+                                        <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
+                                            <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
+                                        </div>
+                                        <div class="titulo_formulario" style="height:39px;">
+                                            <div>
+                                                Container
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div flex></div>
+                                </div>
+                                <div flex layout="column" >
+                                    <div layout="row" layout-align="start center">
+                                        <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
+                                            <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
+                                        </div>
+                                        <div class="titulo_formulario" style="height:39px;">
+                                            <div>
+                                                Pedidos
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div flex></div>
+
+                                </div>
+                                <div flex layout="column" >
+                                    <div layout="row" layout-align="start center">
+                                        <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
+                                            <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
+                                        </div>
+                                        <div class="titulo_formulario" style="height:39px;">
+                                            <div>
+                                                Productos
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div flex></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </md-content>
+        </md-sidenav>
+
+
+        <!------------------------------------------- lista de embarques creados ------------------------------------------------------------------------->
+        <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="listTariff" id="listTariff"   >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller= "listTariffCtrl">
+                <div layout="column" flex>
+                    <div layout="row" class="focused">
+                        <div active-left ></div>
+                        <div class="titulo_formulario" style="height: 39px;" flex>
+                            <div>
+                                <span style="color: #000;">Tarifas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <div active-left  ></div>
+                        <div layout="row"  flex style="padding-right: 4px;">
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="id"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Freight Forwarder</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="id"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Naviera</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="nro_factura"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Puerto</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.nro_factura"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="emision"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>T/T</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.carga"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="fecha_llegada_vnz"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>En venezuela el</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha_llegada_vnz"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="fecha_llegada_tiend"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>En tienda el </label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha_llegada_tiend"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="flete"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Flete</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.flete"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="nacionalizacion"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nacionalizacion</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.nacionalizacion"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="emision"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Carga</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.carga"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="fecha_llegada_vnz"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>En venezuela el</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha_llegada_vnz"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="fecha_llegada_tiend"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>En tienda el </label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha_llegada_tiend"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="flete"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Flete</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.flete"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="nacionalizacion"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nacionalizacion</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.nacionalizacion"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                            <div flex layout="row">
+                                <gridOrder ng-model="tbl" key="nacionalizacion"></gridOrder>
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nacionalizacion</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.nacionalizacion"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </div>
+                    <form layout="row"  class="gridContent" flex>
+                        <div active-left  ></div>
+                        <div layout="column" flex=""   >
+                            <div   ng-repeat="item in tbl.data "   id="shipments{{$index}}"  >
+                                <div layout="row" class="cellGridHolder" >
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.nro_factura}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.carga}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.fecha_llegada_vnz}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.fecha_llegada_tiend}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.flete.monto}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.nro_factura}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.carga}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.fecha_llegada_vnz}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.fecha_llegada_tiend}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.flete.monto}}</div>
+                                    <div flex class="cellGrid" ng-click="setShipment(item)">{{item.nacionalizacion.monto}}</div>
+                                </div>
+                            </div>
+                            <div layout="column" layout-align="center center" flex>
+                                No hay datos para mostrar
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div id="expand"></div>
             </md-content>
         </md-sidenav>
 

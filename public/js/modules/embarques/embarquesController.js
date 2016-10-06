@@ -2,9 +2,20 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
 
     $scope.provSele ={};
     $scope.provs =[];
-    $scope.shipment =setGetShipment.getShipment();
+    $scope.paises =[];
+    $scope.shipment ={};
+    $scope.bindShipment =setGetShipment.bind()
+    $scope.session = {global:'new', isblock: false};
+    $scope.permit={
+        created:true
+    };
     shipment.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
 
+    $scope.toEditHead= function(id,val){
+        if( $scope.session.global != 'new'){
+            setGetShipment.change("shipment",id,val);
+        }
+    };
     $scope.search = function(){
        var data =[];
         if($scope.provs.length > 0){
@@ -16,15 +27,23 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
     $scope.setProvedor = function(prov){
         $scope.provSele= prov;
         $scope.listShipmentCtrl(prov);
-
-
     };
     $scope.closeSide = function(){
         $scope.LayersAction({close:true});
-    }
+    };
+
+
+    $scope.$watch('bindShipment.estado', function(newVal){
+        console.log("bind", newVal);
+        if(newVal){
+            console.log("bind", newVal);
+            $scope.shipment = setGetShipment.getShipment();
+        }
+    });
+
 }]);
 
-MyApp.controller('listShipmentCtrl', ['$scope','setGetShipment',  function ($scope, setGetShipment) {
+MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  function ($scope,shipment, setGetShipment) {
     $scope.tbl ={
         order:"id",
         filter:{},
@@ -32,7 +51,7 @@ MyApp.controller('listShipmentCtrl', ['$scope','setGetShipment',  function ($sco
     };
     $scope.$parent.listShipmentCtrl = function(prov){
         $scope.LayersAction({open:{name:"listShipment", after: function(){
-            console.log("provSelec", $scope.$parent.provSele);
+
             $scope.tbl.data.splice(0,$scope.tbl.data.length);
             var demo = {
                 titulo:"demo ",
@@ -59,10 +78,44 @@ MyApp.controller('listShipmentCtrl', ['$scope','setGetShipment',  function ($sco
 
 MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',  function($scope,shipment, setGetShipment ){
 
-
     $scope.$parent.summaryShipmentCtrl = function(){
-        $scope.LayersAction({open:{name:"summaryShipment"}});
+        $scope.LayersAction({open:{name:"summaryShipment", after: function(){
+        }}});
     }
+
+}]);
+
+MyApp.controller('OpenShipmentCtrl', ['$scope', function($scope){
+    $scope.autoCp ={
+        provSele:{
+            select:null,
+            text:undefined
+        },
+        pais_id:{
+            select:null,
+            text:undefined
+        }
+
+    };
+    $scope.$parent.OpenShipmentCtrl = function(){
+        $scope.LayersAction({open:{name:"detailShipment", after: function(){
+
+
+        }}});
+    }
+}]);
+
+MyApp.controller('listTariffCtrl',['$scope', function($scope){
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+    $scope.listTariffCtrl = function(){
+        $scope.LayersAction({open:{name:"listShipment", after: function(){}}});
+    }
+
+
 
 }]);
 MyApp.factory('shipment', ['$resource',
