@@ -104,6 +104,7 @@ MyApp.config(function ($provide, $httpProvider) {
 //###########################################################################################3
 //##############################REST service (factory)#############################################3
 //###########################################################################################3
+/*
 MyApp.factory('masters', ['$resource',
     function ($resource) {
         return $resource('master/:type/:id', {}, {
@@ -111,6 +112,18 @@ MyApp.factory('masters', ['$resource',
         });
     }
 ]);
+
+*/
+
+MyApp.factory('masters', ['$resource',
+    function ($resource) {
+        return $resource('master/:type/:id', {}, {
+            query: {method: 'GET', params: {type: "",id:""}, isArray: true},
+            post: {method: 'POST', params: {type: "",id:""}, isArray: false}
+        });
+    }
+]);
+
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -164,6 +177,23 @@ MyApp.directive('global', function (Layers, setNotif) {
         }
     };
 });
+
+function bindDirective($compile) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            //var html = $scope.$eval($attrs.bindDirective)
+            element.attr(element.bindDirective,"");
+            
+            element.removeAttr("bind-directive")
+            console.log(element)
+            //toCompile = angular.element('<' + html + '>');
+            element.replaceWith($compile(element)(scope));
+        }
+    };
+}
+
+MyApp.directive('bindDirective', bindDirective)
 
 
 
@@ -788,6 +818,11 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
             secc: 'Pedidos',
             key:'pedidos',
             url: 'modules/pedidos/index',
+            selct: 'btnDot'
+        }, {
+            secc: 'Productos',
+            key:'productos',
+            url: 'modules/productos/index',
             selct: 'btnDot'
         }];
     $scope.seccion = $scope.secciones[0];

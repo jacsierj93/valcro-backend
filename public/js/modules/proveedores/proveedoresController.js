@@ -24,14 +24,7 @@ MyApp.directive('iconGroup', function ($timeout) {
         }
     };
 });
-MyApp.factory('masters', ['$resource',
-    function ($resource) {
-        return $resource('master/:type/:id', {}, {
-            query: {method: 'GET', params: {type: "",id:""}, isArray: true},
-            post: {method: 'POST', params: {type: "",id:""}, isArray: false}
-        });
-    }
-]);
+
 MyApp.factory('providers', ['$resource',
     function ($resource) {
         return $resource('provider/:type/:id_prov', {}, {
