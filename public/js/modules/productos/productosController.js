@@ -22,19 +22,38 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters',function ($scope,
                tipo:"text",
                directive:'prevText'
            }
+       },
+       {
+           campo:"codigo de producto",
+           type:{
+               tipo:"text",
+               directive:'prevText'
+           }
+       },
+       {
+           campo:"linea",
+           type:{
+               tipo:"autocomplete",
+               directive:'prevComplete'
+           }
        }
    ]
 
 
 }]);
 
-MyApp.directive('prevText', function() {
+MyApp.directive('formPreview', function() {
         return {
-            templateUrl: function(elem, attr) {
-                return 'modules/productos/formPreviewTemplates.html#text';
+            link:function(scope,elem,attr){
+                attr.directive=scope.$eval(attr.formPreview);
             },
-            link:function(){
-                alert();
+            templateUrl: function(elem, attr) {
+                //console.log(scope.$eval(attr.formPreview))
+                if(attr.formPreview == "prevText"){
+                    return 'modules/productos/previewFormTemplates/textForm';
+                }else if(attr.formPreview == "autocomplete"){
+                    return 'modules/productos/previewFormTemplates/autocompleteForm';
+                }
             }
         };
 });

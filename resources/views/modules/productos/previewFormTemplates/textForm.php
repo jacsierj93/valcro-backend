@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
-<md-input-container id="#text" class="md-block" flex>
-    <label>Nombre de Linea</label>
+
+<md-input-container id="text" class="md-block" flex>
+    <label>{{field.campo}}</label>
     <input skip-tab
-           info="indique el nombre del proveedor"
+           info="fasfafs"
            ng-disabled="$parent.enabled && prov.id"
            autocomplete="off"
            ng-blur="check('razon_social')"
@@ -25,5 +19,4 @@
 
 </md-input-container>
 
-</body>
-</html>
+
