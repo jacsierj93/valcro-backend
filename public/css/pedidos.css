@@ -97,32 +97,6 @@ div[ng-click] * {
 .cell-filter-order > div > img{
    width: 12px;
 }
-/*@derecated*/
-/*.cell-filter-order *{
-    width: 100%;
-}
-.cell-filter-order > div {
-    height: 50%;
-    width: 100%;
-}*/
-
-/*.cell-filter-order > div > div{
-    padding-top: 4px;
-}*/
-/*.cell-filter-order > div:not(.filter-select) > img{
-    display: none;
-}*/
-/*.cell-filter-order > div:hover > img{
-    display: block ;
-}
-
-
-
-.filter-select *{
-    display: block ;
-}*/
-
-
 
 .cellGrid input{
     border: none;
@@ -316,6 +290,10 @@ md-sidenav .md-sidenav-right.md-locked-open{
     text-decoration: none;
 }
 
+.mini-content-title{
+    border-bottom: solid 1.5px rgb(92, 183, 235);
+    height: 33px;
+}
 .btn:hover {
     background: #3cb0fd;
     background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
