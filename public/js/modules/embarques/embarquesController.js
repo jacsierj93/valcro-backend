@@ -4,7 +4,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
     $scope.provs =[];
     $scope.paises =[];
     $scope.shipment ={};
-    $scope.bindShipment =setGetShipment.bind()
+    $scope.bindShipment =setGetShipment.bind();
     $scope.session = {global:'new', isblock: false};
     $scope.permit={
         created:true
@@ -41,6 +41,11 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
         }
     });
 
+    $scope.$watchGroup(['module.layer', 'module.index'] ,function(newVal){
+        $scope.layer= newVal[0];
+        $scope.index= newVal[1];
+    });
+
 }]);
 
 MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  function ($scope,shipment, setGetShipment) {
@@ -74,6 +79,9 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         setGetShipment.setShipment(data);
         $scope.summaryShipmentCtrl();
     }
+
+
+
 }]);
 
 MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',  function($scope,shipment, setGetShipment ){
@@ -111,14 +119,47 @@ MyApp.controller('listTariffCtrl',['$scope', function($scope){
         filter:{},
         data:[]
     };
-    $scope.listTariffCtrl = function(){
-        $scope.LayersAction({open:{name:"listShipment", after: function(){}}});
+    $scope.plusData= {
+      show:false
+    };
+    $scope.$parent.listTariffCtrl = function(){
+        $scope.LayersAction({open:{name:"listTariff", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
     }
+
+ /*   $scope.showplusData = function(e, data){
+        console.log("e", e);
+        if(!e){
+            $scope.plusData.show=false;
+        }else{
+            $scope.plusData.show=true;
+            $scope.plusData.data=data;
+        }
+    }*/
 
 
 
 }]);
-MyApp.factory('shipment', ['$resource',
+
+
+MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav', function($scope, $mdSidenav){
+    $scope.containers =[];
+    $scope.isOpen= false;
+    $scope.$parent.miniContainerCtrl = function(){
+        $mdSidenav("miniContainer").open().then(function(){
+            $scope.isOpen= true;
+        });
+    }
+    $scope.close = function($e){
+        if($scope.isOpen){
+            $mdSidenav("miniContainer").close();
+        }
+
+    }
+}]);
+    MyApp.factory('shipment', ['$resource',
     function ($resource) {
         return $resource('embarques/:type/:mod', {}, {
             query: {method: 'GET',params: {type: ""}, isArray: true},
@@ -133,6 +174,33 @@ MyApp.factory('shipment', ['$resource',
     }
 ]);
 
+//
+MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+    $scope.$parent.listOrdershipment = function(){
+        $scope.LayersAction({open:{name:"listOrdershipment", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
+    }
+}]);
+MyApp.controller('listOrderAddCtrl',['$scope', function($scope){
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+    $scope.$parent.listOrderAdd = function(){
+        $scope.LayersAction({open:{name:"listOrderAdd", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
+    }
+}]);
 
 /*
 * obtiene el formulario con el que se esta trabajando
@@ -320,17 +388,38 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
     };
 });
 
-MyApp.directive('gridOrderBy', function() {
+MyApp.directive('gridOrderBy', function($timeout) {
+
     return {
-        required:"ngModel",
         replace: true,
         transclude: true,
-        link: function(scope, elem, attr, ctrl){
-            console.log("ctrl", ctrl);
-            console.log("attr", attr);
+        scope:{
+            'model' : "=ngModel"
         },
-        template: function(){
-            return "<div>hi</div>";
+        link: function(scope, elem, attr, ctrl){},
+        template: function(elem, attr){
+    return '<div layout="column" layout-align="end" class="table-filter-order-by" pp="{{model.order}}">' +
+                '<div ng-click="model.order =\''+ attr.key+'\'" layout="column" layout-align="start"  ><img ng-src=\"{{(model.order == \''+attr.key + '\') ? \'images/TrianguloUp.png\' : \'images/Triangulo_2_claro-01.png\' }}\" > </div>' +
+                '<div ng-click="model.order =\'-'+ attr.key+'\'" >'+'<img ng-src=\"{{(model.order == \'-'+attr.key + '\') ? \'images/TrianguloDown.png\' : \'images/Triangulo_1_claro.png\' }}\"  ></div>'+
+        '</div>';
         }
     };
 });
+/**
+
+ <div layout="row" layout-align="end center" class="table-filter ng-isolate-scope layout-align-end layout-column ng-valid" ng-click="test()" ng-model="tbl" key="emision" role="button" tabindex="0" aria-invalid="false" style="margin-left: -8px;">
+
+ <img src="images/TrianguloUp.png" style="
+ margin-bottom: -4px;
+ "><div style="
+ border-bottom: solid 1.5px rgb(225, 225, 225);
+ margin-bottom: 18px;
+ "><img src="images/TrianguloDown.png">
+ </div>
+
+ </div>
+
+ */
+MyApp.controller("orderByCtrl", ['$scope', function($scope){
+console.log("$scope", $scope);
+}]);

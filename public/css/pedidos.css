@@ -355,6 +355,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 }
 .text-row-row > div:first-child{
     margin-right: 4px;
+    white-space: nowrap;
 }
 
 .text-row-row > div:last-child > div {
@@ -404,7 +405,26 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .adj-box  span{
     float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;
 }
+.table-filter-order-by{
+    margin-left: -8px;
+    width: 16px;
+    padding-left: 8px;
+}
+.table-filter-order-by:first-child{
+    margin-bottom: -4px;
+}
+.table-filter-order-by:last-child{
+    border-bottom: solid 1.5px rgb(225, 225, 225);
+    margin-bottom: 10px;
+}
 
+.table-filter-head{
+    margin: 0 4px 0 4px;
+}
+.table-filter-order-by img {
+    width: 8px;
+    height: 8px;
+}
 .loader{
     position: absolute;
     height: 100%;
