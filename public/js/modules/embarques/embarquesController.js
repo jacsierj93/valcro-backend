@@ -1,5 +1,6 @@
 MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,shipment, setGetShipment) {
 
+
     $scope.provSele ={};
     $scope.provs =[];
     $scope.paises =[];
@@ -48,6 +49,8 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
     $timeout(function(){
         console.log("scope parent", $scope);
     },1000);
+
+
 
 
 }]);
@@ -109,13 +112,18 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', function($scope){
         }
 
     };
+    $scope.form= 'head';
+
     $scope.$parent.OpenShipmentCtrl = function(){
         $scope.LayersAction({open:{name:"detailShipment", after: function(){
 
 
         }}});
     }
-    console.log("$scope.$parent.", $scope.$parent);
+
+    $scope.test= function(){
+        alert('');
+    }
 
 }]);
 
@@ -134,17 +142,6 @@ MyApp.controller('listTariffCtrl',['$scope', function($scope){
             $scope.tbl.data.push({id:-1});
         }}});
     }
-
- /*   $scope.showplusData = function(e, data){
-        console.log("e", e);
-        if(!e){
-            $scope.plusData.show=false;
-        }else{
-            $scope.plusData.show=true;
-            $scope.plusData.data=data;
-        }
-    }*/
-
 
 
 }]);
