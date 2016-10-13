@@ -374,6 +374,27 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($s
 
     };
 }]);
+MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.form='';
+
+    $scope.$parent.CreatTariff = function(){
+        $mdSidenav("miniCreatTariff").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniCreatTariff").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+
+    };
+}]);
+
+
 
 
 /*

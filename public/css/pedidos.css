@@ -163,10 +163,14 @@ md-sidenav .md-sidenav-right.md-locked-open{
 }
 
 .form-row-head{
-    height: 33px;
+    height: 32px;
+    margin-bottom: 8px;
 }
 .form-row-head.form-row-head-select{
     border-bottom: solid 1.5px rgb(92, 183, 235);
+    color: rgb(92, 183, 235);
+}
+.form-body-select{
     color: rgb(92, 183, 235);
 }
 .form-style{
@@ -320,6 +324,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .date-row {
     color: #c3c3c3;
     min-width: 200px;
+    white-space: nowrap;
 }
 .date-row > div:first-child{
     margin-right: 4px;
