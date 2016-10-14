@@ -1,9 +1,10 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','setGetShipment', function ($scope, $mdSidenav,shipment, setGetShipment) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,shipment, setGetShipment) {
 
-    $scope.provSele ={};
+    $scope.alerts =[];
+    $scope.provSelec ={};
     $scope.provs =[];
     $scope.paises =[];
-    $scope.shipment ={};
+    $scope.shipment ={objs:{}};
     $scope.bindShipment =setGetShipment.bind();
     $scope.session = {global:'new', isblock: false};
     $scope.permit={
@@ -11,11 +12,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
     };
     shipment.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
 
-    $scope.toEditHead= function(id,val){
-        if( $scope.session.global != 'new'){
-            setGetShipment.change("shipment",id,val);
-        }
-    };
     $scope.search = function(){
        var data =[];
         if($scope.provs.length > 0){
@@ -25,8 +21,12 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
     }
 
     $scope.setProvedor = function(prov){
-        $scope.provSele= prov;
-        $scope.listShipmentCtrl(prov);
+
+        if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
+            $scope.provSelec= prov;
+            $scope.listShipmentCtrl(prov);
+        }
+
     };
     $scope.closeSide = function(){
         $scope.LayersAction({close:true});
@@ -37,7 +37,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
         console.log("bind", newVal);
         if(newVal){
             console.log("bind", newVal);
-            $scope.shipment = setGetShipment.getShipment();
+            $scope.shipment = setGetShipment.getData();
         }
     });
 
@@ -45,6 +45,12 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav', 'shipment','set
         $scope.layer= newVal[0];
         $scope.index= newVal[1];
     });
+    $timeout(function(){
+        console.log("scope parent", $scope);
+    },1000);
+
+
+
 
 }]);
 
@@ -54,29 +60,32 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         filter:{},
         data:[]
     };
+
+    $scope.load =  function () {
+        $scope.tbl.data.splice(0,$scope.tbl.data.length);
+        var demo = {
+            titulo:"demo "+$scope.provSelec.razon_social,
+            nro_factura:"demo ",
+            id:-1,
+            carga:new Date(),
+            fecha_llegada_vnz:
+                new Date(),
+            fecha_llegada_tiend:
+                new Date(),
+            flete:{monto:0,simbol:'$'}
+            ,nacionalizacion:{monto:0, simbol:"$"}
+        }
+        $scope.tbl.data.push(demo);
+    };
     $scope.$parent.listShipmentCtrl = function(prov){
-        $scope.LayersAction({open:{name:"listShipment", after: function(){
-
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            var demo = {
-                titulo:"demo ",
-                nro_factura:"demo ",
-                id:-1,
-                carga:new Date(),
-                fecha_llegada_vnz:
-                    new Date(),
-                fecha_llegada_tiend:
-                    new Date(),
-                flete:{monto:0,simbol:'$'}
-                ,nacionalizacion:{monto:0, simbol:"$"}
-            }
-            $scope.tbl.data.push(demo);
-
-        }}});
-
+        if ($scope.$parent.module.index == 0 ){
+            $scope.LayersAction({open:{name:"listShipment", after:$scope.load }});
+        }else {
+            $scope.load();
+        }
     }
-    $scope.setShipment = function (data){
-        setGetShipment.setShipment(data);
+    $scope.setData = function (data){
+        setGetShipment.setData(data);
         $scope.summaryShipmentCtrl();
     }
 
@@ -93,24 +102,54 @@ MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',
 
 }]);
 
-MyApp.controller('OpenShipmentCtrl', ['$scope', function($scope){
+MyApp.controller('OpenShipmentCtrl', ['$scope', 'shipment','setGetShipment',function($scope,$resource,$model){
+
     $scope.autoCp ={
-        provSele:{
+        provSelec:{
             select:null,
             text:undefined
         },
         pais_id:{
             select:null,
             text:undefined
+        },
+        puerto_id:{
+            select:null,
+            text:undefined
         }
 
     };
-    $scope.$parent.OpenShipmentCtrl = function(){
+    $scope.toEditHead= function(id,val){
+        if( $scope.session.global != 'new'){
+            $model.change("shipment",id,val);
+        }
+    };
+    $scope.form= 'head';
+    //detailShipmenthead
+    $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
+         console.log("newval",newVal);
+        if(!newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
+                $scope.$parent.session.session_id= response.session_id;
+                console.log("response save", response);
+                $scope.detailShipmenthead.$setPristine()
+            });
+        }
+    });
+
+    $scope.$parent.OpenShipmentCtrl = function(data){
+        $scope.form= 'head';
         $scope.LayersAction({open:{name:"detailShipment", after: function(){
-
-
+            if(!data){
+                $scope.detailShipmenthead.$setDirty();
+            }
         }}});
+    };
+
+    $scope.test= function(){
+        alert('');
     }
+
 }]);
 
 MyApp.controller('listTariffCtrl',['$scope', function($scope){
@@ -129,17 +168,6 @@ MyApp.controller('listTariffCtrl',['$scope', function($scope){
         }}});
     }
 
- /*   $scope.showplusData = function(e, data){
-        console.log("e", e);
-        if(!e){
-            $scope.plusData.show=false;
-        }else{
-            $scope.plusData.show=true;
-            $scope.plusData.data=data;
-        }
-    }*/
-
-
 
 }]);
 
@@ -154,27 +182,14 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav', function($scope, $m
     }
     $scope.close = function($e){
         if($scope.isOpen){
-            $mdSidenav("miniContainer").close();
+            $mdSidenav("miniContainer").close().then(function(){
+                $scope.isOpen = false;
+            });
         }
 
     }
 }]);
-    MyApp.factory('shipment', ['$resource',
-    function ($resource) {
-        return $resource('embarques/:type/:mod', {}, {
-            query: {method: 'GET',params: {type: ""}, isArray: true},
-            get: {method: 'GET',params: {type:""}, isArray: false},
-            post: {method: 'POST',params: {type:" "}, isArray: false},
-            postMod: {method: 'POST',params: {type:" ",mod:""}, isArray: false},
-            getMod: {method: 'GET',params: {type:"",mod:""}, isArray: false},
-            queryMod: {method: 'GET',params: {type: "", mod:""}, isArray: true},
-            postAll: {method: 'POST',params: {type:" "}, isArray: false}
 
-        });
-    }
-]);
-
-//
 MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){
     $scope.tbl ={
         order:"id",
@@ -188,6 +203,7 @@ MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){
         }}});
     }
 }]);
+
 MyApp.controller('listOrderAddCtrl',['$scope', function($scope){
     $scope.tbl ={
         order:"id",
@@ -202,6 +218,239 @@ MyApp.controller('listOrderAddCtrl',['$scope', function($scope){
     }
 }]);
 
+MyApp.controller('listProducttshipmentCtrl',['$scope', function($scope){
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+    $scope.$parent.listProductshipment = function(){
+        console.log("tratando de abrir");
+        $scope.LayersAction({open:{name:"listProductshipment", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
+    }
+}]);
+
+MyApp.controller('listProductAddCtrl',['$scope', function($scope,$mdSidenav){
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+    $scope.$parent.listProductAdd = function(){
+        $scope.LayersAction({open:{name:"listProductAdd", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
+    };
+}]);
+
+MyApp.controller('historyProductCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+    $scope.isOpen = false;
+    $scope.$parent.historyProduct = function(){
+        $mdSidenav("miniHistoryProd").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniHistoryProd").close().then(function(){
+                $scope.isOpen = false;
+            });;
+        }
+
+    };
+}]);
+
+MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.prod ={};
+    $scope.$parent.CreatProduct = function(){
+        $mdSidenav("miniCreatProduct").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniCreatProduct").close().then(function(){
+                $scope.isOpen = false;
+            });;
+        }
+
+    };
+}]);
+
+
+MyApp.controller('miniMblCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.$parent.miniMbl = function(){
+        $mdSidenav("miniMbl").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniMbl").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+
+    };
+}]);
+
+MyApp.controller('miniHblCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.$parent.miniHbl = function(){
+        $mdSidenav("miniHbl").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniHbl").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+
+    };
+}]);
+MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.$parent.miniExpAduana = function(){
+        $mdSidenav("miniExpAduana").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniExpAduana").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+
+    };
+}]);
+
+MyApp.controller('detailOrderShipmentCtrl',['$scope', function($scope){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.tbl ={data:[]};
+    $scope.$parent.detailOrderShipment = function(data){
+        $scope.$parent.LayersAction({open:{name:"detailOrder", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
+
+    };
+}]);
+MyApp.controller('detailOrderAddCtrl',['$scope', function($scope){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.tbl ={data:[]};
+    $scope.$parent.detailOrderAdd = function(data){
+        $scope.$parent.LayersAction({open:{name:"detailOrderAdd", after: function(){
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            $scope.tbl.data.push({id:-1});
+        }}});
+
+    };
+}]);
+
+
+MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+
+    $scope.$parent.DetailProductShipment = function(data){
+        $mdSidenav("miniDetailProductShipment").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniDetailProductShipment").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+
+    };
+}]);
+
+MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment',function($scope,$mdSidenav, shipment){
+    $scope.isOpen = false;
+    shipment.query({type:"Notification"}, {}, function(response){$scope.$parent.alerts= response; });
+    $scope.$parent.moduleMsmCtrl = function(){
+        $mdSidenav("moduleMsm").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+
+    $scope.$watch("$parent.module.index", function(newVal){
+        if($scope.isOpen && newVal ){
+
+        }
+    });
+
+    $scope.close =  function(e){
+        if( $scope.isOpen){
+            $mdSidenav("moduleMsm").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+    }
+    $scope.openNoti = function(data){
+        console.log("open ", data);
+    }
+
+
+}]);
+MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+    $scope.isOpen = false;
+    $scope.data ={adjs:[]};
+    $scope.form='';
+
+    $scope.$parent.CreatTariff = function(){
+        $mdSidenav("miniCreatTariff").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+    $scope.close= function(){
+        if($scope.isOpen){
+            $mdSidenav("miniCreatTariff").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+
+    };
+}]);
+
+
+MyApp.factory('shipment', ['$resource',
+    function ($resource) {
+        return $resource('embarques/:type/:mod', {}, {
+            query: {method: 'GET',params: {type: ""}, isArray: true},
+            get: {method: 'GET',params: {type:""}, isArray: false},
+            post: {method: 'POST',params: {type:" "}, isArray: false},
+            postMod: {method: 'POST',params: {type:" ",mod:""}, isArray: false},
+            getMod: {method: 'GET',params: {type:"",mod:""}, isArray: false},
+            queryMod: {method: 'GET',params: {type: "", mod:""}, isArray: true},
+            postAll: {method: 'POST',params: {type:" "}, isArray: false}
+
+        });
+    }
+]);
+
+
 /*
 * obtiene el formulario con el que se esta trabajando
 * */
@@ -214,7 +463,7 @@ MyApp.service('form',function(){
             return true;
         }
     };
-    var form = Object.create(prototype);;
+    var form = Object.create(prototype);
 
     return {
         created: function(){
@@ -363,7 +612,7 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
             return interno;
         }
         ,
-        setShipment : function(doc){
+        setData : function(doc){
             bindin.estado=false;
             Shipment= doc;
             bindin.estado=true;
@@ -373,7 +622,7 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
             bindin.estado=false;
             bindin.estado=true;
         },
-        getShipment : function(){
+        getData : function(){
             return Shipment;
         },
         clear: function(){

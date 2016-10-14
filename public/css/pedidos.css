@@ -97,32 +97,6 @@ div[ng-click] * {
 .cell-filter-order > div > img{
    width: 12px;
 }
-/*@derecated*/
-/*.cell-filter-order *{
-    width: 100%;
-}
-.cell-filter-order > div {
-    height: 50%;
-    width: 100%;
-}*/
-
-/*.cell-filter-order > div > div{
-    padding-top: 4px;
-}*/
-/*.cell-filter-order > div:not(.filter-select) > img{
-    display: none;
-}*/
-/*.cell-filter-order > div:hover > img{
-    display: block ;
-}
-
-
-
-.filter-select *{
-    display: block ;
-}*/
-
-
 
 .cellGrid input{
     border: none;
@@ -187,19 +161,27 @@ div[ng-click] * {
 md-sidenav .md-sidenav-right.md-locked-open{
     /* position: absolute;*/
 }
-.form-head{
-    min-height: 40px;
-    height: 40px;
-}
-.form-body{
+
+.form-row-head{
+    height: 32px;
     margin-bottom: 8px;
+}
+.form-row-head.form-row-head-select{
+    border-bottom: solid 1.5px rgb(92, 183, 235);
+    color: rgb(92, 183, 235);
+}
+.form-body-select{
+    color: rgb(92, 183, 235);
+}
+.form-style{
+    background-image: url("../images/shadowUp.jpg");
+    background-position: bottom;
+    background-repeat: repeat-x;
 }
 
-.form-row{
-    min-height: 28px;
-    height: 28px;
-    margin-bottom: 8px;
-}
+
+
+/****forms embarques***/
 
 /**contenedor de la grilla*/
 .gridContent{
@@ -259,9 +241,6 @@ md-sidenav .md-sidenav-right.md-locked-open{
 }
 
 
-.rowRsmTitle{
-}
-
 .divIconRsm{
     height: 24px;
     font-size: 16px
@@ -316,6 +295,10 @@ md-sidenav .md-sidenav-right.md-locked-open{
     text-decoration: none;
 }
 
+.mini-content-title{
+    border-bottom: solid 1.5px rgb(92, 183, 235);
+    height: 33px;
+}
 .btn:hover {
     background: #3cb0fd;
     background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
@@ -341,6 +324,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .date-row {
     color: #c3c3c3;
     min-width: 200px;
+    white-space: nowrap;
 }
 .date-row > div:first-child{
     margin-right: 4px;
@@ -397,12 +381,12 @@ md-sidenav .md-sidenav-right.md-locked-open{
     resize: none
 }
 
-.adj-box{
+.adj-box-rigth{
     padding: 3px;
     margin: -1px 0 0 -11px
 }
 
-.adj-box  span{
+.adj-box-rigth  span{
     float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;
 }
 .table-filter-order-by{
