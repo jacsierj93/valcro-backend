@@ -19,7 +19,7 @@ class EmbarquesController extends BaseController
     }
 
     public  function  getProvList(){
-        $prov  = Provider::get();
+        $prov  = Provider::where('id','<' ,100)->get();
         $data = [];
 
         return $prov;

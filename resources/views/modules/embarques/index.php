@@ -103,14 +103,14 @@
                 </div>
             </div>
 
-            <div id="listado" flex  style="overflow-y:auto;"  >
+            <div id="listado" flex  style="overflow-y:auto;word-break: break-all;"  >
                 <div class="boxList"  layout="column" flex ng-repeat="item in search()  "  list-box ng-click="setProvedor(item, this)"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
                 >
 
-                    <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
+                    <div  style="overflow: hidden; text-overflow: ellipsis;word-break: break-all;" flex>{{item.razon_social}}</div>
                     <div layout="column" style="height: 54px;">
                         <div style="font-size:14px;"  id="dot-show{{item.id}}" layout="column" flex ng-show="item.show">
                             <spand layout="row" >{{item.text}}</spand>
@@ -573,7 +573,7 @@
         <!------------------------------------------- detalle de embarques creados ------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailShipment" id="detailShipment"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "OpenShipmentCtrl" >
-                <div layout="column" flex>
+                <div layout="column" flex style="padding-right: 2px;">
                     <form layout="row" name="head" ng-class="{'focused':form== 'head'}" ng-click="form = 'head' ">
                         <div active-left  ></div>
                         <div layout="column" flex>
@@ -2411,11 +2411,11 @@
                 <div  layout="column" flex class="layerColumn"   click-out="close($event)">
                     <div layout="row" layout-align="start center" class="focused">
                         <div layout="row" class="form-row-head form-row-head-select" >
-                            <divflex  class="titulo_formulario" style="height:39px;">
+                            <div flex  class="titulo_formulario" style="height:39px;">
                                 <div>
                                     Containers
                                 </div>
-                            </divflex>
+                            </div>
                         </div>
                     </div>
                     <div layout="row" style="padding-right: 4px;">

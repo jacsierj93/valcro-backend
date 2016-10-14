@@ -1,7 +1,7 @@
 MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,shipment, setGetShipment) {
 
 
-    $scope.provSele ={};
+    $scope.provSelec ={};
     $scope.provs =[];
     $scope.paises =[];
     $scope.shipment ={};
@@ -26,8 +26,12 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
     }
 
     $scope.setProvedor = function(prov){
-        $scope.provSele= prov;
-        $scope.listShipmentCtrl(prov);
+
+        if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
+            $scope.provSelec= prov;
+            $scope.listShipmentCtrl(prov);
+        }
+
     };
     $scope.closeSide = function(){
         $scope.LayersAction({close:true});
@@ -61,26 +65,29 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         filter:{},
         data:[]
     };
+
+    $scope.load =  function () {
+        $scope.tbl.data.splice(0,$scope.tbl.data.length);
+        var demo = {
+            titulo:"demo "+$scope.provSelec.razon_social,
+            nro_factura:"demo ",
+            id:-1,
+            carga:new Date(),
+            fecha_llegada_vnz:
+                new Date(),
+            fecha_llegada_tiend:
+                new Date(),
+            flete:{monto:0,simbol:'$'}
+            ,nacionalizacion:{monto:0, simbol:"$"}
+        }
+        $scope.tbl.data.push(demo);
+    };
     $scope.$parent.listShipmentCtrl = function(prov){
-        $scope.LayersAction({open:{name:"listShipment", after: function(){
-
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            var demo = {
-                titulo:"demo ",
-                nro_factura:"demo ",
-                id:-1,
-                carga:new Date(),
-                fecha_llegada_vnz:
-                    new Date(),
-                fecha_llegada_tiend:
-                    new Date(),
-                flete:{monto:0,simbol:'$'}
-                ,nacionalizacion:{monto:0, simbol:"$"}
-            }
-            $scope.tbl.data.push(demo);
-
-        }}});
-
+        if ($scope.$parent.module.index == 0 ){
+            $scope.LayersAction({open:{name:"listShipment", after:$scope.load }});
+        }else {
+            $scope.load();
+        }
     }
     $scope.setShipment = function (data){
         setGetShipment.setShipment(data);
@@ -102,7 +109,7 @@ MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',
 
 MyApp.controller('OpenShipmentCtrl', ['$scope', function($scope){
     $scope.autoCp ={
-        provSele:{
+        provSelec:{
             select:null,
             text:undefined
         },
