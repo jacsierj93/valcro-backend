@@ -38,6 +38,9 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
         if(newVal){
             console.log("bind", newVal);
             $scope.shipment = setGetShipment.getData();
+            if($scope.shipment.objs.prov_id){
+                $scope.provSelec= $scope.shipment.objs.prov_id;
+            }
         }
     });
 
@@ -102,36 +105,55 @@ MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',
 
 }]);
 
-MyApp.controller('OpenShipmentCtrl', ['$scope', 'shipment','setGetShipment',function($scope,$resource,$model){
+MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShipment',function($scope,$timeout ,$resource,$model){
 
-    $scope.autoCp ={
-        provSelec:{
-            select:null,
-            text:undefined
-        },
-        pais_id:{
-            select:null,
-            text:undefined
-        },
-        puerto_id:{
-            select:null,
-            text:undefined
+    $scope.provSelec = null;
+    $scope.provSelecText = undefined;
+
+    $scope.$watch("provSelec", function(newVal){
+        console.log("newval", newVal);
+        if(newVal != null && newVal.id){
+            $resource.query({type:"ProviderDir", id:newVal.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
         }
+    });
+    $scope.$watch("provSelec", function(newVal){
 
-    };
+        if(newVal && $scope.$parent.provSelec){
+            if(newVal.id != $scope.$parent.provSelec.id){
+                $scope.$parent.provSelec = newVal;
+                $timeout(function(){
+                    var elem=angular.element("#prov"+newVal.id);
+                    angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
+                },0)
+            }
+        }else{
+            $scope.$parent.provSelec= {};
+        }
+    });
+    $scope.$watch("$parent.provSelec", function(newVal){
+      if(newVal.id ){
+          if($scope.provSelec == null){
+              $scope.provSelec=newVal;
+          }else{
+              if(newVal.id != $scope.provSelec.id){
+                  //$scope.provSelec=newVal;
+              }
+          }
+
+      }
+    });
     $scope.toEditHead= function(id,val){
         if( $scope.session.global != 'new'){
             $model.change("shipment",id,val);
         }
     };
     $scope.form= 'head';
-    //detailShipmenthead
     $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
          console.log("newval",newVal);
         if(!newVal[1]){
             $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
                 $scope.$parent.session.session_id= response.session_id;
-                console.log("response save", response);
+                $scope.$parent.shipment.id = response.id;
                 $scope.detailShipmenthead.$setPristine()
             });
         }
@@ -158,9 +180,11 @@ MyApp.controller('listTariffCtrl',['$scope', function($scope){
         filter:{},
         data:[]
     };
-    $scope.plusData= {
-      show:false
-    };
+    $scope.pais_idSelec = null;
+    $scope.pais_idText = undefined;
+    $scope.puerto_idSelec = null;
+    $scope.puerto_idText = undefined;
+
     $scope.$parent.listTariffCtrl = function(){
         $scope.LayersAction({open:{name:"listTariff", after: function(){
             $scope.tbl.data.splice(0,$scope.tbl.data.length);
@@ -323,6 +347,7 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav', function($scope,$mdSidena
 
     };
 }]);
+
 MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
@@ -353,6 +378,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope', function($scope){
 
     };
 }]);
+
 MyApp.controller('detailOrderAddCtrl',['$scope', function($scope){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
@@ -386,7 +412,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($s
     };
 }]);
 
-MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment',function($scope,$mdSidenav, shipment){
+MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipment',function($scope,$mdSidenav, shipment, $model){
     $scope.isOpen = false;
     shipment.query({type:"Notification"}, {}, function(response){$scope.$parent.alerts= response; });
     $scope.$parent.moduleMsmCtrl = function(){
@@ -409,11 +435,25 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment',function($sco
         }
     }
     $scope.openNoti = function(data){
-        console.log("open ", data);
+        switch (data.key){
+            case "uncloset":
+                if(data.cantidad == 1){
+                    shipment.get({type:"Shipment", id:data.data[0].id},{}, function(response){
+                        $model.setData(response);
+                        $scope.$parent.OpenShipmentCtrl(response);
+                        $scope.close();
+                    });
+                }else{
+                   alert("no implementado")
+                }
+                break;
+        }
+
     }
 
 
 }]);
+
 MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};

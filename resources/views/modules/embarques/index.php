@@ -588,16 +588,16 @@
                             <div layout="row" class="row" >
                                 <md-input-container class="md-block" flex  >
                                     <label>Proveedor</label>
-                                    <md-autocomplete md-selected-item="autoCp.provSele.select"
+                                    <md-autocomplete md-selected-item="provSelec"
                                                      info="Seleccione el proveedor del embarque"
                                                      required
                                                      ng-disabled="( session.isBlock )"
                                                      ng-click="toEditHead('prov_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
-                                                     md-search-text="autoCp.provSele.text"
+                                                     md-search-text="provSelecText "
                                                      md-auto-select="true"
-                                                     md-items="item in $parent.provs | stringKey : autoCp.provSele.text : 'razon_social' "
+                                                     md-items="item in $parent.provs | stringKey : provSelecText : 'razon_social' "
                                                      md-item-text="item.razon_social"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
@@ -605,7 +605,7 @@
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change="$parent.shipment.prov_id = autoCp.provSele.select.id "
+                                                     md-selected-item-change="$parent.shipment.prov_id = provSelec.id ;$parent.shipment.objs.prov_id = provSelec;"
                                     >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
@@ -647,84 +647,33 @@
 
 
                             </div>
-                            <div layout="row" class="row">
-                                <div class="adj-box-left" flex="10" style="color: rgb(176,176,176);margin-right: 8px;"  ng-click="listTariffCtrl()">
+                            <div layout="row" class="row"  ng-click="listTariffCtrl()">
+                                <div class="adj-box-left" flex="10" style="color: rgb(176,176,176);margin-right: 8px;" >
                                     <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left;margin-right: 0">T </div>
                                     <div style="margin-top: 8px;    border-bottom: dotted 0.6px rgb(176,176,176);margin-left: 26px;">Tarifa</div>
                                 </div>
                                 <md-input-container class="md-block" flex  >
                                     <label>Pais</label>
-                                    <md-autocomplete md-selected-item="autoCp.pais_id.select"
-                                                     info="Selecione el pais de origen para el embarque"
-                                                     required
-                                                     ng-disabled="( session.isBlock )"
-                                                     ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                     id="prov_id"
-                                                     skip-tab
-                                                     md-search-text="autoCp.pais_id.text"
-                                                     md-auto-select="true"
-                                                     md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                     md-item-text="item.razon_social"
-                                                     md-autoselect = "true"
-                                                     md-no-asterisk
-                                                     md-min-length="0"
-                                                     md-no-cache="true"
-                                                     md-select-on-match
-                                                     md-selected-item-change="$parent.shipment.pais_id = autoCp.pais_id.select.id "
-                                    >
-                                        <md-item-template>
-                                            <span>{{item.razon_social}}</span>
-                                        </md-item-template>
-                                        <md-not-found >
-                                            No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
-                                        </md-not-found>
-                                    </md-autocomplete>
+                                    <input ng-model="$parent.shipment.objs.pais_id.short_name" ng-readonly="true" />
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20"  >
                                     <label>Puerto</label>
-                                    <md-autocomplete md-selected-item="autoCp.puerto_id.select"
-                                                     info="Selecione el pais de origen para el embarque"
-                                                     required
-                                                     ng-disabled="( session.isBlock )"
-                                                     ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                     id="prov_id"
-                                                     skip-tab
-                                                     md-search-text="autoCp.pais_id.text"
-                                                     md-auto-select="true"
-                                                     md-items="item in $parent.puertos | stringKey : autoCp.puerto_id.text : 'main_port_name' "
-                                                     md-item-text="item.razon_social"
-                                                     md-autoselect = "true"
-                                                     md-no-asterisk
-                                                     md-min-length="0"
-                                                     md-no-cache="true"
-                                                     md-select-on-match
-                                                     md-selected-item-change="$parent.shipment.pais_id = autoCp.puerto_id.select.id "
-                                    >
-                                        <md-item-template>
-                                            <span>{{item.main_port_name}}</span>
-                                        </md-item-template>
-                                        <md-not-found >
-                                            No se encontro el puerto
-                                        </md-not-found>
-                                    </md-autocomplete>
+                                    <input ng-model="$parent.shipment.objs.puerto_id.main_port_name" ng-readonly="true" />
                                 </md-input-container>
 
                                 <md-input-container flex>
                                     <label>Freigth Forwarder</label>
                                     <input  ng-model="$parent.shipment.objs.tarifa_id.ff"
-                                            ng-change=" toEditHead('titulo', document.titulo ) "
-                                            ng-disabled="true"
+                                            ng-readonly="true"
                                             required
-                                            info="{{'Freigth Forwarder del embarque '+($parent.shipment.objs.tarifa_id.ff) ? $parent.shipment.objs.tarifa_id.ff :' no  ha asignado, haga click en Tarifa' }}"
                                             skip-tab
                                     >
                                 </md-input-container>
                                 <md-input-container flex>
                                     <label>Naviera</label>
                                     <input  ng-model="$parent.shipment.objs.tarifa_id.naviera"
-                                            ng-disabled="true"
+                                            ng-readonly="true"
                                             required
-                                            info="{{'Naviera del embarque '+($parent.shipment.objs.tarifa_id.ff) ? $parent.shipment.objs.tarifa_id.ff :' no  ha asignado, haga click en Tarifa' }}"
                                             skip-tab
                                     >
                                 </md-input-container>
@@ -1316,55 +1265,55 @@
                             <div layout="row" class="row" style="overflow: hidden;">
                                 <md-input-container class="md-block" flex >
                                     <label>Pais</label>
-                                    <md-autocomplete md-selected-item="autoCp.pais_id.select"
+                                    <md-autocomplete md-selected-item="pais_idSelec"
                                                      info="Selecione el pais de origen para el embarque"
-                                                     required
                                                      ng-disabled="( session.isBlock )"
                                                      ng-click="$parent.toEditHead('pais_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
-                                                     md-search-text="autoCp.pais_id.text"
+                                                     md-search-text="pais_idText"
                                                      md-auto-select="true"
-                                                     md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                     md-item-text="item.razon_social"
+                                                     md-items="item in $parent.provSelec.direcciones | stringKey : pais_idText : 'short_name' "
+                                                     md-item-text="item.short_name"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
+                                                     md-selected-item-change="$parent.shipment.pais_id = pais_idSelec.id ;$parent.shipment.objs.pais_id = pais_idSelec;"
+
                                     >
                                         <md-item-template>
-                                            <span>{{item.razon_social}}</span>
+                                            <span>{{item.short_name}}</span>
                                         </md-item-template>
                                         <md-not-found >
-                                            No se encontro el pais {{searchProveedor}}. ¿Desea crearlo?
+                                            No se encontro el pais {{pais_idText}}
                                         </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="30" >
                                     <label>Puerto</label>
-                                    <md-autocomplete md-selected-item="autoCp.pais_id.select"
-                                                     info="Selecione el pais de origen para el embarque"
-                                                     required
+                                    <md-autocomplete md-selected-item="puerto_idSelec"
+                                                     requiered
+                                                     info="Selecione el puerto de origen para el embarque"
                                                      ng-disabled="( session.isBlock )"
                                                      ng-click="$parent.toEditHead('pais_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
-                                                     md-search-text="autoCp.pais_id.text"
+                                                     md-search-text="puerto_idText"
                                                      md-auto-select="true"
-                                                     md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                     md-item-text="item.razon_social"
+                                                     md-items="item in (pais_idSelec ==  null) ? [] :pais_idSelec.ports  | stringKey : puerto_idSelec : 'Main_port_name' "
+                                                     md-item-text="item.Main_port_name"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-no-cache="true"
-                                                     md-select-on-match
                                     >
                                         <md-item-template>
-                                            <span>{{item.razon_social}}</span>
+                                            <span>{{item.Main_port_name}}</span>
                                         </md-item-template>
                                         <md-not-found >
-                                            No se encontro el pais {{searchProveedor}}. ¿Desea crearlo?
+                                            No se encontro el puerto {{puerto_idText}}
                                         </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
@@ -2961,10 +2910,11 @@
                     md-disable-backdrop="true" md-component-id="moduleMsm" id="moduleMsm"
 
 
+
         >
 
             <md-content   layout="row" flex class="sideNavContent"  ng-controller="moduleMsmCtrl" >
-                <div  layout="column" flex="" class="layerColumn"  click-out="close($event)" >
+                <div  layout="column" flex="" class="layerColumn"  click-out="close($event)" style="padding-left: 12px" >
                     <div layout="row" class="form-row-head form-row-head-select" >
                         <div class="titulo_formulario">
                             <div>
@@ -2972,8 +2922,7 @@
                             </div>
                         </div>
                     </div>
-                                        <form layout="row" >
-                        <div class="activeleft"></div>
+                    <form layout="row" >
                         <md-content flex  >
                             <div ng-repeat="item in $parent.alerts"  >
                                 <div layout="row" class="cellGridHolder" ng-click="openNoti(item)" >
@@ -2983,7 +2932,6 @@
                             </div>
 
                         </md-content>
-
                     </form>
                 </div>
 

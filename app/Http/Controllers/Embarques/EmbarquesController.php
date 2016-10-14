@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Embarques;
 
 
+use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Providers\Provider;
+use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Shipments\Shipment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
+use phpDocumentor\Reflection\DocBlock\Type\Collection;
 use Session;
 use Validator;
 
@@ -26,10 +29,10 @@ class EmbarquesController extends BaseController
     public function getNotifications(){
         $result = [];
 
-        $aux= Shipment::selectRaw("count(id)")->whereNotNull('session_id');// sesiones vivas
+        $aux= Shipment::selectraw('id')->whereNotNull('session_id');// sesiones vivas
         $aux= $aux->get();
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>"Embarques pendientes", 'key'=>'uncloset','cantidad'=>$aux[0][0]);
+        if(sizeof($aux) > 0){
+            $result[] = array('titulo'=>"Embarques pendientes", 'key'=>'uncloset','cantidad'=>sizeof($aux), 'data'=> $aux);
         }
 
         return $result;
@@ -40,12 +43,27 @@ class EmbarquesController extends BaseController
         $prov  = Provider::where('id','<' ,100)->get();
         return $prov;
     }
+    public  function  getProvDir(Request $req){
+        $data =[];
+        $paises = ProviderAddress::selectraw('pais_id')
+            ->where('prov_id', $req->id)
+            ->where(function ($query){$query->where('tipo_dir',2)->orWhere('tipo_dir',3);})
+            ->distinct('pais_id')->get();
+
+        foreach($paises as $pais){
+           $contry = Country::find($pais->pais_id);
+            $contry['ports'] = $contry->ports()->get();
+            $data []= $contry;
+        }
+        return $data;
+    }
 
     /************************* SHIPMENT ***********************************/
     public  function  getShipment(Request $req){
         $model = Shipment::findOrfail($req->id);
         $data = [];
         $data['id'] = $model->id;
+        $data['prov_id'] = $model->prov_id;
         $data['session_id'] = $model->session_id;
         $data['pais_id'] = $model->pais_id;
         $data['puerto_id'] = $model->puerto_id;
@@ -60,7 +78,8 @@ class EmbarquesController extends BaseController
         $data['objs'] =[
             'pais_id'=>null,
             'puerto_id'=>null,
-            'tarifa_id'=>null
+            'tarifa_id'=>null,
+            'prov_id'=>($model->prov_id == null) ? null: Provider::find($model->prov_id),
         ];
 
         return $data ;
