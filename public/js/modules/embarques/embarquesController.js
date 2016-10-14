@@ -1,10 +1,10 @@
 MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,shipment, setGetShipment) {
 
-
+    $scope.alerts =[];
     $scope.provSelec ={};
     $scope.provs =[];
     $scope.paises =[];
-    $scope.shipment ={};
+    $scope.shipment ={objs:{}};
     $scope.bindShipment =setGetShipment.bind();
     $scope.session = {global:'new', isblock: false};
     $scope.permit={
@@ -12,11 +12,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
     };
     shipment.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
 
-    $scope.toEditHead= function(id,val){
-        if( $scope.session.global != 'new'){
-            setGetShipment.change("shipment",id,val);
-        }
-    };
     $scope.search = function(){
        var data =[];
         if($scope.provs.length > 0){
@@ -42,7 +37,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
         console.log("bind", newVal);
         if(newVal){
             console.log("bind", newVal);
-            $scope.shipment = setGetShipment.getShipment();
+            $scope.shipment = setGetShipment.getData();
         }
     });
 
@@ -89,8 +84,8 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
             $scope.load();
         }
     }
-    $scope.setShipment = function (data){
-        setGetShipment.setShipment(data);
+    $scope.setData = function (data){
+        setGetShipment.setData(data);
         $scope.summaryShipmentCtrl();
     }
 
@@ -107,7 +102,8 @@ MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',
 
 }]);
 
-MyApp.controller('OpenShipmentCtrl', ['$scope', function($scope){
+MyApp.controller('OpenShipmentCtrl', ['$scope', 'shipment','setGetShipment',function($scope,$resource,$model){
+
     $scope.autoCp ={
         provSelec:{
             select:null,
@@ -116,17 +112,39 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', function($scope){
         pais_id:{
             select:null,
             text:undefined
+        },
+        puerto_id:{
+            select:null,
+            text:undefined
         }
 
     };
+    $scope.toEditHead= function(id,val){
+        if( $scope.session.global != 'new'){
+            $model.change("shipment",id,val);
+        }
+    };
     $scope.form= 'head';
+    //detailShipmenthead
+    $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
+         console.log("newval",newVal);
+        if(!newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
+                $scope.$parent.session.session_id= response.session_id;
+                console.log("response save", response);
+                $scope.detailShipmenthead.$setPristine()
+            });
+        }
+    });
 
-    $scope.$parent.OpenShipmentCtrl = function(){
+    $scope.$parent.OpenShipmentCtrl = function(data){
+        $scope.form= 'head';
         $scope.LayersAction({open:{name:"detailShipment", after: function(){
-
-
+            if(!data){
+                $scope.detailShipmenthead.$setDirty();
+            }
         }}});
-    }
+    };
 
     $scope.test= function(){
         alert('');
@@ -171,20 +189,6 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav', function($scope, $m
 
     }
 }]);
-    MyApp.factory('shipment', ['$resource',
-    function ($resource) {
-        return $resource('embarques/:type/:mod', {}, {
-            query: {method: 'GET',params: {type: ""}, isArray: true},
-            get: {method: 'GET',params: {type:""}, isArray: false},
-            post: {method: 'POST',params: {type:" "}, isArray: false},
-            postMod: {method: 'POST',params: {type:" ",mod:""}, isArray: false},
-            getMod: {method: 'GET',params: {type:"",mod:""}, isArray: false},
-            queryMod: {method: 'GET',params: {type: "", mod:""}, isArray: true},
-            postAll: {method: 'POST',params: {type:" "}, isArray: false}
-
-        });
-    }
-]);
 
 MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){
     $scope.tbl ={
@@ -381,6 +385,35 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($s
 
     };
 }]);
+
+MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment',function($scope,$mdSidenav, shipment){
+    $scope.isOpen = false;
+    shipment.query({type:"Notification"}, {}, function(response){$scope.$parent.alerts= response; });
+    $scope.$parent.moduleMsmCtrl = function(){
+        $mdSidenav("moduleMsm").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+
+    $scope.$watch("$parent.module.index", function(newVal){
+        if($scope.isOpen && newVal ){
+
+        }
+    });
+
+    $scope.close =  function(e){
+        if( $scope.isOpen){
+            $mdSidenav("moduleMsm").close().then(function(){
+                $scope.isOpen = false;
+            });
+        }
+    }
+    $scope.openNoti = function(data){
+        console.log("open ", data);
+    }
+
+
+}]);
 MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
@@ -402,6 +435,20 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav', function($scope,$mdSi
 }]);
 
 
+MyApp.factory('shipment', ['$resource',
+    function ($resource) {
+        return $resource('embarques/:type/:mod', {}, {
+            query: {method: 'GET',params: {type: ""}, isArray: true},
+            get: {method: 'GET',params: {type:""}, isArray: false},
+            post: {method: 'POST',params: {type:" "}, isArray: false},
+            postMod: {method: 'POST',params: {type:" ",mod:""}, isArray: false},
+            getMod: {method: 'GET',params: {type:"",mod:""}, isArray: false},
+            queryMod: {method: 'GET',params: {type: "", mod:""}, isArray: true},
+            postAll: {method: 'POST',params: {type:" "}, isArray: false}
+
+        });
+    }
+]);
 
 
 /*
@@ -416,7 +463,7 @@ MyApp.service('form',function(){
             return true;
         }
     };
-    var form = Object.create(prototype);;
+    var form = Object.create(prototype);
 
     return {
         created: function(){
@@ -565,7 +612,7 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
             return interno;
         }
         ,
-        setShipment : function(doc){
+        setData : function(doc){
             bindin.estado=false;
             Shipment= doc;
             bindin.estado=true;
@@ -575,7 +622,7 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
             bindin.estado=false;
             bindin.estado=true;
         },
-        getShipment : function(){
+        getData : function(){
             return Shipment;
         },
         clear: function(){

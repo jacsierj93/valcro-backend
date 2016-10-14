@@ -256,7 +256,7 @@
 
                 <!-- botonera rigth -->
                 <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show= "module.index == 0">
-                    <div class="{{(alerts.length > 0 ) ? 'animation-arrow' : 'animation-arrow-disable'}}" ng-click="openNotis()" id="noti-button"
+                    <div class="{{(alerts.length > 0 ) ? 'animation-arrow' : 'animation-arrow-disable'}}" ng-click="moduleMsmCtrl()" id="noti-button"
                          layout="column" layout-align="center center"  style=text-align:center; >
                         <img ng-src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
                     </div>
@@ -574,7 +574,7 @@
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailShipment" id="detailShipment"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "OpenShipmentCtrl" >
                 <div layout="column" flex style="padding-right: 2px;">
-                    <form layout="row" name="head" ng-class="{'focused':form== 'head'}" ng-click="form = 'head' ">
+                    <form layout="row" name="detailShipmenthead" ng-class="{'focused':form== 'head'}" ng-click="form = 'head' ">
                         <div active-left  ></div>
                         <div layout="column" flex>
 
@@ -592,7 +592,7 @@
                                                      info="Seleccione el proveedor del embarque"
                                                      required
                                                      ng-disabled="( session.isBlock )"
-                                                     ng-click="$parent.toEditHead('prov_id', provSelect.id)"
+                                                     ng-click="toEditHead('prov_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
                                                      md-search-text="autoCp.provSele.text"
@@ -605,6 +605,7 @@
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
+                                                     md-selected-item-change="$parent.shipment.prov_id = autoCp.provSele.select.id "
                                     >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
@@ -621,7 +622,7 @@
                                             skip-tab
                                     >
                                 </md-input-container>
-                                <div layout="row" class="date-row" >
+                                <div layout="row" class="date-row" ng-show="$parent.shipment.emision">
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Creado</div>
                                     </div>
@@ -636,10 +637,10 @@
                                 <md-input-container flex>
                                     <label>Titulo</label>
                                     <input  ng-model="$parent.shipment.titulo"
-                                            ng-change=" toEditHead('titulo', document.titulo ) "
+                                            ng-change="toEditHead('titulo', document.titulo ) "
                                             ng-disabled="( session.isblock )"
                                             required
-                                            info="Escriba un titulo para facilitar identificacion del documento"
+                                            info="Escriba un titulo para facilitar identificacion del embarque"
                                             skip-tab
                                     >
                                 </md-input-container>
@@ -651,8 +652,6 @@
                                     <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left;margin-right: 0">T </div>
                                     <div style="margin-top: 8px;    border-bottom: dotted 0.6px rgb(176,176,176);margin-left: 26px;">Tarifa</div>
                                 </div>
-
-
                                 <md-input-container class="md-block" flex  >
                                     <label>Pais</label>
                                     <md-autocomplete md-selected-item="autoCp.pais_id.select"
@@ -671,6 +670,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
+                                                     md-selected-item-change="$parent.shipment.pais_id = autoCp.pais_id.select.id "
                                     >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
@@ -698,33 +698,33 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
+                                                     md-selected-item-change="$parent.shipment.pais_id = autoCp.puerto_id.select.id "
                                     >
                                         <md-item-template>
-                                            <span>{{item.razon_social}}</span>
+                                            <span>{{item.main_port_name}}</span>
                                         </md-item-template>
                                         <md-not-found >
-                                            No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
+                                            No se encontro el puerto
                                         </md-not-found>
                                     </md-autocomplete>
                                 </md-input-container>
 
                                 <md-input-container flex>
                                     <label>Freigth Forwarder</label>
-                                    <input  ng-model="$parent.shipment.titulo"
+                                    <input  ng-model="$parent.shipment.objs.tarifa_id.ff"
                                             ng-change=" toEditHead('titulo', document.titulo ) "
-                                            ng-disabled="( session.isblock )"
+                                            ng-disabled="true"
                                             required
-                                            info="Escriba un titulo para facilitar identificacion del documento"
+                                            info="{{'Freigth Forwarder del embarque '+($parent.shipment.objs.tarifa_id.ff) ? $parent.shipment.objs.tarifa_id.ff :' no  ha asignado, haga click en Tarifa' }}"
                                             skip-tab
                                     >
                                 </md-input-container>
                                 <md-input-container flex>
                                     <label>Naviera</label>
-                                    <input  ng-model="$parent.shipment.titulo"
-                                            ng-change=" toEditHead('titulo', document.titulo ) "
-                                            ng-disabled="( session.isblock )"
+                                    <input  ng-model="$parent.shipment.objs.tarifa_id.naviera"
+                                            ng-disabled="true"
                                             required
-                                            info="Escriba un titulo para facilitar identificacion del documento"
+                                            info="{{'Naviera del embarque '+($parent.shipment.objs.tarifa_id.ff) ? $parent.shipment.objs.tarifa_id.ff :' no  ha asignado, haga click en Tarifa' }}"
                                             skip-tab
                                     >
                                 </md-input-container>
@@ -2262,6 +2262,12 @@
                                                    required
                                     ></md-datepicker >
                                 </div>
+                                <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                                    <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
+                                         ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+                                        insertar archivo
+                                    </div>
+                                </div>
 
                             </div>
 
@@ -2321,6 +2327,12 @@
                                 </div>
 
                             </div>
+                            <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                                <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
+                                     ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+                                    insertar archivo
+                                </div>
+                            </div>
 
                             <div flex class="gridContent" ng-show="dataadjs.length">
 
@@ -2378,7 +2390,12 @@
                                 </div>
 
                             </div>
-
+                            <div style="padding: 2px;; min-height: 56px;" layout="row">
+                                <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
+                                     ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+                                    insertar archivo
+                                </div>
+                            </div>
                             <div flex class="gridContent" ng-show="data.djs.length">
 
                             </div>
@@ -2457,6 +2474,12 @@
                             <input  ng-model="container.cantidad" skip-tab
                             >
                         </md-input-container>
+                        <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                            <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
+                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+                                insertar archivo
+                            </div>
+                        </div>
                     </div>
                     <form flex layout="column" class="gridContent">
                         <div ng-repeat="item in $parent.shipment.containers" >
@@ -2932,6 +2955,41 @@
             </md-content>
         </md-sidenav>
 
+        <!-- ########################################## LAYER Mensaje de notificacion########################################## -->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="moduleMsm" id="moduleMsm"
+
+
+        >
+
+            <md-content   layout="row" flex class="sideNavContent"  ng-controller="moduleMsmCtrl" >
+                <div  layout="column" flex="" class="layerColumn"  click-out="close($event)" >
+                    <div layout="row" class="form-row-head form-row-head-select" >
+                        <div class="titulo_formulario">
+                            <div>
+                                Mensajes
+                            </div>
+                        </div>
+                    </div>
+                                        <form layout="row" >
+                        <div class="activeleft"></div>
+                        <md-content flex  >
+                            <div ng-repeat="item in $parent.alerts"  >
+                                <div layout="row" class="cellGridHolder" ng-click="openNoti(item)" >
+                                    <div flex="10" class="cellGrid" >{{item.cantidad}} </div>
+                                    <div flex class="cellGrid"> {{item.titulo}}</div>
+                                </div>
+                            </div>
+
+                        </md-content>
+
+                    </form>
+                </div>
+
+
+            </md-content>
+        </md-sidenav>
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
             style="margin-top:96px;
