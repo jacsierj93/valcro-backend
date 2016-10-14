@@ -470,7 +470,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         priority: 1010,
         terminal:true,
         link: function (scope, element, attrs) {
-            console.log(element)
+            //console.log(element)
             if(attrs["skipTab"] != "off"){
                 element.attr("step","");
             }

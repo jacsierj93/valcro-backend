@@ -271,7 +271,7 @@
                                 </div>
                                 <div flex>
                                     <div ng-repeat="field in criteria" class="row"
-                                         form-preview="{{field.type.directive}}">
+                                         form-preview="{{ field.type.directive }}">
 
                                     </div>
                                 </div>

@@ -34,7 +34,7 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters',function ($scope,
            campo:"linea",
            type:{
                tipo:"autocomplete",
-               directive:'prevComplete'
+               directive:'prevAutocomplete'
            }
        }
    ]
@@ -42,18 +42,15 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters',function ($scope,
 
 }]);
 
-MyApp.directive('formPreview', function() {
+MyApp.directive('formPreview', function($http,$timeout) {
         return {
             link:function(scope,elem,attr){
-                attr.directive=scope.$eval(attr.formPreview);
+
+                console.log(elem.find(">:not(["+attr.formPreview+"])"))
+                elem.find(">:not(["+attr.formPreview+"])").remove();
             },
             templateUrl: function(elem, attr) {
-                //console.log(scope.$eval(attr.formPreview))
-                if(attr.formPreview == "prevText"){
-                    return 'modules/productos/previewFormTemplates/textForm';
-                }else if(attr.formPreview == "autocomplete"){
-                    return 'modules/productos/previewFormTemplates/autocompleteForm';
-                }
+                return 'modules/productos/textForm';
             }
         };
 });
