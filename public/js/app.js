@@ -178,22 +178,7 @@ MyApp.directive('global', function (Layers, setNotif) {
     };
 });
 
-function bindDirective($compile) {
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs) {
-            //var html = $scope.$eval($attrs.bindDirective)
-            element.attr(element.bindDirective,"");
-            
-            element.removeAttr("bind-directive")
-            console.log(element)
-            //toCompile = angular.element('<' + html + '>');
-            element.replaceWith($compile(element)(scope));
-        }
-    };
-}
 
-MyApp.directive('bindDirective', bindDirective)
 
 
 
@@ -485,7 +470,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
         priority: 1010,
         terminal:true,
         link: function (scope, element, attrs) {
-            //console.log(attrs)
+            //console.log(element)
             if(attrs["skipTab"] != "off"){
                 element.attr("step","");
             }

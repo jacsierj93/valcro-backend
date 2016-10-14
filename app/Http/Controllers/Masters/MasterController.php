@@ -6,7 +6,7 @@ use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderReason;
 use App\Models\Sistema\Order\OrderStatus;
 use App\Models\Sistema\Payments\PaymentType;
-use App\Models\Sistema\Ports;
+use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\ProviderAddress;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
