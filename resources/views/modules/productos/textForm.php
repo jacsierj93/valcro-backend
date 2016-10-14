@@ -29,14 +29,14 @@
                      ng-required="(cnt.languaje.length==0)"
                      info="marque cada idioma que hable este contacto"
                      md-search-text="ctrl.searchLang"
-                     md-items="item in languaje | stringKey : ctrl.searchLang: 'lang' | filterSelect: cnt.languaje"
+                     md-items="item in field.opciones | stringKey : ctrl.searchLang: 'nombre'"
                      md-item-text="item.lang"
                      md-no-asterisk
                      ng-disabled="$parent.enabled || cnt.isAgent==1"
                      md-min-length="0">
         <input >
         <md-item-template>
-            <span>{{item.lang}}</span>
+            <span>{{item.nombre}}</span>
         </md-item-template>
     </md-autocomplete>
 

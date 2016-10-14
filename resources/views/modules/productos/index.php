@@ -287,7 +287,7 @@
                     </div>
                     <div flex="15" layout="column" class="md-whiteframe-2dp">
                         <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="i in tipos" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                            <div ng-repeat="i in tipos" ng-click="addField(i)" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                 <div>{{i}}</div>
                             </div>
                         </md-content>
