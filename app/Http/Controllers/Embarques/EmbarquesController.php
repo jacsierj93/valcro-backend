@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Embarques;
 
 
 use App\Models\Sistema\Masters\Country;
+use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Shipments\Shipment;
+use App\Models\Sistema\Tariffs\Tariff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
-use phpDocumentor\Reflection\DocBlock\Type\Collection;
 use Session;
 use Validator;
 
@@ -37,8 +38,13 @@ class EmbarquesController extends BaseController
 
         return $result;
     }
-    /************************* PROVIDER ***********************************/
 
+    /**Docuemntos con sesion abierta*/
+    public function getUncloset(){
+        return json_encode(Shipment::whereNotNull('session_id')->get());
+    }
+
+    /************************* PROVIDER ***********************************/
     public  function  getProvList(){
         $prov  = Provider::where('id','<' ,100)->get();
         return $prov;
@@ -58,12 +64,68 @@ class EmbarquesController extends BaseController
         return $data;
     }
 
+    /************************* TARIFF ***********************************/
+
+    public function getPortCountry(Request $req){
+        return json_encode(Ports::select("id","Main_port_name","pais_id")->where('pais_id', $req->pais_id)->get());
+    }
+
+    public function getTariffs(Request $req){
+        return Tariff::where('puerto_id', $req->puerto_id)->get();
+    }
+    public function saveTariff(Request $req){
+        $model = new Tariff();
+        $model->fregth_forwarder = $req->fregth_forwarder ;
+        $model->pais_id = $req->pais_id ;
+        $model->puerto_id = $req->puerto_id ;
+        $model->moneda_id = $req->moneda_id ;
+        $model->vencimiento = $req->vencimiento ;
+
+        if($req->has("tt")){
+            $model->tt = $req->tt ;
+        }
+        if($req->has("naviera")){
+            $model->naviera = $req->naviera ;
+        }
+        if($req->has("grt")){
+            $model->grt = $req->grt ;
+        }
+        if($req->has("documento")){
+            $model->documento = $req->documento ;
+        }
+        if($req->has("mensajeria")){
+            $model->mensajeria = $req->tt ;
+        }
+        if($req->has("seguros")){
+            $model->seguros = $req->seguros ;
+        }
+        if($req->has("consolidadion")){
+            $model->consolidadion = $req->consolidadion ;
+        }
+        if($req->has("sd20")){
+            $model->sd20 = $req->sd20 ;
+        }
+        if($req->has("sd40")){
+            $model->sd40 = $req->sd40 ;
+        }
+        if($req->has("hc40")){
+            $model->hc40 = $req->hc40 ;
+        }
+        if($req->has("ot40")){
+            $model->ot40 = $req->ot40 ;
+        }
+        $model->save();
+        return['accion'=>'new', 'id'=>$model->id];
+    }
+
     /************************* SHIPMENT ***********************************/
     public  function  getShipment(Request $req){
         $model = Shipment::findOrfail($req->id);
         $data = [];
         $data['id'] = $model->id;
+        $data['emision'] = $model->emision;
         $data['prov_id'] = $model->prov_id;
+        $data['titulo'] = $model->titulo;
         $data['session_id'] = $model->session_id;
         $data['pais_id'] = $model->pais_id;
         $data['puerto_id'] = $model->puerto_id;
@@ -73,19 +135,34 @@ class EmbarquesController extends BaseController
         $data['fecha_tienda'] = $model->fecha_tienda;
         $data['flete_nac'] = $model->flete_nac;
         $data['flete_dua'] = $model->flete_dua;
+        $data['flete_tt'] = $model->flete_tt;
+        $data['nro_mbl'] = $model->nro_mbl;
+        $data['nro_hbl'] = $model->nro_hbl;
+        $data['nro_exp_aduana'] = $model->nro_exp_aduana;
+        $data['moneda_id'] = $model->flete_dua;
         $data['flete'] = ($model->flete_dua ==  null ? 0 : floatval($model->flete_nac))+($model->flete_dua ==  null ? 0 : floatval($model->flete_dua ));
+        // aprobaciones
+
+        $data['conf_f_carga'] = ($model->usuario_conf_f_carga == null )? false: true;
+        $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;
+        $data['conf_f_tienda'] = ($model->usuario_conf_f_tienda == null )? false: true;
+        $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null )? false: true;
+        $data['conf_monto_ft_nac'] = ($model->usuario_conf_monto_ft_nac == null )? false: true;
+        $data['conf_monto_ft_dua'] = ($model->usuario_conf_monto_ft_dua == null )? false: true;
+
+
+
 
         $data['objs'] =[
-            'pais_id'=>null,
-            'puerto_id'=>null,
-            'tarifa_id'=>null,
+            'pais_id'=>($model->pais_id == null) ? null: Country::find($model->pais_id),
+            'puerto_id'=>($model->puerto_id == null) ? null: Ports::find($model->puerto_id),
+            'tarifa_id'=>($model->tarifa_id == null) ? null: Tariff::find($model->tarifa_id),
             'prov_id'=>($model->prov_id == null) ? null: Provider::find($model->prov_id),
         ];
 
         return $data ;
     }
 
-    /************************* SAVE ***********************************/
     public function saveShipment(Request $req){
         $return = ['accion'=>'new'];
         $model = new Shipment();
@@ -126,6 +203,12 @@ class EmbarquesController extends BaseController
                $return['id']= $model->id;
                $return['session_id']=  $model->session_id;
         return $return ;
+    }
+
+    /************************* Another module ***********************************/
+
+    public  function getFregthForwarder(){
+        return [];
     }
 
     /**@deprecated */

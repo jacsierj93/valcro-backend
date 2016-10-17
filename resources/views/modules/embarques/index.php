@@ -21,7 +21,7 @@
                     </md-tooltip>
                 </div>
 
-                <div layout="column" flex="" tabindex="-1"  style="padding: 0px 4px 0px 4px;" tabindex="-1">
+                <div layout="column" flex=""   style="padding: 0px 4px 0px 4px;" tabindex="-1">
                     <form name="provdiderFilter" tabindex="-1">
                         <div class="menuFilter" id="expand1" style="height: 176px;" layout-align="start start" tabindex="-1">
                             <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
@@ -416,6 +416,129 @@
             </md-content>
         </md-sidenav>
 
+        <!------------------------------------------- lista de embarques sin culminar ------------------------------------------------------------------------->
+        <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="listShipmentUncloset" id="listShipmentUncloset"   >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller= "listShipmentUnclosetCtrl">
+                <div layout="column" flex>
+                    <div layout="row" class="focused">
+                        <div active-left ></div>
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                <div>
+                                    <span >Embarques</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <div active-left  ></div>
+                        <div layout="row"  flex style="padding-right: 4px;">
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>N°</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="id"></grid-order-by>
+
+                            </div>
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>N° Factura</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.nro_factura"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="nro_factura"></grid-order-by>
+
+                            </div>
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Carga</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.carga"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="fecha_carga"></grid-order-by>
+
+                            </div>
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>En venezuela el</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha_llegada_vnz"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="fecha_vnz"></grid-order-by>
+
+                            </div>
+                            <div flex layout="row"
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Titulo</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="titulo"></grid-order-by>
+
+                            </div>
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Flete</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.flete"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="flete_tt"></grid-order-by>
+
+                            </div>
+
+                            <div flex layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nacionalizacion</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.nacionalizacion"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="nacionalizacion"></grid-order-by>
+
+                            </div>
+                        </div>
+                    </div>
+                    <form layout="row"  class="gridContent" flex>
+                        <div active-left  ></div>
+                        <div layout="column" flex=""   >
+                            <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict as filter"   id="shipments{{$index}}"  >
+                                <div layout="row" class="cellGridHolder" >
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.nro_factura}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.fecha_carga}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.fecha_vnz}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.flete_tt}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.nacionalizacion}}</div>
+                                </div>
+                            </div>
+                            <div layout="column" layout-align="center center" flex ng-show="filter.length == 0">
+                                No hay datos para mostrar
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div id="expand"></div>
+            </md-content>
+        </md-sidenav>
+
         <!------------------------------------------- resumen de embarque de embarques creados ------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="summaryShipment" id="summaryShipment"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "summaryShipmentCtrl" >
@@ -592,11 +715,9 @@
                                                      info="Seleccione el proveedor del embarque"
                                                      required
                                                      ng-disabled="( session.isBlock )"
-                                                     ng-click="toEditHead('prov_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
                                                      md-search-text="provSelecText "
-                                                     md-auto-select="true"
                                                      md-items="item in $parent.provs | stringKey : provSelecText : 'razon_social' "
                                                      md-item-text="item.razon_social"
                                                      md-autoselect = "true"
@@ -647,33 +768,33 @@
 
 
                             </div>
-                            <div layout="row" class="row"  ng-click="listTariffCtrl()">
+                            <div layout="row" class="row"  ng-click="openTarif();">
                                 <div class="adj-box-left" flex="10" style="color: rgb(176,176,176);margin-right: 8px;" >
                                     <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left;margin-right: 0">T </div>
                                     <div style="margin-top: 8px;    border-bottom: dotted 0.6px rgb(176,176,176);margin-left: 26px;">Tarifa</div>
                                 </div>
                                 <md-input-container class="md-block" flex  >
                                     <label>Pais</label>
-                                    <input ng-model="$parent.shipment.objs.pais_id.short_name" ng-readonly="true" />
+                                    <input ng-model="$parent.shipment.objs.pais_id.short_name" ng-readonly="true" ng-disabled="(!$parent.shipment.objs.pais_id || $parent.shipment.objs.pais_id == null ) " />
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20"  >
                                     <label>Puerto</label>
-                                    <input ng-model="$parent.shipment.objs.puerto_id.main_port_name" ng-readonly="true" />
+                                    <input ng-model="$parent.shipment.objs.puerto_id.Main_port_name" ng-readonly="true" ng-disabled="(!$parent.shipment.objs.puerto_id || $parent.shipment.objs.puerto_id == null)" />
                                 </md-input-container>
 
                                 <md-input-container flex>
                                     <label>Freigth Forwarder</label>
-                                    <input  ng-model="$parent.shipment.objs.tarifa_id.ff"
+                                    <input  ng-model="$parent.shipment.objs.tarifa_id.fregth_forwarder"
+                                            ng-disabled="($parent.shipment.objs.tarifa_id.tbl_tarifa || $parent.shipment.objs.tarifa_id.tbl_tarifa == null) "
                                             ng-readonly="true"
-                                            required
                                             skip-tab
                                     >
                                 </md-input-container>
-                                <md-input-container flex>
+                                <md-input-container flexs>
                                     <label>Naviera</label>
                                     <input  ng-model="$parent.shipment.objs.tarifa_id.naviera"
                                             ng-readonly="true"
-                                            required
+                                            ng-disabled="($parent.shipment.objs.tarifa_id.tbl_tarifa || $parent.shipment.objs.tarifa_id.tbl_tarifa == null) "
                                             skip-tab
                                     >
                                 </md-input-container>
@@ -1297,8 +1418,6 @@
                                                      requiered
                                                      info="Selecione el puerto de origen para el embarque"
                                                      ng-disabled="( session.isBlock )"
-                                                     ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                     id="prov_id"
                                                      skip-tab
                                                      md-search-text="puerto_idText"
                                                      md-auto-select="true"
@@ -1308,6 +1427,8 @@
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-no-cache="true"
+                                                     md-selected-item-change="$parent.shipment.puerto_id = pais_idSelec.id ;$parent.shipment.objs.puerto_id = puerto_idSelec;"
+
                                     >
                                         <md-item-template>
                                             <span>{{item.Main_port_name}}</span>
@@ -2586,8 +2707,8 @@
         >
             <md-content   layout="row" flex class="sideNavContent"   ng-controller="CreatTariffCtrl"  >
                 <div  layout="column" flex class="layerColumn"   click-out="close($event)">
-                    <form  ng-class="{'focused':form== 'head'}" >
-                        <div ng-click="form = 'head'">
+                    <form  ng-click="form = 'head'" name="head" ng-class="{'focused':form== 'head'}" >
+                        <div  id="head">
                             <div layout="row" class="form-row-head "  ng-class="{'form-row-head-select': form == 'head' }" style="margin-left: 12px;" >
                                 <div class="titulo_formulario" flex>
                                     <div>
@@ -2599,33 +2720,29 @@
                                 <div style="padding-left: 12px ; padding-right: 4px;" >
                                     <div layout="row" class="row">
                                         <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Vecimiento</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex >
+                                        <md-datepicker ng-model="model.vencimiento" style="margin-left: -12px;"
+                                                       skip-tab
+                                                       required
+                                        ></md-datepicker >
+                                            </md-input-container class="md-block" flex >
+                                    </div>
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50">
                                             <div layout="column" layout-align="center center">Fregth Forwarder</div>
                                         </div>
                                         <md-input-container class="md-block" flex >
-                                            <md-autocomplete md-selected-item="autoCp.pais_id.select"
-                                                             info="Selecione el pais de origen para el embarque"
-                                                             required
-                                                             ng-disabled="( session.isBlock )"
-                                                             ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                             id="prov_id"
-                                                             skip-tab
-                                                             md-search-text="autoCp.pais_id.text"
-                                                             md-auto-select="true"
-                                                             md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                             md-item-text="item.razon_social"
-                                                             md-autoselect = "true"
-                                                             md-no-asterisk
-                                                             md-min-length="0"
-                                                             md-no-cache="true"
-                                                             md-select-on-match
-                                            >
-                                                <md-item-template>
-                                                    <span>{{item.razon_social}}</span>
-                                                </md-item-template>
-                                                <md-not-found >
-                                                    No se encontro el pais {{searchProveedor}}. ¿Desea crearlo?
-                                                </md-not-found>
-                                            </md-autocomplete>
+                                            <input ng-model="model.fregth_forwarder" required />
+                                        </md-input-container>
+                                    </div>
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Naviera</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex >
+                                            <input ng-model="model.naviera" />
                                         </md-input-container>
                                     </div>
                                     <div layout="row" class="row">
@@ -2633,29 +2750,23 @@
                                             <div layout="column" layout-align="center center">Pais </div>
                                         </div>
                                         <md-input-container class="md-block" flex >
-                                            <md-autocomplete md-selected-item="autoCp.pais_id.select"
-                                                             info="Selecione el pais de origen para el embarque"
+                                            <md-autocomplete md-selected-item="paisSelec"
+                                                             info="Selecione el pais dela nueva tarifa"
                                                              required
-                                                             ng-disabled="( session.isBlock )"
-                                                             ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                             id="prov_id"
                                                              skip-tab
-                                                             md-search-text="autoCp.pais_id.text"
-                                                             md-auto-select="true"
-                                                             md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                             md-item-text="item.razon_social"
+                                                             md-search-text="pais_idText"
+                                                             md-items="item in $parent.provSelec.direcciones | stringKey : pais_idText : 'short_name' "
+                                                             md-item-text="item.short_name"
                                                              md-autoselect = "true"
                                                              md-no-asterisk
                                                              md-min-length="0"
                                                              md-no-cache="true"
                                                              md-select-on-match
+                                                             md-selected-item-change="model.pais_id = paisSelec.id ;loadPorts(paisSelec);"
                                             >
                                                 <md-item-template>
-                                                    <span>{{item.razon_social}}</span>
+                                                    <span>{{item.short_name}}</span>
                                                 </md-item-template>
-                                                <md-not-found >
-                                                    No se encontro el pais {{searchProveedor}}. ¿Desea crearlo?
-                                                </md-not-found>
                                             </md-autocomplete>
                                         </md-input-container>
                                     </div>
@@ -2664,29 +2775,24 @@
                                             <div layout="column" layout-align="center center">Puerto </div>
                                         </div>
                                         <md-input-container class="md-block" flex  >
-                                            <md-autocomplete md-selected-item="autoCp.pais_id.select"
-                                                             info="Selecione el pais de origen para el embarque"
+                                            <md-autocomplete md-selected-item="puertoSelect"
+                                                             info="Selecione el pueto para la nueva tarifa"
                                                              required
-                                                             ng-disabled="( session.isBlock )"
-                                                             ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                             id="prov_id"
                                                              skip-tab
-                                                             md-search-text="autoCp.pais_id.text"
-                                                             md-auto-select="true"
-                                                             md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                             md-item-text="item.razon_social"
+                                                             md-search-text="puertoText"
+                                                             md-items="item in puertos | stringKey : puertoText : 'Main_port_name' "
+                                                             md-item-text="item.Main_port_name"
                                                              md-autoselect = "true"
                                                              md-no-asterisk
                                                              md-min-length="0"
                                                              md-no-cache="true"
-                                                             md-select-on-match
+                                                             md-selected-item-change="model.puerto_id = puertoSelect.id ;"
+                                                             ng-disabled="paisSelec == null"
+
                                             >
                                                 <md-item-template>
-                                                    <span>{{item.razon_social}}</span>
+                                                    <span>{{item.Main_port_name}}</span>
                                                 </md-item-template>
-                                                <md-not-found >
-                                                    No se encontro el pais {{searchProveedor}}. ¿Desea crearlo?
-                                                </md-not-found>
                                             </md-autocomplete>
                                         </md-input-container>
                                     </div>
@@ -2695,29 +2801,25 @@
                                             <div layout="column" layout-align="center center">Moneda </div>
                                         </div>
                                         <md-input-container class="md-block"  flex>
-                                            <md-autocomplete md-selected-item="autoCp.pais_id.select"
-                                                             info="Selecione el pais de origen para el embarque"
+                                            <md-autocomplete md-selected-item="monedaSelect"
+                                                             info="Selecione la moneda par la tarifa"
                                                              required
-                                                             ng-disabled="( session.isBlock )"
-                                                             ng-click="$parent.toEditHead('pais_id', provSelect.id)"
-                                                             id="prov_id"
                                                              skip-tab
-                                                             md-search-text="autoCp.pais_id.text"
+                                                             md-search-text="monedaText"
                                                              md-auto-select="true"
-                                                             md-items="item in $parent.paises | stringKey : autoCp.pais_id.text : 'short_name' "
-                                                             md-item-text="item.razon_social"
+                                                             md-items="item in monedas | stringKey : monedaText : 'nombre' "
+                                                             md-item-text="item.nombre"
                                                              md-autoselect = "true"
                                                              md-no-asterisk
                                                              md-min-length="0"
                                                              md-no-cache="true"
                                                              md-select-on-match
+                                                             md-selected-item-change="model.moneda_id = monedaSelect.id ;"
+
                                             >
-                                                <md-item-template>
-                                                    <span>{{item.razon_social}}</span>
-                                                </md-item-template>
-                                                <md-not-found >
-                                                    No se encontro el pais {{searchProveedor}}. ¿Desea crearlo?
-                                                </md-not-found>
+                                                <md-item-templatess>
+                                                    <span>{{item.nombre}}</span>
+                                                </md-item-templatess>
                                             </md-autocomplete>
                                         </md-input-container>
                                     </div>
@@ -2726,7 +2828,7 @@
                             </div>
                         </div>
                     </form>
-                    <form  ng-class="{'focused':form== 'bond'}" flex layout="column" ng-click="form = 'bond'" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
+                    <form  name="bond" ng-class="{'focused':form== 'bond'}" flex layout="column" ng-click="form = 'bond'" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
                     <div layout="row" class="form-row-head " style="margin-left: 12px ;" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
                         <div class="titulo_formulario" flex>
                             <div>
@@ -2742,7 +2844,7 @@
                                     <div layout="column" layout-align="center center">T/T </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.tt"  decimal >
                                 </md-input-container>
                                 <md-tooltip >Transito Terrestre</md-tooltip>
                             </div>
@@ -2751,7 +2853,7 @@
                                     <div layout="column" layout-align="center center">GRT </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.grt"   decimal  >
                                 </md-input-container>
                                 <md-tooltip >GRT</md-tooltip>
                             </div>
@@ -2760,7 +2862,7 @@
                                     <div layout="column" layout-align="center center">Documento </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.documento" decimal   >
                                 </md-input-container>
                                 <md-tooltip >Documento</md-tooltip>
                             </div>
@@ -2769,7 +2871,7 @@
                                     <div layout="column" layout-align="center center">Mensajeria </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.mensajeria"  decimal  >
                                 </md-input-container>
                                 <md-tooltip >Mensajeria</md-tooltip>
                             </div>
@@ -2778,7 +2880,7 @@
                                     <div layout="column" layout-align="center center">Seguros </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.seguro" decimal   >
                                 </md-input-container>
                                 <md-tooltip >Seguros</md-tooltip>
                             </div>
@@ -2787,7 +2889,7 @@
                                     <div layout="column" layout-align="center center">Consodilacion </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.consolidacion"  decimal  >
                                 </md-input-container>
                                 <md-tooltip >Consolidacion</md-tooltip>
                             </div>
@@ -2796,7 +2898,7 @@
                                     <div layout="column" layout-align="center center">20'SD </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.sd20"  decimal  >
                                 </md-input-container>
                                 <md-tooltip >20' SD</md-tooltip>
                             </div>
@@ -2805,7 +2907,7 @@
                                     <div layout="column" layout-align="center center">40'SD </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.sd40"  decimal  >
                                 </md-input-container>
                                 <md-tooltip >40' SD</md-tooltip>
                             </div>
@@ -2814,7 +2916,7 @@
                                     <div layout="column" layout-align="center center">40'HC </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.hc40" decimal   >
                                 </md-input-container>
                                 <md-tooltip >40' HC</md-tooltip>
                             </div>
@@ -2823,7 +2925,7 @@
                                     <div layout="column" layout-align="center center">40'OT </div>
                                 </div>
                                 <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                    <input  type="text" ng-model="model.ot40"  decimal  >
                                 </md-input-container>
                                 <md-tooltip >40'OT</md-tooltip>
                             </div>
@@ -2856,7 +2958,7 @@
                             </div>
 
                             <md-input-container class="md-block rms" flex >
-                                <input  type="text" ng-model="prod.asigado"  tabindex="-1" >
+                                <input  type="text" ng-model="prod.asigado"    >
                             </md-input-container>
 
                             <md-tooltip >
