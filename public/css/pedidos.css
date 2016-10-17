@@ -141,6 +141,7 @@ div[ng-click] * {
 /**:focus{
     border-left: 1px solid rgb(84, 180, 234);
 }*/
+/**review ? */
 .cellSelect{
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -152,7 +153,7 @@ div[ng-click] * {
     padding-top: 19px;
     margin-top: -9px;
 }
-
+/**review ?*/
 .cellSelect.cellEmpty{
     border-bottom:none;
     margin-top: 0;
@@ -166,9 +167,19 @@ md-sidenav .md-sidenav-right.md-locked-open{
     height: 32px;
     margin-bottom: 8px;
 }
+
 .form-row-head.form-row-head-select{
     border-bottom: solid 1.5px rgb(92, 183, 235);
     color: rgb(92, 183, 235);
+}
+.form-row-head-option{
+    margin-right: 4px;
+    color: black;
+    padding-top: 8px;
+}
+.form-row-head-option div{
+    margin: 0 2px 0 2px;
+    height: 100%;
 }
 .form-body-select{
     color: rgb(92, 183, 235);
@@ -408,6 +419,13 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .table-filter-order-by img {
     width: 8px;
     height: 8px;
+}
+
+.table-row-select div{
+    border-bottom: 1px dashed rgb(84, 180, 234);
+    /*
+    color: rgb(84,180,234);
+    */
 }
 .loader{
     position: absolute;

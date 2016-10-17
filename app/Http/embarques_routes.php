@@ -8,6 +8,10 @@ $app->get('embarques/CountryPorts', 'Embarques\EmbarquesController@getPortCountr
 $app->post('embarques/TariffSave', 'Embarques\EmbarquesController@saveTariff');
 $app->get('embarques/Tariffs', 'Embarques\EmbarquesController@getTariffs');
 
+// containers
+$app->post('embarques/ContainerSave', 'Embarques\EmbarquesController@saveContainer');
+$app->post('embarques/ContainerDelete', 'Embarques\EmbarquesController@DeleteContainer');
+
 
 //providers
 $app->get('embarques/Provider', 'Embarques\EmbarquesController@getProvList');

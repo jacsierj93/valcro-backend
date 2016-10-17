@@ -743,15 +743,11 @@
                                             skip-tab
                                     >
                                 </md-input-container>
-                                <div layout="row" class="date-row" ng-show="$parent.shipment.emision">
+                                <div layout="row" class="date-row" ng-show="$parent.shipment.emision" style="min-width: 0;width: 158px;">
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Creado</div>
                                     </div>
-                                    <md-datepicker ng-model="$parent.shipment.emision"
-                                                   ng-disabled="true"
-                                                   skip-tab
-                                                   required
-                                    ></md-datepicker >
+                                    <div layout="column" class="md-block" layout-align="center center"><div>{{$parent.shipment.emision | date : 'dd-MM-yyyy'}}</div></div>
                                 </div>
                             </div>
                             <div layout="row" class="row" >
@@ -799,11 +795,9 @@
                                     >
                                 </md-input-container>
                             </div>
-
-
                         </div>
                     </form>
-                    <form layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
+                    <form  name="date" layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}" >
@@ -818,12 +812,12 @@
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Carga</div>
                                     </div>
-                                    <md-datepicker ng-model="$parent.shipment.carga"
-                                                   ng-disabled="( session.isBlock )"
-                                                   skip-tab
-                                                   required
-                                                   ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
-                                    ></md-datepicker >
+                                    <div class="md-block" layout="column" layout-align="center center" >
+                                        <md-datepicker ng-model="$parent.shipment.fecha_carga.value"
+                                                       ng-disabled="( session.isBlock )"
+                                                       skip-tab
+                                        ></md-datepicker >
+                                    </div>
 
                                 </div>
                                 <div layout="row" class="date-row" flex="" >
@@ -831,11 +825,9 @@
                                         <div>En Venenzuela</div>
                                     </div>
                                     <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_llegada_vnz"
+                                        <md-datepicker ng-model="$parent.shipment.fecha_llegada_vnz.value"
                                                        ng-disabled="( session.isBlock )"
                                                        skip-tab
-                                                       required
-                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
                                         ></md-datepicker >
                                     </div>
                                 </div>
@@ -844,11 +836,9 @@
                                         <div>En tienda</div>
                                     </div>
                                     <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.$parent.shipment.fecha_llegada_tiend"
+                                        <md-datepicker ng-model="$parent.shipment.fecha_tienda.value"
                                                        ng-disabled="( session.isBlock )"
                                                        skip-tab
-                                                       required
-                                                       ng-change="toEditHead('fecha_aprob_compra', (document.fecha_aprob_compra) ? document.fecha_aprob_compra.toString(): undefined)"
                                         ></md-datepicker >
                                     </div>
                                 </div>
@@ -965,9 +955,19 @@
                                             <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
                                         </div>
                                     </div>
-                                    <div flex><div layout="column" layout-align="center center" flex>
+                                    <div flex class="gridContent">
+                                        <div ng-repeat="item in $parent.shipment.containers" >
+                                            <div layout="row" class="cellGridHolder" >
+                                                <div flex class="cellGrid" >{{item.tipo}} </div>
+                                                <div flex class="cellGrid"> {{item.peso}}</div>
+                                                <div flex class="cellGrid"> {{item.volumen}}</div>
+                                                <div flex class="cellGrid"> {{item.cantidad}}</div>
+                                            </div>
+                                        </div>
+                                        <div flex layout="column" layout-align="center center" ng-show="$parent.shipment.containers.length == 0 ">
                                             No hay datos para mostrar
-                                        </div></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div flex layout="column"  style="padding: 0 4px 0 4px;">
                                     <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'agreds'}" >
@@ -1402,7 +1402,6 @@
                                                      md-no-cache="true"
                                                      md-select-on-match
                                                      md-selected-item-change="$parent.shipment.pais_id = pais_idSelec.id ;$parent.shipment.objs.pais_id = pais_idSelec;"
-
                                     >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
@@ -1449,57 +1448,54 @@
                                 <md-input-container class="md-block"  flex>
                                     <label>T/T</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.carga"
+                                           ng-model="tbl.filter.dias_tt"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="emision"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="dias_tt"></grid-order-by>
 
                             </div>
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>20' SD </label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.fecha_llegada_tiend"
+                                           ng-model="tbl.filter.sd20"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="fecha_llegada_tiend"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="sd20"></grid-order-by>
 
                             </div>
-
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>40' SD</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.flete"
+                                           ng-model="tbl.filter.sd40"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="flete"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="sd40"></grid-order-by>
 
                             </div>
-
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>40' HC</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.nacionalizacion"
+                                           ng-model="tbl.filter.hc40"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="nacionalizacion"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="hc40"></grid-order-by>
                             </div>
-
                             <div flex layout="row" class="table-filter-head" >
                                 <md-input-container class="md-block"  flex>
                                     <label>40' OT</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.nacionalizacion"
+                                           ng-model="tbl.filter.ot40"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="nacionalizacion"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="ot40"></grid-order-by>
                             </div>
 
                         </div>
@@ -1507,16 +1503,16 @@
                     <form layout="row"  class="gridContent" flex>
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div   ng-repeat="item in tbl.data "   id="shipments{{$index}}"  >
-                                <div layout="row" class="cellGridHolder" >
-                                    <div flex class="cellGrid" >{{item.titulo}}</div>
-                                    <div flex class="cellGrid">{{item.id}}</div>
-                                    <div flex class="cellGrid" >{{item.nro_factura}}</div>
-                                    <div flex class="cellGrid">{{item.carga}}</div>
-                                    <div flex class="cellGrid" >{{item.fecha_llegada_vnz}}</div>
+                            <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict as filter "   id="row{{$index}}" ng-click="setData(item)" >
+                                <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(tarifaSelect.id == item.id)}" >
+                                    <div flex class="cellGrid" >{{item.dias_tt}}</div>
+                                    <div flex class="cellGrid">{{item.sd20}}</div>
+                                    <div flex class="cellGrid" >{{item.sd40}}</div>
+                                    <div flex class="cellGrid">{{item.hc40}}</div>
+                                    <div flex class="cellGrid" >{{item.ot40}}</div>
                                 </div>
                             </div>
-                            <div layout="column" layout-align="center center" flex>
+                            <div layout="column" layout-align="center center" ng-show="filter.length == 0" flex>
                                 No hay datos para mostrar
                             </div>
                         </div>
@@ -1524,45 +1520,47 @@
                     </form>
 
                 </div>
-                <div layout="column" flex class="gridContent" style="margin:0">
-                    <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
-                        <div>
-                            <span style="color: #000;">Bondades</span>
+                <div layout="column" flex class="gridContent" style="margin:0 0 0 4px">
+                    <div  layout="row" class="form-row-head form-row-head-select" >
+                        <div class="titulo_formulario" flex>
+                            <div>
+                                <span >Bondades</span>
+                            </div>
                         </div>
                     </div>
                     <div layout="row" >
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Freigth Fowarder</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.fregth_forwarder}}</div>
                         <md-tooltip >
                             Compañia de traslado
                         </md-tooltip>
                     </div>
                     <div layout="row" >
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Naviera</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex>  {{tarifaSelect.naviera}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Naviera
                         </md-tooltip>
                     </div>
                     <div layout="row" >
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Puerto</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex>  {{tarifaSelect.objs.puerto_id.Main_port_name}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Puerto de salida
                         </md-tooltip>
                     </div>
 
                     <div layout="row" >
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">T/T</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex>  {{tarifaSelect.dias_tt}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Tiempo de transito
                         </md-tooltip>
                     </div>
 
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">GRT</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex>  {{tarifaSelect.grt}}</div>
                         <md-tooltip >
                             Compañia de traslado
                         </md-tooltip>
@@ -1570,62 +1568,62 @@
 
                     <div layout="row"flex >
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Documento</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.documento}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Costo en documento
                         </md-tooltip>
                     </div>
 
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Mensajeria</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.mensajeria}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Compañia de mensajeria
                         </md-tooltip>
                     </div>
 
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Seguros</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.seguro}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Costo de seguro
                         </md-tooltip>
                     </div>
 
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Consolidacion</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.consolidacion}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Costo de consolidacion
                         </md-tooltip>
                     </div>
 
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">20'SD</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.sd20}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Costo container 20'SD
                         </md-tooltip>
                     </div>
                     <div layout="row"flex >
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">40'SD</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.sd40}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            Costo de container 40 ' SD
                         </md-tooltip>
                     </div>
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">40'HC</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.hc40}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            costo de container 40' HC
                         </md-tooltip>
                     </div>
                     <div layout="row" flex>
                         <div layout="row" flex="50" style="color: rgb(84, 180, 234);">40'OT</div>
-                        <div class="rms" flex> demo</div>
+                        <div class="rms" flex> {{tarifaSelect.ot40}}</div>
                         <md-tooltip >
-                            Compañia de traslado
+                            costo de container 40'OT
                         </md-tooltip>
                     </div>
                 </div>
@@ -2495,69 +2493,91 @@
                     md-disable-backdrop="true" md-component-id="miniContainer" id="miniContainer"
         >
             <md-content   layout="row" flex class="sideNavContent" ng-controller="miniContainerCtrl"    >
-                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
-                    <div layout="row" layout-align="start center" class="focused">
-                        <div layout="row" class="form-row-head form-row-head-select" >
-                            <div flex  class="titulo_formulario" style="height:39px;">
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)" style="    padding-right: 4px;">
+                    <div layout="row" layout-align="start center" class="focused" style="padding-left: 12px">
+                        <div layout="row" class="form-row-head form-row-head-select" flex  >
+                            <div flex  class="titulo_formulario" flex>
                                 <div>
                                     Containers
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div layout="row" style="padding-right: 4px;">
-                        <md-input-container class="md-block" flex  >
-                            <label>Tipo</label>
-                            <md-autocomplete md-selected-item="tipo.select"
-                                             info="Tipo de container"
-                                             required
-                                             skip-tab
-                                             md-search-text="tipo.text"
-                                             md-auto-select="true"
-                                             md-items="item in containers | filter :tipo.text"
-                                             md-item-text="item.razon_social"
-                                             md-autoselect = "true"
-                                             md-no-asterisk
-                                             md-min-length="0"
-                                             md-require-match="true"
-                                             md-no-cache="true"
-                                             md-select-on-match
-                            >
-                                <md-item-template>
-                                    <span>{{item.nombre}}</span>
-                                </md-item-template>
-                            </md-autocomplete>
-                        </md-input-container>
-                        <md-input-container flex>
-                            <label>Peso</label>
-                            <input  ng-model="container.peso" skip-tab
-                            >
-                        </md-input-container>
-
-                        <md-input-container flex>
-                            <label>volumen</label>
-                            <input  ng-model="container.volumen" skip-tab
-                            >
-                        </md-input-container>
-                        <md-input-container flex>
-                            <label>Cantidad</label>
-                            <input  ng-model="container.cantidad" skip-tab
-                            >
-                        </md-input-container>
-                        <div style="padding: 2px;; min-height: 56px;" layout="row" >
-                            <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
-                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
-                                insertar archivo
+                            <div layout="row" layout-align="center end" class="form-row-head-option">
+                                <div flex layout="column" layout-align="center center" ng-click="created()">
+                                    <span class="icon-Agregar" style="font-size: 12px"></span>
+                                    <md-tooltip >
+                                        Nuevo Container
+                                    </md-tooltip>
+                                </div>
+                                <div flex layout="column" layout-align="center center" ng-click="update()" >
+                                    <span class="icon-Actualizar" style="font-size: 12px" ng-style="(!select.id) ? {'color':'rgb(171,171,171)'} : {}"></span>
+                                    <md-tooltip >
+                                        Actualizar Container
+                                    </md-tooltip>
+                                </div>
                             </div>
+
                         </div>
+
                     </div>
-                    <form flex layout="column" class="gridContent">
-                        <div ng-repeat="item in $parent.shipment.containers" >
-                            <div layout="row" class="cellGridHolder" >
-                                <div flex class="cellGrid" >{{item.tipo}} </div>
-                                <div flex class="cellGrid"> {{item.peso}}</div>
-                                <div flex class="cellGrid"> {{item.volumen}}</div>
-                                <div flex class="cellGrid"> {{item.cantidad}}</div>
+
+                    <form name="containerForm" layout="row" style="padding-right: 4px;" ng-show="options.form">
+                        <div  style="padding-left: 24px" layout="row">
+                            <div style="width: 16px;"></div>
+                            <md-input-container class="md-block" flex  >
+                                <label>Tipo</label>
+                                <md-autocomplete md-selected-item="tipo_select"
+                                                 info="Tipo de container"
+                                                 required
+                                                 skip-tab
+                                                 md-search-text="tipo_text"
+                                                 md-auto-select="true"
+                                                 md-items="item in containers | filter : tipo_text "
+                                                 md-item-text="item.name"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0"
+                                                 md-no-cache="true"
+                                                 md-select-on-match="true"
+                                                 md-selected-item-change="model.tipo = item.name;"
+                                >
+                                    <md-item-template>
+                                        <span>{{item.name}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </md-input-container>
+                            <md-input-container flex>
+                                <label>Peso</label>
+                                <input  ng-model="model.peso" skip-tab decimal required>
+                            </md-input-container>
+
+                            <md-input-container flex>
+                                <label>Volumen</label>
+                                <input  ng-model="model.volumen" skip-tab required >
+                            </md-input-container>
+
+                            <md-input-container flex>
+                                <label>Cantidad</label>
+                                <input  ng-model="model.cantidad" skip-tab required   ng-keypress="($event.which === 13)? save(): 0 ">
+                            </md-input-container>
+                        </div>
+
+
+                    </form>
+                    <form flex layout="row" class="gridContent">
+                        <div style="width: 12px;" ></div>
+                        <div layout="column" flex>
+                            <div ng-repeat="item in $parent.shipment.containers" >
+                                <div layout="row" class="cellGridHolder" ng-click="setData(item, this)" ng-class="{'table-row-select':(select.id == item.id)}" >
+                                    <div style="width: 24px;padding-top: 15px;border: none;">
+                                        <div  layout="column" layout-align="center center"  ng-click="delete(item, this)"  >
+                                            <span class="icon-Eliminar" style="font-size: 12px"></span>
+                                        </div>
+                                    </div>
+                                    <div flex class="cellGrid" >{{item.tipo}} </div>
+                                    <div flex class="cellGrid"> {{item.peso}}</div>
+                                    <div flex class="cellGrid"> {{item.volumen}}</div>
+                                    <div flex class="cellGrid"> {{item.cantidad}}</div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -2723,11 +2743,20 @@
                                             <div layout="column" layout-align="center center">Vecimiento</div>
                                         </div>
                                         <md-input-container class="md-block" flex >
-                                        <md-datepicker ng-model="model.vencimiento" style="margin-left: -12px;"
-                                                       skip-tab
-                                                       required
-                                        ></md-datepicker >
-                                            </md-input-container class="md-block" flex >
+                                            <md-datepicker ng-model="model.vencimiento" style="margin-left: -12px;"
+                                                           skip-tab
+                                                           required
+                                            ></md-datepicker >
+                                        </md-input-container class="md-block" flex >
+                                    </div>
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50" >
+                                            <div layout="column" layout-align="center center">T/T </div>
+                                        </div>
+                                        <md-input-container class="md-block rms" flex >
+                                            <input  type="text" ng-model="model.dias_tt" decimal required >
+                                        </md-input-container>
+                                        <md-tooltip >Transito Terrestre</md-tooltip>
                                     </div>
                                     <div layout="row" class="row">
                                         <div layout="row" flex="50">
@@ -2829,108 +2858,100 @@
                         </div>
                     </form>
                     <form  name="bond" ng-class="{'focused':form== 'bond'}" flex layout="column" ng-click="form = 'bond'" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
-                    <div layout="row" class="form-row-head " style="margin-left: 12px ;" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
-                        <div class="titulo_formulario" flex>
-                            <div>
-                                Bondades
+                        <div layout="row" class="form-row-head " style="margin-left: 12px ;" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
+                            <div class="titulo_formulario" flex>
+                                <div>
+                                    Bondades
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div flex class="gridContent" layout="column" style="padding-right:4px"  ng-class="{'form-body-select':form == 'bond'}">
-                        <div style="padding-left: 12px; height: 100%;" >
-                            <div layout="row" class="row">
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">T/T </div>
+                        <div flex class="gridContent" layout="column" style="padding-right:4px"  ng-class="{'form-body-select':form == 'bond'}">
+                            <div style="padding-left: 12px; height: 100%;" >
+
+                                <div layout="row"  class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">GRT </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.grt"   decimal  >
+                                    </md-input-container>
+                                    <md-tooltip >GRT</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.tt"  decimal >
-                                </md-input-container>
-                                <md-tooltip >Transito Terrestre</md-tooltip>
-                            </div>
-                            <div layout="row"  class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">GRT </div>
+                                <div layout="row" class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">Documento </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.documento" decimal   >
+                                    </md-input-container>
+                                    <md-tooltip >Documento</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.grt"   decimal  >
-                                </md-input-container>
-                                <md-tooltip >GRT</md-tooltip>
-                            </div>
-                            <div layout="row" class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">Documento </div>
+                                <div layout="row" class="row"  >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">Mensajeria </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.mensajeria"  decimal  >
+                                    </md-input-container>
+                                    <md-tooltip >Mensajeria</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.documento" decimal   >
-                                </md-input-container>
-                                <md-tooltip >Documento</md-tooltip>
-                            </div>
-                            <div layout="row" class="row"  >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">Mensajeria </div>
+                                <div layout="row"  class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">Seguros </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.seguro" decimal   >
+                                    </md-input-container>
+                                    <md-tooltip >Seguros</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.mensajeria"  decimal  >
-                                </md-input-container>
-                                <md-tooltip >Mensajeria</md-tooltip>
-                            </div>
-                            <div layout="row"  class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">Seguros </div>
+                                <div layout="row" class="row"  >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">Consodilacion </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.consolidacion"  decimal  >
+                                    </md-input-container>
+                                    <md-tooltip >Consolidacion</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.seguro" decimal   >
-                                </md-input-container>
-                                <md-tooltip >Seguros</md-tooltip>
-                            </div>
-                            <div layout="row" class="row"  >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">Consodilacion </div>
+                                <div layout="row"  class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">20'SD </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.sd20"  decimal  >
+                                    </md-input-container>
+                                    <md-tooltip >20' SD</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.consolidacion"  decimal  >
-                                </md-input-container>
-                                <md-tooltip >Consolidacion</md-tooltip>
-                            </div>
-                            <div layout="row"  class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">20'SD </div>
+                                <div layout="row"  class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">40'SD </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.sd40"  decimal  >
+                                    </md-input-container>
+                                    <md-tooltip >40' SD</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.sd20"  decimal  >
-                                </md-input-container>
-                                <md-tooltip >20' SD</md-tooltip>
-                            </div>
-                            <div layout="row"  class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">40'SD </div>
+                                <div layout="row"  class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">40'HC </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.hc40" decimal   >
+                                    </md-input-container>
+                                    <md-tooltip >40' HC</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.sd40"  decimal  >
-                                </md-input-container>
-                                <md-tooltip >40' SD</md-tooltip>
-                            </div>
-                            <div layout="row"  class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">40'HC </div>
+                                <div layout="row"  class="row" >
+                                    <div layout="row" flex="50" >
+                                        <div layout="column" layout-align="center center">40'OT </div>
+                                    </div>
+                                    <md-input-container class="md-block rms" flex >
+                                        <input  type="text" ng-model="model.ot40"  decimal  >
+                                    </md-input-container>
+                                    <md-tooltip >40'OT</md-tooltip>
                                 </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.hc40" decimal   >
-                                </md-input-container>
-                                <md-tooltip >40' HC</md-tooltip>
-                            </div>
-                            <div layout="row"  class="row" >
-                                <div layout="row" flex="50" >
-                                    <div layout="column" layout-align="center center">40'OT </div>
-                                </div>
-                                <md-input-container class="md-block rms" flex >
-                                    <input  type="text" ng-model="model.ot40"  decimal  >
-                                </md-input-container>
-                                <md-tooltip >40'OT</md-tooltip>
                             </div>
                         </div>
-                    </div>
                     </form>
                 </div>
             </md-content>

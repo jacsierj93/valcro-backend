@@ -7,6 +7,8 @@ use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
+use App\Models\Sistema\Purchase\Purchase;
+use App\Models\Sistema\Shipments\Container;
 use App\Models\Sistema\Shipments\Shipment;
 use App\Models\Sistema\Tariffs\Tariff;
 use Carbon\Carbon;
@@ -57,10 +59,23 @@ class EmbarquesController extends BaseController
             ->distinct('pais_id')->get();
 
         foreach($paises as $pais){
-           $contry = Country::find($pais->pais_id);
+            $contry = Country::find($pais->pais_id);
             $contry['ports'] = $contry->ports()->get();
             $data []= $contry;
         }
+        return $data;
+    }
+
+    /************************* Order ***********************************/
+
+    public function getOrdersXAsig(){
+        $data  = [];
+        $models = Purchase::get();
+        foreach($models as $aux){
+            $aux->items = $aux->items()->get();
+            $data[]= $aux;
+        }
+
         return $data;
     }
 
@@ -71,7 +86,13 @@ class EmbarquesController extends BaseController
     }
 
     public function getTariffs(Request $req){
-        return Tariff::where('puerto_id', $req->puerto_id)->get();
+        $data= [];
+        $model =Tariff::where('puerto_id', $req->puerto_id)->get();
+        foreach($model as $aux ){
+            $aux->objs =['puerto_id'=>Ports::find($aux->puerto_id)];
+            $data[]= $aux;
+        }
+        return $data ;
     }
     public function saveTariff(Request $req){
         $model = new Tariff();
@@ -81,8 +102,8 @@ class EmbarquesController extends BaseController
         $model->moneda_id = $req->moneda_id ;
         $model->vencimiento = $req->vencimiento ;
 
-        if($req->has("tt")){
-            $model->tt = $req->tt ;
+        if($req->has("dias_tt")){
+            $model->dias_tt = $req->dias_tt ;
         }
         if($req->has("naviera")){
             $model->naviera = $req->naviera ;
@@ -115,12 +136,42 @@ class EmbarquesController extends BaseController
             $model->ot40 = $req->ot40 ;
         }
         $model->save();
-        return['accion'=>'new', 'id'=>$model->id];
+        return['accion'=>'new', 'id'=>$model->id, 'model'=>Tariff::findOrFail($model->id)];
     }
+
+    /************************* CONTAINERS ***********************************/
+    public function saveContainer(Request $req){
+        $model = new Container();
+        $result = ['action' =>'new'];
+        if($req->has("id")){
+            $result['action'] = 'upd';
+            $model = Container::findOrfail($req->id);
+        }
+        $model->cantidad = $req->cantidad;
+        $model->peso = $req->cantidad;
+        $model->tipo = $req->tipo;
+        $model->volumen = $req->volumen;
+        $model->peso = $req->cantidad;
+        $model->embarque_id= $req->embarque_id;
+        $model->save();
+
+        $result['id'] = $model->id;
+        $result['model'] = Container::findOrfail($model->id);
+        return $result;
+    }
+
+    public function DeleteContainer(Request $req){
+        $model = Container::findOrFail($req->id);
+        return ['accion'=>'del','response'=> $model->destroy($model->id) ];
+    }
+
 
     /************************* SHIPMENT ***********************************/
     public  function  getShipment(Request $req){
+
         $model = Shipment::findOrfail($req->id);
+        $tarifa = ($model->tarifa_id == null) ? null: Tariff::find($model->tarifa_id);
+
         $data = [];
         $data['id'] = $model->id;
         $data['emision'] = $model->emision;
@@ -130,9 +181,6 @@ class EmbarquesController extends BaseController
         $data['pais_id'] = $model->pais_id;
         $data['puerto_id'] = $model->puerto_id;
         $data['tarifa_id'] = $model->tarifa_id;
-        $data['fecha_carga'] = $model->fecha_carga;
-        $data['fecha_vnz'] = $model->fecha_vnz;
-        $data['fecha_tienda'] = $model->fecha_tienda;
         $data['flete_nac'] = $model->flete_nac;
         $data['flete_dua'] = $model->flete_dua;
         $data['flete_tt'] = $model->flete_tt;
@@ -141,6 +189,7 @@ class EmbarquesController extends BaseController
         $data['nro_exp_aduana'] = $model->nro_exp_aduana;
         $data['moneda_id'] = $model->flete_dua;
         $data['flete'] = ($model->flete_dua ==  null ? 0 : floatval($model->flete_nac))+($model->flete_dua ==  null ? 0 : floatval($model->flete_dua ));
+        $data['containers'] = $model->containers()->get();
         // aprobaciones
 
         $data['conf_f_carga'] = ($model->usuario_conf_f_carga == null )? false: true;
@@ -149,16 +198,36 @@ class EmbarquesController extends BaseController
         $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null )? false: true;
         $data['conf_monto_ft_nac'] = ($model->usuario_conf_monto_ft_nac == null )? false: true;
         $data['conf_monto_ft_dua'] = ($model->usuario_conf_monto_ft_dua == null )? false: true;
-
-
-
-
         $data['objs'] =[
             'pais_id'=>($model->pais_id == null) ? null: Country::find($model->pais_id),
             'puerto_id'=>($model->puerto_id == null) ? null: Ports::find($model->puerto_id),
-            'tarifa_id'=>($model->tarifa_id == null) ? null: Tariff::find($model->tarifa_id),
+            'tarifa_id'=>$tarifa,
             'prov_id'=>($model->prov_id == null) ? null: Provider::find($model->prov_id),
         ];
+        // calculados
+        $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db'];
+        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db'];;
+        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db'];;
+        /*if($model->emision != null){
+            $auxFecha= date_create($model->emision);
+
+            $emision= Carbon::createFromDate($auxFecha->format("Y"),$auxFecha->format("m"),$auxFecha->format("d"));
+            if($tarifa != null){
+                if($tarifa->dias_tt != null){
+                    if( $model->fecha_vnz == null){
+                        $fecha_carga = ['value'=>$emision->copy()->addDay(intval($tarifa->dias_tt)),'method'=>'estimate'];
+                    }
+
+
+                }
+            }
+        }*/
+
+
+        $data['fecha_carga'] = $fecha_carga;
+        $data['fecha_vnz'] = $fecha_vnz;
+        $data['fecha_tienda'] = $fecha_tienda;
+
 
         return $data ;
     }
@@ -171,37 +240,42 @@ class EmbarquesController extends BaseController
             'titulo' => 'required',
             'tarifa_id' => 'required'
         ]);
-       if(!$req->has('session_id')){
+        if(!$req->has('session_id')){
             $model->session_id = uniqid('', true);// removeer en function closeShipment
         }
 
-               if($req->has('id')){
-                   $return['accion']='edit';
-                   $model = $model->findOrFail($req->id);
-               }
-               if(!$validator->fails()  ){
-                   if(!$req->has('emision')){
-                       $model->emision = Carbon::now();
-                   }
-                   $return['valid'] = true;
-               }
+        if($req->has('id')){
+            $return['accion']='edit';
+            $model = $model->findOrFail($req->id);
+        }
+        if(!$validator->fails()  ){
+            if(!$req->has('emision')){
+                $model->emision = Carbon::now();
+            }
+            $return['valid'] = true;
+        }
 
-               if($model->usuario_id == null){$model->usuario_id = $req->session()->get('DATAUSER')['id'];}
-               if($req->has('prov_id')){$model->prov_id= $req->prov_id;}
-               if($req->has('titulo')){ $model->titulo= $req->titulo;}
-               if($req->has('pais_id')){ $model->pais_id= $req->pais_id;}
-               if($req->has('puerto_id')){ $model->puerto_id= $req->puerto_id;}
-               if($req->has('tarifa_id')){ $model->tarifa_id= $req->tarifa_id;}
-               if($req->has('fecha_carga')){ $model->fecha_carga= $req->fecha_carga;}
-               if($req->has('fecha_vnz')){ $model->fecha_vnz= $req->fecha_vnz;}
-               if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda;}
-               if($req->has('flete_nac')){ $model->flete_nac= $req->flete_nac;}
-               if($req->has('flete_dua')){ $model->flete_dua= $req->flete_dua;}
-               $model->save();
+        if($model->usuario_id == null){$model->usuario_id = $req->session()->get('DATAUSER')['id'];}
+        if($req->has('prov_id')){$model->prov_id= $req->prov_id;}
+        if($req->has('titulo')){ $model->titulo= $req->titulo;}
+        if($req->has('pais_id')){ $model->pais_id= $req->pais_id;}
+        if($req->has('puerto_id')){ $model->puerto_id= $req->puerto_id;}
+        if($req->has('tarifa_id')){ $model->tarifa_id= $req->tarifa_id;}
+
+        if($req->has('flete_nac')){ $model->flete_nac= $req->flete_nac;}
+        if($req->has('flete_dua')){ $model->flete_dua= $req->flete_dua;}
+
+        if($req->has('fecha_carga')){
+
+            $model->fecha_carga= $req->fecha_carga['value'];
+        }
+        if($req->has('fecha_vnz')){ $model->fecha_vnz= $req->fecha_vnz['value'];}
+        if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda['value'];}
+        $model->save();
 
 
-               $return['id']= $model->id;
-               $return['session_id']=  $model->session_id;
+        $return['id']= $model->id;
+        $return['session_id']=  $model->session_id;
         return $return ;
     }
 

@@ -15,5 +15,11 @@ class Shipment extends Model
     use SoftDeletes;
     protected $table = "tbl_embarque";
     protected $dates = ['deleted_at'];
+    /**
+     *Container del embarq
+     */
+    public function containers(){
+        return $this->hasMany('App\Models\Sistema\Shipments\Container', 'embarque_id');
+    }
 
 }
