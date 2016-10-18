@@ -697,18 +697,26 @@
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailShipment" id="detailShipment"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "OpenShipmentCtrl" >
                 <div layout="column" flex style="padding-right: 2px;">
-                    <form layout="row" name="detailShipmenthead" ng-class="{'focused':form== 'head'}" ng-click="form = 'head' ">
+                    <form name="detailShipmenthead" layout="row"  ng-class="{'focused':form== 'head'}" ng-click="form = 'head' ">
                         <div active-left  ></div>
                         <div layout="column" flex>
 
                             <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'head'}" >
-                                <div class="titulo_formulario" style="height:39px;">
+                                <div class="titulo_formulario" style="height:39px;" flex>
                                     <div>
                                         Embarque
                                     </div>
                                 </div>
+                                <div layout="row" layout-align="center end" class="form-row-head-option">
+                                    <div flex layout="column" layout-align="center center" ng-click="formOptions.head.expand = !formOptions.head.expand;">
+                                        <span class="{{(formOptions.head.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
+                                        <md-tooltip >
+                                           {{(formOptions.head.expand) ? 'Ocultar' : 'Mostar'}}
+                                        </md-tooltip>
+                                    </div>
+                                </div>
                             </div>
-                            <div layout="row" class="row" >
+                            <div layout="row" class="row" ng-show="formOptions.head.expand" >
                                 <md-input-container class="md-block" flex  >
                                     <label>Proveedor</label>
                                     <md-autocomplete md-selected-item="provSelec"
@@ -750,7 +758,7 @@
                                     <div layout="column" class="md-block" layout-align="center center"><div>{{$parent.shipment.emision | date : 'dd-MM-yyyy'}}</div></div>
                                 </div>
                             </div>
-                            <div layout="row" class="row" >
+                            <div layout="row" class="row"  ng-show="formOptions.head.expand" >
                                 <md-input-container flex>
                                     <label>Titulo</label>
                                     <input  ng-model="$parent.shipment.titulo"
@@ -761,10 +769,8 @@
                                             skip-tab
                                     >
                                 </md-input-container>
-
-
                             </div>
-                            <div layout="row" class="row"  ng-click="openTarif();">
+                            <div layout="row" class="row"  ng-click="openTarif();"   ng-show="formOptions.head.expand" >
                                 <div class="adj-box-left" flex="10" style="color: rgb(176,176,176);margin-right: 8px;" >
                                     <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left;margin-right: 0">T </div>
                                     <div style="margin-top: 8px;    border-bottom: dotted 0.6px rgb(176,176,176);margin-left: 26px;">Tarifa</div>
@@ -797,17 +803,25 @@
                             </div>
                         </div>
                     </form>
-                    <form  name="date" layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
+                    <form name="date" layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}" >
-                                <div class="titulo_formulario" style="height:39px;">
+                                <div flex class="titulo_formulario" style="height:39px;">
                                     <div>
                                         Fechas
                                     </div>
                                 </div>
+                                <div layout="row" layout-align="center end" class="form-row-head-option">
+                                    <div flex layout="column" layout-align="center center" ng-click="formOptions.date.expand = !formOptions.date.expand;">
+                                        <span class="{{(formOptions.date.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
+                                        <md-tooltip >
+                                            {{(formOptions.date.expand) ? 'Ocultar' : 'Mostar'}}
+                                        </md-tooltip>
+                                    </div>
+                                </div>
                             </div>
-                            <div layout="row" class="row" >
+                            <div layout="row" class="row" ng-show="formOptions.date.expand" >
                                 <div layout="row" class="date-row" flex="" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Carga</div>
@@ -845,59 +859,75 @@
                             </div>
                         </div>
                     </form>
-                    <form layout="row" ng-class="{'focused':form== 'doc'}" ng-click="form = 'doc' ">
+                    <form name="doc" layout="row" ng-class="{'focused':form== 'doc'}" ng-click="form = 'doc' ">
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div layout="row"  class="form-row-head" ng-class="{'form-row-head-select':form== 'doc'}">
-                                <div class="titulo_formulario" style="height:39px;">
+                                <div flex class="titulo_formulario" style="height:39px;">
                                     <div>
                                         Documentos
                                     </div>
                                 </div>
+                                <div layout="row" layout-align="center end" class="form-row-head-option">
+                                    <div flex layout="column" layout-align="center center" ng-click="formOptions.doc.expand = !formOptions.doc.expand;">
+                                        <span class="{{(formOptions.doc.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
+                                        <md-tooltip >
+                                            {{(formOptions.doc.expand) ? 'Ocultar' : 'Mostar'}}
+                                        </md-tooltip>
+                                    </div>
+                                </div>
                             </div>
-                            <div layout="row" class="row" >
+                            <div layout="row" class="row" ng-show="formOptions.doc.expand" >
                                 <md-input-container class="md-block" flex ng-click="$parent.miniMbl()" >
                                     <label>MBL</label>
-                                    <input  ng-model="$parent.shipment.mbl"
+                                    <input  ng-model="$parent.shipment.nro_mbl.documento"
                                             ng-disabled="true"
                                     >
                                 </md-input-container>
                                 <div class="adj-box-rigth">
-                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">0 </div>
+                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_mbl.adjs}} </div>
                                 </div>
                                 <md-input-container class="md-block" flex  ng-click="$parent.miniHbl()" >
                                     <label>HBL</label>
-                                    <input  ng-model="$parent.shipment.hbl"
+                                    <input  ng-model="$parent.shipment.nro_hbl.documento"
                                             ng-disabled="true"
                                             skip-tab
                                     >
                                 </md-input-container>
                                 <div class="adj-box-rigth">
-                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">0 </div></div>
+                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_hbl.length}} </div></div>
 
                                 <md-input-container class="md-block" flex ng-click="$parent.miniExpAduana()" >
                                     <label>Exp. Aduanal</label>
-                                    <input  ng-disabled="true"  ng-model="$parent.shipment.nro_exp_aduana"
+                                    <input  ng-disabled="true"  ng-model="$parent.shipment.nro_dua.documento"
                                             skip-tab
                                     >
                                 </md-input-container>
                                 <div class="adj-box-rigth">
-                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">0 </div></div>
+                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_dua.adjs.length}} </div></div>
 
                             </div>
                         </div>
                     </form>
-                    <form layout="row" ng-class="{'focused':form== 'pago'}" ng-click="form = 'pago' ">
+                    <form name="pago" layout="row" ng-class="{'focused':form== 'pago'}" ng-click="form = 'pago' ">
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div layout="row"  class="form-row-head" ng-class="{'form-row-head-select':form== 'pago'}">
-                                <div class="titulo_formulario" style="height:39px;" >
+                                <div flex class="titulo_formulario" style="height:39px;" >
                                     <div>
                                         Pago
                                     </div>
                                 </div>
+                                <div layout="row" layout-align="center end" class="form-row-head-option" >
+                                    <div flex layout="column" layout-align="center center" ng-click="formOptions.pago.expand = !formOptions.pago.expand;">
+                                        <span class="{{(formOptions.pago.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
+                                        <md-tooltip >
+                                            {{(formOptions.pago.expand) ? 'Ocultar' : 'Mostar'}}
+                                        </md-tooltip>
+                                    </div>
+                                </div>
                             </div>
-                            <div layout="row" class="row" >
+                            <div layout="row" class="row" ng-show="formOptions.pago.expand" >
                                 <md-input-container class="md-block" >
                                     <label>Flete</label>
                                     <input  ng-model="$parent.shipment.monto"
@@ -933,17 +963,26 @@
                             </div>
                         </div>
                     </form>
-                    <form layout="row" flex  ng-class="{'focused':form== 'agreds'}" ng-click="form = 'agreds' ">
+                    <form name="agreds" layout="row" flex  ng-class="{'focused':form== 'agreds'}" ng-click="form = 'agreds' ">
                         <div active-left  ></div>
                         <div flex layout="column" >
-                            <div layout="row" class="form-row-head"  >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'agreds'}" ng-click="form = 'agreds' "  >
                                 <div flex class="titulo_formulario" style="height:39px;">
                                     <div>
                                         Agregados
                                     </div>
                                 </div>
+
+                                <div layout="row" layout-align="center end" class="form-row-head-option">
+                                    <div flex layout="column" layout-align="center center" ng-click="formOptions.agreds.expand = !formOptions.agreds.expand;">
+                                        <span class="{{(formOptions.agreds.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
+                                        <md-tooltip >
+                                            {{(formOptions.agreds.expand) ? 'Ocultar' : 'Mostar'}}
+                                        </md-tooltip>
+                                    </div>
+                                </div>
                             </div>
-                            <div layout="row" flex>
+                            <div layout="row" flex  ng-show="formOptions.agreds.expand">
                                 <div flex layout="column" >
                                     <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'agreds'}">
                                         <div class="titulo_formulario" style="height:39px;" flex>
@@ -2318,14 +2357,14 @@
                             <div  layout="column" style="padding-right:4px">
                                 <md-input-container class="md-block" >
                                     <label>N°</label>
-                                    <input  type="text" ng-model="prod.cod_barra"  tabindex="-1" >
+                                    <input  type="text" ng-model="$parent.shipment.nro_mbl.documento"   >
                                 </md-input-container>
                                 <div layout="row" class="date-row" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Emitido</div>
                                     </div>
-                                    <md-datepicker ng-model="$parent.shipment.emision"
-                                                   ng-disabled="true"
+                                    <md-datepicker ng-model="$parent.shipment.nro_mbl.emision"
+
                                                    skip-tab
                                                    required
                                     ></md-datepicker >
@@ -2339,10 +2378,10 @@
 
                             </div>
 
-                            <div flex class="gridContent" ng-show="dataadjs.length">
+                            <div flex class="gridContent" >
 
                             </div>
-                            <div layout="column" layout-align="center center" flex>
+                            <div layout="column" layout-align="center center" flex ng-show="$parent.shipment.nro_mbl.adjs.length" >
                                 No hay adjuntos cargados
                             </div>
 

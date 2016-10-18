@@ -184,26 +184,33 @@ class EmbarquesController extends BaseController
         $data['flete_nac'] = $model->flete_nac;
         $data['flete_dua'] = $model->flete_dua;
         $data['flete_tt'] = $model->flete_tt;
-        $data['nro_mbl'] = $model->nro_mbl;
-        $data['nro_hbl'] = $model->nro_hbl;
-        $data['nro_exp_aduana'] = $model->nro_exp_aduana;
+
         $data['moneda_id'] = $model->flete_dua;
         $data['flete'] = ($model->flete_dua ==  null ? 0 : floatval($model->flete_nac))+($model->flete_dua ==  null ? 0 : floatval($model->flete_dua ));
         $data['containers'] = $model->containers()->get();
         // aprobaciones
-
         $data['conf_f_carga'] = ($model->usuario_conf_f_carga == null )? false: true;
         $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;
         $data['conf_f_tienda'] = ($model->usuario_conf_f_tienda == null )? false: true;
         $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null )? false: true;
         $data['conf_monto_ft_nac'] = ($model->usuario_conf_monto_ft_nac == null )? false: true;
         $data['conf_monto_ft_dua'] = ($model->usuario_conf_monto_ft_dua == null )? false: true;
+
+        // con adjuntos
+        $adjs = $model->attachments()->get();
+        $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emsion_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
+        $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emsion_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
+        $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision,'adjs'=> $model->attachmentsFile("nro_dua") ];
+
+        // foraneos
         $data['objs'] =[
             'pais_id'=>($model->pais_id == null) ? null: Country::find($model->pais_id),
             'puerto_id'=>($model->puerto_id == null) ? null: Ports::find($model->puerto_id),
             'tarifa_id'=>$tarifa,
             'prov_id'=>($model->prov_id == null) ? null: Provider::find($model->prov_id),
         ];
+
+
         // calculados
         $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db'];
         $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db'];;

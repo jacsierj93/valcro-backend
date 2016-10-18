@@ -172,6 +172,13 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
     $scope.provSelec = null;
     $scope.provSelecText = undefined;
     $scope.form= 'head';
+    $scope.formOptions={
+      head:{expand:true} ,
+      date:{expand:true}  ,
+      doc:{expand:true}  ,
+      pago:{expand:true}  ,
+      agreds:{expand:true}
+    };
 
 
 
@@ -343,6 +350,8 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
     $scope.options ={form:false};
     $scope.select ={};
 
+
+    //constructor
     $scope.$parent.miniContainerCtrl = function(){
         $scope.containerForm.$setPristine();
         $scope.containerForm.$setUntouched();
@@ -358,6 +367,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
         });
     };
 
+    // metodos
     $scope.close = function(){
         $scope.inClose();
     };
@@ -368,7 +378,6 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
             });
         }
     };
-
     $scope.created = function (){
         if($scope.select.id){
             //   $scope.$parent.NotifAction("error", "Por favor haga click en el container que desea modificar, ",[],{autohidden:1500});
@@ -439,7 +448,6 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
     $scope.savePromise = function(promise){
         $resource.post({type:"ContainerSave"},$scope.model,promise);
     };
-
     $scope.delete = function(item, e){
         console.log(e);
         $scope.$parent.NotifAction("alert", "¿Esta seguro de eliminar el container?",
@@ -517,6 +525,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
 
         }
     }
+
 }]);
 
 MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){

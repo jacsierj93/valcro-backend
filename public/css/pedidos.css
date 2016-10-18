@@ -172,14 +172,15 @@ md-sidenav .md-sidenav-right.md-locked-open{
     border-bottom: solid 1.5px rgb(92, 183, 235);
     color: rgb(92, 183, 235);
 }
-.form-row-head-option{
-    margin-right: 4px;
-    color: black;
-    padding-top: 8px;
+.form-row-head-option.form-row-head-select{
+   /* color: rgb(92, 183, 235);*/
 }
 .form-row-head-option div{
     margin: 0 2px 0 2px;
     height: 100%;
+}
+.form-row-head-option div:last-child{
+    margin-right: 8px;
 }
 .form-body-select{
     color: rgb(92, 183, 235);
