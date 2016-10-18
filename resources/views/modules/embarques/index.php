@@ -711,7 +711,7 @@
                                     <div flex layout="column" layout-align="center center" ng-click="formOptions.head.expand = !formOptions.head.expand;">
                                         <span class="{{(formOptions.head.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
                                         <md-tooltip >
-                                           {{(formOptions.head.expand) ? 'Ocultar' : 'Mostar'}}
+                                            {{(formOptions.head.expand) ? 'Ocultar' : 'Mostar'}}
                                         </md-tooltip>
                                     </div>
                                 </div>
@@ -885,7 +885,7 @@
                                     >
                                 </md-input-container>
                                 <div class="adj-box-rigth">
-                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_mbl.adjs}} </div>
+                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_mbl.adjs.length}} </div>
                                 </div>
                                 <md-input-container class="md-block" flex  ng-click="$parent.miniHbl()" >
                                     <label>HBL</label>
@@ -895,7 +895,7 @@
                                     >
                                 </md-input-container>
                                 <div class="adj-box-rigth">
-                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_hbl.length}} </div></div>
+                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_hbl.adjs.length}} </div></div>
 
                                 <md-input-container class="md-block" flex ng-click="$parent.miniExpAduana()" >
                                     <label>Exp. Aduanal</label>
@@ -2346,7 +2346,7 @@
             <md-content   layout="row" flex class="sideNavContent"  ng-controller="miniMblCtrl"  >
                 <div  layout="column" flex class="layerColumn"   click-out="close($event)">
                     <div  layout="column" flex style="padding-left: 12px">
-                        <form layout="column" flex="">
+                        <form name="head" layout="column" flex="">
                             <div layout="row"  class="form-row-head form-row-head-select"  >
                                 <div class="titulo_formulario" style="color:rgb(84, 180, 234);">
                                     <div>
@@ -2355,30 +2355,36 @@
                                 </div>
                             </div>
                             <div  layout="column" style="padding-right:4px">
-                                <md-input-container class="md-block" >
-                                    <label>N°</label>
-                                    <input  type="text" ng-model="$parent.shipment.nro_mbl.documento"   >
-                                </md-input-container>
-                                <div layout="row" class="date-row" >
-                                    <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>Emitido</div>
+                                <div layout="row" class="row">
+                                    <md-input-container class="md-block" >
+                                        <label>N°</label>
+                                        <input  type="text" ng-model="$parent.shipment.nro_mbl.documento"   >
+                                    </md-input-container>
+                                </div>
+                                <div layout="row" class="row">
+                                    <div layout="row" class="date-row" >
+                                        <div layout="column" class="md-block" layout-align="center center"  >
+                                            <div style="width: 88px;">Emitido</div>
+                                        </div>
+                                        <md-datepicker ng-model="$parent.shipment.nro_mbl.emision"
+                                                       skip-tab
+                                                       required
+                                        ></md-datepicker >
                                     </div>
-                                    <md-datepicker ng-model="$parent.shipment.nro_mbl.emision"
-
-                                                   skip-tab
-                                                   required
-                                    ></md-datepicker >
                                 </div>
                                 <div style="padding: 2px;; min-height: 56px;" layout="row" >
-                                    <div ngf-drop ngf-select  ng-model="serviceFiles" class="drop-box" ngf-drag-over-class="dragover"
+                                    <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                                          ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
-                                        insertar archivo
+                                        Insertar archivo
                                     </div>
                                 </div>
 
                             </div>
 
                             <div flex class="gridContent" >
+                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_mb.adjs " ng-click="selectImg(item)">
+                                    <img ng-src="images/thumbs/{{item.thumb}}"/>
+                                </div>
 
                             </div>
                             <div layout="column" layout-align="center center" flex ng-show="$parent.shipment.nro_mbl.adjs.length" >
@@ -2424,9 +2430,9 @@
                                 </md-input-container>
                                 <div layout="row" class="date-row" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>Emitido</div>
+                                        <div  style="width: 88px;">Emitido</div>
                                     </div>
-                                    <md-datepicker ng-model="$parent.shipment.emision"
+                                    <md-datepicker ng-model="$parent.shipment.nro_hbl.emision"
                                                    ng-disabled="true"
                                                    skip-tab
                                                    required
@@ -2441,8 +2447,10 @@
                                 </div>
                             </div>
 
-                            <div flex class="gridContent" ng-show="dataadjs.length">
-
+                            <div flex class="gridContent">
+                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_hbl.adjs " ng-click="selectImg(item)">
+                                    <img ng-src="images/thumbs/{{item.thumb}}"/>
+                                </div>
                             </div>
                             <div layout="column" layout-align="center center" flex>
                                 No hay adjuntos cargados
@@ -2465,7 +2473,7 @@
             </md-content>
         </md-sidenav>
 
-        <!------------------------------------------- mini layer house bill landing------------------------------------------------------------------------->
+        <!------------------------------------------- mini layer DUA bill landing------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="miniExpAduana" id="miniExpAduana"
         >
@@ -2487,10 +2495,9 @@
                                 </md-input-container>
                                 <div layout="row" class="date-row" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>Emitido</div>
+                                        <div style="width: 88px;">Emitido</div>
                                     </div>
-                                    <md-datepicker ng-model="$parent.shipment.emision"
-                                                   ng-disabled="true"
+                                    <md-datepicker ng-model="$parent.shipment.nro_dua.emision"
                                                    skip-tab
                                                    required
                                     ></md-datepicker >
@@ -2503,8 +2510,10 @@
                                     insertar archivo
                                 </div>
                             </div>
-                            <div flex class="gridContent" ng-show="data.djs.length">
-
+                            <div flex class="gridContent" >
+                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_dua.adjs " ng-click="selectImg(item)">
+                                    <img ng-src="images/thumbs/{{item.thumb}}"/>
+                                </div>
                             </div>
                             <div layout="column" layout-align="center center" flex>
                                 No hay adjuntos cargados

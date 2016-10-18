@@ -1,4 +1,8 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,$interval,form,shipment, setGetShipment) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,shipment, setGetShipment, filesService) {
+
+    //?review
+    filesService.setFolder('orders');
+
 
     $scope.alerts =[];
     $scope.provSelec ={};
@@ -625,15 +629,118 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav', function($scope,$mdS
     };
 }]);
 
-MyApp.controller('miniMblCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
     $scope.isOpen = false;
-    $scope.data ={adjs:[]};
+    $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+    //{{up:[}, size, estado:'waith'}
+    //{estado:'wait',cu}
+
+
     $scope.$parent.miniMbl = function(){
+        $scope.head.$setPristine();
+        $scope.head.$setUntouched();
         $mdSidenav("miniMbl").open().then(function(){
             $scope.isOpen = true;
         });
     };
-    $scope.close= function(){
+
+    var interval = null;
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            $scope.cola.estado='uploading';
+            $scope.cola.cola = $scope.cola.cola + 1;
+            var pr =Object.create( $scope.asign);
+            $scope.cola.data.push(pr($scope.files,"nro_mbl"));
+            if(interval== null){
+                interval = $interval(function () {
+                    console.log("interval ",$scope.cola );
+                   var finisAll= true;
+                    angular.forEach($scope.cola.data,function (v, k) {
+
+                        if(v.isFinish()){
+                            finisAll=true;
+                            angular.forEach(v.getFilesUp(), function (sv,sf) {
+                                $parent.shipment.nro_mb.adjs.push(sv);
+                            });
+                            if(v.getFilesError().length > 0){
+                                console.log("error subiendo archivos", v.getFilesError());
+                            }
+                        }
+                        if(v.getState() == 'waith'){
+                            finisAll= false;
+                            v.start();
+                        }
+                        if(v.getState() == 'up'){
+                            finisAll= false;
+                        }
+
+
+                    });
+                    if(finisAll){
+                        $scope.cola.estado='finish';
+                        $interval.cancel(interval);
+                        interval=  null;
+                    }
+                },500);
+            }
+        }
+    });
+
+    $scope.asign = function (files, doc) {
+        var estado ="waith";
+        var filesUp = [];
+        var filesError = [];
+        var all;
+        var finish= false;
+        var asig = function (file) {
+            $resource.post({type:"SaveAttachment"},{file:file,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+                all.push({state:'good', file:response});
+                filesUp.push(response);
+                if(all.length== files.length){
+                    finish= true;
+                }
+            })
+        };
+
+        return {
+            getState: function () {return estado;},
+            getFiles : function () {return files;},
+            getSize: function(){return files.length ;},
+            getFilesUp:function () {return filesUp;},
+            getFilesError : function(){return filesError},
+            isFinish : function () {return   finish},
+            getAll : function () {return   all},
+            start: function () {
+                estado =  'up';
+                filesSrv.setFolder("orders");
+/*                var x = $timeout(function () {
+                    if(estado != 'fin'){
+                        estado='error';
+                    }
+                },60000);*/
+                angular.forEach(files, function(v) {
+                    filesSrv.Upload({
+                        file: v,
+                        success: function (data) {
+                            asig(data);
+                        },
+                        error: function (data) {
+                            all.push({state:'bad', file:response});
+                            filesError.push(data);
+                            if(all.length== files.length){
+                                finish= true;
+                            }
+                        }
+                    })
+                });
+            }
+
+
+        }
+    }
+
+
+    $scope.close= function(e){
         if($scope.isOpen){
             $mdSidenav("miniMbl").close().then(function(){
                 $scope.isOpen = false;
@@ -1139,7 +1246,9 @@ MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
         ,
         setData : function(doc){
             bindin.estado = false;
+
             shipment.get({type:"Shipment", id:doc.id},{}, function (response) {
+                console.log("sdefosdaf", response);
                 angular.forEach(response,function (v, k) {
                     if(typeof (v) == 'string' || v == null){
                         Shipment[k]=v;
@@ -1149,19 +1258,15 @@ MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
                 angular.forEach(response.objs,function (v, k) {
                     Shipment.objs[k]=v;
                 });
+                Shipment.fecha_carga= (response.fecha_carga.value!= null) ? DateParse.toDate(response.fecha_carga.value) : null;
+                Shipment.fecha_vnz= (response.fecha_vnz.value!= null) ? DateParse.toDate(response.fecha_vnz.value) : null;
+                Shipment.fecha_tienda= (response.fecha_tienda.value!= null) ? DateParse.toDate(response.fecha_tienda.value) : null;
+                Shipment.emision = (response.emision!= null) ? DateParse.toDate(response.emision) : null;
                 Shipment.containers = response.containers;
-                if(response.fecha_carga.value!= null){
-                    Shipment.fecha_carga.value = DateParse.toDate(response.fecha_carga.value);
-                }
-                if(response.fecha_vnz.value!= null){
-                    Shipment.fecha_vnz.value = DateParse.toDate(response.fecha_vnz.value);
-                }
-                if(response.fecha_tienda.value!= null){
-                    Shipment.fecha_tienda.value = DateParse.toDate(response.fecha_tienda.value);
-                }
-                if(response.emision != null){
-                    Shipment.emision = DateParse.toDate(response.emision);
-                }
+                Shipment.nro_mbl = response.nro_mbl;
+                Shipment.nro_hbl = response.nro_hbl;
+                Shipment.nro_dua = response.nro_dua;
+
                 bindin.estado = true;
 
             });

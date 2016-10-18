@@ -20,3 +20,4 @@ $app->get('embarques/ProviderDir', 'Embarques\EmbarquesController@getProvDir');
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
 $app->post('embarques/Save', 'Embarques\EmbarquesController@saveShipment');
+$app->post('embarques/SaveAttachment', 'Embarques\EmbarquesController@SaveAttachment');

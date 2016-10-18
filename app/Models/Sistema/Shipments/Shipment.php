@@ -52,4 +52,43 @@ class Shipment extends Model
         return $this->hasMany('App\Models\Sistema\Shipments\Container', 'embarque_id');
     }
 
+    /**
+
+    CREATE TABLE IF NOT EXISTS `tbl_embarque` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `prov_id` int(11) DEFAULT NULL,
+    `titulo` longtext,
+    `pais_id` int(11) DEFAULT NULL,
+    `puerto_id` int(11) DEFAULT NULL,
+    `tarifa_id` int(11) DEFAULT NULL,
+    `fecha_carga` date DEFAULT NULL,
+    `fecha_vnz` date DEFAULT NULL,
+    `fecha_tienda` date DEFAULT NULL,
+    `nro_mbl` varchar(100) DEFAULT NULL,
+    `nro_hbl` varchar(100) DEFAULT NULL,
+    `nro_dua` varchar(100) DEFAULT NULL,
+    `flete_tt` decimal(10,4) DEFAULT NULL,
+    `moneda_id` int(11) DEFAULT NULL,
+    `flete_nac` decimal(10,4) DEFAULT NULL,
+    `flete_dua` varchar(100) DEFAULT NULL,
+    `session_id` varchar(100) DEFAULT NULL,
+    `usuario_conf_f_carga` int(11) DEFAULT NULL,
+    `usuario_conf_f_vnz` int(11) DEFAULT NULL,
+    `usuario_conf_f_tienda` int(11) DEFAULT NULL,
+    `usuario_conf_monto_ft_tt` int(11) DEFAULT NULL,
+    `usuario_conf_monto_ft_nac` int(11) DEFAULT NULL,
+    `usuario_conf_monto_ft_dua` int(11) DEFAULT NULL,
+    `usuario_id` int(11) DEFAULT NULL,
+    `created_at` datetime DEFAULT NULL,
+    `updated_at` datetime DEFAULT NULL,
+    `deleted_at` datetime DEFAULT NULL,
+    `emision` datetime DEFAULT NULL,
+    `emsion_mbl` date DEFAULT NULL,
+    `emision_hbl` date DEFAULT NULL,
+    `emision_dua` date DEFAULT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=55 ;
+
+
+     */
 }

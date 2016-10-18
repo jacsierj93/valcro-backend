@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Embarques;
 
 
 use App\Models\Sistema\Masters\Country;
+use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Shipments\Container;
 use App\Models\Sistema\Shipments\Shipment;
+use App\Models\Sistema\Shipments\ShipmentAttachment;
 use App\Models\Sistema\Tariffs\Tariff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -272,18 +274,35 @@ class EmbarquesController extends BaseController
         if($req->has('flete_nac')){ $model->flete_nac= $req->flete_nac;}
         if($req->has('flete_dua')){ $model->flete_dua= $req->flete_dua;}
 
-        if($req->has('fecha_carga')){
+/*        if($req->has('fecha_carga')){
 
             $model->fecha_carga= $req->fecha_carga['value'];
         }
         if($req->has('fecha_vnz')){ $model->fecha_vnz= $req->fecha_vnz['value'];}
-        if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda['value'];}
+        if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda['value'];}*/
         $model->save();
 
 
         $return['id']= $model->id;
         $return['session_id']=  $model->session_id;
         return $return ;
+    }
+
+    public function SaveAttachment(Request $req){
+        $file = FileModel::findOrFail($req->id);
+        $model = new ShipmentAttachment();
+        $model->embarque_id= $req->embarque_id;
+        $model->documento = $req->documento;
+        $model->archivo_id	 = $req->id;
+        $model->comentario	 = ($req->has('comentario') ? $req->comentario : null );
+        $att['id'] = $model->id;
+        $att['archivo_id'] = $model->archivo_id;
+        $att['documento'] = $model->documento;
+        $att['comentario'] = $model->comentario;
+        $att['thumb']=$file->getThumbName();
+        $att['tipo']=$file->tipo;
+        $att['file'] = $file->archivo;
+        return $att;
     }
 
     /************************* Another module ***********************************/
