@@ -189,7 +189,7 @@ class EmbarquesController extends BaseController
 
         $data['moneda_id'] = $model->flete_dua;
         $data['flete'] = ($model->flete_dua ==  null ? 0 : floatval($model->flete_nac))+($model->flete_dua ==  null ? 0 : floatval($model->flete_dua ));
-        $data['containers'] = $model->containers()->get();
+        //$data['containers'] = $model->containers()->get();
         // aprobaciones
         $data['conf_f_carga'] = ($model->usuario_conf_f_carga == null )? false: true;
         $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;

@@ -649,8 +649,8 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         if(newValue > 0){
             $scope.cola.estado='uploading';
             $scope.cola.cola = $scope.cola.cola + 1;
-            var pr =Object.create( $scope.asign);
-            $scope.cola.data.push(pr($scope.files,"nro_mbl"));
+            var pr =Object.create( $scope.asign($scope.files,"nro_mbl"));
+            $scope.cola.data.push(pr);
             if(interval== null){
                 interval = $interval(function () {
                     console.log("interval ",$scope.cola );
@@ -690,7 +690,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         var estado ="waith";
         var filesUp = [];
         var filesError = [];
-        var all;
+        var all =[];
         var finish= false;
         var asig = function (file) {
             $resource.post({type:"SaveAttachment"},{file:file,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
