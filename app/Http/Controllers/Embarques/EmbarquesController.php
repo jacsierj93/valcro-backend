@@ -70,12 +70,26 @@ class EmbarquesController extends BaseController
 
     /************************* Order ***********************************/
 
-    public function getOrdersXAsig(){
+    //mark revuiew db add column fecha prodcion
+
+    public function getOrders(Request $req){
         $data  = [];
         $models = Purchase::get();
         foreach($models as $aux){
-            $aux->items = $aux->items()->get();
-            $data[]= $aux;
+            $odc = [];
+            $odc['id']=$aux->id;
+            $odc['fecha_producion']=$aux->fecha_producion;
+            $odc['fecha_aprob_gerencia']=$aux->fecha_aprob_gerencia;
+            $odc['fecha_aprob_compra']=$aux->fecha_aprob_compra;
+            $odc['nro_proforma']=$aux->nro_proforma;
+            $odc['nro_proforma']=$aux->nro_proforma;
+            $odc['monto']=$aux->monto;
+            $odc['mt3']=$aux->mt3;
+            $odc['peso']=$aux->peso;
+            $odc['asignado']=false;
+/*            $odc['isTotal']=0;*/
+            $odc['items'] = $aux->items()->get();
+            $data[]= $odc;
         }
 
         return $data;
@@ -198,11 +212,16 @@ class EmbarquesController extends BaseController
         $data['conf_monto_ft_nac'] = ($model->usuario_conf_monto_ft_nac == null )? false: true;
         $data['conf_monto_ft_dua'] = ($model->usuario_conf_monto_ft_dua == null )? false: true;
 
-        // con adjuntos
-        $adjs = $model->attachments()->get();
+        // adjuntos
         $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emsion_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
         $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emsion_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
         $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision,'adjs'=> $model->attachmentsFile("nro_dua") ];
+
+        // odc
+        $data['odc'] = [];
+
+        //demo odc
+        $data['odcs'][] = $model->orders();
 
         // foraneos
         $data['objs'] =[

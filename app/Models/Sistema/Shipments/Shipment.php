@@ -52,6 +52,13 @@ class Shipment extends Model
         return $this->hasMany('App\Models\Sistema\Shipments\Container', 'embarque_id');
     }
 
+    public function Orders(){
+        $data = [];
+        $data[] = ['id'=>'', 'isTotal'=>false, 'articulos'=>[]];
+        return $data;
+
+    }
+
     /**
 
     CREATE TABLE IF NOT EXISTS `tbl_embarque` (

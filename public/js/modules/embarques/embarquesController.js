@@ -190,7 +190,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
     $scope.$watch("provSelec", function(newVal){
         if(newVal != null && newVal.id && $scope.$parent.provSelec != null){
-            $resource.query({type:"ProviderDir", id:newVal.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
+            $resource.queryMod({type:"Provider",mod:"Dir", id:newVal.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
         }
     });
     $scope.$watch("provSelec", function(newVal){
@@ -312,7 +312,7 @@ MyApp.controller('listTariffCtrl',['$scope','shipment','tarifForm',  function($s
 
         $scope.pais_idSelec=newVal;
         if(newVal && newVal!= null ){
-            $resource.query({type:"CountryPorts", pais_id:newVal.id},{}, function(response){
+            $resource.query({type:"Country", mod:"Ports", pais_id:newVal.id},{}, function(response){
                 $scope.pais_idSelec.ports = response;
             });
         }
@@ -322,7 +322,7 @@ MyApp.controller('listTariffCtrl',['$scope','shipment','tarifForm',  function($s
     });
     $scope.$watch('puerto_idSelec', function(newVal){
         if(newVal && newVal !=null){
-            $resource.query({type:"Tariffs", puerto_id:$scope.puerto_idSelec.id},{}, function (response) {
+            $resource.queryMod({type:"Tariff",mod:"List", puerto_id:$scope.puerto_idSelec.id},{}, function (response) {
                 $scope.tbl.data= response;
             });
         }
@@ -450,7 +450,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
         $scope.select = item;
     };
     $scope.savePromise = function(promise){
-        $resource.post({type:"ContainerSave"},$scope.model,promise);
+        $resource.postMod({type:"Container",mod:"Save"},$scope.model,promise);
     };
     $scope.delete = function(item, e){
         console.log(e);
@@ -463,7 +463,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                 },
                 {name:"Si estoy seguro", default:5 ,action:
                     function (){
-                        $resource.post({type:"ContainerDelete"},{id:item.id}, function(response){
+                        $resource.postMod({type:"Container",mod:"Delete"},{id:item.id}, function(response){
                             console.log("response del", response);
                             $scope.$parent.NotifAction("ok", "Container eliminado",[],{autohidden:1500});
                             $scope.$parent.shipment.containers.splice(e.$index,1);
@@ -478,7 +478,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
         if($scope.containerForm.$valid && !$scope.containerForm.$pristine){
             if($scope.containerForm.$valid ){
                 $scope.model.embarque_id= $scope.$parent.shipment.id;
-                $resource.post({type:"ContainerSave"},$scope.model, function(response){
+                $resource.postMod({type:"Container",mod:"Save"},$scope.model, function(response){
                     if(response.action== 'new'){
                         console.log("paren",$scope.$parent.shipment);
                         $scope.$parent.shipment.containers.push(response.model);
@@ -532,30 +532,30 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
 
 }]);
 
-MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){
+MyApp.controller('listOrdershipmentCtrl',['$scope','shipment', function($scope,$resource){
     $scope.tbl ={
         order:"id",
-        filter:{},
-        data:[]
+        filter:{}
     };
     $scope.$parent.listOrdershipment = function(){
         $scope.LayersAction({open:{name:"listOrdershipment", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+
         }}});
     }
 }]);
 
-MyApp.controller('listOrderAddCtrl',['$scope', function($scope){
+MyApp.controller('listOrderAddCtrl',['$scope','shipment', function($scope, $resource){
     $scope.tbl ={
         order:"id",
         filter:{},
         data:[]
     };
     $scope.$parent.listOrderAdd = function(){
+        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id},{},function (response) {
+            $scope.tbl.data= response;
+        });
         $scope.LayersAction({open:{name:"listOrderAdd", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+
         }}});
     }
 }]);
@@ -693,7 +693,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         var all =[];
         var finish= false;
         var asig = function (file) {
-            $resource.post({type:"SaveAttachment"},{file:file,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{file:file,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
                 all.push({state:'good', file:response});
                 filesUp.push(response);
                 if(all.length== files.length){
@@ -926,7 +926,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
             }else {
                 if($scope.head.$valid && $scope.bond.$valid ){
                     formSrv.setState("process");
-                    $resource.post({type:"TariffSave"},$scope.model,function (response) {
+                    $resource.postMod({type:"Tariff",mod:"Save"},$scope.model,function (response) {
                         $scope.$parent.NotifAction("ok", "Tarifa creada",[],{autohidden:1500});
                         tarifForm.set(response.model);
                         tarifForm.setState("created");
@@ -980,7 +980,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
     $scope.loadPorts = function(pais){
         if(pais != null){
-            $resource.query({type:"CountryPorts",pais_id:pais.id},{},function (response) {
+            $resource.queryMod({type:"Country",mod:"Ports",pais_id:pais.id},{},function (response) {
                 $scope.puertos =response;
             });
         }else{

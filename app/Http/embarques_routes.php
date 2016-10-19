@@ -4,20 +4,23 @@ $app->get('embarques/Notification', 'Embarques\EmbarquesController@getNotificati
 $app->get('embarques/Uncloset', 'Embarques\EmbarquesController@getUncloset');
 
 //Tariff
-$app->get('embarques/CountryPorts', 'Embarques\EmbarquesController@getPortCountry');
-$app->post('embarques/TariffSave', 'Embarques\EmbarquesController@saveTariff');
-$app->get('embarques/Tariffs', 'Embarques\EmbarquesController@getTariffs');
+$app->get('embarques/Country/Ports', 'Embarques\EmbarquesController@getPortCountry');
+$app->post('embarques/Tariff/Save', 'Embarques\EmbarquesController@saveTariff');
+$app->get('embarques/Tariff/List', 'Embarques\EmbarquesController@getTariffs');
 
 // containers
-$app->post('embarques/ContainerSave', 'Embarques\EmbarquesController@saveContainer');
-$app->post('embarques/ContainerDelete', 'Embarques\EmbarquesController@DeleteContainer');
+$app->post('embarques/Container/Save', 'Embarques\EmbarquesController@saveContainer');
+$app->post('embarques/Container/Delete', 'Embarques\EmbarquesController@DeleteContainer');
 
 
 //providers
 $app->get('embarques/Provider', 'Embarques\EmbarquesController@getProvList');
-$app->get('embarques/ProviderDir', 'Embarques\EmbarquesController@getProvDir');
+$app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
 $app->post('embarques/Save', 'Embarques\EmbarquesController@saveShipment');
-$app->post('embarques/SaveAttachment', 'Embarques\EmbarquesController@SaveAttachment');
+$app->post('embarques/Attachment/Save', 'Embarques\EmbarquesController@SaveAttachment');
+
+//ODC
+$app->get('embarques/Order/List', 'Embarques\EmbarquesController@getOrders');
