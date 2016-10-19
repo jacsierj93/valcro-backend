@@ -558,6 +558,13 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment', function($scope, $reso
 
         }}});
     }
+    //mark
+    $scope.changeAsig = function (data) {
+        console.log("data");
+
+    }
+
+
 }]);
 
 MyApp.controller('listProducttshipmentCtrl',['$scope', function($scope){
@@ -644,6 +651,18 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         });
     };
 
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if($scope.isOpen && !newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
+                $scope.head.$setPristine();
+            });
+        }
+    });
+
+
+
+    /**adjuntos**/
     var interval = null;
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
@@ -659,19 +678,22 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
 
                         if(v.isFinish()){
                             finisAll=true;
+                            console.log("filse fin", v)
                             angular.forEach(v.getFilesUp(), function (sv,sf) {
-                                $parent.shipment.nro_mb.adjs.push(sv);
+                                $scope.$parent.shipment.nro_mbl.adjs.push(sv);
                             });
                             if(v.getFilesError().length > 0){
                                 console.log("error subiendo archivos", v.getFilesError());
                             }
                         }
                         if(v.getState() == 'waith'){
+                            console.log("waith", v);
                             finisAll= false;
                             v.start();
                         }
                         if(v.getState() == 'up'){
                             finisAll= false;
+                            console.log("up", v);
                         }
 
 
@@ -679,13 +701,13 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
                     if(finisAll){
                         $scope.cola.estado='finish';
                         $interval.cancel(interval);
+
                         interval=  null;
                     }
                 },500);
             }
         }
     });
-
     $scope.asign = function (files, doc) {
         var estado ="waith";
         var filesUp = [];
@@ -693,12 +715,15 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         var all =[];
         var finish= false;
         var asig = function (file) {
-            $resource.postMod({type:"Attachment", mod:"Save"},{file:file,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
                 all.push({state:'good', file:response});
                 filesUp.push(response);
-                if(all.length== files.length){
+                if(all.length == files.length){
                     finish= true;
+                    estado= 'finish';
                 }
+            }, function (error) {
+                console.log("error", error);
             })
         };
 
@@ -738,8 +763,6 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
 
         }
     }
-
-
     $scope.close= function(e){
         if($scope.isOpen){
             $mdSidenav("miniMbl").close().then(function(){
@@ -750,14 +773,127 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     };
 }]);
 
-MyApp.controller('miniHblCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
+    $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+
     $scope.$parent.miniHbl = function(){
         $mdSidenav("miniHbl").open().then(function(){
             $scope.isOpen = true;
         });
     };
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if($scope.isOpen && !newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
+                $scope.head.$setPristine();
+            });
+        }
+    });
+    /**adjuntos**/
+    var interval = null;
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            $scope.cola.estado='uploading';
+            $scope.cola.cola = $scope.cola.cola + 1;
+            var pr =Object.create( $scope.asign($scope.files,"nro_hbl"));
+            $scope.cola.data.push(pr);
+            if(interval== null){
+                interval = $interval(function () {
+                    console.log("interval ",$scope.cola );
+                    var finisAll= true;
+                    angular.forEach($scope.cola.data,function (v, k) {
+
+                        if(v.isFinish()){
+                            finisAll=true;
+                            console.log("filse fin", v)
+                            angular.forEach(v.getFilesUp(), function (sv,sf) {
+                                $scope.$parent.shipment.nro_hbl.adjs.push(sv);
+                            });
+                            if(v.getFilesError().length > 0){
+                                console.log("error subiendo archivos", v.getFilesError());
+                            }
+                        }
+                        if(v.getState() == 'waith'){
+                            console.log("waith", v);
+                            finisAll= false;
+                            v.start();
+                        }
+                        if(v.getState() == 'up'){
+                            finisAll= false;
+                            console.log("up", v);
+                        }
+
+
+                    });
+                    if(finisAll){
+                        $scope.cola.estado='finish';
+                        $interval.cancel(interval);
+
+                        interval=  null;
+                    }
+                },500);
+            }
+        }
+    });
+    $scope.asign = function (files, doc) {
+        var estado ="waith";
+        var filesUp = [];
+        var filesError = [];
+        var all =[];
+        var finish= false;
+        var asig = function (file) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+                all.push({state:'good', file:response});
+                filesUp.push(response);
+                if(all.length == files.length){
+                    finish= true;
+                    estado= 'finish';
+                }
+            }, function (error) {
+                console.log("error", error);
+            })
+        };
+
+        return {
+            getState: function () {return estado;},
+            getFiles : function () {return files;},
+            getSize: function(){return files.length ;},
+            getFilesUp:function () {return filesUp;},
+            getFilesError : function(){return filesError},
+            isFinish : function () {return   finish},
+            getAll : function () {return   all},
+            start: function () {
+                estado =  'up';
+                filesSrv.setFolder("orders");
+                /*                var x = $timeout(function () {
+                 if(estado != 'fin'){
+                 estado='error';
+                 }
+                 },60000);*/
+                angular.forEach(files, function(v) {
+                    filesSrv.Upload({
+                        file: v,
+                        success: function (data) {
+                            asig(data);
+                        },
+                        error: function (data) {
+                            all.push({state:'bad', file:response});
+                            filesError.push(data);
+                            if(all.length== files.length){
+                                finish= true;
+                            }
+                        }
+                    })
+                });
+            }
+
+
+        }
+    }
+
+
     $scope.close= function(){
         if($scope.isOpen){
             $mdSidenav("miniHbl").close().then(function(){
@@ -768,14 +904,126 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav', function($scope,$mdSidena
     };
 }]);
 
-MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
+    $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+
     $scope.$parent.miniExpAduana = function(){
         $mdSidenav("miniExpAduana").open().then(function(){
             $scope.isOpen = true;
         });
     };
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if($scope.isOpen && !newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
+                $scope.head.$setPristine();
+            });
+
+        }
+    });
+    /**adjuntos**/
+    var interval = null;
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            $scope.cola.estado='uploading';
+            $scope.cola.cola = $scope.cola.cola + 1;
+            var pr =Object.create( $scope.asign($scope.files,"nro_dua"));
+            $scope.cola.data.push(pr);
+            if(interval== null){
+                interval = $interval(function () {
+                    console.log("interval ",$scope.cola );
+                    var finisAll= true;
+                    angular.forEach($scope.cola.data,function (v, k) {
+
+                        if(v.isFinish()){
+                            finisAll=true;
+                            console.log("filse fin", v)
+                            angular.forEach(v.getFilesUp(), function (sv,sf) {
+                                $scope.$parent.shipment.nro_dua.adjs.push(sv);
+                            });
+                            if(v.getFilesError().length > 0){
+                                console.log("error subiendo archivos", v.getFilesError());
+                            }
+                        }
+                        if(v.getState() == 'waith'){
+                            console.log("waith", v);
+                            finisAll= false;
+                            v.start();
+                        }
+                        if(v.getState() == 'up'){
+                            finisAll= false;
+                            console.log("up", v);
+                        }
+
+
+                    });
+                    if(finisAll){
+                        $scope.cola.estado='finish';
+                        $interval.cancel(interval);
+
+                        interval=  null;
+                    }
+                },500);
+            }
+        }
+    });
+    $scope.asign = function (files, doc) {
+        var estado ="waith";
+        var filesUp = [];
+        var filesError = [];
+        var all =[];
+        var finish= false;
+        var asig = function (file) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+                all.push({state:'good', file:response});
+                filesUp.push(response);
+                if(all.length == files.length){
+                    finish= true;
+                    estado= 'finish';
+                }
+            }, function (error) {
+                console.log("error", error);
+            })
+        };
+
+        return {
+            getState: function () {return estado;},
+            getFiles : function () {return files;},
+            getSize: function(){return files.length ;},
+            getFilesUp:function () {return filesUp;},
+            getFilesError : function(){return filesError},
+            isFinish : function () {return   finish},
+            getAll : function () {return   all},
+            start: function () {
+                estado =  'up';
+                filesSrv.setFolder("orders");
+                /*                var x = $timeout(function () {
+                 if(estado != 'fin'){
+                 estado='error';
+                 }
+                 },60000);*/
+                angular.forEach(files, function(v) {
+                    filesSrv.Upload({
+                        file: v,
+                        success: function (data) {
+                            asig(data);
+                        },
+                        error: function (data) {
+                            all.push({state:'bad', file:response});
+                            filesError.push(data);
+                            if(all.length== files.length){
+                                finish= true;
+                            }
+                        }
+                    })
+                });
+            }
+
+
+        }
+    }
     $scope.close= function(){
         if($scope.isOpen){
             $mdSidenav("miniExpAduana").close().then(function(){
@@ -799,25 +1047,59 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope', function($scope){
     };
 }]);
 
-MyApp.controller('detailOrderAddCtrl',['$scope', function($scope){
+MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($scope, $resource, form){
     $scope.isOpen = false;
-    $scope.data ={adjs:[]};
     $scope.tbl ={data:[]};
+    $scope.prdSelect ={};
+    $scope.select={};
+    $scope.bindForm= form.bind();
+
+
+    $scope.$watch("bindForm.estado", function (newVal) {
+        if(newVal && form.name == 'DetailProduct'){
+
+           angular.forEach(form.getData(), function (v, k) {
+               $scope.prdSelect[k]=v;
+           });
+            form.setBind(false);
+
+        }
+    });
+
     $scope.$parent.detailOrderAdd = function(data){
-        $scope.$parent.LayersAction({open:{name:"detailOrderAdd", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
-        }}});
+
+        $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
+            angular.forEach(response, function (v,k) {
+                $scope.select[k]=v;
+            });
+
+        } );
+        $scope.$parent.LayersAction({open:{name:"detailOrderAdd"}});
 
     };
+
+    $scope.openProd = function (data) {
+        form.name= 'DetailProduct';
+        $scope.prdSelect=data;
+       $scope.$parent.DetailProductShipment(data);
+
+    }
+
 }]);
 
 
-MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout', 'form', function($scope,$mdSidenav, $timeout, formSrv){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
+    $scope.select = {asignado:0};
+    var time = null;
+
 
     $scope.$parent.DetailProductShipment = function(data){
+
+        angular.forEach(data, function (v, k) {
+            $scope.select[k]=v;
+        });
         $mdSidenav("miniDetailProductShipment").open().then(function(){
             $scope.isOpen = true;
         });
@@ -830,6 +1112,32 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($s
         }
 
     };
+
+    $scope.$watchGroup(['prod.$valid','prod.$pristine'], function (newVal) {
+        if(!newVal[1]){
+            $scope.prod.$setPristine();
+            if(time == null){
+                time = $timeout(function () {
+                    console.log("time up", formSrv.bind())
+                    formSrv.setData($scope.select);
+                    formSrv.setBind(true)
+
+                }, 500);
+            }else{
+                $timeout.cancel(time);
+                time = $timeout(function () {
+                    console.log("time up dfsd", formSrv.bind());
+                    formSrv.setData($scope.select);
+                    formSrv.setBind(true)
+
+                }, 500);
+
+            }
+        }
+    });
+
+
+
 }]);
 
 MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipment',function($scope,$mdSidenav, shipment, $model){
@@ -1089,11 +1397,18 @@ MyApp.service('ContainerForm',function(){
 MyApp.service('form',function(){
     var name= "none";
     var state = "waith";
-    var back = function () {}
+    var back = function () {};
+    var doc ={};
+    var bind = {estado:false};
 
     return {
         name:name,
-
+        bind: function () {
+            return bind;
+        },
+        setBind:function (data) {
+            bind.estado= data;
+        },
         getValid:function () {
             return false;
         },
@@ -1102,6 +1417,12 @@ MyApp.service('form',function(){
         },
         getState:function () {
             return state;
+        },
+        setData : function (data) {
+            doc = data;
+        },
+        getData : function () {
+            return doc;
         },
         back:back,
         clear:function () {
@@ -1119,7 +1440,8 @@ MyApp.service('form',function(){
 /*
  Servicio que almacena la informacion del embarque
  */
-MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
+
+MyApp.service('setGetShipment', function(DateParse, shipment) {
 
     var forms ={};
     var interno= 'new';
@@ -1134,10 +1456,6 @@ MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
         if(!forms[form]){
             forms[form]={};
             exist=false;
-            console.log("from ", form);
-            console.log("fiel ", fiel);
-            console.log("value ", value);
-
         }
 
         if(!forms[form][fiel] ){
@@ -1248,7 +1566,6 @@ MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
             bindin.estado = false;
 
             shipment.get({type:"Shipment", id:doc.id},{}, function (response) {
-                console.log("sdefosdaf", response);
                 angular.forEach(response,function (v, k) {
                     if(typeof (v) == 'string' || v == null){
                         Shipment[k]=v;
@@ -1263,10 +1580,22 @@ MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
                 Shipment.fecha_tienda= (response.fecha_tienda.value!= null) ? DateParse.toDate(response.fecha_tienda.value) : null;
                 Shipment.emision = (response.emision!= null) ? DateParse.toDate(response.emision) : null;
                 Shipment.containers = response.containers;
-                Shipment.nro_mbl = response.nro_mbl;
-                Shipment.nro_hbl = response.nro_hbl;
-                Shipment.nro_dua = response.nro_dua;
-
+                Shipment.odcs = response.odcs;
+                Shipment.nro_mbl = {
+                    adjs:response.nro_mbl.adjs,
+                    documento: response.nro_mbl.documento,
+                    emision:(response.nro_mbl.emision== null)? undefined: DateParse.toDate(response.nro_mbl.emision)
+                } ;
+                Shipment.nro_hbl = {
+                    adjs:response.nro_hbl.adjs,
+                    documento: response.nro_hbl.documento,
+                    emision:(response.nro_hbl.emision== null)? undefined: DateParse.toDate(response.nro_hbl.emision)
+                } ;
+                Shipment.nro_dua = {
+                    adjs:response.nro_dua.adjs,
+                    documento: response.nro_dua.documento,
+                    emision:(response.nro_dua.emision== null)? undefined: DateParse.toDate(response.nro_dua.emision)
+                } ;
                 bindin.estado = true;
 
             });
@@ -1293,6 +1622,151 @@ MyApp.service('setGetShipment', function(DateParse, shipment, providers, $q) {
     };
 });
 
+
+/*
+MyApp.service('setGet', function(DateParse, shipment) {
+
+    var forms ={};
+    var interno= 'new';
+    var externo= 'new';
+    var data={};
+    var bindin ={estado:false, comit:"none"};
+
+    var change = function(form,fiel, value){
+
+        var exist= true;
+
+        if(!forms[form]){
+            forms[form]={};
+            exist=false;
+        }
+
+        if(!forms[form][fiel] ){
+            if(typeof (value) == 'object'){
+
+                angular.forEach(value, function(v2,k2){
+                    if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+                        forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
+                    }
+                });
+            }else{
+                forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
+            }
+            exist=false;
+            console.log("from ", form);
+            console.log("fiel ", fiel);
+            console.log("value ", value);
+            interno='upd';
+        };
+
+        if( exist){
+            if(typeof (value) == 'undefined'){
+                forms[form][fiel].estado='del';
+                forms[form][fiel].trace.push();
+            }else if(forms[form][fiel].original != value  ){
+                forms[form][fiel].v= value;
+                forms[form][fiel].trace.push(value);
+                forms[form][fiel].estado='upd';
+                interno='upd';
+
+            }else
+            if(forms[form][fiel].original == value ){
+                forms[form][fiel].estado='new';
+                forms[form][fiel].trace.push(value);
+                forms[form][fiel].v= value;
+                var band= "new";
+                if(interno != 'new'){
+                    angular.forEach(forms[form], function(v,k){
+                        angular.forEach(v, function(v2,k2){
+                            if(forms[form][fiel].estado != 'new' ){
+                                band='upd'
+                            }
+                        });
+                    });
+                    interno=band;
+                }
+
+            }
+        }
+
+
+    };
+    return {
+
+        bind:bindin,
+        setBindState: function (data) {
+            bindin.estado= data;
+        },
+        addForm: function(k, field){
+            if(!forms[k]){
+                forms[k]={};
+                angular.forEach(field, function(v,k2){
+                    if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
+                        forms[k][k2]={original:v, v:v, estado:'new',trace:new Array()};
+                    }
+
+                });
+            }else{
+                /!*angular.forEach(field, function(v,k2){
+                 if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
+                 forms[k][k2].v= v;
+                 forms[k][k2].estado='upd';
+                 forms[k][k2].trace.push(v);
+                 }
+
+                 });*!/
+            }
+        },
+        change:function(form,fiel, value){
+            externo='upd';
+            change(form,fiel, value);
+
+        },
+        getForm: function(name){
+            if(name){
+                return forms[name];
+            }
+            else{
+                return forms;
+            }
+        },
+        restore: function(){
+            forms={};
+            interno='new';
+            externo= 'new';
+            Shipment ={};
+        },
+        setState : function(val){
+            externo= val;
+        },
+        getState: function(){
+            return externo;
+        },
+        getInternalState: function(){
+            return interno;
+        },
+        setData : function(doc){
+            data=doc;
+        },
+        reload: function(doc){
+            bindin.estado=false;
+            bindin.estado=true;
+        },
+        getData : function(){
+            return data;
+        },
+        clear: function(){
+            forms ={};
+            interno= 'new';
+            externo= 'new';
+            Shipment={};
+            bindin.estado=false;
+        }
+
+
+    };
+});
+*/
 MyApp.directive('gridOrderBy', function($timeout) {
 
     return {

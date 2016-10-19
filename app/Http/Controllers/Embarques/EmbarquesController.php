@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Embarques;
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Ports;
+use App\Models\Sistema\Other\SourceType;
+use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Purchase\Purchase;
@@ -70,8 +72,6 @@ class EmbarquesController extends BaseController
 
     /************************* Order ***********************************/
 
-    //mark revuiew db add column fecha prodcion
-
     public function getOrders(Request $req){
         $data  = [];
         $models = Purchase::get();
@@ -87,10 +87,56 @@ class EmbarquesController extends BaseController
             $odc['mt3']=$aux->mt3;
             $odc['peso']=$aux->peso;
             $odc['asignado']=false;
-/*            $odc['isTotal']=0;*/
+            /*            $odc['isTotal']=0;*/
             $odc['items'] = $aux->items()->get();
             $data[]= $odc;
         }
+
+        return $data;
+    }
+
+    public function getOrder(Request $req){
+        $model= Purchase::findOrFail($req->id);
+        $prods =[];
+        $data['id']= $model->id;
+        $data['titulo']= $model->titulo;
+        $data['fecha_produccion']= $model->fecha_produccion;
+        $data['fecha_aprob_gerencia']= $model->fecha_aprob_gerencia;
+        $data['nro_proforma']=['documento'=>$model->nro_proforma, 'adjs'=>[]];
+        $data['monto']= $model->monto;
+        $data['peso']= $model->peso;
+        $data['mt3']= $model->mt3;
+        $data['prods'] =[];
+
+        foreach ($model->items()->get() as $aux){
+
+            $prd  = Product::selectRaw(
+                'tbl_compra_orden_item.id, 
+                tbl_compra_orden_item.descripcion, 
+                tbl_compra_orden_item.tipo_origen_id, 
+                tbl_compra_orden_item.origen_item_id, 
+                tbl_compra_orden_item.producto_id, 
+                tbl_compra_orden_item.saldo as cantidad, 
+                tbl_producto.codigo, 
+                tbl_producto.codigo_barras, 
+                tbl_producto.codigo_profit, 
+                tbl_producto.codigo_fabrica
+                ')
+                ->join('tbl_compra_orden_item','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
+                ->where('tbl_producto.id', $aux->producto_id)->first()
+            ;
+        $prd->saldo='0';
+            $origen =   $this->getFirstProducto($aux);
+            $source = SourceType::find($origen->tipo_origen_id);
+            $prd->origen = ['text'=>$source->descripcion, 'key'=>$source->id];
+            $prods[] =$prd;
+
+        }
+        $data['prods'] =$prods ;
+
+/*        $data['prods'][]= ['id'=>'-1', 'cod'=>'-1', 'cod_fabrica'=>'-1','descripcion'=>'demo demo ','origen'=>['text'=>'Producto','key'=>'-1'], 'cantidad'=>'0', 'saldo'=>'0','total'=>'0'];
+        $data['prods'][]= ['id'=>'-12', 'cod'=>'-1', 'cod_fabrica'=>'-1','descripcoin'=>'demo demo ','origen'=>['text'=>'Producto','key'=>'-1'], 'cantidad'=>'0','saldo'=>'0','total'=>'0'];*/
+
 
         return $data;
     }
@@ -187,8 +233,8 @@ class EmbarquesController extends BaseController
 
         $model = Shipment::findOrfail($req->id);
         $tarifa = ($model->tarifa_id == null) ? null: Tariff::find($model->tarifa_id);
-
         $data = [];
+
         $data['id'] = $model->id;
         $data['emision'] = $model->emision;
         $data['prov_id'] = $model->prov_id;
@@ -203,7 +249,8 @@ class EmbarquesController extends BaseController
 
         $data['moneda_id'] = $model->flete_dua;
         $data['flete'] = ($model->flete_dua ==  null ? 0 : floatval($model->flete_nac))+($model->flete_dua ==  null ? 0 : floatval($model->flete_dua ));
-        //$data['containers'] = $model->containers()->get();
+        $data['containers'] = $model->containers()->get();
+
         // aprobaciones
         $data['conf_f_carga'] = ($model->usuario_conf_f_carga == null )? false: true;
         $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;
@@ -293,12 +340,38 @@ class EmbarquesController extends BaseController
         if($req->has('flete_nac')){ $model->flete_nac= $req->flete_nac;}
         if($req->has('flete_dua')){ $model->flete_dua= $req->flete_dua;}
 
-/*        if($req->has('fecha_carga')){
-
-            $model->fecha_carga= $req->fecha_carga['value'];
+        if($req->has('nro_mbl')){
+            if(array_key_exists('documento',$req->nro_mbl)){
+                $model->nro_mbl=$req->nro_mbl['documento'];
+            }
+            if(array_key_exists('emision',$req->nro_mbl)){
+                $model->emision_mbl=$req->nro_mbl['emision'];
+            }
         }
-        if($req->has('fecha_vnz')){ $model->fecha_vnz= $req->fecha_vnz['value'];}
-        if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda['value'];}*/
+        if($req->has('nro_hbl')){
+            if(array_key_exists('documento',$req->nro_hbl)){
+                $model->nro_hbl=$req->nro_hbl['documento'];
+            }
+            if(array_key_exists('emision',$req->nro_hbl)){
+                $model->emision_hbl=$req->nro_hbl['emision'];
+            }
+        }
+        if($req->has('nro_dua')){
+
+            if(array_key_exists('documento',$req->nro_dua)){
+                $model->nro_dua=$req->nro_hbl['documento'];
+            }
+            if(array_key_exists('emision',$req->nro_dua)){
+                $model->emision_dua=$req->nro_dua['emision'];
+            }
+        }
+
+        /*        if($req->has('fecha_carga')){
+
+                    $model->fecha_carga= $req->fecha_carga['value'];
+                }
+                if($req->has('fecha_vnz')){ $model->fecha_vnz= $req->fecha_vnz['value'];}
+                if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda['value'];}*/
         $model->save();
 
 
@@ -308,12 +381,13 @@ class EmbarquesController extends BaseController
     }
 
     public function SaveAttachment(Request $req){
-        $file = FileModel::findOrFail($req->id);
+        $file = FileModel::findOrFail($req->archivo_id);
         $model = new ShipmentAttachment();
         $model->embarque_id= $req->embarque_id;
         $model->documento = $req->documento;
-        $model->archivo_id	 = $req->id;
+        $model->archivo_id	 = $req->archivo_id;
         $model->comentario	 = ($req->has('comentario') ? $req->comentario : null );
+        $model->save();
         $att['id'] = $model->id;
         $att['archivo_id'] = $model->archivo_id;
         $att['documento'] = $model->documento;
@@ -323,6 +397,37 @@ class EmbarquesController extends BaseController
         $att['file'] = $file->archivo;
         return $att;
     }
+
+    public function SaveOrderItem(Request $req){
+
+    }
+
+    /************************* Private opt master ***********************************/
+    private function getFirstProducto($model){
+        $aux = $model->replicate();
+
+        $i =0;
+        $traza= array();
+        //dd($type);
+        while(true || $i <5){
+            if($aux->tipo_origen_id == 2 || $aux->tipo_origen_id == 3 || $aux->tipo_origen_id == 1){
+                break;
+            }
+            if($aux->tipo_origen_id  = 21){
+                $aux = Solicitude::findOrFail($aux->origen_item_id);
+            }else  if($aux->tipo_origen_id  = 22){
+                $aux = OrderItem::findOrFail($aux->origen_item_id);
+            }else{
+                $aux = Purchase::findOrFail($aux->origen_item_id);
+            }
+
+            $i = $i +1;
+            $traza[]= $aux;
+        }
+
+        return $aux;
+    }
+
 
     /************************* Another module ***********************************/
 
@@ -343,7 +448,6 @@ class EmbarquesController extends BaseController
 
          return $embarques;*/
     }
-
 
 
 

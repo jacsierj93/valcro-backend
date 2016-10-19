@@ -234,5 +234,64 @@ class Purchase extends Model
 
 
 
+    /*
+
+    CREATE TABLE valcro_db2.tbl_compra_orden (
+  id int(11) NOT NULL,
+  final_id varchar(50) DEFAULT NULL,
+  parent_id int(11) DEFAULT NULL,
+  doc_parent_id int(11) DEFAULT NULL,
+  doc_parent_origen_id int(11) DEFAULT NULL,
+  fecha_sustitucion date DEFAULT NULL,
+  version int(11) DEFAULT 1,
+  emision datetime NOT NULL,
+  titulo varchar(100) NOT NULL,
+  ult_revision datetime DEFAULT NULL,
+  nro_proforma varchar(45) DEFAULT NULL,
+  nro_factura varchar(45) DEFAULT NULL,
+  img_proforma varchar(100) DEFAULT NULL,
+  img_factura varchar(100) DEFAULT NULL,
+  img_punto_compra varchar(100) DEFAULT NULL,
+  img_abono varchar(45) DEFAULT NULL,
+  monto decimal(10, 4) DEFAULT 0.0000,
+  comentario longtext DEFAULT NULL,
+  prov_id int(11) DEFAULT NULL,
+  pais_id int(11) DEFAULT NULL,
+  condicion_pago_id int(11) DEFAULT NULL,
+  motivo_id int(11) DEFAULT NULL,
+  estado_id int(11) NOT NULL DEFAULT 1,
+  prov_moneda_id int(11) DEFAULT NULL,
+  direccion_almacen_id int(11) DEFAULT NULL,
+  direccion_facturacion_id int(11) DEFAULT NULL,
+  puerto_id int(11) DEFAULT NULL,
+  comentario_cancelacion longtext DEFAULT NULL,
+  condicion_id int(11) DEFAULT NULL,
+  mt3 varchar(45) DEFAULT NULL,
+  peso varchar(45) DEFAULT NULL,
+  cancelacion date DEFAULT NULL,
+  fecha_aprob_compra date DEFAULT NULL,
+  fecha_aprob_gerencia date DEFAULT NULL,
+  aprob_compras tinyint(1) DEFAULT NULL,
+  aprob_gerencia tinyint(1) DEFAULT NULL,
+  culminacion date DEFAULT NULL,
+  nro_doc char(20) DEFAULT '',
+  tasa decimal(10, 4) DEFAULT NULL,
+  created_at datetime DEFAULT NULL,
+  deleted_at datetime DEFAULT NULL,
+  updated_at datetime DEFAULT NULL,
+  usuario_id int(11) NOT NULL,
+  uid varchar(100) DEFAULT NULL,
+  fecha_envio date DEFAULT NULL,
+  edit_usuario_id varchar(100) DEFAULT NULL,
+  fecha_prodcucion date DEFAULT NULL,
+  UNIQUE INDEX id (id)
+)
+ENGINE = INNODB
+AVG_ROW_LENGTH = 16384
+CHARACTER SET latin1
+COLLATE latin1_swedish_ci;
+   */
+
+
 
 }

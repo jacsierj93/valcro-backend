@@ -31,9 +31,9 @@ class Shipment extends Model
         $models= $this->attachments()->where('documento',$doc)->get();
         $data = [];
 
-        foreach($models as $att){
-            $aux = [];
-            $file= File::findOrFail($aux->archivo_id);
+        foreach($models as $aux){
+            $att = [];
+            $file= FileModel::findOrFail($aux->archivo_id);
             $att['id'] = $aux->id;
             $att['archivo_id'] = $aux->archivo_id;
             $att['documento'] = $aux->documento;
