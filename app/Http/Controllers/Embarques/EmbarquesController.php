@@ -14,6 +14,7 @@ use App\Models\Sistema\Purchase\Purchase;
 use App\Models\Sistema\Shipments\Container;
 use App\Models\Sistema\Shipments\Shipment;
 use App\Models\Sistema\Shipments\ShipmentAttachment;
+use App\Models\Sistema\Shipments\ShipmentItem;
 use App\Models\Sistema\Tariffs\Tariff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -72,7 +73,7 @@ class EmbarquesController extends BaseController
 
     /************************* Order ***********************************/
 
-    public function getOrders(Request $req){
+    public function getOrdersForAsignment(Request $req){
         $data  = [];
         $models = Purchase::get();
         foreach($models as $aux){
@@ -89,10 +90,54 @@ class EmbarquesController extends BaseController
             $odc['asignado']=false;
             /*            $odc['isTotal']=0;*/
             $odc['items'] = $aux->items()->get();
+
+            if(sizeof(ShipmentItem::where('doc_origen_id', $aux->id)->where('tipo_origen_id', 23)->where('embarque_id', $req->embarque_id)->get()) > 0){
+                $odc['asignado']=true;
+            }
             $data[]= $odc;
         }
 
         return $data;
+    }
+
+    public function getOrdersAsignment(Request $req){
+        $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+        $odc = new Purchase();
+
+        foreach ($models as $aux){
+            $odc->Orwhere('id', $aux->doc_origen_id);
+        }
+        foreach($odc->get() as $aux){
+            $odc = [];
+            $odc['id']=$aux->id;
+            $odc['fecha_producion']=$aux->fecha_producion;
+            $odc['fecha_aprob_gerencia']=$aux->fecha_aprob_gerencia;
+            $odc['fecha_aprob_compra']=$aux->fecha_aprob_compra;
+            $odc['nro_proforma']=$aux->nro_proforma;
+            $odc['nro_proforma']=$aux->nro_proforma;
+            $odc['monto']=$aux->monto;
+            $odc['mt3']=$aux->mt3;
+            $odc['peso']=$aux->peso;
+            $odc['asignado']=true;
+            $odc['isTotal']=1;
+            $items = $aux->items()->get();
+            foreach ($items as $item){
+                $shipItem = $models->where('origen_item_id',$item->id);
+                if(sizeof( $shipItem) == 0){
+                    $odc['isTotal'] = 0;
+                    break;
+                }else{
+                    if(floatval($shipItem[0]->saldo) < floatval($item->saldo)){
+                        $odc['isTotal'] = 0;
+                        break;
+                    }
+                }
+            }
+            $data[]= $odc;
+        }
+        return $data;
+
+
     }
 
     public function getOrder(Request $req){
@@ -107,12 +152,13 @@ class EmbarquesController extends BaseController
         $data['peso']= $model->peso;
         $data['mt3']= $model->mt3;
         $data['prods'] =[];
-
-        foreach ($model->items()->get() as $aux){
+        $items = $model->items()->get() ;
+        foreach ($items as $aux){
 
             $prd  = Product::selectRaw(
                 'tbl_compra_orden_item.id, 
                 tbl_compra_orden_item.descripcion, 
+                tbl_compra_orden_item.doc_id, 
                 tbl_compra_orden_item.tipo_origen_id, 
                 tbl_compra_orden_item.origen_item_id, 
                 tbl_compra_orden_item.producto_id, 
@@ -123,21 +169,44 @@ class EmbarquesController extends BaseController
                 tbl_producto.codigo_fabrica
                 ')
                 ->join('tbl_compra_orden_item','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
-                ->where('tbl_producto.id', $aux->producto_id)->first()
-            ;
-        $prd->saldo='0';
+                ->where('tbl_producto.id', $aux->producto_id)->first();
+            $item =  ShipmentItem::where('doc_origen_id', $model->id)->where('tipo_origen_id', '23')->where('origen_item_id',$aux->id)->get();
+            $prd->saldo = 0;
+            $prd->asignado= false;
+            if((sizeof($item) != 0)){
+                $prd->saldo =  $item[0]->saldo;
+                $data['asinado']= true; $prd->asignado = true;
+            }
+            $item =  ShipmentItem::selectRaw("sum(saldo) as in_uso ")->where('doc_origen_id','<>', $model->id)->where('tipo_origen_id', '23')->where('origen_item_id',$aux->id)->first();
+            $prd->disponible = floatval($prd->cantidad) - floatval($item->in_uso);
             $origen =   $this->getFirstProducto($aux);
             $source = SourceType::find($origen->tipo_origen_id);
             $prd->origen = ['text'=>$source->descripcion, 'key'=>$source->id];
             $prods[] =$prd;
 
         }
+
+        if($req->has('embarque_id')){
+            $data['isTotal'] = 1;
+            $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+            foreach ($items as $item){
+                $shipItem = $models->where('origen_item_id',$item->id);
+                if(sizeof( $shipItem) == 0){
+                    $data['isTotal'] = 0;
+                    break;
+                }else{
+
+                    if(floatval($shipItem->first()->saldo) < floatval($item->saldo)){
+                        $data['isTotal'] = 0;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
         $data['prods'] =$prods ;
-
-/*        $data['prods'][]= ['id'=>'-1', 'cod'=>'-1', 'cod_fabrica'=>'-1','descripcion'=>'demo demo ','origen'=>['text'=>'Producto','key'=>'-1'], 'cantidad'=>'0', 'saldo'=>'0','total'=>'0'];
-        $data['prods'][]= ['id'=>'-12', 'cod'=>'-1', 'cod_fabrica'=>'-1','descripcoin'=>'demo demo ','origen'=>['text'=>'Producto','key'=>'-1'], 'cantidad'=>'0','saldo'=>'0','total'=>'0'];*/
-
-
         return $data;
     }
 
@@ -264,11 +333,11 @@ class EmbarquesController extends BaseController
         $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emsion_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
         $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision,'adjs'=> $model->attachmentsFile("nro_dua") ];
 
-        // odc
-        $data['odc'] = [];
+        // items
+        $data['items'] = $model->items();
 
-        //demo odc
-        $data['odcs'][] = $model->orders();
+        // odc
+        $data['odcs']= $this->getOrdersAsignmentModel($model->id);
 
         // foraneos
         $data['objs'] =[
@@ -399,6 +468,50 @@ class EmbarquesController extends BaseController
     }
 
     public function SaveOrderItem(Request $req){
+        $model = new ShipmentItem();
+        $result['accion'] = 'new';
+        if($req->has('id')){
+            $model = ShipmentItem::findOrFail($req->id);
+            $result['accion'] = 'upd';
+        }
+
+        $model->tipo_origen_id= $req->tipo_origen_id;
+        $model->embarque_id= $req->embarque_id;
+        $model->descripcion= $req->descripcion;
+        $model->doc_origen_id= $req->doc_origen_id;
+        $model->origen_item_id= $req->origen_item_id;
+        $model->saldo= $req->saldo;
+
+        $model->save();
+
+        if($req->tipo_origen_id == '23' && !$req->has('id') &&
+            sizeof(ShipmentItem::where('doc_origen_id', $req->doc_origen_id)
+                ->where('embarque_id',$req->origen_item_id)
+                ->get() ) == 1)
+        {
+            $pr =  Purchase::find($req->doc_origen_id);
+            $items = $pr->items()->get();
+            $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+            foreach ($items as $item){
+                $shipItem = $models->where('origen_item_id',$item->id);
+
+                if(sizeof( $shipItem) == 0){
+                    $pr['isTotal'] = 0;
+                    break;
+                }else{
+                    if(floatval($shipItem->first()->saldo) < floatval($item->saldo)){
+                        $pr['isTotal'] = 0;
+                        break;
+                    }
+                }
+            }
+
+            $result['doc_origen_id'] =$pr;
+
+        }
+        $result['id']= $model->id;
+
+        return $result;
 
     }
 
@@ -427,6 +540,58 @@ class EmbarquesController extends BaseController
 
         return $aux;
     }
+
+
+    public function getOrdersAsignmentModel($model){
+        $models = Purchase::selectRaw(
+            'tbl_compra_orden.id ,
+            tbl_compra_orden.fecha_producion ,
+            tbl_compra_orden.fecha_aprob_gerencia ,tbl_compra_orden.fecha_aprob_compra ,
+            tbl_compra_orden.nro_proforma ,
+            tbl_compra_orden.monto,
+            tbl_compra_orden.mt3 ,
+            tbl_compra_orden.peso '
+        )->where('embarque_id',$model)
+            ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=','tbl_compra_orden.id' )
+            ->where('tipo_origen_id', '23')
+            ->groupBy('tbl_embarque_item.doc_origen_id')
+            ->get();
+        $data = [];
+        //dd($models);
+
+        foreach($models as $aux){
+            $odc = [];
+            $odc['id']=$aux->id;
+            $odc['fecha_producion']=$aux->fecha_producion;
+            $odc['fecha_aprob_gerencia']=$aux->fecha_aprob_gerencia;
+            $odc['fecha_aprob_compra']=$aux->fecha_aprob_compra;
+            $odc['nro_proforma']=$aux->nro_proforma;
+            $odc['monto']=$aux->monto;
+            $odc['mt3']=$aux->mt3;
+            $odc['peso']=$aux->peso;
+            $odc['asignado']=true;
+            $odc['isTotal']=1;
+            $items = $aux->items()->get();
+            foreach ($items as $item){
+                $shipItem = $models->where('origen_item_id',$item->id);
+                if(sizeof( $shipItem) == 0){
+                    $odc['isTotal'] = 0;
+                    break;
+                }else{
+                    if(floatval($shipItem->first()->saldo) < floatval($item->saldo)){
+                        $odc['isTotal'] = 0;
+                        break;
+                    }
+                }
+            }
+            $data[]= $odc;
+        }
+        return $data;
+
+
+    }
+
+
 
 
     /************************* Another module ***********************************/

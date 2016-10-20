@@ -44,7 +44,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             }else {
                 $scope.validChangeFor();
             }
-        },0);
+        },500);
 
     };
     var interval = null;
@@ -177,11 +177,11 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
     $scope.provSelecText = undefined;
     $scope.form= 'head';
     $scope.formOptions={
-      head:{expand:true} ,
-      date:{expand:true}  ,
-      doc:{expand:true}  ,
-      pago:{expand:true}  ,
-      agreds:{expand:true}
+        head:{expand:true} ,
+        date:{expand:true}  ,
+        doc:{expand:true}  ,
+        pago:{expand:true}  ,
+        agreds:{expand:true}
     };
 
 
@@ -532,15 +532,29 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
 
 }]);
 
-MyApp.controller('listOrdershipmentCtrl',['$scope','shipment', function($scope,$resource){
+MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','$filter', function($scope,$resource,$filter){
     $scope.tbl ={
         order:"id",
         filter:{}
     };
+    $scope.select ={};
     $scope.$parent.listOrdershipment = function(){
+        $scope.select ={};
         $scope.LayersAction({open:{name:"listOrdershipment", after: function(){
+                console.log("selectsdfsdfsd",  $scope.select);
+
+            if($scope.select.id){
+                $resource.getMod({type:"Order", mod:"Order", id:$scope.select.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
+                    $scope.select.isTotal= response.isTotal;
+                });
+            }
+
 
         }}});
+    }
+    $scope.open = function (data) {
+        $scope.select = data;
+        $scope.detailOrderShipment(data);
     }
 }]);
 
@@ -550,18 +564,24 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment', function($scope, $reso
         filter:{},
         data:[]
     };
+    $scope.select = {};
     $scope.$parent.listOrderAdd = function(){
-        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id},{},function (response) {
+        $scope.select = {};
+        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id, embarque_id: $scope.$parent.shipment.id},{},function (response) {
             $scope.tbl.data= response;
         });
         $scope.LayersAction({open:{name:"listOrderAdd", after: function(){
 
         }}});
     }
-    //mark
+
     $scope.changeAsig = function (data) {
         console.log("data");
+    }
 
+    $scope.open = function (data) {
+        $scope.select = data;
+        $scope.$parent.detailOrderAdd(data);
     }
 
 
@@ -673,7 +693,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
             if(interval== null){
                 interval = $interval(function () {
                     console.log("interval ",$scope.cola );
-                   var finisAll= true;
+                    var finisAll= true;
                     angular.forEach($scope.cola.data,function (v, k) {
 
                         if(v.isFinish()){
@@ -738,11 +758,11 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
             start: function () {
                 estado =  'up';
                 filesSrv.setFolder("orders");
-/*                var x = $timeout(function () {
-                    if(estado != 'fin'){
-                        estado='error';
-                    }
-                },60000);*/
+                /*                var x = $timeout(function () {
+                 if(estado != 'fin'){
+                 estado='error';
+                 }
+                 },60000);*/
                 angular.forEach(files, function(v) {
                     filesSrv.Upload({
                         file: v,
@@ -1034,17 +1054,37 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     };
 }]);
 
-MyApp.controller('detailOrderShipmentCtrl',['$scope', function($scope){
+// detalle de peido agregado
+MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function($scope, $resource, form){
     $scope.isOpen = false;
-    $scope.data ={adjs:[]};
     $scope.tbl ={data:[]};
+    $scope.select  ={};
+    $scope.select={};
+    $scope.bindForm= form.bind();
+
+
     $scope.$parent.detailOrderShipment = function(data){
+        $scope.prodSelect = {};
+        $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
+            angular.forEach(response, function (v,k) {
+                $scope.select[k]=v;
+            });
+
+        } );
+
         $scope.$parent.LayersAction({open:{name:"detailOrder", after: function(){
             $scope.tbl.data.splice(0,$scope.tbl.data.length);
             $scope.tbl.data.push({id:-1});
         }}});
 
     };
+    $scope.open = function (data) {
+        form.name= 'DetailProductShip';
+
+        $scope.prodSelect= data;
+    }
+
+
 }]);
 
 MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($scope, $resource, form){
@@ -1055,16 +1095,6 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
     $scope.bindForm= form.bind();
 
 
-    $scope.$watch("bindForm.estado", function (newVal) {
-        if(newVal && form.name == 'DetailProduct'){
-
-           angular.forEach(form.getData(), function (v, k) {
-               $scope.prdSelect[k]=v;
-           });
-            form.setBind(false);
-
-        }
-    });
 
     $scope.$parent.detailOrderAdd = function(data){
 
@@ -1079,24 +1109,31 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
     };
 
     $scope.openProd = function (data) {
-        form.name= 'DetailProduct';
+        form.name= 'DetailProductAdd';
         $scope.prdSelect=data;
-       $scope.$parent.DetailProductShipment(data);
+        $scope.$parent.DetailProductShipment(data);
 
     }
 
 }]);
 
 
-MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout', 'form', function($scope,$mdSidenav, $timeout, formSrv){
+MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout', 'form','shipment', function($scope,$mdSidenav, $timeout, formSrv, $resource){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
     $scope.select = {asignado:0};
+    $scope.original= {};
+    $scope.isUpdate= false;
     var time = null;
 
 
     $scope.$parent.DetailProductShipment = function(data){
-
+        formSrv.setState("waith");
+        formSrv.setBind(false);
+        formSrv.getValid = function () {
+            return formSrv.getState() == 'waith' &&  $scope.isOpen ;
+        }
+        $scope.original= angular.copy(data);
         angular.forEach(data, function (v, k) {
             $scope.select[k]=v;
         });
@@ -1105,34 +1142,92 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
         });
     };
     $scope.close= function(){
-        if($scope.isOpen){
-            $mdSidenav("miniDetailProductShipment").close().then(function(){
-                $scope.isOpen = false;
-            });
-        }
 
-    };
+        if( $scope.isOpen){
+            console.log("sfe ",$scope.select );
+            if(parseFloat($scope.select.saldo) == parseFloat($scope.original.saldo)){ $scope.inClose();}else
+            if(parseFloat($scope.select.saldo) > parseFloat($scope.original.disponible))
+            {
+                formSrv.setState("process");
+                $scope.$parent.NotifAction("alert", "la cantidad indicada excede el disponible en el pedido",
+                    [
+                        {name: "Corregir" ,
+                            action: function () {
+                                formSrv.setState("cancelar");
+                                var ele= angular.element("#miniDetailProductShipment #input");
+                                ele.click();
+                                ele.focus();
+                            }
+                        },
+                        {name: "Cancelar " ,
+                            action: function () {
+                                $scope.inClose();
+                                formSrv.setState("continue");
+                            }
+                        }
 
-    $scope.$watchGroup(['prod.$valid','prod.$pristine'], function (newVal) {
-        if(!newVal[1]){
-            $scope.prod.$setPristine();
-            if(time == null){
-                time = $timeout(function () {
-                    console.log("time up", formSrv.bind())
-                    formSrv.setData($scope.select);
-                    formSrv.setBind(true)
-
-                }, 500);
-            }else{
-                $timeout.cancel(time);
-                time = $timeout(function () {
-                    console.log("time up dfsd", formSrv.bind());
-                    formSrv.setData($scope.select);
-                    formSrv.setBind(true)
-
-                }, 500);
+                    ],{block:true});
 
             }
+            else{
+                var send = {
+                    id:$scope.select.embarque_id,
+                    descripcion: $scope.select.descripcion,
+                    origen_item_id: $scope.select.id,
+                    saldo: $scope.select.saldo,
+                    tipo_origen_id:23,
+                    embarque_id: $scope.$parent.shipment.id ,
+                    doc_origen_id: $scope.select.doc_id
+                };
+                $resource.postMod({type:"OrderItem", mod:"Save"},send, function (response) {
+
+                    $scope.$parent.NotifAction("ok", "Articulo atualizado", [], {autohidden:1500});
+
+                    if(response.doc_origen_id){
+                        var doc = angular.copy(response.doc_origen_id);
+                        doc.asignado= true;
+                        $scope.$parent.shipment.odcs.push(doc);
+                    }
+                    $scope.select.embarque_id= response.id;
+                    formSrv.setData(angular.copy($scope.select));
+                    formSrv.setBind(true);
+                    $scope.inClose();
+                });
+            }
+        }
+    };
+
+    $scope.inClose = function () {
+        $scope.select ={};
+        $mdSidenav("miniDetailProductShipment").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+    $scope.$watchGroup(['prod.$valid','prod.$pristine'], function (newVal) {
+        if(!newVal[1] && newVal[0]) {
+            formSrv.setData($scope.select);
+            console.log(" original ", $scope.original.saldo);
+            console.log(" copy  ", $scope.select.saldo);
+            formSrv.setState(($scope.original.saldo != $scope.select.saldo) ? 'upd' :'waith');
+            console.log(" get satate  ", formSrv.getState());
+            $scope.prod.$setPristine();
+            /*  if(time == null){
+             time = $timeout(function () {
+             console.log("time up", formSrv.bind())
+             formSrv.setData($scope.select);
+             formSrv.setBind(true)
+
+             }, 500);
+             }else{
+             $timeout.cancel(time);
+             time = $timeout(function () {
+             console.log("time up dfsd", formSrv.bind());
+             formSrv.setData($scope.select);
+             formSrv.setBind(true)
+
+             }, 500);
+
+             }*/
         }
     });
 
@@ -1624,149 +1719,149 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
 
 /*
-MyApp.service('setGet', function(DateParse, shipment) {
+ MyApp.service('setGet', function(DateParse, shipment) {
 
-    var forms ={};
-    var interno= 'new';
-    var externo= 'new';
-    var data={};
-    var bindin ={estado:false, comit:"none"};
+ var forms ={};
+ var interno= 'new';
+ var externo= 'new';
+ var data={};
+ var bindin ={estado:false, comit:"none"};
 
-    var change = function(form,fiel, value){
+ var change = function(form,fiel, value){
 
-        var exist= true;
+ var exist= true;
 
-        if(!forms[form]){
-            forms[form]={};
-            exist=false;
-        }
+ if(!forms[form]){
+ forms[form]={};
+ exist=false;
+ }
 
-        if(!forms[form][fiel] ){
-            if(typeof (value) == 'object'){
+ if(!forms[form][fiel] ){
+ if(typeof (value) == 'object'){
 
-                angular.forEach(value, function(v2,k2){
-                    if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
-                        forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
-                    }
-                });
-            }else{
-                forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
-            }
-            exist=false;
-            console.log("from ", form);
-            console.log("fiel ", fiel);
-            console.log("value ", value);
-            interno='upd';
-        };
+ angular.forEach(value, function(v2,k2){
+ if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+ forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
+ }
+ });
+ }else{
+ forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
+ }
+ exist=false;
+ console.log("from ", form);
+ console.log("fiel ", fiel);
+ console.log("value ", value);
+ interno='upd';
+ };
 
-        if( exist){
-            if(typeof (value) == 'undefined'){
-                forms[form][fiel].estado='del';
-                forms[form][fiel].trace.push();
-            }else if(forms[form][fiel].original != value  ){
-                forms[form][fiel].v= value;
-                forms[form][fiel].trace.push(value);
-                forms[form][fiel].estado='upd';
-                interno='upd';
+ if( exist){
+ if(typeof (value) == 'undefined'){
+ forms[form][fiel].estado='del';
+ forms[form][fiel].trace.push();
+ }else if(forms[form][fiel].original != value  ){
+ forms[form][fiel].v= value;
+ forms[form][fiel].trace.push(value);
+ forms[form][fiel].estado='upd';
+ interno='upd';
 
-            }else
-            if(forms[form][fiel].original == value ){
-                forms[form][fiel].estado='new';
-                forms[form][fiel].trace.push(value);
-                forms[form][fiel].v= value;
-                var band= "new";
-                if(interno != 'new'){
-                    angular.forEach(forms[form], function(v,k){
-                        angular.forEach(v, function(v2,k2){
-                            if(forms[form][fiel].estado != 'new' ){
-                                band='upd'
-                            }
-                        });
-                    });
-                    interno=band;
-                }
+ }else
+ if(forms[form][fiel].original == value ){
+ forms[form][fiel].estado='new';
+ forms[form][fiel].trace.push(value);
+ forms[form][fiel].v= value;
+ var band= "new";
+ if(interno != 'new'){
+ angular.forEach(forms[form], function(v,k){
+ angular.forEach(v, function(v2,k2){
+ if(forms[form][fiel].estado != 'new' ){
+ band='upd'
+ }
+ });
+ });
+ interno=band;
+ }
 
-            }
-        }
-
-
-    };
-    return {
-
-        bind:bindin,
-        setBindState: function (data) {
-            bindin.estado= data;
-        },
-        addForm: function(k, field){
-            if(!forms[k]){
-                forms[k]={};
-                angular.forEach(field, function(v,k2){
-                    if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
-                        forms[k][k2]={original:v, v:v, estado:'new',trace:new Array()};
-                    }
-
-                });
-            }else{
-                /!*angular.forEach(field, function(v,k2){
-                 if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
-                 forms[k][k2].v= v;
-                 forms[k][k2].estado='upd';
-                 forms[k][k2].trace.push(v);
-                 }
-
-                 });*!/
-            }
-        },
-        change:function(form,fiel, value){
-            externo='upd';
-            change(form,fiel, value);
-
-        },
-        getForm: function(name){
-            if(name){
-                return forms[name];
-            }
-            else{
-                return forms;
-            }
-        },
-        restore: function(){
-            forms={};
-            interno='new';
-            externo= 'new';
-            Shipment ={};
-        },
-        setState : function(val){
-            externo= val;
-        },
-        getState: function(){
-            return externo;
-        },
-        getInternalState: function(){
-            return interno;
-        },
-        setData : function(doc){
-            data=doc;
-        },
-        reload: function(doc){
-            bindin.estado=false;
-            bindin.estado=true;
-        },
-        getData : function(){
-            return data;
-        },
-        clear: function(){
-            forms ={};
-            interno= 'new';
-            externo= 'new';
-            Shipment={};
-            bindin.estado=false;
-        }
+ }
+ }
 
 
-    };
-});
-*/
+ };
+ return {
+
+ bind:bindin,
+ setBindState: function (data) {
+ bindin.estado= data;
+ },
+ addForm: function(k, field){
+ if(!forms[k]){
+ forms[k]={};
+ angular.forEach(field, function(v,k2){
+ if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
+ forms[k][k2]={original:v, v:v, estado:'new',trace:new Array()};
+ }
+
+ });
+ }else{
+ /!*angular.forEach(field, function(v,k2){
+ if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
+ forms[k][k2].v= v;
+ forms[k][k2].estado='upd';
+ forms[k][k2].trace.push(v);
+ }
+
+ });*!/
+ }
+ },
+ change:function(form,fiel, value){
+ externo='upd';
+ change(form,fiel, value);
+
+ },
+ getForm: function(name){
+ if(name){
+ return forms[name];
+ }
+ else{
+ return forms;
+ }
+ },
+ restore: function(){
+ forms={};
+ interno='new';
+ externo= 'new';
+ Shipment ={};
+ },
+ setState : function(val){
+ externo= val;
+ },
+ getState: function(){
+ return externo;
+ },
+ getInternalState: function(){
+ return interno;
+ },
+ setData : function(doc){
+ data=doc;
+ },
+ reload: function(doc){
+ bindin.estado=false;
+ bindin.estado=true;
+ },
+ getData : function(){
+ return data;
+ },
+ clear: function(){
+ forms ={};
+ interno= 'new';
+ externo= 'new';
+ Shipment={};
+ bindin.estado=false;
+ }
+
+
+ };
+ });
+ */
 MyApp.directive('gridOrderBy', function($timeout) {
 
     return {

@@ -24,5 +24,6 @@ $app->post('embarques/Attachment/Save', 'Embarques\EmbarquesController@SaveAttac
 $app->post('embarques/OrderItem/Save', 'Embarques\EmbarquesController@SaveOrderItem');
 
 //ODC
-$app->get('embarques/Order/List', 'Embarques\EmbarquesController@getOrders');
+$app->get('embarques/Order/List', 'Embarques\EmbarquesController@getOrdersForAsignment');
+$app->get('embarques/Order/Asigment', 'Embarques\EmbarquesController@getOrdersAsignment');
 $app->get('embarques/Order/Order', 'Embarques\EmbarquesController@getOrder');

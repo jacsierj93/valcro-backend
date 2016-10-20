@@ -412,7 +412,7 @@
                     </form>
 
                 </div>
-                <div id="expand"></div>
+
             </md-content>
         </md-sidenav>
 
@@ -535,7 +535,7 @@
                     </form>
 
                 </div>
-                <div id="expand"></div>
+
             </md-content>
         </md-sidenav>
 
@@ -1082,7 +1082,7 @@
                                 <div layout="row" >
                                     <div class="titulo_formulario" style="height: 39px;" flex>
                                         <div>
-                                            <span style="color: rgb(92, 183, 235);">Detalle de Pedido</span>
+                                            <span style="color: rgb(92, 183, 235);">Detalle de Pedido Agregado</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1118,7 +1118,6 @@
                                     <label>N° Proforma:</label>
                                     <input ng-model="select.nro_proforma.documento"  ng-disabled="( true )"
                                            skip-tab
-
                                     >
                                 </md-input-container>
                                 <div  class="adj-box-rigth">
@@ -1146,6 +1145,12 @@
                                     >
                                 </md-input-container>
                             </div>
+                            <div layout="row" class="row" style="color: #c3c3c3;" >
+                                <div layout="row" layout-align="center center">
+                                    <div>Tipo asignacion:</div>
+                                    <div>{{select.isTotal ? 'Total' : 'Parcial' }}</div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                     <div layout="column" flex>
@@ -1164,9 +1169,10 @@
                             <div active-left  ></div>
 
                             <div layout="row"  flex style="padding-right: 4px;">
-                                <div flex layout="row" class="table-filter-head">
-                                    <div flex layout="row" class="table-filter-head" style="width: 40px; margin:  0 2px 0 2px;"></div>
 
+                                <div  layout="row" class="table-filter-head" style="width: 40px; margin:  0 2px 0 2px;"></div>
+
+                                <div flex layout="row" class="table-filter-head">
                                     <md-input-container class="md-block"  flex>
                                         <label>Cod</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
@@ -1175,8 +1181,9 @@
                                         >
                                     </md-input-container>
                                     <grid-order-by ng-model="tbl" key="codigo"></grid-order-by>
-
                                 </div>
+
+
                                 <div flex layout="row" class="table-filter-head">
                                     <md-input-container class="md-block"  flex>
                                         <label>Cod.  Fabrica</label>
@@ -1233,7 +1240,7 @@
                                     <grid-order-by ng-model="tbl" key="fecha_aprob_gerencia"></grid-order-by>
 
                                 </div>
-                                <div flex layout="row" class="table-filter-head"></div>
+
                             </div>
                         </div>
                         <form layout="row"  class="gridContent" flex>
@@ -1244,12 +1251,12 @@
                                         <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;">
                                             <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeAsig(item)"> </md-switch>
                                         </div>
-                                        <div flex class="cellGrid" >{{item.cod}}</div>
+                                        <div flex class="cellGrid" >{{item.codigo}}</div>
                                         <div flex class="cellGrid" >{{item.cod_fabrica}}</div>
                                         <div flex class="cellGrid" >{{item.descripcion}}</div>
                                         <div flex class="cellGrid" >{{item.origen.text}}</div>
+                                        <div flex class="cellGrid" >{{item.cantidad}}</div>
                                         <div flex class="cellGrid" >{{item.saldo}}</div>
-                                        <div flex class="cellGrid" >{{item.cod}}</div>
 
                                     </div>
                                 </div>
@@ -1264,6 +1271,7 @@
 
             </md-content>
         </md-sidenav>
+
         <!------------------------------------------- detalle de embarques creados ------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailOrderAdd" id="detailOrderAdd"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "detailOrderAddCtrl" >
@@ -1357,7 +1365,6 @@
                             <div active-left  ></div>
 
                             <div layout="row"  flex style="padding-right: 4px;">
-                                <div  layout="row" class="table-filter-head" style="width: 40px; margin:  0 2px 0 2px;"></div>
                                 <div flex layout="row" class="table-filter-head">
 
 
@@ -1434,10 +1441,7 @@
                             <div active-left  ></div>
                             <div layout="column" flex>
                                 <div   ng-repeat="item in select.prods | filter : tbl.filter:strict as filter "   >
-                                    <div layout="row" class="cellGridHolder">
-                                        <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;">
-                                            <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeAsig(item)"> </md-switch>
-                                        </div>
+                                    <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(prdSelect.id == item.id)}">
                                         <div flex class="cellGrid"  ng-click="openProd(item)" >{{item.codigo}}</div>
                                         <div flex class="cellGrid" ng-click="openProd(item)">{{item.codigo_fabrica}}</div>
                                         <div flex class="cellGrid" ng-click="openProd(item)">{{item.descripcion}}</div>
@@ -1829,13 +1833,13 @@
                                     <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;">
                                         <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeAsig(item)"> </md-switch>
                                     </div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.id}}</div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.fecha_produccion}}</div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.fecha_aprob_gerencia}}</div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.nro_proforma}}</div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.monto}}</div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.mt3}}</div>
-                                    <div flex class="cellGrid" ng-click="$parent.detailOrderAdd(item)" >{{item.peso}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.fecha_produccion}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.fecha_aprob_gerencia}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.nro_proforma}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.monto}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.mt3}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.peso}}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" flex ng-show=" filtre.length == 0">
@@ -1896,7 +1900,6 @@
                                 <grid-order-by ng-model="tbl" key="fecha_produccion"></grid-order-by>
 
                             </div>
-
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>Aprobado</label>
@@ -1908,7 +1911,6 @@
                                 <grid-order-by ng-model="tbl" key="fecha_aprob_gerencia"></grid-order-by>
 
                             </div>
-
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>Proforma</label>
@@ -1919,7 +1921,6 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="nro_proforma"></grid-order-by>
                             </div>
-
                             <div flex layout="row" class="table-filter-head" >
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
@@ -1957,14 +1958,14 @@
                                         <md-option value="0">
                                             <div flex layout layout-align="center center">
                                                 <div layout layout-align="center center" >
-                                                    S
+                                                    P
                                                 </div>
                                             </div>
                                         </md-option>
                                         <md-option value="1">
                                             <div flex layout layout-align="center center">
                                                 <div layout layout-align="center center" >
-                                                    t
+                                                    T
                                                 </div>
                                             </div>
                                         </md-option>
@@ -1978,16 +1979,16 @@
                     <form layout="row"  class="gridContent" flex>
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div   ng-repeat="item in $parent.shipment.odcs | filter : tbl.filter:strict as filter " ng-click="$parent.detailOrderShipment(item)"   >
-                                <div layout="row" class="cellGridHolder"  >
-                                    <div flex class="cellGrid">{{item.id}}</div>
-                                    <div flex class="cellGrid" >{{item.fecha_produccion | date :'dd/MM/yyyy' }}</div>
-                                    <div flex class="cellGrid" >{{item.fecha_aprob_gerencia | date :'dd/MM/yyyy' }}</div>
-                                    <div flex class="cellGrid" >{{item.nro_proforma   }}</div>
-                                    <div flex class="cellGrid" >{{item.monto   }}</div>
-                                    <div flex class="cellGrid" >{{item.mt3  }}</div>
-                                    <div flex class="cellGrid" >{{item.peso }}</div>
-                                    <div flex class="cellGrid" >{{(item.isTotal == 1) ?  'T': 'P' }}</div>
+                            <div   ng-repeat="item in $parent.shipment.odcs | filter : tbl.filter:strict as filter "    >
+                                <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}"  >
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.id}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.fecha_produccion | date :'dd/MM/yyyy' }}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)"  >{{item.fecha_aprob_gerencia | date :'dd/MM/yyyy' }}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.nro_proforma   }}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.monto   }}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.mt3  }}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.peso }}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{(item.isTotal == 1) ?  'T': 'P' }}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" flex ng-show=" filter.length == 0 ">
@@ -3030,7 +3031,7 @@
                             </div>
 
                             <md-input-container class="md-block rms" flex >
-                                <input  type="text" ng-model="select.saldo"    >
+                                <input   id="input" type="text" ng-model="select.saldo" range minVal="0.1" maxVal="{{select.cantidad}}"   >
                             </md-input-container>
 
                             <md-tooltip >
@@ -3042,6 +3043,13 @@
                             <div class="rms" flex> {{select.cantidad}}</div>
                             <md-tooltip >
                                 Cantidad en el pedido
+                            </md-tooltip>
+                        </div>
+                        <div layout="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Disponible </div>
+                            <div class="rms" flex> {{select.disponible}}</div>
+                            <md-tooltip >
+                               disponible para asignacion
                             </md-tooltip>
                         </div>
                         <div layout="row" >

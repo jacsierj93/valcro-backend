@@ -22,7 +22,6 @@ class Shipment extends Model
      * adjuntos del documento
      */
     public function attachments(){
-       // $this->adjuntos = $this->hasMany('App\Models\Sistema\Shipments\ShipmentAttachment', 'embarque_id')->get();
         return $this->hasMany('App\Models\Sistema\Shipments\ShipmentAttachment', 'embarque_id');
 
     }
@@ -52,12 +51,13 @@ class Shipment extends Model
         return $this->hasMany('App\Models\Sistema\Shipments\Container', 'embarque_id');
     }
 
-    public function Orders(){
-        $data = [];
-        $data[] = ['id'=>'', 'isTotal'=>false, 'articulos'=>[]];
-        return $data;
-
+    /**
+     *Container del embarq
+     */
+    public function items(){
+        return $this->hasMany('App\Models\Sistema\Shipments\ShipmentItem', 'embarque_id');
     }
+
 
     /**
 
