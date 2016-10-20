@@ -72,6 +72,11 @@ if (Request::is('embarques/*'))
 {
     require __DIR__.'/embarques_routes.php';
 }
+//////enrutador para servicios de Criterios
+if (Request::is('criterio/*'))
+{
+    require __DIR__.'/criterio_routes.php';
+}
 
 
 
