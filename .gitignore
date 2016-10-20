@@ -1,6 +1,7 @@
 /.idea
 /vendor
-/config/database.php
+config/database.php
 /public/components
 /public/.htaccess
 /public/images
+/composer.lock

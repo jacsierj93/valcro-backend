@@ -1,4 +1,8 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,shipment, setGetShipment) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,shipment, setGetShipment, filesService) {
+
+    //?review
+    filesService.setFolder('orders');
+
 
     $scope.alerts =[];
     $scope.provSelec ={};
@@ -13,7 +17,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
     shipment.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
 
     $scope.search = function(){
-       var data =[];
+        var data =[];
         if($scope.provs.length > 0){
             return $scope.provs;
         }
@@ -21,26 +25,53 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
     }
 
     $scope.setProvedor = function(prov){
-
+        console.log("setprov form", form);
         if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
             $scope.provSelec= prov;
             $scope.listShipmentCtrl(prov);
+        }else if($scope.module.layer == 'detailShipment'){
+            $scope.provSelec= prov;
         }
 
     };
+
     $scope.closeSide = function(){
-        $scope.LayersAction({close:true});
+        $timeout(function () {
+            console.log("getvalid",form.getValid());
+            if(!form.getValid()){
+                interval= null;
+                $scope.LayersAction({close:{search:true}});
+            }else {
+                $scope.validChangeFor();
+            }
+        },500);
+
+    };
+    var interval = null;
+    $scope.validChangeFor= function () {
+        if(form.getState() == "process" && interval == null){
+            interval= $interval(function () {
+                console.log("interval", form.getState());
+                if(form.getState() == "continue"){
+                    $scope.LayersAction({close:{search:true}});
+                    interval= null;
+                }else if(form.getState() == "cancel"){
+                    if(form.back){
+                        form.back();
+                    }
+                    $interval.cancel(interval);
+                    interval= null;
+                }
+            },500);
+        }
     };
 
 
     $scope.$watch('bindShipment.estado', function(newVal){
-        console.log("bind", newVal);
+
         if(newVal){
-            console.log("bind", newVal);
             $scope.shipment = setGetShipment.getData();
-            if($scope.shipment.objs.prov_id){
-                $scope.provSelec= $scope.shipment.objs.prov_id;
-            }
+            $scope.provSelec= $scope.shipment.objs.prov_id;
         }
     });
 
@@ -49,7 +80,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout', 'shi
         $scope.index= newVal[1];
     });
     $timeout(function(){
-        console.log("scope parent", $scope);
+
     },1000);
 
 
@@ -96,6 +127,41 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
 
 }]);
 
+MyApp.controller('listShipmentUnclosetCtrl', ['$scope','shipment','setGetShipment',  function ($scope,$resource, setGetShipment) {
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+
+    $scope.$parent.listShipmentCtrl = function(){
+        if ($scope.$parent.module.index == 0 ){
+            $scope.LayersAction({open:{name:"listShipmentUncloset", after: function () {
+                $scope.$parent.provSelec = null;
+                $resource.query({type:"Uncloset"},{}, function (response) {
+                    if(response.length == 0){
+                        $scope.$parent.LayersAction({close:true});
+                    }else{
+                        $scope.tbl.data= response;
+                    }
+                })
+            }}});
+        }else {
+
+        }
+    };
+    $scope.setData = function (data){
+        $resource.get({type:"Shipment", id:data.id},{}, function (response) {
+            setGetShipment.setData(response);
+            $scope.OpenShipmentCtrl(response);
+        })
+
+    }
+
+
+
+}]);
+
 MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',  function($scope,shipment, setGetShipment ){
 
     $scope.$parent.summaryShipmentCtrl = function(){
@@ -109,11 +175,22 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
     $scope.provSelec = null;
     $scope.provSelecText = undefined;
+    $scope.form= 'head';
+    $scope.formOptions={
+        head:{expand:true} ,
+        date:{expand:true}  ,
+        doc:{expand:true}  ,
+        pago:{expand:true}  ,
+        agreds:{expand:true}
+    };
+
+
+
+
 
     $scope.$watch("provSelec", function(newVal){
-        console.log("newval", newVal);
-        if(newVal != null && newVal.id){
-            $resource.query({type:"ProviderDir", id:newVal.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
+        if(newVal != null && newVal.id && $scope.$parent.provSelec != null){
+            $resource.queryMod({type:"Provider",mod:"Dir", id:newVal.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
         }
     });
     $scope.$watch("provSelec", function(newVal){
@@ -126,30 +203,28 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
                     angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
                 },0)
             }
+        } else if(newVal && $scope.$parent.provSelec == null){
+            $scope.$parent.provSelec= newVal
         }else{
-            $scope.$parent.provSelec= {};
+            $scope.$parent.provSelec= null;
         }
     });
     $scope.$watch("$parent.provSelec", function(newVal){
-      if(newVal.id ){
-          if($scope.provSelec == null){
-              $scope.provSelec=newVal;
-          }else{
-              if(newVal.id != $scope.provSelec.id){
-                  //$scope.provSelec=newVal;
-              }
-          }
+        if(newVal!= null){
+            if(newVal.id ){
+                if($scope.provSelec == null || newVal.id != $scope.provSelec.id ){
+                    $scope.provSelec=newVal;
+                    $scope.detailShipmenthead.$setDirty();
+                }
 
-      }
-    });
-    $scope.toEditHead= function(id,val){
-        if( $scope.session.global != 'new'){
-            $model.change("shipment",id,val);
+            }
+        }else{
+            $scope.provSelec=null;
         }
-    };
-    $scope.form= 'head';
+
+    });
+
     $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
-         console.log("newval",newVal);
         if(!newVal[1]){
             $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
                 $scope.$parent.session.session_id= response.session_id;
@@ -161,12 +236,27 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
     $scope.$parent.OpenShipmentCtrl = function(data){
         $scope.form= 'head';
-        $scope.LayersAction({open:{name:"detailShipment", after: function(){
+        $scope.$parent.LayersAction({open:{name:"detailShipment", after: function(){
             if(!data){
                 $scope.detailShipmenthead.$setDirty();
             }
         }}});
     };
+
+    $scope.toEditHead= function(id,val){
+        if( $scope.session.global != 'new'){
+            $model.change("shipment",id,val);
+        }
+    };
+
+    $scope.openTarif = function () {
+        if($scope.provSelec == null){
+            $scope.$parent.NotifAction("error", "selecione un proveedor ",[],{autohidden:2000});
+        }else {
+            $scope.$parent.listTariffCtrl();
+        }
+
+    }
 
     $scope.test= function(){
         alert('');
@@ -174,7 +264,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
 }]);
 
-MyApp.controller('listTariffCtrl',['$scope', function($scope){
+MyApp.controller('listTariffCtrl',['$scope','shipment','tarifForm',  function($scope, $resource,tarifForm){
     $scope.tbl ={
         order:"id",
         filter:{},
@@ -184,62 +274,317 @@ MyApp.controller('listTariffCtrl',['$scope', function($scope){
     $scope.pais_idText = undefined;
     $scope.puerto_idSelec = null;
     $scope.puerto_idText = undefined;
+    $scope.tarifBind= tarifForm.bind();
+    $scope.tarifaSelect = {};
 
     $scope.$parent.listTariffCtrl = function(){
-        $scope.LayersAction({open:{name:"listTariff", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
-        }}});
-    }
+
+        $scope.LayersAction({open:{name:"listTariff",
+            before:function(){
+                if($scope.$parent.shipment.tarifa_id){
+                    $scope.setData($scope.$parent.shipment.objs.tarifa_id);
+                }
+            }
+        }});
+    };
+
+    $scope.setData = function(data){
+        angular.forEach(data, function(v,k){
+            $scope.tarifaSelect[k] =v;
+        });
+    };
+    $scope.$watch("tarifaSelect.id", function (newVal, oldVal){
+
+        if(newVal){
+            $scope.$parent.shipment.tarifa_id = $scope.tarifaSelect.id;
+            $scope.$parent.shipment.objs.tarifa_id=$scope.tarifaSelect;
+            $resource.post({type:"Save"},$scope.$parent.shipment);
+        }
+    });
+    $scope.$watch("tarifBind.estado", function (newVal, oldVal) {
+        if(newVal && newVal == 'created'){
+            $scope.tbl.data.push(tarifForm.get());
+            $scope.setData(tarifForm.get());
+            tarifForm.setState("waith");
+        }
+    });
+    $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
+
+        $scope.pais_idSelec=newVal;
+        if(newVal && newVal!= null ){
+            $resource.query({type:"Country", mod:"Ports", pais_id:newVal.id},{}, function(response){
+                $scope.pais_idSelec.ports = response;
+            });
+        }
+    });
+    $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
+        $scope.puerto_idSelec=newVal;
+    });
+    $scope.$watch('puerto_idSelec', function(newVal){
+        if(newVal && newVal !=null){
+            $resource.queryMod({type:"Tariff",mod:"List", puerto_id:$scope.puerto_idSelec.id},{}, function (response) {
+                $scope.tbl.data= response;
+            });
+        }
+    });
+    $scope.$watchGroup(['tariffF1.$valid', 'tariffF1.$pristine'], function(newVal){
+        if(!newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
+                $scope.$parent.session.session_id= response.session_id;
+                $scope.$parent.shipment.id = response.id;
+                $scope.tariffF1.$setPristine()
+                if($scope.puerto_idSelec!= null){
+
+                }
+
+            });
+        }
+    });
 
 
 }]);
 
-
-MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav', function($scope, $mdSidenav){
-    $scope.containers =[];
+MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','shipment',function($scope, $mdSidenav,$timeout,formSrv, $resource){
     $scope.isOpen= false;
+    $scope.tipo_select = null;
+    $scope.tipo_text = undefined;
+    $scope.model ={};
+    $scope.copy ={};
+    $scope.containers = [{name:"20sd"},{name:"40sd"},{name:"40'ot"},{name:"40ot"}];
+    $scope.options ={form:false};
+    $scope.select ={};
+
+
+    //constructor
     $scope.$parent.miniContainerCtrl = function(){
+        $scope.containerForm.$setPristine();
+        $scope.containerForm.$setUntouched();
+        $scope.select ={};
         $mdSidenav("miniContainer").open().then(function(){
             $scope.isOpen= true;
+
+            formSrv.getValid =function () { return (!$scope.containerForm.$pristine) && $scope.isOpen };
+            if($scope.$parent.shipment.containers.length == 0){
+                $scope.options.edit= false;
+                $scope.options.creat= true;
+            }
         });
-    }
-    $scope.close = function($e){
+    };
+
+    // metodos
+    $scope.close = function(){
+        $scope.inClose();
+    };
+    $scope.inClose = function(){
         if($scope.isOpen){
             $mdSidenav("miniContainer").close().then(function(){
                 $scope.isOpen = false;
             });
         }
+    };
+    $scope.created = function (){
+        if($scope.select.id){
+            //   $scope.$parent.NotifAction("error", "Por favor haga click en el container que desea modificar, ",[],{autohidden:1500});
 
+        }else {
+            var co= angular.copy($scope.select);
+            $scope.model = co;
+        }
+        $scope.options.form= true;
+    };
+    $scope.update = function (){
+
+        var paso = true;
+        if(!$scope.select.id){
+            $scope.$parent.NotifAction("error", "Por favor haga click en el container que desea modificar y vuelva a presionarme  ",[],{autohidden:1500});
+            paso= false;
+        }
+        else
+        if(!$scope.containerForm.$pristine && $scope.model.id){
+            console.log("a",$scope.copy) ;
+            console.log("b",$scope.model );
+            console.log("compare",angular.equals($scope.model,$scope.copy) );
+            if(!angular.equals($scope.model,$scope.copy)){
+                paso= false;
+                $scope.$parent.NotifAction("error", "Se produjeron cambios en el container, ¿Que desea hacer?",
+                    [
+                        {name:"Descartar cambios", default:5, action:
+                            function(){
+                                $scope.copy= angular.copy($scope.select);
+                                $scope.model =$scope.copy($scope.select);
+                                $scope.options.form= true;
+                            }
+                        },
+                        {name:"Guardar y continuar ",  action:
+                            function(){
+                                $scope.savePromise(function(response){
+                                    console.log("promise", response);
+                                    if(response.action== 'upd'){
+                                        // $scope.$parent.NotifAction("ok", "Container Actualizado",[],{autohidden:1500});
+
+                                        $scope.copy= angular.copy($scope.select);
+                                        $scope.model =$scope.copy($scope.select);
+                                        $scope.options.form= true;
+                                    }
+
+
+
+                                });
+
+                            }
+                        }
+                    ]
+                    ,{block:true});
+            }
+        }
+
+        if(paso){
+            $scope.copy= angular.copy($scope.select);
+            $scope.model =angular.copy($scope.select);
+            $scope.tipo_select ={name: $scope.select.tipo}
+            $scope.options.form= true;
+        }
+
+    };
+    $scope.setData = function(item , e){
+        $scope.select = item;
+    };
+    $scope.savePromise = function(promise){
+        $resource.postMod({type:"Container",mod:"Save"},$scope.model,promise);
+    };
+    $scope.delete = function(item, e){
+        console.log(e);
+        $scope.$parent.NotifAction("alert", "¿Esta seguro de eliminar el container?",
+            [
+                {name:"No, no deseo eliminarlo",action:
+                    function (){
+
+                    }
+                },
+                {name:"Si estoy seguro", default:5 ,action:
+                    function (){
+                        $resource.postMod({type:"Container",mod:"Delete"},{id:item.id}, function(response){
+                            console.log("response del", response);
+                            $scope.$parent.NotifAction("ok", "Container eliminado",[],{autohidden:1500});
+                            $scope.$parent.shipment.containers.splice(e.$index,1);
+
+                        });
+                    }
+                }
+            ]);
+
+    };
+    $scope.save = function (){
+        if($scope.containerForm.$valid && !$scope.containerForm.$pristine){
+            if($scope.containerForm.$valid ){
+                $scope.model.embarque_id= $scope.$parent.shipment.id;
+                $resource.postMod({type:"Container",mod:"Save"},$scope.model, function(response){
+                    if(response.action== 'new'){
+                        console.log("paren",$scope.$parent.shipment);
+                        $scope.$parent.shipment.containers.push(response.model);
+                        $scope.$parent.NotifAction("ok", "Container Agregado",[],{autohidden:2000});
+                        $timeout(function () {
+                            formSrv.setState("continue");
+                            $scope.inClose();
+                        },0);
+                        $timeout(function(){
+                            $scope.containerForm.$setPristine();
+                            $scope.containerForm.$setUntouched();
+                            $scope.options.form= false;
+                        },100);
+                    }else{
+                        if(response.action== 'upd'){
+                            $scope.$parent.NotifAction("ok", "Container Actualizado",[],{autohidden:2000});
+                            angular.forEach(response.model, function(v,k){
+                                $scope.select[k]=v;
+                            });
+                            $timeout(function(){
+                                $scope.containerForm.$setPristine();
+                                $scope.containerForm.$setUntouched();
+                                $scope.options.form= false;
+                            },100);
+
+                        }
+                    }
+                    $scope.model.id=undefined;
+                    $scope.model.volumen=undefined;
+                    $scope.model.cantidad=undefined;
+                    $scope.model.tipo=undefined;
+                    $scope.model.peso=undefined;
+                    $scope.tipo_text = undefined;
+
+                });
+            }else{
+                $scope.$parent.NotifAction("error", "Faltan datos en el formulario, por favor veriquelo",[],{autohidden:1500});
+                $timeout(function () {
+                    var ele = angular.element("#miniContainer ng-invalid");
+                    if(ele.length == 0){
+                        ele[0].focus();
+                    }else{
+                        ele = angular.element("#miniContainer ng-pristine");
+                        console.log("asdfa", ele)
+                    }
+                },0);
+            }
+
+        }
     }
+
 }]);
 
-MyApp.controller('listOrdershipmentCtrl',['$scope', function($scope){
+MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','$filter', function($scope,$resource,$filter){
     $scope.tbl ={
         order:"id",
-        filter:{},
-        data:[]
+        filter:{}
     };
+    $scope.select ={};
     $scope.$parent.listOrdershipment = function(){
+        $scope.select ={};
         $scope.LayersAction({open:{name:"listOrdershipment", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+                console.log("selectsdfsdfsd",  $scope.select);
+
+            if($scope.select.id){
+                $resource.getMod({type:"Order", mod:"Order", id:$scope.select.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
+                    $scope.select.isTotal= response.isTotal;
+                });
+            }
+
+
         }}});
+    }
+    $scope.open = function (data) {
+        $scope.select = data;
+        $scope.detailOrderShipment(data);
     }
 }]);
 
-MyApp.controller('listOrderAddCtrl',['$scope', function($scope){
+MyApp.controller('listOrderAddCtrl',['$scope','shipment', function($scope, $resource){
     $scope.tbl ={
         order:"id",
         filter:{},
         data:[]
     };
+    $scope.select = {};
     $scope.$parent.listOrderAdd = function(){
+        $scope.select = {};
+        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id, embarque_id: $scope.$parent.shipment.id},{},function (response) {
+            $scope.tbl.data= response;
+        });
         $scope.LayersAction({open:{name:"listOrderAdd", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+
         }}});
     }
+
+    $scope.changeAsig = function (data) {
+        console.log("data");
+    }
+
+    $scope.open = function (data) {
+        $scope.select = data;
+        $scope.$parent.detailOrderAdd(data);
+    }
+
+
 }]);
 
 MyApp.controller('listProducttshipmentCtrl',['$scope', function($scope){
@@ -311,16 +656,134 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav', function($scope,$mdS
     };
 }]);
 
-
-MyApp.controller('miniMblCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
     $scope.isOpen = false;
-    $scope.data ={adjs:[]};
+    $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+    //{{up:[}, size, estado:'waith'}
+    //{estado:'wait',cu}
+
+
     $scope.$parent.miniMbl = function(){
+        $scope.head.$setPristine();
+        $scope.head.$setUntouched();
         $mdSidenav("miniMbl").open().then(function(){
             $scope.isOpen = true;
         });
     };
-    $scope.close= function(){
+
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if($scope.isOpen && !newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
+                $scope.head.$setPristine();
+            });
+        }
+    });
+
+
+
+    /**adjuntos**/
+    var interval = null;
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            $scope.cola.estado='uploading';
+            $scope.cola.cola = $scope.cola.cola + 1;
+            var pr =Object.create( $scope.asign($scope.files,"nro_mbl"));
+            $scope.cola.data.push(pr);
+            if(interval== null){
+                interval = $interval(function () {
+                    console.log("interval ",$scope.cola );
+                    var finisAll= true;
+                    angular.forEach($scope.cola.data,function (v, k) {
+
+                        if(v.isFinish()){
+                            finisAll=true;
+                            console.log("filse fin", v)
+                            angular.forEach(v.getFilesUp(), function (sv,sf) {
+                                $scope.$parent.shipment.nro_mbl.adjs.push(sv);
+                            });
+                            if(v.getFilesError().length > 0){
+                                console.log("error subiendo archivos", v.getFilesError());
+                            }
+                        }
+                        if(v.getState() == 'waith'){
+                            console.log("waith", v);
+                            finisAll= false;
+                            v.start();
+                        }
+                        if(v.getState() == 'up'){
+                            finisAll= false;
+                            console.log("up", v);
+                        }
+
+
+                    });
+                    if(finisAll){
+                        $scope.cola.estado='finish';
+                        $interval.cancel(interval);
+
+                        interval=  null;
+                    }
+                },500);
+            }
+        }
+    });
+    $scope.asign = function (files, doc) {
+        var estado ="waith";
+        var filesUp = [];
+        var filesError = [];
+        var all =[];
+        var finish= false;
+        var asig = function (file) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+                all.push({state:'good', file:response});
+                filesUp.push(response);
+                if(all.length == files.length){
+                    finish= true;
+                    estado= 'finish';
+                }
+            }, function (error) {
+                console.log("error", error);
+            })
+        };
+
+        return {
+            getState: function () {return estado;},
+            getFiles : function () {return files;},
+            getSize: function(){return files.length ;},
+            getFilesUp:function () {return filesUp;},
+            getFilesError : function(){return filesError},
+            isFinish : function () {return   finish},
+            getAll : function () {return   all},
+            start: function () {
+                estado =  'up';
+                filesSrv.setFolder("orders");
+                /*                var x = $timeout(function () {
+                 if(estado != 'fin'){
+                 estado='error';
+                 }
+                 },60000);*/
+                angular.forEach(files, function(v) {
+                    filesSrv.Upload({
+                        file: v,
+                        success: function (data) {
+                            asig(data);
+                        },
+                        error: function (data) {
+                            all.push({state:'bad', file:response});
+                            filesError.push(data);
+                            if(all.length== files.length){
+                                finish= true;
+                            }
+                        }
+                    })
+                });
+            }
+
+
+        }
+    }
+    $scope.close= function(e){
         if($scope.isOpen){
             $mdSidenav("miniMbl").close().then(function(){
                 $scope.isOpen = false;
@@ -330,14 +793,127 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav', function($scope,$mdSidena
     };
 }]);
 
-MyApp.controller('miniHblCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
+    $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+
     $scope.$parent.miniHbl = function(){
         $mdSidenav("miniHbl").open().then(function(){
             $scope.isOpen = true;
         });
     };
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if($scope.isOpen && !newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
+                $scope.head.$setPristine();
+            });
+        }
+    });
+    /**adjuntos**/
+    var interval = null;
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            $scope.cola.estado='uploading';
+            $scope.cola.cola = $scope.cola.cola + 1;
+            var pr =Object.create( $scope.asign($scope.files,"nro_hbl"));
+            $scope.cola.data.push(pr);
+            if(interval== null){
+                interval = $interval(function () {
+                    console.log("interval ",$scope.cola );
+                    var finisAll= true;
+                    angular.forEach($scope.cola.data,function (v, k) {
+
+                        if(v.isFinish()){
+                            finisAll=true;
+                            console.log("filse fin", v)
+                            angular.forEach(v.getFilesUp(), function (sv,sf) {
+                                $scope.$parent.shipment.nro_hbl.adjs.push(sv);
+                            });
+                            if(v.getFilesError().length > 0){
+                                console.log("error subiendo archivos", v.getFilesError());
+                            }
+                        }
+                        if(v.getState() == 'waith'){
+                            console.log("waith", v);
+                            finisAll= false;
+                            v.start();
+                        }
+                        if(v.getState() == 'up'){
+                            finisAll= false;
+                            console.log("up", v);
+                        }
+
+
+                    });
+                    if(finisAll){
+                        $scope.cola.estado='finish';
+                        $interval.cancel(interval);
+
+                        interval=  null;
+                    }
+                },500);
+            }
+        }
+    });
+    $scope.asign = function (files, doc) {
+        var estado ="waith";
+        var filesUp = [];
+        var filesError = [];
+        var all =[];
+        var finish= false;
+        var asig = function (file) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+                all.push({state:'good', file:response});
+                filesUp.push(response);
+                if(all.length == files.length){
+                    finish= true;
+                    estado= 'finish';
+                }
+            }, function (error) {
+                console.log("error", error);
+            })
+        };
+
+        return {
+            getState: function () {return estado;},
+            getFiles : function () {return files;},
+            getSize: function(){return files.length ;},
+            getFilesUp:function () {return filesUp;},
+            getFilesError : function(){return filesError},
+            isFinish : function () {return   finish},
+            getAll : function () {return   all},
+            start: function () {
+                estado =  'up';
+                filesSrv.setFolder("orders");
+                /*                var x = $timeout(function () {
+                 if(estado != 'fin'){
+                 estado='error';
+                 }
+                 },60000);*/
+                angular.forEach(files, function(v) {
+                    filesSrv.Upload({
+                        file: v,
+                        success: function (data) {
+                            asig(data);
+                        },
+                        error: function (data) {
+                            all.push({state:'bad', file:response});
+                            filesError.push(data);
+                            if(all.length== files.length){
+                                finish= true;
+                            }
+                        }
+                    })
+                });
+            }
+
+
+        }
+    }
+
+
     $scope.close= function(){
         if($scope.isOpen){
             $mdSidenav("miniHbl").close().then(function(){
@@ -348,14 +924,126 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav', function($scope,$mdSidena
     };
 }]);
 
-MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
+    $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+
     $scope.$parent.miniExpAduana = function(){
         $mdSidenav("miniExpAduana").open().then(function(){
             $scope.isOpen = true;
         });
     };
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if($scope.isOpen && !newVal[1]){
+            $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
+                $scope.head.$setPristine();
+            });
+
+        }
+    });
+    /**adjuntos**/
+    var interval = null;
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            $scope.cola.estado='uploading';
+            $scope.cola.cola = $scope.cola.cola + 1;
+            var pr =Object.create( $scope.asign($scope.files,"nro_dua"));
+            $scope.cola.data.push(pr);
+            if(interval== null){
+                interval = $interval(function () {
+                    console.log("interval ",$scope.cola );
+                    var finisAll= true;
+                    angular.forEach($scope.cola.data,function (v, k) {
+
+                        if(v.isFinish()){
+                            finisAll=true;
+                            console.log("filse fin", v)
+                            angular.forEach(v.getFilesUp(), function (sv,sf) {
+                                $scope.$parent.shipment.nro_dua.adjs.push(sv);
+                            });
+                            if(v.getFilesError().length > 0){
+                                console.log("error subiendo archivos", v.getFilesError());
+                            }
+                        }
+                        if(v.getState() == 'waith'){
+                            console.log("waith", v);
+                            finisAll= false;
+                            v.start();
+                        }
+                        if(v.getState() == 'up'){
+                            finisAll= false;
+                            console.log("up", v);
+                        }
+
+
+                    });
+                    if(finisAll){
+                        $scope.cola.estado='finish';
+                        $interval.cancel(interval);
+
+                        interval=  null;
+                    }
+                },500);
+            }
+        }
+    });
+    $scope.asign = function (files, doc) {
+        var estado ="waith";
+        var filesUp = [];
+        var filesError = [];
+        var all =[];
+        var finish= false;
+        var asig = function (file) {
+            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
+                all.push({state:'good', file:response});
+                filesUp.push(response);
+                if(all.length == files.length){
+                    finish= true;
+                    estado= 'finish';
+                }
+            }, function (error) {
+                console.log("error", error);
+            })
+        };
+
+        return {
+            getState: function () {return estado;},
+            getFiles : function () {return files;},
+            getSize: function(){return files.length ;},
+            getFilesUp:function () {return filesUp;},
+            getFilesError : function(){return filesError},
+            isFinish : function () {return   finish},
+            getAll : function () {return   all},
+            start: function () {
+                estado =  'up';
+                filesSrv.setFolder("orders");
+                /*                var x = $timeout(function () {
+                 if(estado != 'fin'){
+                 estado='error';
+                 }
+                 },60000);*/
+                angular.forEach(files, function(v) {
+                    filesSrv.Upload({
+                        file: v,
+                        success: function (data) {
+                            asig(data);
+                        },
+                        error: function (data) {
+                            all.push({state:'bad', file:response});
+                            filesError.push(data);
+                            if(all.length== files.length){
+                                finish= true;
+                            }
+                        }
+                    })
+                });
+            }
+
+
+        }
+    }
     $scope.close= function(){
         if($scope.isOpen){
             $mdSidenav("miniExpAduana").close().then(function(){
@@ -366,50 +1054,185 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav', function($scope,$md
     };
 }]);
 
-MyApp.controller('detailOrderShipmentCtrl',['$scope', function($scope){
+// detalle de peido agregado
+MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function($scope, $resource, form){
     $scope.isOpen = false;
-    $scope.data ={adjs:[]};
     $scope.tbl ={data:[]};
+    $scope.select  ={};
+    $scope.select={};
+    $scope.bindForm= form.bind();
+
+
     $scope.$parent.detailOrderShipment = function(data){
+        $scope.prodSelect = {};
+        $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
+            angular.forEach(response, function (v,k) {
+                $scope.select[k]=v;
+            });
+
+        } );
+
         $scope.$parent.LayersAction({open:{name:"detailOrder", after: function(){
             $scope.tbl.data.splice(0,$scope.tbl.data.length);
             $scope.tbl.data.push({id:-1});
         }}});
 
     };
+    $scope.open = function (data) {
+        form.name= 'DetailProductShip';
+
+        $scope.prodSelect= data;
+    }
+
+
 }]);
 
-MyApp.controller('detailOrderAddCtrl',['$scope', function($scope){
+MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($scope, $resource, form){
     $scope.isOpen = false;
-    $scope.data ={adjs:[]};
     $scope.tbl ={data:[]};
+    $scope.prdSelect ={};
+    $scope.select={};
+    $scope.bindForm= form.bind();
+
+
+
     $scope.$parent.detailOrderAdd = function(data){
-        $scope.$parent.LayersAction({open:{name:"detailOrderAdd", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
-        }}});
+
+        $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
+            angular.forEach(response, function (v,k) {
+                $scope.select[k]=v;
+            });
+
+        } );
+        $scope.$parent.LayersAction({open:{name:"detailOrderAdd"}});
 
     };
+
+    $scope.openProd = function (data) {
+        form.name= 'DetailProductAdd';
+        $scope.prdSelect=data;
+        $scope.$parent.DetailProductShipment(data);
+
+    }
+
 }]);
 
 
-MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout', 'form','shipment', function($scope,$mdSidenav, $timeout, formSrv, $resource){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
+    $scope.select = {asignado:0};
+    $scope.original= {};
+    $scope.isUpdate= false;
+    var time = null;
+
 
     $scope.$parent.DetailProductShipment = function(data){
+        formSrv.setState("waith");
+        formSrv.setBind(false);
+        formSrv.getValid = function () {
+            return formSrv.getState() == 'waith' &&  $scope.isOpen ;
+        }
+        $scope.original= angular.copy(data);
+        angular.forEach(data, function (v, k) {
+            $scope.select[k]=v;
+        });
         $mdSidenav("miniDetailProductShipment").open().then(function(){
             $scope.isOpen = true;
         });
     };
     $scope.close= function(){
-        if($scope.isOpen){
-            $mdSidenav("miniDetailProductShipment").close().then(function(){
-                $scope.isOpen = false;
-            });
-        }
 
+        if( $scope.isOpen){
+            console.log("sfe ",$scope.select );
+            if(parseFloat($scope.select.saldo) == parseFloat($scope.original.saldo)){ $scope.inClose();}else
+            if(parseFloat($scope.select.saldo) > parseFloat($scope.original.disponible))
+            {
+                formSrv.setState("process");
+                $scope.$parent.NotifAction("alert", "la cantidad indicada excede el disponible en el pedido",
+                    [
+                        {name: "Corregir" ,
+                            action: function () {
+                                formSrv.setState("cancelar");
+                                var ele= angular.element("#miniDetailProductShipment #input");
+                                ele.click();
+                                ele.focus();
+                            }
+                        },
+                        {name: "Cancelar " ,
+                            action: function () {
+                                $scope.inClose();
+                                formSrv.setState("continue");
+                            }
+                        }
+
+                    ],{block:true});
+
+            }
+            else{
+                var send = {
+                    id:$scope.select.embarque_id,
+                    descripcion: $scope.select.descripcion,
+                    origen_item_id: $scope.select.id,
+                    saldo: $scope.select.saldo,
+                    tipo_origen_id:23,
+                    embarque_id: $scope.$parent.shipment.id ,
+                    doc_origen_id: $scope.select.doc_id
+                };
+                $resource.postMod({type:"OrderItem", mod:"Save"},send, function (response) {
+
+                    $scope.$parent.NotifAction("ok", "Articulo atualizado", [], {autohidden:1500});
+
+                    if(response.doc_origen_id){
+                        var doc = angular.copy(response.doc_origen_id);
+                        doc.asignado= true;
+                        $scope.$parent.shipment.odcs.push(doc);
+                    }
+                    $scope.select.embarque_id= response.id;
+                    formSrv.setData(angular.copy($scope.select));
+                    formSrv.setBind(true);
+                    $scope.inClose();
+                });
+            }
+        }
     };
+
+    $scope.inClose = function () {
+        $scope.select ={};
+        $mdSidenav("miniDetailProductShipment").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+    $scope.$watchGroup(['prod.$valid','prod.$pristine'], function (newVal) {
+        if(!newVal[1] && newVal[0]) {
+            formSrv.setData($scope.select);
+            console.log(" original ", $scope.original.saldo);
+            console.log(" copy  ", $scope.select.saldo);
+            formSrv.setState(($scope.original.saldo != $scope.select.saldo) ? 'upd' :'waith');
+            console.log(" get satate  ", formSrv.getState());
+            $scope.prod.$setPristine();
+            /*  if(time == null){
+             time = $timeout(function () {
+             console.log("time up", formSrv.bind())
+             formSrv.setData($scope.select);
+             formSrv.setBind(true)
+
+             }, 500);
+             }else{
+             $timeout.cancel(time);
+             time = $timeout(function () {
+             console.log("time up dfsd", formSrv.bind());
+             formSrv.setData($scope.select);
+             formSrv.setBind(true)
+
+             }, 500);
+
+             }*/
+        }
+    });
+
+
+
 }]);
 
 MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipment',function($scope,$mdSidenav, shipment, $model){
@@ -427,7 +1250,7 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
         }
     });
 
-    $scope.close =  function(e){
+    $scope.close =  function(){
         if( $scope.isOpen){
             $mdSidenav("moduleMsm").close().then(function(){
                 $scope.isOpen = false;
@@ -444,7 +1267,9 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
                         $scope.close();
                     });
                 }else{
-                   alert("no implementado")
+                    $scope.close();
+                    $scope.$parent.listShipmentCtrl();
+
                 }
                 break;
         }
@@ -454,24 +1279,153 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
 
 }]);
 
-MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment', function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource){
     $scope.isOpen = false;
+    $scope.isLoad =false;
     $scope.data ={adjs:[]};
     $scope.form='';
+    $scope.model ={};
+
+    $scope.ff =[];
+    $scope.ffSelect =null;
+    $scope.ffText = undefined;
+
+    $scope.paisSelec =null;
+    $scope.pais_idText =undefined;
+
+    $scope.monedas =[];
+    $scope.moneda_idSelect =null;
+    $scope.moneda_idText = undefined;
+
+    $scope.puertos =[];
+    $scope.puertoSelect =null;
+    $scope.puertoText =undefined;
 
     $scope.$parent.CreatTariff = function(){
+        $scope.head.$setPristine();
+        $scope.bond.$setPristine();
+        $scope.head.$setUntouched();
+        $scope.bond.$setUntouched();
         $mdSidenav("miniCreatTariff").open().then(function(){
             $scope.isOpen = true;
+            if(!$scope.isLoad){
+                $scope.loadData();
+            }
+            $timeout(function () {
+                var elem = angular.element("#miniCreatTariff #head");
+                elem[0].click();
+            },0);
+            formSrv.name = "CreatTariff";
+            formSrv.getValid =function () { return (!$scope.head.$pristine || !$scope.bond.$pristine) && $scope.isOpen };
+
         });
+        //return $scope.f;
     };
-    $scope.close= function(){
+
+    $scope.close= function(e){
         if($scope.isOpen){
-            $mdSidenav("miniCreatTariff").close().then(function(){
-                $scope.isOpen = false;
-            });
+            if($scope.head.$pristine && $scope.bond.$pristine  ){
+                $scope.inClose();
+            }else {
+                if($scope.head.$valid && $scope.bond.$valid ){
+                    formSrv.setState("process");
+                    $resource.postMod({type:"Tariff",mod:"Save"},$scope.model,function (response) {
+                        $scope.$parent.NotifAction("ok", "Tarifa creada",[],{autohidden:1500});
+                        tarifForm.set(response.model);
+                        tarifForm.setState("created");
+                        $scope.inClose();
+                        $timeout(function () {
+                            formSrv.setState("continue");$scope.inClose();
+                        },1500)
+                    });
+
+                }else {
+                    formSrv.setState("process");
+                    $scope.$parent.NotifAction("alert", "No se puede crear las tarifa con los datos suministrados ¿Que desea hacer?",
+                        [
+                            {name:"Cancelar la creacion ", default:10,action:
+                                function () { formSrv.setState("continue"); $scope.inClose();}
+
+                            },
+                            {name:"Corregir", action:function () {
+                                formSrv.back= function () {
+                                    $timeout(function () {
+                                        var elem = angular.element("#miniCreatTariff ng-invalid");
+                                        console.log("invlaid", elem);
+                                        elem[0].focus();
+                                        tarifForm.setState("waith");
+                                    },0);
+                                }
+                                formSrv.setState("cancel");
+
+                            }}
+                        ]
+                        ,{block:true});
+                }
+            }
+
         }
 
     };
+    $scope.inClose= function () {
+        $mdSidenav("miniCreatTariff").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+
+    $scope.loadData  = function () {
+
+        masters.query({type:"getCoins"},{}, function (response) {
+            $scope.monedas = response;
+        });
+        $scope.isLoad =true;
+    };
+
+    $scope.loadPorts = function(pais){
+        if(pais != null){
+            $resource.queryMod({type:"Country",mod:"Ports",pais_id:pais.id},{},function (response) {
+                $scope.puertos =response;
+            });
+        }else{
+            $scope.puertos.splice(0,$scope.puertos.length);
+            $scope.puertoSelect =null;
+            $scope.puertoText =undefined
+        }
+
+    };
+
+    $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
+        $scope.paisSelec=newVal;
+    });
+
+    $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
+        $scope.puertoSelect=newVal;
+    });
+    /*
+
+
+     console.log("antes de eidit", $scope.f);
+     $scope.f.isValid = function () {
+     $scope.f.state= "valid";
+     console.log("dentro de valid", this);
+     return $scope.head.$valid && $scope.bond.$valid;
+     };
+     $scope.f.save = function () {
+     console.log("dentro de save", this);
+     $scope.f.state= "saving";
+     $scope.f.state= "save";
+     tarifForm.set($scope.model);
+     tarifForm.setState("save");
+
+
+     return true;
+     };
+     $scope.f.getData = function () {
+     return $scope.model;
+     };*/
+
+
+
 }]);
 
 
@@ -490,44 +1444,99 @@ MyApp.factory('shipment', ['$resource',
     }
 ]);
 
+MyApp.service('tarifForm',function(){
+    var tarifa ={
+        model:{},
+        bind:{estado:"waith"}
+    }
+    return{
+        bind: function () {
+            return tarifa.bind;
+        },
+        set: function (data) {
+            tarifa.model=data;
+        },
+        get: function () {
+            return tarifa.model;
+        },
+        setState: function (data) {
+            console.log("new estat serv", data);
+            tarifa.bind.estado=data;
+        }
+    }
+});
 
-/*
-* obtiene el formulario con el que se esta trabajando
-* */
+MyApp.service('ContainerForm',function(){
+    var dat ={
+        model:{},
+        bind:{estado:"waith"}
+    }
+    return{
+        bind: function () {
+            return dat.bind;
+        },
+        set: function (data) {
+            dat.model=data;
+        },
+        get: function () {
+            return dat.model;
+        },
+        setState: function (data) {
+            console.log("new estat serv", data);
+            dat.bind.estado=data;
+        }
+    }
+});
+
+/**prototipe built**/
 MyApp.service('form',function(){
     var name= "none";
-    var prototype = {
-        isChange : false,
-        state: "waith",
-        save: function(){
-            return true;
-        }
-    };
-    var form = Object.create(prototype);
+    var state = "waith";
+    var back = function () {};
+    var doc ={};
+    var bind = {estado:false};
 
     return {
-        created: function(){
-            return Object.create(prototype);
+        name:name,
+        bind: function () {
+            return bind;
         },
-        setForm: function(setform){
-            form = setform;
+        setBind:function (data) {
+            bind.estado= data;
         },
-        getForm: function (){
-            return form;
+        getValid:function () {
+            return false;
         },
-        setName: function(formName){
-            name = formName;
+        setState: function (data) {
+            state= data;
         },
-        getName: name
+        getState:function () {
+            return state;
+        },
+        setData : function (data) {
+            doc = data;
+        },
+        getData : function () {
+            return doc;
+        },
+        back:back,
+        clear:function () {
+            name="none";
+            valid=false;
+            state="waith";
+        }
+
+
 
 
     }
 });
 
-    /*
-     Servicio que almacena la informacion del embarque
-     */
-MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
+/*
+ Servicio que almacena la informacion del embarque
+ */
+
+MyApp.service('setGetShipment', function(DateParse, shipment) {
 
     var forms ={};
     var interno= 'new';
@@ -542,10 +1551,6 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
         if(!forms[form]){
             forms[form]={};
             exist=false;
-            console.log("from ", form);
-            console.log("fiel ", fiel);
-            console.log("value ", value);
-
         }
 
         if(!forms[form][fiel] ){
@@ -653,9 +1658,44 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
         }
         ,
         setData : function(doc){
-            bindin.estado=false;
-            Shipment= doc;
-            bindin.estado=true;
+            bindin.estado = false;
+
+            shipment.get({type:"Shipment", id:doc.id},{}, function (response) {
+                angular.forEach(response,function (v, k) {
+                    if(typeof (v) == 'string' || v == null){
+                        Shipment[k]=v;
+                    }
+                });
+                Shipment.objs= {};
+                angular.forEach(response.objs,function (v, k) {
+                    Shipment.objs[k]=v;
+                });
+                Shipment.fecha_carga= (response.fecha_carga.value!= null) ? DateParse.toDate(response.fecha_carga.value) : null;
+                Shipment.fecha_vnz= (response.fecha_vnz.value!= null) ? DateParse.toDate(response.fecha_vnz.value) : null;
+                Shipment.fecha_tienda= (response.fecha_tienda.value!= null) ? DateParse.toDate(response.fecha_tienda.value) : null;
+                Shipment.emision = (response.emision!= null) ? DateParse.toDate(response.emision) : null;
+                Shipment.containers = response.containers;
+                Shipment.odcs = response.odcs;
+                Shipment.nro_mbl = {
+                    adjs:response.nro_mbl.adjs,
+                    documento: response.nro_mbl.documento,
+                    emision:(response.nro_mbl.emision== null)? undefined: DateParse.toDate(response.nro_mbl.emision)
+                } ;
+                Shipment.nro_hbl = {
+                    adjs:response.nro_hbl.adjs,
+                    documento: response.nro_hbl.documento,
+                    emision:(response.nro_hbl.emision== null)? undefined: DateParse.toDate(response.nro_hbl.emision)
+                } ;
+                Shipment.nro_dua = {
+                    adjs:response.nro_dua.adjs,
+                    documento: response.nro_dua.documento,
+                    emision:(response.nro_dua.emision== null)? undefined: DateParse.toDate(response.nro_dua.emision)
+                } ;
+                bindin.estado = true;
+
+            });
+
+
 
         },
         reload: function(doc){
@@ -677,6 +1717,151 @@ MyApp.service('setGetShipment', function(DateParse, Order, providers, $q) {
     };
 });
 
+
+/*
+ MyApp.service('setGet', function(DateParse, shipment) {
+
+ var forms ={};
+ var interno= 'new';
+ var externo= 'new';
+ var data={};
+ var bindin ={estado:false, comit:"none"};
+
+ var change = function(form,fiel, value){
+
+ var exist= true;
+
+ if(!forms[form]){
+ forms[form]={};
+ exist=false;
+ }
+
+ if(!forms[form][fiel] ){
+ if(typeof (value) == 'object'){
+
+ angular.forEach(value, function(v2,k2){
+ if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+ forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
+ }
+ });
+ }else{
+ forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
+ }
+ exist=false;
+ console.log("from ", form);
+ console.log("fiel ", fiel);
+ console.log("value ", value);
+ interno='upd';
+ };
+
+ if( exist){
+ if(typeof (value) == 'undefined'){
+ forms[form][fiel].estado='del';
+ forms[form][fiel].trace.push();
+ }else if(forms[form][fiel].original != value  ){
+ forms[form][fiel].v= value;
+ forms[form][fiel].trace.push(value);
+ forms[form][fiel].estado='upd';
+ interno='upd';
+
+ }else
+ if(forms[form][fiel].original == value ){
+ forms[form][fiel].estado='new';
+ forms[form][fiel].trace.push(value);
+ forms[form][fiel].v= value;
+ var band= "new";
+ if(interno != 'new'){
+ angular.forEach(forms[form], function(v,k){
+ angular.forEach(v, function(v2,k2){
+ if(forms[form][fiel].estado != 'new' ){
+ band='upd'
+ }
+ });
+ });
+ interno=band;
+ }
+
+ }
+ }
+
+
+ };
+ return {
+
+ bind:bindin,
+ setBindState: function (data) {
+ bindin.estado= data;
+ },
+ addForm: function(k, field){
+ if(!forms[k]){
+ forms[k]={};
+ angular.forEach(field, function(v,k2){
+ if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
+ forms[k][k2]={original:v, v:v, estado:'new',trace:new Array()};
+ }
+
+ });
+ }else{
+ /!*angular.forEach(field, function(v,k2){
+ if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
+ forms[k][k2].v= v;
+ forms[k][k2].estado='upd';
+ forms[k][k2].trace.push(v);
+ }
+
+ });*!/
+ }
+ },
+ change:function(form,fiel, value){
+ externo='upd';
+ change(form,fiel, value);
+
+ },
+ getForm: function(name){
+ if(name){
+ return forms[name];
+ }
+ else{
+ return forms;
+ }
+ },
+ restore: function(){
+ forms={};
+ interno='new';
+ externo= 'new';
+ Shipment ={};
+ },
+ setState : function(val){
+ externo= val;
+ },
+ getState: function(){
+ return externo;
+ },
+ getInternalState: function(){
+ return interno;
+ },
+ setData : function(doc){
+ data=doc;
+ },
+ reload: function(doc){
+ bindin.estado=false;
+ bindin.estado=true;
+ },
+ getData : function(){
+ return data;
+ },
+ clear: function(){
+ forms ={};
+ interno= 'new';
+ externo= 'new';
+ Shipment={};
+ bindin.estado=false;
+ }
+
+
+ };
+ });
+ */
 MyApp.directive('gridOrderBy', function($timeout) {
 
     return {
@@ -687,10 +1872,10 @@ MyApp.directive('gridOrderBy', function($timeout) {
         },
         link: function(scope, elem, attr, ctrl){},
         template: function(elem, attr){
-    return '<div layout="column" layout-align="end" class="table-filter-order-by" pp="{{model.order}}">' +
+            return '<div layout="column" layout-align="end" class="table-filter-order-by" pp="{{model.order}}">' +
                 '<div ng-click="model.order =\''+ attr.key+'\'" layout="column" layout-align="start"  ><img ng-src=\"{{(model.order == \''+attr.key + '\') ? \'images/TrianguloUp.png\' : \'images/Triangulo_2_claro-01.png\' }}\" > </div>' +
                 '<div ng-click="model.order =\'-'+ attr.key+'\'" >'+'<img ng-src=\"{{(model.order == \'-'+attr.key + '\') ? \'images/TrianguloDown.png\' : \'images/Triangulo_1_claro.png\' }}\"  ></div>'+
-        '</div>';
+                '</div>';
         }
     };
 });
@@ -710,5 +1895,5 @@ MyApp.directive('gridOrderBy', function($timeout) {
 
  */
 MyApp.controller("orderByCtrl", ['$scope', function($scope){
-console.log("$scope", $scope);
+    console.log("$scope", $scope);
 }]);

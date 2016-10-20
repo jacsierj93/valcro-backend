@@ -89,75 +89,7 @@ div[ng-click] * {
     border-bottom:  none;
 
 }
-.cell-filter-order{
-    width: 12px;
-    display: block;
-}
 
-.cell-filter-order > div > img{
-   width: 12px;
-}
-
-.cellGrid input{
-    border: none;
-    background: none;
-    width: 100%;
-}
-.cellGrid:has( input:focus) {
-    border-bottom: none;
-    background-color: #0a6ebd;
-
-}
-
-/**celda que contenga imagenes*/
-.cellGridImg{
-    align-self: flex-end;
-}
-/** div para selecionar, el sidenav */
-
-
-/** celdad de la grilla vacia sin efecto*/
-.cellEmpty{
-    width: 24px;
-    margin: 0px;
-    border: 0px;
-}
-/* para grilla selecionada**/
-.cellSelect:focus{
-
-    border-left: 1px solid rgb(84, 180, 234);
-}
-
-.cellSelect:hover{
-
-    border-left: 1px solid rgb(84, 180, 234);
-}
-
-.cellSelect-select{
-
-    border-left: 1px solid rgb(84, 180, 234);
-}
-
-/**:focus{
-    border-left: 1px solid rgb(84, 180, 234);
-}*/
-.cellSelect{
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    border-bottom: 1px dashed #999999;
-    color: #999999;
-    font-size: 15px;
-    font-weight: 400;
-    display: flex;
-    padding-top: 19px;
-    margin-top: -9px;
-}
-
-.cellSelect.cellEmpty{
-    border-bottom:none;
-    margin-top: 0;
-    padding-top: 8px;
-}
 md-sidenav .md-sidenav-right.md-locked-open{
     /* position: absolute;*/
 }
@@ -166,9 +98,20 @@ md-sidenav .md-sidenav-right.md-locked-open{
     height: 32px;
     margin-bottom: 8px;
 }
+
 .form-row-head.form-row-head-select{
     border-bottom: solid 1.5px rgb(92, 183, 235);
     color: rgb(92, 183, 235);
+}
+.form-row-head-option.form-row-head-select{
+   /* color: rgb(92, 183, 235);*/
+}
+.form-row-head-option div{
+    margin: 0 2px 0 2px;
+    height: 100%;
+}
+.form-row-head-option div:last-child{
+    margin-right: 8px;
 }
 .form-body-select{
     color: rgb(92, 183, 235);
@@ -409,6 +352,85 @@ md-sidenav .md-sidenav-right.md-locked-open{
     width: 8px;
     height: 8px;
 }
+
+.table-row-select div{
+    border-bottom: 1px dashed rgb(84, 180, 234);
+    /*
+    color: rgb(84,180,234);
+    */
+}
+
+.cell-filter-order{
+    width: 12px;
+    display: block;
+}
+
+.cell-filter-order > div > img{
+    width: 12px;
+}
+
+.cellGrid input{
+    border: none;
+    background: none;
+    width: 100%;
+}
+.cellGrid:has( input:focus) {
+    border-bottom: none;
+    background-color: #0a6ebd;
+
+}
+
+/**celda que contenga imagenes*/
+.cellGridImg{
+    align-self: flex-end;
+}
+/** div para selecionar, el sidenav */
+
+
+/** celdad de la grilla vacia sin efecto*/
+.cellEmpty{
+    width: 24px;
+    margin: 0px;
+    border: 0px;
+}
+/* para grilla selecionada**/
+.cellSelect:focus{
+
+    border-left: 1px solid rgb(84, 180, 234);
+}
+
+.cellSelect:hover{
+
+    border-left: 1px solid rgb(84, 180, 234);
+}
+
+.cellSelect-select{
+
+    border-left: 1px solid rgb(84, 180, 234);
+}
+
+/**:focus{
+    border-left: 1px solid rgb(84, 180, 234);
+}*/
+/**review ? */
+.cellSelect{
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    border-bottom: 1px dashed #999999;
+    color: #999999;
+    font-size: 15px;
+    font-weight: 400;
+    display: flex;
+    padding-top: 19px;
+    margin-top: -9px;
+}
+/**review ?*/
+.cellSelect.cellEmpty{
+    border-bottom:none;
+    margin-top: 0;
+    padding-top: 8px;
+}
+
 .loader{
     position: absolute;
     height: 100%;
