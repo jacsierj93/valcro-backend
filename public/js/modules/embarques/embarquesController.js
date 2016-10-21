@@ -35,6 +35,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     };
 
+
     $scope.closeSide = function(){
         $timeout(function () {
             console.log("getvalid",form.getValid());
@@ -47,6 +48,8 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         },500);
 
     };
+
+
     var interval = null;
     $scope.validChangeFor= function () {
         if(form.getState() == "process" && interval == null){
@@ -541,7 +544,7 @@ MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','$filter', functio
     $scope.$parent.listOrdershipment = function(){
         $scope.select ={};
         $scope.LayersAction({open:{name:"listOrdershipment", after: function(){
-                console.log("selectsdfsdfsd",  $scope.select);
+
 
             if($scope.select.id){
                 $resource.getMod({type:"Order", mod:"Order", id:$scope.select.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
@@ -551,7 +554,50 @@ MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','$filter', functio
 
 
         }}});
-    }
+    };
+    $scope.changeAsig = function (data) {
+        console.log("data");
+        var send = {doc_origen_id:data.id, embarque_id:$scope.$parent.shipment.id};
+        if(data.asignado){
+            $resource.postMod({type:"Order", mod:"Save"},send,function (response) {
+                $scope.$parent.NotifAction("ok", "Pedido agregado al embarque",[],{autohidden:1500});
+                if(response.doc_origen_id){
+                    var odc= response.doc_origen_id;
+                    odc.asignado =true;
+                    odc.isTotal = true;
+                    $scope.$parent.shipment.odcs.push(odc)
+                }
+            });
+        }else{
+
+            $scope.$parent.NotifAction("alert", "¿Esta seguro de remover el pedido y todos sus elementos?",
+                [
+                    {name:"Si, estoy seguro", default:6, action:
+                        function () {
+                            $resource.postMod({type:"Order", mod:"Delete"},send,function (response) {
+                                $scope.$parent.NotifAction("ok", "El pedido fue removido",[],{autohidden:1500});
+                                var index = -1;
+                                angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
+                                    if(data.id == v.id){
+                                        index = k;
+                                        return 0;
+                                    }
+                                } );
+
+                                console.log("index", index);
+                                $scope.$parent.shipment.odcs.splice(index,1);
+
+
+                            });
+                        }},
+                    {name:"No", action: function () {
+                        data.asignado = true;
+                    }}
+
+                ],
+                {block:true});
+        }
+    };
     $scope.open = function (data) {
         $scope.select = data;
         $scope.detailOrderShipment(data);
@@ -565,19 +611,60 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment', function($scope, $reso
         data:[]
     };
     $scope.select = {};
+
     $scope.$parent.listOrderAdd = function(){
         $scope.select = {};
-        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id, embarque_id: $scope.$parent.shipment.id},{},function (response) {
-            $scope.tbl.data= response;
-        });
-        $scope.LayersAction({open:{name:"listOrderAdd", after: function(){
 
+        $scope.LayersAction({open:{name:"listOrderAdd", after: function(){
+            $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id, embarque_id: $scope.$parent.shipment.id},{},function (response) {
+                $scope.tbl.data= response;
+            });
         }}});
     }
 
     $scope.changeAsig = function (data) {
         console.log("data");
-    }
+        var send = {doc_origen_id:data.id, embarque_id:$scope.$parent.shipment.id};
+        if(data.asignado){
+            $resource.postMod({type:"Order", mod:"Save"},send,function (response) {
+                $scope.$parent.NotifAction("ok", "Pedido agregado al embarque",[],{autohidden:1500});
+                if(response.doc_origen_id){
+                    var odc= response.doc_origen_id;
+                    odc.asignado =true;
+                    odc.isTotal = true;
+                    $scope.$parent.shipment.odcs.push(odc)
+                }
+            });
+        }else{
+
+            $scope.$parent.NotifAction("alert", "¿Esta seguro de remover el pedido y todos sus elementos?",
+                [
+                    {name:"Si, estoy seguro", default:6, action:
+                        function () {
+                            $resource.postMod({type:"Order", mod:"Delete"},send,function (response) {
+                                $scope.$parent.NotifAction("ok", "El pedido fue removido",[],{autohidden:1500});
+                                var index = -1;
+                                angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
+                                    if(data.id == v.id){
+                                        index = k;
+                                        return 0;
+                                    }
+                                } );
+
+                                console.log("index", index);
+                                $scope.$parent.shipment.odcs.splice(index,1);
+
+
+                            });
+                        }},
+                    {name:"No", action: function () {
+                        data.asignado = true;
+                    }}
+
+                ],
+                {block:true});
+        }
+    };
 
     $scope.open = function (data) {
         $scope.select = data;
@@ -1063,6 +1150,21 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
     $scope.bindForm= form.bind();
 
 
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+        console.log("valida ", newVal);
+        console.log("valida name ", form.name );
+        console.log("valida date ",form.getData() );
+
+        if(newVal && form.name == 'DetailProductShip'){
+            var data = form.getData();
+            console.log("data entro", data);
+            angular.forEach(data, function (v, k) {
+                $scope.prodSelect[k]=v;
+            });
+            console.log("entro",$scope.prodSelect);
+        }
+    });
+
     $scope.$parent.detailOrderShipment = function(data){
         $scope.prodSelect = {};
         $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
@@ -1079,9 +1181,11 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
 
     };
     $scope.open = function (data) {
-        form.name= 'DetailProductShip';
+        form.name = 'DetailProductShip';
+        console.log("name set",form.name);
 
         $scope.prodSelect= data;
+        $scope.$parent.DetailProductShipment(data);
     }
 
 
@@ -1093,6 +1197,21 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
     $scope.prdSelect ={};
     $scope.select={};
     $scope.bindForm= form.bind();
+
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+        console.log("valida ", newVal);
+        console.log("valida name ", form.name );
+        console.log("valida date ",form.getData() );
+
+        if(newVal && form.name == 'DetailProductAdd'){
+            var data = form.getData();
+            console.log("data entro", data);
+            angular.forEach(data, function (v, k) {
+                $scope.prdSelect[k]=v;
+            });
+
+        }
+    });
 
 
 
@@ -1144,7 +1263,6 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
     $scope.close= function(){
 
         if( $scope.isOpen){
-            console.log("sfe ",$scope.select );
             if(parseFloat($scope.select.saldo) == parseFloat($scope.original.saldo)){ $scope.inClose();}else
             if(parseFloat($scope.select.saldo) > parseFloat($scope.original.disponible))
             {
@@ -1189,6 +1307,9 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                         $scope.$parent.shipment.odcs.push(doc);
                     }
                     $scope.select.embarque_id= response.id;
+                    $scope.select.cantidad = response.cantidad;
+                    $scope.select.saldo = response.saldo;
+                    $scope.select.asignado = true;
                     formSrv.setData(angular.copy($scope.select));
                     formSrv.setBind(true);
                     $scope.inClose();
@@ -1206,10 +1327,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
     $scope.$watchGroup(['prod.$valid','prod.$pristine'], function (newVal) {
         if(!newVal[1] && newVal[0]) {
             formSrv.setData($scope.select);
-            console.log(" original ", $scope.original.saldo);
-            console.log(" copy  ", $scope.select.saldo);
             formSrv.setState(($scope.original.saldo != $scope.select.saldo) ? 'upd' :'waith');
-            console.log(" get satate  ", formSrv.getState());
             $scope.prod.$setPristine();
             /*  if(time == null){
              time = $timeout(function () {

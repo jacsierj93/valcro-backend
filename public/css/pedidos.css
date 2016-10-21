@@ -353,7 +353,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
     height: 8px;
 }
 
-.table-row-select div{
+.table-row-select > div:not(.cellEmpty){
     border-bottom: 1px dashed rgb(84, 180, 234);
     /*
     color: rgb(84,180,234);

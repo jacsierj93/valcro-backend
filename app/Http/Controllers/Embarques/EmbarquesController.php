@@ -11,6 +11,7 @@ use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Providers\ProviderAddress;
 use App\Models\Sistema\Purchase\Purchase;
+use App\Models\Sistema\Purchase\PurchaseItem;
 use App\Models\Sistema\Shipments\Container;
 use App\Models\Sistema\Shipments\Shipment;
 use App\Models\Sistema\Shipments\ShipmentAttachment;
@@ -75,26 +76,25 @@ class EmbarquesController extends BaseController
 
     public function getOrdersForAsignment(Request $req){
         $data  = [];
-        $models = Purchase::get();
+        $models = Purchase::selectRaw(
+            'tbl_compra_orden.id,
+             tbl_compra_orden.fecha_producion, 
+             tbl_compra_orden.prov_id, 
+             tbl_compra_orden.fecha_aprob_gerencia, 
+             tbl_compra_orden.fecha_aprob_compra, 
+             tbl_compra_orden.nro_proforma, 
+             tbl_compra_orden.monto, 
+             tbl_compra_orden.mt3 
+             ')
+          ->whereRaw(' (select sum(saldo) from tbl_compra_orden_item where doc_id = tbl_compra_orden.id ) > 0')
+            ->get();
         foreach($models as $aux){
-            $odc = [];
-            $odc['id']=$aux->id;
-            $odc['fecha_producion']=$aux->fecha_producion;
-            $odc['fecha_aprob_gerencia']=$aux->fecha_aprob_gerencia;
-            $odc['fecha_aprob_compra']=$aux->fecha_aprob_compra;
-            $odc['nro_proforma']=$aux->nro_proforma;
-            $odc['nro_proforma']=$aux->nro_proforma;
-            $odc['monto']=$aux->monto;
-            $odc['mt3']=$aux->mt3;
-            $odc['peso']=$aux->peso;
-            $odc['asignado']=false;
-            /*            $odc['isTotal']=0;*/
-            $odc['items'] = $aux->items()->get();
+            $aux->items = $aux->items()->get();
 
             if(sizeof(ShipmentItem::where('doc_origen_id', $aux->id)->where('tipo_origen_id', 23)->where('embarque_id', $req->embarque_id)->get()) > 0){
-                $odc['asignado']=true;
+                $aux->asignado=true;
             }
-            $data[]= $odc;
+            $data[]= $aux;
         }
 
         return $data;
@@ -225,6 +225,7 @@ class EmbarquesController extends BaseController
         }
         return $data ;
     }
+
     public function saveTariff(Request $req){
         $model = new Tariff();
         $model->fregth_forwarder = $req->fregth_forwarder ;
@@ -480,14 +481,28 @@ class EmbarquesController extends BaseController
         $model->descripcion= $req->descripcion;
         $model->doc_origen_id= $req->doc_origen_id;
         $model->origen_item_id= $req->origen_item_id;
-        $model->saldo= $req->saldo;
+
+        if($req->tipo_origen_id == '23'){
+            $odItem = PurchaseItem::findOrFail($req->origen_item_id);
+            $odItem->saldo  = floatval($req->saldo) - floatval($odItem->saldo);
+            $odItem->save();
+            $model->cantidad= $req->saldo;
+            $model->saldo= $req->saldo;
+        }
+        if(!$req->has("cantidad")){
+                $model->cantidad= $req->saldo;
+                $model->saldo= $req->saldo;
+        }else{
+            $model->cantidad= $req->cantidad;
+            $model->saldo= $req->saldo;
+        }
+
 
         $model->save();
-
-        if($req->tipo_origen_id == '23' && !$req->has('id') &&
-            sizeof(ShipmentItem::where('doc_origen_id', $req->doc_origen_id)
-                ->where('embarque_id',$req->origen_item_id)
-                ->get() ) == 1)
+        $itemIns = ShipmentItem::where('doc_origen_id', $req->doc_origen_id)
+            ->where('embarque_id',$req->embarque_id)
+            ->get() ;
+        if($req->tipo_origen_id == '23' && !$req->has('id') && sizeof($itemIns) == 1)
         {
             $pr =  Purchase::find($req->doc_origen_id);
             $items = $pr->items()->get();
@@ -510,7 +525,71 @@ class EmbarquesController extends BaseController
 
         }
         $result['id']= $model->id;
+        $result['saldo']=$model->saldo;
+        $result['cantidad']= $odItem->cantidad;
+        $result['sizeOf']=$itemIns;
 
+
+        return $result;
+
+    }
+
+    public function SaveOrder (Request $req){
+        $odcItem = PurchaseItem::where('doc_id', $req->doc_origen_id)->get();
+        $shipITem = ShipmentItem::where('tipo_origen_id', '23')->where('embarque_id', $req->embarque_id)->get();
+        $isNew = true;
+        $new  = [];
+        $old  = [];
+        $return =['accion'=>'new'];
+        foreach ($odcItem as $aux){
+            if(floatval($aux) > 0){
+            if(sizeof($shipITem->where('origen_item_id',  $aux->id)) == 0){
+                $it = new ShipmentItem();
+                $it->tipo_origen_id = '23' ;
+                $it->embarque_id= $req->embarque_id;
+                $it->descripcion= $aux->descripcion;
+                $it->doc_origen_id= $req->doc_origen_id;
+                $it->origen_item_id= $aux->id;
+                $it->cantidad = $aux->saldo;
+                $it->saldo = $aux->saldo;
+                $aux->saldo= 0;
+                $aux->save();
+                $it->save();
+                $new[]=['pItem'=>$aux, 'shipItem'=>$it];
+            }else{
+                $return['accion'] = 'upd';
+                $isNew = false;
+                $it= $shipITem->where('origen_item_id',  $aux->id)->first();
+                $dif = floatval($aux->saldo) - floatval($it->cantidad);
+                $it->cantidad = floatval($it->cantidad) +$dif;
+                $it->saldo = floatval($it->cantidad) +$dif;
+                $aux->saldo= 0;
+                $aux->save();
+                $it->save();
+                $old[]=['pItem'=>$aux, 'shipItem'=>$it, 'dif'=>$dif];
+            }
+            }
+        }
+        if($isNew){
+            $return['doc_origen_id']= Purchase::findOrFail($req->doc_origen_id);
+        }
+        $return['old']=$old;
+        $return['new']=$new;
+        return $return;
+    }
+
+    public function DeleteOrder (Request $req){
+        $result =['accion'=>'del'];
+        $shipItems = ShipmentItem::where('tipo_origen_id', '23')->where('doc_origen_id', $req->doc_origen_id)->get();
+        $odcItems = PurchaseItem::where('doc_id')->get();
+        $result['restore'] =[];
+        foreach($shipItems as $aux){
+            $it = $odcItems->where('id', $aux->origen_item_id)->first();
+            $it->saldo = floatval($it->saldo) + floatval($aux->cantidad);
+            $it->save();
+            $result['restore'][]=  $it;
+            $aux->destroy($aux->id);
+        }
         return $result;
 
     }
@@ -541,7 +620,6 @@ class EmbarquesController extends BaseController
         return $aux;
     }
 
-
     public function getOrdersAsignmentModel($model){
         $models = Purchase::selectRaw(
             'tbl_compra_orden.id ,
@@ -557,8 +635,6 @@ class EmbarquesController extends BaseController
             ->groupBy('tbl_embarque_item.doc_origen_id')
             ->get();
         $data = [];
-        //dd($models);
-
         foreach($models as $aux){
             $odc = [];
             $odc['id']=$aux->id;
@@ -590,9 +666,6 @@ class EmbarquesController extends BaseController
 
 
     }
-
-
-
 
     /************************* Another module ***********************************/
 

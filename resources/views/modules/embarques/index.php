@@ -1075,14 +1075,14 @@
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailOrder" id="detailOrder"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "detailOrderShipmentCtrl" >
                 <div layout="column" flex>
-                    <form layout="row">
+                    <form layout="row" class="focused">
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div layout="row" class="focused" style="border-bottom: solid 1.5px rgb(92, 183, 235);height: 33px;">
-                                <div layout="row" >
+                            <div layout="row" >
+                                <div layout="row"  class="form-row-head form-row-head-select" flex >
                                     <div class="titulo_formulario" style="height: 39px;" flex>
                                         <div>
-                                            <span style="color: rgb(92, 183, 235);">Detalle de Pedido Agregado</span>
+                                            <div >Detalle de Pedido Agregado</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1247,16 +1247,16 @@
                             <div active-left  ></div>
                             <div layout="column" flex>
                                 <div   ng-repeat="item in select.prods | filter : tbl.filter:strict as filter "   >
-                                    <div layout="row" class="cellGridHolder" ng-click="$parent.DetailProductShipment(item)" >
-                                        <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;">
-                                            <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeAsig(item)"> </md-switch>
+                                    <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(prodSelect.id == item.id)}" >
+                                        <div  ng-click="open(item)" class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;">
+                                            <md-switch ng-disabled="true" class="md-primary" ng-model="item.asignado" ng-change="changeAsig(item)"> </md-switch>
                                         </div>
-                                        <div flex class="cellGrid" >{{item.codigo}}</div>
-                                        <div flex class="cellGrid" >{{item.cod_fabrica}}</div>
-                                        <div flex class="cellGrid" >{{item.descripcion}}</div>
-                                        <div flex class="cellGrid" >{{item.origen.text}}</div>
-                                        <div flex class="cellGrid" >{{item.cantidad}}</div>
-                                        <div flex class="cellGrid" >{{item.saldo}}</div>
+                                        <div flex class="cellGrid" ng-click="open(item)">{{item.codigo}}</div>
+                                        <div flex class="cellGrid" ng-click="open(item)" >{{item.cod_fabrica}}</div>
+                                        <div flex class="cellGrid" ng-click="open(item)" >{{item.descripcion}}</div>
+                                        <div flex class="cellGrid" ng-click="open(item)" >{{item.origen.text}}</div>
+                                        <div flex class="cellGrid" ng-click="open(item)" >{{item.cantidad}}</div>
+                                        <div flex class="cellGrid" ng-click="open(item)" >{{item.saldo}}</div>
 
                                     </div>
                                 </div>
@@ -1276,14 +1276,14 @@
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="detailOrderAdd" id="detailOrderAdd"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "detailOrderAddCtrl" >
                 <div layout="column" flex>
-                    <form layout="row">
+                    <form layout="row" class="focused">
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div layout="row" class="focused" style="border-bottom: solid 1.5px rgb(92, 183, 235);height: 33px;">
-                                <div layout="row" >
-                                    <div class="titulo_formulario" style="height: 39px;" flex>
+                            <div layout="row" >
+                                <div layout="row"  class="form-row-head form-row-head-select " flex>
+                                    <div class="titulo_formulario" flex>
                                         <div>
-                                            <span style="color: rgb(92, 183, 235);">Detalle de Pedido</span>
+                                            <span >Detalle de Pedido</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1352,10 +1352,10 @@
                     <div layout="column" flex>
                         <div layout="row" class="focused" >
                             <div active-left  ></div>
-                            <div layout="row" >
-                                <div class="titulo_formulario"  class="form-row-head form-row-head-select" flex>
+                            <div layout="row"  class="row" class="form-row-head form-row-head-select " >
+                                <div class="titulo_formulario"  flex>
                                     <div>
-                                        <span style="color: rgb(92, 183, 235);">Productos</span>
+                                        <span >Productos</span>
                                     </div>
                                 </div>
                             </div>
@@ -1470,7 +1470,7 @@
                     <div layout="row"  >
                         <div active-left ></div>
                         <div flex layout="row" class="form-row-head form-row-head-select" >
-                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                            <div class="titulo_formulario row" flex>
                                 <div>
                                     <span style="">Tarifas</span>
                                 </div>
@@ -1981,6 +1981,9 @@
                         <div layout="column" flex>
                             <div   ng-repeat="item in $parent.shipment.odcs | filter : tbl.filter:strict as filter "    >
                                 <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}"  >
+                                    <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;">
+                                        <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeAsig(item)"> </md-switch>
+                                    </div>
                                     <div flex class="cellGrid" ng-click="open(item)" >{{item.id}}</div>
                                     <div flex class="cellGrid" ng-click="open(item)" >{{item.fecha_produccion | date :'dd/MM/yyyy' }}</div>
                                     <div flex class="cellGrid" ng-click="open(item)"  >{{item.fecha_aprob_gerencia | date :'dd/MM/yyyy' }}</div>
@@ -2009,8 +2012,8 @@
                 <div layout="column" flex="70"  style="padding-right: 8px;">
                     <div layout="row" class="focused">
                         <div active-left ></div>
-                        <div layout="row" flex style="border-bottom: solid 1.5px rgb(92, 183, 235);height: 33px;">
-                            <div class="titulo_formulario" style="height: 39px;" flex>
+                        <div layout="row" flex class="form-row-head form-row-head-select" >
+                            <div class="titulo_formulario row" flex >
                                 <div>
                                     <span style="">Productos agregados</span>
                                 </div>
@@ -3049,7 +3052,7 @@
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Disponible </div>
                             <div class="rms" flex> {{select.disponible}}</div>
                             <md-tooltip >
-                               disponible para asignacion
+                                disponible para asignacion
                             </md-tooltip>
                         </div>
                         <div layout="row" >
@@ -3140,5 +3143,4 @@
         <div ng-controller="FilesController" ng-include="template"></div>
 
     </div>
-
 </div>
