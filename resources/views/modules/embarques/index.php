@@ -1877,6 +1877,7 @@
                     <div layout="row">
                         <div active-left  ></div>
                         <div layout="row"  flex style="padding-right: 4px;">
+                            <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;"></div>
                             <div flex layout="row" class="table-filter-head">
 
                                 <md-input-container class="md-block"  flex>
@@ -2199,8 +2200,8 @@
                 <div layout="column" flex>
                     <div layout="row" class="focused">
                         <div active-left ></div>
-                        <div layout="row" flex>
-                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                        <div layout="row"  class="form-row-head form-row-head-select"  flex>
+                            <div class="titulo_formulario" flex>
                                 <div>
                                     <span style="">Productos por culminar</span>
                                 </div>
@@ -2211,6 +2212,7 @@
                     <div layout="row">
                         <div active-left  ></div>
                         <div layout="row"  flex style="padding-right: 4px;">
+                            <div class="cellEmpty" style="width: 40px;margin: 0 2px 0 2px;"></div>
                             <div flex layout="row" class="table-filter-head">
 
                                 <md-input-container class="md-block"  flex>
@@ -2234,7 +2236,6 @@
                                 <grid-order-by ng-model="tbl" key="cod_profic"></grid-order-by>
 
                             </div>
-
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>Descripcion</label>
@@ -2246,7 +2247,6 @@
                                 <grid-order-by ng-model="tbl" key="fecha_aprob_gerencia"></grid-order-by>
 
                             </div>
-
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>
                                     <label>Cantidad</label>
@@ -2257,7 +2257,6 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="nro_proforma"></grid-order-by>
                             </div>
-
                             <div flex layout="row" class="table-filter-head" >
                                 <md-input-container class="md-block"  flex>
                                     <label>c/u</label>
@@ -2278,19 +2277,25 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="mt3"></grid-order-by>
                             </div>
-                            <div style="width: 32px"> </div>
                         </div>
                     </div>
                     <form layout="row"  class="gridContent" flex>
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div   ng-repeat="item in tbl.data "   id="shipments{{$index}}"  >
-                                <div layout="row" class="cellGridHolder" >
-                                    <div flex class="cellGrid" >{{item.titulo}}</div>
-                                    <div layout="column"  layout-align="center center" class="cellGrid cellEmpty" style="width: 32px;" ng-click="$parent.historyProduct(item)"><div> H</div></div>
+                            <div   ng-repeat="item in tbl.data | filter : tbl.filter as filter"   id="shipments{{$index}}"  >
+                                <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}" >
+                                    <div class="cellEmpty" style=" width: 40px;margin: 0 2px 0 2px;" ng-click="changeAsig(item)">
+                                        <md-switch class="md-primary" ng-disabled="true" ng-model="item.asignado" > </md-switch>
+                                    </div>
+                                    <div flex class="cellGrid" >{{item.codigo}}</div>
+                                    <div flex class="cellGrid" >{{item.codigo_fabrica}}</div>
+                                    <div flex class="cellGrid" >{{item.descripcion}}</div>
+                                    <div flex class="cellGrid" >{{item.cantidad}}</div>
+                                    <div flex class="cellGrid" >{{item.precio}}</div>
+                                    <div flex class="cellGrid" >{{item.total}}</div>
                                 </div>
                             </div>
-                            <div layout="column" layout-align="center center" flex>
+                            <div layout="column" layout-align="center center" flex ng-show=" filter.length == 0">
                                 No hay datos para mostrar
                             </div>
                         </div>
@@ -3045,7 +3050,21 @@
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cantidad </div>
                             <div class="rms" flex> {{select.cantidad}}</div>
                             <md-tooltip >
-                                Cantidad en el pedido
+                                Cantidad Pedida
+                            </md-tooltip>
+                        </div>
+                        <div layout="row" ng-show="select.precio">
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Precio </div>
+                            <div class="rms" flex> {{select.precio}}</div>
+                            <md-tooltip >
+                               Precio de venta actual
+                            </md-tooltip>
+                        </div>
+                        <div layout="row" ng-show="select.total">
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Total</div>
+                            <div class="rms" flex> {{select.total}}</div>
+                            <md-tooltip >
+                               Total a pagar
                             </md-tooltip>
                         </div>
                         <div layout="row" >

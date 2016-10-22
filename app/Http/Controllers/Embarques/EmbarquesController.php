@@ -27,6 +27,8 @@ use Validator;
 class EmbarquesController extends BaseController
 {
     private  $user = null;
+    private $minAproxDay = 100;
+
 
     public function __construct(Request $req)
     {
@@ -78,7 +80,7 @@ class EmbarquesController extends BaseController
         $data  = [];
         $models = Purchase::selectRaw(
             'tbl_compra_orden.id,
-             tbl_compra_orden.fecha_producion, 
+             tbl_compra_orden.fecha_produccion, 
              tbl_compra_orden.prov_id, 
              tbl_compra_orden.fecha_aprob_gerencia, 
              tbl_compra_orden.fecha_aprob_compra, 
@@ -335,7 +337,7 @@ class EmbarquesController extends BaseController
         $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision,'adjs'=> $model->attachmentsFile("nro_dua") ];
 
         // items
-        $data['items'] = $model->items();
+        $data['items'] = $model->items()->get();
 
         // odc
         $data['odcs']= $this->getOrdersAsignmentModel($model->id);
@@ -534,6 +536,15 @@ class EmbarquesController extends BaseController
 
     }
 
+    public function DeleteOrderItem(Request $req){
+        $result =['accion'=>'del'];
+        $result['id']= $req->id;
+        $model = ShipmentItem::findOrFail($req->id);
+
+        $result['response'] = ShipmentItem::destroy($model->id);
+        return $result;
+    }
+
     public function SaveOrder (Request $req){
         $odcItem = PurchaseItem::where('doc_id', $req->doc_origen_id)->get();
         $shipITem = ShipmentItem::where('tipo_origen_id', '23')->where('embarque_id', $req->embarque_id)->get();
@@ -594,6 +605,55 @@ class EmbarquesController extends BaseController
 
     }
 
+
+    /************************* products for finishes ***********************************/
+//DATEDIFF
+    public function getFinishedProduc(Request $req){
+        $data=[];
+        $Shipmodels = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+
+        $models = PurchaseItem::selectRaw('
+         distinct tbl_compra_orden_item.id, '.
+            'tbl_compra_orden_item.saldo as cantidad,'.
+            'tbl_compra_orden_item.descripcion,'.
+            'tbl_compra_orden_item.doc_id,'.
+            '(tbl_producto.precio  * tbl_compra_orden_item.saldo) as total ,'.
+            'tbl_compra_orden.fecha_produccion,'.
+            'tbl_producto.codigo,'.
+            'tbl_producto.codigo_fabrica,'.
+            ' tbl_lineas.linea,'.
+            ' tbl_prov_tiempo_fab.min_dias,'.
+            ' tbl_prov_tiempo_fab.max_dias,'.
+            ' DATEDIFF(ADDDATE(tbl_compra_orden.fecha_produccion, interval tbl_prov_tiempo_fab.min_dias DAY ), CURDATE()) as minDAys,'.
+            ' ADDDATE(tbl_compra_orden.fecha_produccion, interval tbl_prov_tiempo_fab.min_dias DAY ) as minProducion,'.
+            ' ADDDATE(tbl_compra_orden.fecha_produccion, interval tbl_prov_tiempo_fab.max_dias DAY ) as maxProducion,'.
+            'tbl_producto.precio'
+        )
+            ->rightJoin('tbl_producto','tbl_producto.id','=','tbl_compra_orden_item.producto_id' )
+            ->join('tbl_compra_orden','tbl_compra_orden.id','=','tbl_compra_orden_item.doc_id' )
+            ->leftJoin('tbl_lineas','tbl_lineas.id','=','tbl_producto.linea_id' )
+            ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
+            ->where('saldo','>', 0)
+            ->whereRaw('DATEDIFF(ADDDATE(tbl_compra_orden.fecha_produccion, interval tbl_prov_tiempo_fab.min_dias DAY ), CURDATE()) < '.$this->minAproxDay)
+            ->get();
+
+        foreach ($models as $aux){
+            $item = $Shipmodels->where('origen_item_id', $aux->id);
+            if(sizeof($item) == 0){
+                $aux->asignado = false;
+                $aux->saldo = 0;
+            }else{
+                $aux->asignado = true;
+                $aux->saldo = $item->first()->saldo;
+                $aux->embarque_item_id = $item->first()->id;
+            }
+            $data[]= $aux;
+        }
+
+//*dd($data);
+        return $data;
+    }
+
     /************************* Private opt master ***********************************/
     private function getFirstProducto($model){
         $aux = $model->replicate();
@@ -623,7 +683,7 @@ class EmbarquesController extends BaseController
     public function getOrdersAsignmentModel($model){
         $models = Purchase::selectRaw(
             'tbl_compra_orden.id ,
-            tbl_compra_orden.fecha_producion ,
+            tbl_compra_orden.fecha_produccion ,
             tbl_compra_orden.fecha_aprob_gerencia ,tbl_compra_orden.fecha_aprob_compra ,
             tbl_compra_orden.nro_proforma ,
             tbl_compra_orden.monto,

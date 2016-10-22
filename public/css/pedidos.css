@@ -393,6 +393,11 @@ md-sidenav .md-sidenav-right.md-locked-open{
     margin: 0px;
     border: 0px;
 }
+
+.cellEmpty:has(md-switch){
+    width: 40px;
+    margin: 0 2px 0 2px;
+}
 /* para grilla selecionada**/
 .cellSelect:focus{
 

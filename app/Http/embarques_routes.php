@@ -22,6 +22,7 @@ $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
 $app->post('embarques/Save', 'Embarques\EmbarquesController@saveShipment');
 $app->post('embarques/Attachment/Save', 'Embarques\EmbarquesController@SaveAttachment');
 $app->post('embarques/OrderItem/Save', 'Embarques\EmbarquesController@SaveOrderItem');
+$app->post('embarques/OrderItem/Delete', 'Embarques\EmbarquesController@DeleteOrderItem');
 $app->post('embarques/Order/Save', 'Embarques\EmbarquesController@SaveOrder');
 $app->post('embarques/Order/Delete', 'Embarques\EmbarquesController@DeleteOrder');
 
@@ -29,3 +30,7 @@ $app->post('embarques/Order/Delete', 'Embarques\EmbarquesController@DeleteOrder'
 $app->get('embarques/Order/List', 'Embarques\EmbarquesController@getOrdersForAsignment');
 $app->get('embarques/Order/Asigment', 'Embarques\EmbarquesController@getOrdersAsignment');
 $app->get('embarques/Order/Order', 'Embarques\EmbarquesController@getOrder');
+
+
+//productos odc
+$app->get('embarques/Order/Products', 'Embarques\EmbarquesController@getFinishedProduc');

@@ -535,7 +535,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
 
 }]);
 
-MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','$filter', function($scope,$resource,$filter){
+MyApp.controller('listOrdershipmentCtrl',['$scope','shipment', function($scope,$resource){
     $scope.tbl ={
         order:"id",
         filter:{}
@@ -689,18 +689,79 @@ MyApp.controller('listProducttshipmentCtrl',['$scope', function($scope){
     }
 }]);
 
-MyApp.controller('listProductAddCtrl',['$scope', function($scope,$mdSidenav){
+MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($scope,$resource, formSrv){
     $scope.tbl ={
         order:"id",
         filter:{},
         data:[]
     };
+
+    $scope.bindForm= formSrv.bind();
+    $scope.select ={};
+
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+
+
+        if(newVal && formSrv.name == 'DetailProductProduc'){
+            var data = formSrv.getData();
+            console.log("data entro", data);
+            angular.forEach(data, function (v, k) {
+                $scope.select[k]=v;
+            });
+            console.log("entro",$scope.select);
+        }
+    });
+    $scope.select = {};
     $scope.$parent.listProductAdd = function(){
+        $scope.select = {};
+        console.log("in sciep", $scope.$parent);
+        $resource.queryMod({type:"Order", mod:"Products", embarque_id:$scope.$parent.shipment.id},{}, function (response) {
+            $scope.tbl.data = response;
+        });
         $scope.LayersAction({open:{name:"listProductAdd", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+
         }}});
     };
+
+    /**change asignado en clik espcial */
+    $scope.changeAsig = function (data) {
+        console.log("data", data);
+        if(!data.asignado){
+            formSrv.name= 'DetailProductProduc';
+            $scope.$parent.DetailProductShipment(data);
+            $scope.select = data;
+        }else{
+            $scope.$parent.NotifAction("alert", "¿Esta seguro de eliminar el producto ?",
+                [
+                    {name:"Si, estoy seguro", action:
+                        function () {
+                         var send = {id:data.embarque_item_id};
+                            $resource.postMod({type:"OrderItem", mod:"Delete"},send,function (response){
+                                $scope.$parent.NotifAction("ok", "El producto fue removido",[], {autohidden:1500});
+                                var index = -1;
+                                angular.forEach($scope.$parent.shipment.items,function (v, k) {
+                                    if(data.embarque_item_id == v.id){
+                                        index = k;
+                                        return 0;
+                                    }
+                                } );
+                                console.log(" hola mundo", index);
+                                $scope.$parent.shipment.items.splice(index,1);
+
+
+                            });
+
+                        }
+                    },
+                    {name:"No", action:function () {
+
+                    }
+                    }
+                ],
+                {block:true});
+        }
+    }
+
 }]);
 
 MyApp.controller('historyProductCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
@@ -1151,9 +1212,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
 
 
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-        console.log("valida ", newVal);
-        console.log("valida name ", form.name );
-        console.log("valida date ",form.getData() );
+
 
         if(newVal && form.name == 'DetailProductShip'){
             var data = form.getData();
@@ -1267,7 +1326,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
             if(parseFloat($scope.select.saldo) > parseFloat($scope.original.disponible))
             {
                 formSrv.setState("process");
-                $scope.$parent.NotifAction("alert", "la cantidad indicada excede el disponible en el pedido",
+                $scope.$parent.NotifAction("alert", "la cantidad indicada excede el disponible ",
                     [
                         {name: "Corregir" ,
                             action: function () {
@@ -1306,7 +1365,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                         doc.asignado= true;
                         $scope.$parent.shipment.odcs.push(doc);
                     }
-                    $scope.select.embarque_id= response.id;
+                    $scope.select.embarque_item_id= response.id;
                     $scope.select.cantidad = response.cantidad;
                     $scope.select.saldo = response.saldo;
                     $scope.select.asignado = true;
@@ -1329,23 +1388,6 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
             formSrv.setData($scope.select);
             formSrv.setState(($scope.original.saldo != $scope.select.saldo) ? 'upd' :'waith');
             $scope.prod.$setPristine();
-            /*  if(time == null){
-             time = $timeout(function () {
-             console.log("time up", formSrv.bind())
-             formSrv.setData($scope.select);
-             formSrv.setBind(true)
-
-             }, 500);
-             }else{
-             $timeout.cancel(time);
-             time = $timeout(function () {
-             console.log("time up dfsd", formSrv.bind());
-             formSrv.setData($scope.select);
-             formSrv.setBind(true)
-
-             }, 500);
-
-             }*/
         }
     });
 
