@@ -16,6 +16,8 @@ use App\Models\Sistema\Shipments\Container;
 use App\Models\Sistema\Shipments\Shipment;
 use App\Models\Sistema\Shipments\ShipmentAttachment;
 use App\Models\Sistema\Shipments\ShipmentItem;
+use App\Models\Sistema\Tariffs\FreigthForwarder;
+use App\Models\Sistema\Tariffs\Naviera;
 use App\Models\Sistema\Tariffs\Tariff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -219,6 +221,19 @@ class EmbarquesController extends BaseController
         return json_encode(Ports::select("id","Main_port_name","pais_id")->where('pais_id', $req->pais_id)->get());
     }
 
+
+
+    public function getFreight_Forwarder(Request $req){
+        $models = FreigthForwarder::selectRaw('distinct tbl_freight_forwarder.id,tbl_freight_forwarder.nombre')
+            ->join('tbl_naviera','tbl_naviera.freight_forwarder_id','=','tbl_freight_forwarder.id' )
+            ->join('tbl_tarifa','tbl_naviera.id','=','tbl_tarifa.naviera_id' )
+            ->where('tbl_tarifa.pais_id', $req->pais_id);
+
+        ;
+
+
+        return $models;
+    }
     public function getTariffs(Request $req){
         $data= [];
         $model =Tariff::where('puerto_id', $req->puerto_id)->get();
@@ -231,7 +246,6 @@ class EmbarquesController extends BaseController
 
     public function saveTariff(Request $req){
         $model = new Tariff();
-        $model->fregth_forwarder = $req->fregth_forwarder ;
         $model->pais_id = $req->pais_id ;
         $model->puerto_id = $req->puerto_id ;
         $model->moneda_id = $req->moneda_id ;
@@ -272,6 +286,32 @@ class EmbarquesController extends BaseController
         }
         $model->save();
         return['accion'=>'new', 'id'=>$model->id, 'model'=>Tariff::findOrFail($model->id)];
+    }
+
+    public function saveFreight_Forwarder( Request $req){
+        $model = new FreigthForwarder();
+        $result['accion']= 'new';
+        if($req->has('id')){
+            $model = FreigthForwarder::findOrFail($req->id);
+        }
+        $model->nombre= $req->nombre;
+        $model->save();
+
+        $result['model']= FreigthForwarder::find($model->id);
+        return $result;
+    }
+
+    public function saveNaviera( Request $req){
+        $model = new Naviera();
+        $result['accion']= 'new';
+        if($req->has('id')){
+
+        }
+        $model->nombre= $req->nombre;
+        $model->save();
+
+        $result['model']= Naviera::find($model->id);
+        return $result;
     }
 
     /************************* CONTAINERS ***********************************/

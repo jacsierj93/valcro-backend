@@ -693,13 +693,14 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
     $scope.bindForm= formSrv.bind();
 
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-
-
         if(newVal && formSrv.name == 'DetailProductProducShip'){
             var data = formSrv.getData();
-            console.log("data entro", data);
+            if(data.response && data.response.accion == 'del' ){
+                angular.forEach($scope.select, function (v, k) {
+                    $scope.select[k]= undefined;
+                })
+            }
 
-            console.log("entro",$scope.select);
         }
     });
     $scope.isUpdate = false;
@@ -718,7 +719,7 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
 
     $scope.update = function () {
         if(!$scope.select.id){
-
+            $scope.$parent.NotifAction("error", "Por favor selecione un articulo primero", [], {autohidden:2000});
         }else{
 
             formSrv.name= 'DetailProductProducShip';
@@ -735,8 +736,8 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
                 codigo:$scope.select.codigo,
                 doc_origen_id:$scope.select.doc_origen_id
             };
-            console.log("dara", data);
             $scope.$parent.DetailProductShipment(data);
+
 
         }
 
@@ -759,13 +760,12 @@ MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($sco
         if(newVal && formSrv.name == 'DetailProductProduc'){
             var data = formSrv.getData();
             console.log("data entro", data);
+
             angular.forEach(data, function (v, k) {
                 $scope.select[k]=v;
             });
             console.log("entro",$scope.select);
-            /*if(data.model){
-             $scope.$parent.shipment.items.push(data.model);
-             }*/
+
         }
     });
     $scope.select = {};
@@ -802,6 +802,9 @@ MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($sco
                                         return 0;
                                     }
                                 } );
+                                $scope.select.asignado= false;
+                                $scope.select.cantidad= response.cantidad;
+
                                 console.log(" hola mundo", index);
                                 $scope.$parent.shipment.items.splice(index,1);
 
@@ -1396,7 +1399,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
 
             if(parseFloat($scope.select.saldo) == parseFloat($scope.original.saldo)){ $scope.inClose();}
             else if(parseFloat($scope.select.saldo) == 0){
-                if($scope.select.id){
+                if($scope.select.id || $scope.select.embarque_item_id ){
                     formSrv.setState("process");
                     $scope.$parent.NotifAction("error", "Si establece 0 como valor el articulo sera removido ¿Desea continuar ?",[
                         {name: "Si, deseo quitar el articulo" ,
@@ -1414,7 +1417,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
 
                                     $scope.$parent.shipment.items.splice(index,1);
                                     $scope.select.response = response;
-                                    console.log("respon se", response);
+
                                     if(response.rm_odc){
                                         var index = -1;
                                         angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
@@ -1429,7 +1432,6 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
 
 
                                     }
-
 
                                     $timeout(function () {
                                         formSrv.setData(angular.copy($scope.select));
@@ -1464,6 +1466,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
 
                     ], {block:true});
                 }else{
+
                     $scope.inClose();
                 }
 
@@ -1601,6 +1604,10 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.ffSelect =null;
     $scope.ffText = undefined;
 
+    $scope.nv =[];
+    $scope.nvSelect =null;
+    $scope.nvText = undefined;
+
     $scope.paisSelec =null;
     $scope.pais_idText =undefined;
 
@@ -1619,19 +1626,32 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         $scope.bond.$setUntouched();
         $mdSidenav("miniCreatTariff").open().then(function(){
             $scope.isOpen = true;
-            if(!$scope.isLoad){
-                $scope.loadData();
-            }
+
+
             $timeout(function () {
                 var elem = angular.element("#miniCreatTariff #head");
                 elem[0].click();
             },0);
             formSrv.name = "CreatTariff";
+/*
             formSrv.getValid =function () { return (!$scope.head.$pristine || !$scope.bond.$pristine) && $scope.isOpen };
+*/
 
         });
         //return $scope.f;
     };
+
+    $scope.createdFF = function (data) {
+        console.log("ff create", data);
+        $resource.postMod({type:"Freight_Forwarder", mod:"Save"}, data, function (response) {
+           if(response.accion == 'new'){
+               $scope.ff.push(response.model);
+               $scope.loadFF();
+           }
+        })
+
+    };
+
 
     $scope.close= function(e){
         if($scope.isOpen){
@@ -1705,8 +1725,17 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
     };
 
+    $scope.loadFF = function () {
+        if($scope.$parent.shipment.pais_id){
+            $resource.getMod({type:"Freight_Forwarder", mod:"List"},{paisd_id:newVal.id}, function (response) {
+                $scope.ff= response;
+            });
+        }
+
+    }
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
         $scope.paisSelec=newVal;
+
     });
 
     $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){

@@ -2808,6 +2808,63 @@
                                             ></md-datepicker >
                                         </md-input-container class="md-block" flex >
                                     </div>
+
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Freight Forwarder</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex  >
+                                            <md-autocomplete md-selected-item="ffSelect"
+                                                             info="Selecione el Freight Forwarder"
+                                                             required
+                                                             skip-tab
+                                                             md-search-text="ffText"
+                                                             md-items="item in ff | stringKey : ffText : 'nombre' "
+                                                             md-item-text="item.nombre"
+                                                             md-autoselect = "true"
+                                                             md-no-asterisk
+                                                             md-min-length="1"
+                                                             md-no-cache="true"
+                                                             ng-disabled="paisSelec == null"
+
+                                            >
+                                                <md-item-template>
+                                                    <span>{{item.nombre}}</span>
+                                                </md-item-template>
+                                                <md-not-found >
+                                                    <a ng-href="#" ng-click="createdFF(ffText)"> Crear {{ffText}}</a>
+
+                                                </md-not-found>
+                                            </md-autocomplete>
+                                            </md-input-container>
+                                    </div>
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Naviera</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex  >
+                                            <md-autocomplete md-selected-item="nvSelect"
+                                                             info="Selecione la naviera a usar"
+                                                             required
+                                                             skip-tab
+                                                             md-search-text="nvText"
+                                                             md-items="item in nv | stringKey : nvText : 'nombre' "
+                                                             md-item-text="item.nombre"
+                                                             md-autoselect = "true"
+                                                             md-no-asterisk
+                                                             md-min-length="0"
+                                                             md-no-cache="true"
+                                                             ng-disabled="ffSelect == null"
+
+                                            >
+                                                <md-item-template>
+                                                    <span>{{item.nombre}}</span>
+                                                </md-item-template>
+
+                                            </md-autocomplete>
+                                        </md-input-container>
+                                    </div>
+
                                     <div layout="row" class="row">
                                         <div layout="row" flex="50" >
                                             <div layout="column" layout-align="center center">T/T </div>
@@ -2816,22 +2873,6 @@
                                             <input  type="text" ng-model="model.dias_tt" decimal required >
                                         </md-input-container>
                                         <md-tooltip >Transito Terrestre</md-tooltip>
-                                    </div>
-                                    <div layout="row" class="row">
-                                        <div layout="row" flex="50">
-                                            <div layout="column" layout-align="center center">Fregth Forwarder</div>
-                                        </div>
-                                        <md-input-container class="md-block" flex >
-                                            <input ng-model="model.fregth_forwarder" required />
-                                        </md-input-container>
-                                    </div>
-                                    <div layout="row" class="row">
-                                        <div layout="row" flex="50">
-                                            <div layout="column" layout-align="center center">Naviera</div>
-                                        </div>
-                                        <md-input-container class="md-block" flex >
-                                            <input ng-model="model.naviera" />
-                                        </md-input-container>
                                     </div>
                                     <div layout="row" class="row">
                                         <div layout="row" flex="50" >
