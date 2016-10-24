@@ -39,12 +39,18 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.closeSide = function(){
         $timeout(function () {
             console.log("getvalid",form.getValid());
-            if(!form.getValid()){
+
+            if(form.getState() == "process"){
+                $scope.validChangeFor();
+            }else {
                 interval= null;
                 $scope.LayersAction({close:{search:true}});
-            }else {
-                $scope.validChangeFor();
             }
+            /*if(!form.getValid()){
+
+            }if(form.getState() == "process"){ $scope.validChangeFor();}else {
+                $scope.validChangeFor();
+            }*/
         },500);
 
     };
@@ -52,11 +58,15 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     var interval = null;
     $scope.validChangeFor= function () {
-        if(form.getState() == "process" && interval == null){
+        if(form.getState() == "process" ){
+           if(interval != null){
+               $interval.cancel(interval);
+           }
             interval= $interval(function () {
                 console.log("interval", form.getState());
                 if(form.getState() == "continue"){
                     $scope.LayersAction({close:{search:true}});
+                    $interval.cancel(interval);
                     interval= null;
                 }else if(form.getState() == "cancel"){
                     if(form.back){
@@ -674,18 +684,62 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment', function($scope, $reso
 
 }]);
 
-MyApp.controller('listProducttshipmentCtrl',['$scope', function($scope){
+MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, formSrv){
     $scope.tbl ={
         order:"id",
         filter:{},
         data:[]
     };
+    $scope.bindForm= formSrv.bind();
+
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+
+
+        if(newVal && formSrv.name == 'DetailProductProducShip'){
+            var data = formSrv.getData();
+            console.log("data entro", data);
+
+            console.log("entro",$scope.select);
+        }
+    });
+    $scope.isUpdate = false;
+    $scope.select = {};
     $scope.$parent.listProductshipment = function(){
-        console.log("tratando de abrir");
+        $scope.select = {};
         $scope.LayersAction({open:{name:"listProductshipment", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+            $scope.isUpdate = false;
+
         }}});
+    }
+
+    $scope.open =  function (data) {
+        $scope.select = data;
+    }
+
+    $scope.update = function () {
+        if(!$scope.select.id){
+
+        }else{
+
+            formSrv.name= 'DetailProductProducShip';
+            var data = {
+                embarque_item_id:$scope.select.id,
+                tipo_origen_id:$scope.select.tipo_origen_id,
+                descripcion:$scope.select.descripcion,
+                origen_item_id:$scope.select.origen_item_id,
+                producto_id:$scope.select.producto_id,
+                saldo:$scope.select.cantidad,
+                cantidad:$scope.select.cantidad,
+                codigo_fabrica:$scope.select.codigo_fabrica,
+                disponible:$scope.select.disponible,
+                codigo:$scope.select.codigo,
+                doc_origen_id:$scope.select.doc_origen_id
+            };
+            console.log("dara", data);
+            $scope.$parent.DetailProductShipment(data);
+
+        }
+
     }
 }]);
 
@@ -709,6 +763,9 @@ MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($sco
                 $scope.select[k]=v;
             });
             console.log("entro",$scope.select);
+            /*if(data.model){
+             $scope.$parent.shipment.items.push(data.model);
+             }*/
         }
     });
     $scope.select = {};
@@ -735,7 +792,7 @@ MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($sco
                 [
                     {name:"Si, estoy seguro", action:
                         function () {
-                         var send = {id:data.embarque_item_id};
+                            var send = {id:data.embarque_item_id};
                             $resource.postMod({type:"OrderItem", mod:"Delete"},send,function (response){
                                 $scope.$parent.NotifAction("ok", "El producto fue removido",[], {autohidden:1500});
                                 var index = -1;
@@ -1202,7 +1259,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     };
 }]);
 
-// detalle de peido agregado
+// detalle de peido agregado mark
 MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function($scope, $resource, form){
     $scope.isOpen = false;
     $scope.tbl ={data:[]};
@@ -1220,6 +1277,16 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
             angular.forEach(data, function (v, k) {
                 $scope.prodSelect[k]=v;
             });
+            if(data.response){
+                if(data.response.accion == 'del' && data.response.cantidad){
+                    $scope.prodSelect.saldo = 0;
+                    $scope.prodSelect.embarque_item_id = undefined;
+                    $scope.prodSelect.asignado = false;
+                    $scope.prodSelect.cantidad = data.response.cantidad;
+                    $scope.prodSelect.disponible = data.response.cantidad;
+                }
+
+            }
             console.log("entro",$scope.prodSelect);
         }
     });
@@ -1234,8 +1301,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
         } );
 
         $scope.$parent.LayersAction({open:{name:"detailOrder", after: function(){
-            $scope.tbl.data.splice(0,$scope.tbl.data.length);
-            $scope.tbl.data.push({id:-1});
+
         }}});
 
     };
@@ -1244,6 +1310,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
         console.log("name set",form.name);
 
         $scope.prodSelect= data;
+
         $scope.$parent.DetailProductShipment(data);
     }
 
@@ -1258,16 +1325,20 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
     $scope.bindForm= form.bind();
 
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-        console.log("valida ", newVal);
-        console.log("valida name ", form.name );
-        console.log("valida date ",form.getData() );
-
         if(newVal && form.name == 'DetailProductAdd'){
             var data = form.getData();
-            console.log("data entro", data);
             angular.forEach(data, function (v, k) {
                 $scope.prdSelect[k]=v;
             });
+            if(data.response){
+                if(data.response.accion == 'del' && data.response.cantidad){
+                    $scope.prdSelect.saldo = 0;
+                    $scope.prdSelect.embarque_item_id = undefined;
+                    $scope.prdSelect.cantidad = data.response.cantidad;
+                    $scope.prdSelect.disponible = data.response.cantidad;
+                }
+            }
+
 
         }
     });
@@ -1322,7 +1393,81 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
     $scope.close= function(){
 
         if( $scope.isOpen){
-            if(parseFloat($scope.select.saldo) == parseFloat($scope.original.saldo)){ $scope.inClose();}else
+
+            if(parseFloat($scope.select.saldo) == parseFloat($scope.original.saldo)){ $scope.inClose();}
+            else if(parseFloat($scope.select.saldo) == 0){
+                if($scope.select.id){
+                    formSrv.setState("process");
+                    $scope.$parent.NotifAction("error", "Si establece 0 como valor el articulo sera removido ¿Desea continuar ?",[
+                        {name: "Si, deseo quitar el articulo" ,
+                            action: function () {
+                                var send = {id:$scope.select.embarque_item_id};
+                                $resource.postMod({type:"OrderItem", mod:"Delete"},send,function (response){
+                                    $scope.$parent.NotifAction("ok", "El articulo fue removido",[], {autohidden:1500});
+                                    var index = -1;
+                                    angular.forEach($scope.$parent.shipment.items,function (v, k) {
+                                        if(send.id == v.id){
+                                            index = k;
+                                            return 0;
+                                        }
+                                    } );
+
+                                    $scope.$parent.shipment.items.splice(index,1);
+                                    $scope.select.response = response;
+                                    console.log("respon se", response);
+                                    if(response.rm_odc){
+                                        var index = -1;
+                                        angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
+                                            if(response.rm_odc == v.id){
+                                                index = k;
+                                                return 0;
+                                            }
+                                        } );
+                                        if(index != -1){
+                                            $scope.$parent.shipment.odcs.splice(index,1);
+                                        }
+
+
+                                    }
+
+
+                                    $timeout(function () {
+                                        formSrv.setData(angular.copy($scope.select));
+                                        formSrv.setBind(true);
+                                        $scope.inClose();
+                                        formSrv.setState("continue");
+                                    },1500);
+
+
+                                });
+
+
+                            }
+                        },
+                        {name: "No, dejame corregirlo" ,
+                            action: function () {
+                                formSrv.setState("cancelar");
+                                var ele= angular.element("#miniDetailProductShipment #input");
+                                ele.click();
+                                ele.focus();
+
+                            }
+                        },
+                        {name: "Cancelar" ,
+                            action: function () {
+                                formSrv.setBind(true);
+                                $scope.inClose();
+                                formSrv.setState("continue");
+
+                            }
+                        }
+
+                    ], {block:true});
+                }else{
+                    $scope.inClose();
+                }
+
+            }else
             if(parseFloat($scope.select.saldo) > parseFloat($scope.original.disponible))
             {
                 formSrv.setState("process");
@@ -1348,13 +1493,14 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
             }
             else{
                 var send = {
-                    id:$scope.select.embarque_id,
+                    id:$scope.select.embarque_item_id,
                     descripcion: $scope.select.descripcion,
                     origen_item_id: $scope.select.id,
                     saldo: $scope.select.saldo,
                     tipo_origen_id:23,
                     embarque_id: $scope.$parent.shipment.id ,
-                    doc_origen_id: $scope.select.doc_id
+                    doc_origen_id: $scope.select.doc_id,
+                    producto_id: $scope.select.producto_id
                 };
                 $resource.postMod({type:"OrderItem", mod:"Save"},send, function (response) {
 
@@ -1364,10 +1510,15 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                         var doc = angular.copy(response.doc_origen_id);
                         doc.asignado= true;
                         $scope.$parent.shipment.odcs.push(doc);
+
+                    }
+                    if(response.accion == 'new'){
+                        $scope.$parent.shipment.items.push(response.model);
                     }
                     $scope.select.embarque_item_id= response.id;
                     $scope.select.cantidad = response.cantidad;
                     $scope.select.saldo = response.saldo;
+                    $scope.select.model = response.model;
                     $scope.select.asignado = true;
                     formSrv.setData(angular.copy($scope.select));
                     formSrv.setBind(true);
@@ -1836,6 +1987,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 Shipment.emision = (response.emision!= null) ? DateParse.toDate(response.emision) : null;
                 Shipment.containers = response.containers;
                 Shipment.odcs = response.odcs;
+                Shipment.items = response.items;
                 Shipment.nro_mbl = {
                     adjs:response.nro_mbl.adjs,
                     documento: response.nro_mbl.documento,

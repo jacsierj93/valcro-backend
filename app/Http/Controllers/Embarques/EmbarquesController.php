@@ -177,6 +177,7 @@ class EmbarquesController extends BaseController
             $prd->asignado= false;
             if((sizeof($item) != 0)){
                 $prd->saldo =  $item[0]->saldo;
+                $prd->embarque_item_id =  $item[0]->id;
                 $data['asinado']= true; $prd->asignado = true;
             }
             $item =  ShipmentItem::selectRaw("sum(saldo) as in_uso ")->where('doc_origen_id','<>', $model->id)->where('tipo_origen_id', '23')->where('origen_item_id',$aux->id)->first();
@@ -337,7 +338,33 @@ class EmbarquesController extends BaseController
         $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision,'adjs'=> $model->attachmentsFile("nro_dua") ];
 
         // items
-        $data['items'] = $model->items()->get();
+        $Mitems  =ShipmentItem::selectRaw(
+            'tbl_embarque_item.id,'.
+            'tbl_embarque_item.embarque_id,'.
+            'tbl_embarque_item.descripcion,'.
+            'tbl_embarque_item.saldo,'.
+            'tbl_embarque_item.cantidad,'.
+            'tbl_embarque_item.origen_item_id,'.
+            'tbl_embarque_item.producto_id,'.
+            'tbl_embarque_item.tipo_origen_id,'.
+            'tbl_embarque_item.doc_origen_id,'.
+            'tbl_embarque_item.id as embarque_item_id,'.
+            ' tbl_producto.codigo,'.
+            ' tbl_producto.codigo_fabrica,'.
+            ' tbl_producto.precio,'.
+            '(tbl_producto.precio  * tbl_embarque_item.cantidad) as total '
+        )
+            ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+            ->get();
+        $data['items'] = [];
+        foreach ($Mitems as $aux){
+            if($aux->tipo_origen_id == '23'){
+               $p = PurchaseItem::find($aux->origen_item_id);
+                $aux->disponible= floatval($p->saldo);
+            }
+            $data['items'][] = $aux;
+        }
+
 
         // odc
         $data['odcs']= $this->getOrdersAsignmentModel($model->id);
@@ -476,6 +503,12 @@ class EmbarquesController extends BaseController
         if($req->has('id')){
             $model = ShipmentItem::findOrFail($req->id);
             $result['accion'] = 'upd';
+            if($req->tipo_origen_id == '23'){
+                $odItem = PurchaseItem::findOrFail($req->origen_item_id);
+                $odItem->saldo  = floatval($odItem->saldo) + floatval($model->cantidad);
+                $odItem->save();
+                $result['restoire']= $odItem->saldo ;
+            }
         }
 
         $model->tipo_origen_id= $req->tipo_origen_id;
@@ -483,13 +516,15 @@ class EmbarquesController extends BaseController
         $model->descripcion= $req->descripcion;
         $model->doc_origen_id= $req->doc_origen_id;
         $model->origen_item_id= $req->origen_item_id;
+        $model->producto_id= $req->producto_id;
 
-        if($req->tipo_origen_id == '23'){
+        if($req->tipo_origen_id == '23' ){
             $odItem = PurchaseItem::findOrFail($req->origen_item_id);
             $odItem->saldo  = floatval($req->saldo) - floatval($odItem->saldo);
             $odItem->save();
             $model->cantidad= $req->saldo;
             $model->saldo= $req->saldo;
+            $result['daa']=$odItem->saldo;
         }
         if(!$req->has("cantidad")){
                 $model->cantidad= $req->saldo;
@@ -528,8 +563,23 @@ class EmbarquesController extends BaseController
         }
         $result['id']= $model->id;
         $result['saldo']=$model->saldo;
-        $result['cantidad']= $odItem->cantidad;
+        $result['cantidad']= $odItem->saldo;
         $result['sizeOf']=$itemIns;
+        $result['model']= ShipmentItem::selectRaw(
+            'tbl_embarque_item.id,'.
+            'tbl_embarque_item.embarque_id,'.
+            'tbl_embarque_item.descripcion,'.
+            'tbl_embarque_item.saldo,'.
+            'tbl_embarque_item.cantidad,'.
+            'tbl_embarque_item.id as embarque_item_id,'.
+            ' tbl_producto.codigo,'.
+            ' tbl_producto.codigo_fabrica,'.
+            ' tbl_producto.precio,'.
+            '(tbl_producto.precio  * tbl_embarque_item.cantidad) as total '
+        )
+            ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+            ->where('tbl_embarque_item.id', $model->id)
+            ->get()->first();
 
 
         return $result;
@@ -541,7 +591,28 @@ class EmbarquesController extends BaseController
         $result['id']= $req->id;
         $model = ShipmentItem::findOrFail($req->id);
 
+        if($model->tipo_origen_id=='23'){
+            $pr = PurchaseItem::findOrFail($model->origen_item_id);
+            $pr->saldo = floatval($model->cantidad) + floatval( $pr->saldo);
+            $pr->save();
+            $result['cantidad']=$pr->saldo;
+        }
         $result['response'] = ShipmentItem::destroy($model->id);
+
+        $resta = ShipmentItem::where('tipo_origen_id','23')
+            ->where('doc_origen_id',$model->doc_origen_id)
+            ->where('embarque_id',$model->embarque_id)
+            ->get();
+        $result['resta']= $resta;
+
+        if($model->tipo_origen_id =='23'){
+            if(sizeof( $resta)== 0 ){
+                $result['rm_odc']=$model->doc_origen_id;
+            }
+        }
+
+
+
         return $result;
     }
 
@@ -607,7 +678,6 @@ class EmbarquesController extends BaseController
 
 
     /************************* products for finishes ***********************************/
-//DATEDIFF
     public function getFinishedProduc(Request $req){
         $data=[];
         $Shipmodels = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
@@ -617,6 +687,7 @@ class EmbarquesController extends BaseController
             'tbl_compra_orden_item.saldo as cantidad,'.
             'tbl_compra_orden_item.descripcion,'.
             'tbl_compra_orden_item.doc_id,'.
+            'tbl_compra_orden_item.producto_id,'.
             '(tbl_producto.precio  * tbl_compra_orden_item.saldo) as total ,'.
             'tbl_compra_orden.fecha_produccion,'.
             'tbl_producto.codigo,'.
@@ -692,6 +763,7 @@ class EmbarquesController extends BaseController
         )->where('embarque_id',$model)
             ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=','tbl_compra_orden.id' )
             ->where('tipo_origen_id', '23')
+            ->whereNull('tbl_embarque_item.deleted_at')
             ->groupBy('tbl_embarque_item.doc_origen_id')
             ->get();
         $data = [];
