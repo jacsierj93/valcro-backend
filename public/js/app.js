@@ -605,8 +605,10 @@ MyApp.directive('info', function($timeout,setNotif) {
                         if(model.matches.length > 0 && (model.scope.searchText!=undefined && model.scope.searchText != "")){
                             model.scope.selectedItem = model.matches[0];
                         }else{
+                            if(!attrs.$attr.vlNoClear){
+                                model.scope.searchText = undefined;
+                            }
 
-                            model.scope.searchText = undefined;
                         }
                     }
 

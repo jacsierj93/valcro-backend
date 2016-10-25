@@ -17,7 +17,6 @@ class Shipment extends Model
     use SoftDeletes;
     protected $table = "tbl_embarque";
     protected $dates = ['deleted_at'];
-    protected  $adjuntos =[];
     /**
      * adjuntos del documento
      */
@@ -57,6 +56,8 @@ class Shipment extends Model
     public function items(){
         return $this->hasMany('App\Models\Sistema\Shipments\ShipmentItem', 'embarque_id');
     }
+
+
 
 
     /**

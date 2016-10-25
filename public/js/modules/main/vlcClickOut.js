@@ -33,10 +33,12 @@
                             || (angular.element(event.target).is("[ngf-select]"))
                             || (angular.element(event.target).parents("#lyrAlert").length>0)
                             || (angular.element(event.target).parents(".md-autocomplete-suggestions").length>0)
+                            || (angular.element(event.target).parents(".md-calendar-month-label").length>0)
                             || (angular.element(event.target).parents(".md-calendar-date").length>0)){
                             //console.log("igonrado==>",angular.element(event.target))
                             return;
                         }
+
                         /*end Jacsiel code*/
                         clickOutHandler(scope, {$event: event});
                         scope.$apply();

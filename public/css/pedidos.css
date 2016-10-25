@@ -346,7 +346,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 }
 
 .table-filter-head{
-    margin: 0 4px 0 4px;
+    padding: 0 4px 0 4px;
 }
 .table-filter-order-by img {
     width: 8px;

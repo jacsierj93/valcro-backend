@@ -16,13 +16,7 @@ class FreigthForwarder extends Model
     protected $table = "tbl_freight_forwarder";
     protected $dates = ['deleted_at'];
 
-    /**
-     * navieras
-     */
-    public function navieras(){
-        return $this->hasMany('App\Models\Sistema\Tariffs\Naviera', 'freight_forwarder_id');
 
-    }
 
 }
 

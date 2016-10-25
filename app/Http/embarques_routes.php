@@ -6,10 +6,9 @@ $app->get('embarques/Uncloset', 'Embarques\EmbarquesController@getUncloset');
 //Tariff
 $app->get('embarques/Country/Ports', 'Embarques\EmbarquesController@getPortCountry');
 $app->get('embarques/Tariff/List', 'Embarques\EmbarquesController@getTariffs');
-$app->get('embarques/Tariff/List', 'Embarques\EmbarquesController@getTariffs');
-$app->post('embarques/Freight_Forwarder/List', 'Embarques\EmbarquesController@getFreight_Forwarder');
-$app->post('embarques/Freight_Forwarder/Save', 'Embarques\EmbarquesController@saveFreight_Forwarder');
-$app->post('embarques/Naviera/Save', 'Embarques\EmbarquesController@saveNaviera');
+$app->get('embarques/Freight_Forwarder/List', 'Embarques\EmbarquesController@getFreightForwarder');
+$app->get('embarques/Naviera/List', 'Embarques\EmbarquesController@getNaviera');
+$app->post('embarques/Tariff/Save', 'Embarques\EmbarquesController@saveTariff');
 
 // containers
 $app->post('embarques/Container/Save', 'Embarques\EmbarquesController@saveContainer');
@@ -22,6 +21,7 @@ $app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
+$app->get('embarques/Shipment/Dates', 'Embarques\EmbarquesController@getShipmentDates');
 $app->post('embarques/Save', 'Embarques\EmbarquesController@saveShipment');
 $app->post('embarques/Attachment/Save', 'Embarques\EmbarquesController@SaveAttachment');
 $app->post('embarques/OrderItem/Save', 'Embarques\EmbarquesController@SaveOrderItem');

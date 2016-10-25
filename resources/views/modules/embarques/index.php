@@ -786,7 +786,7 @@
 
                                 <md-input-container flex>
                                     <label>Freigth Forwarder</label>
-                                    <input  ng-model="$parent.shipment.objs.tarifa_id.fregth_forwarder"
+                                    <input  ng-model="$parent.shipment.objs.tarifa_id.freight_forwarder.nombre"
                                             ng-disabled="($parent.shipment.objs.tarifa_id.tbl_tarifa || $parent.shipment.objs.tarifa_id.tbl_tarifa == null) "
                                             ng-readonly="true"
                                             skip-tab
@@ -794,7 +794,7 @@
                                 </md-input-container>
                                 <md-input-container flexs>
                                     <label>Naviera</label>
-                                    <input  ng-model="$parent.shipment.objs.tarifa_id.naviera"
+                                    <input  ng-model="$parent.shipment.objs.tarifa_id.naviera.nombre"
                                             ng-readonly="true"
                                             ng-disabled="($parent.shipment.objs.tarifa_id.tbl_tarifa || $parent.shipment.objs.tarifa_id.tbl_tarifa == null) "
                                             skip-tab
@@ -1464,7 +1464,7 @@
         <!------------------------------------------- lista de tarifas------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="listTariff" id="listTariff"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "listTariffCtrl" >
-                <div layout="column" flex="70">
+                <div layout="column" flex >
                     <div layout="row"  >
                         <div active-left ></div>
                         <div flex layout="row" class="form-row-head form-row-head-select" >
@@ -1474,7 +1474,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <form layout="row" name="tariffF1">
                         <div active-left ></div>
@@ -1536,192 +1535,182 @@
                             </div>
                         </div>
                     </form>
-                    <div layout="row">
+
+                    <div layout="row" flex >
                         <div active-left  ></div>
-                        <div layout="row"  flex style="padding-right: 4px;">
-                            <div flex layout="row" class="table-filter-head">
+                        <div layout="column" flex style="overflow: auto;">
+                            <div layout="row" >
+                                <div style="min-width: 254px;" layout="row" class="table-filter-head" >
+                                    <md-input-container class="md-block" flex >
+                                        <label>Freigth Forwarder</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.freigth_forwarder_id"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="freigth_forwarder_id"></grid-order-by>
+                                </div>
+                                <div style="min-width: 254px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>Naviera</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.naviera_id"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="naviera_id"></grid-order-by>
+                                </div>
+                                <div style="min-width: 254px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>Puerto</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.puerto_id"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="puerto_ide"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>T/T</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.dias_tt"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="dias_tt"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>D/L</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.dl"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="dl"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>GRT</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.grt"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="grt"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>Documento</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.documento"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="documento"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>Mensajeria</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.mensajeria"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="mensajeria"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>Seguros</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.mensajeria"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="seguros"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>Consolidacion</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.consolidacion"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="seguros"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>20' SD </label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.sd20"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="sd20"></grid-order-by>
 
-                                <md-input-container class="md-block"  flex>
-                                    <label>T/T</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.dias_tt"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <grid-order-by ng-model="tbl" key="dias_tt"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>40' SD</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.sd40"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="sd40"></grid-order-by>
 
-                            </div>
-                            <div flex layout="row" class="table-filter-head">
-                                <md-input-container class="md-block"  flex>
-                                    <label>20' SD </label>
-                                    <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.sd20"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <grid-order-by ng-model="tbl" key="sd20"></grid-order-by>
-
-                            </div>
-                            <div flex layout="row" class="table-filter-head">
-                                <md-input-container class="md-block"  flex>
-                                    <label>40' SD</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.sd40"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <grid-order-by ng-model="tbl" key="sd40"></grid-order-by>
-
-                            </div>
-                            <div flex layout="row" class="table-filter-head">
-                                <md-input-container class="md-block"  flex>
-                                    <label>40' HC</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.hc40"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <grid-order-by ng-model="tbl" key="hc40"></grid-order-by>
-                            </div>
-                            <div flex layout="row" class="table-filter-head" >
-                                <md-input-container class="md-block"  flex>
-                                    <label>40' OT</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.ot40"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <grid-order-by ng-model="tbl" key="ot40"></grid-order-by>
-                            </div>
-
-                        </div>
-                    </div>
-                    <form layout="row"  class="gridContent" flex>
-                        <div active-left  ></div>
-                        <div layout="column" flex>
-                            <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict as filter "   id="row{{$index}}" ng-click="setData(item)" >
-                                <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(tarifaSelect.id == item.id)}" >
-                                    <div flex class="cellGrid" >{{item.dias_tt}}</div>
-                                    <div flex class="cellGrid">{{item.sd20}}</div>
-                                    <div flex class="cellGrid" >{{item.sd40}}</div>
-                                    <div flex class="cellGrid">{{item.hc40}}</div>
-                                    <div flex class="cellGrid" >{{item.ot40}}</div>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head">
+                                    <md-input-container class="md-block"  flex>
+                                        <label>40' HC</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.hc40"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="hc40"></grid-order-by>
+                                </div>
+                                <div style="min-width: 102px;" layout="row" class="table-filter-head" >
+                                    <md-input-container class="md-block"  flex>
+                                        <label>40' OT</label>
+                                        <input type="text" class="inputFilter"  ng-minlength="2"
+                                               ng-model="tbl.filter.ot40"
+                                               skip-tab
+                                        >
+                                    </md-input-container>
+                                    <grid-order-by ng-model="tbl" key="ot40"></grid-order-by>
                                 </div>
                             </div>
-                            <div layout="column" layout-align="center center" ng-show="filter.length == 0" flex>
-                                No hay datos para mostrar
+
+                            <div layout="column" flex id="resss" style="width: 1884px;overflow-y: auto;">
+                                <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict as filter "   id="row{{$index}}" ng-click="setData(item)" >
+                                    <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(tarifaSelect.id == item.id)}" style="width: 1884px;">
+                                        <div style="width: 250px; min-width: 250px; " class="cellGrid" >{{item.objs.freight_forwarder_id.nombre}}</div>
+                                        <div style="width: 250px;min-width: 250px;  " class="cellGrid" >{{item.objs.naviera_id.nombre}}</div>
+                                        <div style="width: 250px;min-width: 250px;  " class="cellGrid" >{{item.objs.puerto_id.Main_port_name}}</div>
+                                        <div style="width: 98px;min-width: 98px; " class="cellGrid" >{{item.dias_tt}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.dl}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.grt}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid">{{item.sd20}}</div>
+                                        <div style="width: 98px;min-width: 98px;  " class="cellGrid" >{{item.sd40}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid">{{item.hc40}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.ot40}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.ot40}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.ot40}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.ot40}}</div>
+                                        <div style="width: 98px;min-width: 98px;" class="cellGrid" >{{item.ot40}}</div>
+                                    </div>
+                                </div>
+                                <div layout="column" layout-align="center center" ng-show="filter.length == 0" flex>
+                                    No hay datos para mostrar
+                                </div>
                             </div>
-                        </div>
 
-                    </form>
-
-                </div>
-                <div layout="column" flex class="gridContent" style="margin:0 0 0 4px">
-                    <div  layout="row" class="form-row-head form-row-head-select" >
-                        <div class="titulo_formulario" flex>
-                            <div>
-                                <span >Bondades</span>
-                            </div>
                         </div>
                     </div>
-                    <div layout="row" >
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Freigth Fowarder</div>
-                        <div class="rms" flex> {{tarifaSelect.fregth_forwarder}}</div>
-                        <md-tooltip >
-                            Compañia de traslado
-                        </md-tooltip>
-                    </div>
-                    <div layout="row" >
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Naviera</div>
-                        <div class="rms" flex>  {{tarifaSelect.naviera}}</div>
-                        <md-tooltip >
-                            Naviera
-                        </md-tooltip>
-                    </div>
-                    <div layout="row" >
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Puerto</div>
-                        <div class="rms" flex>  {{tarifaSelect.objs.puerto_id.Main_port_name}}</div>
-                        <md-tooltip >
-                            Puerto de salida
-                        </md-tooltip>
-                    </div>
 
-                    <div layout="row" >
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">T/T</div>
-                        <div class="rms" flex>  {{tarifaSelect.dias_tt}}</div>
-                        <md-tooltip >
-                            Tiempo de transito
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">GRT</div>
-                        <div class="rms" flex>  {{tarifaSelect.grt}}</div>
-                        <md-tooltip >
-                            Compañia de traslado
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="row"flex >
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Documento</div>
-                        <div class="rms" flex> {{tarifaSelect.documento}}</div>
-                        <md-tooltip >
-                            Costo en documento
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Mensajeria</div>
-                        <div class="rms" flex> {{tarifaSelect.mensajeria}}</div>
-                        <md-tooltip >
-                            Compañia de mensajeria
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Seguros</div>
-                        <div class="rms" flex> {{tarifaSelect.seguro}}</div>
-                        <md-tooltip >
-                            Costo de seguro
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Consolidacion</div>
-                        <div class="rms" flex> {{tarifaSelect.consolidacion}}</div>
-                        <md-tooltip >
-                            Costo de consolidacion
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">20'SD</div>
-                        <div class="rms" flex> {{tarifaSelect.sd20}}</div>
-                        <md-tooltip >
-                            Costo container 20'SD
-                        </md-tooltip>
-                    </div>
-                    <div layout="row"flex >
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">40'SD</div>
-                        <div class="rms" flex> {{tarifaSelect.sd40}}</div>
-                        <md-tooltip >
-                            Costo de container 40 ' SD
-                        </md-tooltip>
-                    </div>
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">40'HC</div>
-                        <div class="rms" flex> {{tarifaSelect.hc40}}</div>
-                        <md-tooltip >
-                            costo de container 40' HC
-                        </md-tooltip>
-                    </div>
-                    <div layout="row" flex>
-                        <div layout="row" flex="50" style="color: rgb(84, 180, 234);">40'OT</div>
-                        <div class="rms" flex> {{tarifaSelect.ot40}}</div>
-                        <md-tooltip >
-                            costo de container 40'OT
-                        </md-tooltip>
-                    </div>
                 </div>
             </md-content>
 
@@ -2186,9 +2175,9 @@
                                 Codigo de fabrica
                             </md-tooltip>
                         </div>
-                        </div>
                     </div>
                 </div>
+
             </md-content>
 
         </md-sidenav>
@@ -2659,90 +2648,78 @@
                         </div>
                     </div>
                     <div flex class="gridContent" layout="column" style="padding-right:4px">
+                        <md-input-container class="md-block"   >
+                            <label>Linea</label>
+                            <md-autocomplete md-selected-item="lineaSelec"
+                                             info="Linea del producto "
+                                             required
+                                             skip-tab
+                                             md-search-text="lineaText"
+                                             md-auto-select="true"
+                                             md-items="item in lineas | stringKey : lineaText : 'linea' "
+                                             md-item-text="item.linea"
+                                             md-autoselect = "true"
+                                             md-no-asterisk
+                                             md-min-length="0"
+                                             md-require-match="true"
+                                             md-no-cache="true"
+                                             md-select-on-match
+                                             md-selected-item-change="model.lineas_id = lineaSelec.id;"
+                            >
+                                <md-item-template>
+                                    <span>{{item.linea}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+                        </md-input-container>
+                        <md-input-container class="md-block"   >
+                            <label>Almacen</label>
+                            <md-autocomplete md-selected-item="almacnSelect"
+                                             info="Linea del producto "
+                                             skip-tab
+                                             md-search-text="almacnText"
+                                             md-auto-select="true"
+                                             md-items="item in almacn | stringKey : almacnText : 'linea' "
+                                             md-item-text="item.nombre"
+                                             md-autoselect = "true"
+                                             md-no-asterisk
+                                             md-min-length="0"
+                                             md-require-match="true"
+                                             md-no-cache="true"
+                                             md-select-on-match
+                                             md-selected-item-change="model.almacenes_id = almacnSelect.id;"
+                            >
+                                <md-item-template>
+                                    <span>{{item.linea}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+                        </md-input-container>
                         <md-input-container class="md-block" >
                             <label>Codigo</label>
-                            <input  type="text" ng-model="prod.cod"  tabindex="-1" >
+                            <input  type="text" ng-model="model.codigo"  >
 
                         </md-input-container>
                         <md-input-container class="md-block" >
                             <label>Cod. Profit</label>
-                            <input  type="text" ng-model="prod.cod_profit"  tabindex="-1" >
+                            <input  type="text" ng-model="model.codigo_profit"   >
 
                         </md-input-container>
-                        <md-input-container class="md-block" >
+<!--                        <md-input-container class="md-block" >
                             <label>Cod. fabrica</label>
-                            <input  type="text" ng-model="prod.cod_fabrica"  tabindex="-1" >
+                            <input  type="text" ng-model="model.codigoo_fabrica"  >
 
-                        </md-input-container>
+                        </md-input-container>-->
                         <md-input-container class="md-block" >
                             <label>Cod. Barra</label>
-                            <input  type="text" ng-model="prod.cod_barra"  tabindex="-1" >
+                            <input  type="text" ng-model="model.codigo_barra"   >
                         </md-input-container>
 
                         <md-input-container class="md-block" >
                             <label>Precio</label>
-                            <input  type="text" ng-model="prod.precio"  tabindex="-1" >
+                            <input  type="text" ng-model="model.precio"  >
                         </md-input-container>
-                        <md-input-container class="md-block"   >
-                            <label>Linea</label>
-                            <md-autocomplete md-selected-item="autoCp.provSele.select"
-                                             info="Seleccione el proveedor del embarque"
-                                             required
-                                             ng-disabled="( session.isBlock )"
-                                             ng-click="$parent.toEditHead('prov_id', provSelect.id)"
-                                             id="prov_id"
-                                             skip-tab
-                                             md-search-text="autoCp.provSele.text"
-                                             md-auto-select="true"
-                                             md-items="item in $parent.provs | stringKey : autoCp.provSele.text : 'razon_social' "
-                                             md-item-text="item.razon_social"
-                                             md-autoselect = "true"
-                                             md-no-asterisk
-                                             md-min-length="0"
-                                             md-require-match="true"
-                                             md-no-cache="true"
-                                             md-select-on-match
-                            >
-                                <md-item-template>
-                                    <span>{{item.razon_social}}</span>
-                                </md-item-template>
-                                <md-not-found >
-                                    No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
-                                </md-not-found>
-                            </md-autocomplete>
-                        </md-input-container>
-                        <md-input-container class="md-block"   >
-                            <label>Sub-linea</label>
-                            <md-autocomplete md-selected-item="autoCp.provSele.select"
-                                             info="Seleccione el proveedor del embarque"
-                                             required
-                                             ng-disabled="( session.isBlock )"
-                                             ng-click="$parent.toEditHead('prov_id', provSelect.id)"
-                                             id="prov_id"
-                                             skip-tab
-                                             md-search-text="autoCp.provSele.text"
-                                             md-auto-select="true"
-                                             md-items="item in $parent.provs | stringKey : autoCp.provSele.text : 'razon_social' "
-                                             md-item-text="item.razon_social"
-                                             md-autoselect = "true"
-                                             md-no-asterisk
-                                             md-min-length="0"
-                                             md-require-match="true"
-                                             md-no-cache="true"
-                                             md-select-on-match
-                            >
-                                <md-item-template>
-                                    <span>{{item.razon_social}}</span>
-                                </md-item-template>
-                                <md-not-found >
-                                    No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
-                                </md-not-found>
-                            </md-autocomplete>
-                        </md-input-container>
-
-                        <div>
+<!--                        <div>
                             <md-input-container class="md-block"   >
-                                <label>Almacenes</label>
+                                <label>Almacen</label>
                                 <md-autocomplete md-selected-item="autoCp.provSele.select"
                                                  info="Seleccione el proveedor del embarque"
                                                  required
@@ -2769,10 +2746,10 @@
                                     </md-not-found>
                                 </md-autocomplete>
                             </md-input-container>
-                        </div>
+                        </div>-->
                         <md-input-container class="md-block" >
                             <label>Descripcion</label>
-                            <input  type="text" ng-model="prod.descripcion"  tabindex="-1" >
+                            <input  type="text" ng-model="model.descripcion" >
                         </md-input-container>
                     </div>
 
@@ -2797,83 +2774,7 @@
                             </div>
                             <div layout="column"   ng-class="{'form-row-head-select': form == 'head' ,'form-body-select':form == 'head'}" >
                                 <div style="padding-left: 12px ; padding-right: 4px;" >
-                                    <div layout="row" class="row">
-                                        <div layout="row" flex="50">
-                                            <div layout="column" layout-align="center center">Vecimiento</div>
-                                        </div>
-                                        <md-input-container class="md-block" flex >
-                                            <md-datepicker ng-model="model.vencimiento" style="margin-left: -12px;"
-                                                           skip-tab
-                                                           required
-                                            ></md-datepicker >
-                                        </md-input-container class="md-block" flex >
-                                    </div>
 
-                                    <div layout="row" class="row">
-                                        <div layout="row" flex="50">
-                                            <div layout="column" layout-align="center center">Freight Forwarder</div>
-                                        </div>
-                                        <md-input-container class="md-block" flex  >
-                                            <md-autocomplete md-selected-item="ffSelect"
-                                                             info="Selecione el Freight Forwarder"
-                                                             required
-                                                             skip-tab
-                                                             md-search-text="ffText"
-                                                             md-items="item in ff | stringKey : ffText : 'nombre' "
-                                                             md-item-text="item.nombre"
-                                                             md-autoselect = "true"
-                                                             md-no-asterisk
-                                                             md-min-length="1"
-                                                             md-no-cache="true"
-                                                             ng-disabled="paisSelec == null"
-
-                                            >
-                                                <md-item-template>
-                                                    <span>{{item.nombre}}</span>
-                                                </md-item-template>
-                                                <md-not-found >
-                                                    <a ng-href="#" ng-click="createdFF(ffText)"> Crear {{ffText}}</a>
-
-                                                </md-not-found>
-                                            </md-autocomplete>
-                                            </md-input-container>
-                                    </div>
-                                    <div layout="row" class="row">
-                                        <div layout="row" flex="50">
-                                            <div layout="column" layout-align="center center">Naviera</div>
-                                        </div>
-                                        <md-input-container class="md-block" flex  >
-                                            <md-autocomplete md-selected-item="nvSelect"
-                                                             info="Selecione la naviera a usar"
-                                                             required
-                                                             skip-tab
-                                                             md-search-text="nvText"
-                                                             md-items="item in nv | stringKey : nvText : 'nombre' "
-                                                             md-item-text="item.nombre"
-                                                             md-autoselect = "true"
-                                                             md-no-asterisk
-                                                             md-min-length="0"
-                                                             md-no-cache="true"
-                                                             ng-disabled="ffSelect == null"
-
-                                            >
-                                                <md-item-template>
-                                                    <span>{{item.nombre}}</span>
-                                                </md-item-template>
-
-                                            </md-autocomplete>
-                                        </md-input-container>
-                                    </div>
-
-                                    <div layout="row" class="row">
-                                        <div layout="row" flex="50" >
-                                            <div layout="column" layout-align="center center">T/T </div>
-                                        </div>
-                                        <md-input-container class="md-block rms" flex >
-                                            <input  type="text" ng-model="model.dias_tt" decimal required >
-                                        </md-input-container>
-                                        <md-tooltip >Transito Terrestre</md-tooltip>
-                                    </div>
                                     <div layout="row" class="row">
                                         <div layout="row" flex="50" >
                                             <div layout="column" layout-align="center center">Pais </div>
@@ -2926,6 +2827,94 @@
                                         </md-input-container>
                                     </div>
                                     <div layout="row" class="row">
+                                        <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Expira</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex >
+                                            <md-datepicker ng-model="model.vencimiento" style="margin-left: -12px;"
+                                                           skip-tab
+                                                           required
+                                            ></md-datepicker >
+                                        </md-input-container class="md-block" flex >
+                                    </div>
+
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Freight Forwarder</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex  >
+                                            <md-autocomplete md-selected-item="ffSelect"
+                                                             info="Selecione el Freight Forwarder a usar"
+                                                             required
+                                                             skip-tab
+                                                             md-search-text="ffText"
+                                                             md-items="item in ff | stringKey : ffText : 'nombre'"
+                                                             md-item-text="item.nombre"
+                                                             md-no-asterisk
+                                                             md-min-length="0"
+                                                             md-no-cache="true"
+                                                             md-selected-item-change="model.ff = (ffSelect == null)? ffText : undefined ; model.freight_forwarder_id = ffSelect.id"
+                                                             md-autoselect = "true"
+                                                             md-input-id="ffInput"
+                                                             vl-no-clear
+                                            >
+                                                <md-item-template>
+                                                    <span>{{item.nombre}}</span>
+                                                </md-item-template>
+                                                <!-- <md-not-found   >
+
+                                                     <a  ng-click="createdFF(ffText, this)">Crear {{ffText}}</a>
+
+                                                 </md-not-found>-->
+                                            </md-autocomplete>
+                                        </md-input-container>
+                                        <div>{{filtterFF.length}}</div>
+                                    </div>
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50">
+                                            <div layout="column" layout-align="center center">Naviera</div>
+                                        </div>
+                                        <md-input-container class="md-block" flex ng-click="loadNv()" >
+                                            <md-autocomplete md-selected-item="nvSelect"
+                                                             info="Selecione la naviera a usar"
+                                                             required
+                                                             skip-tab
+                                                             md-search-text="nvText"
+                                                             md-items="item in nv | stringKey : nvText : 'nombre' "
+                                                             md-item-text="item.nombre"
+                                                             md-autoselect = "true"
+                                                             md-no-asterisk
+                                                             md-min-length="0"
+                                                             md-no-cache="true"
+                                                             ng-disabled="ffSelect == null && !ffText "
+                                                             md-input-id="navInput"
+                                                             md-selected-item-change="model.naviera_id = nvSelect.id; model.nav = (nvSelect == null) ? nvText : undefined  "
+                                                             vl-no-clear
+
+                                            >
+                                                <md-item-template>
+                                                    <span>{{item.nombre}}</span>
+                                                </md-item-template>
+                                                <!--                                                <md-not-found   >
+
+                                                                                                    <a href="#" ng-click="createdNv(nvText, this)">Crear {{ffText}}</a>
+
+                                                                                                </md-not-found>-->
+
+                                            </md-autocomplete>
+                                        </md-input-container>
+                                    </div>
+
+                                    <div layout="row" class="row">
+                                        <div layout="row" flex="50" >
+                                            <div layout="column" layout-align="center center">T/T </div>
+                                        </div>
+                                        <md-input-container class="md-block rms" flex >
+                                            <input skip-tab type="text" ng-model="model.dias_tt" decimal required >
+                                        </md-input-container>
+                                        <md-tooltip >Tiempo de transito</md-tooltip>
+                                    </div>
+                                    <div layout="row" class="row">
                                         <div layout="row" flex="50" >
                                             <div layout="column" layout-align="center center">Moneda </div>
                                         </div>
@@ -2950,6 +2939,7 @@
                                                     <span>{{item.nombre}}</span>
                                                 </md-item-templatess>
                                             </md-autocomplete>
+                                            <md-tooltip >Moneda de pago</md-tooltip>
                                         </md-input-container>
                                     </div>
                                 </div>
@@ -3097,14 +3087,14 @@
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Precio </div>
                             <div class="rms" flex> {{select.precio}}</div>
                             <md-tooltip >
-                               Precio de venta actual
+                                Precio de venta actual
                             </md-tooltip>
                         </div>
                         <div layout="row" ng-show="select.total">
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Total</div>
                             <div class="rms" flex> {{select.total}}</div>
                             <md-tooltip >
-                               Total a pagar
+                                Total a pagar
                             </md-tooltip>
                         </div>
                         <div layout="row" >

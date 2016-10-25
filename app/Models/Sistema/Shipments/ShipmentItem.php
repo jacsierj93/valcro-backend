@@ -16,6 +16,8 @@ class ShipmentItem extends Model
     protected $table = "tbl_embarque_item";
     protected $dates = ['deleted_at'];
 
+
+
 /*
 
 CREATE TABLE valcro_db2.tbl_embarque_item (

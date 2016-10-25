@@ -1,4 +1,4 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,shipment, setGetShipment, filesService) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,$resource, setGetShipment, filesService) {
 
     //?review
     filesService.setFolder('orders');
@@ -14,7 +14,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.permit={
         created:true
     };
-    shipment.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
+    $resource.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
 
     $scope.search = function(){
         var data =[];
@@ -48,20 +48,28 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             }
             /*if(!form.getValid()){
 
-            }if(form.getState() == "process"){ $scope.validChangeFor();}else {
-                $scope.validChangeFor();
-            }*/
+             }if(form.getState() == "process"){ $scope.validChangeFor();}else {
+             $scope.validChangeFor();
+             }*/
         },500);
 
     };
 
+    $scope.save = function (fn) {
+        $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
+            $scope.shipment.id= response.id;
+            if(fn){
+                fn(response);
+            }
+        });
+    };
 
     var interval = null;
     $scope.validChangeFor= function () {
         if(form.getState() == "process" ){
-           if(interval != null){
-               $interval.cancel(interval);
-           }
+            if(interval != null){
+                $interval.cancel(interval);
+            }
             interval= $interval(function () {
                 console.log("interval", form.getState());
                 if(form.getState() == "continue"){
@@ -277,7 +285,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
 }]);
 
-MyApp.controller('listTariffCtrl',['$scope','shipment','tarifForm',  function($scope, $resource,tarifForm){
+MyApp.controller('listTariffCtrl',['$scope','$timeout', 'shipment','tarifForm',  function($scope,$timeout,  $resource,tarifForm){
     $scope.tbl ={
         order:"id",
         filter:{},
@@ -294,30 +302,41 @@ MyApp.controller('listTariffCtrl',['$scope','shipment','tarifForm',  function($s
 
         $scope.LayersAction({open:{name:"listTariff",
             before:function(){
-                if($scope.$parent.shipment.tarifa_id){
-                    $scope.setData($scope.$parent.shipment.objs.tarifa_id);
+                if($scope.$parent.shipment.tarifa_id  != null && $scope.$parent.shipment.tarifa_id.model){
+                    console.log("$scope.$parent.shipment.objs", $scope.$parent.shipment.objs);
+                    angular.forEach($scope.$parent.shipment.objs.tarifa_id.model, function(v,k){
+                        $scope.tarifaSelect[k] =v;
+                    });
+
                 }
             }
         }});
     };
 
     $scope.setData = function(data){
-        angular.forEach(data, function(v,k){
-            $scope.tarifaSelect[k] =v;
-        });
-    };
-    $scope.$watch("tarifaSelect.id", function (newVal, oldVal){
+        if($scope.tarifaSelect.id != data.id){
 
-        if(newVal){
-            $scope.$parent.shipment.tarifa_id = $scope.tarifaSelect.id;
-            $scope.$parent.shipment.objs.tarifa_id=$scope.tarifaSelect;
-            $resource.post({type:"Save"},$scope.$parent.shipment);
+
+            angular.forEach(data, function(v,k){
+                $scope.tarifaSelect[k] =v;
+            });
+            console.log('obhs',  $scope.$parent.shipment);
+            console.log(data.objs.freight_forwarder_id);
+            $scope.$parent.shipment.tarifa_id = data.id;
+
+            $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = angular.copy(data.objs.freight_forwarder_id);//tarifa_id.freight_forwarder
+            $scope.$parent.shipment.objs.tarifa_id.naviera = angular.copy(data.objs.naviera_id);
+            console.log('obhs later',  $scope.$parent.shipment);
+
         }
-    });
+
+    };
     $scope.$watch("tarifBind.estado", function (newVal, oldVal) {
-        if(newVal && newVal == 'created'){
+        if(newVal && newVal == 'created' && tarifForm.get()){
             $scope.tbl.data.push(tarifForm.get());
-            $scope.setData(tarifForm.get());
+            angular.forEach(tarifForm.get(), function(v,k){
+                $scope.tarifaSelect[k] =v;
+            });
             tarifForm.setState("waith");
         }
     });
@@ -341,16 +360,19 @@ MyApp.controller('listTariffCtrl',['$scope','shipment','tarifForm',  function($s
         }
     });
     $scope.$watchGroup(['tariffF1.$valid', 'tariffF1.$pristine'], function(newVal){
-        if(!newVal[1]){
-            $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
-                $scope.$parent.session.session_id= response.session_id;
-                $scope.$parent.shipment.id = response.id;
-                $scope.tariffF1.$setPristine()
-                if($scope.puerto_idSelec!= null){
+        if(newVal[0] && !newVal[1]){
 
-                }
+            $timeout(function () {
+                $scope.$parent.save(function () {
+                    $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
+                        $scope.$parent.session.session_id= response.session_id;
+                        $scope.$parent.shipment.id = response.id;
+                        $scope.tariffF1.$setPristine()
+                    });
+                });
+            },1000);
 
-            });
+
         }
     });
 
@@ -846,22 +868,40 @@ MyApp.controller('historyProductCtrl',['$scope','$mdSidenav', function($scope,$m
     };
 }]);
 
-MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav', function($scope,$mdSidenav){
+/**Mark
+ * agregado de productos
+ * **/
+MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters', function($scope,$mdSidenav, masters){
     $scope.isOpen = false;
-    $scope.prod ={};
+    $scope.model ={};
+
+    $scope.lineas = [];
+    $scope.lineaSelec = null;
+    $scope.lineaText = undefined;
+
+    $scope.almacn = [];
+    $scope.almacnSelect = null;
+    $scope.almacnText = undefined ;
+
     $scope.$parent.CreatProduct = function(){
+        masters.query({type:"prodLines"},{}, function (response) {
+            $scope.lineas= response;
+        });
         $mdSidenav("miniCreatProduct").open().then(function(){
             $scope.isOpen = true;
         });
     };
+
     $scope.close= function(){
         if($scope.isOpen){
             $mdSidenav("miniCreatProduct").close().then(function(){
                 $scope.isOpen = false;
-            });;
+            });
         }
 
     };
+
+
 }]);
 
 MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource){
@@ -1633,25 +1673,10 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
                 elem[0].click();
             },0);
             formSrv.name = "CreatTariff";
-/*
-            formSrv.getValid =function () { return (!$scope.head.$pristine || !$scope.bond.$pristine) && $scope.isOpen };
-*/
-
+            $scope.loadFF();
+            $scope.loadData();
         });
-        //return $scope.f;
     };
-
-    $scope.createdFF = function (data) {
-        console.log("ff create", data);
-        $resource.postMod({type:"Freight_Forwarder", mod:"Save"}, data, function (response) {
-           if(response.accion == 'new'){
-               $scope.ff.push(response.model);
-               $scope.loadFF();
-           }
-        })
-
-    };
-
 
     $scope.close= function(e){
         if($scope.isOpen){
@@ -1660,13 +1685,29 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
             }else {
                 if($scope.head.$valid && $scope.bond.$valid ){
                     formSrv.setState("process");
+                    if($scope.ffSelect == null){
+                        $scope.model.ff= $scope.ffText;
+                    }
+                    if($scope.nvSelect == null){
+                        $scope.model.nav= $scope.nvText;
+                    }
                     $resource.postMod({type:"Tariff",mod:"Save"},$scope.model,function (response) {
                         $scope.$parent.NotifAction("ok", "Tarifa creada",[],{autohidden:1500});
                         tarifForm.set(response.model);
                         tarifForm.setState("created");
+                        if($scope.$parent.shipment.objs.tarifa_id== null){
+                            $scope.$parent.shipment.objs.tarifa_id ={};
+                        }
+
+                        $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = response.model.objs.freight_forwarder_id;
+                        $scope.$parent.shipment.objs.tarifa_id.naviera = response.model.objs.naviera_id;
+                        $scope.$parent.shipment.tarifa_id = response.model.id;
+                        console.log( $scope.$parent.shipment);
+                        $scope.$parent.save();
                         $scope.inClose();
                         $timeout(function () {
                             formSrv.setState("continue");$scope.inClose();
+
                         },1500)
                     });
 
@@ -1727,12 +1768,19 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
     $scope.loadFF = function () {
         if($scope.$parent.shipment.pais_id){
-            $resource.getMod({type:"Freight_Forwarder", mod:"List"},{paisd_id:newVal.id}, function (response) {
+            $resource.queryMod({type:"Freight_Forwarder", mod:"List", pais_id:$scope.$parent.shipment.pais_id},{}, function (response) {
                 $scope.ff= response;
             });
         }
+    };
+    $scope.loadNv = function () {
+        if($scope.$parent.shipment.pais_id){
+            $resource.queryMod({type:"Naviera", mod:"List", ff_id:($scope.ffSelect)== null ? undefined: $scope.ffSelect.id},{}, function (response) {
+                $scope.nv= response;
+            });
+        }
 
-    }
+    };
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
         $scope.paisSelec=newVal;
 
@@ -2010,9 +2058,9 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 angular.forEach(response.objs,function (v, k) {
                     Shipment.objs[k]=v;
                 });
-                Shipment.fecha_carga= (response.fecha_carga.value!= null) ? DateParse.toDate(response.fecha_carga.value) : null;
+/*                Shipment.fecha_carga= (response.fecha_carga.value!= null) ? DateParse.toDate(response.fecha_carga.value) : null;
                 Shipment.fecha_vnz= (response.fecha_vnz.value!= null) ? DateParse.toDate(response.fecha_vnz.value) : null;
-                Shipment.fecha_tienda= (response.fecha_tienda.value!= null) ? DateParse.toDate(response.fecha_tienda.value) : null;
+                Shipment.fecha_tienda= (response.fecha_tienda.value!= null) ? DateParse.toDate(response.fecha_tienda.value) : null;*/
                 Shipment.emision = (response.emision!= null) ? DateParse.toDate(response.emision) : null;
                 Shipment.containers = response.containers;
                 Shipment.odcs = response.odcs;
@@ -2032,6 +2080,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                     documento: response.nro_dua.documento,
                     emision:(response.nro_dua.emision== null)? undefined: DateParse.toDate(response.nro_dua.emision)
                 } ;
+                console.log("sgipm", Shipment)
                 bindin.estado = true;
 
             });

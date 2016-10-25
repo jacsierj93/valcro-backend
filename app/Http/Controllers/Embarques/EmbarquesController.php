@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Embarques;
 
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\FileModel;
+use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Product\Product;
@@ -223,22 +224,24 @@ class EmbarquesController extends BaseController
 
 
 
-    public function getFreight_Forwarder(Request $req){
+    public function getFreightForwarder(Request $req){
         $models = FreigthForwarder::selectRaw('distinct tbl_freight_forwarder.id,tbl_freight_forwarder.nombre')
-            ->join('tbl_naviera','tbl_naviera.freight_forwarder_id','=','tbl_freight_forwarder.id' )
-            ->join('tbl_tarifa','tbl_naviera.id','=','tbl_tarifa.naviera_id' )
-            ->where('tbl_tarifa.pais_id', $req->pais_id);
-
-        ;
-
-
+            ->leftJoin('tbl_tarifa','tbl_tarifa.freight_forwarder_id','=','tbl_freight_forwarder.id' )
+            ->whereNotNull('tbl_tarifa.usuario_conf_id')
+            ->get();
         return $models;
     }
+
+    public function getNaviera(Request $req){
+            return ($req->has('ff_id') ? Naviera::where('freight_forwarder_id', $req->ff_id)->get(): Naviera::get());
+    }
+
+
     public function getTariffs(Request $req){
         $data= [];
         $model =Tariff::where('puerto_id', $req->puerto_id)->get();
         foreach($model as $aux ){
-            $aux->objs =['puerto_id'=>Ports::find($aux->puerto_id)];
+            $aux->objs = $aux->objs();
             $data[]= $aux;
         }
         return $data ;
@@ -246,17 +249,39 @@ class EmbarquesController extends BaseController
 
     public function saveTariff(Request $req){
         $model = new Tariff();
+        $ff = new FreigthForwarder();
+        $nav = new Naviera();
+        $rs = ['accion'=>'new'];
+        if($req->has("freight_forwarder_id")){
+            $ff = FreigthForwarder::findOrFail($req->freight_forwarder_id);
+        }else{
+            $ff->nombre = $req->ff;
+            $ff->usuario_created_id = $req->session()->get('DATAUSER')['id'];
+            $ff->save();
+            $rs['createdff']= true;
+
+        }if($req->has("naviera_id")){
+            $nav = Naviera::findOrFail($req->naviera_id);
+        }else{
+            $nav->nombre = $req->nav;
+            $nav->usuario_created_id = $req->session()->get('DATAUSER')['id'];
+            $nav->save();
+            $rs['created nav']= true;
+
+        }
+
         $model->pais_id = $req->pais_id ;
         $model->puerto_id = $req->puerto_id ;
         $model->moneda_id = $req->moneda_id ;
         $model->vencimiento = $req->vencimiento ;
+        $model->naviera_id= $nav->id;
+        $model->freight_forwarder_id= $ff->id;
+
 
         if($req->has("dias_tt")){
             $model->dias_tt = $req->dias_tt ;
         }
-        if($req->has("naviera")){
-            $model->naviera = $req->naviera ;
-        }
+
         if($req->has("grt")){
             $model->grt = $req->grt ;
         }
@@ -264,7 +289,7 @@ class EmbarquesController extends BaseController
             $model->documento = $req->documento ;
         }
         if($req->has("mensajeria")){
-            $model->mensajeria = $req->tt ;
+            $model->mensajeria = $req->mensajeria ;
         }
         if($req->has("seguros")){
             $model->seguros = $req->seguros ;
@@ -285,33 +310,13 @@ class EmbarquesController extends BaseController
             $model->ot40 = $req->ot40 ;
         }
         $model->save();
-        return['accion'=>'new', 'id'=>$model->id, 'model'=>Tariff::findOrFail($model->id)];
-    }
+        $fModel = Tariff::findOrFail($model->id);
+        $fModel->objs =  $fModel->objs();
 
-    public function saveFreight_Forwarder( Request $req){
-        $model = new FreigthForwarder();
-        $result['accion']= 'new';
-        if($req->has('id')){
-            $model = FreigthForwarder::findOrFail($req->id);
-        }
-        $model->nombre= $req->nombre;
-        $model->save();
+        $rs['model'] = $fModel;
 
-        $result['model']= FreigthForwarder::find($model->id);
-        return $result;
-    }
+       return $rs;
 
-    public function saveNaviera( Request $req){
-        $model = new Naviera();
-        $result['accion']= 'new';
-        if($req->has('id')){
-
-        }
-        $model->nombre= $req->nombre;
-        $model->save();
-
-        $result['model']= Naviera::find($model->id);
-        return $result;
     }
 
     /************************* CONTAINERS ***********************************/
@@ -345,7 +350,13 @@ class EmbarquesController extends BaseController
     public  function  getShipment(Request $req){
 
         $model = Shipment::findOrfail($req->id);
-        $tarifa = ($model->tarifa_id == null) ? null: Tariff::find($model->tarifa_id);
+        $tarifa = null;
+        if($model->tarifa_id != null){
+            $tarifa = Tariff::find($model->tarifa_id);
+            $tarifa->objs = $tarifa->objs();
+
+        }
+
         $data = [];
 
         $data['id'] = $model->id;
@@ -413,15 +424,20 @@ class EmbarquesController extends BaseController
         $data['objs'] =[
             'pais_id'=>($model->pais_id == null) ? null: Country::find($model->pais_id),
             'puerto_id'=>($model->puerto_id == null) ? null: Ports::find($model->puerto_id),
-            'tarifa_id'=>$tarifa,
+            'tarifa_id'=>($tarifa == null ) ? [] :
+                [
+                    'model'=> $tarifa,
+                    'freight_forwarder'=> $tarifa->objs['freight_forwarder_id'],
+                    'naviera'=> $tarifa->objs['naviera_id']
+                ] ,
             'prov_id'=>($model->prov_id == null) ? null: Provider::find($model->prov_id),
         ];
 
 
         // calculados
         $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db'];
-        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db'];;
-        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db'];;
+        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db'];
+        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db'];
         /*if($model->emision != null){
             $auxFecha= date_create($model->emision);
 
@@ -438,13 +454,27 @@ class EmbarquesController extends BaseController
         }*/
 
 
-        $data['fecha_carga'] = $fecha_carga;
-        $data['fecha_vnz'] = $fecha_vnz;
-        $data['fecha_tienda'] = $fecha_tienda;
+        //$data['fechas']= $model->getDates();
+
 
 
         return $data ;
     }
+
+    public  function  getShipmentDates(Request $req){
+        $model = Shipment::findOrFail($req->id);
+        $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db', 'confirm'=>($model->usuario_conf_f_carga != null)];
+        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db', 'confirm'=>($model->usuario_conf_f_vnz != null)];
+        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db', 'confirm'=>($model->usuario_conf_f_tienda != null)];
+
+        if($model->emision != null){
+            $rs = Shipment::selectRaw('')->get();
+        }
+        $return =[$fecha_carga,$fecha_vnz,$fecha_tienda];
+        dd($return);
+
+    }
+
 
     public function saveShipment(Request $req){
         $return = ['accion'=>'new'];
@@ -717,7 +747,11 @@ class EmbarquesController extends BaseController
     }
 
 
-    /************************* products for finishes ***********************************/
+    /************************* products  ***********************************/
+
+    public function getLineas(){
+        return Line::get();
+    }
     public function getFinishedProduc(Request $req){
         $data=[];
         $Shipmodels = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
