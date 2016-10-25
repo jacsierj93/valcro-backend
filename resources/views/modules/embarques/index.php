@@ -2647,6 +2647,7 @@
                             </div>
                         </div>
                     </div>
+                    <form name="formProduct">
                     <div flex class="gridContent" layout="column" style="padding-right:4px">
                         <md-input-container class="md-block"   >
                             <label>Linea</label>
@@ -2700,7 +2701,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" >
                             <label>Cod. Profit</label>
-                            <input  type="text" ng-model="model.codigo_profit"   >
+                            <input  type="text" ng-model="model.codigo_profit"  required >
 
                         </md-input-container>
 <!--                        <md-input-container class="md-block" >
@@ -2749,10 +2750,10 @@
                         </div>-->
                         <md-input-container class="md-block" >
                             <label>Descripcion</label>
-                            <input  type="text" ng-model="model.descripcion" >
+                            <input  required type="text" ng-model="model.descripcion" >
                         </md-input-container>
                     </div>
-
+                    </form>
                 </div>
             </md-content>
         </md-sidenav>

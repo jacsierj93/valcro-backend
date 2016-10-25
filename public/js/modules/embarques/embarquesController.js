@@ -871,7 +871,7 @@ MyApp.controller('historyProductCtrl',['$scope','$mdSidenav', function($scope,$m
 /**Mark
  * agregado de productos
  * **/
-MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters', function($scope,$mdSidenav, masters){
+MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shipment', function($scope,$mdSidenav, masters, formSrv, $resource){
     $scope.isOpen = false;
     $scope.model ={};
 
@@ -893,13 +893,36 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters', function($
     };
 
     $scope.close= function(){
+
+
         if($scope.isOpen){
-            $mdSidenav("miniCreatProduct").close().then(function(){
-                $scope.isOpen = false;
-            });
+            if($scope.formProduct.$pristine ){
+                $scope.inClose();
+            }else if(!$scope.formProduct.$pristine && !$scope.formProduct.$valid){
+                formSrv.setState("porcess")
+                $scope.NotifAction("alert","No se puede guardar el Producto ¿Que desea hacer?",
+                    [
+                        {name:"Cancelar", action: function () {
+                            $scope.inClose();
+                            formSrv.setState("continue");
+                        }
+                        },
+                        {name:"Corregir", action: function () { formSrv.setState("cancelar");}}
+                    ]
+                    , {block:true});
+            }else {
+                alert("guardando Prodcuto");
+            }
+
         }
 
     };
+
+    $scope.inClose =  function(){
+        $mdSidenav("miniCreatProduct").close().then(function(){
+            $scope.isOpen = false;
+        });
+    }
 
 
 }]);
