@@ -1486,13 +1486,15 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
             origen_item_id:$scope.prdSelect.id,
             producto_id:$scope.prdSelect.producto_id,
             saldo:$scope.prdSelect.saldo,
-            codigo_fabrica:$scope.select.codigo_fabrica,
-            disponible:$scope.select.disponible,
-            codigo:$scope.select.codigo,
+            codigo_fabrica:$scope.prdSelect.codigo_fabrica,
+            disponible:$scope.prdSelect.disponible,
+            codigo:$scope.prdSelect.codigo,
             doc_origen_id:$scope.select.id
         };
 
+        console.log("data", data)
         $scope.$parent.DetailProductShipment(data);
+
 
     }
 

@@ -3060,13 +3060,13 @@
                                 Cantidad asignada al embarque
                             </md-tooltip>
                         </div>
-                        <div layout="row" >
+<!--                        <div layout="row" >
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cantidad </div>
                             <div class="rms" flex> {{select.cantidad}}</div>
                             <md-tooltip >
                                 Cantidad Pedida
                             </md-tooltip>
-                        </div>
+                        </div>-->
                         <div layout="row" ng-show="select.precio">
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Precio </div>
                             <div class="rms" flex> {{select.precio}}</div>
@@ -3097,7 +3097,7 @@
                         </div>
                         <div layout="row" >
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cod. Fabrica </div>
-                            <div class="rms" flex> {{select.codigo_profit}} </div>
+                            <div class="rms" flex> {{select.codigo_fabrica}} </div>
                             <md-tooltip >
                                 Codigo en profit
                             </md-tooltip>
