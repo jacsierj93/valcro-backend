@@ -18,6 +18,7 @@ class ShipmentItem extends Model
 
 
 
+
 /*
 
 CREATE TABLE valcro_db2.tbl_embarque_item (

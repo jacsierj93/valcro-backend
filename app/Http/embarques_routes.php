@@ -37,3 +37,7 @@ $app->get('embarques/Order/Order', 'Embarques\EmbarquesController@getOrder');
 
 //productos odc
 $app->get('embarques/Order/Products', 'Embarques\EmbarquesController@getFinishedProduc');
+
+// products
+$app->post('embarques/Product/CreateOnAdd', 'Embarques\EmbarquesController@createOnSaveProduct');
+

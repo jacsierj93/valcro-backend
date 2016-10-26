@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Masters;
 
 
+use App\Models\Sistema\Masters\StoreValcro;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderReason;
 use App\Models\Sistema\Order\OrderStatus;
@@ -134,6 +135,7 @@ class MasterController extends BaseController
 	public function getCondition(Request $req){  return (!$req->has('id')) ? OrderCondition::get() : OrderCondition::findOrFail($req->id) ; }
 	public function getStatus(Request $req){  return (!$req->has('id')) ? OrderStatus::get() : OrderStatus::findOrFail($req->id) ;}
 	public function getPaymentType(Request $req){ return (!$req->has('id')) ?  PaymentType::get() : PaymentType::findOrFail($req->id) ;}
+	public function getDirStoresValcro(Request $req){ return (!$req->has('id')) ?  StoreValcro::get() : StoreValcro::findOrFail($req->id) ;}
 
 	public function newCoin(Request $req){
 		$result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");

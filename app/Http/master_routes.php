@@ -11,6 +11,7 @@ $app->get("master/getCities",'Masters\MasterController@getAllCities'); ///obtene
 $app->get("master/getCoin/{id}",'Masters\MasterController@getCoin'); ///obtener una maneda
 $app->get("master/addressType",'Masters\MasterController@getAddressType'); ///obtener tipo direccion
 $app->get("master/prodLines",'Masters\MasterController@getLines'); ///obtener Lineas
+$app->get("master/DirStores",'Masters\MasterController@getDirStoresValcro'); ///obtner la lista de direcciones de almacen de valcro
 $app->get("master/languajes",'Masters\MasterController@getLanguajes'); ///obtener Idiomas
 $app->get("master/cargoContact",'Masters\MasterController@getCargos'); ///obtener Cargos
 $app->get("master/getPorts",'Masters\MasterController@getPorts'); ///obtener Puertos
