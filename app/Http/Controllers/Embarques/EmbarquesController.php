@@ -31,6 +31,7 @@ class EmbarquesController extends BaseController
 {
     private  $user = null;
     private $minAproxDay = 100;
+    private $diasTienda = 15;
 
 
     public function __construct(Request $req)
@@ -157,10 +158,12 @@ class EmbarquesController extends BaseController
         $data['peso']= $model->peso;
         $data['mt3']= $model->mt3;
         $data['prods'] =[];
-        $items = $model->items()->get() ;
+        $items = $model->items()->where('saldo','>', '0')->get() ;
+
+        //dd($items);
         foreach ($items as $aux){
 
-            $prd  = Product::selectRaw(
+            $prd  = PurchaseItem::selectRaw(
                 'tbl_compra_orden_item.id, 
                 tbl_compra_orden_item.descripcion, 
                 tbl_compra_orden_item.doc_id, 
@@ -174,8 +177,11 @@ class EmbarquesController extends BaseController
                 tbl_producto.codigo_profit, 
                 tbl_producto.codigo_fabrica
                 ')
-                ->join('tbl_compra_orden_item','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
-                ->where('tbl_producto.id', $aux->producto_id)->first();
+                ->join('tbl_producto','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
+                ->where('tbl_producto.id', $aux->producto_id)
+                ->where('tbl_compra_orden_item.id', $aux->id)
+                ->first();
+
             $item =  ShipmentItem::where('doc_origen_id', $model->id)
                 ->where('tipo_origen_id', '23')
                 ->where('origen_item_id',$aux->id)
@@ -186,6 +192,7 @@ class EmbarquesController extends BaseController
 
 
             if($item != null){
+
                 $data['asinado']= true;
                 $prd->asignado = true;
                 $prd->embarque_item_id = $item->id;
@@ -418,6 +425,7 @@ class EmbarquesController extends BaseController
             '(tbl_producto.precio  * tbl_embarque_item.cantidad) as total '
         )
             ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+            ->where( 'tbl_embarque_item.embarque_id', $model->id)
             ->get();
         $data['items'] = [];
         foreach ($Mitems as $aux){
@@ -430,7 +438,8 @@ class EmbarquesController extends BaseController
 
 
         // odc
-        $data['odcs']= $this->getOrdersAsignmentModel($model->id);
+        $odcs = $this->getOrdersAsignmentModel($model->id);
+        $data['odcs']= $odcs;
 
         // foraneos
         $data['objs'] =[
@@ -444,49 +453,138 @@ class EmbarquesController extends BaseController
                 ] ,
             'prov_id'=>($model->prov_id == null) ? null: Provider::find($model->prov_id),
         ];
+        $fechas = $this->shipmentDates($model->id);
+        $data['fechas']=$fechas;
 
 
-        // calculados
-        $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db'];
-        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db'];
-        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db'];
-        /*if($model->emision != null){
-            $auxFecha= date_create($model->emision);
-
-            $emision= Carbon::createFromDate($auxFecha->format("Y"),$auxFecha->format("m"),$auxFecha->format("d"));
-            if($tarifa != null){
-                if($tarifa->dias_tt != null){
-                    if( $model->fecha_vnz == null){
-                        $fecha_carga = ['value'=>$emision->copy()->addDay(intval($tarifa->dias_tt)),'method'=>'estimate'];
-                    }
-
-
-                }
-            }
-        }*/
-
-
-        //$data['fechas']= $model->getDates();
-
+        //permisos
 
 
         return $data ;
     }
 
+
     public  function  getShipmentDates(Request $req){
         $model = Shipment::findOrFail($req->id);
-        $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db', 'confirm'=>($model->usuario_conf_f_carga != null)];
-        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db', 'confirm'=>($model->usuario_conf_f_vnz != null)];
-        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db', 'confirm'=>($model->usuario_conf_f_tienda != null)];
+        $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db', 'confirm'=>($model->usuario_conf_f_carga != null), 'isManual'=> $model->f_carga_isManual];
+        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db', 'confirm'=>($model->usuario_conf_f_vnz != null), 'isManual'=> $model->f_vnz_isManual];
+        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db', 'confirm'=>($model->usuario_conf_f_tienda != null), 'isManual'=> $model->f_tienda_isManual];
 
-        if($model->emision != null){
-            $rs = Shipment::selectRaw('')->get();
+        if($req->has('fecha_carga')){
+
+            $items = $model->items()
+                ->where('tipo_origen_id', '23')
+                ->get();
+            if(sizeof($items) >  0 ){
+                //dd("fechAS");
+
+                $maxf = Purchase::selectRaw('max(fecha_produccion) as max')
+                    ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=', 'tbl_compra_orden.id' )
+                    ->where('tipo_origen_id', '23')
+                    ->whereNull('tbl_embarque_item.deleted_at')
+                    ->first();
+
+                $fDias = ShipmentItem::selectRaw(
+                    'ADDDATE( \''.$maxf->max. '\', interval max( tbl_prov_tiempo_fab.min_dias) DAY ) as minProd ,'.
+                    'ADDDATE( \''.$maxf->max. '\', interval max( tbl_prov_tiempo_fab.max_dias) DAY ) as MaxProd'
+                )
+                    ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+                    ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
+                    ->where('embarque_id','=', $model->id)
+                    ->first();
+
+                $fecha_carga['MAXf']=$maxf->max;
+                $fecha_carga['value']= $fDias->MaxProd;
+                $fecha_carga['range']= ['max'=>$fDias->MaxProd , 'min'=>$fDias->minProd];
+                $fecha_carga['method']='st';
+
+
+
+                if($model->tarifa_id != null){
+                    $tarif = Tariff::findOrFail($model->tarifa_id);
+                    $Original= date_create($fecha_carga['value']);
+                    $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+                    $plus =  $auxDate->addDays(intval($tarif->dias_tt));
+                    $fecha_vnz['value']= $plus->format('Y-m-d');
+                    $fecha_vnz['method']= 'st';
+                }
+                if($fecha_vnz['value'] != null){
+                    $Original= date_create($fecha_vnz['value']);
+                    $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+                    $plus =  $auxDate->addDays($this->diasTienda);
+                    $fecha_tienda['value']= $plus->format('Y-m-d');
+                    $fecha_tienda['method']= 'st';
+                }
+            }
+
+            return ['fecha_carga'=>$fecha_carga,'fecha_vnz'=>$fecha_vnz,'fecha_tienda'=>$fecha_tienda];
         }
-        $return =[$fecha_carga,$fecha_vnz,$fecha_tienda];
-        dd($return);
+
+        if($req->has('fecha_vnz')){
+            if($model->tarifa_id != null){
+                $tarif = Tariff::findOrFail($model->tarifa_id);
+                $Original= date_create($fecha_carga['value']);
+                $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+                $plus =  $auxDate->addDays(intval($tarif->dias_tt));
+                $fecha_vnz['value']= $plus->format('Y-m-d');
+                $fecha_vnz['method']= 'st';
+            }
+            if($fecha_vnz['value'] != null){
+                $Original= date_create($fecha_vnz['value']);
+                $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+                $plus =  $auxDate->addDays($this->diasTienda);
+                $fecha_tienda['value']= $plus->format('Y-m-d');
+                $fecha_tienda['method']= 'st';
+            }
+            return ['fecha_carga'=>$fecha_carga,'fecha_vnz'=>$fecha_vnz,'fecha_tienda'=>$fecha_tienda];
+        }
+
+        if($req->has('fecha_vnz')){
+            $Original= date_create($fecha_vnz['value']);
+            $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+            $plus =  $auxDate->addDays($this->diasTienda);
+            $fecha_tienda['value']= $plus->format('Y-m-d');
+            $fecha_tienda['method']= 'st';
+            return ['fecha_carga'=>$fecha_carga,'fecha_vnz'=>$fecha_vnz,'fecha_tienda'=>$fecha_tienda];
+        }
+
+
+
+
+
+
+        $return =['fecha_carga'=>$fecha_carga,'fecha_vnz'=>$fecha_vnz,'fecha_tienda'=>$fecha_tienda];
+        return $return;
 
     }
 
+    public function saveShipmentDates(Request $req){
+        $model =Shipment::findOrFail($req->id);
+        if($req->has('fecha_carga')){
+            $model->fecha_carga = $req->fecha_carga['value'];
+            $model->f_carga_isManual= $req->fecha_carga['isManual'];
+            if($req->fecha_carga['confirm'] && $model->usuario_conf_f_carga == null){
+                $model->usuario_conf_f_carga =  $req->session()->get('DATAUSER')['id'];
+            }
+        }
+        if($req->has('fecha_vnz')){
+            $model->fecha_vnz = $req->fecha_vnz['value'];
+            $model->fecha_vnz= $req->fecha_vnz['isManual'];
+            if($req->fecha_vnz['confirm'] && $model->usuario_conf_f_vnz == null){
+                $model->usuario_conf_f_carga =  $req->session()->get('DATAUSER')['id'];
+            }
+        }
+        if($req->has('fecha_tienda')){
+            $model->fecha_tienda = $req->fecha_tienda['value'];
+            $model->fecha_tienda= $req->fecha_tienda['isManual'];
+            if($req->fecha_tienda['confirm'] && $model->usuario_conf_f_tienda == null){
+                $model->usuario_conf_f_carga =  $req->session()->get('DATAUSER')['id'];
+            }
+        }
+        $model->save();
+
+        return $this->shipmentDates($model->id);
+    }
 
     public function saveShipment(Request $req){
         $return = ['accion'=>'new'];
@@ -507,9 +605,11 @@ class EmbarquesController extends BaseController
         if(!$validator->fails()  ){
             if(!$req->has('emision')){
                 $model->emision = Carbon::now();
+
             }
             $return['valid'] = true;
             $return['emision'] =  $model->emision;
+
         }
 
         if($model->usuario_id == null){$model->usuario_id = $req->session()->get('DATAUSER')['id'];}
@@ -548,13 +648,9 @@ class EmbarquesController extends BaseController
             }
         }
 
-        /*        if($req->has('fecha_carga')){
-
-                    $model->fecha_carga= $req->fecha_carga['value'];
-                }
-                if($req->has('fecha_vnz')){ $model->fecha_vnz= $req->fecha_vnz['value'];}
-                if($req->has('fecha_tienda')){ $model->fecha_tienda= $req->fecha_tienda['value'];}*/
         $model->save();
+
+
 
 
         $return['id']= $model->id;
@@ -932,35 +1028,84 @@ class EmbarquesController extends BaseController
             ->get();
         $data = [];
         foreach($models as $aux){
-            $odc = [];
-            $odc['id']=$aux->id;
-            $odc['fecha_producion']=$aux->fecha_producion;
-            $odc['fecha_aprob_gerencia']=$aux->fecha_aprob_gerencia;
-            $odc['fecha_aprob_compra']=$aux->fecha_aprob_compra;
-            $odc['nro_proforma']=$aux->nro_proforma;
-            $odc['monto']=$aux->monto;
-            $odc['mt3']=$aux->mt3;
-            $odc['peso']=$aux->peso;
-            $odc['asignado']=true;
-            $odc['isTotal']=1;
+
+            $aux->asignado=true;
+            $aux->isTotal=1;
             $items = $aux->items()->get();
             foreach ($items as $item){
                 $shipItem = $models->where('origen_item_id',$item->id);
                 if(sizeof( $shipItem) == 0){
-                    $odc['isTotal'] = 0;
+                    $aux->isTotal = 0;
                     break;
                 }else{
                     if(floatval($shipItem->first()->saldo) < floatval($item->saldo)){
-                        $odc['isTotal'] = 0;
+                        $aux->isTotal = 0;
                         break;
                     }
                 }
             }
-            $data[]= $odc;
+            $data[]= $aux;
         }
         return $data;
 
 
+    }
+
+    private  function  shipmentDates($id){
+        $model = Shipment::findOrFail($id);
+        $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db', 'confirm'=>($model->usuario_conf_f_carga != null), 'isManual'=> $model->f_carga_isManual];
+        $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db', 'confirm'=>($model->usuario_conf_f_vnz != null), 'isManual'=> $model->f_vnz_isManual];
+        $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db', 'confirm'=>($model->usuario_conf_f_tienda != null), 'isManual'=> $model->f_tienda_isManual];
+        $items = $model->items()
+            ->where('tipo_origen_id', '23')
+            ->get();
+
+
+        if(sizeof($items) >  0 && $model->emision != null){
+
+
+                $maxf = Purchase::selectRaw('max(fecha_produccion) as max')
+                    ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=', 'tbl_compra_orden.id' )
+                    ->where('tipo_origen_id', '23')
+                    ->whereNull('tbl_embarque_item.deleted_at')
+                    ->first();
+                //            ' DATEDIFF(ADDDATE(tbl_compra_orden.fecha_produccion, interval tbl_prov_tiempo_fab.min_dias DAY ), CURDATE()) as minDays,'.
+
+                $fDias = ShipmentItem::selectRaw(
+                    'ADDDATE( \''.$maxf->max. '\', interval max( tbl_prov_tiempo_fab.min_dias) DAY ) as minProd ,'.
+                    'ADDDATE( \''.$maxf->max. '\', interval max( tbl_prov_tiempo_fab.max_dias) DAY ) as MaxProd'
+                )
+                    ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+                    ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
+                    ->where('embarque_id','=', $model->id)
+                    ->first();
+
+                $fecha_carga['value']= $fDias->MaxProd;
+                $fecha_carga['range']= ['max'=>$fDias->MaxProd , 'min'=>$fDias->minProd];
+                $fecha_carga['method']='st';
+
+
+
+            if($model->tarifa_id != null){
+                $tarif = Tariff::findOrFail($model->tarifa_id);
+                $Original= date_create($fecha_carga['value']);
+                $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+                $plus =  $auxDate->addDays(intval($tarif->dias_tt));
+                $fecha_vnz['value']= $plus->format('Y-m-d');
+                $fecha_vnz['method']= 'st';
+            }
+            if($fecha_vnz['value'] != null){
+                $Original= date_create($fecha_vnz['value']);
+                $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+                $plus =  $auxDate->addDays($this->diasTienda);
+                $fecha_tienda['value']= $plus->format('Y-m-d');
+                $fecha_tienda['method']= 'st';
+            }
+        }
+
+
+        $return =['fecha_carga'=>$fecha_carga,'fecha_vnz'=>$fecha_vnz,'fecha_tienda'=>$fecha_tienda];
+        return $return;
     }
 
     /************************* Another module ***********************************/

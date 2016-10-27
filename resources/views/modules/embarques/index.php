@@ -806,7 +806,7 @@
                     <form name="date" layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}" >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}"  >
                                 <div flex class="titulo_formulario" style="height:39px;">
                                     <div>
                                         Fechas
@@ -822,40 +822,49 @@
                                 </div>
                             </div>
                             <div layout="row" class="row" ng-show="formOptions.date.expand" >
-                                <div layout="row" class="date-row" flex="" >
+
+                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_carga.confirm}" >
+
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Carga</div>
                                     </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_carga.value"
-                                                       ng-disabled="( session.isBlock )"
-                                                       skip-tab
-                                        ></md-datepicker >
-                                    </div>
+
+
+                                    <md-datepicker ng-model="$parent.shipment.fechas.fecha_carga.value"
+
+                                                   skip-tab
+                                    ></md-datepicker >
+
 
                                 </div>
-                                <div layout="row" class="date-row" flex="" >
+
+                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_vnz.confirm}" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>En Venenzuela</div>
+                                        <div>En Venezuela</div>
                                     </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_llegada_vnz.value"
-                                                       ng-disabled="( session.isBlock )"
+
+                                        <md-datepicker ng-model="$parent.shipment.fechas.fecha_vnz.value"
+
                                                        skip-tab
                                         ></md-datepicker >
-                                    </div>
+
+
                                 </div>
-                                <div layout="row" class="date-row" flex="" >
+
+
+                                <div layout="row" class="date-row vlc-date " flex=""  ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_tienda.confirm}">
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>En tienda</div>
                                     </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_tienda.value"
-                                                       ng-disabled="( session.isBlock )"
+
+                                        <md-datepicker ng-model="$parent.shipment.fechas.fecha_tienda.value"
+
                                                        skip-tab
                                         ></md-datepicker >
-                                    </div>
+
+
                                 </div>
+
                             </div>
                         </div>
                     </form>
@@ -2271,8 +2280,8 @@
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict | orderBy : tbl.order as filter"    >
-                                <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}" >
-                                    <div class="cellEmpty" style=" width: 40px;margin: 0 2px 0 2px;" ng-click="changeAsig(item)">
+                                <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}"  ng-click="changeAsig(item)" >
+                                    <div class="cellEmpty" style=" width: 40px;margin: 0 2px 0 2px;">
                                         <md-switch class="md-primary" ng-disabled="true" ng-model="item.asignado" > </md-switch>
                                     </div>
                                     <div flex class="cellGrid" >{{item.codigo}}</div>
@@ -3060,13 +3069,13 @@
                                 Cantidad asignada al embarque
                             </md-tooltip>
                         </div>
-<!--                        <div layout="row" >
-                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cantidad </div>
-                            <div class="rms" flex> {{select.cantidad}}</div>
-                            <md-tooltip >
-                                Cantidad Pedida
-                            </md-tooltip>
-                        </div>-->
+                        <!--                        <div layout="row" >
+                                                    <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cantidad </div>
+                                                    <div class="rms" flex> {{select.cantidad}}</div>
+                                                    <md-tooltip >
+                                                        Cantidad Pedida
+                                                    </md-tooltip>
+                                                </div>-->
                         <div layout="row" ng-show="select.precio">
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Precio </div>
                             <div class="rms" flex> {{select.precio}}</div>
