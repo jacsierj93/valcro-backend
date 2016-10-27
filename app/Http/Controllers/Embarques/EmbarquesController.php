@@ -189,15 +189,14 @@ class EmbarquesController extends BaseController
                 $data['asinado']= true;
                 $prd->asignado = true;
                 $prd->embarque_item_id = $item->id;
-                $prd->disponible = floatval(floatval($prd->saldo) + floatval($item->cantidad) );
+                $prd->disponible = floatval(floatval($prd->cantidad) + floatval($item->cantidad) );
 
                 $prd->saldo = $item->cantidad;
 
             }else{
                 $prd->saldo = 0;
             }
-           // $item =  ShipmentItem::selectRaw("sum(saldo) as in_uso ")->where('doc_origen_id','<>', $model->id)->where('tipo_origen_id', '23')->where('origen_item_id',$aux->id)->first();
-            //$prd->disponible = floatval($prd->cantidad) - floatval($item->in_uso);
+
             $origen =   $this->getFirstProducto($aux);
             $source = SourceType::find($origen->tipo_origen_id);
             $prd->origen = ['text'=>$source->descripcion, 'key'=>$source->id];
@@ -621,6 +620,7 @@ class EmbarquesController extends BaseController
             $odItem->saldo  = floatval( floatval($odItem->saldo) - floatval($req->saldo) );
             $disponible = floatval( floatval($odItem->saldo) + floatval($req->saldo));
             $odItem->save();
+            $result['rst']= $odItem->saldo;
 
 // confirmacion de estado del pedido original
             $itemIns = ShipmentItem::where('doc_origen_id', $req->doc_origen_id)

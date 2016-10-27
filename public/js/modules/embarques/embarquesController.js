@@ -1416,7 +1416,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
 
         $scope.prodSelect=model;
         var data = {
-            embarque_item_id:$scope.select.embarque_item_id,
+            embarque_item_id:$scope.prodSelect.embarque_item_id,
             tipo_origen_id:23,
             descripcion:$scope.prodSelect.descripcion,
             origen_item_id:$scope.prodSelect.id,
@@ -1480,7 +1480,7 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
         form.name= 'DetailProductAdd';
         $scope.prdSelect=model;
         var data = {
-            embarque_item_id:$scope.select.embarque_item_id,
+            embarque_item_id:$scope.prdSelect.embarque_item_id,
             tipo_origen_id:23,
             descripcion:$scope.prdSelect.descripcion,
             origen_item_id:$scope.prdSelect.id,
