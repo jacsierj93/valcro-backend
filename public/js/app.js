@@ -100,7 +100,23 @@ MyApp.config(function ($provide, $httpProvider) {
 
 
 });
+/// agregado por miguel cambio de formato de fecha
+MyApp.config(function($mdDateLocaleProvider) {
+    $mdDateLocaleProvider.formatDate = function(date) {
 
+        if(date){
+            var day = date.getDate();
+            var monthIndex = date.getMonth();
+            var year = date.getFullYear();
+
+            return day + '/' + (monthIndex + 1) + '/' + year;
+        }else{
+            return null;
+        }
+
+
+    };
+});
 //###########################################################################################3
 //##############################REST service (factory)#############################################3
 //###########################################################################################3

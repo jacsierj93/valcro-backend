@@ -269,7 +269,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
     background-color:#b8b8b8;
     border-radius: 16px 0px 0 16px;
     height: 28px;
-    margin-top: 4px;
+    margin-top: 2px;
     padding-left: 8px;
     padding-right: 8px;
 }
@@ -277,8 +277,12 @@ md-sidenav .md-sidenav-right.md-locked-open{
     margin-left: -14px;
     margin-top: 5px;
 }
+.vlc-date > md-datepicker [disabled] {
+    margin-top: 4px;
+    padding-left: 4px;
+}
 .vlc-date-no-edit > div:first-child{
-    background-color: rgb(232, 129, 0) ;
+    background-color: rgb(232, 129, 0) !important;
 }
 
 .focused div.vlc-date > div:first-child{

@@ -728,13 +728,12 @@
                                                      md-search-text="provSelecText "
                                                      md-items="item in $parent.provs | stringKey : provSelecText : 'razon_social' "
                                                      md-item-text="item.razon_social"
-                                                     md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change="$parent.shipment.prov_id = provSelec.id ;$parent.shipment.objs.prov_id = provSelec;"
+                                                     md-selected-item-change="$parent.shipment.prov_id = provSelec.id ; $parent.shipment.objs.prov_id = provSelec;"
                                     >
                                         <md-item-template>
                                             <span>{{item.razon_social}}</span>
@@ -806,7 +805,7 @@
                     <form name="date" layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}"  >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form == 'date'}"  >
                                 <div flex class="titulo_formulario" style="height:39px;">
                                     <div>
                                         Fechas
@@ -823,19 +822,19 @@
                             </div>
                             <div layout="row" class="row" ng-show="formOptions.date.expand" >
 
-                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_carga.confirm}" >
+                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_carga.confirm}"
+                                ng-click="inDate($parent.shipment.fechas.fecha_carga.value,'fecha_carga' )"
 
-                                    <div layout="column" class="md-block" layout-align="center center"  >
+                                >
+                                    <div layout="column" class="md-block" layout-align="center center" ng-click="($parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_carga() : 0" >
                                         <div>Carga</div>
                                     </div>
-
-
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_carga.value"
+                                                   ng-change="changeFecha_carga()"
+                                                   ng-disabled="$parent.shipment.fechas.fecha_carga.confirm "
 
-                                                   skip-tab
+                                                   info="fecha en que se realizo termino de cargar el embarcar, cambiar solo cuando se este seguro de que el embarque esta cargado"
                                     ></md-datepicker >
-
-
                                 </div>
 
                                 <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_vnz.confirm}" >
@@ -844,7 +843,9 @@
                                     </div>
 
                                         <md-datepicker ng-model="$parent.shipment.fechas.fecha_vnz.value"
-
+                                                       ng-change="changeFecha_vnz()"
+                                                       ng-disabled="$parent.shipment.fechas.fecha_vnz.confirm"
+                                                       ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                        skip-tab
                                         ></md-datepicker >
 
@@ -858,7 +859,9 @@
                                     </div>
 
                                         <md-datepicker ng-model="$parent.shipment.fechas.fecha_tienda.value"
-
+                                                        ng-change="changeFecha_tienda()"
+                                                       ng-disabled="$parent.shipment.fechas.fecha_tienda.confirm"
+                                                       ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                        skip-tab
                                         ></md-datepicker >
 
@@ -1307,7 +1310,7 @@
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>En producion</div>
                                     </div>
-                                    <div layout="column"  layout-align="center center">{{select.fecha_produccion}}</div>
+                                    <div layout="column"  layout-align="center center">{{select.fecha_produccion | date :'dd/MM/yyyy' }}</div>
                                 </div>
 
                             </div>
@@ -1524,13 +1527,13 @@
                                                      skip-tab
                                                      md-search-text="puerto_idText"
                                                      md-auto-select="true"
-                                                     md-items="item in (pais_idSelec ==  null) ? [] :pais_idSelec.ports  | stringKey : puerto_idSelec : 'Main_port_name' "
+                                                     md-items="item in (pais_idSelec ==  null) ? [] :pais_idSelec.ports  | stringKey : puerto_idText : 'Main_port_name' "
                                                      md-item-text="item.Main_port_name"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-no-cache="true"
-                                                     md-selected-item-change="$parent.shipment.puerto_id = pais_idSelec.id ;$parent.shipment.objs.puerto_id = puerto_idSelec;"
+                                                     md-selected-item-change="$parent.shipment.puerto_id = puerto_idSelec.id ;$parent.shipment.objs.puerto_id = puerto_idSelec;"
 
                                     >
                                         <md-item-template>

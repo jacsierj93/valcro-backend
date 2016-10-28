@@ -21,7 +21,7 @@ $app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
-$app->get('embarques/Shipment/Dates', 'Embarques\EmbarquesController@getShipmentDates');
+$app->get('embarques/Shipment/Dates', 'Embarques\EmbarquesController@CalShipmentDates');
 $app->post('embarques/Shipment/SaveDates', 'Embarques\EmbarquesController@saveShipmentDates');
 $app->post('embarques/Save', 'Embarques\EmbarquesController@saveShipment');
 $app->post('embarques/Attachment/Save', 'Embarques\EmbarquesController@SaveAttachment');
