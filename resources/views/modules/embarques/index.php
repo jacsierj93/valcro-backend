@@ -806,7 +806,7 @@
                     <form name="date" layout="row" ng-class="{'focused':form== 'date'}" ng-click="form = 'date' " >
                         <div active-left  ></div>
                         <div layout="column" flex>
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}" >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'date'}"  >
                                 <div flex class="titulo_formulario" style="height:39px;">
                                     <div>
                                         Fechas
@@ -822,40 +822,49 @@
                                 </div>
                             </div>
                             <div layout="row" class="row" ng-show="formOptions.date.expand" >
-                                <div layout="row" class="date-row" flex="" >
+
+                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_carga.confirm}" >
+
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>Carga</div>
                                     </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_carga.value"
-                                                       ng-disabled="( session.isBlock )"
-                                                       skip-tab
-                                        ></md-datepicker >
-                                    </div>
+
+
+                                    <md-datepicker ng-model="$parent.shipment.fechas.fecha_carga.value"
+
+                                                   skip-tab
+                                    ></md-datepicker >
+
 
                                 </div>
-                                <div layout="row" class="date-row" flex="" >
+
+                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_vnz.confirm}" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>En Venenzuela</div>
+                                        <div>En Venezuela</div>
                                     </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_llegada_vnz.value"
-                                                       ng-disabled="( session.isBlock )"
+
+                                        <md-datepicker ng-model="$parent.shipment.fechas.fecha_vnz.value"
+
                                                        skip-tab
                                         ></md-datepicker >
-                                    </div>
+
+
                                 </div>
-                                <div layout="row" class="date-row" flex="" >
+
+
+                                <div layout="row" class="date-row vlc-date " flex=""  ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_tienda.confirm}">
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>En tienda</div>
                                     </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.shipment.fecha_tienda.value"
-                                                       ng-disabled="( session.isBlock )"
+
+                                        <md-datepicker ng-model="$parent.shipment.fechas.fecha_tienda.value"
+
                                                        skip-tab
                                         ></md-datepicker >
-                                    </div>
+
+
                                 </div>
+
                             </div>
                         </div>
                     </form>
@@ -1218,7 +1227,7 @@
                                 <div flex layout="row" class="table-filter-head">
                                     <!--   saldo en odc maximo a asignar-->
                                     <md-input-container class="md-block"  flex>
-                                        <label>Total</label>
+                                        <label>Disponible</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
                                                ng-model="tbl.filter.cantidad"
                                                skip-tab
@@ -1412,7 +1421,7 @@
                                 <div flex layout="row" class="table-filter-head">
                                     <!--   saldo en odc maximo a asignar-->
                                     <md-input-container class="md-block"  flex>
-                                        <label>Total</label>
+                                        <label>Disponible</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
                                                ng-model="tbl.filter.cantidad"
                                                skip-tab
@@ -2012,7 +2021,7 @@
                                     Agregar producto
                                 </md-tooltip>
                             </div>
-                            <div layout="column" layout-align="center center" ng-click="$parent.CreatProduct()" style="width:24px;">
+                            <div layout="column" layout-align="center center" ng-click="created()" style="width:24px;">
                                 <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
                                 <md-tooltip >
                                     Crear producto
@@ -2079,11 +2088,11 @@
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div   ng-repeat="item in $parent.shipment.items | filter : tbl.filter:strict | orderBy : tbl.order as filter  "    >
-                                <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(select.id == item.id)}" ng-click="open(item)">
-                                    <div flex class="cellGrid" >{{item.codigo}}</div>
-                                    <div flex class="cellGrid">{{item.codigo_fabrica}}</div>
-                                    <div flex class="cellGrid" >{{item.descripcion}}</div>
-                                    <div flex class="cellGrid" >{{item.cantidad}}</div>
+                                <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(select.id == item.id)}" >
+                                    <div ng-click="open(item)"  flex class="cellGrid" >{{item.codigo}}</div>
+                                    <div ng-click="open(item)" flex class="cellGrid">{{item.codigo_fabrica}}</div>
+                                    <div ng-click="open(item)"  flex class="cellGrid" >{{item.descripcion}}</div>
+                                    <div ng-click="open(item)"  flex class="cellGrid" >{{item.cantidad}}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" ng-show="filter.length == 0" flex>
@@ -2271,8 +2280,8 @@
                         <div active-left  ></div>
                         <div layout="column" flex>
                             <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict | orderBy : tbl.order as filter"    >
-                                <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}" >
-                                    <div class="cellEmpty" style=" width: 40px;margin: 0 2px 0 2px;" ng-click="changeAsig(item)">
+                                <div layout="row" class="cellGridHolder"  ng-class="{'table-row-select':(select.id == item.id)}"  ng-click="changeAsig(item)" >
+                                    <div class="cellEmpty" style=" width: 40px;margin: 0 2px 0 2px;">
                                         <md-switch class="md-primary" ng-disabled="true" ng-model="item.asignado" > </md-switch>
                                     </div>
                                     <div flex class="cellGrid" >{{item.codigo}}</div>
@@ -2647,112 +2656,95 @@
                             </div>
                         </div>
                     </div>
-                    <form name="formProduct">
-                    <div flex class="gridContent" layout="column" style="padding-right:4px">
-                        <md-input-container class="md-block"   >
-                            <label>Linea</label>
-                            <md-autocomplete md-selected-item="lineaSelec"
-                                             info="Linea del producto "
-                                             required
-                                             skip-tab
-                                             md-search-text="lineaText"
-                                             md-auto-select="true"
-                                             md-items="item in lineas | stringKey : lineaText : 'linea' "
-                                             md-item-text="item.linea"
-                                             md-autoselect = "true"
-                                             md-no-asterisk
-                                             md-min-length="0"
-                                             md-require-match="true"
-                                             md-no-cache="true"
-                                             md-select-on-match
-                                             md-selected-item-change="model.lineas_id = lineaSelec.id;"
-                            >
-                                <md-item-template>
-                                    <span>{{item.linea}}</span>
-                                </md-item-template>
-                            </md-autocomplete>
-                        </md-input-container>
-                        <md-input-container class="md-block"   >
-                            <label>Almacen</label>
-                            <md-autocomplete md-selected-item="almacnSelect"
-                                             info="Linea del producto "
-                                             skip-tab
-                                             md-search-text="almacnText"
-                                             md-auto-select="true"
-                                             md-items="item in almacn | stringKey : almacnText : 'linea' "
-                                             md-item-text="item.nombre"
-                                             md-autoselect = "true"
-                                             md-no-asterisk
-                                             md-min-length="0"
-                                             md-require-match="true"
-                                             md-no-cache="true"
-                                             md-select-on-match
-                                             md-selected-item-change="model.almacenes_id = almacnSelect.id;"
-                            >
-                                <md-item-template>
-                                    <span>{{item.linea}}</span>
-                                </md-item-template>
-                            </md-autocomplete>
-                        </md-input-container>
-                        <md-input-container class="md-block" >
-                            <label>Codigo</label>
-                            <input  type="text" ng-model="model.codigo"  >
+                    <form name="formProduct" class="focused">
+                        <div flex class="gridContent" layout="column" style="padding-right:4px">
 
-                        </md-input-container>
-                        <md-input-container class="md-block" >
-                            <label>Cod. Profit</label>
-                            <input  type="text" ng-model="model.codigo_profit"  required >
+                            <md-input-container class="md-block" >
+                                <label>Cantidad</label>
+                                <input  type="text" ng-model="model.cantidad" decimal >
+                            </md-input-container>
 
-                        </md-input-container>
-<!--                        <md-input-container class="md-block" >
-                            <label>Cod. fabrica</label>
-                            <input  type="text" ng-model="model.codigoo_fabrica"  >
-
-                        </md-input-container>-->
-                        <md-input-container class="md-block" >
-                            <label>Cod. Barra</label>
-                            <input  type="text" ng-model="model.codigo_barra"   >
-                        </md-input-container>
-
-                        <md-input-container class="md-block" >
-                            <label>Precio</label>
-                            <input  type="text" ng-model="model.precio"  >
-                        </md-input-container>
-<!--                        <div>
                             <md-input-container class="md-block"   >
-                                <label>Almacen</label>
-                                <md-autocomplete md-selected-item="autoCp.provSele.select"
-                                                 info="Seleccione el proveedor del embarque"
+                                <label>Linea</label>
+                                <md-autocomplete md-selected-item="lineaSelec"
+                                                 info="Linea del producto "
                                                  required
-                                                 ng-disabled="( session.isBlock )"
-                                                 ng-click="$parent.toEditHead('prov_id', provSelect.id)"
-                                                 id="prov_id"
                                                  skip-tab
-                                                 md-search-text="autoCp.provSele.text"
+                                                 md-search-text="lineaText"
                                                  md-auto-select="true"
-                                                 md-items="item in $parent.provs | stringKey : autoCp.provSele.text : 'razon_social' "
-                                                 md-item-text="item.razon_social"
+                                                 md-items="item in lineas | stringKey : lineaText : 'linea' "
+                                                 md-item-text="item.linea"
                                                  md-autoselect = "true"
                                                  md-no-asterisk
                                                  md-min-length="0"
                                                  md-require-match="true"
                                                  md-no-cache="true"
                                                  md-select-on-match
+                                                 md-selected-item-change="model.linea_id = lineaSelec.id;"
                                 >
                                     <md-item-template>
-                                        <span>{{item.razon_social}}</span>
+                                        <span>{{item.linea}}</span>
                                     </md-item-template>
-                                    <md-not-found >
-                                        No se encontro el proveedor {{searchProveedor}}. ¿Desea crearlo?
-                                    </md-not-found>
                                 </md-autocomplete>
                             </md-input-container>
-                        </div>-->
-                        <md-input-container class="md-block" >
-                            <label>Descripcion</label>
-                            <input  required type="text" ng-model="model.descripcion" >
-                        </md-input-container>
-                    </div>
+                            <md-input-container class="md-block"   >
+                                <label>Almacen</label>
+                                <md-autocomplete md-selected-item="almacnSelect"
+                                                 info="Linea del producto "
+                                                 required
+                                                 skip-tab
+                                                 md-search-text="almacnText"
+                                                 md-auto-select="true"
+                                                 md-items="item in almacn | stringKey : almacnText : 'nombre' "
+                                                 md-item-text="item.nombre"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0"
+                                                 md-require-match="true"
+                                                 md-no-cache="true"
+                                                 md-select-on-match
+                                                 md-selected-item-change="model.almacen_id = almacnSelect.id;"
+                                >
+                                    <md-item-template>
+                                        <span>{{item.nombre}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Cod. Profit</label>
+                                <input  type="text" ng-model="model.codigo_profit"  required >
+
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Serie</label>
+                                <input  type="text" required ng-model="model.serie"  >
+
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Codigo</label>
+                                <input  type="text" ng-model="model.codigo"  >
+
+                            </md-input-container>
+
+                            <!--                        <md-input-container class="md-block" >
+                                                        <label>Cod. fabrica</label>
+                                                        <input  type="text" ng-model="model.codigoo_fabrica"  >
+
+                                                    </md-input-container>-->
+                            <md-input-container class="md-block" >
+                                <label>Cod. Barra</label>
+                                <input  type="text" ng-model="model.codigo_barra"   >
+                            </md-input-container>
+
+                            <md-input-container class="md-block" >
+                                <label>Precio</label>
+                                <input  type="text" ng-model="model.precio"  decimal >
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Descripcion</label>
+                                <input  required type="text" ng-model="model.descripcion" >
+                            </md-input-container>
+                        </div>
                     </form>
                 </div>
             </md-content>
@@ -3077,13 +3069,13 @@
                                 Cantidad asignada al embarque
                             </md-tooltip>
                         </div>
-                        <div layout="row" >
-                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cantidad </div>
-                            <div class="rms" flex> {{select.cantidad}}</div>
-                            <md-tooltip >
-                                Cantidad Pedida
-                            </md-tooltip>
-                        </div>
+                        <!--                        <div layout="row" >
+                                                    <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cantidad </div>
+                                                    <div class="rms" flex> {{select.cantidad}}</div>
+                                                    <md-tooltip >
+                                                        Cantidad Pedida
+                                                    </md-tooltip>
+                                                </div>-->
                         <div layout="row" ng-show="select.precio">
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Precio </div>
                             <div class="rms" flex> {{select.precio}}</div>
@@ -3099,7 +3091,7 @@
                             </md-tooltip>
                         </div>
                         <div layout="row" >
-                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Disponible </div>
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Maximo </div>
                             <div class="rms" flex> {{select.disponible}}</div>
                             <md-tooltip >
                                 disponible para asignacion
@@ -3114,7 +3106,7 @@
                         </div>
                         <div layout="row" >
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">Cod. Fabrica </div>
-                            <div class="rms" flex> {{select.codigo_profit}} </div>
+                            <div class="rms" flex> {{select.codigo_fabrica}} </div>
                             <md-tooltip >
                                 Codigo en profit
                             </md-tooltip>

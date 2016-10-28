@@ -1,15 +1,14 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,$resource, setGetShipment, filesService) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,$resource, $model, filesService) {
 
     //?review
     filesService.setFolder('orders');
-
 
     $scope.alerts =[];
     $scope.provSelec ={};
     $scope.provs =[];
     $scope.paises =[];
     $scope.shipment ={objs:{}};
-    $scope.bindShipment =setGetShipment.bind();
+    $scope.bindShipment =$model.bind();
     $scope.session = {global:'new', isblock: false};
     $scope.permit={
         created:true
@@ -31,15 +30,30 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $scope.listShipmentCtrl(prov);
         }else if($scope.module.layer == 'detailShipment'){
             $scope.provSelec= prov;
+            $scope.save();
         }
 
+    };
+
+    $scope.reloadDates = function () {
+        $resource.getMod({type:"Shipment", mod:"Dates", id:$scope.$parent.shipment.id,fecha_carga:true}, {}, function (response) {
+            $model.setDates(response);
+            $resource.postMod({type:"Shipment", mod:"SaveDates"},
+                { id:$scope.$parent.shipment.id,
+                    fecha_carga:response.fecha_carga,
+                    fecha_tienda:response.fecha_tienda,
+                    fecha_vnz:response.fecha_vnz
+                }
+                , function (response) {
+
+                    $model.setDates(response);
+                });
+        });
     };
 
 
     $scope.closeSide = function(){
         $timeout(function () {
-            console.log("getvalid",form.getValid());
-
             if(form.getState() == "process"){
                 $scope.validChangeFor();
             }else {
@@ -55,13 +69,25 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     };
 
+    var timeUp= null
     $scope.save = function (fn) {
-        $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
-            $scope.shipment.id= response.id;
-            if(fn){
-                fn(response);
-            }
-        });
+        timeUp = $timeout(function () {
+            $resource.post({type:"Save"},$scope.shipment, function(response){
+                $scope.shipment.id = response.id;
+                $scope.shipment.session_id = response.session_id;
+                if(response.emision){
+                    $scope.shipment.emision;
+                }
+
+                $timeout.cancel(timeUp);
+                timeUp= null;
+                if(fn){
+                    fn(response);
+                }
+            });
+        },500);
+
+
     };
 
     var interval = null;
@@ -91,18 +117,26 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.$watch('bindShipment.estado', function(newVal){
 
         if(newVal){
-            $scope.shipment = setGetShipment.getData();
-            $scope.provSelec= $scope.shipment.objs.prov_id;
+            $scope.shipment = $model.getData();
+            if( $scope.shipment.objs){
+                $scope.provSelec = $scope.shipment.objs.prov_id;
+            }
+
+
+
         }
     });
 
     $scope.$watchGroup(['module.layer', 'module.index'] ,function(newVal){
         $scope.layer= newVal[0];
         $scope.index= newVal[1];
-    });
-    $timeout(function(){
+        if(newVal[1] == 0 || newVal[0] == 'listShipmentUncloset'){
+            $model.clear();
+            $scope.provSelec= undefined;
+        }
 
-    },1000);
+
+    });
 
 
 
@@ -204,11 +238,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
         pago:{expand:true}  ,
         agreds:{expand:true}
     };
-
-
-
-
-
     $scope.$watch("provSelec", function(newVal){
         if(newVal != null && newVal.id && $scope.$parent.provSelec != null){
             $resource.queryMod({type:"Provider",mod:"Dir", id:newVal.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
@@ -247,16 +276,18 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
     $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
         if(!newVal[1]){
-            $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
-                $scope.$parent.session.session_id= response.session_id;
-                $scope.$parent.shipment.id = response.id;
+            $scope.$parent.save(function () {
                 $scope.detailShipmenthead.$setPristine()
             });
+
         }
     });
 
     $scope.$parent.OpenShipmentCtrl = function(data){
+
         $scope.form= 'head';
+        $scope.detailShipmenthead.$setPristine();
+        $scope.detailShipmenthead.$setUntouched();
         $scope.$parent.LayersAction({open:{name:"detailShipment", after: function(){
             if(!data){
                 $scope.detailShipmenthead.$setDirty();
@@ -282,10 +313,20 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
     $scope.test= function(){
         alert('');
     }
+    //fechas
+
+    $scope.clickFecha_carga = function () {
+
+      if($scope.$parent.shipment.fechas.fecha_carga.confirm)  {
+
+      }
+    };
+
+
 
 }]);
 
-MyApp.controller('listTariffCtrl',['$scope','$timeout', 'shipment','tarifForm',  function($scope,$timeout,  $resource,tarifForm){
+MyApp.controller('listTariffCtrl',['$scope','$timeout', 'shipment','tarifForm','setGetShipment',   function($scope,$timeout,  $resource,tarifForm, $model){
     $scope.tbl ={
         order:"id",
         filter:{},
@@ -320,15 +361,32 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'shipment','tarifForm', 
             angular.forEach(data, function(v,k){
                 $scope.tarifaSelect[k] =v;
             });
-            console.log('obhs',  $scope.$parent.shipment);
-            console.log(data.objs.freight_forwarder_id);
+            console.log(data);
             $scope.$parent.shipment.tarifa_id = data.id;
 
             $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = angular.copy(data.objs.freight_forwarder_id);//tarifa_id.freight_forwarder
             $scope.$parent.shipment.objs.tarifa_id.naviera = angular.copy(data.objs.naviera_id);
-            console.log('obhs later',  $scope.$parent.shipment);
+            $resource.getMod({type:"Shipment", mod:"Dates", id:$scope.$parent.shipment.id,fecha_carga:true}, {}, function (response) {
+                console.log("dates", response);
+                $model.setDates(response);
+                $resource.postMod({type:"Shipment", mod:"SaveDates"},
+                    { id:$scope.$parent.shipment.id,
+                        fecha_carga:response.fecha_carga,
+                        fecha_tienda:response.fecha_tienda,
+                        fecha_vnz:response.fecha_vnz
+                    }
+                    , function (response) {
+
+                        $model.setDates(response);
+                    });
+
+
+            });
+
+
 
         }
+
 
     };
     $scope.$watch("tarifBind.estado", function (newVal, oldVal) {
@@ -338,6 +396,22 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'shipment','tarifForm', 
                 $scope.tarifaSelect[k] =v;
             });
             tarifForm.setState("waith");
+            $resource.getMod({type:"Shipment", mod:"Dates", id:$scope.$parent.shipment.id,fecha_carga:true}, {}, function (response) {
+                console.log("dates", response);
+                $model.setDates(response);
+                $resource.postMod({type:"Shipment", mod:"SaveDates"},
+                    { id:$scope.$parent.shipment.id,
+                        fecha_carga:response.fecha_carga,
+                        fecha_tienda:response.fecha_tienda,
+                        fecha_vnz:response.fecha_vnz
+                    }
+                    , function (response) {
+
+                        $model.setDates(response);
+                    });
+
+
+            });
         }
     });
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
@@ -364,11 +438,7 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'shipment','tarifForm', 
 
             $timeout(function () {
                 $scope.$parent.save(function () {
-                    $resource.post({type:"Save"},$scope.$parent.shipment, function(response){
-                        $scope.$parent.session.session_id= response.session_id;
-                        $scope.$parent.shipment.id = response.id;
-                        $scope.tariffF1.$setPristine()
-                    });
+                    $scope.tariffF1.$setPristine();
                 });
             },1000);
 
@@ -715,13 +785,30 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
     $scope.bindForm= formSrv.bind();
 
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+
         if(newVal && formSrv.name == 'DetailProductProducShip'){
             var data = formSrv.getData();
+            console.log("data", data);
             if(data.response && data.response.accion == 'del' ){
+
+
                 angular.forEach($scope.select, function (v, k) {
                     $scope.select[k]= undefined;
                 })
+            }else{
+                angular.forEach(data, function (v, k) {
+                    $scope.select[k]= v;
+                });
+                $scope.select.cantidad= data.saldo;
             }
+
+
+        }
+        if(newVal && formSrv.name == 'DetailProductCreate'){
+            console.log("new object",formSrv.getData() );
+            angular.forEach(formSrv.getData(), function (v, k) {
+                $scope.select[k]= v;
+            });
 
         }
     });
@@ -737,7 +824,8 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
 
     $scope.open =  function (data) {
         $scope.select = data;
-    }
+
+    };
 
     $scope.update = function () {
         if(!$scope.select.id){
@@ -758,15 +846,22 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
                 codigo:$scope.select.codigo,
                 doc_origen_id:$scope.select.doc_origen_id
             };
+
+            console.log("data en upadtea", data);
             $scope.$parent.DetailProductShipment(data);
 
 
         }
 
     }
+
+    $scope.created = function () {
+        formSrv.name= 'DetailProductCreate';
+        $scope.$parent.CreatProduct();
+    }
 }]);
 
-MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($scope,$resource, formSrv){
+MyApp.controller('listProductAddCtrl',['$scope','shipment','form', 'setGetShipment',function($scope,$resource, formSrv, $model){
     $scope.tbl ={
         order:"id",
         filter:{},
@@ -781,19 +876,33 @@ MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($sco
 
         if(newVal && formSrv.name == 'DetailProductProduc'){
             var data = formSrv.getData();
-            console.log("data entro", data);
 
             angular.forEach(data, function (v, k) {
                 $scope.select[k]=v;
             });
-            console.log("entro",$scope.select);
+                $resource.getMod({type:"Shipment", mod:"Dates", id:$scope.$parent.shipment.id,fecha_carga:true}, {}, function (response) {
+                    console.log("dates", response);
+                    $model.setDates(response);
+                    $resource.postMod({type:"Shipment", mod:"SaveDates"},
+                        { id:$scope.$parent.shipment.id,
+                            fecha_carga:response.fecha_carga,
+                            fecha_tienda:response.fecha_tienda,
+                            fecha_vnz:response.fecha_vnz
+                        }
+                        , function (response) {
+
+                            $model.setDates(response);
+                        });
+
+
+                });
+
 
         }
     });
     $scope.select = {};
     $scope.$parent.listProductAdd = function(){
         $scope.select = {};
-        console.log("in sciep", $scope.$parent);
         $resource.queryMod({type:"Order", mod:"Products", embarque_id:$scope.$parent.shipment.id},{}, function (response) {
             $scope.tbl.data = response;
         });
@@ -804,8 +913,9 @@ MyApp.controller('listProductAddCtrl',['$scope','shipment','form', function($sco
 
     /**change asignado en clik espcial */
     $scope.changeAsig = function (data) {
-        console.log("data", data);
+
         if(!data.asignado){
+
             formSrv.name= 'DetailProductProduc';
             $scope.$parent.DetailProductShipment(data);
             $scope.select = data;
@@ -887,6 +997,10 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shi
         masters.query({type:"prodLines"},{}, function (response) {
             $scope.lineas= response;
         });
+        masters.query({type:"DirStores"},{}, function (response) {
+            $scope.almacn= response;
+        });
+        $scope.model.prov_id= $scope.$parent.shipment.prov_id;
         $mdSidenav("miniCreatProduct").open().then(function(){
             $scope.isOpen = true;
         });
@@ -911,7 +1025,13 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shi
                     ]
                     , {block:true});
             }else {
-                alert("guardando Prodcuto");
+                $resource.postMod({type:"Product", mod:"CreateOnAdd"},$scope.model,function (response) {
+                    $scope.$parent.shipment.items.push(response.model);
+                    $scope.$parent.NotifAction("ok", "Producto creado y añadido",[],{autohidden:2000});
+                    $scope.inClose();
+                    formSrv.setData(response.model);
+                    formSrv.setState("continue");
+                });
             }
 
         }
@@ -1359,7 +1479,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
 
     $scope.$parent.detailOrderShipment = function(data){
         $scope.prodSelect = {};
-        $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
+        $resource.getMod({type:"Order", mod:"Order", id:data.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
             angular.forEach(response, function (v,k) {
                 $scope.select[k]=v;
             });
@@ -1371,12 +1491,25 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','shipment','form', function
         }}});
 
     };
-    $scope.open = function (data) {
+    $scope.open = function (model) {
         form.name = 'DetailProductShip';
         console.log("name set",form.name);
 
-        $scope.prodSelect= data;
+        $scope.prodSelect=model;
+        var data = {
+            embarque_item_id:$scope.prodSelect.embarque_item_id,
+            tipo_origen_id:23,
+            descripcion:$scope.prodSelect.descripcion,
+            origen_item_id:$scope.prodSelect.id,
+            producto_id:$scope.prodSelect.producto_id,
+            saldo:$scope.prodSelect.saldo,
+            codigo_fabrica:$scope.prodSelect.codigo_fabrica,
+            disponible:$scope.prodSelect.disponible,
+            codigo:$scope.prodSelect.codigo,
+            doc_origen_id:$scope.select.id
+        };
 
+        console.log("data", data)
         $scope.$parent.DetailProductShipment(data);
     }
 
@@ -1393,6 +1526,7 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
         if(newVal && form.name == 'DetailProductAdd'){
             var data = form.getData();
+            console.log(data);
             angular.forEach(data, function (v, k) {
                 $scope.prdSelect[k]=v;
             });
@@ -1413,7 +1547,7 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
 
     $scope.$parent.detailOrderAdd = function(data){
 
-        $resource.getMod({type:"Order", mod:"Order", id:data.id},{},function (response) {
+        $resource.getMod({type:"Order", mod:"Order", id:data.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
             angular.forEach(response, function (v,k) {
                 $scope.select[k]=v;
             });
@@ -1423,15 +1557,29 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','form', function($sco
 
     };
 
-    $scope.openProd = function (data) {
+    $scope.openProd = function (model) {
         form.name= 'DetailProductAdd';
-        $scope.prdSelect=data;
+        $scope.prdSelect=model;
+        var data = {
+            embarque_item_id:$scope.prdSelect.embarque_item_id,
+            tipo_origen_id:23,
+            descripcion:$scope.prdSelect.descripcion,
+            origen_item_id:$scope.prdSelect.id,
+            producto_id:$scope.prdSelect.producto_id,
+            saldo:$scope.prdSelect.saldo,
+            codigo_fabrica:$scope.prdSelect.codigo_fabrica,
+            disponible:$scope.prdSelect.disponible,
+            codigo:$scope.prdSelect.codigo,
+            doc_origen_id:$scope.select.id
+        };
+
+        console.log("data", data)
         $scope.$parent.DetailProductShipment(data);
+
 
     }
 
 }]);
-
 
 MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout', 'form','shipment', function($scope,$mdSidenav, $timeout, formSrv, $resource){
     $scope.isOpen = false;
@@ -1520,7 +1668,6 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                         },
                         {name: "Cancelar" ,
                             action: function () {
-                                formSrv.setBind(true);
                                 $scope.inClose();
                                 formSrv.setState("continue");
 
@@ -1561,11 +1708,11 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                 var send = {
                     id:$scope.select.embarque_item_id,
                     descripcion: $scope.select.descripcion,
-                    origen_item_id: $scope.select.id,
+                    origen_item_id: ($scope.select.origen_item_id) ? $scope.select.origen_item_id : $scope.select.id,
                     saldo: $scope.select.saldo,
-                    tipo_origen_id:23,
+                    tipo_origen_id:($scope.select.tipo_origen_id)? $scope.select.tipo_origen_id : 23,
                     embarque_id: $scope.$parent.shipment.id ,
-                    doc_origen_id: $scope.select.doc_id,
+                    doc_origen_id:($scope.select.doc_origen_id) ? $scope.select.doc_origen_id : $scope.select.doc_id,
                     producto_id: $scope.select.producto_id
                 };
                 $resource.postMod({type:"OrderItem", mod:"Save"},send, function (response) {
@@ -1614,7 +1761,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
 
 MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipment',function($scope,$mdSidenav, shipment, $model){
     $scope.isOpen = false;
-    shipment.query({type:"Notification"}, {}, function(response){$scope.$parent.alerts= response; });
+
     $scope.$parent.moduleMsmCtrl = function(){
         $mdSidenav("moduleMsm").open().then(function(){
             $scope.isOpen = true;
@@ -1652,6 +1799,12 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
         }
 
     }
+
+    $scope.$watch("$parent.index", function (newVal) {
+        if(newVal == 0){
+            shipment.query({type:"Notification"}, {}, function(response){$scope.$parent.alerts= response; });
+        }
+    })
 
 
 }]);
@@ -1725,7 +1878,6 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
                         $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = response.model.objs.freight_forwarder_id;
                         $scope.$parent.shipment.objs.tarifa_id.naviera = response.model.objs.naviera_id;
                         $scope.$parent.shipment.tarifa_id = response.model.id;
-                        console.log( $scope.$parent.shipment);
                         $scope.$parent.save();
                         $scope.inClose();
                         $timeout(function () {
@@ -2081,9 +2233,28 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 angular.forEach(response.objs,function (v, k) {
                     Shipment.objs[k]=v;
                 });
-/*                Shipment.fecha_carga= (response.fecha_carga.value!= null) ? DateParse.toDate(response.fecha_carga.value) : null;
-                Shipment.fecha_vnz= (response.fecha_vnz.value!= null) ? DateParse.toDate(response.fecha_vnz.value) : null;
-                Shipment.fecha_tienda= (response.fecha_tienda.value!= null) ? DateParse.toDate(response.fecha_tienda.value) : null;*/
+                if(response.fechas){
+                    Shipment.fechas= {};
+                    if(response.fechas.fecha_carga.value){
+                        Shipment.fechas.fecha_carga={};
+                        Shipment.fechas.fecha_carga.confirm=response.fechas.fecha_carga.confirm;
+                        Shipment.fechas.fecha_carga.isManual=response.fechas.fecha_carga.isManual;
+                        Shipment.fechas.fecha_carga.value = DateParse.toDate(response.fechas.fecha_carga.value);
+                    }
+                    if(response.fechas.fecha_tienda.value){
+                        Shipment.fechas.fecha_tienda={};
+                        Shipment.fechas.fecha_tienda.confirm=response.fechas.fecha_carga.confirm;
+                        Shipment.fechas.fecha_tienda.isManual=response.fechas.fecha_carga.isManual;
+                        Shipment.fechas.fecha_tienda.value = DateParse.toDate(response.fechas.fecha_tienda.value);
+                    }
+                    if(response.fechas.fecha_vnz.value){
+                        Shipment.fechas.fecha_vnz={};
+                        Shipment.fechas.fecha_vnz.confirm=response.fechas.fecha_vnz.confirm;
+                        Shipment.fechas.fecha_vnz.isManual=response.fechas.fecha_carga.isManual;
+                        Shipment.fechas.fecha_vnz.value = DateParse.toDate(response.fechas.fecha_vnz.value);
+                    }
+                }
+
                 Shipment.emision = (response.emision!= null) ? DateParse.toDate(response.emision) : null;
                 Shipment.containers = response.containers;
                 Shipment.odcs = response.odcs;
@@ -2103,7 +2274,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                     documento: response.nro_dua.documento,
                     emision:(response.nro_dua.emision== null)? undefined: DateParse.toDate(response.nro_dua.emision)
                 } ;
-                console.log("sgipm", Shipment)
+                console.log("chipment", Shipment);
                 bindin.estado = true;
 
             });
@@ -2111,6 +2282,28 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
 
         },
+       setDates : function (fechas) {
+           Shipment.fechas= {};
+           if(fechas.fecha_carga.value){
+               Shipment.fechas.fecha_carga={};
+               Shipment.fechas.fecha_carga.confirm=fechas.fecha_carga.confirm;
+               Shipment.fechas.fecha_carga.isManual=fechas.fecha_carga.isManual;
+               Shipment.fechas.fecha_carga.value = DateParse.toDate(fechas.fecha_carga.value);
+           }
+           if(fechas.fecha_tienda.value){
+               Shipment.fechas.fecha_tienda={};
+               Shipment.fechas.fecha_tienda.confirm=fechas.fecha_carga.confirm;
+               Shipment.fechas.fecha_tienda.isManual=fechas.fecha_carga.isManual;
+               Shipment.fechas.fecha_tienda.value = DateParse.toDate(fechas.fecha_tienda.value);
+           }
+           if(fechas.fecha_vnz.value){
+               Shipment.fechas.fecha_vnz={};
+               Shipment.fechas.fecha_vnz.confirm=fechas.fecha_vnz.confirm;
+               Shipment.fechas.fecha_vnz.isManual=fechas.fecha_carga.isManual;
+               Shipment.fechas.fecha_vnz.value = DateParse.toDate(fechas.fecha_vnz.value);
+           }
+
+       },
         reload: function(doc){
             bindin.estado=false;
             bindin.estado=true;
@@ -2119,11 +2312,44 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
             return Shipment;
         },
         clear: function(){
+            bindin.estado = false;
             forms ={};
             interno= 'new';
             externo= 'new';
-            Shipment={};
-            bindin.estado=false;
+             bindin.estado=false;
+            Shipment.nro_dua={};
+            Shipment.nro_dua.documento = undefined;
+            Shipment.nro_dua.emision =undefined;
+            Shipment.nro_dua.emision =undefined;
+            Shipment.nro_hbl={};
+            Shipment.nro_hbl.documento = undefined;
+            Shipment.nro_hbl.emision =undefined;
+            Shipment.nro_hbl.emision =undefined;
+            Shipment.nro_mbl={};
+            Shipment.nro_mbl.documento = undefined;
+            Shipment.nro_mbl.emision =undefined;
+            Shipment.nro_mbl.emision =undefined;
+            Shipment.items = [];
+            Shipment.odcs = [];
+            Shipment.containers = [];
+            Shipment.emision = undefined;
+            Shipment.fechas= {};
+            Shipment.fechas.fecha_vnz = {};
+            Shipment.fechas.fecha_tienda = {};
+            Shipment.fechas.fecha_carga = {};
+
+           if(Shipment.objs){
+               angular.forEach(Shipment.objs,function (v, k) {
+                   Shipment.objs[k]=null;
+               });
+           }
+            angular.forEach(Shipment,function (v, k) {
+               if(typeof v =='string'){
+                   Shipment[k]= undefined;
+               }
+            });
+            bindin.estado = true;
+
         }
 
 
