@@ -1,7 +1,7 @@
 
 
 <md-input-container id="text" class="md-block" flex prevText>
-    <label>{{field.campo}}</label>
+    <label>{{field.field.descripcion}}</label>
     <input skip-tab
            info="fasfafs"
            ng-disabled="$parent.enabled && prov.id"
@@ -15,13 +15,13 @@
            ng-minlength="3"
            required
            md-no-asterisk
-           ng-model="dtaPrv.description" >
+           id="{{field.id}}">
 
 </md-input-container>
 
 
 <md-input-container flex prevAutocomplete>
-    <label>{{field.campo}}</label>
+    <label>{{field.field.descripcion}}</label>
     <md-autocomplete md-selected-item="ctrl.lang"
                      flex
                      skip-tab
@@ -33,7 +33,8 @@
                      md-item-text="item.lang"
                      md-no-asterisk
                      ng-disabled="$parent.enabled || cnt.isAgent==1"
-                     md-min-length="0">
+                     md-min-length="0"
+                     id="{{field.id}}">
         <input >
         <md-item-template>
             <span>{{item.nombre}}</span>

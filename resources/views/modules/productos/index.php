@@ -269,6 +269,7 @@
                                         Vista previa Formulario
                                     </div>
                                 </div>
+
                                 <div flex>
                                     <div ng-repeat="field in criteria" class="row"
                                          form-preview="{{ field.type.directive }}">
@@ -280,15 +281,15 @@
                     </div>
                     <div flex="15" layout="column" class="md-whiteframe-2dp">
                         <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="i in [0,1,2,3,4,5,6,7]" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                <div>campo {{i}}</div>
+                            <div ng-repeat="field in fields" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div ng-click="setField(field)">{{field.descripcion}}</div>
                             </div>
                         </md-content>
                     </div>
                     <div flex="15" layout="column" class="md-whiteframe-2dp">
                         <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="i in tipos" ng-click="addField(i)" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                <div>{{i}}</div>
+                            <div ng-repeat="type in tipos" ng-click="addField(i)" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div>{{type.descripcion}}</div>
                             </div>
                         </md-content>
                     </div>
