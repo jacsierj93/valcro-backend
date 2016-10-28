@@ -1,57 +1,45 @@
 /**
  * Created by jacsiel on 04/10/16.
  */
+MyApp.factory('criterios', ['$resource',
+    function ($resource) {
+        return $resource('criterio/:type/:id', {}, {
+            query: {method: 'GET', cancellable:true, params: {type: "",id:""}, isArray: true},
+            get:   {method: 'POST', params: {type: ""}, isArray: false},
+            put:   {method: 'POST', params: {type: ""}, isArray: false}
+        });
+    }
+]);
 
-MyApp.controller('prodMainController',['$scope', 'setNotif','masters','$mdSidenav','critForm',function ($scope, setNotif, masters,$mdSidenav,critForm) {
+MyApp.controller('prodMainController',['$scope', 'setNotif','masters','$mdSidenav','critForm','criterios',function ($scope, setNotif, masters,$mdSidenav,critForm,criterios) {
     $scope.clicked = function(){
         $mdSidenav("layer0").open();
     };
     $scope.listLines = masters.query({ type:"prodLines"});
-    $scope.tipos = ['texto','numero','selector','checkbox','radio'];
+    $scope.fields = criterios.query({type:"fieldList"});
+    $scope.tipos = criterios.query({type:"typeList"});
+    $scope.critField = {
+        id:false,
+        line:null,
+        type:null,
+        field:null
+    };
+
+    $scope.createField = function(data,type){
+
+    };
     $scope.opennext = function(){
         $mdSidenav("layer1").open();
     };
     $scope.addField= function(type){
         critForm.add(type);
-        //console.log(type)
-        /*  var newField = angular.copy(factory[type]);
-         newField.campo = name;
-         $scope.criteria.push(newFieldw);*/
     };
 
 }]);
 
-MyApp.service("critForm",function(){
-    var factory = {
-        "texto": {
-            campo: "",
-            type: {
-                tipo: "text",
-                directive: 'prevText'
-            }
-        },
-
-        "selector": {
-            campo: "",
-            type: {
-                tipo: "autocomplete",
-                directive: 'prevAutocomplete'
-            },
-            opciones:[
-                {
-                    id:1,
-                    nombre:'oopcion1'
-                },{
-                    id:2,
-                    nombre:'oopcion2'
-                },{
-                    id:3,
-                    nombre:'oopcion3'
-                },
-            ]
-        }
-    };
-    var listado = [];
+MyApp.service("critForm",function(criterios){
+    var factory = criterios.query({ type:"getCriteria"});
+    var listado = criterios.query({ type:"getCriteria"});
     return {
         add:function(datos){
             var nuevo = angular.copy(factory[datos]);
@@ -68,10 +56,7 @@ MyApp.service("critForm",function(){
 
 
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm',function ($scope, setNotif, masters,critForm) {
-
    $scope.criteria = critForm.get();
-
-
 }]);
 
 MyApp.directive('formPreview', function($http,$timeout) {
