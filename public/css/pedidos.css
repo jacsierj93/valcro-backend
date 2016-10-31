@@ -104,7 +104,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
     color: rgb(92, 183, 235);
 }
 .form-row-head-option.form-row-head-select{
-   /* color: rgb(92, 183, 235);*/
+    /* color: rgb(92, 183, 235);*/
 }
 .form-row-head-option div{
     margin: 0 2px 0 2px;
@@ -285,9 +285,18 @@ md-sidenav .md-sidenav-right.md-locked-open{
     background-color: rgb(232, 129, 0) !important;
 }
 
-.focused div.vlc-date > div:first-child{
-    background-color: rgb(84, 180, 234);
+.focused div.vlc-buttom-aprob{
+    background-color: rgb(232, 129, 0) !important;
 
+}.focused div.vlc-date > div:first-child{
+     background-color: rgb(84, 180, 234);
+
+ }
+
+.final-nav img{
+    width: 8px;
+}.final-nav img:first-child{
+   margin-left: 2px;
 }
 
 

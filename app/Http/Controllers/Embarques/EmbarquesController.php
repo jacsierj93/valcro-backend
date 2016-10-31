@@ -20,6 +20,7 @@ use App\Models\Sistema\Shipments\ShipmentItem;
 use App\Models\Sistema\Tariffs\FreigthForwarder;
 use App\Models\Sistema\Tariffs\Naviera;
 use App\Models\Sistema\Tariffs\Tariff;
+use App\Models\Sistema\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -32,12 +33,20 @@ class EmbarquesController extends BaseController
     private  $user = null;
     private $minAproxDay = 100;
     private $diasTienda = 15;
+    /***
+    model shipmente
 
+     */
 
     public function __construct(Request $req)
     {
-        $this->user['id']= $req->session()->get('DATAUSER')['id'];
         $this->middleware('auth');
+        $this->request= $req;
+        if($this->user == null){
+            $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
+                ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
+        }
+
     }
 
     /************************* SYSTEM ***********************************/
@@ -53,10 +62,12 @@ class EmbarquesController extends BaseController
         return $result;
     }
 
-    /**Docuemntos con sesion abierta*/
+    /**documentos  con sesion abierta*/
     public function getUncloset(){
         return json_encode(Shipment::whereNotNull('session_id')->get());
     }
+
+
 
     /************************* PROVIDER ***********************************/
     public  function  getProvList(){
@@ -95,7 +106,7 @@ class EmbarquesController extends BaseController
             ->whereRaw(' (select sum(saldo) from tbl_compra_orden_item where doc_id = tbl_compra_orden.id ) > 0')
             ->get();
         foreach($models as $aux){
-            $aux->items = $aux->items()->get();
+            // $aux->items = $aux->items()->get();
 
             if(sizeof(ShipmentItem::where('doc_origen_id', $aux->id)->where('tipo_origen_id', 23)->where('embarque_id', $req->embarque_id)->get()) > 0){
                 $aux->asignado=true;
@@ -149,21 +160,8 @@ class EmbarquesController extends BaseController
     public function getOrder(Request $req){
         $model= Purchase::findOrFail($req->id);
         $prods =[];
-        $data['id']= $model->id;
-        $data['titulo']= $model->titulo;
-        $data['fecha_produccion']= $model->fecha_produccion;
-        $data['fecha_aprob_gerencia']= $model->fecha_aprob_gerencia;
-        $data['nro_proforma']=['documento'=>$model->nro_proforma, 'adjs'=>[]];
-        $data['monto']= $model->monto;
-        $data['peso']= $model->peso;
-        $data['mt3']= $model->mt3;
-        $data['prods'] =[];
-        $items = $model->items()->where('saldo','>', '0')->get() ;
-
-        //dd($items);
-        foreach ($items as $aux){
-
-            $prd  = PurchaseItem::selectRaw(
+        $items = $model->items()
+            ->selectRaw(
                 'tbl_compra_orden_item.id, 
                 tbl_compra_orden_item.descripcion, 
                 tbl_compra_orden_item.doc_id, 
@@ -172,60 +170,55 @@ class EmbarquesController extends BaseController
                 tbl_compra_orden_item.producto_id, 
                 tbl_compra_orden_item.saldo as cantidad, 
                 tbl_compra_orden_item.saldo as disponible, '.
+                'tbl_prov_tiempo_fab.min_dias, '.
+                'tbl_prov_tiempo_fab.max_dias, '.
                 ' ADDDATE(\''.$model->fecha_produccion.'\', interval tbl_prov_tiempo_fab.min_dias DAY ) as minProducion,'.
                 ' ADDDATE(\''.$model->fecha_produccion.'\', interval tbl_prov_tiempo_fab.max_dias DAY ) as maxProducion,'.
                 'tbl_producto.codigo, 
                 tbl_producto.codigo_barra, 
                 tbl_producto.codigo_profit, 
+                tbl_producto.linea_id, 
                 tbl_producto.codigo_fabrica
                 ')
-                ->join('tbl_producto','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
-                ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
-                ->where('tbl_producto.id', $aux->producto_id)
-                ->where('tbl_compra_orden_item.id', $aux->id)
-                ->first();
+            ->join('tbl_producto','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
+            ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
+            ->get() ;
 
+        foreach ($items as $aux){
             $item =  ShipmentItem::where('doc_origen_id', $model->id)
                 ->where('tipo_origen_id', '23')
                 ->where('origen_item_id',$aux->id)
                 ->where('embarque_id', $req->embarque_id)
                 ->first();
-            $prd->asignado= false;
-
-
-
+            $aux->asignado= false;
             if($item != null){
-
                 $data['asinado']= true;
-                $prd->asignado = true;
-                $prd->embarque_item_id = $item->id;
-                $prd->disponible = floatval(floatval($prd->cantidad) + floatval($item->cantidad) );
-
-                $prd->saldo = $item->cantidad;
-
+                $aux->asignado = true;
+                $aux->embarque_item_id = $item->id;
+                $aux->disponible = floatval(floatval($aux->cantidad) + floatval($item->cantidad) );
+                $aux->saldo = $item->cantidad;
             }else{
-                $prd->saldo = 0;
+                $aux->saldo = 0;
             }
-
             $origen =   $this->getFirstProducto($aux);
             $source = SourceType::find($origen->tipo_origen_id);
-            $prd->origen = ['text'=>$source->descripcion, 'key'=>$source->id];
-            $prods[] =$prd;
+            $aux->origen = ['text'=>$source->descripcion, 'key'=>$source->id];
+            $prods[] =$aux;
 
         }
 
         if($req->has('embarque_id')){
-            $data['isTotal'] = 1;
+            $model->isTotal = 1;
             $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
             foreach ($items as $item){
                 $shipItem = $models->where('origen_item_id',$item->id);
                 if(sizeof( $shipItem) == 0){
-                    $data['isTotal'] = 0;
+                    $model->isTotal = 0;
                     break;
                 }else{
 
                     if(floatval($shipItem->first()->saldo) < floatval($item->saldo)){
-                        $data['isTotal'] = 0;
+                        $model->isTotal = 0;
                         break;
                     }
                 }
@@ -233,9 +226,12 @@ class EmbarquesController extends BaseController
         }
 
 
+        $model->maxProducion = $items->max('maxProducion');
+        $model->minProducion = $items->max('minProducion');
+        $model->prods = $prods;
+        //$data['prods'] =$prods ;
 
-        $data['prods'] =$prods ;
-        return $data;
+        return $model;
     }
 
     /************************* TARIFF ***********************************/
@@ -386,8 +382,8 @@ class EmbarquesController extends BaseController
         $data['pais_id'] = $model->pais_id;
         $data['puerto_id'] = $model->puerto_id;
         $data['tarifa_id'] = $model->tarifa_id;
-        $data['flete_nac'] = $model->flete_nac;
-        $data['flete_dua'] = $model->flete_dua;
+        $data['nacionalizacion'] = $model->nacionalizacion;
+        $data['dua'] = $model->dua;
         $data['flete_tt'] = $model->flete_tt;
 
         $data['moneda_id'] = $model->flete_dua;
@@ -399,8 +395,8 @@ class EmbarquesController extends BaseController
         $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;
         $data['conf_f_tienda'] = ($model->usuario_conf_f_tienda == null )? false: true;
         $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null )? false: true;
-        $data['conf_monto_ft_nac'] = ($model->usuario_conf_monto_ft_nac == null )? false: true;
-        $data['conf_monto_ft_dua'] = ($model->usuario_conf_monto_ft_dua == null )? false: true;
+        $data['conf_monto_nac'] = ($model->usuario_conf_monto_nac == null )? false: true;
+        $data['conf_monto_dua'] = ($model->usuario_conf_monto_dua == null )? false: true;
 
         // adjuntos
         $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emsion_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
@@ -457,14 +453,41 @@ class EmbarquesController extends BaseController
         $data['fechas']=$fechas;
 
 
-        //permisos
-
-
         return $data ;
     }
 
+    public  function  getShipmentItems(Request $req){
+        $items=  ShipmentItem::selectRaw(
+            'tbl_embarque_item.id,'.
+            'tbl_embarque_item.embarque_id,'.
+            'tbl_embarque_item.descripcion,'.
+            'tbl_embarque_item.saldo,'.
+            'tbl_embarque_item.cantidad,'.
+            'tbl_embarque_item.origen_item_id,'.
+            'tbl_embarque_item.producto_id,'.
+            'tbl_embarque_item.tipo_origen_id,'.
+            'tbl_embarque_item.doc_origen_id,'.
+            'tbl_embarque_item.id as embarque_item_id,'.
+            ' tbl_producto.codigo,'.
+            ' tbl_producto.codigo_fabrica,'.
+            ' tbl_producto.precio,'.
+            '(tbl_producto.precio  * tbl_embarque_item.cantidad) as total '
+        )
+            ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+            ->where( 'tbl_embarque_item.embarque_id', $req->id );
+        foreach ($items as $aux){
+            if($aux->tipo_origen_id == '23'){
+                $p = PurchaseItem::find($aux->origen_item_id);
+                $aux->disponible= floatval(floatval($p->saldo) + $aux->cantidad);
+            }
+        }
 
+        return json_encode($items->get() );
+    }
 
+    public  function  getShipments(Request $req){
+        return json_encode(Shipment::whereNull('session_id')->get());
+    }
 
     public function saveShipment(Request $req){
         $return = ['accion'=>'new'];
@@ -499,8 +522,34 @@ class EmbarquesController extends BaseController
         if($req->has('puerto_id')){ $model->puerto_id= $req->puerto_id;}
         if($req->has('tarifa_id')){ $model->tarifa_id= $req->tarifa_id;}
 
-        if($req->has('flete_nac')){ $model->flete_nac= $req->flete_nac;}
-        if($req->has('flete_dua')){ $model->flete_dua= $req->flete_dua;}
+        if($req->has('flete_tt')){ $model->flete_tt= $req->flete_tt;}
+        if($req->has('nacionalizacion')){ $model->nacionalizacion= $req->nacionalizacion;}
+        if($req->has('dua')){ $model->dua= $req->dua;}
+        //conf_monto_ft_tt
+        if($req->has('conf_monto_ft_tt')){
+
+            if($req->conf_monto_ft_tt){
+
+                $model->usuario_conf_monto_ft_tt= $req->session()->get('DATAUSER')['id'];
+
+            }else{
+                $model->usuario_conf_monto_ft_tt= null;
+            }
+        }
+        if($req->has('conf_monto_nac')){
+            if($req->conf_monto_nac){
+                $model->usuario_conf_monto_nac= $req->session()->get('DATAUSER')['id'];
+            }else{
+                $model->usuario_conf_monto_nac= null;
+            }
+        }
+        if($req->has('conf_monto_dua')){
+            if($req->conf_monto_dua){
+                $model->usuario_conf_monto_dua= $req->session()->get('DATAUSER')['id'];
+            }else{
+                $model->usuario_conf_monto_dua= null;
+            }
+        }
 
         if($req->has('nro_mbl')){
             if(array_key_exists('documento',$req->nro_mbl)){
@@ -695,39 +744,43 @@ class EmbarquesController extends BaseController
 
     public function SaveOrder (Request $req){
         $odcItem = PurchaseItem::where('doc_id', $req->doc_origen_id)->get();
-        $shipITem = ShipmentItem::where('tipo_origen_id', '23')->where('embarque_id', $req->embarque_id)->get();
+        $shipITem = ShipmentItem::where('tipo_origen_id', '23')
+            ->where('embarque_id', $req->embarque_id)
+            ->where('doc_origen_id', $req->doc_origen_id)
+            ->get();
         $isNew = true;
         $new  = [];
         $old  = [];
         $return =['accion'=>'new'];
         foreach ($odcItem as $aux){
-            if(floatval($aux) > 0){
-                if(sizeof($shipITem->where('origen_item_id',  $aux->id)) == 0){
-                    $it = new ShipmentItem();
-                    $it->tipo_origen_id = '23' ;
-                    $it->embarque_id= $req->embarque_id;
-                    $it->descripcion= $aux->descripcion;
-                    $it->doc_origen_id= $req->doc_origen_id;
-                    $it->origen_item_id= $aux->id;
-                    $it->cantidad = $aux->saldo;
-                    $it->saldo = $aux->saldo;
-                    $aux->saldo= 0;
-                    $aux->save();
-                    $it->save();
-                    $new[]=['pItem'=>$aux, 'shipItem'=>$it];
-                }else{
-                    $return['accion'] = 'upd';
-                    $isNew = false;
-                    $it= $shipITem->where('origen_item_id',  $aux->id)->first();
-                    $dif = floatval($aux->saldo) - floatval($it->cantidad);
-                    $it->cantidad = floatval($it->cantidad) +$dif;
-                    $it->saldo = floatval($it->cantidad) +$dif;
-                    $aux->saldo= 0;
-                    $aux->save();
-                    $it->save();
-                    $old[]=['pItem'=>$aux, 'shipItem'=>$it, 'dif'=>$dif];
-                }
+
+            if(sizeof($shipITem->where('origen_item_id',  $aux->id)) == 0){
+                $it = new ShipmentItem();
+                $it->tipo_origen_id = '23' ;
+                $it->embarque_id= $req->embarque_id;
+                $it->descripcion= $aux->descripcion;
+                $it->doc_origen_id= $req->doc_origen_id;
+                $it->origen_item_id= $aux->id;
+                $it->cantidad = $aux->saldo;
+                $it->saldo = $aux->saldo;
+                $it->producto_id = $aux->producto_id;
+                $aux->saldo= 0;
+                $aux->save();
+                $it->save();
+                $new[]=['pItem'=>$aux, 'shipItem'=>$it];
+            }else{
+                $return['accion'] = 'upd';
+                $isNew = false;
+                $it= $shipITem->where('origen_item_id',  $aux->id)->first();
+                $dif = floatval($aux->saldo) - floatval($it->cantidad);
+                $it->cantidad = floatval($it->cantidad) +$dif;
+                $it->saldo = floatval($it->cantidad) +$dif;
+                $aux->saldo= 0;
+                $aux->save();
+                $it->save();
+                $old[]=['pItem'=>$aux, 'shipItem'=>$it, 'dif'=>$dif];
             }
+
         }
         if($isNew){
             $return['doc_origen_id']= Purchase::findOrFail($req->doc_origen_id);
@@ -858,16 +911,17 @@ class EmbarquesController extends BaseController
             $model->f_carga_isManual= ($req->fecha_carga['isManual']) ? 1: 0;
             if($req->fecha_carga['confirm'] ){
                 $model->usuario_conf_f_carga =  $req->session()->get('DATAUSER')['id'];
+            }else{
+                $model->usuario_conf_f_carga= null;
             }
         }
         if($req->has('fecha_vnz')){
             $model->fecha_vnz = $req->fecha_vnz['value'];
             $model->f_vnz_isManual= $req->fecha_vnz['isManual'];
             if($req->fecha_vnz['confirm'] ){
-
                 $model->usuario_conf_f_vnz =  $req->session()->get('DATAUSER')['id'];
-
-
+            }else{
+                $model->usuario_conf_f_vnz = null;
             }
         }
         if($req->has('fecha_tienda')){
@@ -875,6 +929,8 @@ class EmbarquesController extends BaseController
             $model->f_tienda_isManual= $req->fecha_tienda['isManual'];
             if($req->fecha_tienda['confirm']){
                 $model->usuario_conf_f_tienda =  $req->session()->get('DATAUSER')['id'];
+            }else{
+                $model->usuario_conf_f_tienda = null;
             }
         }
         $model->save();
@@ -1068,7 +1124,14 @@ class EmbarquesController extends BaseController
         $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db', 'confirm'=>($model->usuario_conf_f_carga != null), 'isManual'=> ( $model->f_carga_isManual == 1 ) ];
         $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db', 'confirm'=>($model->usuario_conf_f_vnz != null), 'isManual'=> ($model->f_vnz_isManual == 1 )];
         $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db', 'confirm'=>($model->usuario_conf_f_tienda != null), 'isManual'=> ($model->f_tienda_isManual == 1)];
-        $return =['fecha_carga'=>$fecha_carga,'fecha_vnz'=>$fecha_vnz,'fecha_tienda'=>$fecha_tienda];
+
+        $return =[
+            'fecha_carga'=>$fecha_carga,
+            'fecha_vnz'=>$fecha_vnz,
+            'fecha_tienda'=>$fecha_tienda,
+            'manual'=> ( $model->f_carga_isManual == 1 || $model->f_vnz_isManual == 1 || $model->f_tienda_isManual == 1 ),
+            'confirm'=> ( $model->usuario_conf_f_carga == null || $model->usuario_conf_f_vnz == null || $model->usuario_conf_f_tienda == null )
+        ];
         return $return;
     }
 
