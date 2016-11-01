@@ -9,3 +9,4 @@
 $app->get("criterio/fieldList",'Criterio\CritController@getCampos');
 $app->get("criterio/typeList",'Criterio\CritController@getTypes');
 $app->get("criterio/getCriteria",'Criterio\CritController@getCriterio');
+$app->post("criterio/save",'Criterio\CritController@saveCritField');

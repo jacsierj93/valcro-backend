@@ -18,4 +18,5 @@ class ProductType extends Model
     protected $table = "tbl_producto_tipo";
 
 
+
 }

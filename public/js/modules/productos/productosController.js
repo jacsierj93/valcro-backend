@@ -11,40 +11,109 @@ MyApp.factory('criterios', ['$resource',
     }
 ]);
 
-MyApp.controller('prodMainController',['$scope', 'setNotif','masters','$mdSidenav','critForm','criterios',function ($scope, setNotif, masters,$mdSidenav,critForm,criterios) {
+MyApp.service("mastersCrit",function(criterios,masters){
+    var lists = {
+        Lines : masters.query({ type:"prodLines"}),
+        Fields : criterios.query({type:"fieldList"}),
+        Types : criterios.query({type:"typeList"}),
+    };
+    return {
+        getLines:function(){
+
+            return lists.Lines;
+        },
+        getFields:function(){
+            return lists.Fields;
+        },
+        getTypes:function(){
+            return lists.Types;
+        }
+    }
+});
+
+MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios',function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios) {
     $scope.clicked = function(){
         $mdSidenav("layer0").open();
     };
-    $scope.listLines = masters.query({ type:"prodLines"});
-    $scope.fields = criterios.query({type:"fieldList"});
-    $scope.tipos = criterios.query({type:"typeList"});
+    $scope.listLines = mastersCrit.getLines();
+    $scope.fields = mastersCrit.getFields();
+    $scope.tipos = mastersCrit.getTypes();
     $scope.critField = {
         id:false,
-        line:null,
+        line:1,
         type:null,
         field:null
     };
+    $scope.options = [];
+    $scope.opcValue = {};
+    $scope.inicialize = function(obj){
+        $scope.opcValue[obj.descripcion] = {
+            descripcion:obj.descripcion,
+            opc_id:obj.id,
+            field_id:$scope.critField.id,
+            id:false
+        }
 
-    $scope.createField = function(data,type){
+    };
 
+    $scope.saveOptions = function(){
+        criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
+            $scope.critField.id = data.id;
+            critForm.add($scope.critField);
+        });
+    };
+    
+    $scope.createField = function(data,campo){
+        if(campo == "type"){
+            $scope.options = data.cfg;
+        }
+
+        $scope.critField[campo]=data.id;
+        criterios.put({type:"save"},$scope.critField,function(data){
+            $scope.critField.id = data.id;
+            critForm.add($scope.critField);
+        });
     };
     $scope.opennext = function(){
         $mdSidenav("layer1").open();
     };
+    
     $scope.addField= function(type){
         critForm.add(type);
     };
 
 }]);
 
-MyApp.service("critForm",function(criterios){
-    var factory = criterios.query({ type:"getCriteria"});
+MyApp.service("critForm",function(criterios,mastersCrit,$filter){
+
+    var lines = mastersCrit.getLines();
+    var fields = mastersCrit.getFields();
+    var tipos = mastersCrit.getTypes();
     var listado = criterios.query({ type:"getCriteria"});
+    var factory = {
+        linea_id: "1",
+        campo_id: "1",
+        tipo_id: "2",
+        line:{},
+        field:$filter("filterSearch")(fields,[1])[0],
+        type:$filter("filterSearch")(tipos,[2])[0],
+        id:false
+    };
     return {
         add:function(datos){
-            var nuevo = angular.copy(factory[datos]);
-            nuevo.campo = listado.length+1
-            listado.push(nuevo);
+            var elem = {};
+            elem = $filter("filterSearch")(listado,[datos.id])[0]
+            if(!elem){
+                elem = angular.copy(factory)
+                listado.push(elem);
+            }
+            elem.id=datos.id;
+            elem.linea_id=datos.line;
+            elem.line = $filter("filterSearch")(lines,[datos.line])[0];
+            elem.campo_id=datos.field;
+            elem.field = $filter("filterSearch")(fields,[datos.field])[0];
+            elem.tipo_id=datos.type;
+            elem.type = $filter("filterSearch")(tipos,[datos.type])[0];
         },
         get:function(){
             return listado;
@@ -61,9 +130,9 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm',functi
 
 MyApp.directive('formPreview', function($http,$timeout) {
         return {
-            link:function(scope,elem,attr){
+            /*link:function(scope,elem,attr){
                 elem.find(">:not(["+attr.formPreview+"])").remove();
-            },
+            },*/
             templateUrl: function(elem, attr) {
                 return 'modules/productos/textForm';
             }

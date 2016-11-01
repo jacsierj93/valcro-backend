@@ -14,4 +14,7 @@ class CritTipoCamp extends Model
 {
     use SoftDeletes;
     protected $table = "tbl_crit_tipo";
+    public function config(){
+        return $this->belongsToMany('App\Models\Sistema\Criterios\CritOption', 'tbl_crit_lct_cfg', 'lct_id', 'opc_id');
+    }
 }

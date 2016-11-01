@@ -270,30 +270,48 @@
                                     </div>
                                 </div>
 
-                                <div flex>
+                                <md-content layout="column" style="margin: 0px 4px 0px 4px">
                                     <div ng-repeat="field in criteria" class="row"
                                          form-preview="{{ field.type.directive }}">
 
                                     </div>
-                                </div>
+                                </md-content>
                             </div>
                         </form>
                     </div>
-                    <div flex="15" layout="column" class="md-whiteframe-2dp">
+                    <div flex="15" layout="column" class="md-whiteframe-2dp" >
                         <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="field in fields" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                <div ng-click="setField(field)">{{field.descripcion}}</div>
+                            <div ng-repeat="field in fields" class="row" ng-class="{'rowSel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
                             </div>
                         </md-content>
                     </div>
                     <div flex="15" layout="column" class="md-whiteframe-2dp">
                         <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="type in tipos" ng-click="addField(i)" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                <div>{{type.descripcion}}</div>
+                            <div ng-repeat="type in tipos" ng-class="{'rowSel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div ng-click="createField(type,'type')" >{{type.descripcion}}</div>
                             </div>
                         </md-content>
                     </div>
                     <div flex layout="column" class="md-whiteframe-2dp">
+                        <div flex>
+                            <div class="titulo_formulario" layout="column" layout-align="start start">
+                                <div ng-click="show()">
+                                    Opciones
+                                </div>
+                            </div>
+                            <div flex>
+                                <div ng-repeat="opcion in options" class="row" ng-init="inicialize(opcion)" >
+                                    <md-input-container class="md-block" flex>
+                                        <label>{{opcion.descripcion}}</label>
+                                        <input skip-tab
+                                               ng-model="opcValue[opcion.descripcion].valor"
+                                               id="{{field.id}}">
+                                    </md-input-container>
+                                </div>
+                            </div>
+
+                        </div>
 
                     </div>
                 </md-content>

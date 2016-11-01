@@ -1,15 +1,10 @@
 
 
-<md-input-container id="text" class="md-block" flex prevText>
-    <label>{{field.field.descripcion}}</label>
+<md-input-container id="text" class="md-block" flex prevText ng-show="(field.type.directive == 'prevText' || field.type.directive == null)" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
+    <label>{{field.field.descripcion}}{{field.type.directive}}</label>
     <input skip-tab
            info="fasfafs"
-           ng-disabled="$parent.enabled && prov.id"
            autocomplete="off"
-           ng-blur="check('razon_social')"
-           duplicate="list"
-           duplicate-msg="ya existe un proveedor con esta razon social"
-           field="razon_social"
            name="razon_social"
            maxlength="80"
            ng-minlength="3"
@@ -20,11 +15,12 @@
 </md-input-container>
 
 
-<md-input-container flex prevAutocomplete>
-    <label>{{field.field.descripcion}}</label>
+<md-input-container flex prevAutocomplete  ng-show="(field.type.directive == 'prevAutocomplete')">
+    <label>{{field.field.descripcion}}{{field.type.directive}}</label>
     <md-autocomplete md-selected-item="ctrl.lang"
                      flex
                      skip-tab
+
                      id="langCont"
                      ng-required="(cnt.languaje.length==0)"
                      info="marque cada idioma que hable este contacto"
@@ -32,7 +28,6 @@
                      md-items="item in field.opciones | stringKey : ctrl.searchLang: 'nombre'"
                      md-item-text="item.lang"
                      md-no-asterisk
-                     ng-disabled="$parent.enabled || cnt.isAgent==1"
                      md-min-length="0"
                      id="{{field.id}}">
         <input >

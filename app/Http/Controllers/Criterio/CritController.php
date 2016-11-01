@@ -21,6 +21,7 @@ use App\Models\Sistema\Criterios\CritCampos as Campos;
 use App\Models\Sistema\Criterios\CritTipoCamp as Types;
 use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Criterios\CritLinCamTip as Criterio;
+use App\Models\Sistema\Criterios\CritCampoOption as Options;
 
 class CritController extends BaseController
 {
@@ -35,11 +36,13 @@ class CritController extends BaseController
     }
     
     public function getTypes(){
-        return json_encode(Types::all());
+        $types = Types::all();
+        foreach ($types as $tip){
+            $tip['cfg'] = $tip->config()->get();
+        }
+        return json_encode($types);
     }
-
-
-
+    
     public function getCriterio(){
         $crit = Criterio::where("linea_id","1")->get();
         foreach ($crit as $field){
@@ -58,7 +61,6 @@ class CritController extends BaseController
         }else{
             $crit = new Criterio();
         }
-
         $crit->linea_id = $rq->line;
         $crit->campo_id = $rq->field;
         $crit->tipo_id = $rq->type;
@@ -67,5 +69,22 @@ class CritController extends BaseController
         $ret["id"] = $crit->id;
         return $ret;
 
+    }
+
+    public function saveOptions(Request  $rq){
+        $ret = array("action"=>"new","id"=>false);
+        if($rq->id){
+            $opt = Options::find($rq->id);
+            $ret["action"]="upd";
+        }else{
+            $opt = new Options();
+        }
+        $opt->lct_id = $rq->field_id;
+        $opt->opc_id = $rq->opc_id;
+        $opt->value = $rq->value;
+
+        $opt->save();
+        $ret["id"] = $opt->id;
+        return $ret;
     }
 }

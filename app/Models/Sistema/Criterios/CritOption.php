@@ -13,5 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CritOption extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_crit_tipo";
+    protected $table = "tbl_crit_opc";
+    public function config(){
+        return $this->belongsToMany('App\Models\Sistema\Criterios\CritTipoCamp', 'tbl_crit_lct_cfg', 'lct_id', 'opc_id');
+    }
 }
