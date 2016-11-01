@@ -342,11 +342,9 @@ class EmbarquesController extends BaseController
             $result['action'] = 'upd';
             $model = Container::findOrfail($req->id);
         }
-        $model->cantidad = $req->cantidad;
-        $model->peso = $req->cantidad;
+        $model->peso = $req->peso;
         $model->tipo = $req->tipo;
         $model->volumen = $req->volumen;
-        $model->peso = $req->cantidad;
         $model->embarque_id= $req->embarque_id;
         $model->save();
 
@@ -362,6 +360,10 @@ class EmbarquesController extends BaseController
 
 
     /************************* SHIPMENT ***********************************/
+
+    public function closeShipment(Request $req){
+
+    }
     public  function  getShipment(Request $req){
 
         $model = Shipment::findOrfail($req->id);
@@ -399,9 +401,9 @@ class EmbarquesController extends BaseController
         $data['conf_monto_dua'] = ($model->usuario_conf_monto_dua == null )? false: true;
 
         // adjuntos
-        $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emsion_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
-        $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emsion_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
-        $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision,'adjs'=> $model->attachmentsFile("nro_dua") ];
+        $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emision_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
+        $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emision_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
+        $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision_dua,'adjs'=> $model->attachmentsFile("nro_dua") ];
 
         // items
         $Mitems  =ShipmentItem::selectRaw(
@@ -556,7 +558,9 @@ class EmbarquesController extends BaseController
                 $model->nro_mbl=$req->nro_mbl['documento'];
             }
             if(array_key_exists('emision',$req->nro_mbl)){
+
                 $model->emision_mbl=$req->nro_mbl['emision'];
+
             }
         }
         if($req->has('nro_hbl')){

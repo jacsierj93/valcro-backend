@@ -40,6 +40,7 @@
 .dot-attachment{border: 1px solid rgb(84, 180, 234);color:rgb(84, 180, 234);}/** dot para marcar adjuntos **/
 .dot-select{border: 1px solid rgb(84, 180, 234) !important;color:rgb(84, 180, 234) !important;}/** dot que este selecionado**/
 
+.dot-vlc{  background-color: rgb(232, 129, 0);}
 
 /** dot que este selecionado**/
 .item-select{ color:rgb(84, 180, 234) !important;} /**item selecionado */
