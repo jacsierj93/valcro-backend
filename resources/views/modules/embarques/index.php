@@ -950,7 +950,7 @@
                                                 ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_ft_tt)"
                                                 minlength="2"
                                                 decimal
-                                                ng-change="toEditHead('flete_tt',$parent.shipment.flete_tt)"
+                                                ng-change="toEdit('flete_tt',$parent.shipment.flete_tt)"
                                         >
                                     </md-input-container>
                                     <div class="adj-box-rigth" ng-click="aprobFlete()">
@@ -973,6 +973,7 @@
                                         <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':$parent.shipment.conf_monto_nac}"  style="float:left">A </div>
                                     </div>
                                 </div>
+
                                 <div layout="row">
 
                                     <md-input-container class="md-block" >
@@ -2358,7 +2359,7 @@
                             <div  style="height:24px;" layout="row" layout-align="start" ng-show="model.document.titulo.estado && model.document.titulo.estado !='new'" >
                                 <div layout="row" style="min-width: 88px; color:#ccc">Titulo</div>
                                 <div layout="row" style="color: #999">
-                                    <div class="rms" flex> {{shipment.titulo}}</div>
+                                    <div class="rms" flex> {{$parent.shipment.titulo}}</div>
                                 </div>
                             </div><div  style="height:24px;" layout="row" layout-align="start" ng-show="(model.document.prov_id.estado && model.document.prov_id.estado != 'new')" >
                                 <div layout="row" style="min-width: 88px; color:#ccc">Proveedor</div>
@@ -2380,7 +2381,7 @@
                             </div>
 
                             <div layout="column" layout-align="center center"
-                                 ng-show="(model.document.titulo.estado == 'new' && model.document.titulo.estado) && (model.document.pais_id.estado =='new' ||  model.document.pais_id.estado) && (model.document.puerto_id.estado =='new' || model.document.puerto_id.estado) && (model.document.prov_id.estado || model.document.prov_id.estado == 'new')"
+                                 ng-show="keyCount(model.document) == 0;"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2394,7 +2395,7 @@
                                     Tarifa
                                 </div>
                             </div>
-                            <div  layout="row"  layout-align="end start"  ng-show="!(model.document.tarifa_id.estado =='new') " >
+                            <div  layout="row"  layout-align="end start"  ng-show="(model.document.tarifa_id.estado !='new') && model.document.tarifa_id.estado " >
                                 <md-switch class="md-primary"
                                            ng-model="goTo.tarifa_id"
                                            ng-disabled="true"
@@ -2418,7 +2419,7 @@
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center"
-                                 ng-show="model.document.tarifa_id.estado =='new' "
+                                 ng-show="model.document.tarifa_id.estado == 'new' || !model.document.tarifa_id"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2458,7 +2459,7 @@
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center"
-                                 ng-show="(model.nro_mbl.emision.estado == 'new' && model.nro_mbl.emision.estado == 'new')  "
+                                 ng-show="keyCount(model.nro_mbl) == 0;"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2497,7 +2498,7 @@
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" style="width: 65%%"
-                                 ng-show="(model.nro_hbl.emision.estado == 'new' && model.nro_hbl.emision.estado == 'new') || !(model.nro_hbl.emision.estado && model.nro_hbl.emision.estado) "
+                                 ng-show="keyCount(model.nro_hbl) == 0;"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2535,7 +2536,7 @@
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center"
-                                 ng-show="(model.nro_dua.documento.estado == 'new' && model.nro_dua.emision.estado == 'new') || !(model.nro_dua.emision.estado || model.nro_dua.documento.estado) "
+                                 ng-show="keyCount(model.nro_dua) == 0;"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2588,6 +2589,7 @@
                             </div>
 
                         </div>
+
                         <div layout="column" >
                             <div layout="row">
                                 <div flex class="titulo_formulario" style="height:39px;">
@@ -2595,7 +2597,7 @@
                                         Fechas
                                     </div>
                                 </div>
-                                <div  layout="row"  layout-align="end start"  ng-show="!(model.fecha_tienda.value.estado == 'new' && model.fecha_vnz.value.estado == 'new' && model.fecha_carga.value.estado == 'new')">
+                                <div  layout="row"  layout-align="end start"  ng-show="keyCount(model.fechas.fecha_vnz) > 0 || keyCount(model.fechas.fecha_carga) > 0 || keyCount(model.fechas.fecha_tienda) > 0">
                                     <md-switch class="md-primary"
                                                ng-model="goTo.fechas"
                                                ng-disabled="true"
@@ -2606,10 +2608,10 @@
                             </div>
 
                             <div layout="column" style="height: 76px;overflow: auto;" >
-                                <div  style="height:24px;" layout="row" layout-align=" start" ng-show="(model.fecha_carga.value.estado && model.fecha_carga.value.estado != 'new')">
+                                <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="model.fechas.fecha_carga.value.estado && model.fecha_carga.value.estado != 'new' " >
                                     <div layout="row" style="min-width: 106px;color:#ccc;">Carga el</div>
                                     <div layout="row" style="color:#999;width: 125px;">
-                                        <div class="rms" flex> {{shipment.fechas.fecha_carga.value | date :'dd/MM/yyyy' }}</div>
+                                        <div class="rms" flex> {{$parent.shipment.fechas.fecha_carga.value | date :'dd/MM/yyyy' }}</div>
                                     </div>
                                     <div layout="column" layout-align="center center">
                                         <div class="dot-empty" ng-class="{'dot-vlc':(shipment.fechas.fecha_carga.confirm)}"></div>
@@ -2618,10 +2620,10 @@
                                         </md-tooltip>
                                     </div>
                                 </div>
-                                <div  style="height:24px;"  layout="row" layout-align=" start" ng-show="model.fecha_vnz.value.estado && model.fecha_vnz.value.estado != 'new' ">
+                                <div  style="height:24px;"  layout="row" layout-align=" start" ng-show="model.fechas.fecha_vnz.value.estado && model.fecha_vnz.value.estado != 'new' ">
                                     <div layout="row" style="min-width: 106px;color:#ccc;">En Venezuela</div>
                                     <div layout="row"  style="color:#999; width: 125px;"  >
-                                        <div class="rms" > {{shipment.fechas.fecha_vnz.value | date :'dd/MM/yyyy' }}</div>
+                                        <div class="rms" > {{$parent.shipment.fechas.fecha_vnz.value | date :'dd/MM/yyyy' }}</div>
                                     </div>
                                     <div layout="column" layout-align="center center">
                                         <div class="dot-empty" ng-class="{'dot-vlc':(shipment.fechas.fecha_vnz.confirm)}"></div>
@@ -2630,10 +2632,10 @@
                                         </md-tooltip>
                                     </div>
                                 </div>
-                                <div  style="height:24px;" layout="row" layout-align=" start" ng-show="model.fecha_tienda.value.estado && model.fecha_tienda.value.estado != 'new' ">
+                                <div  style="height:24px;" layout="row" layout-align=" start" ng-show="model.fechas.fecha_vnz.value.estado && model.fecha_vnz.value.estado != 'new' " >
                                     <div layout="row" style="min-width: 106px;color:#ccc; width: 106px;">En tienda</div>
                                     <div layout="row" style="color:#999;width: 106px;" >
-                                        <div class="rms" flex> {{shipment.fechas.fecha_tienda.value | date :'dd/MM/yyyy' }}</div>
+                                        <div class="rms" flex> {{$parent.shipment.fechas.fecha_tienda.value | date :'dd/MM/yyyy' }}</div>
                                     </div>
                                     <div layout="column" layout-align="center center">
                                         <div class="dot-empty" ng-class="{'dot-vlc':(shipment.fechas.fecha_tienda.confirm)}"></div>
@@ -2644,7 +2646,7 @@
                                     </div>
                                 </div>
                                 <div layout="column" layout-align="center center"
-                                     ng-show="model.fecha_tienda.value.estado == 'new' && model.fecha_vnz.value.estado == 'new' && model.fecha_carga.value.estado == 'new'"
+                                     ng-show="keyCount(model.fechas.fecha_vnz) == 0 && keyCount(model.fechas.fecha_carga) == 0 && keyCount(model.fechas.fecha_tienda) == 0;"
                                 >
                                     <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                                 </div>

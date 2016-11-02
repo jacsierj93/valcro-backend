@@ -29,9 +29,11 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $scope.provSelec = prov;
             $scope.listShipmentCtrl(prov);
         }else if($scope.module.layer == 'detailShipment'){
-            console.log("porv en set porv", prov)
-            $scope.provSelec= prov;
-            $scope.save();
+            if(!$scope.shipment.pais_id){
+                $scope.provSelec= prov;
+                $scope.save();
+            }
+
         }
 
     };
@@ -1613,50 +1615,68 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
         productos:true
     };
     $scope.model ={document:{},items:[], odcs:[], containers:[]};
+    $scope.keyCount = function (obj) {
+        return (obj)? Object.keys(obj) :[];
+    };
 
     $scope.$parent.updateShipmentCtrl = function () {
         var data = $model.getData();
 
-        if($model.getInternalState() == 'new'){
+        if($model.getInternalState() == 'new' && false){
 
             return true;
         }else{
-            $scope.shipment ={}
-            angular.forEach(data, function (v, k) {
-                $scope.shipment[k]=v;
 
-            });
-
-            $scope.model ={document:{},items:[], odcs:[], containers:[]};
+            $scope.model ={document:{},items:[], odcs:[], containers:[], pagos:{}, fechas:{fecha_carga:{},fecha_vnz:{},fecha_tienda:{}}};
             var form = $model.getForm();
             $scope.isModif = false;
-            angular.forEach(form, function (v, k) {
-                /*
-                 if(k == 'titulo'){
-                 v.name ='Titulo';
-                 $scope.model2.document[k]=v;
-                 }
-                 if(k == 'pais_id'){
-                 v.name ='Pais';
-                 $scope.model2.document[k]=v;
-                 }
-                 if(k == 'puerto_id'){
-                 v.name ='Puerto';
-                 $scope.model2.document[k]=v;
-                 }
-                 if(k == 'tarifa_id'){
-                 v.name ='Tarifa';
-                 $scope.model2.document[k]=v;
-                 }*/
+            $scope.model.nro_mbl= {};$scope.model.nro_hbl= {};$scope.model.nro_dua= {};
 
+            angular.forEach($model.getForm('fecha_carga'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.fechas.fecha_carga[k]=v;
+                }
+            });
+            angular.forEach($model.getForm('fecha_tienda'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.fechas.fecha_tienda[k]=v;
+                }
+            });
+            angular.forEach($model.getForm('fecha_vnz'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.fechas.fecha_vnz[k]=v;
+                }
+            });
+            angular.forEach($model.getForm('nro_mbl'), function (v, k) {
 
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.nro_mbl[k]=v;
+                }
+            });
+            angular.forEach($model.getForm('nro_hbl'), function (v, k) {
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.nro_hbl[k]=v;
+                }
+            });
+            angular.forEach($model.getForm('nro_dua'), function (v, k) {
 
-                if(k.startsWith("documen") || k.startsWith("fecha")|| k.startsWith("nro_")){
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.nro_dua[k]=v;
+                }
+            });
+            angular.forEach($model.getForm('document'), function (v, k) {
 
-                    $scope.model[k]=v;
-
+                if(v.estado && v.estado != 'new'){
+                    if( k == 'flete_tt' || k == 'nacionalizacion'|| k =='dua'){
+                        $scope.model.pagos[k]=v;
+                    }
+                    else{
+                        $scope.model.document[k]=v;
+                    }
 
                 }
+            });
+            angular.forEach(form, function (v, k) {
                 if(k.startsWith("container")){
                     if(v.peso.estado != 'new' || v.tipo.estado != 'new' ||  v.volumen.estado !='new' || v.id.estado != 'new'){
                         if(v.peso.estado == 'upd' || v.tipo.estado == 'upd' ||  v.volumen.estado =='upd'){
@@ -1718,8 +1738,8 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
                     ]
                     , {block:true});
                 console.log("form",form);
-                console.log("state",$model.getInternalState());
-                console.log("local",$scope.shipment );
+               // console.log("state",$model.getInternalState());
+               // console.log("local",$scope.shipment );
                 console.log("model",$scope.model );
                 console.log("ship",$scope.$parent.shipment );
 
@@ -3243,17 +3263,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
             bindin.estado = false;
 
             shipment.get({type:"Shipment", id:doc.id},{}, function (response) {
-                /**angular.forEach(response,function(v,k){
-                        if(!order[k]){
-                            order[k]= v;
-                            if(v !=null && typeof (v) != 'object' && typeof (v) != 'array' && !angular.isNumber(k)){
-                                forms['document'][k]={original:v, v:v, estado:'new',trace:[]};
-                            }
-
-                        }
-                    });*/
-
-                forms['document'] = [];
+                forms['document'] = {};
                 angular.forEach(response,function (v, k) {
                     if((typeof (v) != 'object' && typeof (v) != 'array' )|| v == null){
                         Shipment[k]=v;
@@ -3266,14 +3276,13 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 angular.forEach(response.objs,function (v, k) {
                     Shipment.objs[k]=v;
                 });
-
                 Shipment.permit ={};
                 angular.forEach(response.permit,function (v, k){
                     Shipment.permit[k]=v;
                 });
-
-
-                forms['fecha_carga'] = [];
+                forms['fecha_carga'] = {};
+                forms['fecha_tienda'] = {};
+                forms['fecha_vnz'] = {};
                 if(response.fechas){
                     Shipment.fechas= {fecha_carga:{}, fecha_tienda:{},fecha_vnz:{}};
                     if(response.fechas.fecha_carga.value){
@@ -3287,7 +3296,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                         forms['fecha_carga']['value']={original:Shipment.fechas.fecha_carga.value, v:Shipment.fechas.fecha_carga.value, estado:'new',trace:[]};
 
                     }
-                    forms['fecha_tienda'] = [];
+
                     if(response.fechas.fecha_tienda.value){
                         Shipment.fechas.fecha_tienda={};
                         Shipment.fechas.fecha_tienda.confirm=response.fechas.fecha_tienda.confirm;
@@ -3297,7 +3306,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                         forms['fecha_tienda']['isManual']={original:Shipment.fechas.fecha_tienda.isManual, v:Shipment.fechas.fecha_tienda.isManual, estado:'new',trace:[]};
                         forms['fecha_tienda']['value']={original:Shipment.fechas.fecha_tienda.value, v:Shipment.fechas.fecha_tienda.value, estado:'new',trace:[]};
                     }
-                    forms['fecha_vnz'] = [];
+
                     if(response.fechas.fecha_vnz.value){
                         Shipment.fechas.fecha_vnz={};
                         Shipment.fechas.fecha_vnz.confirm=response.fechas.fecha_vnz.confirm;
@@ -3359,7 +3368,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                     documento: response.nro_mbl.documento,
                     emision:(response.nro_mbl.emision== null)? undefined: DateParse.toDate(response.nro_mbl.emision)
                 } ;
-                forms['nro_mbl'] = [];
+                forms['nro_mbl'] = {};
                 if(Shipment.nro_mbl.documento){
                     forms['nro_mbl']['documento']={original:Shipment.nro_mbl.documento, v:Shipment.nro_mbl.documento, estado:'new',trace:[]};
                 }
@@ -3372,7 +3381,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                     emision:(response.nro_hbl.emision== null)? undefined: DateParse.toDate(response.nro_hbl.emision)
                 } ;
 
-                forms['nro_hbl'] = [];
+                forms['nro_hbl'] = {};
                 if(Shipment.nro_hbl.documento){
                     forms['nro_hbl']['documento']={original:Shipment.nro_hbl.documento, v:Shipment.nro_hbl.documento, estado:'new',trace:[]};
                 }
@@ -3384,7 +3393,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                     documento: response.nro_dua.documento,
                     emision:(response.nro_dua.emision== null)? undefined: DateParse.toDate(response.nro_dua.emision)
                 } ;
-                forms['nro_dua'] = [];
+                forms['nro_dua'] = {};
                 if(Shipment.nro_dua.documento){
                     forms['nro_dua']['documento']={original:Shipment.nro_dua.documento, v:Shipment.nro_dua.documento, estado:'new',trace:[]};
                 }
@@ -3441,7 +3450,8 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 change('fecha_vnz','value',Shipment.fechas.fecha_vnz.value.toString());
             }
 
-        },reloadItems : function () {
+        },
+        reloadItems : function () {
             shipment.queryMod({type:"Shipment", mod:"Items" ,id:Shipment.id},{}, function (response) {
                 Shipment.items.splice(0, Shipment.items.length);
                 angular.forEach(response, function (v) {
