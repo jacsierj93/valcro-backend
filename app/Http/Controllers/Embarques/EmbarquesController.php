@@ -7,6 +7,7 @@ use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Masters\Ports;
+use App\Models\Sistema\Notifications\NotificationModule;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\Providers\Provider;
@@ -33,6 +34,7 @@ class EmbarquesController extends BaseController
     private  $user = null;
     private $minAproxDay = 100;
     private $diasTienda = 15;
+    private $doc_tipo= 23;
     /***
     model shipmente
 
@@ -362,6 +364,147 @@ class EmbarquesController extends BaseController
     /************************* SHIPMENT ***********************************/
 
     public function closeShipment(Request $req){
+        $model= Shipment::findOrFail($req->id);
+        $originShae= $model->sha256;
+        $newShae=$model->getSha256();
+        $result = ['accion'=>'close'];
+        $notis = NotificationModule::where('modulo','embarques')
+            ->where('doc_id', $req->id)
+            ->where('doc_tipo_id',$this->doc_tipo)
+            ->get();
+
+        if($originShae == null){
+            $result['msm'][] ='Creado';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.ResumenDoc', [''], [],'creacion');
+        }else if($newShae != $originShae){
+            $result['msm'][] ='Modificado';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='modificacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.ResumenDoc', [''], [],'modificacion');
+
+        }
+
+
+// carga
+     /*   if($model->usuario_conf_f_carga != null && $notis->where('clave','usuario_conf_f_carga')->first() == null){
+            $result['msm'][] ='confirmacion de carga ';
+
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+
+            $noti->send_mail('Embarques','Internal.aprobacion', [''], [],'usuario_conf_f_carga');
+
+        }
+        if($model->usuario_conf_f_carga == null && $notis->where('clave','usuario_conf_f_carga')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de carga ';
+            NotificationModule::destroy($notis->where('clave','usuario_conf_f_carga')->first()->id);
+
+
+        }
+        // venezuela
+        if($model->usuario_conf_f_vnz != null && $notis->where('clave','usuario_conf_f_vnz')->first() == null){
+            $result['msm'][] ='confirmacion de en venezuela ';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.aprobacion', [''], [],'usuario_conf_f_carga');
+
+        }
+        if($model->usuario_conf_f_vnz == null && $notis->where('clave','usuario_conf_f_vnz')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de venezuela ';
+            NotificationModule::destroy($notis->where('clave','usuario_conf_f_carga')->first()->id);
+
+        }
+        // tienda
+        if($model->usuario_conf_f_tienda != null && $notis->where('clave','usuario_conf_f_tienda')->first() == null){
+            $result['msm'][] ='confirmacion de tienda ';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_f_tienda');
+            $model->fecha_finalizacion = Carbon::now();
+
+        }
+        if($model->usuario_conf_f_tienda == null && $notis->where('clave','usuario_conf_f_tienda')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de eliminacion de llegada en tienda ';
+            NotificationModule::destroy($notis->where('clave','usuario_conf_f_tienda')->first()->id);
+        }
+
+        //monto flete terrestre
+        if($model->usuario_conf_monto_ft_tt != null && $notis->where('clave','usuario_conf_monto_ft_tt')->first() == null){
+            $result['msm'][] ='confirmacion de en aprobacion de monto flete terrestre ';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_monto_ft_tt');
+
+        }
+        if($model->usuario_conf_monto_ft_tt == null && $notis->where('clave','usuario_conf_monto_ft_tt')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de  monto flete terrestre ';
+            NotificationModule::destroy($notis->where('clave','usuario_conf_monto_ft_tt')->first()->id);
+
+        }
+        //monto flete nacional
+        if($model->usuario_conf_monto_nac != null && $notis->where('clave','usuario_conf_monto_nac')->first() == null){
+            $result['msm'][] ='confirmacion de en aprobacion de monto flete terrestre ';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_monto_nac');
+
+        }
+        if($model->usuario_conf_monto_nac == null && $notis->where('clave','usuario_conf_monto_nac')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de  monto flete terrestre ';
+            NotificationModule::destroy($notis->where('clave','usuario_conf_monto_nac')->first()->id);
+
+        }
+        //monto flete nacional
+        if($model->usuario_conf_monto_dua != null && $notis->where('clave','usuario_conf_monto_dua')->first() == null){
+            $result['msm'][] ='confirmacion de en aprobacion de monto flete de aduanda ';
+            $noti = new NotificationModule();
+            $noti->doc_id= $model->id;
+            $noti->doc_tipo_id=24;
+            $noti->descripcion='creacion de embarque';
+            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_monto_dua');
+
+        }
+        if($model->usuario_conf_monto_dua == null && $notis->where('clave','usuario_conf_monto_dua')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de  monto flete aduanda ';
+            NotificationModule::destroy($notis->where('clave','usuario_conf_monto_dua')->first()->id);
+
+        }*/
+
+        $model->sha256 = $newShae;
+
+        $model->session_id = null;
+
+        $model->save();
+
+        $result['id']=$model->id;
+
+        $result['sha256']=$model->sha256;
+
+        return $result;
 
     }
     public  function  getShipment(Request $req){
@@ -797,10 +940,11 @@ class EmbarquesController extends BaseController
     public function DeleteOrder (Request $req){
         $result =['accion'=>'del'];
         $shipItems = ShipmentItem::where('tipo_origen_id', '23')->where('doc_origen_id', $req->doc_origen_id)->get();
-        $odcItems = PurchaseItem::where('doc_id')->get();
+        $odcItems = PurchaseItem::where('doc_id', $req->doc_origen_id)->get();
         $result['restore'] =[];
         foreach($shipItems as $aux){
             $it = $odcItems->where('id', $aux->origen_item_id)->first();
+
             $it->saldo = floatval($it->saldo) + floatval($aux->cantidad);
             $it->save();
             $result['restore'][]=  $it;

@@ -24,7 +24,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     }
 
     $scope.setProvedor = function(prov){
-        console.log("setprov form", form);
+
         if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
             $scope.provSelec = prov;
             $scope.listShipmentCtrl(prov);
@@ -32,8 +32,12 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             if(!$scope.shipment.pais_id){
                 $scope.provSelec= prov;
                 $scope.save();
+            }else{
+                $scope.sessionExit();
             }
 
+        }else{
+            $scope.sessionExit();
         }
 
     };
@@ -72,18 +76,21 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     $scope.closeSide = function(){
         $timeout(function () {
+            console.log("interval dddd", form.getState());
             if(form.getState() == "process"){
+
                 $scope.validChangeFor();
             }else {
-                interval= null;
-                $scope.LayersAction({close:{search:true}});
-            }
-            /*if(!form.getValid()){
+               if($scope.module.layer=='detailShipment' ){
+                   $scope.sessionExit();
+               }else{
+                   $scope.LayersAction({close:{search:true}});
+               }
 
-             }if(form.getState() == "process"){ $scope.validChangeFor();}else {
-             $scope.validChangeFor();
-             }*/
-        },500);
+
+
+            }
+        },1000);
 
     };
 
@@ -131,6 +138,72 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }
     };
 
+    $scope.showNext = function (status) {
+        if (status) {
+
+            if($model.getInternalState() != 'new'){
+                $mdSidenav("NEXT").open();
+            }
+        } else {
+            $mdSidenav("NEXT").close()
+        }
+
+    };
+
+    $scope.next = function () {
+       if($scope.module.layer== 'detailShipment' && !$scope.updateShipmentCtrl() ){
+           $resource.postAll({type:'Shipment',mod:'Close'},{id:$scope.shipment.id}, function (response) {
+               if($scope.module.historia[1] == 'detailShipment'){
+                   $scope.LayersAction({close:{all:true}});
+               }else{
+                   $scope.LayersAction({close:{first:true, search:true}});
+               }
+           });
+       }
+
+    };
+
+    $scope.sessionExit = function () {
+        var val =$scope.updateShipmentCtrl();
+
+        if(!val  ){
+            {
+                if($scope.shipment.id){
+                    $scope.NotifAction("alert", "¿Esta seguro de salir?",
+                        [
+                            {name:"Si,estoy eguro",action:function () {
+                                if($scope.module.historia[1] == 'detailShipment'){
+                                    $scope.LayersAction({close:{all:true}});
+                                }else{
+                                    $scope.LayersAction({close:{first:true, search:true}});
+                                }
+                            } },
+                            {name:"No", action: function () {
+
+                            }}
+                        ]
+                        ,{block:true});
+                }else{
+                    if($scope.module.historia[1] == 'detailShipment'){
+                        $scope.LayersAction({close:{all:true}});
+                    }else{
+                        $scope.LayersAction({close:{first:true, search:true}});
+                    }
+                }
+
+            }
+
+        }
+        return val;
+    };
+
+    $scope.unblock = function (id) {
+        console.log("inblock", id);
+        $scope.session.isblock =false;
+    };
+
+    $scope.layerExit = function(layer){}
+
 
     $scope.$watch('bindShipment.estado', function(newVal){
 
@@ -149,30 +222,94 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         $scope.layer= newVal[0];
         $scope.index= newVal[1];
         if(newVal[1] == 0 || newVal[0] == 'listShipmentUncloset'){
-            $model.clear();
-            $scope.provSelec= undefined;
+            $timeout(function () {
+                $model.clear();
+                $scope.provSelec= undefined;
+                $scope.session.global = 'new';
+                $scope.session.isblock = true;
+            },500);
         }
-
-
     });
 
-    $scope.showNext = function (status) {
-        if (status) {
-
-            if($model.getInternalState() != 'new'){
-                $mdSidenav("NEXT").open();
-            }
 
 
-        } else {
-            $mdSidenav("NEXT").close()
+    $scope.isModif = function () {
+        var isModif = false;
+        if($model.getInternalState() == 'new'){
+            return false;
+        }else{
+            var form = $model.getForm();
+            angular.forEach($model.getForm('fecha_carga'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('tarifa'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('fecha_tienda'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('fecha_vnz'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('nro_mbl'), function (v, k) {
+
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('nro_hbl'), function (v, k) {
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('nro_dua'), function (v, k) {
+
+                if(v.estado && v.estado != 'new'){
+                    isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('document'), function (v, k) {
+
+                if(v.estado && v.estado != 'new'){
+
+                    isModif=true;
+
+                }
+            });
+            angular.forEach(form, function (v, k) {
+                if(k.startsWith("container")){
+                    if(v.peso.estado != 'new' || v.tipo.estado != 'new' ||  v.volumen.estado !='new' || v.id.estado != 'new'){
+
+                        isModif=true;
+                    }
+                }
+                if(k.startsWith("item")){
+                    if(v.total.estado !='new' || v.saldo.estado !='new'  || v.disponible.estado !='new' || v.id.estado !='new'){
+
+                        isModif=true;
+
+                    }
+
+                }
+                if(k.startsWith("odc")){
+                    if(v.id.estado != 'new'){
+                        isModif=true;
+                    }
+
+                }
+            });
+            return isModif;
         }
-
-    };
-
-    $scope.next = function () {
-        $scope.updateShipmentCtrl();
     }
+
 
 }]);
 
@@ -246,11 +383,15 @@ MyApp.controller('listShipmentUnclosetCtrl', ['$scope','shipment','setGetShipmen
     };
     $scope.setData = function (data){
         $scope.select = angular.copy(data);
-        $model.change('update','temp','');
-        $model.setData(data);
+
+        $model.setData(data, function () {
+            $scope.session.global = 'uncloset';
+
+            $scope.$parent.unblock({embarque_id:data.id});
+
+            $model.change('sistem',undefined,{uncloset:true});
+        });
         $scope.$parent.OpenShipmentCtrl(data);
-
-
 
     }
 
@@ -398,15 +539,26 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
         if($scope.$parent.shipment.dua){
             $scope.$parent.shipment.flete+= parseFloat($scope.$parent.shipment.dua);
         }
+
         $scope.$parent.LayersAction({open:{name:"detailShipment", after: function(){
             if(!data){
-                $scope.detailShipmenthead.$setDirty();
+                $scope.$parent.save(function (response) {
+                    $model.setData({id:response.id});
+                    $scope.$parent.unblock({embarque_id:response.id});
+                });
+
+
             }
         }}});
     };
 
     $scope.toEditHead= function(id,val){
-        $model.change("document",id,val);
+
+        if($scope.$parent.module.layer == 'detailShipment' && val){
+
+            $model.change("document",id,val);
+        }
+
     };
 
     $scope.openTarif = function () {
@@ -931,7 +1083,7 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
         angular.forEach(data, function(v,k){
             $scope.tarifaSelect[k] =v;
         });
-        $model.change('document', 'tarifa_id',data.id);
+        $model.change('tarifa', 'tarifa_id',data.id);
         $scope.$parent.shipment.tarifa_id = data.id;
         if(!$scope.$parent.shipment.objs.tarifa_id){
             $scope.$parent.shipment.objs.tarifa_id= {};
@@ -976,7 +1128,10 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
             $scope.tbl.data.splice(0,  $scope.tbl.data.length);
 
         }
-        $model.change('document', 'pais_id',(newVal) ? newVal.id: undefined);
+        if( $scope.$parent.module.layer == 'listTariff'){
+            $model.change('tarifa', 'pais_id',(newVal) ? newVal.id: undefined);
+        }
+
     })
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
 
@@ -1001,7 +1156,10 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
             });
 
         }
-        $model.change('document', 'puerto_id',(newVal) ? newVal.id: undefined);
+        if( $scope.$parent.module.layer == 'listTariff'){
+            $model.change('tarifa', 'puerto_id',(newVal) ? newVal.id: undefined);
+        }
+
 
     });
     $scope.$watchGroup(['tariffF1.$valid', 'tariffF1.$pristine'], function(newVal){
@@ -1457,7 +1615,7 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment','DateParse','$timeout',
                 [
                     {name:"Si, estoy seguro", default:6, action:
                         function () {
-                            $resource.postMod({type:"Order", mod:"Delete"},send,function (response) {
+                            $resource.postMod({type:"Order", mod:"Delete"},{doc_origen_id:data.id},function (response) {
                                 $scope.$parent.NotifAction("ok", "El pedido fue removido",[],{autohidden:1500});
                                 var index = -1;
                                 angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
@@ -1599,7 +1757,7 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
     }
 }]);
 
-MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',function ($scope,$model,formSrv) {
+MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', 'form','clickerTime',function ($scope,$resource,$model,formSrv,clickerTime) {
 
     $scope.isModif = false;
     $scope.goTo = {
@@ -1615,53 +1773,61 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
         productos:true
     };
     $scope.model ={document:{},items:[], odcs:[], containers:[]};
-    $scope.keyCount = function (obj) {
-        return (obj)? Object.keys(obj) :[];
-    };
+
 
     $scope.$parent.updateShipmentCtrl = function () {
-        var data = $model.getData();
-
-        if($model.getInternalState() == 'new' && false){
-
-            return true;
+        if($model.getInternalState() == 'new'){
+            return false;
         }else{
-
-            $scope.model ={document:{},items:[], odcs:[], containers:[], pagos:{}, fechas:{fecha_carga:{},fecha_vnz:{},fecha_tienda:{}}};
+            $scope.model ={document:{},items:[], odcs:[], containers:[], pagos:{}, tarifa:{}, fechas:{fecha_carga:{},fecha_vnz:{},fecha_tienda:{}}};
             var form = $model.getForm();
             $scope.isModif = false;
-            $scope.model.nro_mbl= {};$scope.model.nro_hbl= {};$scope.model.nro_dua= {};
+            $scope.model.nro_mbl= {};
+            $scope.model.nro_hbl= {};
+            $scope.model.nro_dua= {};
 
             angular.forEach($model.getForm('fecha_carga'), function (v, k){
                 if(v.estado && v.estado != 'new'){
                     $scope.model.fechas.fecha_carga[k]=v;
+                    $scope.isModif=true;
+                }
+            });
+            angular.forEach($model.getForm('tarifa'), function (v, k){
+                if(v.estado && v.estado != 'new'){
+                    $scope.model.tarifa[k]=v;
+                    $scope.isModif=true;
                 }
             });
             angular.forEach($model.getForm('fecha_tienda'), function (v, k){
                 if(v.estado && v.estado != 'new'){
                     $scope.model.fechas.fecha_tienda[k]=v;
+                    $scope.isModif=true;
                 }
             });
             angular.forEach($model.getForm('fecha_vnz'), function (v, k){
                 if(v.estado && v.estado != 'new'){
                     $scope.model.fechas.fecha_vnz[k]=v;
+                    $scope.isModif=true;
                 }
             });
             angular.forEach($model.getForm('nro_mbl'), function (v, k) {
 
                 if(v.estado && v.estado != 'new'){
                     $scope.model.nro_mbl[k]=v;
+                    $scope.isModif=true;
                 }
             });
             angular.forEach($model.getForm('nro_hbl'), function (v, k) {
                 if(v.estado && v.estado != 'new'){
                     $scope.model.nro_hbl[k]=v;
+                    $scope.isModif=true;
                 }
             });
             angular.forEach($model.getForm('nro_dua'), function (v, k) {
 
                 if(v.estado && v.estado != 'new'){
                     $scope.model.nro_dua[k]=v;
+                    $scope.isModif=true;
                 }
             });
             angular.forEach($model.getForm('document'), function (v, k) {
@@ -1673,6 +1839,7 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
                     else{
                         $scope.model.document[k]=v;
                     }
+                    $scope.isModif=true;
 
                 }
             });
@@ -1690,8 +1857,8 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
                         }
 
                         $scope.model.containers.push(v);
+                        $scope.isModif=true;
                     }
-
                 }
                 if(k.startsWith("item")){
                     if(v.total.estado !='new' || v.saldo.estado !='new'  || v.disponible.estado !='new' || v.id.estado !='new'){
@@ -1705,6 +1872,7 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
                             v.estado='del'
                         }
                         $scope.model.items.push(v);
+                        $scope.isModif=true;
 
                     }
 
@@ -1718,37 +1886,50 @@ MyApp.controller('updateShipmentCtrl',['$scope','setGetShipment', 'form',functio
                         if(v.id.estado == 'del'){
                             v.estado='del'
                         }
+                        $scope.isModif=true;
 
                     }
 
                 }
             });
-
-            $scope.LayersAction({open:{name:"updateShipment", before: function(){
+            if( $scope.isModif){
                 formSrv.setState("process");
-                $scope.$parent.NotifAction("alert","Se ha realizado los siguientes cambios en el embarque son correctos",
-                    [
-                        {name:"Si, son correctos",default:10, action: function () {
-                            formSrv.setState("continue");
-                        }
-                        },
-                        {name:"No, dejame corregirlos", action:function () {
-                            formSrv.setState("cancel");
-                        }}
-                    ]
-                    , {block:true});
-                console.log("form",form);
-               // console.log("state",$model.getInternalState());
-               // console.log("local",$scope.shipment );
-                console.log("model",$scope.model );
-                console.log("ship",$scope.$parent.shipment );
+                $scope.LayersAction({open:{name:"updateShipment", before: function(){
 
-            }}});
-            return false;
+                    $scope.$parent.NotifAction("alert","Se ha realizado los siguientes cambios en el embarque son correctos",
+                        [
+                            {name:"Si, son correctos",default:10, action: function () {
+                                formSrv.setState("continue");
+                            }
+                            },
+                            {name:"No, dejame corregirlos", action:function () {
+                                formSrv.setState("cancel");
+                            }}
+                        ]
+                        , {block:true});
+                }}});
+                return true;
+            }else{
+
+                return false;
+            }
         }
-
     };
 
+    $scope.keyCount = function (obj) {
+        return (obj)? Object.keys(obj) :[];
+    };
+
+    $scope.close = function (fn) {
+        $resource.postMod({type:"Shipment", mod:'close'}, {id:$scope.$parent.shipment.id}, function (response) {
+            if(fn){
+                fn(response)
+            }
+        })
+    };
+    $scope.goTo = function(data){
+        clickerTime({to:data,time:400});
+    }
 
 }]);
 
@@ -2820,11 +3001,13 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
         switch (data.key){
             case "uncloset":
                 if(data.cantidad == 1){
-                    shipment.get({type:"Shipment", id:data.data[0].id},{}, function(response){
-                        $model.setData(response);
-                        $scope.$parent.OpenShipmentCtrl(response);
-                        $scope.close();
+                    $scope.$parent.unblock({embarque_id:data.data[0].id});
+                    $scope.$parent.OpenShipmentCtrl(data.data[0].id);
+                    $model.setData({id:data.data[0].id}, function () {
+                        $model.change('sistem',undefined,{uncloset:true});
                     });
+
+                    $scope.close();
                 }else{
                     $scope.close();
                     $scope.$parent.listUnclosetCtrl();
@@ -3106,6 +3289,7 @@ MyApp.service('form',function(){
             return false;
         },
         setState: function (data) {
+            console.log("etsat", data);
             state= data;
         },
         getState:function () {
@@ -3123,10 +3307,6 @@ MyApp.service('form',function(){
             valid=false;
             state="waith";
         }
-
-
-
-
     }
 });
 
@@ -3163,10 +3343,8 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
             }
             exist=false;
-            // console.log("from ", form);
-            // console.log("fiel ", fiel);
-            // console.log("value ", value);
             interno='upd';
+
         };
 
         if( exist){
@@ -3190,9 +3368,9 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 forms[form][fiel].v= value;
                 var band= "new";
                 if(interno != 'new'){
-                    angular.forEach(forms[form], function(v,k){
-                        angular.forEach(v, function(v2,k2){
-                            if(forms[form][fiel].estado != 'new' ){
+                    angular.forEach(forms[form], function(v){
+                        angular.forEach(v, function(v2){
+                            if(v2.estado != 'new' ){
                                 band='upd'
                             }
                         });
@@ -3202,6 +3380,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
             }
         }
+
 
 
     };
@@ -3259,17 +3438,23 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
             return interno;
         }
         ,
-        setData : function(doc){
+        setData : function(doc,fn){
             bindin.estado = false;
 
             shipment.get({type:"Shipment", id:doc.id},{}, function (response) {
                 forms['document'] = {};
+                forms['tarifa'] = {};
                 angular.forEach(response,function (v, k) {
                     if((typeof (v) != 'object' && typeof (v) != 'array' )|| v == null){
                         Shipment[k]=v;
                     }
                     if(v !=null && typeof (v) != 'object' && typeof (v) != 'array' && !angular.isNumber(k)){
-                        forms['document'][k]={original:v, v:v, estado:'new',trace:[]};
+                        if(k == 'puerto_id' || k == 'pais_id'){
+
+                        }else{
+                            forms['document'][k]={original:v, v:v, estado:'new',trace:[]};
+                        }
+
                     }
                 });
                 Shipment.objs= {};
@@ -3410,9 +3595,12 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 if(Shipment.dua){
                     Shipment.flete+= parseFloat(Shipment.dua);
                 }
-                console.log("chipment", Shipment);
-                console.log("from", forms);
+
                 bindin.estado = true;
+
+                if(fn){
+                    fn(this);
+                }
 
             });
 
@@ -3468,9 +3656,6 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
         },
         clear: function(){
             bindin.estado = false;
-            forms ={};
-            interno= 'new';
-            externo= 'new';
             bindin.estado=false;
             Shipment.nro_dua={};
             Shipment.nro_dua.documento = undefined;

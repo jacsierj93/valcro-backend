@@ -57,6 +57,41 @@ class Shipment extends Model
         return $this->hasMany('App\Models\Sistema\Shipments\ShipmentItem', 'embarque_id');
     }
 
+    public function getSha256(){
+
+        $original= ''.
+            $this->id.
+            $this->prov_id.
+            $this->titulo.
+            $this->pais_id.
+            $this->puerto_id.
+            $this->tarifa_id.
+            $this->fecha_carga.
+            $this->fecha_vnz.
+            $this->fecha_tienda.
+            $this->nro_mbl.
+            $this->nro_hbl.
+            $this->nro_dua.
+            $this->flete_tt.
+            $this->moneda_id.
+            $this->emision.
+            $this->nacionalizacion.
+            $this->emision_mbl.
+            $this->emision_hbl.
+            $this->emision_dua.
+            $this->dua;
+        $sha= '';
+
+        foreach ($this->items()->get() as $aux){
+            $original .=$aux->id.$aux->saldo.$aux->cantidad;
+        }
+        foreach ($this->attachments()->get() as $aux){
+            $original .=$aux->id;
+        }
+        //$return  = ['original'=>$original, 'sha256'=>];
+        return hash('sha256',$original,false);
+    }
+
 
 
 

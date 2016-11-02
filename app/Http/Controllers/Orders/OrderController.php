@@ -9,7 +9,7 @@ use App\Libs\Api\RestApi;
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\Masters\FileModel;
-use App\Models\Sistema\Notifications\NotificationOrder;
+use App\Models\Sistema\Notifications\NotificationModule;
 use App\Models\Sistema\Order\OrderAnswer;
 use App\Models\Sistema\Order\OrderAnswerAttachment;
 use App\Models\Sistema\Order\OrderAttachment;
@@ -319,7 +319,7 @@ class OrderController extends BaseController
             $userModif = User::findOrFail($model->edit_usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
                 if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
                     if(sizeof($notif->where('clave','send_provider')->get()) == 0){
                         return ['action' => 'send'];
                     }
@@ -339,7 +339,7 @@ class OrderController extends BaseController
             $userModif = User::findOrFail($model->edit_usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
                 if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
                     if(sizeof($notif->where('clave','send_provider')->get()) == 0){
                         return ['action' => 'send'];
                     }
@@ -3630,7 +3630,7 @@ class OrderController extends BaseController
                 'cc' =>[],
                 'ccb' =>[]
             ];
-            $noti = new NotificationOrder();
+            $noti = new NotificationModule();
             $noti->doc_id = $model->id;
             $noti->doc_tipo = 21;
             $noti->usuario_id = $this->user->id;
@@ -3673,7 +3673,7 @@ class OrderController extends BaseController
                 'cc' =>[],
                 'ccb' =>[]
             ];
-            $noti = new NotificationOrder();
+            $noti = new NotificationModule();
             $noti->doc_id = $model->id;
             $noti->doc_tipo = 21;
             $noti->usuario_id = $this->user->id;
@@ -3716,7 +3716,7 @@ class OrderController extends BaseController
                 'cc' =>[],
                 'ccb' =>[]
             ];
-            $noti = new NotificationOrder();
+            $noti = new NotificationModule();
             $noti->doc_id = $model->id;
             $noti->doc_tipo = 21;
             $noti->usuario_id = $this->user->id;
@@ -5052,7 +5052,7 @@ class OrderController extends BaseController
         $result['success'] = "Registro guardado con éxito!";
         $result['action'][] = "close";
         $model = Solicitude::findOrFail($req->id);
-        $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
         $model->final_id=
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
@@ -5067,7 +5067,7 @@ class OrderController extends BaseController
         ];
 
         if(sizeof($notif->where('clave', 'created')->get()) == 0){
-            $noti = new NotificationOrder();
+            $noti = new NotificationModule();
             $noti->doc_id = $model->id;
             $noti->doc_tipo = 21;
             $noti->usuario_id = $this->user->id;
@@ -5077,8 +5077,8 @@ class OrderController extends BaseController
             $result['action'][]="send";
         }else{
             if($model->fecha_aprob_compra != null){
-                if(sizeof(NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21)->where('clave', 'aprob_compras')->get()) == 0){
-                    $noti = new NotificationOrder();
+                if(sizeof(NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21)->where('clave', 'aprob_compras')->get()) == 0){
+                    $noti = new NotificationModule();
                     $noti->doc_id = $model->id;
                     $noti->doc_tipo = 21;
                     $noti->usuario_id = $this->user->id;
@@ -5087,7 +5087,7 @@ class OrderController extends BaseController
                     $noti->send($data,$sender,$noti,"aprob_compras");
                     $result['action'][]="aprob_compras";
                 }else if(sizeof($notif->where('clave', 'aprob_compras')->where('usuario_id', $this->user->id)->get()) > 0){
-                    $noti = new NotificationOrder();
+                    $noti = new NotificationModule();
                     $noti->doc_id = $model->id;
                     $noti->doc_tipo = 21;
                     $noti->usuario_id = $this->user->id;
@@ -5098,7 +5098,7 @@ class OrderController extends BaseController
                 }
             }else{
                 $sender['subject']= "Notificacion de modificacion de solicitud";
-                $noti = new NotificationOrder();
+                $noti = new NotificationModule();
                 $noti->doc_id = $model->id;
                 $noti->doc_tipo = 21;
                 $noti->usuario_id = $this->user->id;
@@ -5115,7 +5115,7 @@ class OrderController extends BaseController
     /***/
     public function ClosePurchase(Request $req)
     {
-        $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
 
         $result['success'] = "Registro guardado con éxito!";
         $result['action'] = "new";
@@ -5133,7 +5133,7 @@ class OrderController extends BaseController
             'cc' =>[],
             'ccb' =>[]
         ];
-        $noti = new NotificationOrder();
+        $noti = new NotificationModule();
         $noti->doc_id = $model->id;
         $noti->doc_tipo = 21;
         $noti->usuario_id = $this->user->id;
@@ -5150,7 +5150,7 @@ class OrderController extends BaseController
     /***/
     public function CloseOrder(Request $req)
     {
-        $notif= NotificationOrder::where('doc_id',$req->id)->where('doc_tipo', 21);
+        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
 
         $result['success'] = "Registro guardado con éxito!";
         $result['action'] = "new";
@@ -5166,7 +5166,7 @@ class OrderController extends BaseController
             'cc' =>[],
             'ccb' =>[]
         ];
-        $noti = new NotificationOrder();
+        $noti = new NotificationModule();
         $noti->doc_id = $model->id;
         $noti->doc_tipo = 21;
         $noti->usuario_id = $this->user->id;
@@ -5754,7 +5754,7 @@ class OrderController extends BaseController
     }
 
     private function sendNotificacion($data,$sender, $type = null){
-        $noti = new NotificationOrder();
+        $noti = new NotificationModule();
         $noti->doc_id= $data['id'];
         $noti->doc_tipo = $data['tipo'];
         $noti->clave = $type;
@@ -5834,7 +5834,7 @@ class OrderController extends BaseController
 
                 }else{
                     if($this->user->cargo_id == $this->profile['trabajador']){
-                        $notif = NotificationOrder::where('doc_id',$model->id)->where('doc_tipo',$model->getTipoId());
+                        $notif = NotificationModule::where('doc_id',$model->id)->where('doc_tipo',$model->getTipoId());
                         if(sizeof($notif->where('usuario_id','<>',$model->usuario_id)->get()) == 0){
                             $permit['update']=true;
                             $permit['metodo']='sin cambios';

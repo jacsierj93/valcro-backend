@@ -190,7 +190,7 @@
                     <div layout="column" ng-show="(module.layer == 'listOrdershipment')" layout-align="center center" ng-click="listOrderAdd()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
-                            Nuevo Pedido
+                          Agregar pedido
                         </md-tooltip>
                     </div>
                     <div layout="column" ng-show="(module.layer == 'listTariff')" layout-align="center center" ng-click="CreatTariff()">
@@ -199,53 +199,10 @@
                             Nueva tarifa
                         </md-tooltip>
                     </div>
-
-                    <div layout="column" layout-align="center center"
-                         ng-show="(module.index > 1 && Docsession.block && document.permit.update )" ng-click="updateForm()">
+                    <div layout="column" ng-show="ssesion.block" layout-align="center center" ng-click="CreatTariff()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                         <md-tooltip >
-                            Actualizar la  {{formMode.name}}
-                        </md-tooltip>
-                    </div>
-                    <div layout="column" layout-align="center center"
-                         ng-show="( module.layer == 'delalleDoc' && !FormHeadDocument.$valid && document.permit.del )"
-                         ng-click="delete(document)" >
-                        <span class="icon-Eliminar" style="font-size: 24px"></span>
-                        <md-tooltip>
-                            Eliminar la {{formMode.name}}
-                        </md-tooltip>
-                    </div>
-                    <div layout="column" layout-align="center center"
-                         ng-show="( FormHeadDocument.$valid && Docsession.global != 'new' && document.permit.cancel)"
-                         ng-click="cancelDoc()" >
-                        <span  style="font-size: 24px">(/)</span>
-                        <md-tooltip>
-                            Cancelar la {{formMode.name}}
-                        </md-tooltip>
-                    </div>
-                    <div layout="column" layout-align="center center"
-                         ng-show="( document.id && Docsession.isCopyableable && document.permit.update)"
-                         ng-click="copyDoc()">
-                        <span class="icon-Copiado" style="font-size: 24px"> </span>
-                        <md-tooltip >
-                            Crear una copia de la {{formMode.name}} (Sin adjuntos)
-                        </md-tooltip>
-                    </div>
-
-                    <div layout="column"
-                         ng-show="(!document.doc_parent_id && provSelec.id && module.layer == 'detalleDoc')"
-                         layout-align="center center" ng-click="openImport()">
-                        <span class="icon-Importar" style="font-size: 24px"></span>
-                        <md-tooltip >
-                            Importar desde {{forModeAvilable.getXValue(formMode.value - 1 ) > 21 ? 'una': 'un' }}  {{ forModeAvilable.getXValue(formMode.value - 1 ).name}}
-                        </md-tooltip>
-                    </div>
-                    <div layout="column" layout-align="center center"
-                         ng-show="( document.id &&  document.version && document.version > 1  )"
-                         ng-click="openVersions()">
-                        <span style="font-size: 24px"> OLD </span>
-                        <md-tooltip >
-                            Ver las versiones anteriores de la {{formMode.name}}
+                          Actualizar
                         </md-tooltip>
                     </div>
 
@@ -707,14 +664,7 @@
                                         Embarque
                                     </div>
                                 </div>
-                                <!--<div layout="row" layout-align="center end" class="form-row-head-option">
-                                    <div flex layout="column" layout-align="center center" ng-click="">
-                                        <span class="{{(formOptions.head.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
-                                        <md-tooltip >
-                                            {{(formOptions.head.expand) ? 'Ocultar' : 'Mostar'}}
-                                        </md-tooltip>
-                                    </div>
-                                </div>-->
+
                             </div>
                             <div layout="row" class="row" ng-show="formOptions.head.expand" >
                                 <md-input-container class="md-block" flex  >
@@ -722,8 +672,7 @@
                                     <md-autocomplete md-selected-item="provSelec"
                                                      info="Seleccione el proveedor del embarque"
                                                      required
-                                                     ng-disabled="( session.isBlock || $parent.shipment.pais_id)"
-
+                                                     ng-disabled="( session.isblock || $parent.shipment.pais_id)"
                                                      md-search-text="provSelecText "
                                                      md-items="item in $parent.provs | stringKey : provSelecText : 'razon_social' "
                                                      md-item-text="item.razon_social"
@@ -761,7 +710,7 @@
                                     <label>Titulo</label>
                                     <input  ng-model="$parent.shipment.titulo"
                                             ng-change="toEditHead('titulo', $parent.shipment.titulo ) "
-                                            ng-disabled="( session.isblock || form != 'head' )"
+                                            ng-disabled="( session.isblock )"
                                             required
                                             info="Escriba un titulo para facilitar identificacion del embarque"
                                             skip-tab
@@ -810,14 +759,7 @@
                                         Fechas
                                     </div>
                                 </div>
-                                <!--<div layout="row" layout-align="center end" class="form-row-head-option">
-                                    <div flex layout="column" layout-align="center center" ng-click="">
-                                        <span class="{{(formOptions.date.expand) ? 'icon-Up' : 'icon-Above '}}" style="font-size: 12px"></span>
-                                        <md-tooltip >
-                                            {{(formOptions.date.expand) ? 'Ocultar' : 'Mostar'}}
-                                        </md-tooltip>
-                                    </div>
-                                </div>-->
+
                             </div>
                             <div layout="row" class="row" ng-show="formOptions.date.expand" >
 
@@ -830,7 +772,7 @@
                                     </div>
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_carga.value"
                                                    ng-change="changeFecha_carga()"
-                                                   ng-disabled="$parent.shipment.fechas.fecha_carga.confirm "
+                                                   ng-disabled="$parent.shipment.fechas.fecha_carga.confirm || session.isblock"
 
                                                    info="fecha en que se realizo termino de cargar el embarcar, cambiar solo cuando se este seguro de que el embarque esta cargado"
                                     ></md-datepicker >
@@ -843,7 +785,7 @@
 
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_vnz.value"
                                                    ng-change="changeFecha_vnz()"
-                                                   ng-disabled="$parent.shipment.fechas.fecha_vnz.confirm"
+                                                   ng-disabled="$parent.shipment.fechas.fecha_vnz.confirm || session.isblock"
                                                    ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                    skip-tab
                                     ></md-datepicker >
@@ -859,7 +801,7 @@
 
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_tienda.value"
                                                    ng-change="changeFecha_tienda()"
-                                                   ng-disabled="$parent.shipment.fechas.fecha_tienda.confirm"
+                                                   ng-disabled="$parent.shipment.fechas.fecha_tienda.confirm || session.isblock"
                                                    ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                    skip-tab
                                     ></md-datepicker >
@@ -1521,7 +1463,7 @@
                                     <label>Pais</label>
                                     <md-autocomplete md-selected-item="pais_idSelec"
                                                      info="Selecione el pais de origen para el embarque"
-                                                     ng-disabled="( session.isBlock || $parent.shipment.fechas.fecha_carga.confirm || $parent.shipment.tarifa_id )"
+                                                     ng-disabled="( session.isblock  || $parent.shipment.fechas.fecha_carga.confirm || $parent.shipment.tarifa_id )"
                                                      ng-click="$parent.toEditHead('pais_id', provSelect.id)"
                                                      id="prov_id"
                                                      skip-tab
@@ -1549,7 +1491,7 @@
                                     <md-autocomplete md-selected-item="puerto_idSelec"
                                                      requiered
                                                      info="Selecione el puerto de origen para el embarque"
-                                                     ng-disabled="( session.isBlock || $parent.shipment.fechas.fecha_carga.confirm || $parent.shipment.tarifa_id  )"
+                                                     ng-disabled="( session.isblock  || $parent.shipment.fechas.fecha_carga.confirm || $parent.shipment.tarifa_id  )"
                                                      skip-tab
                                                      md-search-text="puerto_idText"
                                                      md-auto-select="true"
@@ -2349,36 +2291,25 @@
                                 <md-switch class="md-primary"
                                            ng-model="goTo.titulo"
                                            ng-disabled="true"
-
                                 >
                                 </md-switch>
                             </div>
                         </div>
 
-                        <div layout="column" style="height: 120px;overflow: auto;">
+                        <div layout="column" style="height: 26px;overflow: auto;">
                             <div  style="height:24px;" layout="row" layout-align="start" ng-show="model.document.titulo.estado && model.document.titulo.estado !='new'" >
                                 <div layout="row" style="min-width: 88px; color:#ccc">Titulo</div>
                                 <div layout="row" style="color: #999">
                                     <div class="rms" flex> {{$parent.shipment.titulo}}</div>
                                 </div>
-                            </div><div  style="height:24px;" layout="row" layout-align="start" ng-show="(model.document.prov_id.estado && model.document.prov_id.estado != 'new')" >
+                            </div>
+                            <div  style="height:24px;" layout="row" layout-align="start" ng-show="(model.document.prov_id.estado && model.document.prov_id.estado != 'new')" >
                                 <div layout="row" style="min-width: 88px; color:#ccc">Proveedor</div>
                                 <div layout="row" style="color: #999">
                                     <div class="rms" flex> {{shipment.objs.prov_id.razon_social}}</div>
                                 </div>
                             </div>
-                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="model.document.pais_id.estado &&  model.document.pais_id.estado !='new'" >
-                                <div layout="row" style="min-width: 88px; color:#ccc;">Pais</div>
-                                <div layout="row" style="color:#999">
-                                    <div class="rms" flex> {{shipment.objs.pais_id.short_name}}</div>
-                                </div>
-                            </div>
-                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.document.puerto_id.estado && model.document.puerto_id.estado !='new')" >
-                                <div layout="row" style="min-width: 88px; color:#ccc;">Puerto</div>
-                                <div layout="row" style="color:#999">
-                                    <div class="rms" flex> {{shipment.objs.puerto_id.Main_port_name}}</div>
-                                </div>
-                            </div>
+
 
                             <div layout="column" layout-align="center center"
                                  ng-show="keyCount(model.document) == 0;"
@@ -2395,7 +2326,7 @@
                                     Tarifa
                                 </div>
                             </div>
-                            <div  layout="row"  layout-align="end start"  ng-show="(model.document.tarifa_id.estado !='new') && model.document.tarifa_id.estado " >
+                            <div  layout="row"  layout-align="end start"  ng-show="keyCount(model.document.tarifa_id) > 0" >
                                 <md-switch class="md-primary"
                                            ng-model="goTo.tarifa_id"
                                            ng-disabled="true"
@@ -2418,8 +2349,20 @@
                                     <div class="rms" flex style="color:#999" > {{shipment.objs.tarifa_id.naviera.nombre}}</div>
                                 </div>
                             </div>
+                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="model.document.pais_id.estado &&  model.document.pais_id.estado !='new'" >
+                                <div layout="row" style="min-width: 88px; color:#ccc;">Pais</div>
+                                <div layout="row" style="color:#999">
+                                    <div class="rms" flex> {{shipment.objs.pais_id.short_name}}</div>
+                                </div>
+                            </div>
+                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.document.puerto_id.estado && model.document.puerto_id.estado !='new')" >
+                                <div layout="row" style="min-width: 88px; color:#ccc;">Puerto</div>
+                                <div layout="row" style="color:#999">
+                                    <div class="rms" flex> {{shipment.objs.puerto_id.Main_port_name}}</div>
+                                </div>
+                            </div>
                             <div layout="column" layout-align="center center"
-                                 ng-show="model.document.tarifa_id.estado == 'new' || !model.document.tarifa_id"
+                                 ng-show="keyCount(model.document.tarifa_id)== 0"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2885,7 +2828,7 @@
                             >
                         </md-input-container>
                         <md-input-container flex>
-                            <label>Costo?</label>
+                            <label>Costo</label>
                             <input  ng-model="container.cantidad" skip-tab
                             >
                         </md-input-container>
@@ -2924,7 +2867,10 @@
                                 <div layout="row" class="row">
                                     <md-input-container class="md-block" flex>
                                         <label>N°</label>
-                                        <input  type="text" ng-model="$parent.shipment.nro_mbl.documento" ng-change="toEditHead('documento',$parent.shipment.nro_mbl.documento)"  >
+                                        <input  type="text"
+                                                ng-model="$parent.shipment.nro_mbl.documento" ng-change="toEditHead('documento',$parent.shipment.nro_mbl.documento)"
+                                                ng-disabled=" $parent.session.isblock"
+                                        >
                                     </md-input-container>
                                 </div>
                                 <div layout="row" class="row" flex>
@@ -2935,10 +2881,11 @@
                                         <md-datepicker ng-model="$parent.shipment.nro_mbl.emision"
                                                        skip-tab
                                                        ng-change="toEditHead('emision',$parent.shipment.nro_mbl.emision)"
+                                                       ng-disabled = " session.isblock"
                                         ></md-datepicker >
                                     </div>
                                 </div>
-                                <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                                <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show=" $parent.session.isblock ">
                                     <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                                          ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
                                         Insertar archivo
@@ -2981,7 +2928,7 @@
                             <div  layout="column" style="padding-right:4px">
                                 <md-input-container class="md-block" >
                                     <label>N°</label>
-                                    <input  type="text" ng-model="$parent.shipment.nro_hbl.documento"   ng-change="toEditHead('documento',$parent.shipment.nro_hbl.documento)" >
+                                    <input  ng-disabled=" $parent.session.isblock " type="text" ng-model="$parent.shipment.nro_hbl.documento"   ng-change="toEditHead('documento',$parent.shipment.nro_hbl.documento)" >
                                 </md-input-container>
                                 <div layout="row" class="row" flex>
                                     <div layout="row" class="date-row vlc-date" >
@@ -2989,6 +2936,7 @@
                                             <div  style="width: 88px;">Emitido</div>
                                         </div>
                                         <md-datepicker ng-model="$parent.shipment.nro_hbl.emision"
+                                                       ng-disabled=" $parent.session.isblock "
                                                        ng-change="toEditHead('emision',($parent.shipment.nro_hbl.emision)? $parent.shipment.nro_hbl.emision.toString() : undefined )"
                                                        skip-tab
                                         ></md-datepicker >
@@ -2996,7 +2944,7 @@
                                 </div>
 
                             </div>
-                            <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                            <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="$parent.session.isblock " >
                                 <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                                      ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
                                     Insertar archivo
@@ -3250,11 +3198,6 @@
 
                             </md-input-container>
 
-                            <!--                        <md-input-container class="md-block" >
-                                                        <label>Cod. fabrica</label>
-                                                        <input  type="text" ng-model="model.codigoo_fabrica"  >
-
-                                                    </md-input-container>-->
                             <md-input-container class="md-block" >
                                 <label>Cod. Barra</label>
                                 <input  type="text" ng-model="model.codigo_barra"   >
