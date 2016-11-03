@@ -301,14 +301,18 @@
                                 </div>
                             </div>
                             <div flex>
-                                <div ng-repeat="opcion in options" class="row" ng-init="inicialize(opcion)" >
-                                    <md-input-container class="md-block" flex>
-                                        <label>{{opcion.descripcion}}</label>
-                                        <input skip-tab
-                                               ng-model="opcValue[opcion.descripcion].valor"
-                                               id="{{field.id}}">
-                                    </md-input-container>
-                                </div>
+                                <form name="optionsForm">
+                                    <div ng-repeat="opcion in options" class="row" ng-init="inicialize(opcion)" >
+                                        <md-input-container class="md-block" flex>
+                                            <label>{{opcion.descripcion}}</label>
+                                            <input skip-tab
+                                                   ng-focus="checkSave()"
+                                                   ng-model="opcValue[opcion.descripcion].valor"
+                                                   id="{{field.id}}">
+                                        </md-input-container>
+                                    </div>
+                                </form>
+
                             </div>
 
                         </div>

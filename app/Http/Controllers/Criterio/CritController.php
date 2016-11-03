@@ -72,7 +72,14 @@ class CritController extends BaseController
     }
 
     public function saveOptions(Request  $rq){
-        $ret = array("action"=>"new","id"=>false);
+        foreach ($rq->request as $k=>$req){
+            echo $k;
+
+        }
+        /*$ret = array("action"=>"new","ids"=>[]);
+        foreach ($rq as $req){
+
+        }
         if($rq->id){
             $opt = Options::find($rq->id);
             $ret["action"]="upd";
@@ -85,6 +92,6 @@ class CritController extends BaseController
 
         $opt->save();
         $ret["id"] = $opt->id;
-        return $ret;
+        return $ret;*/
     }
 }

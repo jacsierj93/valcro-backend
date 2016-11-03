@@ -56,10 +56,17 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     };
 
-    $scope.saveOptions = function(){
+    $scope.checkSave = function(){
+        console.log($scope.optionsForm);
+        console.log($scope.opcValue)
+         saveOptions($scope.opcValue)
+    };
+
+    var saveOptions = function(datos){
+
         criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
-            $scope.critField.id = data.id;
-            critForm.add($scope.critField);
+            console.log(data);
+
         });
     };
     
