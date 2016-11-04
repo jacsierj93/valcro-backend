@@ -22,7 +22,7 @@ $app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
 $app->get('embarques/Shipment/Items', 'Embarques\EmbarquesController@getShipmentItems');
-$app->post('embarques/Shipment/Close', 'Embarques\EmbarquesController@closeShipment');
+$app->get('embarques/Item/History', 'Embarques\EmbarquesController@getItemHistory');
 $app->get('embarques/Shipments', 'Embarques\EmbarquesController@getShipments');
 $app->get('embarques/Shipment/Dates', 'Embarques\EmbarquesController@CalShipmentDates');
 $app->post('embarques/Shipment/SaveDates', 'Embarques\EmbarquesController@saveShipmentDates');

@@ -507,6 +507,7 @@ class EmbarquesController extends BaseController
         return $result;
 
     }
+
     public  function  getShipment(Request $req){
 
         $model = Shipment::findOrfail($req->id);
@@ -601,6 +602,25 @@ class EmbarquesController extends BaseController
         return $data ;
     }
 
+    public function getItemHistory(Request $req){
+        $models = ShipmentItem::selectRaw(
+            'tbl_embarque_item.id,'.
+            'tbl_embarque_item.producto_id,'.
+            'tbl_compra_orden_item.precio,'.
+            'tbl_compra_orden_item.updated_at as fecha,'.
+            'tbl_compra_orden_item.doc_id,'.
+            'tbl_producto.codigo_fabrica'
+        )
+            ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+            ->join('tbl_compra_orden_item','tbl_compra_orden_item.producto_id','=','tbl_producto.id' )
+            ->get()
+        ;
+
+
+        return $models;
+
+    }
+
     public  function  getShipmentItems(Request $req){
         $items=  ShipmentItem::selectRaw(
             'tbl_embarque_item.id,'.
@@ -631,7 +651,7 @@ class EmbarquesController extends BaseController
     }
 
     public  function  getShipments(Request $req){
-        return json_encode(Shipment::whereNull('session_id')->get());
+        return json_encode(Shipment::where('prov_id',$req->prov_id)->get());
     }
 
     public function saveShipment(Request $req){

@@ -4182,7 +4182,10 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
         if(newVal){
             var module = Layers.getModule();
             var arg = $scope.accion.data;
-            $scope.accion.estado=false;
+            $timeout(function () {
+                $scope.accion.estado=false;
+            },0)
+
             if(arg.open){
                 open(arg.open, module);
             }else
@@ -4225,6 +4228,7 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
                 paso= callfn(arg.before);
                 close = paso ? 1 : 0;
             }
+
 
 
             if(paso){
