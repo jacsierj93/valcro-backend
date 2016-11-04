@@ -25,8 +25,12 @@ use App\Models\Sistema\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\View;
 use Session;
 use Validator;
+use PDF;
+use App;
+
 
 
 class EmbarquesController extends BaseController
@@ -70,6 +74,18 @@ class EmbarquesController extends BaseController
     }
 
 
+    public function testPdf (Request $req){
+     //   $data =$this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
+/*        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
+        $view = View::make("emails/modules/Embarques/Internal/Simple",[])->render();
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadHTML($view);
+
+        return $pdf->stream();*/
+
+        return View::make("emails/modules/Embarques/Internal/Simple",[]);
+
+    }
 
     /************************* PROVIDER ***********************************/
     public  function  getProvList(){

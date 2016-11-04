@@ -2,6 +2,7 @@
 ///sistema
 $app->get('embarques/Notification', 'Embarques\EmbarquesController@getNotifications');
 $app->get('embarques/Uncloset', 'Embarques\EmbarquesController@getUncloset');
+$app->get('embarques/Test', 'Embarques\EmbarquesController@testPdf');
 
 //Tariff
 $app->get('embarques/Country/Ports', 'Embarques\EmbarquesController@getPortCountry');
