@@ -272,6 +272,7 @@
 
                                 <md-content layout="column" style="margin: 0px 4px 0px 4px">
                                     <div ng-repeat="field in criteria" class="row"
+                                         ng-dblclick="setEdit(field)"
                                          form-preview="{{ field.type.directive }}">
 
                                     </div>

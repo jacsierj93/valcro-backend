@@ -49,6 +49,7 @@ class CritController extends BaseController
             $field->line;
             $field->field;
             $field->type;
+            $field['options'] = $field->options()->get();
         }
         return  json_encode($crit);
     }
@@ -71,27 +72,28 @@ class CritController extends BaseController
 
     }
 
-    public function saveOptions(Request  $rq){
-        foreach ($rq->request as $k=>$req){
-            echo $k;
+    public function saveOptions(Request  $reqs){
+        $ret = array();
+        foreach ($reqs->request as $k=>$rq){
+            //dd($rq['id']);
+            if($rq['id']){
+                $opt = Options::find($rq['id']);
+                if($opt->value == $rq['valor']){
+                    continue;
+                }
+                $ret[$k]["action"]="upd";
+            }else{
+                $opt = new Options();
+            }
+            $opt->lct_id = $rq['field_id'];
+            $opt->opc_id = $rq['opc_id'];
+            $opt->value = $rq['valor'];
 
+            $opt->save();
+            $ret[$k]["id"] = $opt->id;
+            return $ret;
         }
-        /*$ret = array("action"=>"new","ids"=>[]);
-        foreach ($rq as $req){
 
-        }
-        if($rq->id){
-            $opt = Options::find($rq->id);
-            $ret["action"]="upd";
-        }else{
-            $opt = new Options();
-        }
-        $opt->lct_id = $rq->field_id;
-        $opt->opc_id = $rq->opc_id;
-        $opt->value = $rq->value;
 
-        $opt->save();
-        $ret["id"] = $opt->id;
-        return $ret;*/
     }
 }

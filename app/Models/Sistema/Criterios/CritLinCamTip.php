@@ -26,4 +26,9 @@ class CritLinCamTip extends Model
     public function type(){
         return $this->hasOne('App\Models\Sistema\Criterios\CritTipoCamp','id','tipo_id');
     }
+
+    public function options(){
+        return $this->belongsToMany('App\Models\Sistema\Criterios\CritOption','tbl_crit_lct_opc','lct_id','opc_id')->withPivot("value")->whereNull('tbl_crit_lct_opc.deleted_at') // Table `group_user` has column `deleted_at`
+        ->withTimestamps(); ;
+    }
 }

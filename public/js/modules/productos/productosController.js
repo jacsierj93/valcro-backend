@@ -31,49 +31,62 @@ MyApp.service("mastersCrit",function(criterios,masters){
     }
 });
 
-MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios',function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios) {
+MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
     $scope.clicked = function(){
         $mdSidenav("layer0").open();
     };
     $scope.listLines = mastersCrit.getLines();
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
-    $scope.critField = {
-        id:false,
-        line:1,
-        type:null,
-        field:null
-    };
-    $scope.options = [];
-    $scope.opcValue = {};
+    $scope.critField = critForm.getEdit();
+
+    $scope.opcValue =critForm.getOptions();
     $scope.inicialize = function(obj){
         $scope.opcValue[obj.descripcion] = {
             descripcion:obj.descripcion,
             opc_id:obj.id,
             field_id:$scope.critField.id,
-            id:false
+            id:false,
+            valor:''
         }
 
     };
 
     $scope.checkSave = function(){
-        console.log($scope.optionsForm);
-        console.log($scope.opcValue)
+        
          saveOptions($scope.opcValue)
     };
 
     var saveOptions = function(datos){
 
         criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
-            console.log(data);
+            angular.forEach(data, function(value, key){
+                if(key.match(/^[^\$]/g) && ("id" in value)) {
+                    $scope.opcValue[key].id = value.id;
+                }
+            });
 
         });
     };
-    
+
+    $scope.$watch("critField.type",function(val){
+
+        $scope.options = (val)?$filter("filterSearch")($scope.tipos ,[val])[0].cfg:[];
+    });
+    $scope.$watch("critField.id",function(val){
+        $timeout(function(){
+            angular.forEach($scope.critField.opcs,function(v,k){
+                var key = v.descripcion;
+                $scope.opcValue[key].id=v.pivot.id;
+                $scope.opcValue[key].opc_id=v.pivot.opc_id;
+                $scope.opcValue[key].field_id=v.pivot.lct_id;
+                $scope.opcValue[key].valor=v.pivot.value;
+            })
+        },1000)
+
+    });
+
     $scope.createField = function(data,campo){
-        if(campo == "type"){
-            $scope.options = data.cfg;
-        }
 
         $scope.critField[campo]=data.id;
         criterios.put({type:"save"},$scope.critField,function(data){
@@ -97,6 +110,8 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var fields = mastersCrit.getFields();
     var tipos = mastersCrit.getTypes();
     var listado = criterios.query({ type:"getCriteria"});
+    var date = new Date();
+    var options = {opcs:[],last:date.getDate()};
     var factory = {
         linea_id: "1",
         campo_id: "1",
@@ -105,6 +120,13 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         field:$filter("filterSearch")(fields,[1])[0],
         type:$filter("filterSearch")(tipos,[2])[0],
         id:false
+    };
+    var edit = {
+        id:false,
+        line:null,
+        type:null,
+        field:null,
+        opcs:[]
     };
     return {
         add:function(datos){
@@ -121,10 +143,26 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             elem.field = $filter("filterSearch")(fields,[datos.field])[0];
             elem.tipo_id=datos.type;
             elem.type = $filter("filterSearch")(tipos,[datos.type])[0];
+            elem.opcs = elem.type.cfg;
         },
         get:function(){
             return listado;
+        },
+        setEdit:function(campo){
+            edit.id = campo.id;
+            edit.line = campo.linea_id;
+            edit.field = campo.campo_id;
+            edit.type = campo.tipo_id;
+            edit.opcs = campo.options;
+
+        },
+        getEdit:function(){
+            return edit;
+        },
+        getOptions:function () {
+            return options;
         }
+
     }
 });
 
@@ -132,7 +170,10 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 
 
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm',function ($scope, setNotif, masters,critForm) {
-   $scope.criteria = critForm.get();
+    $scope.criteria = critForm.get();
+    $scope.setEdit = function(campo){
+        critForm.setEdit(campo);
+    }
 }]);
 
 MyApp.directive('formPreview', function($http,$timeout) {
