@@ -75,7 +75,7 @@ class CritController extends BaseController
     public function saveOptions(Request  $reqs){
         $ret = array();
         foreach ($reqs->request as $k=>$rq){
-            //dd($rq['id']);
+
             if($rq['id']){
                 $opt = Options::find($rq['id']);
                 if($opt->value == $rq['valor']){

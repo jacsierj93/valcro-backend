@@ -31,11 +31,23 @@ MyApp.service("mastersCrit",function(criterios,masters){
     }
 });
 
-MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
-    $scope.clicked = function(){
+
+
+MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
+    $scope.listLines = mastersCrit.getLines();
+
+    $scope.clicked = function(line){
+        critForm.setLine(line);
         $mdSidenav("layer0").open();
     };
+    $scope.curLine = critForm.getLine();
+    console.log($scope.curLine)
+}]);
+
+MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
+
     $scope.listLines = mastersCrit.getLines();
+    $scope.line = critForm.getLine();
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
@@ -76,6 +88,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.$watch("critField.id",function(val){
         $timeout(function(){
             angular.forEach($scope.critField.opcs,function(v,k){
+                console.log(v)
                 var key = v.descripcion;
                 $scope.opcValue[key].id=v.pivot.id;
                 $scope.opcValue[key].opc_id=v.pivot.opc_id;
@@ -110,8 +123,8 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var fields = mastersCrit.getFields();
     var tipos = mastersCrit.getTypes();
     var listado = criterios.query({ type:"getCriteria"});
-    var date = new Date();
-    var options = {opcs:[],last:date.getDate()};
+    var curLine = {id:false};
+    var options = {};
     var factory = {
         linea_id: "1",
         campo_id: "1",
@@ -129,6 +142,12 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         opcs:[]
     };
     return {
+        setLine:function(elem){
+            curLine.id = elem.id;
+        },
+        getLine:function(){
+            return curLine;
+        },
         add:function(datos){
             var elem = {};
             elem = $filter("filterSearch")(listado,[datos.id])[0]

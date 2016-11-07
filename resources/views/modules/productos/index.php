@@ -6,7 +6,7 @@
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex ng-controller="prodMainController">
 
-        <div class="barraLateral" layout="column" >
+        <div class="barraLateral" layout="column" ng-controller="listController">
             <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div class="menu" style="min-height: 48px; width: 100%;">
@@ -53,7 +53,7 @@
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
             <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines" id="lineId{{line.id}}" ng-click="clicked()" >
+                <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
 
                 </div>
