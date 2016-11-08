@@ -168,14 +168,21 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     };
 
     $scope.next = function () {
-        if($scope.module.layer== 'detailShipment' && !$scope.updateShipmentCtrl() ){
-            $resource.postAll({type:'Shipment',mod:'Close'},{id:$scope.shipment.id}, function (response) {
-                if($scope.module.historia[1] == 'detailShipment'){
-                    $scope.LayersAction({close:{all:true}});
-                }else{
-                    $scope.LayersAction({close:{first:true, search:true}});
-                }
+        if($scope.module.layer== 'detailShipment'  ){
+
+            $model.setNext(function () {
+                $resource.postAll({type:'Shipment',mod:'Close'},{id:$scope.shipment.id}, function (response) {
+                    if($scope.module.historia[1] == 'detailShipment'){
+                        $scope.LayersAction({close:{all:true}});
+                    }else{
+                        $scope.LayersAction({close:{first:true, search:true}});
+                    }
+                });
             });
+            $model.exit();
+
+        }else{
+
         }
 
     };
@@ -214,10 +221,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         return val;
     };
 
-    $scope.exit = function () {
-
-
-    };
 
     $scope.exitSet = function (next, back) {
 

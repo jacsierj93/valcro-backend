@@ -92,6 +92,14 @@ class Shipment extends Model
         return hash('sha256',$original,false);
     }
 
+    public function provider(){
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
+    }
+
+    public function country(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Country', 'pais_id');
+    }
+
 
 
 
