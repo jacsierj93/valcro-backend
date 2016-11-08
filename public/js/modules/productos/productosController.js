@@ -38,13 +38,21 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
 
     $scope.clicked = function(line){
         critForm.setLine(line);
-        $mdSidenav("layer0").open();
+        $mdSidenav("layer1").open();
     };
     $scope.curLine = critForm.getLine();
     console.log($scope.curLine)
 }]);
 
 MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
+
+    $scope.newCrit = function(){
+        $mdSidenav("layer0").open();
+    };
+    $scope.newLine = function(){
+
+        $mdSidenav("layer2").open();
+    };
 
     $scope.listLines = mastersCrit.getLines();
     $scope.line = critForm.getLine();

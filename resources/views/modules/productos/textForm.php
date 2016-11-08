@@ -16,7 +16,7 @@
 
 
 <md-input-container flex prevAutocomplete  ng-show="(field.type.directive == 'prevAutocomplete')">
-    <label>{{field.field.descripcion}}{{field.type.directive}}</label>
+    <label>{{field.field.descripcion}}</label>
     <md-autocomplete md-selected-item="ctrl.lang"
                      flex
                      skip-tab
@@ -37,3 +37,7 @@
     </md-autocomplete>
 
 </md-input-container>
+
+<div vlc-buttomGroup layout="row" ng-show="(field.type.directive == 'prevRadio')">
+    <div ng-repeat="item in [222,33,4,5,51,21]" class="rad-button" flex >{{item}}</div>
+</div>

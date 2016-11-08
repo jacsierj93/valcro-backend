@@ -69,7 +69,7 @@
                 </div>
                 <div layout="column" layout-align="center center">
                     <!--<i class="fa fa-plus"></i>-->
-                    <span class="icon-Agregar" style="font-size: 23px"></span>
+                    <span class="icon-Agregar" ng-click="newCrit()" style="font-size: 23px"></span>
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center">
@@ -100,6 +100,39 @@
         </div>
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0" id="layer0">
+            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+
+            <input type="hidden" md-autofocus>
+            <div layout="row" flex>
+                <md-content class="cntLayerHolder" layout="column" flex style="padding-left: 8px">
+                    <div style="height: 48px;">
+                        <form name="LineProd" layout="row" class="focused" >
+                            <div class="titulo_formulario" layout="row" layout-align="start start" flex>
+                                <div>
+                                    Linea
+                                </div>
+                                <div style="width: 24px; font-size:24px;" ng-click="newLine()">+</div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="barraLateral" layout="column" ng-controller="listController">
+                        <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
+                        <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
+                        <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
+                            <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
+                            <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
+                                <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
+
+                            </div>
+                        </div>
+                        <!--</md-content>-->
+                    </div>
+                </md-content>
+            </div>
+        </md-sidenav>
+
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 332px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
 
             <input type="hidden" md-autofocus>
@@ -157,97 +190,7 @@
                     </form>
 
                     <!--creacion y carga de sublineas-->
-                    <form name="subLine" layout="row" class="focused" >
-                        <div active-left></div>
-                        <div flex layout="column">
-                            <div class="titulo_formulario" layout="column" layout-align="start start">
-                                <div>
-                                    Sub Linea
-                                </div>
-                            </div>
-                            <div flex layout="column" class="area-form">
-                                <div class="row" layout="row">
 
-                                    <md-input-container class="md-block" flex>
-                                        <label>Nombre de Sublinea</label>
-                                        <input skip-tab
-                                               info="indique el nombre del proveedor"
-                                               ng-disabled="$parent.enabled && prov.id"
-                                               autocomplete="off"
-                                               ng-blur="check('razon_social')"
-                                               duplicate="list"
-                                               duplicate-msg="ya existe un proveedor con esta razon social"
-                                               field="razon_social"
-                                               name="razon_social"
-                                               maxlength="80"
-                                               ng-minlength="3"
-                                               required
-                                               md-no-asterisk
-                                               ng-model="dtaPrv.description"
-                                        >
-
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex="10">
-                                        <label>Siglas</label>
-                                        <input skip-tab
-                                               info="Siglas para esta linea"
-                                               autocomplete="off"
-                                               name="linea"
-                                               maxlength="80"
-                                               ng-minlength="3"
-                                               required
-                                               md-no-asterisk
-
-                                        >
-
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Comentario</label>
-                                        <input skip-tab
-                                               info="comentarios"
-                                               autocomplete="off"
-                                               name="linea"
-                                               maxlength="80"
-                                               ng-minlength="3"
-                                               required
-                                               md-no-asterisk
-
-                                        >
-
-                                    </md-input-container>
-                                </div>
-                              <!--  <div layout="column" class="row showMore">
-                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
-                                </div>-->
-                                <div layout="column" flex>
-
-                                    <div layout="row" class="headGridHolder" style="font-weight: bolder;">
-                                        <div flex class="headGrid row"> Nombre</div>
-                                        <div flex="20" class="headGrid row"> Siglas</div>
-                                        <!--<div flex="10" class="headGrid row"> Comentario</div>-->
-                                        <div flex="5" class="headGrid row"> Criterio</div>
-                                    </div>
-                                    <md-content id="grid" flex >
-                                        <div flex ng-repeat="cont in [0,1,2,3,4,5,6]" class="row" ng-click="opennext()">
-                                            <div layout="row" layout-wrap class="cellGridHolder" >
-                                                <div flex class="headGrid row"> Nombre</div>
-                                                <div flex="20" class="headGrid row"> Siglas</div>
-                                                <!--<div flex="10" class="headGrid row"> Comentario</div>-->
-                                                <div flex="5" class="headGrid row"> Criterio</div>
-                                            </div>
-                                        </div>
-                                    </md-content>
-                                    <div layout="column" class="row" >
-                                        <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </form>
                     <div flex></div>
                 </md-content>
             </div>
