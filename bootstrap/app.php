@@ -87,14 +87,18 @@ $app->routeMiddleware([
 $app->register('Collective\Html\HtmlServiceProvider');
 $app->register('Collective\Html\InjectVarsServiceProvider');
 $app->register('Intervention\Image\ImageServiceProvider');
-$app->register(\Barryvdh\DomPDF\ServiceProvider::class);
+//$app->register(\Barryvdh\DomPDF\ServiceProvider::class);
+$app->register(Barryvdh\Snappy\ServiceProvider::class);
 
 
 
 class_alias('Collective\Html\HtmlFacade', 'Html');
 class_alias('Collective\Html\FormFacade', 'Form');
+class_alias('Barryvdh\Snappy\Facades\SnappyPdf', 'PDF');
 
-class_alias(Barryvdh\DomPDF\Facade::class, 'PDF');
+
+
+//class_alias(Barryvdh\DomPDF\Facade::class, 'PDF');
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +115,6 @@ $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
 });
 
-$app->configure('dompdf');
+$app->configure('snappy');
 
 return $app;
