@@ -43,7 +43,7 @@
                     <tbody>
                     <tr style="margin: 0;padding:0">
                         <td   width="90%" align="center" style="color: rgb(140,140,140);margin: 0;padding: 10px;">
-                            Notificacion de {{$data['text']['accion']}}
+                            Notificacion de {{$noti->data->where('key','accion')->first()->value}}
                         </td>
                     </tr>
 
@@ -67,11 +67,11 @@
                     <tbody><tr style="margin: 0;padding:0">
                         <td  align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Responsable:
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0; font-weight: normal;">
-                                {{$model->usuario->nombre}}
+                                {{$model->user->nombre}}
                             </p></td>
                         <td  align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Correo:
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
-                                {{$model->usuario->nombre}}</p>
+                                {{$model->user->email}}</p>
                         </td>
                     </tr>
                     </tbody>
@@ -108,20 +108,22 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding: 0 0 8px 8px ;border-top: 1px solid #e8e8e8">
                     <tbody>
                     <tr style="color: rgb(140,140,140); height: 32px;font-weight: bold;">
-                        <td style="text-align: left;">Codigo </td>
-                        <td style="text-align: left;">Descripcion</td>
-                        <td style="text-align: left;">Cantidad</td>
+                        <td width="5%" style="text-align: left;"> </td>
+                        <td width="20%" style="text-align: left;">Codigo </td>
+                        <td  style="text-align: left;">Descripcion</td>
+                        <td  width="20%"style="text-align: left;">Cantidad</td>
                     </tr>
-                    @for ($i = 0; $i < sizeof($model->items); $i++)
+                    @for ($i = 0; $i < sizeof($model->items()->get()); $i++)
                         <tr style="height: 32px;font-weight: normal; font-size: 13px; @if($i % 2 == 0)  color: #000000;background: rgb(241,241,241) @endif">
-                            <td  width="30%" style="text-align: left; " >
+                            <td  width="5%" style="text-align: center; background-color: white;border: solid 1.5px rgb(241, 241, 241);" >{{$i +1}}</td>
+                            <td  width="20%" style="text-align: left; " >
                                 {{$model->items[$i]['codigo_fabrica']}}
                             </td>
-                            <td  width="30%" style="text-align: left;"  >
+                            <td   style="text-align: left;"  >
                                 {{$model->items[$i]['descripcion']}}
 
                             </td>
-                            <td width="30%"  style=" text-align: left;">
+                            <td width="20%"  style=" text-align: left;">
                                 {{$model->items[$i]['cantidad']}}
                             </td>
                         </tr>

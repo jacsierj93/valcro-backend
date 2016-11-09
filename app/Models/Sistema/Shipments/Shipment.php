@@ -99,6 +99,11 @@ class Shipment extends Model
     public function country(){
         return $this->belongsTo('App\Models\Sistema\Masters\Country', 'pais_id');
     }
+    public function user(){
+        return $this->belongsTo('App\Models\Sistema\User', 'usuario_id');
+    }
+
+
 
 
 

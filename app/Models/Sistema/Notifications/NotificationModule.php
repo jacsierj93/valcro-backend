@@ -7,6 +7,7 @@
  */
 
 namespace App\Models\Sistema\Notifications;
+use App\Libs\Utils\GenericModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
@@ -50,7 +51,6 @@ class NotificationModule extends Model
     use SoftDeletes;
     protected $table = "tbl_noti_modulo";
     protected $dates = ['deleted_at'];
-    protected $template = "emails.modules.Order.Internal.ResumenDoc";
 
 
     /**
@@ -68,23 +68,66 @@ class NotificationModule extends Model
 
 
 
-    public function send($data,$sender, $model, $type = null, $template = null){
-        Mail::send(($template== null) ?$template :$this->template,$data, function ($m) use( $data, $sender, $type,$model ){
+    public function view (){
+        $model= new GenericModel($this->doc_tipo_id);
+
+        $model = $model->getModel()->findOrFail($this->doc_id);
+        return View::make($this->plantilla,['model'=>$model, 'noti'=>$this])->render();
+    }
+    public function send(){
+        $model= new GenericModel($this->doc_tipo_id);
+        $model = $model->getModel()->findOrFail($this->doc_id);
+
+        $sender = ['subject'=>$this->asunto , 'to'=>$this->where('tipo','to'), 'cc'=>$this->where('tipo','cc'), 'ccb'=>$this->where('tipo','ccb')];
+        $data =['model'=>$model, 'noti'=>$this];
+
+
+        $html = View::make($this->plantilla,$data)->render();
+        $snappy = App::make('snappy.pdf');
+        $archivo = response()->make($snappy->getOutputFromHtml($html), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition'   => 'attachment; filename="file.pdf"'
+        ]);
+        if(!array_key_exists('attsData',$sender )){
+            $sender['attsData']= [];
+        }
+        $sender['attsData'][] =['data'=>$archivo,'name'=>'pdf'];
+        $model = $this;
+
+
+        Mail::send($this->plantilla,$data, function ($m) use( $data, $sender, $model ){
             $m->subject($sender['subject']);
             foreach($sender['to'] as $aux)
             {
                 $m->to($aux['email'], $aux['name']);
             }
-            foreach($sender['cc'] as $aux)
-            {
-                $m->cc($aux['email'], $aux['name']);
+            if(array_key_exists('cc',$sender )){
+                foreach($sender['cc'] as $aux)
+                {
+                    $m->cc($aux['email'], $aux['name']);
+                }
             }
-            foreach($sender['ccb'] as $aux)
-            {
-                $m->ccb($aux['email'], $aux['name']);
+            if(array_key_exists('ccb',$sender )){
+                foreach($sender['ccb'] as $aux)
+                {
+                    $m->ccb($aux['email'], $aux['name']);
+                }
             }
-            $model->clave= $type;
+            if(array_key_exists('attsData',$sender )){
+                foreach($sender['attsData'] as $aux)
+                {
+                    $m->attachData($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
+                }
+            }
+            if(array_key_exists('atts',$sender )){
+                foreach($sender['atts'] as $aux)
+                {
+                    $m->attach($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
+                }
+            }
+            $model->send_at = Carbon::now();
             $model->save();
+
 
 
         });

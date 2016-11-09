@@ -78,6 +78,7 @@ class EmbarquesController extends BaseController
 
     public function testPdf (Request $req){
         $noti = NotificationModule::find($req->id);
+        return $noti->send();
         $model = Shipment::find($noti->doc_id);
         $model->usuario = $this->user ;
         $model->items = $model->items()->get();
