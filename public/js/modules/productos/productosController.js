@@ -13,9 +13,10 @@ MyApp.factory('criterios', ['$resource',
 
 MyApp.service("mastersCrit",function(criterios,masters){
     var lists = {
-        Lines : masters.query({ type:"prodLines"}),
+        Lines : criterios.query({type:"avaiableLines"}),
         Fields : criterios.query({type:"fieldList"}),
         Types : criterios.query({type:"typeList"}),
+        AvaiableLines :criterios.query({type:"avaiableLines"}),
     };
     return {
         getLines:function(){
@@ -27,6 +28,9 @@ MyApp.service("mastersCrit",function(criterios,masters){
         },
         getTypes:function(){
             return lists.Types;
+        },
+        getLinesDisp:function(){
+            return lists.AvaiableLines;
         }
     }
 });
@@ -41,7 +45,41 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
         $mdSidenav("layer1").open();
     };
     $scope.curLine = critForm.getLine();
-    console.log($scope.curLine)
+    $scope.filtAvaiable = function(c,v){
+        console.log(c,v)
+        return c.hasCrit == v;
+    };
+
+}]);
+
+MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidenav','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,criterios,$filter,$timeout) {
+    $scope.newLine = {
+        id:false,
+        name:"",
+        letter:""
+    };
+
+    $scope.list = mastersCrit.getLinesDisp();
+
+    $scope.$watchGroup(['LineProd.$valid','LineProd.$pristine'], function(nuevo) {
+        if(nuevo[0] && !nuevo[1]) {
+            criterios.put({type:"createLine"},$scope.newLine,function(data){
+                $scope.newLine.id = data.id;
+                if(data.action=="new"){
+                    $scope.listLines.push({
+                        id:$scope.newLine.id,
+                        linea:$scope.newLine.name,
+                        siglas:$scope.newLine.letter
+                    });
+                }else{
+                   var line = $filter("filterSearch")($scope.listLines ,[data.id])[0];
+                    line.linea = $scope.newLine.name;
+                    line.siglas = $scope.newLine.letter;
+                }
+            });
+        }
+    });
+    
 }]);
 
 MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
@@ -96,7 +134,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.$watch("critField.id",function(val){
         $timeout(function(){
             angular.forEach($scope.critField.opcs,function(v,k){
-                console.log(v)
                 var key = v.descripcion;
                 $scope.opcValue[key].id=v.pivot.id;
                 $scope.opcValue[key].opc_id=v.pivot.opc_id;
