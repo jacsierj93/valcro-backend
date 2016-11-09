@@ -615,8 +615,8 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                    //if(angular.element(element).parent(".md-input-invalid").length > 0){
-                    if(!model.scope.selectedItem){
+                   console.log("angular = ",angular.element(e.relatedTarget))
+                    if(!model.scope.selectedItem && !angular.element(e.relatedTarget).is("li[md-virtual-repeat]")){
 
                         if(model.matches.length > 0 && (model.scope.searchText!=undefined && model.scope.searchText != "")){
                             model.scope.selectedItem = model.matches[0];
@@ -627,6 +627,8 @@ MyApp.directive('info', function($timeout,setNotif) {
 
                         }
                     }
+
+
 
                 });
             }else{
