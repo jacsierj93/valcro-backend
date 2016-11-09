@@ -603,7 +603,7 @@
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div layout="row" flex="50">Exp. Aduana</div>
-                                <div class="rms" flex> {{($parent.shipment.nro_dua.documento)? $parent.shipment.nro_dua.documento :'No asignado'}}</div>
+                                <div class="rms" flex> {{($parent.shipment.nro_eaa.documento)? $parent.shipment.nro_eaa.documento :'No asignado'}}</div>
                                 <md-tooltip >
                                     N° de expediente aduanal
                                 </md-tooltip>
@@ -834,7 +834,7 @@
                                     ></md-datepicker >
                                 </div>
 
-                                <div layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_vnz.confirm}" >
+                                <div  ng-click="inDate($parent.shipment.fechas.fecha_vnz.value,'fecha_vnz' )"  layout="row" class="date-row vlc-date" flex="" ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_vnz.confirm}" >
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>En Venezuela</div>
                                     </div>
@@ -843,6 +843,7 @@
                                                    ng-change="changeFecha_vnz()"
                                                    ng-disabled="$parent.shipment.fechas.fecha_vnz.confirm || session.isblock"
                                                    ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
+                                                   md-min-date="$parent.shipment.fechas.fecha_carga.plus"
                                                    skip-tab
                                     ></md-datepicker >
 
@@ -850,7 +851,7 @@
                                 </div>
 
 
-                                <div layout="row" class="date-row vlc-date " flex=""  ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_tienda.confirm}">
+                                <div  ng-click="inDate($parent.shipment.fechas.fecha_tienda.value,'fecha_tienda' )"  layout="row" class="date-row vlc-date " flex=""  ng-class="{'vlc-date-no-edit':$parent.shipment.fechas.fecha_tienda.confirm}">
                                     <div layout="column" class="md-block" layout-align="center center"  >
                                         <div>En tienda</div>
                                     </div>
@@ -860,6 +861,7 @@
                                                    ng-disabled="$parent.shipment.fechas.fecha_tienda.confirm || session.isblock"
                                                    ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                    skip-tab
+                                                   md-min-date="$parent.shipment.fechas.fecha_carga.plus"
                                     ></md-datepicker >
 
 
@@ -909,12 +911,12 @@
 
                                 <md-input-container class="md-block" flex ng-click="$parent.miniExpAduana()" >
                                     <label>Exp. Aduanal</label>
-                                    <input  ng-disabled="true"  ng-model="$parent.shipment.nro_dua.documento"
+                                    <input  ng-disabled="true"  ng-model="$parent.shipment.nro_eaa.documento"
                                             skip-tab
                                     >
                                 </md-input-container>
                                 <div class="adj-box-rigth">
-                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_dua.adjs.length}} </div></div>
+                                    <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">{{$parent.shipment.nro_eaa.adjs.length}} </div></div>
 
                             </div>
                         </div>
@@ -941,7 +943,7 @@
 
                                 <div layout="row" flex class="vlc-option ">
 
-                                    <md-input-container class="md-block" >
+                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_tt)"  click-out="outPay($parent.shipment.flete_tt,'flete_tt' )">
                                         <label>Terrestre</label>
                                         <input  ng-model="$parent.shipment.flete_tt"
                                                 skip-tab
@@ -955,9 +957,25 @@
                                         <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':($parent.shipment.conf_monto_ft_tt)}"  style="float:left">A</div>
                                     </div>
                                 </div>
+                                <div layout="row" flex>
+
+                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_maritimo)" click-out="outPay($parent.shipment.flete_maritimo,'flete_maritimo' )" >
+                                        <label>Maritimo</label>
+                                        <input  ng-model="$parent.shipment.flete_maritimo"
+                                                skip-tab
+                                                ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_dua)"
+                                                decimal
+                                                minlength="2"
+                                                ng-change="toEditHead('dua',$parent.shipment.nacionalizacion)"
+                                        >
+                                    </md-input-container>
+                                    <div class="adj-box-rigth" ng-click="aprobMaritimo()">
+                                        <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':$parent.shipment.conf_monto_dua}"  style="float:left">A</div>
+                                    </div>
+                                </div>
                                 <div layout="row"  flex >
 
-                                    <md-input-container class="md-block" >
+                                    <md-input-container class="md-block"  ng-click="inPay($parent.shipment.nacionalizacion)" click-out="outPay($parent.shipment.nacionalizacion,'flete_maritimo' )" >
                                         <label>Nacionalizacion</label>
                                         <input  ng-model="$parent.shipment.nacionalizacion"
                                                 skip-tab
@@ -972,9 +990,9 @@
                                     </div>
                                 </div>
 
-                                <div layout="row">
+                                <div layout="row" flex>
 
-                                    <md-input-container class="md-block" >
+                                    <md-input-container class="md-block"  ng-click="inPay($parent.shipment.dua)" click-out="outPay($parent.shipment.dua,'dua' )" >
                                         <label>DUA</label>
                                         <input  ng-model="$parent.shipment.dua"
                                                 skip-tab
@@ -989,13 +1007,7 @@
                                     </div>
                                 </div>
 
-                                <md-input-container class="md-block" >
-                                    <label>Total</label>
-                                    <input  ng-model="$parent.shipment.flete"
-                                            skip-tab
-                                            ng-disabled="true"
-                                    >
-                                </md-input-container>
+
                             </div>
                         </div>
                     </form>
@@ -2581,7 +2593,7 @@
                                     DUA
                                 </div>
                             </div>
-                            <div  layout="row"  layout-align="end start" ng-show="!((model.nro_dua.documento.estado == 'new' && model.nro_dua.emision.estado == 'new') || !(model.nro_dua.emision.estado && model.nro_dua.documento.estado)) ">
+                            <div  layout="row"  layout-align="end start" ng-show="!((model.nro_eaa.documento.estado == 'new' && model.nro_eaa.emision.estado == 'new') || !(model.nro_eaa.emision.estado && model.nro_eaa.documento.estado)) ">
                                 <md-switch class="md-primary"
                                            ng-model="goTo.dua"
                                            ng-disabled="true"
@@ -2592,21 +2604,21 @@
                         </div>
 
                         <div layout="column" style="height: 48px;overflow: auto;" >
-                            <div layout="row" layout-align=" start"  style="height:24px;" ng-show="model.nro_dua.documento && model.nro_dua.documento.estado != 'new' ">
+                            <div layout="row" layout-align=" start"  style="height:24px;" ng-show="model.nro_eaa.documento && model.nro_eaa.documento.estado != 'new' ">
                                 <div layout="row" style="min-width: 72px;color:#ccc;">N° DUA</div>
                                 <div layout="row" style="color:#999;">
-                                    <div class="rms" flex> {{$parent.shipment.nro_dua.documento }}</div>
+                                    <div class="rms" flex> {{$parent.shipment.nro_eaa.documento }}</div>
                                 </div>
                             </div>
 
-                            <div layout="row" layout-align=" start"  style="height:24px;" ng-show="model.nro_dua.emision && model.nro_dua.emision.estado != 'new' ">
+                            <div layout="row" layout-align=" start"  style="height:24px;" ng-show="model.nro_eaa.emision && model.nro_eaa.emision.estado != 'new' ">
                                 <div layout="row" style="min-width: 72px;color:#ccc;">Emision</div>
                                 <div layout="row" style="color:#999;">
-                                    <div class="rms" flex> {{$parent.shipment.nro_dua.emision | date :'dd/MM/yyyy' }}</div>
+                                    <div class="rms" flex> {{$parent.shipment.nro_eaa.emision | date :'dd/MM/yyyy' }}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center"
-                                 ng-show="keyCount(model.nro_dua) == 0;"
+                                 ng-show="keyCount(model.nro_eaa) == 0;"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2997,22 +3009,25 @@
                                         <input  type="text"
                                                 ng-model="$parent.shipment.nro_mbl.documento" ng-change="toEditHead('documento',$parent.shipment.nro_mbl.documento)"
                                                 ng-disabled=" $parent.session.isblock"
+                                                info="Numero del documento Master Bill landing  "
+                                                skip-tab
                                         >
                                     </md-input-container>
                                 </div>
                                 <div layout="row" class="row" flex>
-                                    <div layout="row" class="date-row vlc-date" >
+                                    <div layout="row" class="date-row" >
                                         <div layout="column" class="md-block" layout-align="center center"  >
-                                            <div style="width: 88px;">Emitido</div>
+                                            <div style="margin-bottom: 4px;">Emitido</div>
                                         </div>
                                         <md-datepicker ng-model="$parent.shipment.nro_mbl.emision"
                                                        skip-tab
                                                        ng-change="toEditHead('emision',$parent.shipment.nro_mbl.emision)"
                                                        ng-disabled = " session.isblock"
+                                                       info="Fecha de emision del  Master Bill landing segun el documento "
                                         ></md-datepicker >
                                     </div>
                                 </div>
-                                <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show=" $parent.session.isblock ">
+                                <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="!$parent.session.isblock ">
                                     <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                                          ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
                                         Insertar archivo
@@ -3022,7 +3037,7 @@
                             </div>
 
                             <div flex class="gridContent" ng-show="$parent.shipment.nro_mbl.adjs.length > 0">
-                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_mbl.adjs " ng-click="selectImg(item)">
+                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_mbl.adjs  track by $index" ng-click="selectImg(item)">
                                     <img ng-src="images/thumbs/{{item.thumb}}"/>
                                 </div>
                             </div>
@@ -3055,23 +3070,24 @@
                             <div  layout="column" style="padding-right:4px">
                                 <md-input-container class="md-block" >
                                     <label>N°</label>
-                                    <input  ng-disabled=" $parent.session.isblock " type="text" ng-model="$parent.shipment.nro_hbl.documento"   ng-change="toEditHead('documento',$parent.shipment.nro_hbl.documento)" >
+                                    <input   info="Numero del documento House Bill landing  "  skip-tab  ng-disabled="$parent.session.isblock " type="text" ng-model="$parent.shipment.nro_hbl.documento"   ng-change="toEditHead('documento',$parent.shipment.nro_hbl.documento)" >
                                 </md-input-container>
                                 <div layout="row" class="row" flex>
-                                    <div layout="row" class="date-row vlc-date" >
+                                    <div layout="row" class="date-row " >
                                         <div layout="column" class="md-block" layout-align="center center"  >
-                                            <div  style="width: 88px;">Emitido</div>
+                                            <div  style="margin-bottom: 4px;" >Emitido</div>
                                         </div>
                                         <md-datepicker ng-model="$parent.shipment.nro_hbl.emision"
                                                        ng-disabled=" $parent.session.isblock "
                                                        ng-change="toEditHead('emision',($parent.shipment.nro_hbl.emision)? $parent.shipment.nro_hbl.emision.toString() : undefined )"
                                                        skip-tab
+                                                       info="Fecha de emision del House Bill landing segun el documento "
                                         ></md-datepicker >
                                     </div>
                                 </div>
 
                             </div>
-                            <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="$parent.session.isblock " >
+                            <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="!$parent.session.isblock " >
                                 <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                                      ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
                                     Insertar archivo
@@ -3079,7 +3095,7 @@
                             </div>
 
                             <div flex class="gridContent" ng-show="$parent.shipment.nro_hbl.adjs.length > 0">
-                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_hbl.adjs " ng-click="selectImg(item)">
+                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_hbl.adjs track by $index " ng-click="selectImg(item)">
                                     <img ng-src="images/thumbs/{{item.thumb}}"/>
                                 </div>
                             </div>
@@ -3094,7 +3110,7 @@
             </md-content>
         </md-sidenav>
 
-        <!------------------------------------------- mini layer DUA bill landing------------------------------------------------------------------------->
+        <!------------------------------------------- mini layer EAA bill landing------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="miniExpAduana" id="miniExpAduana"
         >
@@ -3112,33 +3128,34 @@
                             <div  layout="column" style="padding-right:4px">
                                 <md-input-container class="md-block" >
                                     <label>N°</label>
-                                    <input  type="text" ng-model="$parent.shipment.nro_dua.documento"   ng-change="toEditHead('documento',$parent.shipment.nro_dua.documento)" >
+                                    <input   info="Numero del documento unico de aduana "  skip-tab type="text" ng-model="$parent.shipment.nro_eaa.documento"   ng-change="toEditHead('documento',$parent.shipment.nro_eaa.documento)" >
                                 </md-input-container>
                                 <div layout="row" class="row" flex>
-                                    <div layout="row"class="date-row vlc-date" >
+                                    <div layout="row"class="date-row " >
                                         <div layout="column" class="md-block" layout-align="center center"  >
-                                            <div>Emitido</div>
+                                            <div style="margin-bottom: 4px;" >Emitido</div>
                                         </div>
-                                        <md-datepicker ng-model="$parent.shipment.nro_dua.emision"
+                                        <md-datepicker ng-model="$parent.shipment.nro_eaa.emision"
+                                                       info="Fecha de emision del Documento unico de aduana segun el mismo "
                                                        skip-tab
-                                                       ng-change="toEditHead('emision',($parent.shipment.nro_dua.emision) ? $parent.shipment.nro_dua.emision.toString() : undefined )"
+                                                       ng-change="toEditHead('emision',($parent.shipment.nro_eaa.emision) ? $parent.shipment.nro_eaa.emision.toString() : undefined )"
                                         ></md-datepicker >
                                     </div>
                                 </div>
 
                             </div>
-                            <div style="padding: 2px;; min-height: 56px;" layout="row" >
+                            <div style="padding: 2px;; min-height: 56px;" layout="row"  ng-show="!$parent.session.isblock " >
                                 <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
                                      ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
                                     Insertar archivo
                                 </div>
                             </div>
-                            <div flex class="gridContent" ng-show="$parent.shipment.nro_dua.adjs.length > 0">
-                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_dua.adjs " ng-click="selectImg(item)">
+                            <div flex class="gridContent" ng-show="$parent.shipment.nro_eaa.adjs.length > 0">
+                                <div class="imgItem" ng-repeat="item in $parent.shipment.nro_eaa.adjs track by $index" ng-click="selectImg(item)">
                                     <img ng-src="images/thumbs/{{item.thumb}}"/>
                                 </div>
                             </div>
-                            <div layout="column" layout-align="center center" flex ng-show="$parent.shipment.nro_dua.adjs.length == 0" >
+                            <div layout="column" layout-align="center center" flex ng-show="$parent.shipment.nro_eaa.adjs.length == 0" >
                                 No hay adjuntos cargados
                             </div>
 
@@ -3359,7 +3376,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div layout="column"   ng-class="{'form-row-head-select': form == 'head' ,'form-body-select':form == 'head'}" >
+                            <div layout="column"   ng-class="{'form-row-head-select': form == 'head' ,'form-body-select':form == 'head'}" ng-show="form == 'head'">
                                 <div style="padding-left: 12px ; padding-right: 4px;" >
 
                                     <div layout="row" class="row">
@@ -3543,7 +3560,7 @@
                             </div>
                         </div>
 
-                        <div flex class="gridContent" layout="column" style="padding-right:4px"  ng-class="{'form-body-select':form == 'bond'}">
+                        <div flex class="gridContent" layout="column" style="padding-right:4px"  ng-class="{'form-body-select':form == 'bond'}" ng-show="form == 'bond'">
                             <div style="padding-left: 12px; height: 100%;" >
 
                                 <div layout="row"  class="row" >
@@ -3551,7 +3568,7 @@
                                         <div layout="column" layout-align="center center">GRT </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.grt"   decimal  >
+                                        <input  skip-tab  type="text" ng-model="model.grt"   decimal info="Costo del tonelaje bruto de registro en metros cúbicos" >
                                     </md-input-container>
                                     <md-tooltip >GRT</md-tooltip>
                                 </div>
@@ -3560,7 +3577,7 @@
                                         <div layout="column" layout-align="center center">Documento </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.document" decimal   >
+                                        <input  type="text" skip-tab  ng-model="model.document" decimal  info="Costo del documento"  >
                                     </md-input-container>
                                     <md-tooltip >Documento</md-tooltip>
                                 </div>
@@ -3569,7 +3586,7 @@
                                         <div layout="column" layout-align="center center">Mensajeria </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.mensajeria"  decimal  >
+                                        <input  skip-tab  type="text" ng-model="model.mensajeria"  decimal  info="Costo del servicio de mensajeria"  >
                                     </md-input-container>
                                     <md-tooltip >Mensajeria</md-tooltip>
                                 </div>
@@ -3578,7 +3595,7 @@
                                         <div layout="column" layout-align="center center">Seguros </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.seguro" decimal   >
+                                        <input  type="text" skip-tab  ng-model="model.seguro" decimal  info="Costo del seguro"   >
                                     </md-input-container>
                                     <md-tooltip >Seguros</md-tooltip>
                                 </div>
@@ -3587,7 +3604,7 @@
                                         <div layout="column" layout-align="center center">Consodilacion </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.consolidacion"  decimal  >
+                                        <input  skip-tab  type="text" ng-model="model.consolidacion"  decimal info="Costo de la consolidacion"  >
                                     </md-input-container>
                                     <md-tooltip >Consolidacion</md-tooltip>
                                 </div>
@@ -3596,7 +3613,7 @@
                                         <div layout="column" layout-align="center center">20'SD </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.sd20"  decimal  >
+                                        <input   skip-tab type="text" ng-model="model.sd20"  decimal info="Costo del container 20'sd "  >
                                     </md-input-container>
                                     <md-tooltip >20' SD</md-tooltip>
                                 </div>
@@ -3605,7 +3622,7 @@
                                         <div layout="column" layout-align="center center">40'SD </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.sd40"  decimal  >
+                                        <input  skip-tab  type="text" ng-model="model.sd40"  decimal  info="Costo del container 40'sd " >
                                     </md-input-container>
                                     <md-tooltip >40' SD</md-tooltip>
                                 </div>
@@ -3614,7 +3631,7 @@
                                         <div layout="column" layout-align="center center">40'HC </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.hc40" decimal   >
+                                        <input  skip-tab  type="text" ng-model="model.hc40" decimal  info="Costo del container 40'hc "  >
                                     </md-input-container>
                                     <md-tooltip >40' HC</md-tooltip>
                                 </div>
@@ -3623,7 +3640,7 @@
                                         <div layout="column" layout-align="center center">40'OT </div>
                                     </div>
                                     <md-input-container class="md-block rms" flex >
-                                        <input  type="text" ng-model="model.ot40"  decimal  >
+                                        <input  skip-tab type="text" ng-model="model.ot40"  decimal info="Costo del container 40' ot "   >
                                     </md-input-container>
                                     <md-tooltip >40'OT</md-tooltip>
                                 </div>

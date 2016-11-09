@@ -232,18 +232,18 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     };
 
     $scope.layerExit = function(){
-       if( !$scope.session.isblock ){
-           $model.setNext(function () {
-              if($scope.module.historia[1] == 'detailShipment'){
-                   $scope.LayersAction({close:{all:true}});
-               }else{
-                   $scope.LayersAction({close:{first:true, search:true}});
-               }
-           });
-           $model.exit();
+        if( !$scope.session.isblock ){
+            $model.setNext(function () {
+                if($scope.module.historia[1] == 'detailShipment'){
+                    $scope.LayersAction({close:{all:true}});
+                }else{
+                    $scope.LayersAction({close:{first:true, search:true}});
+                }
+            });
+            $model.exit();
 
-           return false;
-       }
+            return false;
+        }
         return true;
     };
 
@@ -313,7 +313,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                     isModif=true;
                 }
             });
-            angular.forEach($model.getForm('nro_dua'), function (v, k) {
+            angular.forEach($model.getForm('nro_eaa'), function (v, k) {
 
                 if(v.estado && v.estado != 'new'){
                     isModif=true;
@@ -459,7 +459,7 @@ MyApp.controller('summaryShipmentCtrl', ['$scope',  'shipment','setGetShipment',
 
 }]);
 
-MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShipment',function($scope,$timeout ,$resource,$model){
+MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse','setGetShipment',function($scope,$timeout ,$resource,DateParse,$model){
 
     $scope.fechas =  {
         fecha_carga:{
@@ -477,6 +477,12 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
         bind:{
             estado:false
         }
+    };
+    $scope.pagos =  {
+        flete_tt:undefined,
+        flete_maritimo:undefined,
+        nacionalizacion:undefined,
+        dua:undefined
     };
     $scope.provSelec = undefined;
     $scope.provSelecText = undefined;
@@ -539,19 +545,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
     $scope.$watch("$parent.provSelec", function(newVal){
 
         $scope.provSelec = newVal;
-        /*console.log("prov en seopen ", newVal)
-         if(newVal!= null){
-         if(newVal.id ){
-         if($scope.provSelec == null ){
-
-         }else{
-         $scope.provSelec = newVal;
-         $scope.detailShipmenthead.$setDirty();
-         }
-
-         }
-         }*/
-
     });
 
     $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
@@ -579,17 +572,29 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
         $scope.date.$setPristine();
         $scope.date.$setUntouched();
-
-        $scope.$parent.shipment.flete= 0;
-        if($scope.$parent.shipment.flete_tt){
-            $scope.$parent.shipment.flete+= parseFloat($scope.$parent.shipment.flete_tt);
-        }
-        if($scope.$parent.shipment.nacionalizacion){
-            $scope.$parent.shipment.flete+= parseFloat($scope.$parent.shipment.nacionalizacion);
-        }
-        if($scope.$parent.shipment.dua){
-            $scope.$parent.shipment.flete+= parseFloat($scope.$parent.shipment.dua);
-        }
+        $scope.fechas =  {
+            fecha_carga:{
+                in: undefined
+            },
+            fecha_vnz:{
+                in: undefined,
+            },
+            fecha_tienda:{
+                in: undefined,
+                out:undefined
+            },
+            calc:undefined,
+            send:{},
+            bind:{
+                estado:false
+            }
+        };
+        $scope.pagos =  {
+            flete_tt:undefined,
+            flete_maritimo:undefined,
+            nacionalizacion:undefined,
+            dua:undefined
+        };
 
         $scope.$parent.LayersAction({open:{name:"detailShipment", after: function(){
             if(!data){
@@ -630,111 +635,23 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
         $scope.fechas[k].in= angular.copy(v);
 
     };
+
+    $scope.setSend = function (fecha, cal,clear) {
+        if(clear){
+            $scope.fechas.send ={};
+        }
+
+        angular.forEach(fecha, function (v, k) {
+            $scope.fechas.send[k]=v;
+        })
+        $scope.fechas.calc= cal;
+    };
     $scope.changeFecha_carga = function () {
 
+
         if(!$scope.date.$pristine){
-
-
-            if(!$scope.$parent.shipment.fechas.fecha_carga.confirm){
-
-                if($scope.$parent.shipment.fechas.fecha_vnz.value || $scope.$parent.shipment.fechas.fecha_tienda.value ){ // si tiene datos asignados
-                    if($scope.$parent.shipment.fechas.fecha_vnz.isManual || $scope.$parent.shipment.fechas.fecha_tienda.isManual ){// si son valores fueron asignados a mano
-                        $scope.$parent.NotifAction("alert",
-                            "Se a asignado la fecha de  llegada a Venezuela o  la fecha de llegada a la tienda manualmente",
-                            [
-                                {name:"Cambiar segun la nueva fecha", default:10,
-                                    action: function () {
-                                        $scope.fechas.calc="fecha_vnz";
-                                        $scope.fechas.send ={};
-                                        $scope.fechas.send.fecha_carga ={};
-                                        $scope.fechas.send.fecha_carga.value = angular.copy($scope.$parent.shipment.fechas.fecha_carga.value);
-                                        $scope.fechas.send.fecha_carga.isManual = true;
-                                        $scope.fechas.send.fecha_carga.confirm = false;
-                                        if($scope.$parent.shipment.fechas.fecha_carga.value <= new Date()){
-                                            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                                                [
-                                                    {
-                                                        name:"Si, es la definitiva",action : function () {
-                                                        $scope.fechas.send.fecha_carga.confirm = true;
-                                                        $scope.fechas.bind.estado = true;
-                                                    }
-                                                    },{
-                                                    name:"No ",action : function () {
-                                                        $scope.fechas.bind.estado = true;
-                                                    }
-                                                }
-                                                ]
-                                                , {block:true});
-                                        }else{
-                                            $scope.fechas.bind.estado = true;
-                                        }
-                                    }
-                                },
-                                {name:"Mantener fechas actuales",
-                                    action: function () {
-                                        if($scope.$parent.shipment.fechas.fecha_carga.value <= new Date()){
-                                            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                                                [
-                                                    {
-                                                        name:"Si, es la definitiva",action : function () {
-                                                        $scope.fechas.send.fecha_carga.confirm = true;
-                                                        $scope.fechas.bind.estado = true;
-                                                    }
-                                                    },{
-                                                    name:"No ",action : function () {
-                                                        $scope.fechas.bind.estado = true;
-                                                    }
-                                                }
-                                                ]
-                                                , {block:true});
-                                        }else{
-                                            $scope.fechas.bind.estado = true;
-                                        }
-                                    }
-                                },
-                                {name:"Cancelar",
-                                    action: function () {
-                                        $scope.fechas.send ={};
-                                        $scope.calc =undefined;
-                                    }
-                                }
-
-                            ]);
-                    }else{
-                        console.log("fechas ", $scope.$parent.shipment.fechas);
-                        $scope.fechas.calc="fecha_vnz";
-                        $scope.fechas.send ={};
-                        $scope.fechas.send.fecha_carga= {};
-                        $scope.fechas.send.fecha_carga.value = angular.copy($scope.$parent.shipment.fechas.fecha_carga.value);
-                        $scope.fechas.send.fecha_carga.isManual = true;
-                        $scope.fechas.send.fecha_carga.confirm = false;
-                        if($scope.$parent.shipment.fechas.fecha_carga.value <= new Date()){
-                            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                                [
-                                    {
-                                        name:"Si, es la definitiva",action : function () {
-                                        $scope.fechas.send.fecha_carga.confirm = true;
-                                        $scope.fechas.bind.estado = true;
-                                    }
-                                    },{
-                                    name:"No ",action : function () {
-                                        $scope.fechas.send.fecha_carga.confirm = false;
-                                        $scope.fechas.bind.estado = true;
-                                    }
-                                }
-                                ]
-                                , {block:true});
-                        }else{
-                            $scope.fechas.bind.estado = true;
-                        }
-
-                    }
-                }else{
-                    $scope.fechas.calc="fecha_vnz";
-                    $scope.fechas.send= {fecha_carga:{}};
-                    $scope.fechas.send.fecha_carga.value = angular.copy($scope.$parent.shipment.fechas.fecha_carga.value);
-                    $scope.fechas.send.fecha_carga.isManual = true;
-                    $scope.fechas.send.fecha_carga.confirm = false;
+            var cambiar = function () {
+                $timeout(function () {
                     if($scope.$parent.shipment.fechas.fecha_carga.value <= new Date()){
                         $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
                             [
@@ -745,7 +662,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
                                 }
                                 },{
                                 name:"No ",action : function () {
-                                    $scope.fechas.send.fecha_carga.confirm = false;
                                     $scope.fechas.bind.estado = true;
                                 }
                             }
@@ -754,164 +670,240 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
                     }else{
                         $scope.fechas.bind.estado = true;
                     }
+                },0);
+
+            };
+
+            var cambiarRv = function () {
+                $timeout(function () {
+                    if($scope.$parent.shipment.fechas.fecha_vnz.value || $scope.$parent.shipment.fechas.fecha_tienda.value ){ // si tiene datos asignados
+                        if($scope.$parent.shipment.fechas.fecha_vnz.isManual || $scope.$parent.shipment.fechas.fecha_tienda.isManual )
+                        {// si son valores fueron asignados a mano
+                            $scope.$parent.NotifAction("alert",
+                                "Se a asignado la fecha de  llegada a Venezuela o  la fecha de llegada a la tienda manualmente",
+                                [
+                                    {name:"Cambiar segun la nueva fecha", default:10,
+                                        action: function () {
+                                            $scope.setSend ({fecha_carga:{value: angular.copy($scope.$parent.shipment.fechas.fecha_carga.value),isManual:true,confirm: false}},'fecha_vnz', true);
+                                            cambiar();
+                                        }
+                                    },
+                                    {name:"Mantener fechas actuales",
+                                        action: function () {
+                                            $scope.setSend ({fecha_carga:{value: angular.copy($scope.$parent.shipment.fechas.fecha_carga.value),isManual:true,confirm: false}},undefined, true);
+                                            cambiar();
+                                        }
+                                    },
+                                    {name:"Cancelar",
+                                        action: function () {
+                                            $scope.fechas.send ={};
+                                            $scope.calc =undefined;
+                                            $scope.$parent.shipment.fechas.fecha_carga = angular.copy($scope.fechas.fecha_carga.in);
+
+                                        }
+                                    }
+
+                                ]);
+                        }
+                        else{
+                            $scope.setSend ({fecha_carga:{value: angular.copy($scope.$parent.shipment.fechas.fecha_carga.value),isManual:true,confirm: false}},'fecha_vnz', true);
+                            cambiar();
+
+                        }
+                    }else{
+                        $scope.setSend ({fecha_carga:{value: angular.copy($scope.$parent.shipment.fechas.fecha_carga.value),isManual:true,confirm: false}},'fecha_vnz', true);
+                        cambiar();
+                    }
+                },0);
+
+            };
+
+            if($scope.$parent.shipment.fechas.fecha_carga.max){
+
+                var max = DateParse.toDate($scope.$parent.shipment.fechas.fecha_carga.max);
+                console.log("max", max);
+
+                if($scope.$parent.shipment.fechas.fecha_carga.value > max){
+                    $scope.$parent.NotifAction("alert", "La fecha ideal para la carga, es "+ max.getDate()+"/"+max.getMonth()+"/"+max.getFullYear()+" ¿Esta seguro que la fecha es correcta?",
+                        [
+                            {name:"Si, estoy seguro", action: function ()
+                            {
+                                cambiarRv();
+                            }
+                            }
+                            ,{name:"No, dejame corregirlo", action: function ()
+                            {
+                                $scope.$parent.shipment.fechas.fecha_carga.value = angular.copy($scope.fechas.fecha_carga.in);
+                            }
+                            }
+                    ]
+                        ,{block:true, confirm:true});
+                }else{
+                    cambiarRv();
                 }
-
             }
-
+            else{
+                cambiarRv();
+            }
         }
     };
     $scope.changeFecha_vnz = function () {
 
         if(!$scope.date.$pristine){
+            console.log("fechas",$scope.$parent.shipment.fechas);
 
+            var cambiar = function () {
+                $timeout(function () {
+                    $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
+                        [
+                            {
+                                name:"Si, es la definitiva",action : function () {
+                                $scope.fechas.send.fecha_vnz.confirm = true;
+                                $scope.fechas.bind.estado = true;
+                            }
+                            },{
+                            name:"No no es la definitiva",action : function () {
+                                $scope.fechas.bind.estado = true;
+                            }
+                        }
+                        ]
+                        , {block:true});
+                },0);
 
-            if(!$scope.$parent.shipment.fechas.fecha_vnz.confirm){
-                if($scope.$parent.shipment.fechas.fecha_tienda.value ){ // si tiene datos asignados
-                    if($scope.$parent.shipment.fechas.fecha_tienda.isManual ){// si son valores fueron asignados a mano
-                        $scope.$parent.NotifAction("alert",
-                            "Se a asignado la fecha de llegada a la tienda manualmente ¿Que desea hacer?",
-                            [
-                                {name:"Cambiar segun la nueva fecha", default:5,
-                                    action: function () {
-                                        $scope.fechas.calc="fecha_tienda";
-                                        $scope.fechas.send ={};
-                                        $scope.fechas.send.fecha_vnz ={};
-                                        $scope.fechas.send.fecha_vnz.value = angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value);
-                                        $scope.fechas.send.fecha_vnz.isManual = true;
-                                        $scope.fechas.send.fecha_vnz.confirm = false;
-                                        if($scope.$parent.shipment.fechas.fecha_vnz.value <= new Date()){
-                                            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                                                [
-                                                    {
-                                                        name:"Si, es la definitiva",action : function () {
-                                                        $scope.fechas.send.fecha_vnz.confirm = true;
-                                                        $scope.fechas.bind.estado = true;
-                                                    }
-                                                    }
-                                                ]
-                                                , {block:true});
-                                        }else{
-                                            $scope.fechas.bind.estado = true;
+            } ;
+            var cambiarRv = function () {
+                $timeout(function () {
+                    if(!$scope.$parent.shipment.fechas.fecha_vnz.confirm){
+                        if($scope.$parent.shipment.fechas.fecha_tienda.value ){ // si tiene datos asignados
+                            if($scope.$parent.shipment.fechas.fecha_tienda.isManual ){// si son valores fueron asignados a mano
+                                $scope.$parent.NotifAction("alert",
+                                    "Se a asignado la fecha de llegada a la tienda manualmente ¿Que desea hacer?",
+                                    [
+                                        {name:"Cambiar segun la nueva fecha", default:5,
+                                            action: function () {
+                                                $scope.setSend ({fecha_vnz:{value: angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value),isManual:true,confirm: false}},'fecha_tienda', true);
+                                                cambiar();
+                                            }
+                                        },
+                                        {name:"Mantener la fecha de llegada a la tienda",
+                                            action: function () {
+                                                $scope.setSend ({fecha_vnz:{value: angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value),isManual:true,confirm: false}},undefined, true);
+                                                cambiar();
+                                            }
+                                        },
+                                        {name:"Cancelar",
+                                            action: function () {
+                                                $scope.fechas.send ={};
+                                                $scope.calc =undefined;
+                                                $scope.$parent.shipment.fechas.fecha_vnz = angular.copy($scope.fechas.fecha_vnz.in);
+                                            }
                                         }
-                                    }
-                                },
-                                {name:"Mantener la fecha de llegada a la tienda",
-                                    action: function () {
-                                        $scope.fechas.calc="fecha_tienda";
-                                        $scope.fechas.send ={};
-                                        $scope.fechas.send.fecha_vnz.value = angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value);
-                                        $scope.fechas.send.fecha_vnz.isManual = true;
-                                        $scope.fechas.send.fecha_vnz.confirm = false;
-                                        if($scope.$parent.shipment.fechas.fecha_vnz.value <= new Date()){
-                                            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                                                [
-                                                    {
-                                                        name:"Si, es la definitiva",action : function () {
-                                                        $scope.fechas.send.fecha_vnz.confirm = true;
-                                                        $scope.fechas.bind.estado = true;
-                                                    }
-                                                    }
-                                                ]
-                                                , {block:true});
-                                        }else{
-                                            $scope.fechas.bind.estado = true;
-                                        }
-                                    }
-                                },
-                                {name:"Cancelar",
-                                    action: function () {
-                                        $scope.fechas.send ={};
-                                        $scope.calc =undefined;
-                                    }
-                                }
 
-                            ]);
-                    }else{
-                        console.log("fechas ", $scope.$parent.shipment.fechas);
-                        $scope.fechas.calc="fecha_tienda";
-                        $scope.fechas.send ={};
-                        $scope.fechas.send.fecha_vnz= {};
-                        $scope.fechas.send.fecha_vnz.value = angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value);
-                        $scope.fechas.send.fecha_vnz.isManual = true;
-                        $scope.fechas.send.fecha_vnz.confirm = false;
-                        if($scope.$parent.shipment.fechas.fecha_vnz.value <= new Date()){
-                            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                                [
-                                    {
-                                        name:"Si, es la definitiva",action : function () {
-                                        $scope.fechas.send.fecha_vnz.confirm = true;
-                                        $scope.fechas.bind.estado = true;
-                                    }
-                                    },{
-                                    name:"No ",action : function () {
-                                        $scope.fechas.send.fecha_vnz.confirm = false;
-                                        $scope.fechas.bind.estado = true;
-                                    }
-                                }
-                                ]
-                                , {block:true});
+                                    ]);
+                            }else{
+                                $scope.setSend ({fecha_vnz:{value: angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value),isManual:true,confirm: false}},'fecha_tienda', true);
+                                cambiar();
+                            }
                         }else{
-                            $scope.fechas.bind.estado = true;
+                            $scope.setSend ({fecha_vnz:{value: angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value),isManual:true,confirm: false}},'fecha_tienda', true);
+                            cambiar();
+
                         }
 
                     }
-                }else{
-                    $scope.fechas.calc="fecha_tienda";
-                    $scope.fechas.send= {fecha_carga:{}};
-                    $scope.fechas.send.fecha_vnz.value = angular.copy($scope.$parent.shipment.fechas.fecha_vnz.value);
-                    $scope.fechas.send.fecha_vnz.isManual = true;
-                    $scope.fechas.send.fecha_vnz.confirm = false;
-                    if($scope.$parent.shipment.fechas.fecha_carga.value <= new Date()){
-                        $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                            [
-                                {
-                                    name:"Si, es la definitiva",action : function () {
-                                    $scope.fechas.send.fecha_vnz.confirm = true;
-                                    $scope.fechas.bind.estado = true;
-                                }
-                                },{
-                                name:"No ",action : function () {
-                                    $scope.fechas.send.fecha_vnz.confirm = false;
-                                    $scope.fechas.bind.estado = true;
-                                }
+                });
+
+            };
+            if($scope.$parent.shipment.fechas.fecha_vnz.max){
+
+                var max = DateParse.toDate($scope.$parent.shipment.fechas.fecha_vnz.max);
+                console.log("max", max);
+
+                if($scope.$parent.shipment.fechas.fecha_vnz.value > max){
+                    $scope.$parent.NotifAction("alert", "La fecha ideal para la llegada a venezuela, es "+ max.getDate()+"/"+max.getMonth()+"/"+max.getFullYear()+" ¿Esta seguro que la fecha es correcta?",
+                        [
+                            {name:"Si, estoy seguro", action: function ()
+                            {
+                                cambiarRv();
                             }
-
-                            ]
-                            , {block:true});
-                    }else{
-                        $scope.fechas.bind.estado = true;
-                    }
+                            }
+                            ,{name:"No, dejame corregirlo", action: function ()
+                        {
+                            $scope.$parent.shipment.fechas.fecha_vnz.value = angular.copy($scope.fechas.fecha_vnz.in);
+                        }
+                        }
+                        ]
+                        ,{block:true, confirm:true});
+                }else{
+                    cambiarRv();
                 }
-
             }
+            else{
+                cambiarRv();
+            }
+
+
+
+
+
 
         }
     };
     $scope.changeFecha_tienda = function () {
-        $scope.fechas.send ={};
-        $scope.fechas.send.fecha_tienda ={};
-        $scope.fechas.send.fecha_tienda.value = angular.copy($scope.$parent.shipment.fechas.fecha_tienda.value);
-        $scope.fechas.send.fecha_tienda.isManual = true;
-        $scope.fechas.send.fecha_tienda.confirm = false;
-        if($scope.$parent.shipment.fechas.fecha_tienda.value <= new Date()){
-            $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                [
-                    {
-                        name:"Si, es la definitiva",action : function () {
-                        $scope.fechas.send.fecha_tienda.confirm = true;
-                        $scope.fechas.bind.estado = true;
-                    }
-                    },{
-                    name:"No ",action : function () {
-                        $scope.fechas.send.fecha_tienda.confirm = false;
-                        $scope.fechas.bind.estado = true;
-                    }
+
+        var cambiar = function () {
+            $timeout(function () {
+                if($scope.$parent.shipment.fechas.fecha_tienda.value <= new Date()){
+                    $scope.setSend ({fecha_tienda:{value: angular.copy($scope.$parent.shipment.fechas.fecha_tienda.value),isManual:true,confirm: false}},undefined, true);
+                    $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
+                        [
+                            {
+                                name:"Si, es la definitiva",action : function () {
+                                $scope.fechas.send.fecha_tienda.confirm = true;
+                                $scope.fechas.bind.estado = true;
+                            }
+                            },{
+                            name:"No ",action : function () {
+                                $scope.fechas.send.fecha_tienda.confirm = false;
+                                $scope.fechas.bind.estado = true;
+                            }
+                        }
+                        ]
+                        , {block:true});
+                }else{
+                    $scope.fechas.bind.estado = true;
                 }
-                ]
-                , {block:true});
+            },0);
+
+        };
+
+        if($scope.$parent.shipment.fechas.fecha_tienda.max){
+            var max = DateParse.toDate($scope.$parent.shipment.fechas.fecha_tienda.max);
+
+            if($scope.$parent.shipment.fechas.fecha_tienda.value > max){
+                $scope.$parent.NotifAction("alert", "La fecha ideal  es "+ max.getDate()+"/"+max.getMonth()+"/"+max.getFullYear()+" ¿Esta seguro que la fecha es correcta?",
+                    [
+                        {name:"Si, estoy seguro", action: function ()
+                        {
+                            cambiar();
+                        }
+                        }
+                        ,{name:"No, dejame corregirlo", action: function ()
+                    {
+                        $scope.$parent.shipment.fechas.fecha_tienda.value = angular.copy($scope.fechas.fecha_tienda.in);
+                    }
+                    }
+                    ]
+                    ,{block:true, confirm:true});
+            }else{
+                cambiar();
+            }
         }else{
-            $scope.fechas.bind.estado = true;
+            cambiar();
         }
+
+
+
     }
     $scope.desblockFecha_carga = function () {
 
@@ -925,7 +917,19 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
         console.log("desbloqueo forsoso");
     };
 
-    //pagos
+    //pagos+
+    // fechas
+    $scope.inPay = function (v,k) {
+        $scope.pagos[k]=  angular.copy(v);
+
+    };
+    $scope.outPay = function (v, k) {
+
+        if(!$scope.pago.$pristine && k   ){
+            console.log("en pagos v", v);
+            console.log("en pagos k", k);
+        }
+    }
     $scope.$watchGroup(['pago.$valid', 'pago.$pristine'], function(newVal){
         if(!newVal[1]){
             $scope.$parent.save(function () {
@@ -971,7 +975,42 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
             }
         }
 
-    }
+    };
+
+    $scope.aprobMaritimo = function(){
+        if($scope.$parent.shipment.flete_maritimo){
+            if(!$scope.$parent.shipment.conf_monto_ft_maritimo){
+                $scope.$parent.NotifAction("alert","¿Desea aprobar el monto de flete Maritmo?",
+                    [
+                        {name:"Si, eso quiero", default:9,action:function () {
+                            $scope.$parent.shipment.conf_monto_maritimo = true;
+                            $scope.$parent.save(function () {
+
+                                $scope.$parent.NotifAction("ok", "Aprobacion realizada",[], {autohidden:1500});
+                            });
+                        }},
+                        {name:"No",action:function () {}}
+                    ],{block:true}
+                );
+
+            }else{
+                $scope.$parent.NotifAction("alert","¿Esta seguro de remover la aprobacion de flete terrestre?",
+                    [
+                        {name:"Si, eso quiero", default:9,action:function () {
+
+                            $scope.$parent.shipment.conf_monto_maritimo = true;
+                            $scope.$parent.save(function () {
+
+                                $scope.$parent.NotifAction("ok", "Aprobacion removida",[], {autohidden:1500});
+                            });
+                        }},
+                        {name:"No",action:function () {}}
+                    ],{block:true}
+                );
+            }
+        }
+
+    };
     $scope.aprobNac = function(){
         if($scope.$parent.shipment.nacionalizacion){
             if(!$scope.$parent.shipment.conf_monto_nac){
@@ -1043,6 +1082,8 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','setGetShi
 
 
 
+
+
 }]);
 
 MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment','tarifForm','setGetShipment',   function($scope,$timeout, DateParse, $resource,tarifForm, $model){
@@ -1072,7 +1113,7 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
             },after: function () {
                 $timeout(function () {
                     var ele = angular.element("#listTariff input").first();
-                   ele.focus();
+                    ele.focus();
                 },0);
             }
         }});
@@ -1158,23 +1199,11 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
             angular.forEach(tarifForm.get(), function(v,k){
                 $scope.tarifaSelect[k] =v;
             });
+            $scope.setTarif(tarifForm.get())
             tarifForm.setState("waith");
-            $resource.getMod({type:"Shipment", mod:"Dates", id:$scope.$parent.shipment.id,fecha_carga:true}, {}, function (response) {
-                console.log("dates", response);
-                $model.setDates(response);
-                $resource.postMod({type:"Shipment", mod:"SaveDates"},
-                    { id:$scope.$parent.shipment.id,
-                        fecha_carga:response.fecha_carga,
-                        fecha_tienda:response.fecha_tienda,
-                        fecha_vnz:response.fecha_vnz
-                    }
-                    , function (response) {
 
-                        $model.setDates(response);
-                    });
+            $scope.$parent.reloadDates();
 
-
-            });
         }
     });
     $scope.$watch("pais_idSelec", function (newVal) {
@@ -1243,7 +1272,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
     $scope.tipo_text = undefined;
     $scope.model ={};
     $scope.copy ={};
-    $scope.containers = [{name:"20sd"},{name:"40sd"},{name:"40'ot"},{name:"40ot"}];
+    $scope.containers = [{name:"20sd"},{name:"40sd"},{name:"40'ot"}];
     $scope.options ={form:false};
     $scope.select ={};
 
@@ -1865,7 +1894,7 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
         $scope.isModif = false;
         $scope.model.nro_mbl= {};
         $scope.model.nro_hbl= {};
-        $scope.model.nro_dua= {};
+        $scope.model.nro_eaa= {};
 
         angular.forEach($model.getForm('fecha_carga'), function (v, k){
             if(v.estado && v.estado != 'new'){
@@ -1904,10 +1933,10 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
                 $scope.isModif=true;
             }
         });
-        angular.forEach($model.getForm('nro_dua'), function (v, k) {
+        angular.forEach($model.getForm('nro_eaa'), function (v, k) {
 
             if(v.estado && v.estado != 'new'){
-                $scope.model.nro_dua[k]=v;
+                $scope.model.nro_eaa[k]=v;
                 $scope.isModif=true;
             }
         });
@@ -2144,31 +2173,31 @@ MyApp.controller('listProductAddCtrl',['$scope','$filter','shipment','form', 'se
 }]);
 
 /*
-MyApp.controller('historyProductCtrl',['$scope','$mdSidenav','setGetShipment', function($scope,$mdSidenav, $resource){
-    $scope.tbl ={
-        order:"id",
-        filter:{},
-        data:[]
-    };
-    $scope.isOpen = false;
-    $scope.$parent.historyProduct = function(data){
+ MyApp.controller('historyProductCtrl',['$scope','$mdSidenav','setGetShipment', function($scope,$mdSidenav, $resource){
+ $scope.tbl ={
+ order:"id",
+ filter:{},
+ data:[]
+ };
+ $scope.isOpen = false;
+ $scope.$parent.historyProduct = function(data){
 
 
 
-        $mdSidenav("miniHistoryProd").open().then(function(){
-            $scope.isOpen = true;
-        });
-    };
-    $scope.close= function(){
-        if($scope.isOpen){
-            $mdSidenav("miniHistoryProd").close().then(function(){
-                $scope.isOpen = false;
-            });;
-        }
+ $mdSidenav("miniHistoryProd").open().then(function(){
+ $scope.isOpen = true;
+ });
+ };
+ $scope.close= function(){
+ if($scope.isOpen){
+ $mdSidenav("miniHistoryProd").close().then(function(){
+ $scope.isOpen = false;
+ });;
+ }
 
-    };
-}]);
-*/
+ };
+ }]);
+ */
 
 MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shipment', 'setGetShipment',function($scope,$mdSidenav, masters, formSrv, $resource, $model){
     $scope.isOpen = false;
@@ -2536,7 +2565,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     };
 
     $scope.toEditHead= function(id,val){
-        $model.change("nro_dua",id,val);
+        $model.change("nro_eaa",id,val);
     };
 
     $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
@@ -2553,7 +2582,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
         if(newValue > 0){
             $scope.cola.estado='uploading';
             $scope.cola.cola = $scope.cola.cola + 1;
-            var pr =Object.create( $scope.asign($scope.files,"nro_dua"));
+            var pr =Object.create( $scope.asign($scope.files,"nro_eaa"));
             $scope.cola.data.push(pr);
             if(interval== null){
                 interval = $interval(function () {
@@ -2565,7 +2594,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
                             finisAll=true;
                             console.log("filse fin", v)
                             angular.forEach(v.getFilesUp(), function (sv,sf) {
-                                $scope.$parent.shipment.nro_dua.adjs.push(sv);
+                                $scope.$parent.shipment.nro_eaa.adjs.push(sv);
                             });
                             if(v.getFilesError().length > 0){
                                 console.log("error subiendo archivos", v.getFilesError());
@@ -2875,27 +2904,6 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','DateParse','form', '
         }else{
 
         }
-        /*
-         if(false){
-
-         }else {
-         form.name= 'DetailProductAdd';
-         $scope.prdSelect=model;
-         var data = {
-         embarque_item_id:$scope.prdSelect.embarque_item_id,
-         tipo_origen_id:23,
-         descripcion:$scope.prdSelect.descripcion,
-         origen_item_id:$scope.prdSelect.id,
-         producto_id:$scope.prdSelect.producto_id,
-         saldo:$scope.prdSelect.saldo,
-         codigo_fabrica:$scope.prdSelect.codigo_fabrica,
-         disponible:$scope.prdSelect.disponible,
-         codigo:$scope.prdSelect.codigo,
-         doc_origen_id:$scope.select.id
-         };
-         $scope.$parent.DetailProductShipment(data);
-         }*/
-
 
 
     }
@@ -3202,6 +3210,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
             formSrv.name = "CreatTariff";
             $scope.loadFF();
             $scope.loadData();
+            $scope.loadNv();
         });
     };
 
@@ -3315,28 +3324,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
         $scope.puertoSelect=newVal;
     });
-    /*
 
-
-     console.log("antes de eidit", $scope.f);
-     $scope.f.isValid = function () {
-     $scope.f.state= "valid";
-     console.log("dentro de valid", this);
-     return $scope.head.$valid && $scope.bond.$valid;
-     };
-     $scope.f.save = function () {
-     console.log("dentro de save", this);
-     $scope.f.state= "saving";
-     $scope.f.state= "save";
-     tarifForm.set($scope.model);
-     tarifForm.setState("save");
-
-
-     return true;
-     };
-     $scope.f.getData = function () {
-     return $scope.model;
-     };*/
 
 
 
@@ -3590,6 +3578,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
                     }
                 });
+                Shipment.criterios= response.criterios;
                 Shipment.objs= {};
                 angular.forEach(response.objs,function (v, k) {
                     Shipment.objs[k]=v;
@@ -3609,6 +3598,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                         Shipment.fechas.fecha_carga.confirm=response.fechas.fecha_carga.confirm;
                         Shipment.fechas.fecha_carga.isManual=response.fechas.fecha_carga.isManual;
                         Shipment.fechas.fecha_carga.value = DateParse.toDate(response.fechas.fecha_carga.value);
+                        Shipment.fechas.fecha_carga.max = (response.fechas.fecha_carga.max) ? DateParse.toDate(response.fechas.fecha_carga.max) : undefined;
                         forms['fecha_carga']['confirm']={original:Shipment.fechas.fecha_carga.confirm, v:Shipment.fechas.fecha_carga.confirm, estado:'new',trace:[]};
                         forms['fecha_carga']['isManual']={original:Shipment.fechas.fecha_carga.isManual, v:Shipment.fechas.fecha_carga.isManual, estado:'new',trace:[]};
                         forms['fecha_carga']['value']={original:Shipment.fechas.fecha_carga.value, v:Shipment.fechas.fecha_carga.value, estado:'new',trace:[]};
@@ -3620,6 +3610,8 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                         Shipment.fechas.fecha_tienda.confirm=response.fechas.fecha_tienda.confirm;
                         Shipment.fechas.fecha_tienda.isManual=response.fechas.fecha_tienda.isManual;
                         Shipment.fechas.fecha_tienda.value = DateParse.toDate(response.fechas.fecha_tienda.value);
+                        Shipment.fechas.fecha_tienda.max = (response.fechas.fecha_tienda.max) ? DateParse.toDate(response.fechas.fecha_tienda.max) : undefined;
+
                         forms['fecha_tienda']['confirm']={original:Shipment.fechas.fecha_tienda.confirm, v:Shipment.fechas.fecha_tienda.confirm, estado:'new',trace:[]};
                         forms['fecha_tienda']['isManual']={original:Shipment.fechas.fecha_tienda.isManual, v:Shipment.fechas.fecha_tienda.isManual, estado:'new',trace:[]};
                         forms['fecha_tienda']['value']={original:Shipment.fechas.fecha_tienda.value, v:Shipment.fechas.fecha_tienda.value, estado:'new',trace:[]};
@@ -3630,6 +3622,8 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                         Shipment.fechas.fecha_vnz.confirm=response.fechas.fecha_vnz.confirm;
                         Shipment.fechas.fecha_vnz.isManual=response.fechas.fecha_vnz.isManual;
                         Shipment.fechas.fecha_vnz.value = DateParse.toDate(response.fechas.fecha_vnz.value);
+                        Shipment.fechas.fecha_vnz.max = (response.fechas.fecha_vnz.max) ? DateParse.toDate(response.fechas.fecha_vnz.max) : undefined;
+
                         forms['fecha_vnz']['confirm']={original:Shipment.fechas.fecha_vnz.confirm, v:Shipment.fechas.fecha_vnz.confirm, estado:'new',trace:[]};
                         forms['fecha_vnz']['isManual']={original:Shipment.fechas.fecha_vnz.isManual, v:Shipment.fechas.fecha_vnz.isManual, estado:'new',trace:[]};
                         forms['fecha_vnz']['value']={original:Shipment.fechas.fecha_vnz.value, v:Shipment.fechas.fecha_vnz.value, estado:'new',trace:[]};
@@ -3706,27 +3700,17 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 if(Shipment.nro_hbl.emision){
                     forms['nro_hbl']['emision']={original:Shipment.nro_hbl.emision.toString(), v:Shipment.nro_hbl.emision.toString(), estado:'new',trace:[]};
                 }
-                Shipment.nro_dua = {
-                    adjs:response.nro_dua.adjs,
-                    documento: response.nro_dua.documento,
-                    emision:(response.nro_dua.emision== null)? undefined: DateParse.toDate(response.nro_dua.emision)
+                Shipment.nro_eaa = {
+                    adjs:response.nro_eaa.adjs,
+                    documento: response.nro_eaa.documento,
+                    emision:(response.nro_eaa.emision== null)? undefined: DateParse.toDate(response.nro_eaa.emision)
                 } ;
-                forms['nro_dua'] = {};
-                if(Shipment.nro_dua.documento){
-                    forms['nro_dua']['documento']={original:Shipment.nro_dua.documento, v:Shipment.nro_dua.documento, estado:'new',trace:[]};
+                forms['nro_eaa'] = {};
+                if(Shipment.nro_eaa.documento){
+                    forms['nro_eaa']['documento']={original:Shipment.nro_eaa.documento, v:Shipment.nro_eaa.documento, estado:'new',trace:[]};
                 }
-                if(Shipment.nro_dua.emision){
-                    forms['nro_dua']['emision']={original:Shipment.nro_dua.emision.toString(), v:Shipment.nro_dua.emision.toString(), estado:'new',trace:[]};
-                }
-                Shipment.flete= 0;
-                if(Shipment.flete_tt){
-                    Shipment.flete+= parseFloat(Shipment.flete_tt);
-                }
-                if(Shipment.nacionalizacion){
-                    Shipment.flete+= parseFloat(Shipment.nacionalizacion);
-                }
-                if(Shipment.dua){
-                    Shipment.flete+= parseFloat(Shipment.dua);
+                if(Shipment.nro_eaa.emision){
+                    forms['nro_eaa']['emision']={original:Shipment.nro_eaa.emision.toString(), v:Shipment.nro_eaa.emision.toString(), estado:'new',trace:[]};
                 }
 
                 bindin.estado = true;
@@ -3741,6 +3725,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
         },
         setDates : function (fechas) {
+            var  plus = 2;
             Shipment.fechas= {};
             Shipment.fechas= {fecha_carga:{}, fecha_tienda:{},fecha_vnz:{}};
             if(fechas.fecha_carga.value){
@@ -3748,6 +3733,14 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 Shipment.fechas.fecha_carga.confirm=fechas.fecha_carga.confirm;
                 Shipment.fechas.fecha_carga.isManual=fechas.fecha_carga.isManual;
                 Shipment.fechas.fecha_carga.value = DateParse.toDate(fechas.fecha_carga.value);
+                Shipment.fechas.fecha_carga.max = (fechas.fecha_carga.max) ? DateParse.toDate(fechas.fecha_carga.max) : undefined;
+                Shipment.fechas.fecha_carga.plus =  new Date(Shipment.fechas.fecha_carga.value.getFullYear(),
+                    Shipment.fechas.fecha_carga.value.getMonth(),
+                    Shipment.fechas.fecha_carga.value.getDate()+ plus,
+                    Shipment.fechas.fecha_carga.value.getHours(),
+                    Shipment.fechas.fecha_carga.value.getMinutes(),
+                    Shipment.fechas.fecha_carga.value.getSeconds()
+                );
                 change('fecha_carga','confirm',Shipment.fechas.fecha_carga.confirm);
                 change('fecha_carga','isManual',Shipment.fechas.fecha_carga.isManual);
                 change('fecha_carga','value',Shipment.fechas.fecha_carga.value.toString());
@@ -3757,6 +3750,15 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 Shipment.fechas.fecha_tienda.confirm=fechas.fecha_tienda.confirm;
                 Shipment.fechas.fecha_tienda.isManual=fechas.fecha_tienda.isManual;
                 Shipment.fechas.fecha_tienda.value = DateParse.toDate(fechas.fecha_tienda.value);
+                Shipment.fechas.fecha_tienda.max = (fechas.fecha_tienda.max) ? DateParse.toDate(fechas.fecha_tienda.max) : undefined;
+
+                Shipment.fechas.fecha_tienda.plus  =  new Date(Shipment.fechas.fecha_tienda.value.getFullYear(),
+                    Shipment.fechas.fecha_tienda.value.getMonth(),
+                    Shipment.fechas.fecha_tienda.value.getDate()+ plus,
+                    Shipment.fechas.fecha_tienda.value.getHours(),
+                    Shipment.fechas.fecha_tienda.value.getMinutes(),
+                    Shipment.fechas.fecha_tienda.value.getSeconds()
+                );
                 change('fecha_tienda','confirm',Shipment.fechas.fecha_tienda.confirm);
                 change('fecha_tienda','isManual',Shipment.fechas.fecha_tienda.isManual);
                 change('fecha_tienda','value',Shipment.fechas.fecha_tienda.value.toString());
@@ -3766,6 +3768,14 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 Shipment.fechas.fecha_vnz.confirm=fechas.fecha_vnz.confirm;
                 Shipment.fechas.fecha_vnz.isManual=fechas.fecha_vnz.isManual;
                 Shipment.fechas.fecha_vnz.value = DateParse.toDate(fechas.fecha_vnz.value);
+                Shipment.fechas.fecha_vnz.max = (fechas.fecha_vnz.max) ? DateParse.toDate(fechas.fecha_vnz.max) : undefined;
+                Shipment.fechas.fecha_vnz.plus  =  new Date(Shipment.fechas.fecha_tienda.value.getFullYear(),
+                    Shipment.fechas.fecha_vnz.value.getMonth(),
+                    Shipment.fechas.fecha_vnz.value.getDate()+ plus,
+                    Shipment.fechas.fecha_vnz.value.getHours(),
+                    Shipment.fechas.fecha_vnz.value.getMinutes(),
+                    Shipment.fechas.fecha_vnz.value.getSeconds()
+                );
                 change('fecha_vnz','confirm',Shipment.fechas.fecha_vnz.confirm);
                 change('fecha_vnz','isManual',Shipment.fechas.fecha_vnz.isManual);
                 change('fecha_vnz','value',Shipment.fechas.fecha_vnz.value.toString());
@@ -3790,10 +3800,9 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
         clear: function(){
             bindin.estado = false;
             bindin.estado=false;
-            Shipment.nro_dua={};
-            Shipment.nro_dua.documento = undefined;
-            Shipment.nro_dua.emision =undefined;
-            Shipment.nro_dua.emision =undefined;
+            Shipment.nro_eaa={};
+            Shipment.nro_eaa.documento = undefined;
+            Shipment.nro_eaa.emision =undefined;
             Shipment.nro_hbl={};
             Shipment.nro_hbl.documento = undefined;
             Shipment.nro_hbl.emision =undefined;
@@ -3831,7 +3840,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
             next=data;
         },
         getNext: function () {
-          return next;
+            return next;
         },
         exit: function (val) {
             console.log("exit");

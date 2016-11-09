@@ -623,6 +623,7 @@ return $html;
     public  function  getShipment(Request $req){
 
         $model = Shipment::findOrfail($req->id);
+        $criterios =[];
         $tarifa = null;
         if($model->tarifa_id != null){
             $tarifa = Tariff::find($model->tarifa_id);
@@ -640,12 +641,14 @@ return $html;
         $data['pais_id'] = $model->pais_id;
         $data['puerto_id'] = $model->puerto_id;
         $data['tarifa_id'] = $model->tarifa_id;
+
+        // pagos
         $data['nacionalizacion'] = $model->nacionalizacion;
         $data['dua'] = $model->dua;
         $data['flete_tt'] = $model->flete_tt;
+        $data['flete_maritimo'] = $model->flete_maritimo;
 
         $data['moneda_id'] = $model->flete_dua;
-        $data['flete'] = ($model->flete_dua ==  null ? 0 : floatval($model->flete_nac))+($model->flete_dua ==  null ? 0 : floatval($model->flete_dua ));
         $data['containers'] = $model->containers()->get();
 
         // aprobaciones
@@ -653,13 +656,14 @@ return $html;
         $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;
         $data['conf_f_tienda'] = ($model->usuario_conf_f_tienda == null )? false: true;
         $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null )? false: true;
+        $data['conf_monto_ft_maritimo'] = ($model->usuario_conf_monto_ft_maritimo == null )? false: true;
         $data['conf_monto_nac'] = ($model->usuario_conf_monto_nac == null )? false: true;
         $data['conf_monto_dua'] = ($model->usuario_conf_monto_dua == null )? false: true;
 
         // adjuntos
         $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emision_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
         $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emision_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
-        $data['nro_dua'] = ['documento'=>$model->nro_dua, 'emision'=> $model->emision_dua,'adjs'=> $model->attachmentsFile("nro_dua") ];
+        $data['nro_eaa'] = ['documento'=>$model-> nro_eaa, 'emision'=> $model->emision_dua,'adjs'=> $model->attachmentsFile(" nro_eaa") ];
 
         // items
         $Mitems  =ShipmentItem::selectRaw(
@@ -709,6 +713,13 @@ return $html;
         ];
         $fechas = $this->shipmentDates($model->id);
         $data['fechas']=$fechas;
+
+        $criterios['nacionalizacion']=['min'=>1, 'max'=>1000];
+        $criterios['dua']=['min'=>1, 'max'=>1000];
+        $criterios['flete_tt']=['min'=>1, 'max'=>1000];
+        $criterios['flete_maritimo']=['min'=>1, 'max'=>1000];
+
+        $data['criterios']= $criterios;
 
 
         return $data ;
@@ -800,6 +811,7 @@ return $html;
         if($req->has('tarifa_id')){ $model->tarifa_id= $req->tarifa_id;}
 
         if($req->has('flete_tt')){ $model->flete_tt= $req->flete_tt;}
+        if($req->has('flete_maritimo')){ $model->flete_maritimo= $req->flete_maritimo;}
         if($req->has('nacionalizacion')){ $model->nacionalizacion= $req->nacionalizacion;}
         if($req->has('dua')){ $model->dua= $req->dua;}
         //conf_monto_ft_tt
@@ -827,6 +839,13 @@ return $html;
                 $model->usuario_conf_monto_dua= null;
             }
         }
+        if($req->has('conf_monto_maritimo')){
+            if($req->conf_monto_maritimo){
+                $model->usuario_conf_monto_maritimo= $req->session()->get('DATAUSER')['id'];
+            }else{
+                $model->usuario_conf_monto_maritimo= null;
+            }
+        }
 
         if($req->has('nro_mbl')){
             if(array_key_exists('documento',$req->nro_mbl)){
@@ -846,13 +865,13 @@ return $html;
                 $model->emision_hbl=$req->nro_hbl['emision'];
             }
         }
-        if($req->has('nro_dua')){
+        if($req->has(' nro_eaa')){
 
-            if(array_key_exists('documento',$req->nro_dua)){
-                $model->nro_dua=$req->nro_hbl['documento'];
+            if(array_key_exists('documento',$req-> nro_eaa)){
+                $model-> nro_eaa=$req->nro_hbl['documento'];
             }
-            if(array_key_exists('emision',$req->nro_dua)){
-                $model->emision_dua=$req->nro_dua['emision'];
+            if(array_key_exists('emision',$req-> nro_eaa)){
+                $model->emision_dua=$req-> nro_eaa['emision'];
             }
         }
 
@@ -1114,7 +1133,7 @@ return $html;
                     ->where('embarque_id','=', $model->id)
                     ->first();
 
-                $fecha_carga['MAXf']=$maxf->max;
+                $fecha_carga['max']=$maxf->max;
                 $fecha_carga['value']= $fDias->MaxProd;
                 $fecha_carga['range']= ['max'=>$fDias->MaxProd , 'min'=>$fDias->minProd];
                 $fecha_carga['isManual']=false;
@@ -1400,10 +1419,55 @@ return $html;
 
 
     private  function  shipmentDates($id){
+
         $model = Shipment::findOrFail($id);
+
         $fecha_carga = ['value'=>$model->fecha_carga,'method'=>'db', 'confirm'=>($model->usuario_conf_f_carga != null), 'isManual'=> ( $model->f_carga_isManual == 1 ) ];
         $fecha_vnz = ['value'=>$model->fecha_vnz,'method'=>'db', 'confirm'=>($model->usuario_conf_f_vnz != null), 'isManual'=> ($model->f_vnz_isManual == 1 )];
         $fecha_tienda = ['value'=>$model->fecha_tienda,'method'=>'db', 'confirm'=>($model->usuario_conf_f_tienda != null), 'isManual'=> ($model->f_tienda_isManual == 1)];
+
+        // validacion de fecha de carga
+        $items = $model->items()
+            ->where('tipo_origen_id', '23')
+            ->get();
+      //  dd($items);
+        if(sizeof($items) >  0 ){
+            $maxf = Purchase::selectRaw('max(fecha_produccion) as max')
+                ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=', 'tbl_compra_orden.id' )
+                ->where('tipo_origen_id', '23')
+                ->whereNull('tbl_embarque_item.deleted_at')
+                ->first();
+
+            $fDias = ShipmentItem::selectRaw(
+                'ADDDATE( \''.$maxf->max. '\', interval max( tbl_prov_tiempo_fab.min_dias) DAY ) as minProd ,'.
+                'ADDDATE( \''.$maxf->max. '\', interval max( tbl_prov_tiempo_fab.max_dias) DAY ) as MaxProd'
+            )
+                ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
+                ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
+                ->where('embarque_id','=', $model->id)
+                ->first();
+
+            $fecha_carga['max']=$maxf->max;
+            $fecha_carga['range']= ['max'=>$fDias->MaxProd , 'min'=>$fDias->minProd];
+        }
+        // validacion fecha venezuela
+        if($model->tarifa_id != null && $fecha_carga['value'] != null){
+            $tarif = Tariff::findOrFail($model->tarifa_id);
+            $Original= date_create($fecha_carga['value']);
+            $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+            $plus =  $auxDate->addDays(intval($tarif->dias_tt));
+            $fecha_vnz['max']=$plus->format('Y-m-d');
+        }
+        // validacion de fecha en tienda
+        if($fecha_vnz['value']!= null){
+            $Original= date_create($fecha_vnz['value']);
+            $auxDate= Carbon::createFromDate($Original->format("Y"),$Original->format("m"),$Original->format("d"));
+            $plus =  $auxDate->addDays($this->diasTienda);
+            $fecha_tienda['max']= $plus->format('Y-m-d');
+        }
+
+
+
 
         $return =[
             'fecha_carga'=>$fecha_carga,
