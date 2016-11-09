@@ -53,7 +53,7 @@
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
             <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : true : filtAvaiable" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
 
                 </div>
@@ -121,7 +121,7 @@
                         <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
                         <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                            <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
+                            <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : false : filtAvaiable" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
                                 <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
 
                             </div>
@@ -139,7 +139,7 @@
             <div layout="row" flex>
                 <md-content class="cntLayerHolder" layout="column" flex style="padding-left: 8px">
                     <!--creacion o edicion de la linea-->
-                    <form name="LineProd" layout="row" class="focused" >
+                    <form name="LineProd" layout="row" class="focused" ng-controller="lineController">
                         <div active-left></div>
                         <div flex layout="column">
                             <div class="titulo_formulario" layout="column" layout-align="start start">
@@ -154,18 +154,17 @@
                                         <label>Nombre de Linea</label>
                                         <input skip-tab
                                                info="indique el nombre del proveedor"
-                                               ng-disabled="$parent.enabled && prov.id"
+
                                                autocomplete="off"
-                                               ng-blur="check('razon_social')"
-                                               duplicate="list"
-                                               duplicate-msg="ya existe un proveedor con esta razon social"
-                                               field="razon_social"
+                                               duplicate="listLines"
+                                               duplicate-msg="esta linea ya existe"
+                                               field="linea"
                                                name="razon_social"
                                                maxlength="80"
                                                ng-minlength="3"
                                                required
                                                md-no-asterisk
-                                               ng-model="dtaPrv.description"
+                                               ng-model="newLine.name"
                                         >
 
                                     </md-input-container>
@@ -173,13 +172,16 @@
                                         <label>Siglas</label>
                                         <input skip-tab
                                                info="Siglas para esta linea"
+                                               duplicate="listLines"
+                                               duplicate-msg="estas siglas ya existen"
+                                               field="siglas"
                                                autocomplete="off"
                                                name="linea"
-                                               maxlength="80"
+                                               maxlength="4"
                                                ng-minlength="3"
                                                required
                                                md-no-asterisk
-
+                                               ng-model="newLine.letter"
                                         >
 
                                     </md-input-container>

@@ -20,4 +20,8 @@ class Line extends Model
     {
         return $this->belongsTo('App\Models\Sistema\Providers\ProdTime','linea_id');
     }
+
+    public function criterios(){
+        return $this->hasMany('App\Models\Sistema\Criterios\CritLinCamTip','linea_id',"id");
+    }
 }

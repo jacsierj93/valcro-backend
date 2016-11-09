@@ -18,7 +18,7 @@ class CritLinCamTip extends Model
     protected $table="tbl_crit_lin_cam_tip";
 
     public function line(){
-        return $this->hasOne('App\Models\Sistema\Masters\Line',"id","linea_id");
+        return $this->belongsTo('App\Models\Sistema\Masters\Line',"linea_id");
     }
     public function field(){
         return $this->hasOne('App\Models\Sistema\Criterios\CritCampos','id','campo_id');

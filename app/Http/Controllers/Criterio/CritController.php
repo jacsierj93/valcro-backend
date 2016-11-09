@@ -34,6 +34,15 @@ class CritController extends BaseController
     public function getCampos(){
         return json_encode(Campos::all());
     }
+
+    public function getAvaiableLines(){
+       $lines = Line::all();
+        foreach ($lines as $line){
+            $line['hasCrit'] = $line->criterios()->count() > 0;
+        }
+        return $lines;
+
+    }
     
     public function getTypes(){
         $types = Types::all();
@@ -52,6 +61,24 @@ class CritController extends BaseController
             $field['options'] = $field->options()->get();
         }
         return  json_encode($crit);
+    }
+
+    public function createLine(Request $rq){
+        $ret = array("action"=>"new","id"=>false);
+        $usr = $rq->session()->get('DATAUSER');
+        if($rq->id){
+            $line = Line::find($rq->id);
+            $ret["action"]="upd";
+        }else{
+            $line = new Line();
+        }
+        $line->linea = $rq->name;
+        $line->siglas = $rq->letter;
+        $line->user_id = $usr['id'];
+
+        $line->save();
+        $ret["id"] = $line->id;
+        return $ret;
     }
 
     public function saveCritField(Request $rq){
