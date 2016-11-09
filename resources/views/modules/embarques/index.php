@@ -726,6 +726,7 @@
                                     <label>Proveedor</label>
                                     <md-autocomplete md-selected-item="provSelec"
                                                      info="Seleccione el proveedor del embarque"
+                                                     skip-tab
                                                      required
                                                      ng-disabled="( session.isblock || $parent.shipment.pais_id)"
                                                      md-search-text="provSelecText "
@@ -772,8 +773,8 @@
                                     >
                                 </md-input-container>
                             </div>
-                            <div layout="row" class="row"  ng-click="openTarif();"   ng-show="formOptions.head.expand" >
-                                <div class="adj-box-left" flex="10" style="color: rgb(176,176,176);margin-right: 8px;" >
+                            <div layout="row" class="row "  ng-click="openTarif();"   ng-show="formOptions.head.expand" >
+                                <div class="adj-box-left autoclick " flex="10" style="color: rgb(176,176,176);margin-right: 8px;" skip-tab>
                                     <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left;margin-right: 0">T </div>
                                     <div style="margin-top: 8px;    border-bottom: dotted 0.6px rgb(176,176,176);margin-left: 26px;">Tarifa</div>
                                 </div>
@@ -2413,7 +2414,7 @@
                                     Cambios en el  Embarque
                                 </div>
                             </div>
-                            <div  layout="row"  layout-align="end start"  ng-show="!((model.document.titulo.estado == 'new' && model.document.titulo.estado) && (model.document.pais_id.estado =='new' ||  model.document.pais_id.estado) && (model.document.puerto_id.estado =='new' || model.document.puerto_id.estado) && (model.document.prov_id.estado || model.document.prov_id.estado == 'new'))" >
+                            <div  layout="row"  layout-align="end start"   ng-show="keyCount(model.document).length > 0" >
                                 <md-switch class="md-primary"
                                            ng-model="goTo.titulo"
                                            ng-disabled="true"
@@ -2432,7 +2433,7 @@
                             <div  style="height:24px;" layout="row" layout-align="start" ng-show="(model.document.prov_id.estado && model.document.prov_id.estado != 'new')" >
                                 <div layout="row" style="min-width: 88px; color:#ccc">Proveedor</div>
                                 <div layout="row" style="color: #999">
-                                    <div class="rms" flex> {{shipment.objs.prov_id.razon_social}}</div>
+                                    <div class="rms" flex> {{$parent.shipment.objs.prov_id.razon_social}}</div>
                                 </div>
                             </div>
 
@@ -2452,7 +2453,7 @@
                                     Tarifa
                                 </div>
                             </div>
-                            <div  layout="row"  layout-align="end start"  ng-show="keyCount(model.document.tarifa_id) > 0" >
+                            <div  layout="row"  layout-align="end start"  ng-show="keyCount(model.tarifa).length > 0" >
                                 <md-switch class="md-primary"
                                            ng-model="goTo.tarifa_id"
                                            ng-disabled="true"
@@ -2462,33 +2463,33 @@
                             </div>
                         </div>
 
-                        <div layout="column" style="height: 58px;overflow: auto;">
-                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.document.tarifa_id && model.document.tarifa_id.estado != 'new') "  >
+                        <div layout="column" style="height: 107px;overflow: auto;">
+                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.tarifa.freight_forwarder_id && model.document.freight_forwarder_id.estado != 'new') "  >
                                 <div layout="row" style="min-width: 130px;color:#ccc;">Freigth Fowarder</div>
                                 <div layout="row" style="color:#999">
-                                    <div class="rms" flex> {{shipment.objs.tarifa_id.freight_forwarder.nombre}}</div>
+                                    <div class="rms" flex> {{$parent.shipment.objs.tarifa_id.freight_forwarder.nombre}}</div>
                                 </div>
                             </div>
-                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.document.tarifa_id && model.document.tarifa_id.estado != 'new')" >
+                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.tarifa.naviera_id && model.tarifa.naviera_id.estado != 'new')" >
                                 <div layout="row" style="min-width: 130px;color:#ccc;">Naviera</div>
                                 <div layout="row">
-                                    <div class="rms" flex style="color:#999" > {{shipment.objs.tarifa_id.naviera.nombre}}</div>
+                                    <div class="rms" flex style="color:#999" > {{$parent.shipment.objs.tarifa_id.naviera.nombre}}</div>
                                 </div>
                             </div>
-                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="model.document.pais_id.estado &&  model.document.pais_id.estado !='new'" >
-                                <div layout="row" style="min-width: 88px; color:#ccc;">Pais</div>
+                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="model.tarifa.pais_id.estado &&  model.tarifa.pais_id.estado !='new'" >
+                                <div layout="row" style="min-width: 130px; color:#ccc;">Pais</div>
                                 <div layout="row" style="color:#999">
-                                    <div class="rms" flex> {{shipment.objs.pais_id.short_name}}</div>
+                                    <div class="rms" flex> {{$parent.shipment.objs.pais_id.short_name}}</div>
                                 </div>
                             </div>
-                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.document.puerto_id.estado && model.document.puerto_id.estado !='new')" >
-                                <div layout="row" style="min-width: 88px; color:#ccc;">Puerto</div>
+                            <div  style="height:24px;" layout="row" layout-align=" start"  ng-show="(model.tarifa.puerto_id.estado && model.tarifa.puerto_id.estado !='new')" >
+                                <div layout="row" style="min-width: 130px; color:#ccc;">Puerto</div>
                                 <div layout="row" style="color:#999">
-                                    <div class="rms" flex> {{shipment.objs.puerto_id.Main_port_name}}</div>
+                                    <div class="rms" flex> {{$parent.shipment.objs.puerto_id.Main_port_name}}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center"
-                                 ng-show="keyCount(model.document.tarifa_id)== 0"
+                                 ng-show="keyCount(model.tarifa).length == 0"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>
                             </div>
@@ -2513,7 +2514,7 @@
                             </div>
                         </div>
 
-                        <div layout="column" style="height: 34px;overflow: auto;"  >
+                        <div layout="column" style="height: 36px;overflow: auto;"  >
 
                             <div layout="row" layout-align=" start"  style="height:24px;" ng-show="model.nro_mbl.documento.estado &&  model.nro_mbl.documento.estado != 'new' ">
                                 <div layout="row" style="min-width: 72px;color:#ccc;">N° </div>

@@ -615,7 +615,6 @@ MyApp.directive('info', function($timeout,setNotif) {
                 });
 
                 element.on("blur","input", function(e) {
-                   console.log("angular = ",angular.element(e.relatedTarget))
                     if(!model.scope.selectedItem && !angular.element(e.relatedTarget).is("li[md-virtual-repeat]")){
 
                         if(model.matches.length > 0 && (model.scope.searchText!=undefined && model.scope.searchText != "")){

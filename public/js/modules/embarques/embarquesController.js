@@ -45,7 +45,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             }
 
         }else{
-            console.log("nex ");
+
             $model.setNext(function () {
                 $scope.LayersAction({close:{all:true, after:function () {
                     $scope.provSelec = prov;
@@ -1058,20 +1058,22 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
     $scope.tarifBind= tarifForm.bind();
     $scope.tarifaSelect = {};
 
-    $scope.$parent.listTariffCtrl = function(){
-
-
-        $scope.tbl.data = [];
+    $scope.$parent.listTariffCtrl = function(fn){
         $resource.queryMod({type:"Provider",mod:"Dir", id:$scope.$parent.provSelec.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
         $scope.LayersAction({open:{name:"listTariff",
             before:function(){
                 if($scope.$parent.shipment.tarifa_id  != null && $scope.$parent.shipment.objs.tarifa_id.model){
-
                     angular.forEach($scope.$parent.shipment.objs.tarifa_id.model, function(v,k){
                         $scope.tarifaSelect[k] =v;
                     });
-
+                }else{
+                    $scope.tarifaSelect ={};
                 }
+            },after: function () {
+                $timeout(function () {
+                    var ele = angular.element("#listTariff input").first();
+                   ele.focus();
+                },0);
             }
         }});
     };
@@ -1145,6 +1147,8 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
 
         $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = angular.copy(data.objs.freight_forwarder_id);//tarifa_id.freight_forwarder
         $scope.$parent.shipment.objs.tarifa_id.naviera = angular.copy(data.objs.naviera_id);
+        $model.change("tarifa",'freight_forwarder_id',$scope.$parent.shipment.objs.tarifa_id.freight_forwarder.id);
+        $model.change("tarifa",'naviera_id',$scope.$parent.shipment.objs.tarifa_id.naviera.id);
         $scope.$parent.save(fn);
 
     };
@@ -1177,6 +1181,8 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
         if(newVal && $scope.$parent.module.layer == 'listTariff'){
             $scope.puerto_idText  = undefined;
             $scope.tbl.data.splice(0,  $scope.tbl.data.length);
+            $scope.$parent.save();
+
 
         }
         if( $scope.$parent.module.layer == 'listTariff'){
@@ -1192,6 +1198,7 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
             $resource.query({type:"Country", mod:"Ports", pais_id:newVal.id},{}, function(response){
                 $scope.pais_idSelec.ports = response;
             });
+            $scope.$parent.save();
 
         }
     });
@@ -1201,17 +1208,18 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
     });
     $scope.$watch('puerto_idSelec', function(newVal){
 
+
         if(newVal && newVal !=null){
             $resource.queryMod({type:"Tariff",mod:"List", puerto_id:$scope.puerto_idSelec.id},{}, function (response) {
                 $scope.tbl.data= response;
             });
+            $scope.$parent.save();
+
 
         }
         if( $scope.$parent.module.layer == 'listTariff'){
             $model.change('tarifa', 'puerto_id',(newVal) ? newVal.id: undefined);
         }
-
-
     });
     $scope.$watchGroup(['tariffF1.$valid', 'tariffF1.$pristine'], function(newVal){
         if(newVal[0] && !newVal[1]){
@@ -1832,7 +1840,7 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
     $scope.model ={document:{},items:[], odcs:[], containers:[]};
 
     $model.exit = function () {
-        console.log(" eit en upadte");
+        console.log("llamando a exit");
         if($model.getInternalState() == 'new'){
 
             $timeout(function () {
@@ -1966,10 +1974,25 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
             }
         });
         if( $scope.isModif){
+            console.log("final form", $scope.model);
 
+            if($scope.$parent.module.layer!=  'updateShipment'){
+                $scope.LayersAction({open:{name:"updateShipment", before: function(){
 
-            $scope.LayersAction({open:{name:"updateShipment", before: function(){
+                    $scope.$parent.NotifAction("alert","Se ha realizado los siguientes cambios en el embarque son correctos",
+                        [
+                            {name:"Si, son correctos",default:10, action: function () {
 
+                                $model.getNext()();
+                            }
+                            },
+                            {name:"No, dejame corregirlos", action:function () {
+
+                            }}
+                        ]
+                        , {block:true});
+                }}});
+            }else{
                 $scope.$parent.NotifAction("alert","Se ha realizado los siguientes cambios en el embarque son correctos",
                     [
                         {name:"Si, son correctos",default:10, action: function () {
@@ -1982,8 +2005,11 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
                         }}
                     ]
                     , {block:true});
-            }}});
-            return true;
+            }
+
+
+
+
         }else{
 
             $model.getNext()();
