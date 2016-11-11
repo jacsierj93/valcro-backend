@@ -478,12 +478,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
             estado:false
         }
     };
-    $scope.pagos =  {
-        flete_tt:undefined,
-        flete_maritimo:undefined,
-        nacionalizacion:undefined,
-        dua:undefined
-    };
+
     $scope.provSelec = undefined;
     $scope.provSelecText = undefined;
     $scope.form= 'head';
@@ -560,6 +555,12 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
 
     $scope.$parent.OpenShipmentCtrl = function(data){
 
+        $scope.pagos =  {
+            flete_tt:{val:undefined, confirm: false},
+            flete_maritimo:{val:undefined, confirm: false},
+            nacionalizacion:{val:undefined, confirm: false},
+            dua:{val:undefined, confirm: false}
+        };
         $scope.form= 'head';
         $scope.detailShipmenthead.$setPristine();
         $scope.detailShipmenthead.$setUntouched();
@@ -588,12 +589,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
             bind:{
                 estado:false
             }
-        };
-        $scope.pagos =  {
-            flete_tt:undefined,
-            flete_maritimo:undefined,
-            nacionalizacion:undefined,
-            dua:undefined
         };
 
         $scope.$parent.LayersAction({open:{name:"detailShipment", after: function(){
@@ -737,7 +732,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                         }
                         }
                         ]
-                        ,{block:true, confirm:true});
+                        ,{block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
                 }else{
                     cambiarRv();
                 }
@@ -833,7 +828,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                         }
                         }
                         ]
-                        ,{block:true, confirm:true});
+                        ,{block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
                 }else{
                     cambiarRv();
                 }
@@ -894,7 +889,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                     }
                     }
                     ]
-                    ,{block:true, confirm:true});
+                    ,{block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
             }else{
                 cambiar();
             }
@@ -920,27 +915,44 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
     //pagos+
     // fechas
     $scope.inPay = function (v,k) {
-        $scope.pagos[k]=  angular.copy(v);
+        $scope.pagos[k].val=  (v) ? v: undefined;
 
     };
-    $scope.outPay = function (v, k) {
+    $scope.outPay = function (v, k, e) {
 
-        if(!$scope.pago.$pristine && k   ){
-            console.log("en pagos v", v);
-            console.log("en pagos k", k);
-        }
-    }
-    $scope.$watchGroup(['pago.$valid', 'pago.$pristine'], function(newVal){
-        if(!newVal[1]){
+
+        var save = function () {
             $scope.$parent.save(function () {
                 $scope.pago.$setPristine();
 
             });
+        };
+
+        if(!$scope.pago.$pristine &&  $scope.$parent.shipment.criterios[k] && v){
+            var range = $scope.$parent.shipment.criterios[k];
+            var val = parseFloat(v);
+            if(val < range.min || val > range.max){
+                var focus= angular.element(":focus");
+                $scope.$parent.NotifAction("alert", "El monto ideal se encuentra entre "+range.min+" y "+ range.max +
+                    " ¿Esta seguro que el monto es correcto?",
+                    [
+                        {name:"Si, estoy seguro", action: function () {
+                            $scope.pagos[k].confirm = true;
+                            save();
+                        }},
+                        {name:"No, dejame corregirlo", action: function () {
+                            focus.focus();
+                            $scope.pagos[k].confirm = false;
+                        }
+                        }
+                    ]
+                    ,{block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+            }else{
+               save();
+            }
 
         }
-    });
-
-
+    }
 
     $scope.aprobFlete = function(){
         if($scope.$parent.shipment.flete_tt){
@@ -1277,11 +1289,12 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
     };
     $scope.copy ={};
 
+    //  peso en kgs volumen mt3
     $scope.containers = [
-        {name:"20sd",peso:100, volumen:150},
-        {name:"40sd",peso:200, volumen:250},
-        {name:"40' hc",peso:300, volumen:350},
-        {name:"40'ot",peso:400, volumen:450},
+        {name:"20sd",peso:28230  , volumen:33 },
+        {name:"40sd",peso:26700 , volumen:67 },
+        {name:"40' hc",peso:26460 , volumen:76 },
+        {name:"40'ot",26670 :400, volumen:65 },
     ];
     $scope.options ={form:false};
     $scope.select ={};
@@ -1321,7 +1334,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                     }
                     }
                 ]
-                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"25", doc_id:$scope.$parent.shipment.id}}
+                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}}
             );
         }
 
@@ -1342,7 +1355,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                     }
                     }
                 ]
-                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"25", doc_id:$scope.$parent.shipment.id}});
+                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
 
 
         }else{
@@ -2230,32 +2243,6 @@ MyApp.controller('listProductAddCtrl',['$scope','$filter','shipment','form', 'se
 
 }]);
 
-/*
- MyApp.controller('historyProductCtrl',['$scope','$mdSidenav','setGetShipment', function($scope,$mdSidenav, $resource){
- $scope.tbl ={
- order:"id",
- filter:{},
- data:[]
- };
- $scope.isOpen = false;
- $scope.$parent.historyProduct = function(data){
-
-
-
- $mdSidenav("miniHistoryProd").open().then(function(){
- $scope.isOpen = true;
- });
- };
- $scope.close= function(){
- if($scope.isOpen){
- $mdSidenav("miniHistoryProd").close().then(function(){
- $scope.isOpen = false;
- });;
- }
-
- };
- }]);
- */
 
 MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shipment', 'setGetShipment',function($scope,$mdSidenav, masters, formSrv, $resource, $model){
     $scope.isOpen = false;
@@ -2393,7 +2380,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
                     texto += " Se agregaron "+result.succeces.length +" archivos";
                 }
                 if(result.error.length > 0){
-                    texto += " fallaron "+result.length +" archivos";
+                    texto += " fallaron "+result.error.length +" archivos";
                 }
                 if(result.total.length > 0){
                     texto += " de  "+result.total.length +" ";
@@ -2422,6 +2409,7 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
     $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+    $scope.bindFiles = fileSrv.bin();
 
     $scope.$parent.miniHbl = function(){
         $mdSidenav("miniHbl").open().then(function(){
@@ -2454,7 +2442,7 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
             fileSrv.storage("orders");
             fileSrv.setKey("miniHblCtrl");
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
-                $scope.$parent.shipment.nro_mbl.adjs.push(v);
+                $scope.$parent.shipment.nro_hbl.adjs.push(v);
             });
         }
     });
@@ -2463,18 +2451,17 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         if(fileSrv.getKey() == 'miniHblCtrl'){
             var result = angular.copy(fileSrv.get());
             if(newVal == 'finish'){
-                var texto = undefined;
+                var texto = '';
                 //{succeces:[], error:[], total:[],upload:{}};
                 if(result.succeces.length > 0){
                     texto += " Se agregaron "+result.succeces.length +" archivos";
                 }
                 if(result.error.length > 0){
-                    texto += " fallaron "+result.length +" archivos";
-                }
-                if(result.total.length > 0){
+                    texto += " fallaron "+result.error.length +" archivos";
+                }                if(result.total.length > 0){
                     texto += " de  "+result.total.length +" ";
                 }
-                if(texto){
+                if(texto.length > 1){
                     $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
                 }
 
@@ -2497,6 +2484,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
     $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+    $scope.bindFiles = fileSrv.bin();
 
     $scope.$parent.miniExpAduana = function(){
         $mdSidenav("miniExpAduana").open().then(function(){
@@ -2529,7 +2517,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
             fileSrv.storage("orders");
             fileSrv.setKey("miniExpAduanaCtrl");
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
-                $scope.$parent.shipment.nro_mbl.adjs.push(v);
+                $scope.$parent.shipment.nro_eaa.adjs.push(v);
             });
         }
     });
@@ -2538,18 +2526,17 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
         if(fileSrv.getKey() == 'miniExpAduanaCtrl'){
             var result = angular.copy(fileSrv.get());
             if(newVal == 'finish'){
-                var texto = undefined;
+                var texto = '';
                 //{succeces:[], error:[], total:[],upload:{}};
                 if(result.succeces.length > 0){
                     texto += " Se agregaron "+result.succeces.length +" archivos";
                 }
                 if(result.error.length > 0){
-                    texto += " fallaron "+result.length +" archivos";
-                }
-                if(result.total.length > 0){
+                    texto += " fallaron "+result.error.length +" archivos";
+                }                if(result.total.length > 0){
                     texto += " de  "+result.total.length +" ";
                 }
-                if(texto){
+                if(texto.length > 1){
                     $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
                 }
 
@@ -3080,8 +3067,6 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         $scope.bond.$setUntouched();
         $mdSidenav("miniCreatTariff").open().then(function(){
             $scope.isOpen = true;
-
-
             $timeout(function () {
                 var elem = angular.element("#miniCreatTariff #head");
                 elem[0].click();
@@ -4011,7 +3996,6 @@ MyApp.directive('vlThumb', function( fileSrv) {
         link: function(scope, elem, attr, ctrl){
 
             scope.$watch('model.state', function (newVal,oldVal) {
-                console.log("new val , ", scope.attr);
                 if(newVal == 'up'){
                     delete scope.model.up;
                     if( scope.up){

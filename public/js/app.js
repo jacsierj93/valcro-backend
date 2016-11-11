@@ -290,14 +290,12 @@ MyApp.directive('decimal', function () {
 
 
                 var key = window.Event ? e.which : e.keyCode;
-                console.log("key", key);
-
                 if(!((key >= 48 && key <= 57) || (key==8)  || (key >= 96 && key <= 105
                         || key == 188 || key == 190 ||key == 110 || key == 17 || key == 16 || key == 20 || key == 93 || key == 225)
                         || (key >= 112 && key <= 123)
                     )   ){
                     if(key != 13){
-                        // e.preventDefault();
+                         e.preventDefault();
                     }
 
 

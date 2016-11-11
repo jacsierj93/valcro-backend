@@ -663,7 +663,7 @@ return $html;
         // adjuntos
         $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emision_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
         $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emision_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
-        $data['nro_eaa'] = ['documento'=>$model-> nro_eaa, 'emision'=> $model->emision_dua,'adjs'=> $model->attachmentsFile(" nro_eaa") ];
+        $data['nro_eaa'] = ['documento'=>$model-> nro_eaa, 'emision'=> $model->emision_dua,'adjs'=> $model->attachmentsFile("nro_eaa") ];
 
         // items
         $Mitems  =ShipmentItem::selectRaw(

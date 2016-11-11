@@ -943,7 +943,7 @@
 
                                 <div layout="row" flex class="vlc-option ">
 
-                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_tt)"  click-out="outPay($parent.shipment.flete_tt,'flete_tt' )">
+                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_tt,'flete_tt')"  >
                                         <label>Terrestre</label>
                                         <input  ng-model="$parent.shipment.flete_tt"
                                                 skip-tab
@@ -951,6 +951,7 @@
                                                 minlength="2"
                                                 decimal
                                                 ng-change="toEdit('flete_tt',$parent.shipment.flete_tt)"
+                                                ng-blur="outPay($parent.shipment.flete_tt,'flete_maritimo', $event )"
                                         >
                                     </md-input-container>
                                     <div class="adj-box-rigth" ng-click="aprobFlete()">
@@ -959,7 +960,7 @@
                                 </div>
                                 <div layout="row" flex>
 
-                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_maritimo)" click-out="outPay($parent.shipment.flete_maritimo,'flete_maritimo' )" >
+                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_maritimo,'flete_maritimo')"  >
                                         <label>Maritimo</label>
                                         <input  ng-model="$parent.shipment.flete_maritimo"
                                                 skip-tab
@@ -967,6 +968,8 @@
                                                 decimal
                                                 minlength="2"
                                                 ng-change="toEditHead('dua',$parent.shipment.nacionalizacion)"
+                                                ng-blur="outPay($parent.shipment.flete_maritimo,'flete_maritimo', $event )"
+
                                         >
                                     </md-input-container>
                                     <div class="adj-box-rigth" ng-click="aprobMaritimo()">
@@ -975,14 +978,15 @@
                                 </div>
                                 <div layout="row"  flex >
 
-                                    <md-input-container class="md-block"  ng-click="inPay($parent.shipment.nacionalizacion)" click-out="outPay($parent.shipment.nacionalizacion,'flete_maritimo' )" >
+                                    <md-input-container class="md-block"  ng-click="inPay($parent.shipment.nacionalizacion,'nacionalizacion')" >
                                         <label>Nacionalizacion</label>
                                         <input  ng-model="$parent.shipment.nacionalizacion"
                                                 skip-tab
                                                 ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_nac)"
                                                 decimal
                                                 minlength="2"
-                                                ng-change="toEditHead('nacionalizacion',$parent.shipment.nacionalizacion)"
+                                                ng-change="toEditHead('conf_monto_nac',$parent.shipment.conf_monto_nac)"
+                                                ng-blur="outPay($parent.shipment.nacionalizacion,'nacionalizacion', $event )"
                                         >
                                     </md-input-container>
                                     <div class="adj-box-rigth" ng-click="aprobNac()">
@@ -992,15 +996,15 @@
 
                                 <div layout="row" flex>
 
-                                    <md-input-container class="md-block"  ng-click="inPay($parent.shipment.dua)" click-out="outPay($parent.shipment.dua,'dua' )" >
+                                    <md-input-container class="md-block"  ng-click="inPay($parent.shipment.dua,'dua')"  >
                                         <label>DUA</label>
                                         <input  ng-model="$parent.shipment.dua"
                                                 skip-tab
                                                 ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_dua)"
                                                 decimal
                                                 minlength="2"
-                                                ng-change="toEditHead('dua',$parent.shipment.nacionalizacion)"
-                                        >
+                                                ng-change="toEditHead('dua',$parent.shipment.dua)"
+                                                ng-blur="outPay($parent.shipment.dua,'dua', $event )"                                        >
                                     </md-input-container>
                                     <div class="adj-box-rigth" ng-click="aprobDua()">
                                         <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':$parent.shipment.conf_monto_dua}"  style="float:left">A</div>
@@ -1014,7 +1018,7 @@
                     <form name="agreds" layout="row" flex  ng-class="{'focused':form== 'agreds'}" ng-click="form = 'agreds' ">
                         <div active-left  ></div>
                         <div flex layout="column" >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':form== 'agreds'}" ng-click="form = 'agreds' "  >
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select':form== 'agreds'}" ng-click="form = 'agreds' "   >
                                 <div flex class="titulo_formulario" style="height:39px;" ng-dblclick="formOptions.agreds.expand = !formOptions.agreds.expand;" >
                                     <div>
                                         Agregados
@@ -1038,7 +1042,7 @@
                                                 Container
                                             </div>
                                         </div>
-                                        <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="miniContainerCtrl()" style="width:24px;">
+                                        <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="miniContainerCtrl()" style="width:24px;" skip-tab class="autoclick"  >
                                             <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
                                         </div>
                                     </div>
@@ -1062,7 +1066,7 @@
                                                 Pedidos
                                             </div>
                                         </div>
-                                        <div layout="column" layout-align="center center" ng-click="listOrdershipment()" style="width:24px;">
+                                        <div layout="column" layout-align="center center" ng-click="listOrdershipment()" style="width:24px;" skip-tab class="autoclick" >
                                             <span class="icon-Agregar" style="font-size: 12px; float: right; color: #0a0a0a"></span>
                                         </div>
 
@@ -1083,7 +1087,7 @@
 
                                 </div>
                                 <div flex layout="column" >
-                                    <div layout="row" class="form-row-head" ng-class="{'form-row-head-select': form == 'agreds'}" >
+                                    <div layout="row" class="form-row-head" ng-class="{'form-row-head-select': form == 'agreds'}" skip-tab class="autoclick" >
                                         <div flex class="titulo_formulario" style="height:39px;">
                                             <div>
                                                 Productos
