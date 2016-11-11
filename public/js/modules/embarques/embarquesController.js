@@ -732,11 +732,11 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                             }
                             }
                             ,{name:"No, dejame corregirlo", action: function ()
-                            {
-                                $scope.$parent.shipment.fechas.fecha_carga.value = angular.copy($scope.fechas.fecha_carga.in);
-                            }
-                            }
-                    ]
+                        {
+                            $scope.$parent.shipment.fechas.fecha_carga.value = angular.copy($scope.fechas.fecha_carga.in);
+                        }
+                        }
+                        ]
                         ,{block:true, confirm:true});
                 }else{
                     cambiarRv();
@@ -1271,27 +1271,85 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
     $scope.tipo_select = undefined;
     $scope.tipo_text = undefined;
     $scope.model ={};
+    $scope.model_in ={
+        volumen:{val:undefined,confirm:false},
+        peso:{val:undefined,confirm:false}
+    };
     $scope.copy ={};
-    $scope.containers = [{name:"20sd"},{name:"40sd"},{name:"40'ot"}];
+
+    $scope.containers = [
+        {name:"20sd",peso:100, volumen:150},
+        {name:"40sd",peso:200, volumen:250},
+        {name:"40' hc",peso:300, volumen:350},
+        {name:"40'ot",peso:400, volumen:450},
+    ];
     $scope.options ={form:false};
     $scope.select ={};
 
 
     //constructor
-    $scope.$parent.miniContainerCtrl = function(){
+    $scope.$parent.miniContainerCtrl = function(fn){
         $scope.containerForm.$setPristine();
         $scope.containerForm.$setUntouched();
         $scope.select ={};
+        $scope.model_in.peso.confirm= false;
         $mdSidenav("miniContainer").open().then(function(){
             $scope.isOpen= true;
-
-
             if($scope.$parent.shipment.containers.length == 0){
-
+                if(fn){
+                    fn($scope);
+                }
             }
         });
     };
 
+    $scope.outPeso = function () {
+        if(!$scope.containerForm.$pristine && $scope.model.peso && !$scope.model_in.peso.confirm && parseFloat($scope.model.peso) > $scope.tipo_select.peso){
+            $scope.$parent.NotifAction("alert","El peso del container excede el peso total del tipo de container selecionado ¿Esta seguro que es el peso correcto?",
+                [
+                    {name:"Si, estoy seguro", action:function ()
+                    {
+                        angular.element("#miniContainer #volumen").first().focus();
+                        $scope.model_in.peso.confirm= true;
+
+                    }
+                    },
+                    {name:"No, dejame corregirlo", action:function ()
+                    {
+                        angular.element("#miniContainer #peso").first().focus();
+                        $scope.model_in.peso.confirm= false;
+                    }
+                    }
+                ]
+                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"25", doc_id:$scope.$parent.shipment.id}}
+            );
+        }
+
+    };
+    $scope.outVolumen= function () {
+        if(!$scope.containerForm.$pristine && $scope.model.volumen && parseFloat($scope.model.volumen) > $scope.tipo_select.volumen){
+            $scope.$parent.NotifAction("alert","El volumen del container excede el volumen total del tipo de container selecionado ¿Esta seguro que  el volumen es  correcto?",
+                [
+                    {name:"Si, estoy seguro", action:function ()
+                    {
+                        $scope.save();
+                    }
+                    },
+                    {name:"No, dejame corregirlo", action:function ()
+                    {
+                        angular.element("#miniContainer #volumen").first().focus();
+                        $scope.model.volumen = angular.copy($scope.model_in.volumen);
+                    }
+                    }
+                ]
+                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"25", doc_id:$scope.$parent.shipment.id}});
+
+
+        }else{
+            $scope.save();
+        }
+
+    }
     // metodos
     $scope.close = function(){
         if($scope.options.form && !$scope.containerForm.$pristine ){
@@ -2266,9 +2324,10 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shi
 
 }]);
 
-MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment','setGetShipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource, $model){
+MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fileSrv','shipment','setGetShipment', function($scope,$mdSidenav,$timeout, $interval,fileSrv, $resource, $model){
     $scope.isOpen = false;
     $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
+    $scope.bindFiles = fileSrv.bin();
     //{{up:[}, size, estado:'waith'}
     //{estado:'wait',cu}
 
@@ -2305,109 +2364,50 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         }
     });
 
+    $scope.fileUp= function (file) {
+        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_mbl', embarque_id:$scope.$parent.shipment.id}, function (response) {
 
+        }, function (error) {
+            console.log("error", error);
+        });
+    };
 
     /**adjuntos**/
-    var interval = null;
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
-            $scope.cola.estado='uploading';
-            $scope.cola.cola = $scope.cola.cola + 1;
-            var pr =Object.create( $scope.asign($scope.files,"nro_mbl"));
-            $scope.cola.data.push(pr);
-            if(interval== null){
-                interval = $interval(function () {
-                    console.log("interval ",$scope.cola );
-                    var finisAll= true;
-                    angular.forEach($scope.cola.data,function (v, k) {
+            fileSrv.storage("orders");
+            fileSrv.setKey("miniMblCtrl");
+            angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+                $scope.$parent.shipment.nro_mbl.adjs.push(v);
+            });
+        }
+    });
 
-                        if(v.isFinish()){
-                            finisAll=true;
-                            console.log("filse fin", v)
-                            angular.forEach(v.getFilesUp(), function (sv,sf) {
-                                $scope.$parent.shipment.nro_mbl.adjs.push(sv);
-                            });
-                            if(v.getFilesError().length > 0){
-                                console.log("error subiendo archivos", v.getFilesError());
-                            }
-                        }
-                        if(v.getState() == 'waith'){
-                            console.log("waith", v);
-                            finisAll= false;
-                            v.start();
-                        }
-                        if(v.getState() == 'up'){
-                            finisAll= false;
-                            console.log("up", v);
-                        }
+    $scope.$watch('bindFiles.estado', function (newVal) {
+        if(fileSrv.getKey() == 'miniMblCtrl'){
+            var result = angular.copy(fileSrv.get());
+            if(newVal == 'finish'){
+                var texto = '';
+                //{succeces:[], error:[], total:[],upload:{}};
+                if(result.succeces.length > 0){
+                    texto += " Se agregaron "+result.succeces.length +" archivos";
+                }
+                if(result.error.length > 0){
+                    texto += " fallaron "+result.length +" archivos";
+                }
+                if(result.total.length > 0){
+                    texto += " de  "+result.total.length +" ";
+                }
+               if(texto.length > 1){
+                   $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+               }
 
-
-                    });
-                    if(finisAll){
-                        $scope.cola.estado='finish';
-                        $interval.cancel(interval);
-
-                        interval=  null;
-                    }
-                },500);
             }
         }
     });
-    $scope.asign = function (files, doc) {
-        var estado ="waith";
-        var filesUp = [];
-        var filesError = [];
-        var all =[];
-        var finish= false;
-        var asig = function (file) {
-            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
-                all.push({state:'good', file:response});
-                filesUp.push(response);
-                if(all.length == files.length){
-                    finish= true;
-                    estado= 'finish';
-                }
-            }, function (error) {
-                console.log("error", error);
-            })
-        };
-
-        return {
-            getState: function () {return estado;},
-            getFiles : function () {return files;},
-            getSize: function(){return files.length ;},
-            getFilesUp:function () {return filesUp;},
-            getFilesError : function(){return filesError},
-            isFinish : function () {return   finish},
-            getAll : function () {return   all},
-            start: function () {
-                estado =  'up';
-                filesSrv.setFolder("orders");
-                /*                var x = $timeout(function () {
-                 if(estado != 'fin'){
-                 estado='error';
-                 }
-                 },60000);*/
-                angular.forEach(files, function(v) {
-                    filesSrv.Upload({
-                        file: v,
-                        success: function (data) {
-                            asig(data);
-                        },
-                        error: function (data) {
-                            all.push({state:'bad', file:response});
-                            filesError.push(data);
-                            if(all.length== files.length){
-                                finish= true;
-                            }
-                        }
-                    })
-                });
-            }
 
 
-        }
-    }
+
     $scope.close= function(e){
         if($scope.isOpen){
             $mdSidenav("miniMbl").close().then(function(){
@@ -2418,7 +2418,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     };
 }]);
 
-MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment','setGetShipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource,$model){
+MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fileSrv','shipment','setGetShipment', function($scope,$mdSidenav,$timeout, $interval,fileSrv, $resource,$model){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
     $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
@@ -2433,6 +2433,14 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         $model.change("nro_hbl",id,val);
     };
 
+    $scope.fileUp= function (file) {
+        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_hbl', embarque_id:$scope.$parent.shipment.id}, function (response) {
+
+        }, function (error) {
+            console.log("error", error);
+        });
+    };
+
     $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
         if($scope.isOpen && !newVal[1]){
             $resource.post({type:"Save"},$scope.$parent.shipment, function (response) {
@@ -2441,106 +2449,38 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
         }
     });
     /**adjuntos**/
-    var interval = null;
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
-            $scope.cola.estado='uploading';
-            $scope.cola.cola = $scope.cola.cola + 1;
-            var pr =Object.create( $scope.asign($scope.files,"nro_hbl"));
-            $scope.cola.data.push(pr);
-            if(interval== null){
-                interval = $interval(function () {
-                    console.log("interval ",$scope.cola );
-                    var finisAll= true;
-                    angular.forEach($scope.cola.data,function (v, k) {
+            fileSrv.storage("orders");
+            fileSrv.setKey("miniHblCtrl");
+            angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+                $scope.$parent.shipment.nro_mbl.adjs.push(v);
+            });
+        }
+    });
 
-                        if(v.isFinish()){
-                            finisAll=true;
-                            console.log("filse fin", v)
-                            angular.forEach(v.getFilesUp(), function (sv,sf) {
-                                $scope.$parent.shipment.nro_hbl.adjs.push(sv);
-                            });
-                            if(v.getFilesError().length > 0){
-                                console.log("error subiendo archivos", v.getFilesError());
-                            }
-                        }
-                        if(v.getState() == 'waith'){
-                            console.log("waith", v);
-                            finisAll= false;
-                            v.start();
-                        }
-                        if(v.getState() == 'up'){
-                            finisAll= false;
-                            console.log("up", v);
-                        }
+    $scope.$watch('bindFiles.estado', function (newVal) {
+        if(fileSrv.getKey() == 'miniHblCtrl'){
+            var result = angular.copy(fileSrv.get());
+            if(newVal == 'finish'){
+                var texto = undefined;
+                //{succeces:[], error:[], total:[],upload:{}};
+                if(result.succeces.length > 0){
+                    texto += " Se agregaron "+result.succeces.length +" archivos";
+                }
+                if(result.error.length > 0){
+                    texto += " fallaron "+result.length +" archivos";
+                }
+                if(result.total.length > 0){
+                    texto += " de  "+result.total.length +" ";
+                }
+                if(texto){
+                    $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+                }
 
-
-                    });
-                    if(finisAll){
-                        $scope.cola.estado='finish';
-                        $interval.cancel(interval);
-
-                        interval=  null;
-                    }
-                },500);
             }
         }
     });
-    $scope.asign = function (files, doc) {
-        var estado ="waith";
-        var filesUp = [];
-        var filesError = [];
-        var all =[];
-        var finish= false;
-        var asig = function (file) {
-            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
-                all.push({state:'good', file:response});
-                filesUp.push(response);
-                if(all.length == files.length){
-                    finish= true;
-                    estado= 'finish';
-                }
-            }, function (error) {
-                console.log("error", error);
-            })
-        };
-
-        return {
-            getState: function () {return estado;},
-            getFiles : function () {return files;},
-            getSize: function(){return files.length ;},
-            getFilesUp:function () {return filesUp;},
-            getFilesError : function(){return filesError},
-            isFinish : function () {return   finish},
-            getAll : function () {return   all},
-            start: function () {
-                estado =  'up';
-                filesSrv.setFolder("orders");
-                /*                var x = $timeout(function () {
-                 if(estado != 'fin'){
-                 estado='error';
-                 }
-                 },60000);*/
-                angular.forEach(files, function(v) {
-                    filesSrv.Upload({
-                        file: v,
-                        success: function (data) {
-                            asig(data);
-                        },
-                        error: function (data) {
-                            all.push({state:'bad', file:response});
-                            filesError.push(data);
-                            if(all.length== files.length){
-                                finish= true;
-                            }
-                        }
-                    })
-                });
-            }
-
-
-        }
-    }
 
 
     $scope.close= function(){
@@ -2553,7 +2493,7 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     };
 }]);
 
-MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interval','filesService','shipment','setGetShipment', function($scope,$mdSidenav,$timeout, $interval,filesSrv, $resource,$model){
+MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interval','fileSrv','shipment','setGetShipment', function($scope,$mdSidenav,$timeout, $interval,fileSrv, $resource,$model){
     $scope.isOpen = false;
     $scope.data ={adjs:[]};
     $scope.cola ={estado:'waith', data :[], upload:0, cola:0};
@@ -2567,6 +2507,13 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     $scope.toEditHead= function(id,val){
         $model.change("nro_eaa",id,val);
     };
+    $scope.fileUp= function (file) {
+        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_eaa', embarque_id:$scope.$parent.shipment.id}, function (response) {
+
+        }, function (error) {
+            console.log("error", error);
+        });
+    };
 
     $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
         if($scope.isOpen && !newVal[1]){
@@ -2577,106 +2524,38 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
         }
     });
     /**adjuntos**/
-    var interval = null;
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
-            $scope.cola.estado='uploading';
-            $scope.cola.cola = $scope.cola.cola + 1;
-            var pr =Object.create( $scope.asign($scope.files,"nro_eaa"));
-            $scope.cola.data.push(pr);
-            if(interval== null){
-                interval = $interval(function () {
-                    console.log("interval ",$scope.cola );
-                    var finisAll= true;
-                    angular.forEach($scope.cola.data,function (v, k) {
+            fileSrv.storage("orders");
+            fileSrv.setKey("miniExpAduanaCtrl");
+            angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+                $scope.$parent.shipment.nro_mbl.adjs.push(v);
+            });
+        }
+    });
 
-                        if(v.isFinish()){
-                            finisAll=true;
-                            console.log("filse fin", v)
-                            angular.forEach(v.getFilesUp(), function (sv,sf) {
-                                $scope.$parent.shipment.nro_eaa.adjs.push(sv);
-                            });
-                            if(v.getFilesError().length > 0){
-                                console.log("error subiendo archivos", v.getFilesError());
-                            }
-                        }
-                        if(v.getState() == 'waith'){
-                            console.log("waith", v);
-                            finisAll= false;
-                            v.start();
-                        }
-                        if(v.getState() == 'up'){
-                            finisAll= false;
-                            console.log("up", v);
-                        }
+    $scope.$watch('bindFiles.estado', function (newVal) {
+        if(fileSrv.getKey() == 'miniExpAduanaCtrl'){
+            var result = angular.copy(fileSrv.get());
+            if(newVal == 'finish'){
+                var texto = undefined;
+                //{succeces:[], error:[], total:[],upload:{}};
+                if(result.succeces.length > 0){
+                    texto += " Se agregaron "+result.succeces.length +" archivos";
+                }
+                if(result.error.length > 0){
+                    texto += " fallaron "+result.length +" archivos";
+                }
+                if(result.total.length > 0){
+                    texto += " de  "+result.total.length +" ";
+                }
+                if(texto){
+                    $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+                }
 
-
-                    });
-                    if(finisAll){
-                        $scope.cola.estado='finish';
-                        $interval.cancel(interval);
-
-                        interval=  null;
-                    }
-                },500);
             }
         }
     });
-    $scope.asign = function (files, doc) {
-        var estado ="waith";
-        var filesUp = [];
-        var filesError = [];
-        var all =[];
-        var finish= false;
-        var asig = function (file) {
-            $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:doc, embarque_id:$scope.$parent.shipment.id}, function (response) {
-                all.push({state:'good', file:response});
-                filesUp.push(response);
-                if(all.length == files.length){
-                    finish= true;
-                    estado= 'finish';
-                }
-            }, function (error) {
-                console.log("error", error);
-            })
-        };
-
-        return {
-            getState: function () {return estado;},
-            getFiles : function () {return files;},
-            getSize: function(){return files.length ;},
-            getFilesUp:function () {return filesUp;},
-            getFilesError : function(){return filesError},
-            isFinish : function () {return   finish},
-            getAll : function () {return   all},
-            start: function () {
-                estado =  'up';
-                filesSrv.setFolder("orders");
-                /*                var x = $timeout(function () {
-                 if(estado != 'fin'){
-                 estado='error';
-                 }
-                 },60000);*/
-                angular.forEach(files, function(v) {
-                    filesSrv.Upload({
-                        file: v,
-                        success: function (data) {
-                            asig(data);
-                        },
-                        error: function (data) {
-                            all.push({state:'bad', file:response});
-                            filesError.push(data);
-                            if(all.length== files.length){
-                                finish= true;
-                            }
-                        }
-                    })
-                });
-            }
-
-
-        }
-    }
     $scope.close= function(){
         if($scope.isOpen){
             $mdSidenav("miniExpAduana").close().then(function(){
@@ -3857,7 +3736,119 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
     };
 });
 
+MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upload,$timeout,$interval,$filter) {
+    var folder = 'none';
+    var key = '';
+    var bin = {estado:'wait', data: undefined};
+    var upload =  {succeces:[], error:[], total:[],upload:{}};
+    var start = function () {
+        console.log("start", upload.upload)
+        angular.forEach( upload.upload, function (v, k) {
+            if(v.state == "wait"){
+                var copy = upFile;
+                copy(v);
+                return 0;
+            }
+        });
+        stop();
+    };
 
+    var stop= function () {
+        var stop = true;
+        angular.forEach( upload.upload, function (v, k) {
+            if(v.state == "wait" || v.state == 'load' ){
+                stop= false;
+                return 0;
+            }
+        });
+
+        if (stop){
+            bin.estado= 'finish';
+
+            $timeout(function () {
+                bin.estado= 'wait';
+                bin.data= undefined;
+                clear();
+            },500);
+
+        }
+
+    }
+    var upFile = function (file) {
+        if(file.fail){
+            delete file.fail;
+        }
+        $timeout(function () {
+            bin.data = file;
+            bin.estado = 'up';
+            var send = { folder:folder, file: file.file};
+            Upload.upload({
+                url: 'master/files/upload',
+                data :send
+            }).progress(function (evt) {
+                file.state = 'load';
+                file.up = parseInt(100.0 * evt.loaded / evt.total)
+            }).success(function (data, status, headers, config) {
+                file.state = 'up';
+                angular.forEach(data,function (v, k) {
+                    file[k]= v;
+                });
+                upload.total.push(file);
+                upload.succeces.push(file);
+                start();
+            }).error(function(){
+                upload.total.push(file);
+                upload.error.push(file);
+                file.state = 'fail';
+                start();
+            });
+        },50*file.index );
+    };
+    
+     var clear = function () {
+         folder = 'none';
+         key = '';
+         bin = {estado:'wait', data: undefined};
+         upload.succeces.splice(0,upload.succeces.length);
+         upload.error.splice(0,upload.error.length);
+         upload.total.splice(0,upload.total.length);
+         upload.upload = {};
+     };
+
+    return {
+        bin:function () {
+            return bin;
+        },
+        setKey: function (data) {
+            key= data;
+        },
+        getKey: function () {
+           return key;
+        },
+        upload : function (data) {
+            angular.forEach(data, function (v, k) {
+                var uid = Math.random();
+                upload.upload[uid]= {uid:uid,file:v, state:'wait', up:0 , index : k+1};
+            });
+            start();
+            return upload.upload;
+        },
+        upFile : upFile,
+        get: function () {
+            return upload;
+        }
+        ,storage : function (data) {
+            folder = data;
+        }
+        , clear : function () {
+
+            clear();
+        }
+
+
+
+    }
+}]);
 
 /*
  MyApp.service('setGet', function(DateParse, shipment) {
@@ -4003,6 +3994,54 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
  };
  });
  */
+
+MyApp.directive('vlThumb', function( fileSrv) {
+
+
+    return {
+        replace: true,
+        transclude: true,
+        scope:{
+            'model' : "=ngModel",
+            'up' : "=vlUp",
+            /*'fail' : "=vlFail",
+            'progress' : "=vlLoad"*/
+
+        },
+        link: function(scope, elem, attr, ctrl){
+
+            scope.$watch('model.state', function (newVal,oldVal) {
+                console.log("new val , ", scope.attr);
+                if(newVal == 'up'){
+                    delete scope.model.up;
+                    if( scope.up){
+                        scope.up(scope.model);
+                    }
+                }
+                if(newVal == 'fail'){
+                    scope.model.fail = true;
+                    /*if(scope.fail){
+                        scope.model
+                        //scope.fail(scope.model);
+                    }*/
+                }
+            });
+
+            scope.reinten = function (item) {
+                fileSrv.upFile(item);
+            }
+
+        },
+        template: function () {
+
+            return '<div layout="column"  layout-align="center center" style="background-color: rgba(88, 181, 234,{{( model.up)/100}}); height: 100%">'  +
+                '<img ng-src="images/thumbs/{{model.thumb}}"/>' +
+                ' <div style="position: absolute; vertical-align: middle;" ng-show="model.up">{{model.up}}%</div> ' +
+                ' <div style="position: absolute; vertical-align: bottom; background-color: #0a6ebd;" ng-show="model.fail" ng-click="reinten(model)">fail</div> ' +
+                '</div>'
+        }
+    };
+});
 MyApp.directive('gridOrderBy', function($timeout) {
 
     return {
@@ -4021,29 +4060,6 @@ MyApp.directive('gridOrderBy', function($timeout) {
     };
 });
 
-MyApp.directive('next', function($timeout,$mdSidenav) {
-    return {
-        replace: true,
-        transclude: true,
-        scope:{
-            'model' : "=ngModel"
-        },
-        link: function(scope, elem, attr, ctrl){
-            scope.showNext = function (status) {
-                if (status) {
-                    $mdSidenav("NEXT").open();
-                } else {
-                    $mdSidenav("NEXT").close()
-                }
-            };
-        },
-        template: function(elem, attr){
-            return '<md-sidenav style=\'margin-top:96px;margin-bottom:48px;width:96px; background-color: transparent;background-image: url(\'images/btn_backBackground.png\');z-index: 100;\'' +
-                'layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" id="NEXT" ng-mouseleave="showNext(false)" ng-click="next()" click-out="showNext(false)">' +
-                '<?= HTML::image("images/btn_nextArrow.png")></md-sidenav>';
-        }
-    };
-});
 /**
 
  <div layout="row" layout-align="end center" class="table-filter ng-isolate-scope layout-align-end layout-column ng-valid" ng-click="test()" ng-model="tbl" key="emision" role="button" tabindex="0" aria-invalid="false" style="margin-left: -8px;">

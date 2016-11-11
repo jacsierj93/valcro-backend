@@ -48,10 +48,10 @@ window.addEventListener("keydown", function(e) {
 
 MyApp.config(function ($provide, $httpProvider) {
 
-/*    localStorageServiceProvider
-        .setStorageType('localStorage')
-        .setDefaultToCookie(false);
-    */
+    /*    localStorageServiceProvider
+     .setStorageType('localStorage')
+     .setDefaultToCookie(false);
+     */
 
     $httpProvider.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
@@ -70,7 +70,7 @@ MyApp.config(function ($provide, $httpProvider) {
             // On request failure
             requestError: function (rejection) {
                 // console.log(rejection); // Contains the data about the error on the request.
-          //      console.log("request ", rejection);
+                //      console.log("request ", rejection);
                 // Return the promise rejection.
                 return $q.reject(rejection);
             },
@@ -85,9 +85,9 @@ MyApp.config(function ($provide, $httpProvider) {
             // On response failture
             responseError: function (rejection) {
                 // console.log(rejection); // Contains the data about the error.
-                    if(rejection.status == 401){
-                        location.replace(path +'login');
-                    }
+                if(rejection.status == 401){
+                    location.replace(path +'login');
+                }
                 // Return the promise rejection.
                 return $q.reject(rejection);
             }
@@ -96,7 +96,7 @@ MyApp.config(function ($provide, $httpProvider) {
 
     // Add the interceptor to the $httpProvider.
     $httpProvider.interceptors.push('MyHttpInterceptor');
-   // $locationProvider.html5Mode(true);
+    // $locationProvider.html5Mode(true);
 
 
 });
@@ -121,15 +121,15 @@ MyApp.config(function($mdDateLocaleProvider) {
 //##############################REST service (factory)#############################################3
 //###########################################################################################3
 /*
-MyApp.factory('masters', ['$resource',
-    function ($resource) {
-        return $resource('master/:type/:id', {}, {
-            query: {method: 'GET', params: {type: "",id:""}, isArray: true}
-        });
-    }
-]);
+ MyApp.factory('masters', ['$resource',
+ function ($resource) {
+ return $resource('master/:type/:id', {}, {
+ query: {method: 'GET', params: {type: "",id:""}, isArray: true}
+ });
+ }
+ ]);
 
-*/
+ */
 
 MyApp.factory('masters', ['$resource',
     function ($resource) {
@@ -183,13 +183,13 @@ MyApp.directive('global', function (Layers, setNotif) {
             scope.module= Layers.getModule();
             scope.LayersAction = Layers.setAccion;
             scope.NotifAction = setNotif.addNotif;
-           /* scope.scrollTo = function(newHash){
-                if ($location.hash() !== newHash) {
-                    $location.hash(newHash);
-                } else {
-                    $anchorScroll();
-                }
-            }*/
+            /* scope.scrollTo = function(newHash){
+             if ($location.hash() !== newHash) {
+             $location.hash(newHash);
+             } else {
+             $anchorScroll();
+             }
+             }*/
         }
     };
 });
@@ -290,23 +290,28 @@ MyApp.directive('decimal', function () {
 
 
                 var key = window.Event ? e.which : e.keyCode;
+                console.log("key", key);
 
                 if(!((key >= 48 && key <= 57) || (key==8)  || (key >= 96 && key <= 105
-                    || key == 188 || key == 190 ||key == 110 || key == 17 || key == 16 || key == 20 || key == 93 || key == 225)
-                    || (key >= 112 && key <= 123)
+                        || key == 188 || key == 190 ||key == 110 || key == 17 || key == 16 || key == 20 || key == 93 || key == 225)
+                        || (key >= 112 && key <= 123)
                     )   ){
-                    e.preventDefault();
+                    if(key != 13){
+                        // e.preventDefault();
+                    }
+
+
                 }
             });
 
-            ctrl.$validators.decimal = function(modelValue, viewValue) {
-                if(viewValue === undefined || viewValue=="" || viewValue==null){
-                    return true;
-                }
-                var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
+            /*ctrl.$validators.decimal = function(modelValue, viewValue) {
+             if(viewValue === undefined || viewValue=="" || viewValue==null){
+             return true;
+             }
+             var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
 
-                return !(num === null)
-            };
+             return !(num === null)
+             };*/
 
         }
     };
@@ -322,9 +327,9 @@ MyApp.directive('chip', function ($timeout) {
                     x = elem.next();
                     if(x.length>0){
                         x.focus().click();
-                     }else{
+                    }else{
                         elem.parent().find("[chip]").first().focus().click();
-                     }
+                    }
                 }else if(e.which=="37"){
                     x = elem.prev();
                     if(x.length>0 && !x.is("#valNameContainer")){
@@ -467,7 +472,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         },elem);
                     }
                 }else{
-                    
+
                     if(scope.endLayer){
                         scope.endLayer(function(elem){
                             angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
@@ -520,7 +525,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         if(!angular.element("#lyrAlert").hasClass("md-closed")){
                             scope.$parent.prevFocus = angular.element(":focus");
                             if(angular.element("#lyrAlert").find(".alertTextOpcs:visible").length > 0){
-                               var focus =angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first();
+                                var focus =angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first();
                                 angular.element(focus).focus();
                             };
                         }
@@ -535,7 +540,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 MyApp.directive('skipNotif', function ($compile,$timeout) {
     return {
         /*priority: 1001,
-        terminal:true,*/
+         terminal:true,*/
         link: function (scope, element, attrs) {
             element.bind("keydown",function(e){
                 if(e.which=="39"){
@@ -696,10 +701,21 @@ MyApp.directive('range', function () {
         restrict: 'A',
         require: 'ngModel',
         link: function (scope, elem, attrs, ctrl) {
-            /*        console.log("atttr", attrs);
-             console.log("atttr", elem);
-             console.log("escope", scope);
-             console.log("ctrol", ctrl);*/
+/*            console.log("atttr", attrs);
+            console.log("atttr", elem);
+            console.log("escope", scope);
+            console.log("ctrol", ctrl);*/
+            elem.bind("keydown",function(e){
+                var key = window.Event ? e.which : e.keyCode;
+                if(!((key >= 48 && key <= 57) || (key==8)  || (key >= 96 && key <= 105
+                        || key == 188 || key == 190 ||key == 110 || key == 17 || key == 16 || key == 20 || key == 93 || key == 225)
+                        || (key >= 112 && key <= 123)
+                    )   ){
+                    if(key != 13){
+                        e.preventDefault();
+                    }
+                }
+            });
             var validate = false;
             attrs.$observe('range', function(range){
                 if(range == "true" ){
@@ -715,19 +731,14 @@ MyApp.directive('range', function () {
                         ctrl.$render();
                         ctrl.$setViewValue("0");
                         ctrl.$render();
-
-
                     }
                 }
-
             });
-
-
             ctrl.$validators.range = function(modelValue, viewValue) {
                 if(validate == true){
                     var paso= validateRange(viewValue,attrs.minval,attrs.maxval);
                     if(!paso){
-                        elem[0].focus();
+                      //  elem[0].focus();
                     }
                     return paso;
                 }
@@ -751,9 +762,9 @@ MyApp.directive('rowSelect', function () {
                     var focus = angular.element(prev).find(".cellSelect");
                     focus[0].focus();
                 }else if(e.which=="13"){
-                   /* $timeout(function(){
-                        angular.element(elem).click();
-                    },0)*/
+                    /* $timeout(function(){
+                     angular.element(elem).click();
+                     },0)*/
                 }
             })
 
@@ -872,14 +883,14 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
     //###########################################################################################3
     //$scope.toggleLeft = buildToggler('left');
 
-   /* $scope.toggleRight = buildToggler('right');
-    $scope.toggleOtro = buildToggler('otro');
-    function buildToggler(navID) {
-        return function() {
-            // Component lookup should always be available since we are not using `ng-if`
-            $mdSidenav(navID).toggle();
-        }
-    }*/
+    /* $scope.toggleRight = buildToggler('right');
+     $scope.toggleOtro = buildToggler('otro');
+     function buildToggler(navID) {
+     return function() {
+     // Component lookup should always be available since we are not using `ng-if`
+     $mdSidenav(navID).toggle();
+     }
+     }*/
     //###########################################################################################3
     //###########################################################################################3
     //###########################################################################################3
@@ -986,7 +997,7 @@ MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource'
                     url: 'master/files/upload',
                     data :{ folder:filesService.getFolder(),file: file}
                 }).progress(function (evt) {
-                   // progress=evt.loaded;
+                    // progress=evt.loaded;
                     uploaded = parseInt(100.0 * evt.loaded / evt.total)
 
                     //$scope.progress = ($scope.cola.terminados.length != $scope.cola.total)?(($scope.cola.terminados.length*100) + uploaded) / $scope.cola.total:($scope.cola.terminados.length*100)/$scope.cola.total;
@@ -1114,7 +1125,7 @@ MyApp.service('App' ,[function(){
             msm =data;
         },
         getMsm: function(){
-        return  msm;
+            return  msm;
         },
         clearMsm : function(){
             msm= {}
@@ -1126,7 +1137,7 @@ MyApp.service('App' ,[function(){
             bindBloc.value=data;
         },
         getBindBloc: function(){
-           return bindBloc;
+            return bindBloc;
         }
 
     }
@@ -1290,87 +1301,87 @@ MyApp.service('Layers' , function(){
  }]);*/
 
 /*
-MyApp.controller('ListProv', function ($scope,$http) {
-    $http({
-        method: 'POST',
-        url: 'proveedores/provList'
-    }).then(function successCallback(response) {
-        $scope.todos = response.data;
-    }, function errorCallback(response) {
-        console.log("errorrr");
-    });
+ MyApp.controller('ListProv', function ($scope,$http) {
+ $http({
+ method: 'POST',
+ url: 'proveedores/provList'
+ }).then(function successCallback(response) {
+ $scope.todos = response.data;
+ }, function errorCallback(response) {
+ console.log("errorrr");
+ });
 
-});
-*/
+ });
+ */
 
 
 
 
 /*function DemoCtrl1 ($timeout, $q, $log) {
-    var self = this;
-    self.simulateQuery = false;
-    self.isDisabled    = false;
-    // list of `state` value/display objects
-    self.states        = loadAll();
-    self.querySearch   = querySearch;
-    self.selectedItemChange = selectedItemChange;
-    self.searchTextChange   = searchTextChange;
-    self.newState = newState;
-    function newState(state) {
-        alert("Sorry! You'll need to create a Constituion for " + state + " first!");
-    }
-    // ******************************
-    // Internal methods
-    // ******************************
-    /!**
-     * Search for states... use $timeout to simulate
-     * remote dataservice call.
-     *!/
-    function querySearch (query) {
-        var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
-            deferred;
-        if (self.simulateQuery) {
-            deferred = $q.defer();
-            $timeout(function () { deferred.resolve( results ); }, Math.random() * 1000, false);
-            return deferred.promise;
-        } else {
-            return results;
-        }
-    }
-    function searchTextChange(text) {
-        $log.info('Text changed to ' + text);
-    }
-    function selectedItemChange(item) {
-        $log.info('Item changed to ' + JSON.stringify(item));
-    }
-    /!**
-     * Build `states` list of key/value pairs
-     *!/
-    function loadAll() {
-        var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
-              Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana,\
-              Maine, Maryland, Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,\
-              Nebraska, Nevada, New Hampshire, New Jersey, New Mexico, New York, North Carolina,\
-              North Dakota, Ohio, Oklahoma, Oregon, Pennsylvania, Rhode Island, South Carolina,\
-              South Dakota, Tennessee, Texas, Utah, Vermont, Virginia, Washington, West Virginia,\
-              Wisconsin, Wyoming';
-        return allStates.split(/, +/g).map( function (state) {
-            return {
-                value: state.toLowerCase(),
-                display: state
-            };
-        });
-    }
-    /!**
-     * Create filter function for a query string
-     *!/
-    function createFilterFor(query) {
-        var lowercaseQuery = angular.lowercase(query);
-        return function filterFn(state) {
-            return (state.value.indexOf(lowercaseQuery) === 0);
-        };
-    }
-}*/
+ var self = this;
+ self.simulateQuery = false;
+ self.isDisabled    = false;
+ // list of `state` value/display objects
+ self.states        = loadAll();
+ self.querySearch   = querySearch;
+ self.selectedItemChange = selectedItemChange;
+ self.searchTextChange   = searchTextChange;
+ self.newState = newState;
+ function newState(state) {
+ alert("Sorry! You'll need to create a Constituion for " + state + " first!");
+ }
+ // ******************************
+ // Internal methods
+ // ******************************
+ /!**
+ * Search for states... use $timeout to simulate
+ * remote dataservice call.
+ *!/
+ function querySearch (query) {
+ var results = query ? self.states.filter( createFilterFor(query) ) : self.states,
+ deferred;
+ if (self.simulateQuery) {
+ deferred = $q.defer();
+ $timeout(function () { deferred.resolve( results ); }, Math.random() * 1000, false);
+ return deferred.promise;
+ } else {
+ return results;
+ }
+ }
+ function searchTextChange(text) {
+ $log.info('Text changed to ' + text);
+ }
+ function selectedItemChange(item) {
+ $log.info('Item changed to ' + JSON.stringify(item));
+ }
+ /!**
+ * Build `states` list of key/value pairs
+ *!/
+ function loadAll() {
+ var allStates = 'Alabama, Alaska, Arizona, Arkansas, California, Colorado, Connecticut, Delaware,\
+ Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana,\
+ Maine, Maryland, Massachusetts, Michigan, Minnesota, Mississippi, Missouri, Montana,\
+ Nebraska, Nevada, New Hampshire, New Jersey, New Mexico, New York, North Carolina,\
+ North Dakota, Ohio, Oklahoma, Oregon, Pennsylvania, Rhode Island, South Carolina,\
+ South Dakota, Tennessee, Texas, Utah, Vermont, Virginia, Washington, West Virginia,\
+ Wisconsin, Wyoming';
+ return allStates.split(/, +/g).map( function (state) {
+ return {
+ value: state.toLowerCase(),
+ display: state
+ };
+ });
+ }
+ /!**
+ * Create filter function for a query string
+ *!/
+ function createFilterFor(query) {
+ var lowercaseQuery = angular.lowercase(query);
+ return function filterFn(state) {
+ return (state.value.indexOf(lowercaseQuery) === 0);
+ };
+ }
+ }*/
 
 /******************* Agregado por miguel, convertidor de date de la base de datos  *******************/
 
