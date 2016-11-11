@@ -205,14 +205,15 @@
             <input type="hidden" md-autofocus>
             <div layout="row" flex>
                 <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
-                    <div flex="30" layout="column" ng-controller="formPreview">
+                    <div style="width:440px;padding:8px" layout="column" ng-controller="formPreview">
                         <form name="LineProd" layout="row" class="focused" >
                             <div active-left></div>
                             <div flex layout="column">
-                                <div class="titulo_formulario" layout="column" layout-align="start start">
+                                <div class="titulo_formulario" layout="row" layout-align="start start" flex>
                                     <div>
-                                        Vista previa Formulario
+                                        Linea
                                     </div>
+                                    <div style="width: 24px; font-size:24px;" ng-click="openConstruct()">+</div>
                                 </div>
 
                                 <md-content layout="column" style="margin: 0px 4px 0px 4px">
@@ -225,7 +226,8 @@
                             </div>
                         </form>
                     </div>
-                    <div flex="15" layout="column" class="md-whiteframe-2dp" >
+                    <div flex></div>
+                    <!--<div flex="15" layout="column" class="md-whiteframe-2dp" >
                         <md-content style="margin: 0 8px 0 8px !important;">
                             <div ng-repeat="field in fields" class="row" ng-class="{'rowSel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                 <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
@@ -239,7 +241,7 @@
                             </div>
                         </md-content>
                     </div>
-                    <div flex layout="column" class="md-whiteframe-2dp">
+                    <div flex layout="column" class="md-whiteframe-2dp" style="padding:8px;">
                         <div flex>
                             <div class="titulo_formulario" layout="column" layout-align="start start">
                                 <div ng-click="show()">
@@ -247,15 +249,44 @@
                                 </div>
                             </div>
                             <div flex>
-                                <form name="optionsForm">
-                                    <div ng-repeat="opcion in options" class="row" ng-init="inicialize(opcion)" >
-                                        <md-input-container class="md-block" flex>
-                                            <label>{{opcion.descripcion}}</label>
-                                            <input skip-tab
-                                                   ng-focus="checkSave()"
-                                                   ng-model="opcValue[opcion.descripcion].valor"
-                                                   id="{{field.id}}">
-                                        </md-input-container>
+                                <form name="optionsForm" layout="column">
+                                    <div ng-repeat="opcion in options" ng-init="inicialize(opcion)" style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                        <div layout="column" class="optHolder" ng-show="opcion.descripcion == 'Requerido'" flex tabindex="0" id="{{opcion.descripcion}}">
+                                            <md-input-container class="md-block" flex>
+
+                                                <md-switch ng-model="opcValue[opcion.descripcion].valor"
+                                                           ng-blur="checkSave($event)"
+                                                >
+                                                    {{opcion.descripcion}}
+                                                </md-switch>
+                                            </md-input-container>
+                                            <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
+                                                <label>{{opcion.descripcion}} mensaje</label>
+                                                <input skip-tab
+                                                       ng-model="opcValue[opcion.descripcion].msg"
+                                                       ng-blur="checkSave($event)"
+                                                      >
+                                            </md-input-container>
+                                        </div>
+
+                                        <div layout="column" class="optHolder" ng-show="opcion.descripcion != 'Requerido'" tabindex="0" id="{{opcion.descripcion}}">
+                                            <md-input-container class="md-block" flex>
+                                                <label>{{opcion.descripcion}}</label>
+                                                <input skip-tab
+                                                       ng-model="opcValue[opcion.descripcion].valor"
+                                                       ng-blur="checkSave($event)"
+                                                       >
+                                            </md-input-container>
+                                            <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
+                                                <label>{{opcion.descripcion}} mensaje</label>
+                                                <input skip-tab
+                                                       ng-model="opcValue[opcion.descripcion].msg"
+                                                       ng-blur="checkSave($event)"
+                                                       >
+                                            </md-input-container>
+                                        </div>
+
+
                                     </div>
                                 </form>
 
@@ -263,9 +294,112 @@
 
                         </div>
 
-                    </div>
+                    </div>-->
                 </md-content>
             </div>
         </md-sidenav>
+
+        <div>
+            <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 736px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst1" >
+                <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+
+                <input type="hidden" md-autofocus>
+                <div layout="row" flex>
+                    <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
+
+                        <div style="width:192px;" layout="column" >
+                            <md-content style="margin: 0 8px 0 8px !important;">
+                                <div ng-repeat="field in fields" class="row" ng-class="{'rowSel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                    <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
+                                </div>
+                            </md-content>
+                        </div>
+                        <div flex ></div>
+                    </md-content>
+                </div>
+            </md-sidenav>
+            <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 928px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst2" >
+                <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+
+                <input type="hidden" md-autofocus>
+                <div layout="row" flex>
+                    <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
+
+                        <div style="width:192px;" layout="column" >
+                            <md-content style="margin: 0 8px 0 8px !important;">
+                                <div ng-repeat="type in tipos" ng-class="{'rowSel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                    <div ng-click="createField(type,'type')" >{{type.descripcion}}</div>
+                                </div>
+                            </md-content>
+                        </div>
+                        <div flex ></div>
+                    </md-content>
+                </div>
+            </md-sidenav>
+            <md-sidenav  style="margin-top:96px; margin-bottom:48px; width:calc(100% - 1120px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst3" >
+                <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+
+                <input type="hidden" md-autofocus>
+                <div layout="row" flex>
+                    <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
+                        <div flex layout="column" style="padding:8px;">
+                            <div flex>
+                                <div class="titulo_formulario" layout="column" layout-align="start start">
+                                    <div ng-click="show()">
+                                        Opciones
+                                    </div>
+                                </div>
+                                <div flex>
+                                    <form name="optionsForm" layout="column">
+                                        <div ng-repeat="opcion in options" ng-init="inicialize(opcion)" style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                            <div layout="column" class="optHolder" ng-show="opcion.descripcion == 'Requerido'" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <md-input-container class="md-block" flex>
+
+                                                    <md-switch ng-model="opcValue[opcion.descripcion].valor"
+                                                               ng-blur="checkSave($event)"
+                                                    >
+                                                        {{opcion.descripcion}}
+                                                    </md-switch>
+                                                </md-input-container>
+                                                <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
+                                                    <label>{{opcion.descripcion}} mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue[opcion.descripcion].msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+
+                                            <div layout="column" class="optHolder" ng-show="opcion.descripcion != 'Requerido'" tabindex="0" id="{{opcion.descripcion}}">
+                                                <md-input-container class="md-block" flex>
+                                                    <label>{{opcion.descripcion}}</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue[opcion.descripcion].valor"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                                <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
+                                                    <label>{{opcion.descripcion}} mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue[opcion.descripcion].msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+
+
+                                        </div>
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </md-content>
+                </div>
+            </md-sidenav>
+
+        </div>
     </div>
 </div>

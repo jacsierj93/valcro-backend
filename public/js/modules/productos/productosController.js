@@ -46,7 +46,6 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
     };
     $scope.curLine = critForm.getLine();
     $scope.filtAvaiable = function(c,v){
-        console.log(c,v)
         return c.hasCrit == v;
     };
 
@@ -71,6 +70,8 @@ MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidena
                         linea:$scope.newLine.name,
                         siglas:$scope.newLine.letter
                     });
+                    setNotif.addNotif("ok", "Nueva Linea Creada", [
+                    ],{autohidden:3000});
                 }else{
                    var line = $filter("filterSearch")($scope.listLines ,[data.id])[0];
                     line.linea = $scope.newLine.name;
@@ -105,14 +106,18 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             opc_id:obj.id,
             field_id:$scope.critField.id,
             id:false,
-            valor:''
+            valor:'',
+            msg:''
         }
 
     };
 
-    $scope.checkSave = function(){
-        
-         saveOptions($scope.opcValue)
+    $scope.checkSave = function(e){
+        var id = angular.element(e.currentTarget).parents(".optHolder").first().attr("id");
+        if(angular.element(e.relatedTarget).parents("#"+id).length!=0){
+           return false;
+        }
+        saveOptions($scope.opcValue)
     };
 
     var saveOptions = function(datos){
@@ -139,6 +144,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                 $scope.opcValue[key].opc_id=v.pivot.opc_id;
                 $scope.opcValue[key].field_id=v.pivot.lct_id;
                 $scope.opcValue[key].valor=v.pivot.value;
+                $scope.opcValue[key].msg=v.pivot.message;
             })
         },1000)
 
@@ -233,10 +239,22 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 
 
 
-MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm',function ($scope, setNotif, masters,critForm) {
+MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout) {
     $scope.criteria = critForm.get();
     $scope.setEdit = function(campo){
         critForm.setEdit(campo);
+        $scope.openConstruct()
+    }
+
+    $scope.openConstruct = function(){
+        $mdSidenav("lyrConst1").open()
+        $timeout(function(){
+            $mdSidenav("lyrConst2").open()
+        },250)
+        $timeout(function(){
+            $mdSidenav("lyrConst3").open()
+        },500)
+
     }
 }]);
 

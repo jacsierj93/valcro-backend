@@ -108,7 +108,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
                 //$scope.block++;
                 $timeout(function(){
                     angular.element("#lyrAlert").find(".alertTextOpcs:visible > div").first().focus();
-                },10);
+                },50);
 
             }
             if("inputTitle" in params){

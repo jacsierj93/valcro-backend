@@ -105,7 +105,8 @@ class CritController extends BaseController
 
             if($rq['id']){
                 $opt = Options::find($rq['id']);
-                if($opt->value == $rq['valor']){
+                
+                if($opt->value == $rq['valor'] && $opt->message == $rq['msg']){
                     continue;
                 }
                 $ret[$k]["action"]="upd";
@@ -115,6 +116,7 @@ class CritController extends BaseController
             $opt->lct_id = $rq['field_id'];
             $opt->opc_id = $rq['opc_id'];
             $opt->value = $rq['valor'];
+            $opt->message = $rq['msg'];
 
             $opt->save();
             $ret[$k]["id"] = $opt->id;
