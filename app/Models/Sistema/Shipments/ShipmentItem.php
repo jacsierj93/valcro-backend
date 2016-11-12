@@ -16,6 +16,10 @@ class ShipmentItem extends Model
     protected $table = "tbl_embarque_item";
     protected $dates = ['deleted_at'];
 
+    public function order_item(){
+        return $this->belongsTo('App\Models\Sistema\Purchase\PurchaseItem', 'origen_item_id');
+    }
+
 
 
 

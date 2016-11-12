@@ -3,8 +3,10 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     //?review
     filesService.setFolder('orders');
 
+    $scope.list ='provider';
+
+    $scope.paisSelec = undefined;
     $scope.alerts =[];
-    //$scope.provSelec =undefined;
     $scope.provs =[];
     $scope.paises =[];
     $scope.shipment ={objs:{}};
@@ -13,7 +15,15 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.permit={
         created:true
     };
-    $resource.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
+    $timeout(function () {
+        $resource.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
+    },0);
+
+    $timeout(function () {
+        $resource.query({type:"Country"}, {}, function(response){$scope.paises= response; });
+    },0);
+
+
 
     $scope.search = function(){
         var data =[];
@@ -27,17 +37,19 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
         if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
             $scope.provSelec = prov;
-            $scope.listShipmentCtrl(prov);
+            $scope.shipment.prov_id= prov.id;
+            $scope.listShipmentCtrl({prov_id: prov.id});
         }else if($scope.module.layer == 'detailShipment' && !$scope.session.isblock){
             console.log("scope", $scope);
             if(!$scope.shipment.pais_id){
                 $scope.provSelec= prov;
+                $scope.shipment.prov_id= prov.id;
                 $scope.save();
             }else {
                 $model.setNext(function () {
                     $scope.LayersAction({close:{all:true, after:function () {
                         $scope.provSelec = prov;
-                        $scope.listShipmentCtrl(prov);
+                        $scope.listShipmentCtrl({prov_id: prov.id});
                     }}})
 
                 });
@@ -50,6 +62,44 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                 $scope.LayersAction({close:{all:true, after:function () {
                     $scope.provSelec = prov;
                     $scope.listShipmentCtrl(prov);
+                }}})
+
+            });
+            $model.exit();
+
+        }
+
+    };
+
+
+    $scope.setPais = function(pais){
+
+        if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
+            $scope.paisSelec = pais;
+            $scope.shipment.pais_id= pais.id;
+            $scope.listShipmentCtrl({pais_id: pais.id});
+        }else if($scope.module.layer == 'detailShipment' && !$scope.session.isblock){
+
+            console.log("scope", $scope);
+            if(!$scope.shipment.tarifa_id){
+                $scope.paisSelec= pais;
+                $scope.shipment.pais_id= pais.id;
+                $scope.save();
+            }else {
+                $model.setNext(function () {
+                    $scope.LayersAction({close:{all:true, after:function () {
+                        $scope.paisSelec= pais;
+                        $scope.listShipmentCtrl({pais_id: pais.id});
+                    }}})
+                });
+                $model.exit();
+            }
+        }else{
+
+            $model.setNext(function () {
+                $scope.LayersAction({close:{all:true, after:function () {
+                    $scope.paisSelec= pais;
+                    $scope.listShipmentCtrl({pais_id: pais.id});
                 }}})
 
             });
@@ -222,10 +272,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     };
 
 
-    $scope.exitSet = function (next, back) {
-
-    }
-
     $scope.unblock = function (id) {
         console.log("inblock", id);
         $scope.session.isblock =false;
@@ -268,6 +314,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $timeout(function () {
                 $model.clear();
                 $scope.provSelec= undefined;
+                $scope.paisSelec= undefined;
                 $scope.session.global = 'new';
                 $scope.session.isblock = true;
             },0);
@@ -351,20 +398,16 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }
     }
 
-    // menu
 
-    // menu rigth
-    $scope.isOpenmenuRigth = false;
-    $scope.toggleMenurigth = function (width) {
-        var expand = angular.element("#expand-rigth");
-        if( $scope.isOpenmenuRigth){
-            expand.animate({width:width+'px'},500);
-            $scope.isOpenmenuRigth= true;
+    $scope.FilterLateral = function(){
+        if(!$scope.showLateralFilter){
+            angular.element("#menu").animate({height:"258px"},500);
+            $scope.showLateralFilter=true;
         }else{
-            expand.animate({width:'0px'},500);
-            $scope.isOpenmenuRigth= false;
+            angular.element("#menu").animate({height:"48px"},500);
+            $scope.showLateralFilter=false;
         }
-    }
+    };
 
 }]);
 
@@ -375,20 +418,24 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         data:[]
     };
 
-    $scope.load = function (prov) {
+    $scope.load = function (data) {
         $scope.tbl.data.splice(0, $scope.tbl.data.length);
-        $resource.query({type:"Shipments",prov_id: prov.id},{}, function (response) {
+        var send = {type:"Shipments" };
+        angular.forEach(data, function (v, k) {
+            send[k]= v;
+        })
+        $resource.query(send,{}, function (response) {
             angular.forEach(response, function (v, k) {
                 $scope.tbl.data.push(v);
             })
         })
     };
 
-    $scope.$parent.listShipmentCtrl = function(prov, fn){
+    $scope.$parent.listShipmentCtrl = function(data, fn){
 
 
         $scope.LayersAction({search:{name:"listShipment", after: function () {
-            $scope.load(prov);
+            $scope.load(data);
             if(fn){
                 fn();
             }
@@ -553,6 +600,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
 
         $scope.provSelec = newVal;
     });
+
 
     $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
         if(!newVal[1]){
@@ -1230,13 +1278,15 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
 
         }
     });
+    $scope.$watch("$parent.paisSelec", function(newVal){
+        $scope.pais_idSelec =  newVal;
+
+    });
     $scope.$watch("pais_idSelec", function (newVal) {
-        if(newVal && $scope.$parent.module.layer == 'listTariff'){
+        if(newVal ){
             $scope.puerto_idText  = undefined;
             $scope.tbl.data.splice(0,  $scope.tbl.data.length);
             $scope.$parent.save();
-
-
         }
         if( $scope.$parent.module.layer == 'listTariff'){
             $model.change('tarifa', 'pais_id',(newVal) ? newVal.id: undefined);
@@ -2605,6 +2655,109 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
 
     };
 }]);
+
+//
+MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$interval','fileSrv','shipment','setGetShipment',
+    function($scope,$mdSidenav,$timeout, $interval,fileSrv, $resource,$model){
+        $scope.bindFiles = fileSrv.bin();
+        $scope.$parent.miniCancelShipment = function () {
+            $scope.model = {adjs:[]};
+            $mdSidenav("miniCancelShipment").open().then(function(){
+                $scope.isOpen = true;
+            });
+        };
+
+        $scope.$watch('files.length', function(newValue){
+            if(newValue > 0){
+                fileSrv.storage("orders");
+                fileSrv.setKey("miniCancelShipmentCtrl");
+                angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+                    $scope.model.adjs.push(v);
+                });
+            }
+        });
+
+        $scope.$watch('bindFiles.estado', function (newVal) {
+            if(fileSrv.getKey() == 'miniCancelShipmentCtrl'){
+                var result = angular.copy(fileSrv.get());
+                if(newVal == 'finish'){
+                    var texto = '';
+                    //{succeces:[], error:[], total:[],upload:{}};
+                    if(result.succeces.length > 0){
+                        texto += " Se agregaron "+result.succeces.length +" archivos";
+                    }
+                    if(result.error.length > 0){
+                        texto += " fallaron "+result.error.length +" archivos";
+                    }                if(result.total.length > 0){
+                        texto += " de  "+result.total.length +" ";
+                    }
+                    if(texto.length > 1){
+                        $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+                    }
+
+                }
+            }
+        });
+        $scope.inClose = function () {
+            $mdSidenav("miniCancelShipment").close().then(function(){
+                $scope.isOpen = false;
+            });
+        };
+
+        $scope.close = function () {
+            if( $scope.isOpen){
+                if(!$scope.form.$pristine){
+                    if($scope.form.$valid){
+                        $scope.save();
+                    }else{
+                        $scope.$parent.NotifAction("alert", "No se agrego el motivo de cancelacion",
+                            [
+                                {name:"Corregir", action:function () {}},
+                                {name:"Cancelar", action:function (){$scope.inClose();}
+                                }
+                            ]
+                            ,{block:true});
+
+                    }
+
+                }else{
+                    $scope.inClose();
+                }
+            }
+        };
+
+
+        $scope.send = function () {
+            $scope.model.id=$scope.$parent.shipment.id;
+            $resource.postMod({type:"Shipment", mod:"Cancel"},$scope.model, function (response) {
+                $scope.inClose();
+                $scope.$parent.NotifAction("ok", "Documento cancelado",[],{autohidden:2000});
+                if($scope.module.historia[1] == 'detailShipment'){
+                    $scope.LayersAction({close:{all:true}});
+                }else{
+                    $scope.LayersAction({close:{first:true, search:true}});
+                }
+
+            })
+        };
+        $scope.save = function () {
+
+            $scope.$parent.NotifAction("alert", " ¿Esta seguro de Cancelar el embarque? ",
+                [
+                    {name:"Si, estoy complemtamente seguro", action:
+                        function(){
+                            $scope.send();
+                        }
+                    },{name:"Cancelar", action:
+                    function(){
+
+                    }
+                }
+                ]
+                , {block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+        };
+
+    }]);
 
 MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','form', function($scope, DateParse,$resource, form){
     $scope.isOpen = false;

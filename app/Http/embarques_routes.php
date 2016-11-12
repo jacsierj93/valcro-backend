@@ -20,9 +20,15 @@ $app->post('embarques/Container/Delete', 'Embarques\EmbarquesController@DeleteCo
 $app->get('embarques/Provider', 'Embarques\EmbarquesController@getProvList');
 $app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 
+// country
+$app->get('embarques/Country', 'Embarques\EmbarquesController@getCountryList');
+
+
+
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
 $app->post('embarques/Shipment/Close', 'Embarques\EmbarquesController@closeShipment');
+$app->post('embarques/Shipment/Cancel', 'Embarques\EmbarquesController@cancelShipment');
 $app->get('embarques/Shipment/Items', 'Embarques\EmbarquesController@getShipmentItems');
 $app->get('embarques/Item/History', 'Embarques\EmbarquesController@getItemHistory');
 $app->get('embarques/Shipments', 'Embarques\EmbarquesController@getShipments');

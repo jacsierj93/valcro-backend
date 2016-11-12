@@ -73,7 +73,7 @@ class EmbarquesController extends BaseController
 
     /**documentos  con sesion abierta*/
     public function getUncloset(){
-        return json_encode(Shipment::whereNotNull('session_id')->get());
+        return json_encode(Shipment::whereNotNull('session_id')->whereNull('comentario_cancelacion')->get());
     }
 
 
@@ -184,6 +184,14 @@ return $html;
         }
         return $data;
     }
+
+    /************************* Countrye ***********************************/
+
+    public function getCountryList(){
+        $model  =  Country::selectRaw(' distinct tbl_pais.id, tbl_pais.short_name')->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )->get();
+        return $model;
+    }
+
 
     /************************* Order ***********************************/
 
@@ -775,8 +783,9 @@ return $html;
     }
 
     public  function  getShipments(Request $req){
-        return json_encode(Shipment::where('prov_id',$req->prov_id)->get());
+        return ($req->has('prov_id')) ? json_encode(Shipment::where('prov_id',$req->prov_id)->whereNull('comentario_cancelacion')->get()) :json_encode(Shipment::where('pais_id',$req->pais_id)->whereNull('comentario_cancelacion')->get());
     }
+
 
     public function saveShipment(Request $req){
         $return = ['accion'=>'new'];
@@ -1237,6 +1246,33 @@ return $html;
 
 
         return $this->shipmentDates($model->id);
+    }
+
+    public function cancelShipment (Request $req){
+        $model = Shipment::findOrfail($req->id);
+        $result = ['accion'=>'cancel'];
+
+        $model->comentario_cancelacion = $req->texto;
+
+        if($req->has('adjs')){
+            foreach ($req->adjs as $aux){
+                $att = new ShipmentAttachment();
+                $att->embarque_id= $model->id;
+                $att->documento ='cancelacion';
+                $att->archivo_id	 = $aux['id'];
+                $att->comentario	 = (array_key_exists('comentario', $aux) ? $aux['comentario'] : null );
+                $att->save();
+            }
+        }
+        $model->save();
+
+        foreach ($model->items()->where('tipo_origen_id', '23')->get() as $aux){
+            $it = $aux->order_item;
+            $it->saldo = floatval($it->saldo) + floatval($aux->cantidad);
+            $it->save();
+        }
+
+        return $result;
     }
 
 

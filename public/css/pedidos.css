@@ -161,19 +161,14 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .menuFilter{
     width: 192px;
     background-color: #f1f1f1;
-
     color: #999999;
 }
-
-.menu-expand-rigth{
-    position: absolute;
-    margin-left:174px;
-    height: 48px;
-    color :#b5b5b5;
+.menu-option{
+    height: 24px; margin-bottom: 8px;
+    border-bottom: solid 1.5px #b5b5b5;
 }
-.menu-expand-rigth div{
-     height: 48px;
-    background-color: #f1f1f1;
+.menu-option-selec{
+    border-bottom: solid 1.5px  rgb(84, 180, 234);
 }
 
 .btnMas{
@@ -384,6 +379,21 @@ md-sidenav .md-sidenav-right.md-locked-open{
 
 .adj-box-rigth  span{
     float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;
+}
+
+.drop-box-content{
+    padding: 2px; min-height: 56px;
+}
+
+.drop-box-content div.vlc-buttom{
+    width: 24px;
+    margin: 0 4px 0 -2px;
+    height: 50px;
+
+}
+
+textarea{
+    width: 100%; height: 100%; border: none; color:#9c9d9e;
 }
 .table-filter-order-by{
     margin-left: -8px;
