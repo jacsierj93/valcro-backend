@@ -24,6 +24,7 @@ use App\Models\Sistema\Tariffs\FreigthForwarder;
 use App\Models\Sistema\Tariffs\Naviera;
 use App\Models\Sistema\Tariffs\Tariff;
 use App\Models\Sistema\User;
+use  App\Models\Sistema\Product\ProductStorage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -1248,14 +1249,13 @@ return $html;
     public function createOnSaveProduct(Request $req){
         $Productmodel = new Product();
         $shipItemModel = new ShipmentItem();
+
         $result = ['accion'=>'new'];
-        $Productmodel->prov_id = $req->prov_id;
-        $Productmodel->linea_id = $req->linea_id;
-        $Productmodel->almacen_id = $req->almacen_id;
-        $Productmodel->codigo_profit = $req->codigo_profit;
-        $Productmodel->codigo_fabrica = $req->codigo_profit;
+        $Productmodel->codigo_fabrica = $req->codigo_fabrica;
         $Productmodel->descripcion = $req->descripcion;
-        $Productmodel->serie = $req->serie;
+        $Productmodel->prov_id = $req->prov_id;
+        $Productmodel->linea_id = ($req->linea_id == '0 ' ) ? null:$req->linea_id;
+
         $Productmodel->tipo_producto_id = 2;
 
         if($req->has('codigo')){
@@ -1270,6 +1270,8 @@ return $html;
             $Productmodel->precio = $req->precio;
 
         }
+
+
         $result['responseProd']= $Productmodel->save();
         $result['producto_id']= $Productmodel->id;
         $Productmodel= Product::find($Productmodel->id);;
@@ -1283,6 +1285,16 @@ return $html;
         $shipItemModel->tipo_origen_id =1;
 
         $result['responseItem']= $shipItemModel->save();
+
+        if($req->has('almcenes')){
+            foreach ($req->almcenes as $aux){
+                $alm = new ProductStorage();
+                $alm->producto_id = $Productmodel->id;
+                $alm->almacen_id= $aux['id'];
+                $alm->save();
+
+            }
+        }
         $result['id']= $shipItemModel->id;
         $result['model']=ShipmentItem::selectRaw(
             'tbl_embarque_item.id,'.

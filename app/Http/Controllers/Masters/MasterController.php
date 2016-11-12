@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Masters;
 
 
 use App\Models\Sistema\Masters\StoreValcro;
+use App\Models\Sistema\Masters\SubLine;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderReason;
 use App\Models\Sistema\Order\OrderStatus;
@@ -84,6 +85,11 @@ class MasterController extends BaseController
 	public function getLines(){
 		return json_encode(Line::all()->prepend(array("id"=>"0","linea"=>"TODAS","siglas"=>"todo")));
 	}
+	public function getSubLines(Request $req){
+
+		return json_encode(($req->has('linea_id') ? SubLine::where('linea_id', $req->linea_id)->get() : SubLine::get()));
+	}
+
 
 	public function getStates($id){
 		if($id){

@@ -3269,25 +3269,25 @@
 
                             <md-input-container class="md-block" >
                                 <label>Cod. Fabrica</label>
-                                <input  type="text" ng-model="model.codigo_fabrica" required skip-tap info="Codigo de fabrica del producto" >
+                                <input  type="text" ng-model="model.codigo_fabrica" required skip-tab info="Codigo de fabrica del producto" >
 
                             </md-input-container>
                             <md-input-container class="md-block" >
                                 <label>Descripcion Fabrica</label>
-                                <input  type="text" ng-model="model.descripcion_fabrica" required skip-tap info="Descripcion fabrica del producto" >
+                                <input  type="text" ng-model="model.descripcion" required skip-tab info="Descripcion fabrica del producto" >
                             </md-input-container>
                             <md-input-container class="md-block" >
                                 <label>Cod. Profit</label>
-                                <input  type="text" ng-model="model.codigo_profit"  required skip-tap info="Codigo en profit"  >
+                                <input  type="text" ng-model="model.codigo_profit"  skip-tab info="Codigo en profit"  >
 
                             </md-input-container>
                             <md-input-container class="md-block" >
                                 <label>Descripcion Profit</label>
-                                <input  type="text" ng-model="model.descripcion_profit"  skip-tap info="Descripcion de porfit del producto" >
+                                <input  type="text" ng-model="model.descripcion_profit"  skip-tab info="Descripcion de porfit del producto" >
                             </md-input-container>
                             <md-input-container class="md-block" >
                                 <label>Cantidad</label>
-                                <input  type="text" ng-model="model.cantidad" decimal >
+                                <input  required type="text" ng-model="model.cantidad" decimal skip-tab >
                             </md-input-container>
 
                             <md-input-container class="md-block"   >
@@ -3316,67 +3316,62 @@
                             <md-input-container class="md-block"   >
                                 <label>Sub-Linea</label>
                                 <md-autocomplete md-selected-item="SublineaSelec"
-                                                 info="Linea del producto "
-                                                 required
+                                                 info="Sub linea  del producto "
+
                                                  skip-tab
                                                  md-search-text="SublineaText"
-                                                 md-auto-select="true"
-                                                 md-items="item in subLineas | stringKey : lineaText : 'linea' "
-                                                 md-item-text="item.linea"
-                                                 md-autoselect = "true"
-                                                 md-no-asterisk
+                                                 md-items="item in subLineas | stringKey : lineaText : 'linea'  "
+                                                 md-item-text="item.sublinea"
                                                  md-min-length="0"
-                                                 md-require-match="true"
                                                  md-no-cache="true"
                                                  md-select-on-match
                                                  md-selected-item-change="model.sublinea_id = SublineaSelec.id;"
                                                  ng-disabled="!lineaSelec"
                                 >
                                     <md-item-template>
-                                        <span>{{item.linea}}</span>
+                                        <span>{{item.sublinea}}</span>
                                     </md-item-template>
                                 </md-autocomplete>
                             </md-input-container>
-                            <md-input-container class="md-block"   >
-                                <label>Almacenes</label>
-                                <md-autocomplete md-selected-item="almacnSelect"
-                                                 info="Linea del producto "
-                                                 required
-                                                 skip-tab
-                                                 md-search-text="almacnText"
-                                                 md-auto-select="true"
-                                                 md-items="item in almacn | stringKey : almacnText : 'nombre' "
-                                                 md-item-text="item.nombre"
-                                                 md-autoselect = "true"
-                                                 md-no-asterisk
-                                                 md-min-length="0"
-                                                 md-require-match="true"
-                                                 md-no-cache="true"
-                                                 md-select-on-match
-                                                 md-selected-item-change="model.almacen_id = almacnSelect.id;"
-                                >
-                                    <md-item-template>
-                                        <span>{{item.nombre}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
-                            </md-input-container>
-                            <!--
-                                                        <md-input-container class="md-block" >
-                                                            <label>Serie</label>
-                                                            <input  type="text" required ng-model="model.serie"  >
-
-                                                        </md-input-container>
-
-
-                                                        <md-input-container class="md-block" >
-                                                            <label>Cod. Barra</label>
-                                                            <input  type="text" ng-model="model.codigo_barra"   >
-                                                        </md-input-container>-->
-
                             <md-input-container class="md-block" >
                                 <label>Precio</label>
-                                <input  type="text" ng-model="model.precio"  decimal >
+                                <input  type="text" ng-model="model.precio"  decimal skip-tab >
                             </md-input-container>
+                            <div layout="column" flex>
+                                <md-input-container class="md-block"   >
+                                    <label>Almacen</label>
+                                    <md-autocomplete md-selected-item="almacnSelect"
+                                                     info="Almacen de llegada del producto "
+                                                     skip-tab
+                                                     md-search-text="almacnText"
+                                                     md-items="item in almacn | stringKey : almacnText : 'nombre' | customFind : almacnAdd : isAddAlmacen "
+                                                     md-item-text="item.nombre"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-selected-item-change="model.almacen_id = almacnSelect.id;addAlmacen(almacnSelect)"
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                </md-input-container>
+                                <div flex class="gridContent" skip-tab>
+                                    <div ng-repeat="item in model.almcenes"   >
+                                        <div layout="row" class="cellGridHolder"  >
+                                            <div style="width: 24px;padding-top: 15px;border: none;" ng-click="removeAlmacen(item, $index)" omit-out>
+                                                <div  layout="column" layout-align="center center"   omit-out >
+                                                    <span class="icon-Eliminar" style="font-size: 12px"omit-out ></span>
+                                                </div>
+                                            </div>
+                                            <div flex class="cellGrid" >{{item.nombre}} </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
                     </form>

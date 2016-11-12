@@ -34,6 +34,7 @@
                             || (angular.element(event.target).parents("#lyrAlert").length>0)
                             || (angular.element(event.target).parents(".md-autocomplete-suggestions").length>0)
                             || (angular.element(event.target).attr('id') == 'notifBlock')
+                            || (angular.element(event.target).is('[omit-out]'))
                             || (angular.element(event.target).parents(".md-calendar-month-label").length>0)
                             || (angular.element(event.target).parents(".md-calendar-date").length>0)){
                             //console.log("igonrado==>",angular.element(event.target))

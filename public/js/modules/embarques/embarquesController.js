@@ -948,7 +948,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                     ]
                     ,{block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
             }else{
-               save();
+                save();
             }
 
         }
@@ -2244,34 +2244,52 @@ MyApp.controller('listProductAddCtrl',['$scope','$filter','shipment','form', 'se
 }]);
 
 
-MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shipment', 'setGetShipment',function($scope,$mdSidenav, masters, formSrv, $resource, $model){
+MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','$timeout','masters','form','shipment', 'setGetShipment',function($scope,$mdSidenav, $timeout,masters, formSrv, $resource, $model){
     $scope.isOpen = false;
-    $scope.model ={};
-
-    $scope.lineas = [];
-    $scope.lineaSelec = undefined;
-    $scope.lineaText = undefined;
-
-    $scope.almacn = [];
-    $scope.almacnSelect = undefined;
-    $scope.almacnText = undefined ;
 
     $scope.$parent.CreatProduct = function(){
+        $scope.formProduct.$setPristine();
+        $scope.formProduct.$setUntouched();
+        $scope.almacnAdd = [] ;
+        $scope.model ={almcenes:[]};
+        $scope.model.prov_id= $scope.$parent.shipment.prov_id;
+        $scope.lineas = [];
+        $scope.lineaSelec = undefined;
+        $scope.lineaText = undefined;
+        $scope.almacn = [];
+        $scope.almacnSelect = undefined;
+        $scope.almacnText = undefined ;
+        $scope.subLineas = [];
+        $scope.SublineaSelec = undefined;
+        $scope.SublineaText = undefined ;
         masters.query({type:"prodLines"},{}, function (response) {
             $scope.lineas= response;
         });
         masters.query({type:"DirStores"},{}, function (response) {
             $scope.almacn= response;
         });
-        $scope.model.prov_id= $scope.$parent.shipment.prov_id;
+
+
         $mdSidenav("miniCreatProduct").open().then(function(){
             $scope.isOpen = true;
         });
     };
 
-    $scope.close= function(){
-
-
+    $scope. save = function (fn) {
+        $resource.postMod({type:"Product", mod:"CreateOnAdd"},$scope.model,function (response) {
+            $model.change("item"+response.model.id, undefined,response);
+            $scope.$parent.shipment.items.push(response.model);
+            $scope.$parent.NotifAction("ok", "Producto creado y añadido",[],{autohidden:2000});
+            $scope.inClose();
+            formSrv.setData(response.model);
+            formSrv.setState("continue");
+            if(fn){
+                fn(response);
+            }
+        });
+    }
+    $scope.close= function(e){
+        console.log("e", e)
         if($scope.isOpen){
             if($scope.formProduct.$pristine ){
                 $scope.inClose();
@@ -2288,18 +2306,32 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shi
                     ]
                     , {block:true});
             }else {
-                $resource.postMod({type:"Product", mod:"CreateOnAdd"},$scope.model,function (response) {
-                    $model.change("item"+response.model.id, undefined,response);
-                    $scope.$parent.shipment.items.push(response.model);
-                    $scope.$parent.NotifAction("ok", "Producto creado y añadido",[],{autohidden:2000});
-                    $scope.inClose();
-                    formSrv.setData(response.model);
-                    formSrv.setState("continue");
-                });
+                $scope.save();
             }
 
         }
 
+    };
+
+    $scope.isAddAlmacen = function(val){
+        return $scope.almacnAdd.indexOf(val.id) === -1
+    };
+
+    $scope.addAlmacen = function (val) {
+
+        if(val){
+            $scope.model.almcenes.push(val);
+            $scope.almacnAdd.push(val.id);
+            $timeout( function () {
+                $scope.almacnText = undefined ;
+            },0);
+
+        }
+    }
+
+    $scope.removeAlmacen = function (val, index) {
+        $scope.almacnAdd.splice(index,1);
+        $scope.model.almcenes.splice(index,1);
     };
 
     $scope.inClose =  function(){
@@ -2307,6 +2339,15 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','masters','form','shi
             $scope.isOpen = false;
         });
     }
+
+    $scope.$watch('lineaSelec', function (newVal, oldVal) {
+        if(newVal ){
+            masters.query({type:"prodSubLines", linea_id: newVal.id},{}, function (response) {
+                $scope.subLineas =response;
+            });
+
+        }
+    });
 
 
 }]);
@@ -2385,9 +2426,9 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
                 if(result.total.length > 0){
                     texto += " de  "+result.total.length +" ";
                 }
-               if(texto.length > 1){
-                   $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
-               }
+                if(texto.length > 1){
+                    $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+                }
 
             }
         }
@@ -3274,7 +3315,6 @@ MyApp.service('form',function(){
             return false;
         },
         setState: function (data) {
-            console.log("etsat", data);
             state= data;
         },
         getState:function () {
@@ -3789,16 +3829,16 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
             });
         },50*file.index );
     };
-    
-     var clear = function () {
-         folder = 'none';
-         key = '';
-         bin = {estado:'wait', data: undefined};
-         upload.succeces.splice(0,upload.succeces.length);
-         upload.error.splice(0,upload.error.length);
-         upload.total.splice(0,upload.total.length);
-         upload.upload = {};
-     };
+
+    var clear = function () {
+        folder = 'none';
+        key = '';
+        bin = {estado:'wait', data: undefined};
+        upload.succeces.splice(0,upload.succeces.length);
+        upload.error.splice(0,upload.error.length);
+        upload.total.splice(0,upload.total.length);
+        upload.upload = {};
+    };
 
     return {
         bin:function () {
@@ -3808,7 +3848,7 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
             key= data;
         },
         getKey: function () {
-           return key;
+            return key;
         },
         upload : function (data) {
             angular.forEach(data, function (v, k) {
@@ -3990,7 +4030,7 @@ MyApp.directive('vlThumb', function( fileSrv) {
             'model' : "=ngModel",
             'up' : "=vlUp",
             /*'fail' : "=vlFail",
-            'progress' : "=vlLoad"*/
+             'progress' : "=vlLoad"*/
 
         },
         link: function(scope, elem, attr, ctrl){
@@ -4005,9 +4045,9 @@ MyApp.directive('vlThumb', function( fileSrv) {
                 if(newVal == 'fail'){
                     scope.model.fail = true;
                     /*if(scope.fail){
-                        scope.model
-                        //scope.fail(scope.model);
-                    }*/
+                     scope.model
+                     //scope.fail(scope.model);
+                     }*/
                 }
             });
 
