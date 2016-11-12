@@ -164,6 +164,18 @@ md-sidenav .md-sidenav-right.md-locked-open{
 
     color: #999999;
 }
+
+.menu-expand-rigth{
+    position: absolute;
+    margin-left:174px;
+    height: 48px;
+    color :#b5b5b5;
+}
+.menu-expand-rigth div{
+     height: 48px;
+    background-color: #f1f1f1;
+}
+
 .btnMas{
     background-color: transparent;
     color: rgb(153, 153, 153);

@@ -2,106 +2,125 @@
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="embarquesController" global >
     <div class="contentHolder" layout="row" flex>
         <div class="barraLateral" layout="column" id="barraLateral" >
-
-
-            <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1;
+            <div layout="row" class="md-whiteframe-1dp" >
+                <div id="menu" layout="column"  style="height: 48px; overflow: hidden; background-color: #f1f1f1;
              min-height: 48px;">
-                <!-- 3) ########################################## MENU ########################################## -->
-                <div class="menu" style="min-height: 48px; width: 100%;">
-                    <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
-                        Menu
+                    <!-- 3) ########################################## MENU ########################################## -->
+                    <div class="menu" style="min-height: 48px; width: 100%;">
+                        <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
+                            Menu
+                        </div>
+                        <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;"
+                             ng-click="FilterLateral()" ng-hide="showLateralFilter">
+                            <img ng-src="images/Down.png">
+                            <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
+                        </div>
+                        <md-tooltip md-direction="right">
+                            Click para desplegar opciones
+                        </md-tooltip>
                     </div>
-                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;"
-                         ng-click="FilterLateral()" ng-hide="showLateralFilter">
-                        <img ng-src="images/Down.png">
-                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
-                    </div>
-                    <md-tooltip md-direction="right">
-                        Click para desplegar opciones
-                    </md-tooltip>
-                </div>
 
-                <div layout="column" flex=""   style="padding: 0px 4px 0px 4px;" tabindex="-1">
-                    <form name="provdiderFilter" tabindex="-1">
-                        <div class="menuFilter" id="expand1" style="height: 176px;" layout-align="start start" tabindex="-1">
-                            <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
-                                <label>Razon  Social</label>
-                                <input  type="text" ng-model="filterProv.razon_social"  tabindex="-1" >
+                    <div layout="column" flex=""   style="padding: 0px 4px 0px 4px;" tabindex="-1">
+                        <form name="provdiderFilter" tabindex="-1">
+                            <div class="menuFilter" id="expand1" style="height: 176px;" layout-align="start start" tabindex="-1">
+                                <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                                    <label>Razon  Social</label>
+                                    <input  type="text" ng-model="filterProv.razon_social"  tabindex="-1" >
 
-                            </md-input-container>
+                                </md-input-container>
 
-                            <!--  <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
-                                  <label>Pais</label>
-                                  <input  type="text" ng-model="filterProv.pais"  tabindex="-1" >
-                              </md-input-container>-->
+                                <!--  <md-input-container class="md-block" style="width: calc(100% - 16px); height: 24px;">
+                                      <label>Pais</label>
+                                      <input  type="text" ng-model="filterProv.pais"  tabindex="-1" >
+                                  </md-input-container>-->
 
-                            <div layout="row" class="dotRow" style="height: 24px;">
-                                <div flex layout layout-align="center center" ng-click="filterProv.f100 = !filterProv.f100  ">
-                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f100 ,'dot-filter100':!filterProv.f100}" >
-                                        +
+                                <div layout="row" class="dotRow" style="height: 24px;">
+                                    <div flex layout layout-align="center center" ng-click="filterProv.f100 = !filterProv.f100  ">
+                                        <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f100 ,'dot-filter100':!filterProv.f100}" >
+                                            +
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center"  ng-click="filterProv.f90 = !filterProv.f90  ">
+                                        <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f90 ,'dot-filter90':!filterProv.f90}" >
+                                            90
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center"  ng-click="filterProv.f60 = !filterProv.f60  ">
+                                        <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f60 ,'dot-filter60':!filterProv.f60}">
+                                            60
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center"  ng-click="filterProv.f30 = !filterProv.f30  " >
+                                        <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f30 ,'dot-filter30':!filterProv.f30}">
+                                            30
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center"  ng-click="filterProv.f7 = !filterProv.f7  " >
+                                        <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f7 ,'dot-filter7':!filterProv.f7}" >
+                                            7
+                                        </div>
+                                    </div>
+                                    <div flex layout layout-align="center center"  ng-click="filterProv.f0 = !filterProv.f0  " >
+                                        <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f0 ,'dot-filter0':!filterProv.f0}">
+                                            0
+                                        </div>
                                     </div>
                                 </div>
-                                <div flex layout layout-align="center center"  ng-click="filterProv.f90 = !filterProv.f90  ">
-                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f90 ,'dot-filter90':!filterProv.f90}" >
-                                        90
+                                <div style="height:48px; padding-right: 16px;" layout="row" layout-align="space-between center">
+                                    <div flex="" style="overflow: hidden;" layout="row" ng-init="filterProv.op = '+'">
+                                        <div  style="width: 16px;" layout="column" layout-align="center center" ng-click="filterProv.op = (filterProv.op == '+') ? '-' : '+' " >
+                                            <img ng-src="{{(filterProv.op == '+') ? 'images/TrianguloUp.png' : 'images/TrianguloDown.png' }}" >
+                                            <!-- <span  style="font-size: 24px"  >  {{filterProv.op }} </span>-->
+                                        </div>
+                                        <md-input-container class="md-block" flex >
+                                            <label>Monto</label>
+                                            <input  type="text" ng-model="filterProv.monto"   >
+                                        </md-input-container>
+                                    </div>
+
+                                    <div flex="20" layout="row"  layout-align="center center" ng-click="filterProv.pc = !filterProv.pc" >
+                                        <div layout="column" layout-align="center center" >
+                                            <span class="icon-PuntoCompra" style="font-size: 24px"  ng-class= "{'item-select' : filterProv.pc ,'item-no-select':!filterProv.pc}"></span>
+                                        </div>
+                                    </div>
+                                    <div flex="20" layout="row"  layout-align="center center" ng-click="filterProv.cp = !filterProv.cp" >
+                                        <div layout="column" layout-align="center center" >
+                                            <span class="icon-Contrapedidos" style="font-size: 24px"  ng-class= "{'item-select' : filterProv.cp ,'item-no-select':!filterProv.cp}"></span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div flex layout layout-align="center center"  ng-click="filterProv.f60 = !filterProv.f60  ">
-                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f60 ,'dot-filter60':!filterProv.f60}">
-                                        60
-                                    </div>
-                                </div>
-                                <div flex layout layout-align="center center"  ng-click="filterProv.f30 = !filterProv.f30  " >
-                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f30 ,'dot-filter30':!filterProv.f30}">
-                                        30
-                                    </div>
-                                </div>
-                                <div flex layout layout-align="center center"  ng-click="filterProv.f7 = !filterProv.f7  " >
-                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f7 ,'dot-filter7':!filterProv.f7}" >
-                                        7
-                                    </div>
-                                </div>
-                                <div flex layout layout-align="center center"  ng-click="filterProv.f0 = !filterProv.f0  " >
-                                    <div layout layout-align="center center" class="dot-item " ng-class= "{'dot-select' : filterProv.f0 ,'dot-filter0':!filterProv.f0}">
-                                        0
-                                    </div>
-                                </div>
+
                             </div>
-                            <div style="height:48px; padding-right: 16px;" layout="row" layout-align="space-between center">
-                                <div flex="" style="overflow: hidden;" layout="row" ng-init="filterProv.op = '+'">
-                                    <div  style="width: 16px;" layout="column" layout-align="center center" ng-click="filterProv.op = (filterProv.op == '+') ? '-' : '+' " >
-                                        <img ng-src="{{(filterProv.op == '+') ? 'images/TrianguloUp.png' : 'images/TrianguloDown.png' }}" >
-                                        <!-- <span  style="font-size: 24px"  >  {{filterProv.op }} </span>-->
-                                    </div>
-                                    <md-input-container class="md-block" flex >
-                                        <label>Monto</label>
-                                        <input  type="text" ng-model="filterProv.monto"   >
-                                    </md-input-container>
-                                </div>
-
-                                <div flex="20" layout="row"  layout-align="center center" ng-click="filterProv.pc = !filterProv.pc" >
-                                    <div layout="column" layout-align="center center" >
-                                        <span class="icon-PuntoCompra" style="font-size: 24px"  ng-class= "{'item-select' : filterProv.pc ,'item-no-select':!filterProv.pc}"></span>
-                                    </div>
-                                </div>
-                                <div flex="20" layout="row"  layout-align="center center" ng-click="filterProv.cp = !filterProv.cp" >
-                                    <div layout="column" layout-align="center center" >
-                                        <span class="icon-Contrapedidos" style="font-size: 24px"  ng-class= "{'item-select' : filterProv.cp ,'item-no-select':!filterProv.cp}"></span>
-                                    </div>
-                                </div>
-                            </div>
+                        </form>
+                        <div id="expand2" flex >
 
                         </div>
-                    </form>
-                    <div id="expand2" flex >
-
-                    </div>
-                    <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateralMas()">
-                        <img ng-src="{{imgLateralFilter}}">
-                        <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
+                        <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateralMas()">
+                            <img ng-src="{{imgLateralFilter}}">
+                            <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
+                        </div>
                     </div>
                 </div>
+
+               <!-- <div style="background-color: #f1f1f1; width: 12px;" layout="column" layout-align="center center" ></div>-->
+                <!--<div class="menu-expand-rigth"  layout="row" layout-align="start center" >
+                    <div layout="row"  layout="row" layout-align="start center" style="width: 0" id='expand-rigth'>
+
+                            <div layout="column" >
+                                <span style="font-size: 24px">P</span>
+                                <md-tooltip >
+                                    Ver por Pais
+                                </md-tooltip>
+                            </div>
+
+                    </div>
+                    <div  class="div-img" layout="column"  layout-align="center center"  >
+                        <img src="images/btn_nextArrow.png">
+                    </div>
+
+                </div>-->
             </div>
+
 
             <div id="listado" flex  style="overflow-y:auto;word-break: break-all;"  >
                 <div class="boxList"  layout="column" flex ng-repeat="item in search()  "  list-box ng-click="setProvedor(item, this)"

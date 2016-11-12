@@ -274,8 +274,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }
     });
 
-
-
     $scope.isModif = function () {
         var isModif = false;
         if($model.getInternalState() == 'new'){
@@ -353,6 +351,20 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }
     }
 
+    // menu
+
+    // menu rigth
+    $scope.isOpenmenuRigth = false;
+    $scope.toggleMenurigth = function (width) {
+        var expand = angular.element("#expand-rigth");
+        if( $scope.isOpenmenuRigth){
+            expand.animate({width:width+'px'},500);
+            $scope.isOpenmenuRigth= true;
+        }else{
+            expand.animate({width:'0px'},500);
+            $scope.isOpenmenuRigth= false;
+        }
+    }
 
 }]);
 
@@ -4066,6 +4078,8 @@ MyApp.directive('vlThumb', function( fileSrv) {
         }
     };
 });
+
+
 MyApp.directive('gridOrderBy', function($timeout) {
 
     return {
