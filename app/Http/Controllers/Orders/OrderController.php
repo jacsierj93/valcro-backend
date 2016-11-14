@@ -5511,11 +5511,11 @@ class OrderController extends BaseController
                 break;
             }
             if($aux->tipo_origen_id  = 21){
-                $aux = Solicitude::findOrFail($aux->origen_item_id);
+                $aux = SolicitudeItem::findOrFail($aux->origen_item_id);
             }else  if($aux->tipo_origen_id  = 22){
                 $aux = OrderItem::findOrFail($aux->origen_item_id);
             }else{
-                $aux = Purchase::findOrFail($aux->origen_item_id);
+                $aux = PurchaseItem::findOrFail($aux->origen_item_id);
             }
 
             $i = $i +1;

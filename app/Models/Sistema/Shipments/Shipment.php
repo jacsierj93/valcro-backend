@@ -21,7 +21,7 @@ class Shipment extends Model
      * adjuntos del documento
      */
     public function attachments(){
-        return $this->hasMany('App\Models\Sistema\Shipments\ShipmentAttachment', 'embarque_id');
+        return $this->hasMany('App\Models\Sistema\Shipments\ShipmentAttachment', 'doc_id');
 
     }
 
@@ -54,7 +54,7 @@ class Shipment extends Model
      *Container del embarq
      */
     public function items(){
-        return $this->hasMany('App\Models\Sistema\Shipments\ShipmentItem', 'embarque_id');
+        return $this->hasMany('App\Models\Sistema\Shipments\ShipmentItem', 'doc_id');
     }
 
     public function getSha256(){

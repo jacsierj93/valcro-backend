@@ -212,7 +212,7 @@ return $html;
         foreach($models as $aux){
             // $aux->items = $aux->items()->get();
 
-            if(sizeof(ShipmentItem::where('doc_origen_id', $aux->id)->where('tipo_origen_id', 23)->where('embarque_id', $req->embarque_id)->get()) > 0){
+            if(sizeof(ShipmentItem::where('doc_origen_id', $aux->id)->where('tipo_origen_id', 23)->where('doc_id', $req->doc_id)->get()) > 0){
                 $aux->asignado=true;
             }
             $data[]= $aux;
@@ -222,7 +222,7 @@ return $html;
     }
 
     public function getOrdersAsignment(Request $req){
-        $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+        $models = ShipmentItem::where('doc_id',$req->doc_id)->where('tipo_origen_id', '23')->get();
         $odc = new Purchase();
 
         foreach ($models as $aux){
@@ -292,7 +292,7 @@ return $html;
             $item =  ShipmentItem::where('doc_origen_id', $model->id)
                 ->where('tipo_origen_id', '23')
                 ->where('origen_item_id',$aux->id)
-                ->where('embarque_id', $req->embarque_id)
+                ->where('doc_id', $req->doc_id)
                 ->first();
             $aux->asignado= false;
             if($item != null){
@@ -311,9 +311,9 @@ return $html;
 
         }
 
-        if($req->has('embarque_id')){
+        if($req->has('doc_id')){
             $model->isTotal = 1;
-            $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+            $models = ShipmentItem::where('doc_id',$req->doc_id)->where('tipo_origen_id', '23')->get();
             foreach ($items as $item){
                 $shipItem = $models->where('origen_item_id',$item->id);
                 if(sizeof( $shipItem) == 0){
@@ -449,7 +449,7 @@ return $html;
         $model->peso = $req->peso;
         $model->tipo = $req->tipo;
         $model->volumen = $req->volumen;
-        $model->embarque_id= $req->embarque_id;
+        $model->doc_id= $req->doc_id;
         $model->save();
 
         $result['id'] = $model->id;
@@ -677,7 +677,7 @@ return $html;
         // items
         $Mitems  =ShipmentItem::selectRaw(
             'tbl_embarque_item.id,'.
-            'tbl_embarque_item.embarque_id,'.
+            'tbl_embarque_item.doc_id,'.
             'tbl_embarque_item.descripcion,'.
             'tbl_embarque_item.saldo,'.
             'tbl_embarque_item.cantidad,'.
@@ -692,7 +692,7 @@ return $html;
             '(tbl_producto.precio  * tbl_embarque_item.cantidad) as total '
         )
             ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
-            ->where( 'tbl_embarque_item.embarque_id', $model->id)
+            ->where( 'tbl_embarque_item.doc_id', $model->id)
             ->get();
         $data['items'] = [];
         foreach ($Mitems as $aux){
@@ -756,7 +756,7 @@ return $html;
     public  function  getShipmentItems(Request $req){
         $items=  ShipmentItem::selectRaw(
             'tbl_embarque_item.id,'.
-            'tbl_embarque_item.embarque_id,'.
+            'tbl_embarque_item.doc_id,'.
             'tbl_embarque_item.descripcion,'.
             'tbl_embarque_item.saldo,'.
             'tbl_embarque_item.cantidad,'.
@@ -771,7 +771,7 @@ return $html;
             '(tbl_producto.precio  * tbl_embarque_item.cantidad) as total '
         )
             ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
-            ->where( 'tbl_embarque_item.embarque_id', $req->id );
+            ->where( 'tbl_embarque_item.doc_id', $req->id );
         foreach ($items as $aux){
             if($aux->tipo_origen_id == '23'){
                 $p = PurchaseItem::find($aux->origen_item_id);
@@ -898,7 +898,7 @@ return $html;
     public function SaveAttachment(Request $req){
         $file = FileModel::findOrFail($req->archivo_id);
         $model = new ShipmentAttachment();
-        $model->embarque_id= $req->embarque_id;
+        $model->doc_id= $req->doc_id;
         $model->documento = $req->documento;
         $model->archivo_id	 = $req->archivo_id;
         $model->comentario	 = ($req->has('comentario') ? $req->comentario : null );
@@ -931,7 +931,7 @@ return $html;
         }
 
         $model->tipo_origen_id= $req->tipo_origen_id;
-        $model->embarque_id= $req->embarque_id;
+        $model->doc_id= $req->doc_id;
         $model->descripcion= $req->descripcion;
         $model->doc_origen_id= ($req->has('doc_origen_id')) ? $req->doc_origen_id : null;
         $model->origen_item_id= $req->origen_item_id;
@@ -957,13 +957,13 @@ return $html;
 
 // confirmacion de estado del pedido original
             $itemIns = ShipmentItem::where('doc_origen_id', $req->doc_origen_id)
-                ->where('embarque_id',$req->embarque_id)
+                ->where('doc_id',$req->doc_id)
                 ->get() ;
             if($req->tipo_origen_id == '23' && !$req->has('id') && sizeof($itemIns) == 1)
             {
                 $pr =  Purchase::find($req->doc_origen_id);
                 $items = $pr->items()->get();
-                $models = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+                $models = ShipmentItem::where('doc_id',$req->doc_id)->where('tipo_origen_id', '23')->get();
                 foreach ($items as $item){
                     $shipItem = $models->where('origen_item_id',$item->id);
 
@@ -989,7 +989,7 @@ return $html;
         $result['saldo']=$model->saldo;
         $model = ShipmentItem::selectRaw(
             'tbl_embarque_item.id,'.
-            'tbl_embarque_item.embarque_id,'.
+            'tbl_embarque_item.doc_id,'.
             'tbl_embarque_item.descripcion,'.
             'tbl_embarque_item.saldo,'.
             'tbl_embarque_item.producto_id,'.
@@ -1035,7 +1035,7 @@ return $html;
 
         $resta = ShipmentItem::where('tipo_origen_id','23')
             ->where('doc_origen_id',$model->doc_origen_id)
-            ->where('embarque_id',$model->embarque_id)
+            ->where('doc_id',$model->doc_id)
             ->get();
         $result['resta']= $resta;
 
@@ -1053,7 +1053,7 @@ return $html;
     public function SaveOrder (Request $req){
         $odcItem = PurchaseItem::where('doc_id', $req->doc_origen_id)->get();
         $shipITem = ShipmentItem::where('tipo_origen_id', '23')
-            ->where('embarque_id', $req->embarque_id)
+            ->where('doc_id', $req->doc_id)
             ->where('doc_origen_id', $req->doc_origen_id)
             ->get();
         $isNew = true;
@@ -1065,7 +1065,7 @@ return $html;
             if(sizeof($shipITem->where('origen_item_id',  $aux->id)) == 0){
                 $it = new ShipmentItem();
                 $it->tipo_origen_id = '23' ;
-                $it->embarque_id= $req->embarque_id;
+                $it->doc_id= $req->doc_id;
                 $it->descripcion= $aux->descripcion;
                 $it->doc_origen_id= $req->doc_origen_id;
                 $it->origen_item_id= $aux->id;
@@ -1140,7 +1140,7 @@ return $html;
                 )
                     ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
                     ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
-                    ->where('embarque_id','=', $model->id)
+                    ->where('doc_id','=', $model->id)
                     ->first();
 
                 $fecha_carga['max']=$maxf->max;
@@ -1257,7 +1257,7 @@ return $html;
         if($req->has('adjs')){
             foreach ($req->adjs as $aux){
                 $att = new ShipmentAttachment();
-                $att->embarque_id= $model->id;
+                $att->doc_id= $model->id;
                 $att->documento ='cancelacion';
                 $att->archivo_id	 = $aux['id'];
                 $att->comentario	 = (array_key_exists('comentario', $aux) ? $aux['comentario'] : null );
@@ -1356,7 +1356,7 @@ return $html;
 
     public function getFinishedProduc(Request $req){
         $data=[];
-        $Shipmodels = ShipmentItem::where('embarque_id',$req->embarque_id)->where('tipo_origen_id', '23')->get();
+        $Shipmodels = ShipmentItem::where('doc_id',$req->doc_id)->where('tipo_origen_id', '23')->get();
 
         $models = PurchaseItem::selectRaw('
          distinct tbl_compra_orden_item.id, '.
@@ -1433,7 +1433,7 @@ return $html;
             tbl_compra_orden.monto,
             tbl_compra_orden.mt3 ,
             tbl_compra_orden.peso '
-        )->where('embarque_id',$model)
+        )->where('doc_id',$model)
             ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=','tbl_compra_orden.id' )
             ->where('tipo_origen_id', '23')
             ->whereNull('tbl_embarque_item.deleted_at')
@@ -1492,7 +1492,7 @@ return $html;
             )
                 ->join('tbl_producto','tbl_producto.id','=','tbl_embarque_item.producto_id' )
                 ->join('tbl_prov_tiempo_fab','tbl_producto.linea_id','=','tbl_prov_tiempo_fab.linea_id' )
-                ->where('embarque_id','=', $model->id)
+                ->where('doc_id','=', $model->id)
                 ->first();
 
             $fecha_carga['max']=$maxf->max;

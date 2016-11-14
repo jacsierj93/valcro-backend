@@ -497,7 +497,7 @@ MyApp.controller('listShipmentUnclosetCtrl', ['$scope','shipment','setGetShipmen
         $model.setData(data, function () {
             $scope.session.global = 'uncloset';
 
-            $scope.$parent.unblock({embarque_id:data.id});
+            $scope.$parent.unblock({doc_id:data.id});
 
             $model.change('sistem',undefined,{uncloset:true});
         });
@@ -655,7 +655,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
             if(!data){
                 $scope.$parent.save(function (response) {
                     $model.setData({id:response.id});
-                    $scope.$parent.unblock({embarque_id:response.id});
+                    $scope.$parent.unblock({doc_id:response.id});
                 });
 
 
@@ -1587,7 +1587,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
     $scope.save = function (fn){
         if(!$scope.containerForm.$pristine){
             if($scope.containerForm.$valid ){
-                $scope.model.embarque_id= $scope.$parent.shipment.id;
+                $scope.model.doc_id= $scope.$parent.shipment.id;
                 $resource.postMod({type:"Container",mod:"Save"},$scope.model, function(response){
                     if(response.action== 'new'){
                         console.log("paren",$scope.$parent.shipment);
@@ -1674,7 +1674,7 @@ MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','setGetShipment', 
 
 
             if($scope.select.id){
-                $resource.getMod({type:"Order", mod:"Order", id:$scope.select.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
+                $resource.getMod({type:"Order", mod:"Order", id:$scope.select.id, doc_id:$scope.$parent.shipment.id},{},function (response) {
                     $scope.select.isTotal= response.isTotal;
                 });
             }
@@ -1684,7 +1684,7 @@ MyApp.controller('listOrdershipmentCtrl',['$scope','shipment','setGetShipment', 
     };
     $scope.changeAsig = function (data) {
         console.log("data");
-        var send = {doc_origen_id:data.id, embarque_id:$scope.$parent.shipment.id};
+        var send = {doc_origen_id:data.id, doc_id:$scope.$parent.shipment.id};
         if(data.asignado){
             $resource.postMod({type:"Order", mod:"Save"},send,function (response) {
                 $scope.$parent.NotifAction("ok", "Pedido agregado al embarque",[],{autohidden:1500});
@@ -1745,7 +1745,7 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment','DateParse','$timeout',
 
     $scope.load = function () {
         $scope.tbl.data.splice(0, $scope.tbl.data.length);
-        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id, embarque_id: $scope.$parent.shipment.id},{},function (response) {
+        $resource.queryMod({type:"Order", mod:"List", prov_id:$scope.$parent.shipment.prov_id, doc_id: $scope.$parent.shipment.id},{},function (response) {
             angular.forEach(response, function (v) {
 
                 aux = angular.copy(v);
@@ -1776,7 +1776,7 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment','DateParse','$timeout',
         if(data.asignado){
             if(!$scope.$parent.shipment.fechas.fecha_carga.confirm){
                 if($scope.$parent.shipment.fechas.fecha_carga.isManual){
-                    $resource.getMod({type:"Order", mod:"Order", id:data.id, embarque_id:$scope.$parent.shipment.id},{},function (response){
+                    $resource.getMod({type:"Order", mod:"Order", id:data.id, doc_id:$scope.$parent.shipment.id},{},function (response){
                         var maxDate = DateParse.toDate(response.maxProducion);
                         if(maxDate > $scope.$parent.shipment.fechas.fecha_carga.value){
                             $scope.$parent.NotifAction("alert",
@@ -1863,7 +1863,7 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment','DateParse','$timeout',
     };
 
     $scope.addOrder = function (data, fn) {
-        var send = {doc_origen_id:data.id, embarque_id:$scope.$parent.shipment.id};
+        var send = {doc_origen_id:data.id, doc_id:$scope.$parent.shipment.id};
         $resource.postMod({type:"Order", mod:"Save"},send,function (response) {
             $scope.$parent.NotifAction("ok", "Pedido agregado al embarque",[],{autohidden:1500});
             if(response.doc_origen_id){
@@ -2229,10 +2229,10 @@ MyApp.controller('listProductAddCtrl',['$scope','$filter','shipment','form', 'se
     $scope.select = {};
     $scope.$parent.listProductAdd = function(){
         $scope.select = {};
-        $resource.queryMod({type:"Order", mod:"Products", embarque_id:$scope.$parent.shipment.id},{}, function (response) {
+        $resource.queryMod({type:"Order", mod:"Products", doc_id:$scope.$parent.shipment.id},{}, function (response) {
             $scope.tbl.data = response;
         });
-        $resource.queryMod({type:"Item", mod:"History", embarque_id:$scope.$parent.shipment.id},{}, function (response) {
+        $resource.queryMod({type:"Item", mod:"History", doc_id:$scope.$parent.shipment.id},{}, function (response) {
             $scope.tbl_historia.data = response;
         });
         $scope.LayersAction({open:{name:"listProductAdd", after: function(){
@@ -2455,7 +2455,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     });
 
     $scope.fileUp= function (file) {
-        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_mbl', embarque_id:$scope.$parent.shipment.id}, function (response) {
+        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_mbl', doc_id:$scope.$parent.shipment.id}, function (response) {
 
         }, function (error) {
             console.log("error", error);
@@ -2525,7 +2525,7 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     };
 
     $scope.fileUp= function (file) {
-        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_hbl', embarque_id:$scope.$parent.shipment.id}, function (response) {
+        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_hbl', doc_id:$scope.$parent.shipment.id}, function (response) {
 
         }, function (error) {
             console.log("error", error);
@@ -2599,7 +2599,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
         $model.change("nro_eaa",id,val);
     };
     $scope.fileUp= function (file) {
-        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_eaa', embarque_id:$scope.$parent.shipment.id}, function (response) {
+        $resource.postMod({type:"Attachment", mod:"Save"},{archivo_id:file.id,documento:'nro_eaa', doc_id:$scope.$parent.shipment.id}, function (response) {
 
         }, function (error) {
             console.log("error", error);
@@ -2792,7 +2792,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','for
 
     $scope.$parent.detailOrderShipment = function(data){
         $scope.prodSelect = {};
-        $resource.getMod({type:"Order", mod:"Order", id:data.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
+        $resource.getMod({type:"Order", mod:"Order", id:data.id, doc_id:$scope.$parent.shipment.id},{},function (response) {
             angular.forEach(response, function (v,k) {
                 if(k == 'fecha_aprob_gerencia' || k == 'fecha_produccion'){
                     if(v!= null){
@@ -2897,7 +2897,7 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','DateParse','form', '
 
     $scope.$parent.detailOrderAdd = function(data){
 
-        $resource.getMod({type:"Order", mod:"Order", id:data.id, embarque_id:$scope.$parent.shipment.id},{},function (response) {
+        $resource.getMod({type:"Order", mod:"Order", id:data.id, doc_id:$scope.$parent.shipment.id},{},function (response) {
 
 
             angular.forEach(response, function (v,k) {
@@ -3132,7 +3132,7 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                     origen_item_id: ($scope.select.origen_item_id) ? $scope.select.origen_item_id : $scope.select.id,
                     saldo: $scope.select.saldo,
                     tipo_origen_id:($scope.select.tipo_origen_id)? $scope.select.tipo_origen_id : 23,
-                    embarque_id: $scope.$parent.shipment.id ,
+                    doc_id: $scope.$parent.shipment.id ,
                     doc_origen_id:($scope.select.doc_origen_id) ? $scope.select.doc_origen_id : $scope.select.doc_id,
                     producto_id: $scope.select.producto_id
                 };
@@ -3214,7 +3214,7 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
         switch (data.key){
             case "uncloset":
                 if(data.cantidad == 1){
-                    $scope.$parent.unblock({embarque_id:data.data[0].id});
+                    $scope.$parent.unblock({doc_id:data.data[0].id});
                     $scope.$parent.OpenShipmentCtrl(data.data[0].id);
                     $model.setData({id:data.data[0].id}, function () {
                         $model.change('sistem',undefined,{uncloset:true});
