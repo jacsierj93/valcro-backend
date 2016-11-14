@@ -75,13 +75,13 @@ class NotificationModule extends Model
         return View::make($this->plantilla,['model'=>$model, 'noti'=>$this])->render();
     }
     public function send(){
-        $model= new GenericModel($this->doc_tipo_id);
+/*        $model= new GenericModel($this->doc_tipo_id);
         $model = $model->getModel()->findOrFail($this->doc_id);
 
         $sender = ['subject'=>$this->asunto , 'to'=>$this->where('tipo','to'), 'cc'=>$this->where('tipo','cc'), 'ccb'=>$this->where('tipo','ccb')];
-        $data =['model'=>$model, 'noti'=>$this];
+        $data =['model'=>$model, 'noti'=>$this];*/
 
-
+/*
         $html = View::make($this->plantilla,$data)->render();
         $snappy = App::make('snappy.pdf');
         $archivo = response()->make($snappy->getOutputFromHtml($html), 200, [
@@ -130,8 +130,8 @@ class NotificationModule extends Model
 
 
 
-        });
-        return $sender;
+        });*/
+        //return $sender;
     }
 
     public function send_mail( $template ,$sender, $data ){

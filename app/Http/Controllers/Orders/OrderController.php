@@ -319,7 +319,7 @@ class OrderController extends BaseController
             $userModif = User::findOrFail($model->edit_usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
                 if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
                     if(sizeof($notif->where('clave','send_provider')->get()) == 0){
                         return ['action' => 'send'];
                     }
@@ -339,7 +339,7 @@ class OrderController extends BaseController
             $userModif = User::findOrFail($model->edit_usuario_id);
             if($userCreate->cargo_id == $this->profile['trabajador'] ){
                 if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
+                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
                     if(sizeof($notif->where('clave','send_provider')->get()) == 0){
                         return ['action' => 'send'];
                     }
@@ -1146,16 +1146,17 @@ class OrderController extends BaseController
         $provProd = Product::where('prov_id',$model->prov_id)->get();
         $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
         $atts =$model->attachments()->get();
+
         foreach($items as $aux){
             $temp= array();
-            $p= $provProd->where('id',$aux->producto_id)->first();
+            //$p= $provProd->where('id',$aux->producto_id)->first();
             $temp['id']=$aux->id;
             $temp['producto_id']=$aux->producto_id;
-            $temp['codigo']=$p->codigo;
-            $temp['codigo_fabrica']=$p->codigo_fabrica;
+            $temp['codigo']=$aux->product->codigo;
+            $temp['codigo_fabrica']=$aux->product->codigo_fabrica;
             $temp['descripcion']=$aux->descripcion;
             $temp['cantidad']=$aux->cant;
-            $temp['extra']= $p;
+            $temp['extra']= $aux->product;
             $prod[]= $temp;
         }
 
@@ -1176,14 +1177,14 @@ class OrderController extends BaseController
         $atts =$model->attachments()->get();
         foreach($items as $aux){
             $temp= array();
-            $p= $provProd->where('id',$aux->producto_id)->first();
+           // $p= $provProd->where('id',$aux->producto_id)->first();
             $temp['id']=$aux->id;
             $temp['producto_id']=$aux->producto_id;
-            $temp['codigo']=$p->codigo;
-            $temp['codigo_fabrica']=$p->codigo_fabrica;
+            $temp['codigo']=$aux->product->codigo;
+            $temp['codigo_fabrica']=$aux->product->codigo_fabrica;
             $temp['descripcion']=$aux->descripcion;
             $temp['cantidad']=$aux->cant;
-            $temp['extra']= $p;
+            $temp['extra']= $aux->product;
             $temp['condicion_pago']= PurchaseItemCondition::where('item_id',$aux->id)->get();
             $prod[]= $temp;
         }
@@ -3632,7 +3633,7 @@ class OrderController extends BaseController
             ];
             $noti = new NotificationModule();
             $noti->doc_id = $model->id;
-            $noti->doc_tipo = 21;
+            $noti->doc_tipo_id = 21;
             $noti->usuario_id = $this->user->id;
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion'] ="Envio al proveedor";
@@ -3675,7 +3676,7 @@ class OrderController extends BaseController
             ];
             $noti = new NotificationModule();
             $noti->doc_id = $model->id;
-            $noti->doc_tipo = 21;
+            $noti->doc_tipo_id = 21;
             $noti->usuario_id = $this->user->id;
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion'] ="Envio al proveedor";
@@ -3718,7 +3719,7 @@ class OrderController extends BaseController
             ];
             $noti = new NotificationModule();
             $noti->doc_id = $model->id;
-            $noti->doc_tipo = 21;
+            $noti->doc_tipo_id = 21;
             $noti->usuario_id = $this->user->id;
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion'] ="Envio al proveedor";
@@ -5052,7 +5053,7 @@ class OrderController extends BaseController
         $result['success'] = "Registro guardado con éxito!";
         $result['action'][] = "close";
         $model = Solicitude::findOrFail($req->id);
-        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
+        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
         $model->final_id=
             "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
             ."-a".sizeof($model->attachments()->get());
@@ -5069,7 +5070,7 @@ class OrderController extends BaseController
         if(sizeof($notif->where('clave', 'created')->get()) == 0){
             $noti = new NotificationModule();
             $noti->doc_id = $model->id;
-            $noti->doc_tipo = 21;
+            $noti->doc_tipo_id = 21;
             $noti->usuario_id = $this->user->id;
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion'] ="Creacion de solicitud ";
@@ -5077,10 +5078,10 @@ class OrderController extends BaseController
             $result['action'][]="send";
         }else{
             if($model->fecha_aprob_compra != null){
-                if(sizeof(NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21)->where('clave', 'aprob_compras')->get()) == 0){
+                if(sizeof(NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21)->where('clave', 'aprob_compras')->get()) == 0){
                     $noti = new NotificationModule();
                     $noti->doc_id = $model->id;
-                    $noti->doc_tipo = 21;
+                    $noti->doc_tipo_id = 21;
                     $noti->usuario_id = $this->user->id;
                     $data =$this->parseDocToSummaryEmail($model);
                     $data['accion'] ="Aprobacion de solicitud";
@@ -5089,7 +5090,7 @@ class OrderController extends BaseController
                 }else if(sizeof($notif->where('clave', 'aprob_compras')->where('usuario_id', $this->user->id)->get()) > 0){
                     $noti = new NotificationModule();
                     $noti->doc_id = $model->id;
-                    $noti->doc_tipo = 21;
+                    $noti->doc_tipo_id = 21;
                     $noti->usuario_id = $this->user->id;
                     $data =$this->parseDocToSummaryEmail($model);
                     $data['accion'] ="Desaprobacion de solicitud";
@@ -5100,7 +5101,7 @@ class OrderController extends BaseController
                 $sender['subject']= "Notificacion de modificacion de solicitud";
                 $noti = new NotificationModule();
                 $noti->doc_id = $model->id;
-                $noti->doc_tipo = 21;
+                $noti->doc_tipo_id = 21;
                 $noti->usuario_id = $this->user->id;
                 $data =$this->parseDocToSummaryEmail($model);
                 $data['accion'] ="Modificacion de solicitud ";
@@ -5115,7 +5116,7 @@ class OrderController extends BaseController
     /***/
     public function ClosePurchase(Request $req)
     {
-        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
+        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
 
         $result['success'] = "Registro guardado con éxito!";
         $result['action'] = "new";
@@ -5145,12 +5146,14 @@ class OrderController extends BaseController
             $noti->send($data,$sender,$noti,"created");
             $result['action'][]="send";
         }
+
+        $model->fecha_produccion = Carbon:: now();
         return $result;
     }
     /***/
     public function CloseOrder(Request $req)
     {
-        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo', 21);
+        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
 
         $result['success'] = "Registro guardado con éxito!";
         $result['action'] = "new";
@@ -5168,14 +5171,14 @@ class OrderController extends BaseController
         ];
         $noti = new NotificationModule();
         $noti->doc_id = $model->id;
-        $noti->doc_tipo = 21;
+        $noti->doc_tipo_id = 21;
         $noti->usuario_id = $this->user->id;
 
         if(sizeof($notif->where('clave', 'created')->get()) == 0){
             $data =$this->parseDocToSummaryEmail($model);
             $data['accion'] ="Creacion de Pedido";
             $noti->send($data,$sender,$noti,"created");
-            $result['action'][]="send";
+            $result['action2'][]="send";
         }
         return $result;
 
@@ -5511,12 +5514,14 @@ class OrderController extends BaseController
                 break;
             }
             if($aux->tipo_origen_id  = 21){
+
                 $aux = SolicitudeItem::findOrFail($aux->origen_item_id);
             }else  if($aux->tipo_origen_id  = 22){
                 $aux = OrderItem::findOrFail($aux->origen_item_id);
             }else{
                 $aux = PurchaseItem::findOrFail($aux->origen_item_id);
             }
+
 
             $i = $i +1;
             $traza[]= $aux;
@@ -5713,6 +5718,7 @@ class OrderController extends BaseController
         $data['articulos'] = sizeof(($items));
         $data['articulos_kitchenBox'] =0;
         $data['articulos_contraPedido'] =0;
+
         foreach($items as $aux){
             $p= $this->getFirstProducto($aux);
             switch($p->tipo_origen_id){
@@ -5756,7 +5762,7 @@ class OrderController extends BaseController
     private function sendNotificacion($data,$sender, $type = null){
         $noti = new NotificationModule();
         $noti->doc_id= $data['id'];
-        $noti->doc_tipo = $data['tipo'];
+        $noti->doc_tipo_id_id = $data['tipo'];
         $noti->clave = $type;
         $noti->usuario_id = $this->user->id;
 
@@ -5778,7 +5784,7 @@ class OrderController extends BaseController
             if($type != null){
                 $noti = new NotificationOrder();
                 $noti->doc_id= $data['id'];
-                $noti->doc_tipo = $data['tipo'];
+                $noti->doc_tipo_id = $data['tipo'];
                 switch($type){
                     case "created";  break;
                 }
@@ -5834,7 +5840,7 @@ class OrderController extends BaseController
 
                 }else{
                     if($this->user->cargo_id == $this->profile['trabajador']){
-                        $notif = NotificationModule::where('doc_id',$model->id)->where('doc_tipo',$model->getTipoId());
+                        $notif = NotificationModule::where('doc_id',$model->id)->where('doc_tipo_id',$model->getTipoId());
                         if(sizeof($notif->where('usuario_id','<>',$model->usuario_id)->get()) == 0){
                             $permit['update']=true;
                             $permit['metodo']='sin cambios';
@@ -5843,7 +5849,7 @@ class OrderController extends BaseController
                         $noti = User::selectRaw('tbl_usuario.id,tbl_usuario.cargo_id, count(tbl_noti_pedido.id) as noti ')
                             ->join('tbl_noti_pedido','tbl_noti_pedido.usuario_id','=','tbl_usuario.id' )
                             ->where('doc_id',$model->id)
-                            ->where('doc_tipo',$model->getTipoId())
+                            ->where('doc_tipo_id',$model->getTipoId())
                             ->where('cargo_id',$this->profile['gerente'])
                             ->groupBy('tbl_usuario.cargo_id')
                             ->get();
@@ -5859,7 +5865,7 @@ class OrderController extends BaseController
                 /*$noti = User::selectRaw('tbl_usuario.id,tbl_usuario.cargo_id, count(tbl_noti_pedido.id) as noti ')
                     ->join('tbl_noti_pedido','tbl_noti_pedido.usuario_id','=','tbl_usuario.id' )
                     ->where('doc_id',$model->id)
-                    ->where('doc_tipo',$model->getTipoId())
+                    ->where('doc_tipo_id',$model->getTipoId())
                     ->where('cargo_id',$this->profile['gerente'])
                     ->groupBy('tbl_usuario.cargo_id')
                     ->get();*/
