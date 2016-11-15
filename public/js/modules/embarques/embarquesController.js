@@ -1,4 +1,4 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,form,$resource, $model, filesService) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','$filter','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,$filter,form,$resource, $model, filesService) {
 
     //?review
     filesService.setFolder('orders');
@@ -25,13 +25,223 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
 
 
-    $scope.search = function(){
+/*    $scope.search = function(){
         var data =[];
         if($scope.provs.length > 0){
             return $scope.provs;
         }
         return data;
-    }
+    }*/
+
+    $scope.search = function(){
+        var data  =[];
+        if($scope.provs.length > 0){
+            data = $filter("customFind")($scope.provs,$scope.filterProv,
+                function(current,compare){
+                    var paso = true;
+                    current.prioridad = 0;
+                    if(compare.razon_social){
+                        if(current.razon_social.toLowerCase().indexOf(compare.razon_social.toLowerCase()) != -1){
+                            current.prioridad ++;
+                        }else{
+                            paso = false;
+                        }
+                    }
+                    if(compare.pais){
+                        var i= $filter("customFind")(current.paises,compare.pais, function(c,cp){ return c.toLowerCase().indexOf(cp.toLowerCase()) == -1}).length;
+                        if(i>0){
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+
+                    if(compare.pc == true){
+                        if(current.puntoCompra > 0 ){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+
+                    if(compare.cp == true){
+                        if(current.contrapedido > 0 ){
+                            paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+
+                    if(compare.monto){
+                        if(compare.op == '+'){
+                            if(parseFloat(current.deuda) < parseFloat(compare.monto)){
+                                paso = false;
+                            }
+                        }
+                        if(compare.op == '-'){
+                            if(parseFloat(current.deuda) > parseFloat(compare.monto)){
+                                paso = false;
+                            }
+                        }
+                    }
+
+                    if(compare.f0 == true){
+                        if(current.emit0 > 0  ||  current.review0 > 0){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f7 == true){
+                        if(current.emit7 > 0  ||  current.review7 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f30 == true){
+                        if(current.emit30 > 0  ||  current.review30 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f60 == true){
+                        if(current.emit60 > 0  ||  current.review60 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f90 == true){
+                        if(current.emit90 > 0  ||  current.review90 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }if(compare.f100 == true){
+                        if(current.emit100 > 0  ||  current.review100 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    return paso;
+
+                });
+        }
+        return  data;
+        //  return data;
+    };
+
+    $scope.searchCountry = function(){
+        var data  =[];
+        if($scope.paises.length > 0){
+            data = $filter("customFind")($scope.paises,$scope.filterCountry,
+                function(current,compare){
+                    var paso = true;
+                    current.prioridad = 0;
+                    if(compare.short_name){
+                        if(current.short_name.toLowerCase().indexOf(compare.short_name.toLowerCase()) != -1){
+                            current.prioridad ++;
+                        }else{
+                            paso = false;
+                        }
+                    }
+
+                    if(compare.pc == true){
+                        if(current.puntoCompra > 0 ){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+
+                    if(compare.cp == true){
+                        if(current.contrapedido > 0 ){
+                            paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+
+                    if(compare.monto){
+                        if(compare.op == '+'){
+                            if(parseFloat(current.deuda) < parseFloat(compare.monto)){
+                                paso = false;
+                            }
+                        }
+                        if(compare.op == '-'){
+                            if(parseFloat(current.deuda) > parseFloat(compare.monto)){
+                                paso = false;
+                            }
+                        }
+                    }
+
+                    if(compare.f0 == true){
+                        if(current.emit0 > 0  ||  current.review0 > 0){
+                            //paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f7 == true){
+                        if(current.emit7 > 0  ||  current.review7 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f30 == true){
+                        if(current.emit30 > 0  ||  current.review30 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f60 == true){
+                        if(current.emit60 > 0  ||  current.review60 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    if(compare.f90 == true){
+                        if(current.emit90 > 0  ||  current.review90 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }if(compare.f100 == true){
+                        if(current.emit100 > 0  ||  current.review100 > 0){
+                            //  paso = true;
+                            current.prioridad ++;
+                        }else {
+                            paso = false;
+                        }
+                    }
+                    return paso;
+
+                });
+        }
+        return  data;
+        //  return data;
+    };
 
     $scope.setProvedor = function(prov){
 
@@ -407,6 +617,23 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             angular.element("#menu").animate({height:"48px"},500);
             $scope.showLateralFilter=false;
         }
+    };
+
+    $scope.showDotData= function(item,emit,review, dias){
+        if(emit && review){
+            item.emit= angular.copy(emit);
+            item.review= angular.copy(review);
+            item.show = true;
+            item.dias=dias;
+            if(dias== 0){
+                item.text = " hoy ";
+            }else{
+                item.text = " hace " + dias+" dias ";
+            }
+        }else{
+            item.show = false;
+        }
+
     };
 
 }]);
@@ -2917,8 +3144,10 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','DateParse','form', '
                 var aux = {};
                 angular.forEach(v, function (v2, k) {
                     if(k == 'minProducion' || k == 'maxProducion'){
+                        if(v2!= null){
+                            aux[k] = DateParse.toDate(v2);
+                        }
 
-                        aux[k] = DateParse.toDate(v2);
                     } else if(k == 'cantidad' || k == 'disponible'){
                         aux[k] = parseFloat(v2);
                     }else{
@@ -3246,6 +3475,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.data ={adjs:[]};
     $scope.form='';
     $scope.model ={};
+    $scope.process = false;
 
     $scope.ff =[];
     $scope.ffSelect =null;
@@ -3267,10 +3497,16 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.puertoText =undefined;
 
     $scope.$parent.CreatTariff = function(){
+        $scope.process = false;
         $scope.head.$setPristine();
         $scope.bond.$setPristine();
         $scope.head.$setUntouched();
         $scope.bond.$setUntouched();
+        $scope.ffText = undefined;
+        $scope.nvText = undefined;
+        $scope.moneda_idText = undefined;
+        $scope.model.diasd_tt = undefined;
+
         $mdSidenav("miniCreatTariff").open().then(function(){
             $scope.isOpen = true;
             $timeout(function () {
@@ -3285,10 +3521,12 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     };
 
     $scope.close= function(e){
-        if($scope.isOpen){
+        if($scope.isOpen && !$scope.process){
+
             if($scope.head.$pristine && $scope.bond.$pristine  ){
                 $scope.inClose();
             }else {
+                $scope.process = true;
                 if($scope.head.$valid && $scope.bond.$valid ){
                     formSrv.setState("process");
                     if($scope.ffSelect == null){

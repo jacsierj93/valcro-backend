@@ -34,8 +34,6 @@ use Validator;
 use PDF;
 use App;
 
-
-
 class EmbarquesController extends BaseController
 {
     private  $user = null;
@@ -167,7 +165,32 @@ return $html;
     */
     /************************* PROVIDER ***********************************/
     public  function  getProvList(){
-        $prov  = Provider::where('id','<' ,100)->get();
+        $select = 'tbl_proveedor.id,'.
+            'tbl_proveedor.razon_social ,'.
+            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
+            'INNER JOIN tbl_compra_orden_item tcoi ON tcoi.id = tei.origen_item_id '.
+            'INNER JOIN tbl_embarque te ON tei.doc_id = te.id'.
+            ' WHERE tcoi.tipo_origen_id = 1 AND te.prov_id = tbl_proveedor.id) as contraPedido ,'.
+            '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
+            ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.prov_id = tbl_proveedor.id ) AS deuda,'.
+            '('.$this->generateEmit("emision","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("emision"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
+            .
+            '('.$this->generateReview("updated_at","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as review0 ,".
+            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review7, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review30,".
+            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review60, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review90, ".
+            '('.$this->generateReview("updated_at"," > 90 ","tbl_proveedor.id = tbl_embarque.prov_id").") as review100 ";
+
+        $prov  = Provider::selectraw($select)
+            ->where('id','<' ,100)->get();
         return $prov;
     }
     public  function  getProvDir(Request $req){
@@ -188,7 +211,32 @@ return $html;
     /************************* Countrye ***********************************/
 
     public function getCountryList(){
-        $model  =  Country::selectRaw(' distinct tbl_pais.id, tbl_pais.short_name')->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )->get();
+        $select = 'distinct tbl_pais.id,'
+            .' tbl_pais.short_name ,'.
+            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
+            'INNER JOIN tbl_compra_orden_item tcoi ON tcoi.id = tei.origen_item_id '.
+            'INNER JOIN tbl_embarque te ON tei.doc_id = te.id'.
+            ' WHERE tcoi.tipo_origen_id = 1 AND te.pais_id = tbl_pais.id) as contraPedido ,'.
+            '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
+            ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.pais_id = tbl_pais.id ) AS deuda,'.
+            '('.$this->generateEmit("emision","<=0","tbl_pais.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("emision"," > 90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit100, "
+            .
+            '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.prov_id").") as review0 ,".
+            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as review7, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as review30,".
+            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as review60, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as review90, ".
+            '('.$this->generateReview("updated_at"," > 90 ","tbl_pais.id = tbl_embarque.prov_id").") as review100 ";
+        $model  =  Country::selectRaw($select)
+            ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
+            ->get();
         return $model;
     }
 
@@ -1398,6 +1446,24 @@ return $html;
         return $data;
     }
 
+    /************************* Private master ***********************************/
+    private function generateEmit($campo, $condicion, $where){
+        $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_embarque where ".$where." and tbl_embarque.deleted_at is null and tbl_embarque.comentario_cancelacion is null),0) "
+            .""
+        ;
+        return $q;
+    }
+
+    private function generateReview($campo, $condicion,$where){
+        $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+            ." tbl_embarque where ".$where." and tbl_embarque.deleted_at is null and tbl_embarque.comentario_cancelacion is null ),0) "
+            .""
+        ;
+        return $q;
+    }
+
+
     /************************* Private opt master ***********************************/
     private function getFirstProducto($model){
         $aux = $model->replicate();
@@ -1410,11 +1476,12 @@ return $html;
                 break;
             }
             if($aux->tipo_origen_id  = 21){
-                $aux = Solicitude::findOrFail($aux->origen_item_id);
+                $aux = App\Models\Sistema\Solicitude\SolicitudeItem::findOrFail($aux->origen_item_id);
             }else  if($aux->tipo_origen_id  = 22){
-                $aux = OrderItem::findOrFail($aux->origen_item_id);
+                $aux = App\Models\Sistema\Order\OrderItem::findOrFail($aux->origen_item_id);
             }else{
-                $aux = Purchase::findOrFail($aux->origen_item_id);
+                $aux =
+                PurchaseItem::findOrFail($aux->origen_item_id);
             }
 
             $i = $i +1;
@@ -1463,8 +1530,6 @@ return $html;
 
 
     }
-
-
 
     private  function  shipmentDates($id){
 
