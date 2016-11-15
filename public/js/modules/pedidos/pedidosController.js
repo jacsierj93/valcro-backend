@@ -4771,6 +4771,59 @@ MyApp.directive('loader', function() {
     };
 });
 
+
+MyApp.directive('vlNext', function($timeout, vlNextSrv) {
+
+    return {
+        replace: true,
+        controller: 'vlNextCtrl',
+        scope:{
+            'show' : "=vlShow",
+            'click': '=?click'
+        },
+        link: function(scope, elem, attr, ctrl){
+            console.log("in directiva", scope);
+            scope.click= function (e) {
+                console.log('hizo click',e)
+            }
+
+            scope.enter= function (e) {
+                console.log('hover',e)
+            }
+            scope.leave= function (e) {
+                console.log('hover',e)
+            }
+
+        },
+        template: function(elem, attr){
+            return ' <div style="width: 16px;" ng-mousehover="enter($event)" ng-mouseleave="showNext($event)"  > </div>';
+        }
+    };
+});
+
+MyApp.controller('vlNextCtrl', ['$scope','$mdSidenav', function ($scope,$mdSidenav) {
+
+
+    $scope.showNext = function (e) {
+        console.log("e ", e)
+        if (e) {
+            $mdSidenav("NEXT").open();
+        }else {
+            $mdSidenav("NEXT").close();
+        }
+    }
+}]);
+
+MyApp.service('vlNextSrv',function () {
+    var call = undefined;
+    return {
+        set : function (data) {
+            call= data;
+        }, get : function () {
+            return call;
+        }
+    }
+});
 MyApp.directive('alert', function(setNotif) {
 
     return {
