@@ -1811,8 +1811,7 @@
                     </div>
 
                 </div>
-               <!-- <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>-->
-                <vl-next click="next()"></vl-next>
+                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
 
             </md-content>
         </md-sidenav>
@@ -4666,9 +4665,8 @@
                     z-index: 100;"
             layout="column" layout-align="center center" class="md-sidenav-right"
             md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
-           >
-            <div ng-controller="vlNextCtrl"  ng-mouseleave="showNext()" ng-click="next()" click-out="showNext()"> <?= HTML::image("images/btn_nextArrow.png") ?></div>
-
+            ng-mouseleave="showNext(false)" ng-click="next()" click-out="showNext(false)">
+            <?= HTML::image("images/btn_nextArrow.png") ?>
         </md-sidenav>
 
         <!------------------------------------------- Alertas ------------------------------------------------>
