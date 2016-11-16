@@ -194,6 +194,14 @@
                             Actualizar la  {{formMode.name}}
                         </md-tooltip>
                     </div>
+                    <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center" ng-show=" module.layer == 'listProducProv' && !Docsession.block">
+                        <div ng-click="openCreateProduct()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
+                            <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                        </div skip-tab >
+                        <md-tooltip >
+                            Crear Producto
+                        </md-tooltip>
+                    </div>
                     <div layout="column" layout-align="center center"
                          ng-show="( module.layer == 'delalleDoc' && !FormHeadDocument.$valid && document.permit.del )"
                          ng-click="delete(document)" >
@@ -1122,19 +1130,27 @@
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detalleDoc" id="detalleDoc">
 
-            <md-content  layout="row" flex class="sideNavContent">
+            <md-content  layout="row" flex class="sideNavContent" >
                 <div  layout="column" flex="" layout-align=" none" >
                     <form name="FormHeadDocument" layout="row" ng-class="{focused: gridView == 1}" ng-style="(gridView != 5 && tbl_dtDoc.extend == 0 ) ? {'min-height' : '320px'} : {} ">
                         <div active-left></div>
                         <div layout="column" flex ng-init=" tbl_dtDoc.extend = 0" >
-                            <div layout="row" class="row" >
-
-                                <div class="titulo_formulario" layout="column" layout-align="start start"  ng-click=" gridView = 1 ; tbl_dtDoc.extend = 0 ;">
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 1}" >
+                                <div class="titulo_formulario" style="height:39px;" flex >
                                     <div>
                                         Datos de {{formMode.name}}
                                     </div>
                                 </div>
+
                             </div>
+                            <!--<div layout="row" class="row"  class="form-row-head" ng-class="{'form-row-head-select':gridView == 1}"  >
+
+                                <div class="titulo_formulario" layout="column" layout-align="start start"  ng-click=" gridView = 1 ; tbl_dtDoc.extend = 0 ;" class="form-row-head" ng-class="{'form-row-head-select':tbl_dtDoc.extend == 0 }"  >
+                                    <div>
+                                        Datos de {{formMode.name}}
+                                    </div>
+                                </div>
+                            </div>-->
                             <div   ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex ng-click="allowEdit()" >
                                     <label>Proveedor</label>
@@ -1463,14 +1479,22 @@
                     <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
                         <div active-left></div>
                         <div layout="column" flex >
-                            <div layout="row" flex class="row">
-                                <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 2">
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" >
+                                <div class="titulo_formulario" style="height:39px;" flex >
                                     <div>
                                         Aprobacion de Gerente
                                     </div>
                                 </div>
 
                             </div>
+                            <!--<div layout="row" flex class="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}"  >
+                                <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 2">
+                                    <div>
+                                        Aprobacion de Gerente
+                                    </div>
+                                </div>
+
+                            </div>-->
 
                             <div layout="row" ng-show="( gridView == 2 )" class="row"  id="estatusDoc">
 
@@ -1498,13 +1522,21 @@
                     <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="document.permit.aprob_compras && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras($event): 0" >
                         <div active-left></div>
                         <div layout="column" flex>
-                            <div layout="row" flex class="row" >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 3}" >
+                                <div class="titulo_formulario" style="height:39px;" flex >
+                                    <div>
+                                        Aprobación
+                                    </div>
+                                </div>
+
+                            </div>
+                           <!-- <div layout="row" flex class="row"  class="form-row-head" ng-class="{'form-row-head-select':gridView == 3}" >
                                 <div class="titulo_formulario"  layout="column" layout-align="start start" ng-click=" gridView = 3">
                                     <div>
                                         Aprobación
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
 
@@ -1554,14 +1586,22 @@
                     <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.permit.cancel && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
                         <div active-left></div>
                         <div layout="column" flex  >
-                            <div layout="row" flex class="row" >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}" >
+                                <div class="titulo_formulario" style="height:39px;" flex >
+                                    <div>
+                                        Cancelacion
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!--<div layout="row" flex class="row" >
 
                                 <div class="titulo_formulario" layout="column"  id="docCancel" layout-align="start start" ng-click=" gridView = 4">
                                     <div>
                                         Cancelacion
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
                                 <label>Motivo de cancelacion </label>
@@ -1577,9 +1617,21 @@
 
                         </div>
                     </form>
-                    <form layout="row" ng-class="{focused: (gridView == 5)}" ng-show="tbl_dtDoc.extend == 0 && document.productos.todos.length > 0 ">
+                    <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5)}" ng-show="tbl_dtDoc.extend == 0 && document.productos.todos.length > 0 ">
                         <div active-left></div>
-                        <div layout="row"  flex class="row" >
+                        <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}" >
+                            <div class="titulo_formulario" style="height:39px;" flex >
+                                <div>
+                                    Productos agregados
+                                </div>
+                            </div>
+                            <div layout-align="center center" layout="column">
+                                <span style="color: #1f1f1f" ng-show="(document.productos.todos.length > 0 )">
+                                        ({{document.productos.todos.length}})</span>
+                            </div>
+
+                        </div>
+                        <!--<div layout="row"  flex class="row" >
                             <div layout-align="center center" layout="column">
                                 <span style="color: #1f1f1f" ng-show="(document.productos.todos.length > 0 )">
                                         ({{document.productos.todos.length}})</span>
@@ -1591,70 +1643,51 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                    <form layout="row" ng-class="{focused: (gridView == 5) }" ng-show="(gridView == 5) ">
+                        </div>-->
+                    </div>
+                    <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5) }" ng-show="(gridView == 5) ">
                         <div active-left></div>
                         <div layout="row" flex ng-init="tbl_dtDoc.order = 'id' " class="row">
-                            <div flex="5">
-
-                            </div>
+                            <div flex="5"></div>
                             <div flex="10" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'cod_producto' "><img ng-src="{{(tbl_dtDoc.order == 'cod_producto') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-cod_producto' "><img ng-src="{{(tbl_dtDoc.order == '-cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
                                 <md-input-container class="md-block" flex >
                                     <label>Codigo</label>
-                                    <input  ng-model="tbl_dtDoc.filter.cod_producto"
-                                    >
+                                    <input  ng-model="tbl_dtDoc.filter.cod_producto">
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl_dtDoc" key="cod_producto"></grid-order-by>
 
                             </div>
 
                             <div flex layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'descripcion' "><img ng-src="{{(tbl_dtDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-descripcion' " ><img ng-src="{{(tbl_dtDoc.order == '-descripcion') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
                                 <md-input-container class="md-block" flex >
                                     <label>Descripcion</label>
                                     <input  ng-model="tbl_dtDoc.filter.descripcion"
                                     >
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl_dtDoc" key="descripcion"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'documento' " ><img ng-src="{{(tbl_dtDoc.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-documento' " ><img ng-src="{{(tbl_dtDoc.order == '-documento') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
                                 <md-input-container class="md-block" flex >
                                     <label>Documento</label>
                                     <input  ng-model="tbl_dtDoc.filter.documento"
                                     >
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl_dtDoc" key="documento"></grid-order-by>
 
                             </div>
                             <div flex="10" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_dtDoc.order = 'saldo' " ><img ng-src="{{(tbl_dtDoc.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_dtDoc.order = '-saldo' "><img ng-src="{{(tbl_dtDoc.order == '-saldo') ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block" flex >
                                     <label>Cantidad</label>
                                     <input  ng-model="tbl_dtDoc.filter.saldo"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl_dtDoc" key="saldo"></grid-order-by>
                             </div>
                         </div>
 
-                    </form>
-                    <form class="gridContent"  layout="row" name="dtdocProductos" flex >
+                    </div>
+                    <div class="gridContent form-style"  layout="row"  flex >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div >
@@ -1686,7 +1719,7 @@
                         </div>
 
 
-                    </form>
+                    </div>
                     <div layout="column"  class="row" ng-click=" tbl_dtDoc.extend = ( tbl_dtDoc.extend == 0) ? 1: 0 " ng-show="docProdFilter.length > 0 && (gridView == 5) ">
                         <div flex style="border: dashed 1px #f1f1f1; text-align: center" layout="column" layout-align="end none">
                             <span class="{{ ( tbl_dtDoc.extend == 0) ? 'icon-Up' : 'icon-Above' }}"></span>
@@ -1823,21 +1856,17 @@
 
             <md-content  layout="row" flex class="sideNavContent">
                 <div  layout="column" flex class="layerColumn" >
-                    <form  layout="row" class="focused">
+                    <div  layout="row" class="focused form-style">
                         <!----FILTROS ---->
                         <div active-left ></div>
                         <div class="titulo_formulario md-block"  layout="row" >
-                            <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center">
-                                <div ng-click="openCreateProduct()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
-                                    <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-                                </div skip-tab >
-                            </div>
+
                             <div>
                                 Productos
                             </div>
                         </div>
-                    </form>
-                    <form name="newProd" layout="row">
+                    </div>
+                    <div class="form-style" name="newProd" layout="row">
                         <!----FILTROS ---->
                         <div active-left ></div>
                         <div layout="column" flex>
@@ -1845,11 +1874,6 @@
                                 <div flex="5" class=""></div>
 
                                 <div layout="row" flex="20">
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'codigo' " ><img ng-src="{{(tbl_listProducProv.order == 'codigo') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-codigo' " ><img ng-src="{{(tbl_listProducProv.order == '-codigo') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
-
                                     <md-input-container class="md-block"  flex>
                                         <label>Codigo</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
@@ -1857,13 +1881,11 @@
                                                skip-tab
                                         >
                                     </md-input-container>
+                                    <grid-order-by ng-model="tbl_listProducProv" key="codigo"></grid-order-by>
                                 </div>
 
                                 <div layout="row" flex="20">
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'codigo_fabrica' "><img ng-src="{{(tbl_listProducProv.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-codigo_fabrica' " ><img ng-src="{{(tbl_listProducProv.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
+
                                     <md-input-container class="md-block" flex>
                                         <label>Cod. Fabrica</label>
                                         <input type="text" class="inputFilter"  ng-minlength="2"
@@ -1872,12 +1894,9 @@
 
                                         >
                                     </md-input-container>
+                                    <grid-order-by ng-model="tbl_listProducProv" key="codigo_fabrica"></grid-order-by>
                                 </div>
                                 <div layout="row" flex >
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'descripcion' " ><img ng-src="{{(tbl_listProducProv.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-descripcion' "><img ng-src="{{(tbl_listProducProv.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
 
                                     <md-input-container class="md-block" flex >
                                         <label>Descripcion</label>
@@ -1889,15 +1908,13 @@
 
                                         >
                                     </md-input-container>
+                                    <grid-order-by ng-model="tbl_listProducProv" key="descripcion"></grid-order-by>
                                 </div>
 
                                 <!--<div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )"></div>-->
 
                                 <div layout="row" flex="15">
-                                    <div class="cell-filter-order" layout-align="center center" >
-                                        <div ng-click="tbl_listProducProv.order = 'cantidad' " ><img ng-src="{{(tbl_listProducProv.order == 'cantidad') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                        <div ng-click="tbl_listProducProv.order = '-cantidad' "><img ng-src="{{(tbl_listProducProv.order == '-cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                    </div>
+
 
                                     <md-input-container class="md-block" flex>
                                         <label>Cantidad</label>
@@ -1909,12 +1926,13 @@
 
                                         >
                                     </md-input-container>
+                                    <grid-order-by ng-model="tbl_listProducProv" key="saldo"></grid-order-by>
 
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <form name="listProductoItems" class="gridContent"  layout="row" flex >
+                    </div>
+                    <form  name="listProductoItems" class="gridContent"  layout="row" flex >
                         <div active-left ></div>
                         <div  flex layout="column">
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order  as filterProductProv"
