@@ -1337,6 +1337,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
     };
+
+    $scope.testShow = function () {
+        return $scope.docProdFilter.length > 0
+    }
+
+
     $scope.showNext = function (status) {
         if (status) {
             if($scope.module.layer == 'detalleDoc'){
@@ -4782,42 +4788,50 @@ MyApp.directive('vlNext', function($timeout, vlNextSrv) {
             'click': '=?click'
         },
         link: function(scope, elem, attr, ctrl){
-            console.log("in directiva", scope);
-            scope.click= function (e) {
-                console.log('hizo click',e)
-            }
-
-            scope.enter= function (e) {
-                console.log('hover',e)
-            }
-            scope.leave= function (e) {
-                console.log('hover',e)
-            }
 
         },
         template: function(elem, attr){
-            return ' <div style="width: 16px;" ng-mousehover="enter($event)" ng-mouseleave="showNext($event)"  > </div>';
+            return ' <div style="width: 16px;" ng-mouseenter="showNext($event, click, show, this);" > </div>';
         }
     };
 });
 
-MyApp.controller('vlNextCtrl', ['$scope','$mdSidenav', function ($scope,$mdSidenav) {
+MyApp.controller('vlNextCtrl', ['$scope','$mdSidenav','vlNextSrv', function ($scope,$mdSidenav,vlNextSrv) {
 
 
-    $scope.showNext = function (e) {
-        console.log("e ", e)
-        if (e) {
-            $mdSidenav("NEXT").open();
-        }else {
-            $mdSidenav("NEXT").close();
+    $scope.showNext = function (e, click, show, all) {
+     if (e ) {
+         vlNextSrv.set({click:click,show:show, all: all});
+         if(show){
+             console.log("tiene show", e);
+             if(show()){
+
+                 if(show()){
+                     $mdSidenav("NEXT").open().then(function () {
+                     });
+                 }
+             }
+         }
+     }else{
+        $mdSidenav("NEXT").close().then(function () {
+
+        });
         }
-    }
+     }
+
+     // en el scopde de next
+     $scope.clicker = function (e) {
+           var event = vlNextSrv.get();
+        event.click(event);
+     }
+
 }]);
 
 MyApp.service('vlNextSrv',function () {
     var call = undefined;
     return {
         set : function (data) {
+            console.log("in service", data)
             call= data;
         }, get : function () {
             return call;

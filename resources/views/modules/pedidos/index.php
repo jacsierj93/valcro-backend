@@ -1695,7 +1695,8 @@
 
                 </div>
                 <div   id="expand"></div>
-                <div style="width: 16px;"   ng-mouseover="showNext(true)"  ng-mouseenter="(gridView == 3) ? saveAprobCompras(): 0" > </div>
+               <!-- <div style="width: 16px;"   ng-mouseover="showNext(true)"  ng-mouseenter="(gridView == 3) ? saveAprobCompras(): 0" > </div>-->
+                <vl-next click="next" vl-show="testShow"></vl-next>
             </md-content>
 
 
@@ -1812,6 +1813,7 @@
 
                 </div>
                 <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+
 
             </md-content>
         </md-sidenav>
@@ -4665,8 +4667,9 @@
                     z-index: 100;"
             layout="column" layout-align="center center" class="md-sidenav-right"
             md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
-            ng-mouseleave="showNext(false)" ng-click="next()" click-out="showNext(false)">
-            <?= HTML::image("images/btn_nextArrow.png") ?>
+           >
+            <div  style="width: 100%;" ng-controller="vlNextCtrl"   ng-mouseleave="showNext()"  layout="column" layout-align="center center" flex ng-click="clicker(this)"> <?= HTML::image("images/btn_nextArrow.png") ?></div>
+
         </md-sidenav>
 
         <!------------------------------------------- Alertas ------------------------------------------------>
