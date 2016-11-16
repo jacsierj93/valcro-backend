@@ -16,11 +16,11 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         created:true
     };
     $timeout(function () {
-        $resource.query({type:"Provider"}, {}, function(response){$scope.provs= response; });
+        $resource.query({type:"Providers"}, {}, function(response){$scope.provs= response; });
     },0);
 
     $timeout(function () {
-        $resource.query({type:"Country"}, {}, function(response){$scope.paises= response; });
+        $resource.query({type:"Countrys"}, {}, function(response){$scope.paises= response; });
     },0);
 
 
@@ -250,10 +250,11 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $scope.shipment.prov_id= prov.id;
             $scope.listShipmentCtrl({prov_id: prov.id});
         }else if($scope.module.layer == 'detailShipment' && !$scope.session.isblock){
-            console.log("scope", $scope);
-            if(!$scope.shipment.pais_id){
+
+            if(!$scope.shipment.tarifa_id){
                 $scope.provSelec= prov;
                 $scope.shipment.prov_id= prov.id;
+                $model.change('document','prov_id',  prov.id);
                 $scope.save();
             }else {
                 $model.setNext(function () {
@@ -288,12 +289,13 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $scope.paisSelec = pais;
             $scope.shipment.pais_id= pais.id;
             $scope.listShipmentCtrl({pais_id: pais.id});
-        }else if($scope.module.layer == 'detailShipment' && !$scope.session.isblock){
+        }else if(($scope.module.layer == 'detailShipment' || $scope.module.layer == 'listTariff') && !$scope.session.isblock){
 
             console.log("scope", $scope);
-            if(!$scope.shipment.tarifa_id){
+            if(!$scope.shipment.tarifa_id ){
                 $scope.paisSelec= pais;
                 $scope.shipment.pais_id= pais.id;
+                $model.change('tarifa','pais_id',  pais.id);
                 $scope.save();
             }else {
                 $model.setNext(function () {
@@ -350,6 +352,36 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
 
     };
+
+    $scope.reloadProv= function (fn) {
+        console.log('$scope.provSelec', $scope.provSelec)
+        if( $scope.provSelec && $scope.provSelec.id){
+            $resource.get({type:"Provider", id:$scope.provSelec.id}, {}, function(response){
+                angular.forEach(response, function (v,k) {
+                    $scope.provSelec[k]=v;
+                });
+                if(fn){
+                    fn($scope.provSelec);
+                }
+            });
+        }
+
+
+    }
+    $scope.reloadCountry= function (fn) {
+        if( $scope.paisSelec && $scope.paisSelec.id){
+            $resource.get({type:"Country",id:$scope.paisSelec.id}, {}, function(response){
+                angular.forEach(response, function (v,k) {
+                    $scope.paisSelec[k]=v;
+                });
+                if(fn){
+                    fn($scope.paisSelec);
+                }
+            });
+        }
+
+
+    }
 
     $scope.closeSide = function(){
         $timeout(function () {
@@ -507,10 +539,13 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.$watch('bindShipment.estado', function(newVal){
 
         if(newVal){
-            $scope.shipment = $model.getData();
-            if( $scope.shipment.objs){
-                $scope.provSelec = $scope.shipment.objs.prov_id;
-            }
+            $timeout(function () {
+                $scope.shipment = $model.getData();
+                if( $scope.shipment.objs){
+                    $scope.provSelec = $scope.shipment.objs.prov_id;
+                }
+            },0);
+
 
 
 
@@ -523,8 +558,14 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         if(newVal[1] == 0 || newVal[0] == 'listShipmentUncloset'){
             $timeout(function () {
                 $model.clear();
-                $scope.provSelec= undefined;
-                $scope.paisSelec= undefined;
+                $scope.reloadProv(function () {
+                    $scope.provSelec= undefined
+                });
+                $scope.reloadCountry(function () {
+                    $scope.paisSelec= undefined;
+                });
+
+
                 $scope.session.global = 'new';
                 $scope.session.isblock = true;
             },0);
@@ -824,7 +865,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
         }
     });
     $scope.$watch("$parent.provSelec", function(newVal){
-
         $scope.provSelec = newVal;
     });
 
@@ -1506,20 +1546,39 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
         }
     });
     $scope.$watch("$parent.paisSelec", function(newVal){
-        $scope.pais_idSelec =  newVal;
+        if($scope.$parent.paisSelec){
+            $scope.pais_idSelec =  newVal;
+        }
 
     });
     $scope.$watch("pais_idSelec", function (newVal) {
         if(newVal ){
-            $scope.puerto_idText  = undefined;
+
             $scope.tbl.data.splice(0,  $scope.tbl.data.length);
             $scope.$parent.save();
         }
         if( $scope.$parent.module.layer == 'listTariff'){
             $model.change('tarifa', 'pais_id',(newVal) ? newVal.id: undefined);
+            $scope.puerto_idText  = undefined;
         }
 
     })
+    $scope.$watch("pais_idSelec", function(newVal){
+//paisSelec
+        if(newVal && $scope.$parent.paisSelec){
+            if(newVal.id != $scope.$parent.paisSelec.id){
+                $scope.$parent.paisSelec = newVal;
+                $timeout(function(){
+                    var elem=angular.element("#prov"+newVal.id);
+                    angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
+                },0)
+            }
+        } else if(newVal && $scope.$parent.paisSelec == null){
+            $scope.$parent.paisSelec= newVal
+        }else{
+            $scope.$parent.paisSelec= undefined;
+        }
+    });
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
 
         $scope.pais_idSelec=newVal;
@@ -1533,7 +1592,9 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
         }
     });
     $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
-        $scope.puerto_idSelec=newVal;
+        if(newVal){
+            $scope.puerto_idSelec=newVal;
+        }
 
     });
     $scope.$watch('puerto_idSelec', function(newVal){
@@ -2188,7 +2249,8 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
                 codigo_fabrica:$scope.select.codigo_fabrica,
                 disponible:$scope.select.disponible,
                 codigo:$scope.select.codigo,
-                doc_origen_id:$scope.select.doc_origen_id
+                doc_origen_id:$scope.select.doc_origen_id,
+                uid:$scope.select.uid
             };
 
             console.log("data en upadtea", data);
@@ -2578,7 +2640,6 @@ MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','$timeout','masters',
         });
     }
     $scope.close= function(e){
-        console.log("e", e)
         if($scope.isOpen){
             if($scope.formProduct.$pristine ){
                 $scope.inClose();
@@ -3069,6 +3130,7 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','for
             codigo_fabrica:$scope.prodSelect.codigo_fabrica,
             disponible:$scope.prodSelect.disponible,
             codigo:$scope.prodSelect.codigo,
+            uid:$scope.prodSelect.uid,
             doc_origen_id:$scope.select.id
         };
 
@@ -3222,6 +3284,7 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','DateParse','form', '
             codigo_fabrica:$scope.prdSelect.codigo_fabrica,
             disponible:$scope.prdSelect.disponible,
             codigo:$scope.prdSelect.codigo,
+            uid:$scope.prdSelect.uid,
             doc_origen_id:$scope.select.id
         };
         $scope.$parent.DetailProductShipment(data);
@@ -3363,7 +3426,8 @@ MyApp.controller('DetailProductShipmentCtrl',['$scope','$mdSidenav', '$timeout',
                     tipo_origen_id:($scope.select.tipo_origen_id)? $scope.select.tipo_origen_id : 23,
                     doc_id: $scope.$parent.shipment.id ,
                     doc_origen_id:($scope.select.doc_origen_id) ? $scope.select.doc_origen_id : $scope.select.doc_id,
-                    producto_id: $scope.select.producto_id
+                    producto_id: $scope.select.producto_id,
+                    uid: $scope.select.uid
                 };
                 $resource.postMod({type:"OrderItem", mod:"Save"},send, function (response) {
 
@@ -3630,7 +3694,9 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     });
 
     $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
-        $scope.puertoSelect=newVal;
+        if(newVal){
+            $scope.puertoSelect=newVal;
+        }
     });
 
 
@@ -4025,6 +4091,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 if(fn){
                     fn(this);
                 }
+                console.log("in data ",Shipment );
 
             });
 

@@ -17,11 +17,13 @@ $app->post('embarques/Container/Delete', 'Embarques\EmbarquesController@DeleteCo
 
 
 //providers
-$app->get('embarques/Provider', 'Embarques\EmbarquesController@getProvList');
+$app->get('embarques/Providers', 'Embarques\EmbarquesController@getProvList');
+$app->get('embarques/Provider', 'Embarques\EmbarquesController@getProvider');
 $app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 
 // country
-$app->get('embarques/Country', 'Embarques\EmbarquesController@getCountryList');
+$app->get('embarques/Countrys', 'Embarques\EmbarquesController@getCountryList');
+$app->get('embarques/Country', 'Embarques\EmbarquesController@getCountry');
 
 
 

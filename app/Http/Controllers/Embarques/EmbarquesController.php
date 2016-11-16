@@ -168,9 +168,16 @@ return $html;
         $select = 'tbl_proveedor.id,'.
             'tbl_proveedor.razon_social ,'.
             '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
-            'INNER JOIN tbl_compra_orden_item tcoi ON tcoi.id = tei.origen_item_id '.
-            'INNER JOIN tbl_embarque te ON tei.doc_id = te.id'.
-            ' WHERE tcoi.tipo_origen_id = 1 AND te.prov_id = tbl_proveedor.id) as contraPedido ,'.
+            'INNER JOIN '.
+            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
+            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
+            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
+            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
+            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
+            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
+            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
+            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.prov_id = tbl_proveedor.id  GROUP BY todos.uid) '.
+            'as contraPedido ,'.
             '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
@@ -189,8 +196,7 @@ return $html;
             '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review90, ".
             '('.$this->generateReview("updated_at"," > 90 ","tbl_proveedor.id = tbl_embarque.prov_id").") as review100 ";
 
-        $prov  = Provider::selectraw($select)
-            ->where('id','<' ,100)->get();
+        $prov  = Provider::selectraw($select)->get();
         return $prov;
     }
     public  function  getProvDir(Request $req){
@@ -208,15 +214,57 @@ return $html;
         return $data;
     }
 
+    public function getProvider(Request $req){
+        $select = 'tbl_proveedor.id,'.
+            'tbl_proveedor.razon_social ,'.
+            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
+            'INNER JOIN '.
+            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
+            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
+            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
+            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
+            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
+            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
+            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
+            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.prov_id = tbl_proveedor.id  GROUP BY todos.uid) '.
+            'as contraPedido ,'.
+            '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
+            ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.prov_id = tbl_proveedor.id ) AS deuda,'.
+            '('.$this->generateEmit("emision","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("emision"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
+            .
+            '('.$this->generateReview("updated_at","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as review0 ,".
+            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review7, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review30,".
+            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review60, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review90, ".
+            '('.$this->generateReview("updated_at"," > 90 ","tbl_proveedor.id = tbl_embarque.prov_id").") as review100 ";
+
+        $prov  = Provider::selectraw($select)->where('tbl_proveedor.id',$req->id)->first();
+        return $prov;
+    }
+
     /************************* Countrye ***********************************/
 
     public function getCountryList(){
         $select = 'distinct tbl_pais.id,'
             .' tbl_pais.short_name ,'.
             '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
-            'INNER JOIN tbl_compra_orden_item tcoi ON tcoi.id = tei.origen_item_id '.
-            'INNER JOIN tbl_embarque te ON tei.doc_id = te.id'.
-            ' WHERE tcoi.tipo_origen_id = 1 AND te.pais_id = tbl_pais.id) as contraPedido ,'.
+            'INNER JOIN '.
+            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
+            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
+            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
+            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
+            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
+            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
+            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
+            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.pais_id = tbl_pais.id  GROUP BY todos.uid) as contraPedido ,'.
             '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
@@ -237,6 +285,42 @@ return $html;
         $model  =  Country::selectRaw($select)
             ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
             ->get();
+        return $model;
+    }
+    public function getCountry(Request $req){
+        $select = 'distinct tbl_pais.id,'
+            .' tbl_pais.short_name ,'.
+            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
+            'INNER JOIN '.
+            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
+            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
+            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
+            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
+            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
+            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
+            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
+            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.pais_id = tbl_pais.id  GROUP BY todos.uid) as contraPedido ,'.
+            '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
+            ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
+            ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.pais_id = tbl_pais.id ) AS deuda,'.
+            '('.$this->generateEmit("emision","<=0","tbl_pais.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("emision"," > 90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit100, "
+            .
+            '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.prov_id").") as review0 ,".
+            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as review7, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as review30,".
+            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as review60, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as review90, ".
+            '('.$this->generateReview("updated_at"," > 90 ","tbl_pais.id = tbl_embarque.prov_id").") as review100 ";
+        $model  =  Country::selectRaw($select)
+            ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
+            ->where('tbl_pais.id', $req->id)
+            ->first();
         return $model;
     }
 
@@ -320,6 +404,7 @@ return $html;
                 tbl_compra_orden_item.tipo_origen_id, 
                 tbl_compra_orden_item.origen_item_id, 
                 tbl_compra_orden_item.producto_id, 
+                tbl_compra_orden_item.uid, 
                 tbl_compra_orden_item.saldo as cantidad, 
                 tbl_compra_orden_item.saldo as disponible, '.
                 'tbl_prov_tiempo_fab.min_dias, '.
@@ -985,6 +1070,12 @@ return $html;
         $model->origen_item_id= $req->origen_item_id;
         $model->producto_id= $req->producto_id;
 
+        if(!$req->has('uid')){
+            $model->uid = Carbon::now()->toRfc2822String().uniqid('', true);// removeer en function closeShipment
+        }else{
+            $model->uid =$req->uid;
+        }
+
         if(!$req->has("cantidad")){
             $model->cantidad= $req->saldo;
             $model->saldo= $req->saldo;
@@ -1412,6 +1503,7 @@ return $html;
             'tbl_compra_orden_item.descripcion,'.
             'tbl_compra_orden_item.doc_id,'.
             'tbl_compra_orden_item.producto_id,'.
+            'tbl_compra_orden_item.uid,'.
             '(tbl_producto.precio  * tbl_compra_orden_item.saldo) as total ,'.
             'tbl_compra_orden.fecha_produccion,'.
             'tbl_producto.codigo,'.

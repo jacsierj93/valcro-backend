@@ -697,21 +697,21 @@
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div layout="row" flex="50">Puerto</div>
-                                <div class="rms" flex> {{($parent.shipment.obj.puerto_id.Main_port_name)?$parent.shipment.obj.puerto_id.Main_port_name:'No asignado'}}</div>
+                                <div class="rms" flex> {{($parent.shipment.objs.puerto_id.Main_port_name)? $parent.shipment.objs.puerto_id.Main_port_name:'No asignado'}}</div>
                                 <md-tooltip >
                                     Puerto de origen del embarque
                                 </md-tooltip>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div layout="row" flex="50">Freigth Fowarder</div>
-                                <div class="rms" flex> {{$parent.shipment.freigth}}</div>
+                                <div class="rms" flex> {{($parent.shipment.objs.tarifa_id.freight_forwarder.nombre)? $parent.shipment.objs.tarifa_id.freight_forwarder.nombre : 'No asignado'}}</div>
                                 <md-tooltip >
                                     Compañia de traslado
                                 </md-tooltip>
                             </div>
                             <div layout="row"  class="rowRsm">
                                 <div layout="row" flex="50">Naviera</div>
-                                <div class="rms" flex> {{$parent.shipment.naviera}}</div>
+                                <div class="rms" flex> {{($parent.shipment.objs.tarifa_id.naviera.nombre) ? $parent.shipment.objs.tarifa_id.naviera.nombre : 'No asignado'}}</div>
                                 <md-tooltip >
                                     Compañia de embarcacion
                                 </md-tooltip>

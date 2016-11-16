@@ -47,7 +47,7 @@ class Shipment extends Model
      *Container del embarq
      */
     public function containers(){
-        return $this->hasMany('App\Models\Sistema\Shipments\Container', 'embarque_id');
+        return $this->hasMany('App\Models\Sistema\Shipments\Container', 'doc_id');
     }
 
     /**
