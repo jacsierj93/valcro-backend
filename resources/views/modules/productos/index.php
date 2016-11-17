@@ -1,10 +1,10 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex >
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="prodMainController">
 
 
 
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
-    <div class="contentHolder" layout="row" flex ng-controller="prodMainController">
+    <div class="contentHolder" layout="row" flex >
 
         <div class="barraLateral" layout="column" ng-controller="listController">
             <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
@@ -213,7 +213,7 @@
                                     <div>
                                         Linea
                                     </div>
-                                    <div style="width: 24px; font-size:24px;" ng-click="openConstruct()">+</div>
+                                    <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
                                 </div>
 
                                 <md-content layout="column" style="margin: 0px 4px 0px 4px">
@@ -351,9 +351,163 @@
                                 </div>
                                 <div flex>
                                     <form name="optionsForm" layout="column">
-                                        <div ng-repeat="opcion in options" ng-init="inicialize(opcion)" style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                            <div layout="column" class="optHolder" ng-show="opcion.descripcion == 'Requerido'" flex tabindex="0" id="{{opcion.descripcion}}">
+                                        <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                            <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <md-input-container class="md-block" flex >
+                                                    <label>info</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue.info.valor"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+                                        </div>
+
+                                        <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                            <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
                                                 <md-input-container class="md-block" flex>
+
+                                                    <md-switch ng-model="opcValue.req.valor"
+                                                               ng-blur="checkSave($event)"
+                                                    >
+                                                        {{opcion.descripcion}}
+                                                    </md-switch>
+                                                </md-input-container>
+                                            </div>
+                                            <md-input-container class="md-block" flex ng-show="opcValue.req.valor != ''">
+                                                <label>{{opcion.descripcion}} mensaje</label>
+                                                <input skip-tab
+                                                       ng-model="opcValue.req.msg"
+                                                       ng-blur="checkSave($event)"
+                                                >
+                                            </md-input-container>
+                                        </div>
+                                        <div ng-show="critField.type == 2" >
+
+                                            <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                    <md-input-container class="md-block" flex >
+                                                        <label>Minimo</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.min.valor"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                </div>
+                                                <md-input-container class="md-block" flex ng-show="opcValue.min.valor != ''">
+                                                    <label>mensaje de Minimo</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue.min.msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+                                            <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                    <md-input-container class="md-block" flex >
+                                                        <label>Maximo</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.max.valor"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                </div>
+                                                <md-input-container class="md-block" flex ng-show="opcValue.max.valor != ''">
+                                                    <label>mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue.max.msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+                                            <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                    <md-input-container class="md-block" flex >
+                                                        <label>Minimo Imposible</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.minI.valor"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                </div>
+                                                <md-input-container class="md-block" flex ng-show="opcValue.minI.valor != ''">
+                                                    <label>mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue.minI.msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+                                            <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                    <md-input-container class="md-block" flex >
+                                                        <label>Maximo  Imposible</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.maxI.valor"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                </div>
+                                                <md-input-container class="md-block" flex ng-show="opcValue.maxI.valor != ''">
+                                                    <label>mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue.maxI.msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+
+                                        </div>
+
+                                        <div ng-show="critField.type == 1 || critField.type == 3">
+
+                                            <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                    <md-input-container flex>
+                                                        <label>opciones</label>
+                                                        <md-autocomplete md-selected-item="ctrl.selOption"
+                                                                         flex
+                                                                         skip-tab
+                                                                         ng-required="(cnt.languaje.length==0)"
+                                                                         md-selected-item-change="setOptSel(ctrl.selOption.id)"
+                                                                         info="opcion a agregar"
+                                                                         md-search-text="ctrl.searchOpctions"
+                                                                         md-items="item in listOptions | stringKey : ctrl.searchOpctions: 'nombre' | filterSelect: opcValue.opts.valor"
+                                                                         md-item-text="item.nombre"
+                                                                         md-no-asterisk
+                                                                         md-min-length="0"
+                                                                         vl-no-clear
+                                                        >
+                                                            <input >
+                                                            <md-item-template>
+                                                                <span>{{item.nombre}}</span>
+                                                            </md-item-template>
+                                                            <md-not-found>
+                                                                <a ng-click="createNewIten(ctrl.searchOpctions)">la opcion {{ctrl.searchOpctions}}, no existe
+                                                                    crearla?</a>
+                                                            </md-not-found>
+                                                        </md-autocomplete>
+
+                                                    </md-input-container>
+                                                </div>
+                                                <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
+                                                    <label>{{opcion.descripcion}} mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue[opcion.descripcion].msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
+                                            </div>
+
+                                            <md-content>
+                                                <div ng-repeat="opt in opcValue.opts.valor" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                                    {{getoptSet(opt).nombre}}
+                                                </div>
+                                            </md-content>
+                                        </div>
+                                        <!--<div ng-repeat="opcion in options" ng-init="inicialize(opcion)" style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
+                                            <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <md-input-container class="md-block" flex ng-show="opcion.descripcion == 'Requerido'">
 
                                                     <md-switch ng-model="opcValue[opcion.descripcion].valor"
                                                                ng-blur="checkSave($event)"
@@ -361,23 +515,42 @@
                                                         {{opcion.descripcion}}
                                                     </md-switch>
                                                 </md-input-container>
-                                                <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
-                                                    <label>{{opcion.descripcion}} mensaje</label>
-                                                    <input skip-tab
-                                                           ng-model="opcValue[opcion.descripcion].msg"
-                                                           ng-blur="checkSave($event)"
-                                                    >
-                                                </md-input-container>
-                                            </div>
 
-                                            <div layout="column" class="optHolder" ng-show="opcion.descripcion != 'Requerido'" tabindex="0" id="{{opcion.descripcion}}">
-                                                <md-input-container class="md-block" flex>
+                                                <md-input-container class="md-block" flex ng-show="opcion.descripcion != 'Requerido'" >
                                                     <label>{{opcion.descripcion}}</label>
                                                     <input skip-tab
                                                            ng-model="opcValue[opcion.descripcion].valor"
                                                            ng-blur="checkSave($event)"
                                                     >
                                                 </md-input-container>
+
+                                                <md-input-container flex ng-show="opcion.descripcion == 'Requerido'" >
+                                                    <label>opciones</label>
+                                                    <md-autocomplete md-selected-item=""
+                                                                     flex
+                                                                     skip-tab
+                                                                     ng-required="(cnt.languaje.length==0)"
+                                                                     info="opcion a agregar"
+                                                                     md-search-text="ctrl.searchOpctions"
+                                                                     md-items="item in listOptions | stringKey : ctrl.searchOpctions: 'nombre'"
+                                                                     md-item-text="item.nombre"
+                                                                     md-no-asterisk
+                                                                     md-min-length="0"
+                                                                     vl-no-clear
+                                                                    >
+                                                        <input >
+                                                        <md-item-template>
+                                                            <span>{{item.nombre}}</span>
+                                                        </md-item-template>
+                                                        <md-not-found>
+                                                            <a ng-click="createNewIten(ctrl.searchOpctions)">la opcion {{ctrl.searchOpctions}}, no existe
+                                                            crearla?</a>
+                                                        </md-not-found>
+                                                    </md-autocomplete>
+
+                                                </md-input-container>
+
+
                                                 <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
                                                     <label>{{opcion.descripcion}} mensaje</label>
                                                     <input skip-tab
@@ -388,7 +561,7 @@
                                             </div>
 
 
-                                        </div>
+                                        </div>-->
                                     </form>
 
                                 </div>
@@ -402,4 +575,5 @@
 
         </div>
     </div>
+    <div ng-controller="notificaciones" ng-include="template"></div>
 </div>
