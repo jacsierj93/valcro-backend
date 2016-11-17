@@ -13,15 +13,14 @@ MyApp.factory('criterios', ['$resource',
 
 MyApp.service("mastersCrit",function(criterios,masters){
     var lists = {
-        Lines : criterios.query({type:"avaiableLines"}),
+        //Lines : masters.query({ type:"prodLines"}),
         Fields : criterios.query({type:"fieldList"}),
         Types : criterios.query({type:"typeList"}),
         AvaiableLines :criterios.query({type:"avaiableLines"}),
     };
     return {
         getLines:function(){
-
-            return lists.Lines;
+            return lists.AvaiableLines;
         },
         getFields:function(){
             return lists.Fields;
@@ -97,7 +96,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
-    $scope.listOptions = criterios.query({ type:"optionLists"});
+    $scope.listOptions = critForm.getOptions();
     //$scope.opcValue =critForm.getOptions();
 
     $scope.opcValue = {
@@ -158,6 +157,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         if(angular.element(e.relatedTarget).parents("#"+id).length!=0){
            return false;
         }
+        console.log("beforeSave",$scope.opcValue)
         saveOptions($scope.opcValue)
     };
 
@@ -166,6 +166,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
     $scope.setOptSel = function(id){
+        
         if(id){
             $scope.opcValue.opts.valor.unshift(id);
             $timeout(function(){$scope.ctrl.searchOpctions = null},0);
@@ -178,7 +179,15 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
             angular.forEach(data, function(value, key){
                 if(key.match(/^[^\$]/g) && ("id" in value)) {
+                    /*$.grep($scope.opcValue, function(e){
+                       if(e.opc_id == value.opc_id){
+                           e.id = value.id;
+                           return true;
+                       }
+                    });
+                    */
                     $scope.opcValue[key].id = value.id;
+                    critForm.updOptions($scope.opcValue[key]);
                 }
             });
 
@@ -190,17 +199,19 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     });
     $scope.$watch("critField.id",function(val){
         $timeout(function(){
-            angular.forEach($scope.critField.opcs,function(v,k){
-                var key = $filter("customFind")($scope.opcValue,[v.pivot.opc_id],function(c,v){
-                    return c.opc_id == v.opc_id;
+
+            angular.forEach($scope.opcValue, function(value, key){
+                var v =  $filter("customFind")($scope.critField.opcs,[value.opc_id],function(c,v){
+                    return c.pivot.opc_id == v[0];
                 })[0];
-                key.id=v.pivot.id;
-                key.opc_id=v.pivot.opc_id;
-                key.field_id=v.pivot.lct_id;
-                key.valor=v.pivot.value;
-                key.msg=v.pivot.message;
-            })
-        },1000)
+                value.field_id = val
+                if(v){
+                    value.id=v.pivot.id || false;
+                    value.valor=v.pivot.value || "";
+                    value.msg=v.pivot.message || "";
+                }
+            });
+        },0)
 
     });
 
@@ -240,8 +251,9 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var fields = mastersCrit.getFields();
     var tipos = mastersCrit.getTypes();
     var listado = criterios.query({ type:"getCriteria"});
+    var masterOptions = criterios.query({ type:"masterOptions"});
+    var ListOptions = criterios.query({ type:"optionLists"});
     var curLine = {id:false};
-    var options = {};
     var factory = {
         linea_id: "1",
         campo_id: "1",
@@ -270,7 +282,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             var elem = {};
             elem = $filter("filterSearch")(listado,[datos.id])[0]
             if(!elem){
-                elem = angular.copy(factory)
+                elem = angular.copy(factory);
                 listado.push(elem);
             }
             elem.id=datos.id;
@@ -297,8 +309,54 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         getEdit:function(){
             return edit;
         },
+        updOptions:function (opt) {
+            var aux = $filter("filterSearch")(listado,[opt.field_id])[0];
+            if(opt.opc_id == 4){
+                var valAux = angular.copy(opt.valor);
+                angular.forEach(aux.options, function(value, key){
+                    if(value.id==opt.opc_id){
+                        var idx = valAux.indexOf(parseInt(value.id))
+                        if(idx==-1){
+                            aux.options.splice(key,1);
+                        }else{
+                            valAux.splice(idx,1);
+                        }
+                    }
+                });
+                angular.forEach(valAux, function(value, key) {
+                    aux.options.push({
+                        camp_tipo: "txt",
+                        descripcion: "Opcion",
+                        id: value.opc_id,
+                        pivot: {
+                            id: value.id,
+                            lct_id: value.field_id,
+                            opc_id: value.opc_id,
+                            value: value.valor,
+                            message: value.msg
+                        }
+                    })
+                });
+            }else{
+                var upd =  $filter("filterSearch")(aux.options,[opt.opc_id])[0];
+                if(upd){
+                    upd.pivot.value =  opt.valor;
+                    upd.pivot.message =  opt.msg;
+                }else{
+                    var temp = angular.copy($filter("filterSearch")(masterOptions,[opt.opc_id])[0]);
+                    temp.pivot= {
+                        id: opt.id,
+                        lct_id: opt.field_id,
+                        opc_id: opt.opc_id,
+                        value: opt.valor,
+                        message: opt.msg
+                    };
+                    aux.options.push(temp);
+                }
+            }
+        },
         getOptions:function () {
-            return options;
+            return ListOptions;
         }
 
     }
@@ -307,13 +365,27 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 
 
 
-MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout) {
+MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
     $scope.criteria = critForm.get();
+    $scope.listOptions = critForm.getOptions();
     $scope.setEdit = function(campo){
 
         $scope.openConstruct(function () {
             critForm.setEdit(campo);
         });
+    };
+    $scope.formId = critForm.getEdit();
+    
+    $scope.get = function (tipo,options) {
+        if(options.length>0){
+            if(tipo != "Opcion"){
+                return $filter("customFind")(options,[tipo],function(c,v){
+                    return c.descripcion == v[0];
+                })[0];
+            }
+        }
+
+
     };
 
     $scope.openConstruct = function(callback){
@@ -324,7 +396,6 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         $timeout(function(){
             $mdSidenav("lyrConst3").open().then(callback)
         },500);
-        //critForm.setEdit(true);
     }
 }]);
 

@@ -7,6 +7,7 @@
  */
 $app->get("criterio/avaiableLines",'Criterio\CritController@getAvaiableLines');
 $app->get("criterio/optionLists",'Criterio\CritController@getListType');
+$app->get("criterio/masterOptions",'Criterio\CritController@getOptions');
 $app->get("criterio/fieldList",'Criterio\CritController@getCampos');
 $app->get("criterio/typeList",'Criterio\CritController@getTypes');
 $app->get("criterio/getCriteria",'Criterio\CritController@getCriterio');

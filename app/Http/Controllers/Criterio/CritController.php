@@ -23,21 +23,25 @@ use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Criterios\CritLinCamTip as Criterio;
 use App\Models\Sistema\Criterios\CritCampoOption as Options;
 use App\Models\Sistema\Criterios\OpcionList as Lista ;
+use App\Models\Sistema\Criterios\CritOption;
 
 
 class CritController extends BaseController
 {
-    public function __construct()
+   /* public function __construct()
     {
 
         $this->middleware('auth');
-    }
+    }*/
 
     public function getCampos(){
         return json_encode(Campos::all());
     }
     public function getListType(){
         return json_encode(Lista::all());
+    }
+    public function getOptions(){
+        return json_encode(CritOption::all());
     }
 
     public function getAvaiableLines(){
@@ -64,6 +68,7 @@ class CritController extends BaseController
             $field->field;
             $field->type;
             $field['options'] = $field->options()->get();
+
         }
         return  json_encode($crit);
     }

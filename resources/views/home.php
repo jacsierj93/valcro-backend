@@ -14,6 +14,7 @@
     <?= HTML::style("css/styles.css") ?>
     <?= HTML::style("css/pagos.css") ?>
     <?= HTML::style("css/pedidos.css") ?>
+    <?= HTML::style("css/criterios.css") ?>
     <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
 
     <?= HTML::script("components/jquery/dist/jquery.min.js") ?>

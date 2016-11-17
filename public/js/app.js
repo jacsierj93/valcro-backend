@@ -86,7 +86,7 @@ MyApp.config(function ($provide, $httpProvider) {
             responseError: function (rejection) {
                 // console.log(rejection); // Contains the data about the error.
                 if(rejection.status == 401){
-                    location.replace(path +'login');
+                    //location.replace(path +'login');
                 }
                 // Return the promise rejection.
                 return $q.reject(rejection);
@@ -152,7 +152,7 @@ MyApp.filter('filterSelect', function() {
 MyApp.filter('filterSearch', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
         return arr1.filter(function(val) {
-            return (arr2.indexOf(val.id.toString()) !== -1 || arr2.indexOf(val.id) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+            return (arr2.indexOf(val.id.toString()) !== -1 || arr2.indexOf(parseInt(val.id)) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
     }
 });

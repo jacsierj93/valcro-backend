@@ -218,6 +218,8 @@
 
                                 <md-content layout="column" style="margin: 0px 4px 0px 4px">
                                     <div ng-repeat="field in criteria" class="row"
+                                         ng-class="{'field-sel':field.id==formId.id}"
+                                         test="{{formId.id}}"
                                          ng-dblclick="setEdit(field)"
                                          form-preview="{{ field.type.directive }}">
 
@@ -309,7 +311,7 @@
 
                         <div style="width:192px;" layout="column" >
                             <md-content style="margin: 0 8px 0 8px !important;">
-                                <div ng-repeat="field in fields" class="row" ng-class="{'rowSel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div ng-repeat="field in fields" class="row" ng-class="{'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                     <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
                                 </div>
                             </md-content>
@@ -327,7 +329,7 @@
 
                         <div style="width:192px;" layout="column" >
                             <md-content style="margin: 0 8px 0 8px !important;">
-                                <div ng-repeat="type in tipos" ng-class="{'rowSel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div ng-repeat="type in tipos" ng-class="{'field-sel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                     <div ng-click="createField(type,'type')" >{{type.descripcion}}</div>
                                 </div>
                             </md-content>
@@ -352,7 +354,7 @@
                                 <div flex>
                                     <form name="optionsForm" layout="column">
                                         <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                            <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                            <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">
                                                 <md-input-container class="md-block" flex >
                                                     <label>info</label>
                                                     <input skip-tab
@@ -364,18 +366,18 @@
                                         </div>
 
                                         <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                            <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                            <div layout="column" class="optHolder" flex tabindex="0" id="prevReq">
                                                 <md-input-container class="md-block" flex>
 
                                                     <md-switch ng-model="opcValue.req.valor"
                                                                ng-blur="checkSave($event)"
                                                     >
-                                                        {{opcion.descripcion}}
+                                                        &nbsp;Requerido
                                                     </md-switch>
                                                 </md-input-container>
                                             </div>
                                             <md-input-container class="md-block" flex ng-show="opcValue.req.valor != ''">
-                                                <label>{{opcion.descripcion}} mensaje</label>
+                                                <label>Requerido mensaje</label>
                                                 <input skip-tab
                                                        ng-model="opcValue.req.msg"
                                                        ng-blur="checkSave($event)"
@@ -385,7 +387,7 @@
                                         <div ng-show="critField.type == 2" >
 
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="prevMin">
                                                     <md-input-container class="md-block" flex >
                                                         <label>Minimo</label>
                                                         <input skip-tab
@@ -403,7 +405,7 @@
                                                 </md-input-container>
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="prevMax">
                                                     <md-input-container class="md-block" flex >
                                                         <label>Maximo</label>
                                                         <input skip-tab
@@ -421,7 +423,7 @@
                                                 </md-input-container>
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="prevMinI">
                                                     <md-input-container class="md-block" flex >
                                                         <label>Minimo Imposible</label>
                                                         <input skip-tab
@@ -439,7 +441,7 @@
                                                 </md-input-container>
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="prevMaxI">
                                                     <md-input-container class="md-block" flex >
                                                         <label>Maximo  Imposible</label>
                                                         <input skip-tab
@@ -462,7 +464,7 @@
                                         <div ng-show="critField.type == 1 || critField.type == 3">
 
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                                <div layout="column" class="optHolder" flex tabindex="0" id="{{opcion.descripcion}}">
+                                                <div layout="column" class="optHolder" flex tabindex="0" id="prevOpc">
                                                     <md-input-container flex>
                                                         <label>opciones</label>
                                                         <md-autocomplete md-selected-item="ctrl.selOption"
