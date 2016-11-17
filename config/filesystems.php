@@ -16,6 +16,10 @@ return ['disks' => [
         'driver' => 'local',
         'root' => storage_path() . '/app/pedidos',
     ],
+    'shipments' => [
+        'driver' => 'local',
+        'root' => storage_path() . '/app/embarques',
+    ]
 ],
 
 ];

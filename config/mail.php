@@ -34,7 +34,7 @@ return [
     | stay compatible with the Mailgun e-mail application by default.
     |
     */
-    'port' => env('MAIL_PORT', 25),
+    'port' => env('MAIL_PORT', 587),
     /*
     |--------------------------------------------------------------------------
     | Global "From" Address

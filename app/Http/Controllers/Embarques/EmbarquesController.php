@@ -33,6 +33,8 @@ use Session;
 use Validator;
 use PDF;
 use App;
+use Illuminate\Support\Facades\Mail;
+
 
 class EmbarquesController extends BaseController
 {
@@ -75,46 +77,61 @@ class EmbarquesController extends BaseController
     }
 
 
+    public function sendMail ($template,$sender){
+
+            Mail::send($template,[], function ($m) use($sender, $good ){
+                $m->subject($sender['subject']);
+
+                foreach($sender['to'] as $aux)
+                {
+
+                    $m->to($aux['email'], $aux['name']);
+                }
+                if(array_key_exists('cc',$sender )){
+                    foreach($sender['cc'] as $aux)
+                    {
+                        $m->cc($aux['email'], $aux['name']);
+                    }
+                }
+                if(array_key_exists('ccb',$sender )){
+                    foreach($sender['ccb'] as $aux)
+                    {
+                        $m->ccb($aux['email'], $aux['name']);
+                    }
+                }
+                if(array_key_exists('attsData',$sender )){
+                    foreach($sender['attsData'] as $aux)
+                    {
+                        $m->attachData($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
+                    }
+                }
+                if(array_key_exists('atts',$sender )){
+                    foreach($sender['atts'] as $aux)
+                    {
+                        $m->attach($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
+                    }
+                }
+
+
+
+
+
+            });
+
+    }
+
     public function testPdf (Request $req){
-        $noti = NotificationModule::find($req->id);
-        return $noti->send();
-        $model = Shipment::find($noti->doc_id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-        $dat = $noti->data()->get();
+        //$html = View::make('emails.prueba',[])->render();
+        $sender =['subject'=>'demo','to'=>[
+            ['email'=>'meqh1992@gmail.com','name'=>'Miguel']
+        ]];
+    try {
+        $this->sendMail('emails.prueba',$sender);
+    }
+        catch (\Exception $e) {
+           return "fallo";
 
-        $send= $noti->senders()->get();
-
-        $senders = ['subject'=>$noti->asunto , 'to'=>$send->where('tipo','to'), 'cc'=>$send->where('tipo','cc'), 'ccb'=>$send->where('tipo','ccb')];
-        $data = [];
-        $data['text'] =[];
-
-        foreach ($dat->where('tipo','text') as $aux){
-            $data['text'][$aux->key] = $aux->value;
         }
-
-        $noti->send_mail($noti->plantilla,$senders,['model'=>$model, 'data'=>$data] );
-
-
-
-
-       // return  View::make($noti->plantilla,['model'=>$model, 'data'=>$data])->render();
-
-
-
-        /*$model = Shipment::findOrFail($req->id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-
-        $not = [];
-        $not[] =['key'=>'Eliminacion de carga', 'value'=>'asdfsdf'];
-        $not[] =['key'=>'Eliminacion de carga'];
-        $html =
-
-        $sender = [];
-
-
-        return $html;*/
 
     }
 
