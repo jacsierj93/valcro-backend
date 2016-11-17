@@ -22,6 +22,8 @@ use App\Models\Sistema\Criterios\CritTipoCamp as Types;
 use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Criterios\CritLinCamTip as Criterio;
 use App\Models\Sistema\Criterios\CritCampoOption as Options;
+use App\Models\Sistema\Criterios\OpcionList as Lista ;
+
 
 class CritController extends BaseController
 {
@@ -33,6 +35,9 @@ class CritController extends BaseController
 
     public function getCampos(){
         return json_encode(Campos::all());
+    }
+    public function getListType(){
+        return json_encode(Lista::all());
     }
 
     public function getAvaiableLines(){
@@ -81,11 +86,27 @@ class CritController extends BaseController
         return $ret;
     }
 
-    public function saveCritField(Request $rq){
+    public function createOptionList(Request $rq){
         $ret = array("action"=>"new","id"=>false);
+        $exist = Lista::where("nombre",$rq->name)->count();
+        if($exist>0){
+            $ret["action"]="error";
+        }else{
+            $opt = new Lista();
+            $opt->nombre = $rq->name;
+            $opt->save();
+            $ret["id"] = $opt->id;
+            return $ret;
+        }
+
+    }
+
+    public function saveCritField(Request $rq){
+        $ret = array("action"=>"new","id"=>false,"ready"=>false);
         if($rq->id){
             $crit = Criterio::find($rq->id);
             $ret["action"]="upd";
+
         }else{
             $crit = new Criterio();
         }
@@ -95,6 +116,7 @@ class CritController extends BaseController
 
         $crit->save();
         $ret["id"] = $crit->id;
+        $ret["ready"] = ($crit->linea_id && $crit->campo_id && $crit->tipo_id);
         return $ret;
 
     }
