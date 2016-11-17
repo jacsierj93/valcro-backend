@@ -77,14 +77,14 @@ class EmbarquesController extends BaseController
     }
 
 
-    public function sendMail ($template,$sender){
+    public function sendMail ($template,$sender,$model){
 
-            Mail::send($template,[], function ($m) use($sender, $good ){
+        try {
+            Mail::send('emails.render', ['data'=>$template],function ($m) use($sender ){
                 $m->subject($sender['subject']);
 
                 foreach($sender['to'] as $aux)
                 {
-
                     $m->to($aux['email'], $aux['name']);
                 }
                 if(array_key_exists('cc',$sender )){
@@ -113,25 +113,42 @@ class EmbarquesController extends BaseController
                 }
 
 
-
-
-
             });
+            return ['send'=>true];
 
+        }
+        catch (\Exception $e) {
+
+            return ['send'=>false];
+
+        }
     }
 
     public function testPdf (Request $req){
-        //$html = View::make('emails.prueba',[])->render();
+
+        $sender = ['subject'=>'demo','to'=>
+            [ new NotificationSenders(['tipo'=>'to','doc_id'=>'78','email'=>'luisnavarro.dg@gmail.com','nombre'=>'luis'])]
+        ];
+       // return View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
+           $email = new NotificationModule();
+          // $email = NotificationModule::find(80);
+      /* // $email->id= 80;
+        return $email->resend();*/
+
+        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
+        return $email->sendMail($html, $sender);
+        /*$html = View::make('emails.prueba',[])->render();
         $sender =['subject'=>'demo','to'=>[
             ['email'=>'meqh1992@gmail.com','name'=>'Miguel']
         ]];
-    try {
+        return $this->sendMail($html,$sender);*/
+  /*  try {
         $this->sendMail('emails.prueba',$sender);
     }
         catch (\Exception $e) {
-           return "fallo";
+           //return dd($e);
 
-        }
+        }*/
 
     }
 

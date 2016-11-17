@@ -19,6 +19,14 @@ return ['disks' => [
     'shipments' => [
         'driver' => 'local',
         'root' => storage_path() . '/app/embarques',
+    ],
+    'mail_fail' => [
+        'driver' => 'local',
+        'root' => storage_path() . '/app/mail/fails',
+    ],
+    'mail_backut' => [
+        'driver' => 'local',
+        'root' => storage_path() . '/app/mail/backut',
     ]
 ],
 

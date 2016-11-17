@@ -20,10 +20,23 @@ this model sen mail on registre in tbl_noti_modulo
 /**sender struct **/
 
 
-class NotificationData extends Model
+class NotificationAttachment extends Model
 {
     use SoftDeletes;
-    protected $table = "tbl_noti_modulo_data";
+    protected $table = "tbl_noti_modulo_destinos";
     protected $dates = ['deleted_at'];
+
+    // constructores
+    function __construct()
+    {
+        $a = func_get_args();
+        if(sizeof($a > 0)){
+            foreach ($a[0] as $key => $value){
+              $this[$key]= $value;
+            }
+        }
+        $this->save();
+
+    }
 
 }

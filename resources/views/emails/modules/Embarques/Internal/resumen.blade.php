@@ -43,7 +43,7 @@
                     <tbody>
                     <tr style="margin: 0;padding:0">
                         <td   width="90%" align="center" style="color: rgb(140,140,140);margin: 0;padding: 10px;">
-                            Notificacion de {{$noti->data->where('key','accion')->first()->value}}
+                            {{$data['titulo']}}
                         </td>
                     </tr>
 
