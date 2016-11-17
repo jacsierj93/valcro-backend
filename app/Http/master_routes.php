@@ -22,7 +22,10 @@ $app->get("master/getOrderStatus",'Masters\MasterController@getStatus'); ///obte
 $app->get("master/getPaymentType",'Masters\MasterController@getPaymentType'); ///obtener tipos de pagos
 $app->post("master/search",'Masters\Compare@search'); ///obtener tipos de pagos
 $app->post("master/newCoin",'Masters\MasterController@newCoin'); ///obtener tipos de pagos
+$app->post("master/alerts/save",'Masters\MasterController@saveAlert'); ///sube un archivo al servidors
+$app->post("master/alerts/save",'Masters\MasterController@saveAlert'); ///sube un archivo al servidors
 
 $app->post("master/files/upload",'Masters\FilesController@uploadFile'); ///sube un archivo al servidors
 $app->get("master/files/getFile",'Masters\FilesController@getFileId'); /// obtiene el archivo
 $app->get("master/files/getFiles",'Masters\FilesController@getFiles'); ///obtiene todos los archivo
+

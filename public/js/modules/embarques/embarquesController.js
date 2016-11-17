@@ -24,6 +24,19 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     },0);
 
 
+    $scope.test = function () {
+      $scope.NotifAction("alert",'demo',[
+            {name:"a",action:function () {
+                console.log("a")
+                }
+            },{name:"b",action:function () {
+              console.log("b")
+          }
+          }
+        ],{save:{doc_origen_id:$scope.shipment.id, tipo_origen_id:25,comentario:"hola mundo"}});
+    };
+
+
 
 /*    $scope.search = function(){
         var data =[];
@@ -1059,7 +1072,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                         }
                         }
                         ]
-                        ,{block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                        ,{block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
                 }else{
                     cambiarRv();
                 }
@@ -1155,7 +1168,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                         }
                         }
                         ]
-                        ,{block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                        ,{block:true,save:{doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
                 }else{
                     cambiarRv();
                 }
@@ -1216,7 +1229,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                     }
                     }
                     ]
-                    ,{block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                    ,{block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
             }else{
                 cambiar();
             }
@@ -1273,7 +1286,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                         }
                         }
                     ]
-                    ,{block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                    ,{block:true, save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
             }else{
                 save();
             }
@@ -1684,7 +1697,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                     }
                     }
                 ]
-                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}}
+                , {block:true, save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}}
             );
         }
 
@@ -1705,7 +1718,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                     }
                     }
                 ]
-                , {block:true, confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                , {block:true, save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
 
 
         }else{
@@ -2753,7 +2766,7 @@ MyApp.controller('miniMblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     /**adjuntos**/
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
-            fileSrv.storage("orders");
+            fileSrv.storage("shipments");
             fileSrv.setKey("miniMblCtrl");
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
                 $scope.$parent.shipment.nro_mbl.adjs.push(v);
@@ -2830,7 +2843,7 @@ MyApp.controller('miniHblCtrl',['$scope','$mdSidenav','$timeout','$interval','fi
     /**adjuntos**/
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
-            fileSrv.storage("orders");
+            fileSrv.storage("shipments");
             fileSrv.setKey("miniHblCtrl");
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
                 $scope.$parent.shipment.nro_hbl.adjs.push(v);
@@ -2905,7 +2918,7 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     /**adjuntos**/
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
-            fileSrv.storage("orders");
+            fileSrv.storage("shipments");
             fileSrv.setKey("miniExpAduanaCtrl");
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
                 $scope.$parent.shipment.nro_eaa.adjs.push(v);
@@ -2957,7 +2970,7 @@ MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$in
 
         $scope.$watch('files.length', function(newValue){
             if(newValue > 0){
-                fileSrv.storage("orders");
+                fileSrv.storage("shipments");
                 fileSrv.setKey("miniCancelShipmentCtrl");
                 angular.forEach(fileSrv.upload($scope.files), function (v, k) {
                     $scope.model.adjs.push(v);
@@ -3042,7 +3055,7 @@ MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$in
                     }
                 }
                 ]
-                , {block:true,confirm:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                , {block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
         };
 
     }]);

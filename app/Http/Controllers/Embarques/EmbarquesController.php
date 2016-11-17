@@ -33,6 +33,8 @@ use Session;
 use Validator;
 use PDF;
 use App;
+use Illuminate\Support\Facades\Mail;
+
 
 class EmbarquesController extends BaseController
 {
@@ -75,46 +77,78 @@ class EmbarquesController extends BaseController
     }
 
 
-    public function testPdf (Request $req){
-        $noti = NotificationModule::find($req->id);
-        return $noti->send();
-        $model = Shipment::find($noti->doc_id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-        $dat = $noti->data()->get();
+    public function sendMail ($template,$sender,$model){
 
-        $send= $noti->senders()->get();
+        try {
+            Mail::send('emails.render', ['data'=>$template],function ($m) use($sender ){
+                $m->subject($sender['subject']);
 
-        $senders = ['subject'=>$noti->asunto , 'to'=>$send->where('tipo','to'), 'cc'=>$send->where('tipo','cc'), 'ccb'=>$send->where('tipo','ccb')];
-        $data = [];
-        $data['text'] =[];
+                foreach($sender['to'] as $aux)
+                {
+                    $m->to($aux['email'], $aux['name']);
+                }
+                if(array_key_exists('cc',$sender )){
+                    foreach($sender['cc'] as $aux)
+                    {
+                        $m->cc($aux['email'], $aux['name']);
+                    }
+                }
+                if(array_key_exists('ccb',$sender )){
+                    foreach($sender['ccb'] as $aux)
+                    {
+                        $m->ccb($aux['email'], $aux['name']);
+                    }
+                }
+                if(array_key_exists('attsData',$sender )){
+                    foreach($sender['attsData'] as $aux)
+                    {
+                        $m->attachData($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
+                    }
+                }
+                if(array_key_exists('atts',$sender )){
+                    foreach($sender['atts'] as $aux)
+                    {
+                        $m->attach($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
+                    }
+                }
 
-        foreach ($dat->where('tipo','text') as $aux){
-            $data['text'][$aux->key] = $aux->value;
+
+            });
+            return ['send'=>true];
+
         }
+        catch (\Exception $e) {
 
-        $noti->send_mail($noti->plantilla,$senders,['model'=>$model, 'data'=>$data] );
+            return ['send'=>false];
 
+        }
+    }
 
+    public function testPdf (Request $req){
 
+        $sender = ['subject'=>'demo','to'=>
+            [ new NotificationSenders(['tipo'=>'to','doc_id'=>'78','email'=>'luisnavarro.dg@gmail.com','nombre'=>'luis'])]
+        ];
+       // return View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
+           $email = new NotificationModule();
+          // $email = NotificationModule::find(80);
+      /* // $email->id= 80;
+        return $email->resend();*/
 
-       // return  View::make($noti->plantilla,['model'=>$model, 'data'=>$data])->render();
+        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
+        return $email->sendMail($html, $sender);
+        /*$html = View::make('emails.prueba',[])->render();
+        $sender =['subject'=>'demo','to'=>[
+            ['email'=>'meqh1992@gmail.com','name'=>'Miguel']
+        ]];
+        return $this->sendMail($html,$sender);*/
+  /*  try {
+        $this->sendMail('emails.prueba',$sender);
+    }
+        catch (\Exception $e) {
+           //return dd($e);
 
-
-
-        /*$model = Shipment::findOrFail($req->id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-
-        $not = [];
-        $not[] =['key'=>'Eliminacion de carga', 'value'=>'asdfsdf'];
-        $not[] =['key'=>'Eliminacion de carga'];
-        $html =
-
-        $sender = [];
-
-
-        return $html;*/
+        }*/
 
     }
 

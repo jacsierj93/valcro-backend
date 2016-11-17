@@ -1,4 +1,4 @@
-MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter","$timeout","$interval", function ($scope, $mdSidenav,setNotif,$filter,$timeout,$interval) {
+MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter","$timeout","$interval",'masters','App', function ($scope, $mdSidenav,setNotif,$filter,$timeout,$interval,masters,App) {
 
     $scope.template = "modules/home/notificaciones";
 
@@ -8,13 +8,12 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     // ####################################################################################################
     $scope.alerts = setNotif.listNotif();
 
-    $scope.ok = function(call, val){
+    $scope.ok = function(call, data){
+        console.log("call", call);
+        console.log("title", data);
         if(call.opc.action){
-            if(val){
-                call.opc.action(val);
-            }else {
-                call.opc.action();
-            }
+            call.opc.action(call,data);
+            $scope.saveAnswer(call,data );
         }else{
             $scope.curFocus.focus();
         }
@@ -158,6 +157,31 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
             return (x.param && z in x.param);
         }).length>0)
 
+    };
+
+    $scope.saveAnswer = function (call, data) {
+        if(data.noti.param && data.noti.param.save){
+
+
+            $timeout(function () {
+                console.log('seccion',App.getSeccion());
+                var send = {
+                    texto:data.noti.content,modulo: App.getSeccion().secc};
+
+                    angular.forEach(data.noti.param.save, function (v, k) {
+                        send[k]= v;
+                    });
+                send.items = [];
+                send.items.push({texto:call.opc.name, isSelecionada:1});
+                angular.forEach(data.noti.opcs , function (v, k) {
+                    if(v.name != call.opc.name){
+                        send.items.push({texto:v.name, isSelecionada:0});
+                    }
+
+                });
+                masters.post({type:"alerts",id:"save"},send);
+            },0);
+               }
     };
 /*
     $scope.$watch("alerts.input.length", function(newVal){

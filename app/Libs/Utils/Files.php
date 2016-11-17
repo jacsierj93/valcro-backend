@@ -129,6 +129,19 @@ class Files
 
     }
 
+    public function pdf (){
+        $archivo = new FileModel();
+        $archivo->modulo = $this->module;
+        $archivo->tipo = 'application/pdf';
+        $archivo->mime = 'docs/';
+        $dataUser = Session::get("DATAUSER");
+        $archivo->user_id = $dataUser["id"]; // id del ususario
+        $fileName = $archivo->id . '-' . str_random(13) . '-' . $dataUser["id"] . '-' . date("Y-m-d_h_i_s");
+        $archivo->archivo = $fileName;
+        $archivo->save();
+        return FileModel::find($archivo->id);
+    }
+
 
     /**borrar archivo
      * @param $name
@@ -158,6 +171,7 @@ class Files
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getFile($name)
+
     {
 
         try {
@@ -177,6 +191,16 @@ class Files
         }
 
         return $archivo;
+
+
+    }    /**busca y muestra un archivo, dada su ruta
+     * @param $name
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getFileUrl($name)
+    {
+        return $this->fileSystem.$name;
+
 
 
     }
