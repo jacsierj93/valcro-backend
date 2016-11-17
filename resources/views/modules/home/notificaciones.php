@@ -21,7 +21,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('ok');ok(this)" skip-notif>
+                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('ok');ok(this, tab.content)" skip-notif>
                         {{opc.name}}
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex layout="row" ng-repeat="opc in tab.opcs" autotrigger="{{opc.$$hashKey}}" tabindex="0" ng-click="closeThis('alert');ok(this)" skip-notif>
+                    <div flex layout="row" ng-repeat="opc in tab.opcs" autotrigger="{{opc.$$hashKey}}" tabindex="0" ng-click="closeThis('alert');ok(this, {noti:tab,opc:opc});" skip-notif>
                         <div ng-show="opc.default"><span class="icon-Tiempo" >{{opc.count}}</span></div>
                         <div flex>{{opc.name}}</div>
                     </div>
@@ -60,7 +60,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('error');ok(this)" skip-notif>
+                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('error');ok(this, tab.content)" skip-notif>
                         {{opc.name}}
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
-                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('info');ok(this)" skip-notif>
+                    <div flex ng-repeat="opc in tab.opcs" ng-click="closeThis('info');ok(this, tab.content)" skip-notif>
                         {{opc.name}}
                     </div>
                 </div>
@@ -107,7 +107,7 @@
                         <div layout="column" layout-align="center center" ng-click="closeThis('info');" flex >
                             <span class="icon-Filtro" style="font-size: 16px"></span>
                         </div>
-                        <div layout="column" layout-align="center center"  ng-click="closeThis('info');ok(this)" flex="" >
+                        <div layout="column" layout-align="center center"  ng-click="closeThis('info');ok(this, tab.content)" flex="" >
                             <span class="icon-Filtro" style="font-size: 16px"></span>
                         </div>
                     </div>

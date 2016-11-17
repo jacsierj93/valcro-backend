@@ -322,7 +322,7 @@
             <div class="botonera" layout="row" layout-align="space-between center">
                 <!-- botonera left -->
                 <div style="width: 240px;" layout="row">
-                    <div layout="column" layout-align="center center"></div>
+                    <div layout="column" layout-align="center center" ng-click="test()">  <span >test </span></div>
 
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listShipment') && permit.created)" layout-align="center center" ng-click="OpenShipmentCtrl()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>

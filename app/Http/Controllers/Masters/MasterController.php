@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Masters;
 
 
+use App\Models\Sistema\Alerts\Alert;
+use App\Models\Sistema\Alerts\AlertItem;
 use App\Models\Sistema\Masters\StoreValcro;
 use App\Models\Sistema\Masters\SubLine;
 use App\Models\Sistema\Order\OrderCondition;
@@ -156,5 +158,31 @@ class MasterController extends BaseController
 		$result['id'] = $coin->id;
 		return $result;
 	}
+
+	public function saveAlert(Request $req){
+        $return = ['accion'=>'new'];
+        $model = new Alert();
+        $model->texto = $req->texto;
+        $model->doc_origen_id = $req->doc_origen_id;
+        $model->tipo_origen_id = $req->tipo_origen_id;
+        $model->modulo = $req->modulo;
+        if($req->has('comentario')){
+            $model->comentario= $req->comentario;
+        }
+        $model->save();
+
+
+        foreach ($req-> items as $aux){
+            $item= new AlertItem();
+            $item->texto= $aux['texto'];
+            $item->isSelecionada= $aux['isSelecionada'];
+            $item->doc_id = $model->id;
+            $item->save();
+        }
+        $model =  Alert::find($model->id);
+        $return['model'] =$model;
+        $return['items'] =$model->items()->get();
+         return $return;
+    }
 
 }

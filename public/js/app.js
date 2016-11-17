@@ -842,6 +842,7 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
     $scope.seccLink = function (item){
         $scope.seccion = angular.copy(item);
         Layers.setModule($scope.seccion.key);
+        App.setSeccion(item);
         angular.forEach($scope.secciones, function(value, key) {
             if( $scope.seccion.key == value.key){
                 value.selct = 'btnLine';
@@ -1105,6 +1106,7 @@ MyApp.service('App' ,[function(){
 
     var accion ={estado :false,value:{}};
     var msm ={};
+    var seccion = undefined;
 
     var bindBloc = {
         estado:false,
@@ -1112,6 +1114,12 @@ MyApp.service('App' ,[function(){
     };
     return {
 
+        setSeccion : function (data) {
+            seccion= data;
+        },
+        getSeccion : function () {
+          return seccion;
+        },
         getAccion : function(){
             return accion;
         },
