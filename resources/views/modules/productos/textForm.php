@@ -3,7 +3,7 @@
 <md-input-container id="text" class="md-block" flex prevText ng-show="(field.type.directive == 'prevText' || field.type.directive == null)" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
     <label>{{field.field.descripcion}}{{field.type.directive}}</label>
     <input skip-tab
-           info="{{get('Info',field)}}"
+           info="{{get(true,{tipo:'Info',options:field.options}).pivot.value}}"
            autocomplete="off"
            name="razon_social"
            maxlength="80"
@@ -22,9 +22,9 @@
                      skip-tab
                      id="langCont"
                      ng-required="(cnt.languaje.length==0)"
-                     info="{{get('Info',field.options).pivot.value || ''}}"
+                     info="{{get(true,{tipo:'Info',options:field.options}).pivot.value || ''}}"
                      md-search-text="ctrl.searchLang"
-                     md-items="item in listOptions | stringKey : ctrl.searchLang: 'nombre'"
+                     md-items="item in listOptions | stringKey : ctrl.searchLang: 'nombre' | customFind : {tipo:'Opcion',options:field.options} : get"
                      md-item-text="item.nombre"
                      md-no-asterisk
                      md-min-length="0"

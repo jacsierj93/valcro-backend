@@ -201,15 +201,23 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         $timeout(function(){
 
             angular.forEach($scope.opcValue, function(value, key){
-                var v =  $filter("customFind")($scope.critField.opcs,[value.opc_id],function(c,v){
-                    return c.pivot.opc_id == v[0];
-                })[0];
                 value.field_id = val
-                if(v){
-                    value.id=v.pivot.id || false;
-                    value.valor=v.pivot.value || "";
-                    value.msg=v.pivot.message || "";
+                if(key!="opts"){
+                    var v =  $filter("customFind")($scope.critField.opcs,[value.opc_id],function(c,v){
+                        return c.pivot.opc_id == v[0];
+                    })[0];
+
+                    if(v){
+                        value.id=v.pivot.id || false;
+                        value.valor=v.pivot.value || "";
+                        value.msg=v.pivot.message || "";
+                    }
+                }else{
+                    angular.forEach($filter("filterSearch")($scope.critField.opcs,[value.opc_id]), function(valor, key){
+                        value.valor.push(valor.id);
+                    })
                 }
+
             });
         },0)
 
@@ -376,12 +384,16 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     };
     $scope.formId = critForm.getEdit();
     
-    $scope.get = function (tipo,options) {
-        if(options.length>0){
-            if(tipo != "Opcion"){
-                return $filter("customFind")(options,[tipo],function(c,v){
+    $scope.get = function (filt,obj) {
+        if(obj.options.length>0){
+            if(obj.tipo != "Opcion"){
+                return $filter("customFind")(obj.options,[obj.tipo],function(c,v){
                     return c.descripcion == v[0];
                 })[0];
+            }else{
+                return $filter("customFind")(obj.options,[filt.id],function(c,v){
+                    return c.descripcion == obj.tipo && c.id == v[0];
+                }).length > 0;
             }
         }
 
