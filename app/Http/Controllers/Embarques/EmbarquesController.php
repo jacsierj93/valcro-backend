@@ -7,9 +7,9 @@ use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Masters\Ports;
-use App\Models\Sistema\Notifications\NotificationModule;
-use App\Models\Sistema\Notifications\NotificationSenders;
-use App\Models\Sistema\Notifications\NotificationData;
+use App\Models\Sistema\MailModels\MailModule;
+use  App\Models\Sistema\MailModels\MailAlert;
+use App\Models\Sistema\MailModels\MailAlertDestinations;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\Providers\Provider;
@@ -34,6 +34,9 @@ use Validator;
 use PDF;
 use App;
 use Illuminate\Support\Facades\Mail;
+use Storage;
+
+
 
 
 class EmbarquesController extends BaseController
@@ -75,128 +78,32 @@ class EmbarquesController extends BaseController
     public function getUncloset(){
         return json_encode(Shipment::whereNotNull('session_id')->whereNull('comentario_cancelacion')->get());
     }
-
-
-    public function sendMail ($template,$sender,$model){
-
-        try {
-            Mail::send('emails.render', ['data'=>$template],function ($m) use($sender ){
-                $m->subject($sender['subject']);
-
-                foreach($sender['to'] as $aux)
-                {
-                    $m->to($aux['email'], $aux['name']);
-                }
-                if(array_key_exists('cc',$sender )){
-                    foreach($sender['cc'] as $aux)
-                    {
-                        $m->cc($aux['email'], $aux['name']);
-                    }
-                }
-                if(array_key_exists('ccb',$sender )){
-                    foreach($sender['ccb'] as $aux)
-                    {
-                        $m->ccb($aux['email'], $aux['name']);
-                    }
-                }
-                if(array_key_exists('attsData',$sender )){
-                    foreach($sender['attsData'] as $aux)
-                    {
-                        $m->attachData($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
-                    }
-                }
-                if(array_key_exists('atts',$sender )){
-                    foreach($sender['atts'] as $aux)
-                    {
-                        $m->attach($aux['data'], $aux['name'],(array_key_exists('opcs',$aux) ?$aux['opcs'] :[] ) );
-                    }
-                }
-
-
-            });
-            return ['send'=>true];
-
-        }
-        catch (\Exception $e) {
-
-            return ['send'=>false];
-
-        }
+/*
+ private function outputDate($databd){
+        return  date_format(date_create($databd),'d-m-Y');
     }
+*/
 
     public function testPdf (Request $req){
 
-        $sender = ['subject'=>'demo','to'=>
-            [ new NotificationSenders(['tipo'=>'to','doc_id'=>'78','email'=>'luisnavarro.dg@gmail.com','nombre'=>'luis'])]
-        ];
-       // return View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
-           $email = new NotificationModule();
-          // $email = NotificationModule::find(80);
-      /* // $email->id= 80;
-        return $email->resend();*/
-
-        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
-        return $email->sendMail($html, $sender);
-        /*$html = View::make('emails.prueba',[])->render();
-        $sender =['subject'=>'demo','to'=>[
-            ['email'=>'meqh1992@gmail.com','name'=>'Miguel']
-        ]];
-        return $this->sendMail($html,$sender);*/
-  /*  try {
-        $this->sendMail('emails.prueba',$sender);
-    }
-        catch (\Exception $e) {
-           //return dd($e);
-
-        }*/
-
+        $model = new MailAlert();
+        $model->tipo_origen_id = '24';
+        $model->doc_origen_id = 248;
+        $model->plantilla = "emails.modules.Embarques.Internal.Alert";
+        $model->save();
+        $send = new MailAlertDestinations();
+        $send->email = "meqh1992@gmail.com";
+        $send->nombre = "Miguel";
+        $send->doc_id = $model->id;
+        $send->tipo = 'to' ;
+        $send->save();
+         return $model->sendMail();
     }
 
-    /*  public function testPdf (Request $req){
-       $model = Shipment::findOrFail($req->id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-
-        $not = [];
-        $not[] =['key'=>'Eliminacion de carga', 'value'=>'asdfsdf'];
-        $not[] =['key'=>'Eliminacion de carga'];
-        $html = View::make("emails/modules/Embarques/Internal/notificaciones",['model'=>$model, 'data'=>$not])->render();
 
 
-        return $html;
-
-    }*/
-    /*    public function testPdf (Request $req){
-       $model = Shipment::findOrFail($req->id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-
-        $html = View::make("emails/modules/Embarques/Internal/resumen",['model'=>$model, 'data'=>['accion'=>'Demo']])->render();
 
 
-        return $html;
-
-    }*/
-
-    /*
-
-    public function testPdf (Request $req){
-
-$snappy = App::make('snappy.pdf');
-$html = View::make("emails/modules/Embarques/Internal/Simple",[])->render();
-
-
-$archivo = response()->make($snappy->getOutputFromHtml($html), 200, [
-'Content-Type' => 'application/pdf',
-'Content-Disposition'   => 'attachment; filename="file.pdf"'
-]);
-
-return $html;
-
-}
-
-
-    */
     /************************* PROVIDER ***********************************/
     public  function  getProvList(){
         $select = 'tbl_proveedor.id,'.
@@ -1736,6 +1643,20 @@ return $html;
          return $embarques;*/
     }
 
+    /************************* examples ***********************************/
+
+    //
+    public function example_sen_mail (Request $req){
+
+        $sender = ['subject'=>'demo','to'=>
+            [ new MailModuleSenders(['tipo'=>'to','doc_id'=>'78','email'=>'luisnavarro.dg@gmail.com','nombre'=>'luis'])]
+        ];
+        $email = new MailModule();
+        $email->doc_id= $req->doc_id;
+        $email->tipo_origen_id= $req->tipo_origen_id;
+        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>Shipment::find($req->id)]);
+        return $email->sendMail($html, $sender);
+    }
 
 
 

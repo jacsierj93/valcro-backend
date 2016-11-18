@@ -193,16 +193,6 @@ class Files
         return $archivo;
 
 
-    }    /**busca y muestra un archivo, dada su ruta
-     * @param $name
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getFileUrl($name)
-    {
-        return $this->fileSystem.$name;
-
-
-
     }
 
     /**

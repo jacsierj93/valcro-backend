@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\SendShipmentMail::class
+        Commands\MailAlert::class
     ];
 
     /**
@@ -26,5 +26,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //
+        $schedule->command('MailAlert')->everyFiveMinutes();
     }
 }

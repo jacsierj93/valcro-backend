@@ -7,13 +7,13 @@ use App\Models\Sistema\User;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
-class SendShipmentMail extends Command {
+class MailAlert extends Command {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'emailShipment:send {id}';
+    protected $signature = 'MailAlert';
 
     /**
      * The console command description.
@@ -49,23 +49,13 @@ class SendShipmentMail extends Command {
      */
     public function handle()
     {
-        $noti = NotificationModule::find($this->argument('id'));
-        $model = Shipment::find($noti->doc_id);
-        $model->usuario = $this->user ;
-        $model->items = $model->items()->get();
-        $dat = $noti->data()->get();
+        $model = \App\Models\Sistema\MailModels\MailAlert::where('periodo',1)->get();
+        foreach ($model as $aux){
+            $aux->asunto = Carbon::now();
 
-        $send= $noti->senders()->get();
-
-        $senders = ['subject'=>$noti->asunto , 'to'=>$send->where('tipo','to'), 'cc'=>$send->where('tipo','cc'), 'ccb'=>$send->where('tipo','ccb')];
-        $data = [];
-        $data['text'] =[];
-
-        foreach ($dat->where('tipo','text') as $aux){
-            $data['text'][$aux->key] = $aux->value;
+            $aux->sendMail();
         }
-
-        $noti->send_mail($noti->plantilla,$senders,['model'=>$model, 'data'=>$data] );
+        $this->info(''.sizeof($model));
     }
 
 
