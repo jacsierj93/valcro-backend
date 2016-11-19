@@ -1,5 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="prodMainController">
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="prodMainController" global>
 
 
 
@@ -51,9 +51,9 @@
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
-            <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
+            <div id="mainList" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : true : filtAvaiable" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : true : filtAvaiable" id="lineId{{line.id}}" ng-click="openCrit(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
 
                 </div>
@@ -100,7 +100,7 @@
         </div>
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer0" id="layer0">
-            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+            <!-- 11) ########################################## LINEAS #SIN CRITERIO ########################################## -->
 
             <input type="hidden" md-autofocus>
             <div layout="row" flex>
@@ -121,7 +121,7 @@
                         <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
                         <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                            <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : false : filtAvaiable" id="lineId{{line.id}}" ng-click="clicked(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
+                            <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : false : filtAvaiable" id="lineId{{line.id}}" ng-click="openCrit(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
                                 <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
 
                             </div>
@@ -133,13 +133,13 @@
         </md-sidenav>
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 332px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer2" id="layer2">
-            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+            <!-- 11) ########################################## NUEVA LINEA ########################################## -->
 
             <input type="hidden" md-autofocus>
-            <div layout="row" flex>
+            <div layout="row" flex  ng-controller="lineController">
                 <md-content class="cntLayerHolder" layout="column" flex style="padding-left: 8px">
                     <!--creacion o edicion de la linea-->
-                    <form name="LineProd" layout="row" class="focused" ng-controller="lineController">
+                    <form name="LineProd" layout="row" class="focused">
                         <div active-left></div>
                         <div flex layout="column">
                             <div class="titulo_formulario" layout="column" layout-align="start start">
@@ -195,12 +195,14 @@
 
                     <div flex></div>
                 </md-content>
+                <div class="showNext" style="width: 16px;" ng-mouseover="(LineProd.$valid && !LineProd.$pristine)?$parent.showNext(true,saveNewLine):showMsg()" ng-mouseleave="over = false;">
+                </div>
             </div>
         </md-sidenav>
 
 
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="layer1">
-            <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+            <!-- 11) ########################################## LAYER PREVIEW DEL FORMULARIO ########################################## -->
 
             <input type="hidden" md-autofocus>
             <div layout="row" flex>
@@ -301,16 +303,22 @@
             </div>
         </md-sidenav>
 
-        <div>
+        <div id="critConstruct">
             <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 736px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst1" >
-                <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+                <!-- 11) ########################################## MINI LAYER SELECTOR NOMBRE CAMPO ########################################## -->
 
                 <input type="hidden" md-autofocus>
                 <div layout="row" flex>
                     <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
 
-                        <div style="width:192px;" layout="column" >
-                            <md-content style="margin: 0 8px 0 8px !important;">
+                        <div style="width:192px; padding: 0 8px 0 8px !important" layout="column" >
+                            <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                <div>
+                                    Nombre del Campo
+                                </div>
+                                <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
+                            </div>
+                            <md-content flex>
                                 <div ng-repeat="field in fields" class="row" ng-class="{'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                     <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
                                 </div>
@@ -321,14 +329,20 @@
                 </div>
             </md-sidenav>
             <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 928px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst2" >
-                <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
+                <!-- 11) ########################################## MINI LAYER SELECTOR TIPO DE CAMPO ########################################## -->
 
                 <input type="hidden" md-autofocus>
                 <div layout="row" flex>
                     <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
 
-                        <div style="width:192px;" layout="column" >
-                            <md-content style="margin: 0 8px 0 8px !important;">
+                        <div style="width:192px; padding: 0 8px 0 8px !important" layout="column" >
+                            <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                <div>
+                                    Tipo de Campo
+                                </div>
+                                <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
+                            </div>
+                            <md-content flex>
                                 <div ng-repeat="type in tipos" ng-class="{'field-sel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                     <div ng-click="createField(type,'type')" >{{type.descripcion}}</div>
                                 </div>
@@ -346,7 +360,7 @@
                     <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
                         <div flex layout="column" style="padding:8px;">
                             <div flex>
-                                <div class="titulo_formulario" layout="column" layout-align="start start">
+                                <div class="titulo_formulario row" layout="column" layout-align="start start">
                                     <div ng-click="show()">
                                         Opciones
                                     </div>
@@ -572,10 +586,16 @@
 
                         </div>
                     </md-content>
+                    <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
+                    </div>
                 </div>
             </md-sidenav>
 
         </div>
     </div>
+    <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
+        <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nxtAction(nextLyr,\$event)")) ?>
+    </md-sidenav>
+
     <div ng-controller="notificaciones" ng-include="template"></div>
 </div>

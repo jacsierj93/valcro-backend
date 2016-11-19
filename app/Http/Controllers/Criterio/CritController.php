@@ -61,14 +61,13 @@ class CritController extends BaseController
         return json_encode($types);
     }
     
-    public function getCriterio(){
-        $crit = Criterio::where("linea_id","1")->get();
+    public function getCriterio($line){
+        $crit = Criterio::where("linea_id",$line)->get();
         foreach ($crit as $field){
             $field->line;
             $field->field;
             $field->type;
             $field['options'] = $field->options()->get();
-
         }
         return  json_encode($crit);
     }
@@ -129,27 +128,46 @@ class CritController extends BaseController
     public function saveOptions(Request  $reqs){
         $ret = array();
         foreach ($reqs->request as $k=>$rq){
+            if($k != "opts"){
+                if($rq['id']){
+                    $opt = Options::find($rq['id']);
 
-            if($rq['id']){
-                $opt = Options::find($rq['id']);
-                
-                if($opt->value == $rq['valor'] && $opt->message == $rq['msg']){
-                    continue;
+                    if($opt->value == $rq['valor'] && $opt->message == $rq['msg']){
+                        continue;
+                    }
+                    $ret[$k]["action"]="upd";
+                }else{
+                    $opt = new Options();
                 }
-                $ret[$k]["action"]="upd";
+                $opt->lct_id = $rq['field_id'];
+                $opt->opc_id = $rq['opc_id'];
+                $opt->value = $rq['valor'];
+                $opt->message = $rq['msg'];
+
+                $opt->save();
+                $ret[$k]["id"] = $opt->id;
             }else{
-                $opt = new Options();
+                Options::where("lct_id",$rq['field_id'])->where("opc_id",$rq['opc_id'])->whereNotIn("value",$rq['valor'])->delete();
+
+                $regs = Options::where("lct_id",$rq['field_id'])->where("opc_id",$rq['opc_id'])->lists("value");
+
+                foreach ($rq['valor'] as $opcion){
+
+                    if(!$regs->contains($opcion)){
+                        echo"dasdasdasd";
+                        $opt = new Options();
+                        $opt->lct_id = $rq['field_id'];
+                        $opt->opc_id = $rq['opc_id'];
+                        $opt->value = $opcion;
+                        $opt->save();
+                        $ret[$k]["id"] = $opt->id;
+                    }
+                }
             }
-            $opt->lct_id = $rq['field_id'];
-            $opt->opc_id = $rq['opc_id'];
-            $opt->value = $rq['valor'];
-            $opt->message = $rq['msg'];
 
-            $opt->save();
-            $ret[$k]["id"] = $opt->id;
-            return $ret;
+
         }
-
+        return $ret;
 
     }
 }

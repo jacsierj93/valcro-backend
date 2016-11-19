@@ -10,7 +10,7 @@ $app->get("criterio/optionLists",'Criterio\CritController@getListType');
 $app->get("criterio/masterOptions",'Criterio\CritController@getOptions');
 $app->get("criterio/fieldList",'Criterio\CritController@getCampos');
 $app->get("criterio/typeList",'Criterio\CritController@getTypes');
-$app->get("criterio/getCriteria",'Criterio\CritController@getCriterio');
+$app->get("criterio/getCriteria/{line}",'Criterio\CritController@getCriterio');
 $app->post("criterio/save",'Criterio\CritController@saveCritField');
 $app->post("criterio/saveOptions",'Criterio\CritController@saveOptions');
 $app->post("criterio/createLine",'Criterio\CritController@createLine');

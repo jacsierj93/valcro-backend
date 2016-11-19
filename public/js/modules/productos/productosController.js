@@ -39,9 +39,10 @@ MyApp.service("mastersCrit",function(criterios,masters){
 MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
     $scope.listLines = mastersCrit.getLines();
 
-    $scope.clicked = function(line){
+    $scope.openCrit = function(line){
         critForm.setLine(line);
-        $mdSidenav("layer1").open();
+        $scope.$parent.LayersAction({open:{name:"layer1"}});
+        /*$mdSidenav("layer1").open();*/
     };
     $scope.curLine = critForm.getLine();
     $scope.filtAvaiable = function(c,v){
@@ -59,36 +60,84 @@ MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidena
 
     $scope.list = mastersCrit.getLinesDisp();
 
-    $scope.$watchGroup(['LineProd.$valid','LineProd.$pristine'], function(nuevo) {
-        if(nuevo[0] && !nuevo[1]) {
-            criterios.put({type:"createLine"},$scope.newLine,function(data){
-                $scope.newLine.id = data.id;
-                if(data.action=="new"){
-                    $scope.listLines.push({
+    $scope.saveNewLine = function(){
+        criterios.put({type:"createLine"},$scope.newLine,function(data){
+            $scope.newLine.id = data.id;
+            if(data.action=="new"){
+                var line = {
                         id:$scope.newLine.id,
                         linea:$scope.newLine.name,
-                        siglas:$scope.newLine.letter
-                    });
-                    setNotif.addNotif("ok", "Nueva Linea Creada", [
-                    ],{autohidden:3000});
-                }else{
-                   var line = $filter("filterSearch")($scope.listLines ,[data.id])[0];
-                    line.linea = $scope.newLine.name;
-                    line.siglas = $scope.newLine.letter;
-                }
-            });
-        }
-    });
+                        siglas:$scope.newLine.letter,
+                        hasCrit: true
+                };
+                $scope.listLines.push(line);
+                setNotif.addNotif("ok", "Nueva Linea Creada", [
+                ],{autohidden:3000});
+            }else{
+                var line = $filter("filterSearch")($scope.listLines ,[data.id])[0];
+                line.linea = $scope.newLine.name;
+                line.siglas = $scope.newLine.letter;
+            }
+            $timeout(function(){
+                $scope.$parent.LayersAction({close:{all:true,after:function(){
+                    $scope.newLine.id = false;
+                    $scope.newLine.name = "";
+                    $scope.newLine.letter = "";
+                    $timeout(function(){
+                        angular.element("#mainList").find("#lineId"+line.id).click();
+                    },500);
+                }}});
+            },500)
+
+        });
+    };
+    $scope.over = false;
+    $scope.showMsg = function(){
+        $scope.over = true;
+        console.log($scope.over);
+        $timeout(function(){
+           if($scope.over){
+               if($scope.LineProd.$pristine){
+                   setNotif.addNotif("info", "Si desea regresar sin cargar ninguna nueva linea porfavor de click en la flecha \"atras\"", [
+                   ],{autohidden:3000});
+               }
+
+           }else if(!$scope.LineProd.$valid && !$scope.LineProd.$pristine){
+               setNotif.addNotif("alert", "es imposible continuar con al creacion de la linea, porfavor corrija los errores", [
+               ],{autohidden:3000});
+           }
+        },300);
+    }
+    
     
 }]);
 
 MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
-    $scope.index = 2;
+
+    $scope.nxtAction = null;
+    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
+        $scope.index = nvo[1];
+        $scope.layerIndex = nvo[0];
+        $scope.layer = nvo[0];
+    });
+
+    $scope.showNext = function(status,to){
+        if(status){
+            $scope.nxtAction = to;
+            $mdSidenav("NEXT").open()
+        }else{
+            $mdSidenav("NEXT").close()
+        }
+    };
     $scope.newCrit = function(){
-        $mdSidenav("layer0").open();
+        $scope.LayersAction({open:{name:"layer0"}});
     };
     $scope.newLine = function(){
-        $mdSidenav("layer2").open();
+        $scope.LayersAction({open:{name:"layer2"}});
+    };
+
+    $scope.prevLayer = function(){
+        $scope.LayersAction({close:true});
     };
 
     $scope.listLines = mastersCrit.getLines();
@@ -97,7 +146,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
     $scope.listOptions = critForm.getOptions();
-    //$scope.opcValue =critForm.getOptions();
 
     $scope.opcValue = {
         info: {
@@ -157,7 +205,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         if(angular.element(e.relatedTarget).parents("#"+id).length!=0){
            return false;
         }
-        console.log("beforeSave",$scope.opcValue)
         saveOptions($scope.opcValue)
     };
 
@@ -170,6 +217,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         if(id){
             $scope.opcValue.opts.valor.unshift(id);
             $timeout(function(){$scope.ctrl.searchOpctions = null},0);
+            saveOptions($scope.opcValue)
         }
 
     };
@@ -232,7 +280,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         });
     };
     $scope.opennext = function(){
-        $mdSidenav("layer1").open();
+        $scope.LayersAction({open:{name:"layer1"}});
     };
     
     $scope.addField= function(type){
@@ -258,7 +306,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var lines = mastersCrit.getLines();
     var fields = mastersCrit.getFields();
     var tipos = mastersCrit.getTypes();
-    var listado = criterios.query({ type:"getCriteria"});
+    var listado = [];
     var masterOptions = criterios.query({ type:"masterOptions"});
     var ListOptions = criterios.query({ type:"optionLists"});
     var curLine = {id:false};
@@ -282,6 +330,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     return {
         setLine:function(elem){
             curLine.id = elem.id;
+            listado = criterios.query({ type:"getCriteria",id:curLine.id});
         },
         getLine:function(){
             return curLine;
@@ -374,8 +423,11 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 
 
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
-    $scope.criteria = critForm.get();
+    $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
+    $scope.$watch("line.id",function(){
+        $scope.criteria = critForm.get();
+    });
     $scope.setEdit = function(campo){
 
         $scope.openConstruct(function () {
@@ -411,11 +463,8 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     }
 }]);
 
-MyApp.directive('formPreview', function($http,$timeout) {
+MyApp.directive('formPreview', function() {
         return {
-            /*link:function(scope,elem,attr){
-                elem.find(">:not(["+attr.formPreview+"])").remove();
-            },*/
             templateUrl: function(elem, attr) {
                 return 'modules/productos/textForm';
             }
