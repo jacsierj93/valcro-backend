@@ -3811,7 +3811,7 @@ MyApp.service('form',function(){
         back:back,
         clear:function () {
             name="none";
-            valid=false;
+
             state="waith";
         }
     }

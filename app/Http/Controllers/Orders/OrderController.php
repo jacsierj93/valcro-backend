@@ -1836,12 +1836,19 @@ class OrderController extends BaseController
             $model->doc_id = $req->doc_id;
             $model->origen_item_id= $req->id;
             $model->doc_origen_id= $req->doc_origen_id;
-            $model->cantidad= $req->cantidad;
-            $model->saldo= $req->saldo;
             $model->producto_id= $req->producto_id;
             $model->descripcion= $req->descripcion;
+            $model->saldo= $req->saldo;
+            $model->cantidad = $req->has('cantidad') ? $model->cantidad :   $model->cantidad =$req->saldo ;
             $resul['response']=$model->save();
             $resul['renglon_id']=$model->id;
+
+            // op
+            if($req->tipo_origen_id == 1){
+
+            }else{
+
+            }
 
 
         }else{

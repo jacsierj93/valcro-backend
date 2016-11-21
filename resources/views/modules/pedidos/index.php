@@ -243,14 +243,14 @@
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
                     </div>
-                   <!-- <div layout="column" layout-align="center center"
-                         ng-show="( document.id )"
-                         ng-click="openMailPreview()">
+                    <div layout="column" layout-align="center center"
+
+                         ng-click="test()">
                         <span style="font-size: 24px"> TEst </span>
                         <md-tooltip >
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
-                    </div>-->
+                    </div>
 
                 </div>
 
@@ -1135,7 +1135,7 @@
                     <form name="FormHeadDocument" layout="row" ng-class="{focused: gridView == 1}" ng-style="(gridView != 5 && tbl_dtDoc.extend == 0 ) ? {'min-height' : '320px'} : {} ">
                         <div active-left></div>
                         <div layout="column" flex ng-init=" tbl_dtDoc.extend = 0" >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 1}" >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 1}"  ng-click="gridView = 1">
                                 <div class="titulo_formulario" style="height:39px;" flex >
                                     <div>
                                         Datos de {{formMode.name}}
@@ -1479,8 +1479,8 @@
                     <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
                         <div active-left></div>
                         <div layout="column" flex >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" >
-                                <div class="titulo_formulario" style="height:39px;" flex >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" ng->
+                                <div class="titulo_formulario" style="height:39px;" flex ng-click="gridView = 2" >
                                     <div>
                                         Aprobacion de Gerente
                                     </div>
@@ -1523,7 +1523,7 @@
                         <div active-left></div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 3}" >
-                                <div class="titulo_formulario" style="height:39px;" flex >
+                                <div class="titulo_formulario" style="height:39px;" flex   ng-click="gridView = 3">
                                     <div>
                                         Aprobación
                                     </div>
@@ -1586,7 +1586,7 @@
                     <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.permit.cancel && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
                         <div active-left></div>
                         <div layout="column" flex  >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}" >
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}"  ng-click="gridView = 4" >
                                 <div class="titulo_formulario" style="height:39px;" flex >
                                     <div>
                                         Cancelacion
@@ -1619,8 +1619,8 @@
                     </form>
                     <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5)}" ng-show="tbl_dtDoc.extend == 0 && document.productos.todos.length > 0 ">
                         <div active-left></div>
-                        <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}" >
-                            <div class="titulo_formulario" style="height:39px;" flex >
+                        <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 5}" flex>
+                            <div class="titulo_formulario" style="height:39px;" flex  ng-click="gridView = 5" >
                                 <div>
                                     Productos agregados
                                 </div>
@@ -1853,8 +1853,7 @@
 
         <!--  ########################################## LAYER PRODUCTOS PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listProducProv" id="listProducProv">
-
-            <md-content  layout="row" flex class="sideNavContent">
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistProducProvCtrl">
                 <div  layout="column" flex class="layerColumn" >
                     <div  layout="row" class="focused form-style">
                         <!----FILTROS ---->
@@ -1936,24 +1935,25 @@
                         <div active-left ></div>
                         <div  flex layout="column">
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order  as filterProductProv"
-                                   ng-mouseenter = "mouseEnterProd(item) " row-select>
+                                   ng-mouseenter = "mouseEnterProd(item) " row-select ng-click="change({item:item,event:$event})" OrderCreatProduct >
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellEmpty cellSelect">
-                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(Docsession.block || !document.permit.update)" ng-model="item.asignado"></md-switch>
+                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(true)" ng-model="item.asignado"></md-switch>
                                     </div>
                                     <div flex="20" class="cellGrid" > {{item.codigo}}</div>
                                     <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
                                     <div flex class="cellGrid" > {{item.descripcion}}</div>
+                                    <div flex="15" class="cellGrid" > {{item.saldo}}</div>
                                     <!--<div flex="10" class="cellGrid" >
                                         <md-switch class="md-primary" ng-disabled="true" ng-model="item.puntoCompra"></md-switch>
                                     </div>-->
-                                    <div flex="15" class="cellGrid cellGrid-input {{(provRow ==  item.id) ? 'cellGrid-input-focus' : 'cellGrid-input-no-focus'}}"
+                                    <!--<div flex="15" class="cellGrid cellGrid-input {{(provRow ==  item.id) ? 'cellGrid-input-focus' : 'cellGrid-input-no-focus'}}"
 
                                     >
                                         <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
                                                 type="number" range="{{item.asignado}}" minVal="1" maxVal="6" id="p{{item.id}}"
                                                 ng-disabled="(!item.asignado || Docsession.block) " ng-focus="provRow = item.id "  ng-blur="provRow = '-1'" />
-                                    </div>
+                                    </div>-->
 
 
 
@@ -1966,7 +1966,8 @@
 
                     </form>
                 </div>
-                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+                <vl-next click="next" vl-show="showNext"></vl-next>
+                <!--<div style="width: 16px;" ng-mouseover="showNext(true)" > </div>-->
 
             </md-content>
         </md-sidenav>
@@ -4172,7 +4173,97 @@
                 <div  style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
         </md-sidenav>
+        <!------------------------------------------- mini layer crear  producto ------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderminiCreatProduct" id="OrderminiCreatProduct"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderCreatProductCtrl" style="padding-left: 12px" >
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                    <div layout="row" class="form-row-head form-row-head-select" >
 
+                        <div class="titulo_formulario">
+                            <div>
+                                Agregar producto
+                            </div>
+                        </div>
+                    </div>
+                    <form name="prod" flex class="gridContent focused" layout="column" style="padding-right:4px">
+
+                        <div layout="row" class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Asignado </div>
+                            </div>
+
+                            <md-input-container class="md-block rms" flex >
+                                <input  skip-tab required id="input" type="text" ng-model="select.saldo" range minVal="0.1" maxVal="{{select.cantidad}}"   >
+                            </md-input-container>
+
+                            <md-tooltip >Cantidad a agregar</md-tooltip>
+                        </div>
+
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Costo unitario </div>
+                            </div>
+                            <md-input-container class="md-block rms" flex >
+                                <input skip-tab  id="input" type="text" ng-model="select.precio" range minVal="0.1" maxVal="{{select.cantidad}}"   >
+                            </md-input-container>
+
+                            <md-tooltip >Monto a pagar por unidad</md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Maximo</div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;"> {{(select.disponible) ? select.disponible :'N/A'}}</div>
+
+                            <md-tooltip >
+                                Disponible para asignacion
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Cod. Fabrica</div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;"> {{(select.codigo_fabrica) ? select.codigo_fabrica :'No existe'}} </div>
+
+                            <md-tooltip >
+                                Codigo en fabrica
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Codigo</div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;"> {{(select.codigo) ? select.codigo :'No existe'}} </div>
+
+                            <md-tooltip >
+                                Codigo
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Cod. Barra </div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;">{{(select.codigo_barra) ? select.codigo_barra : 'No existe'}} </div>
+                            <md-tooltip >
+                                Codigo de barra
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Descripcion </div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;">{{select.descripcion}} </div>
+                            <md-tooltip >
+                                Descripcion del producto
+                            </md-tooltip>
+                        </div>
+
+                    </form>
+                </div>
+            </md-content>
+        </md-sidenav>
 
         <!-- ########################################## LAYER Mensaje de notificacion########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(30%); z-index: 60 ;"

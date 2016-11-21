@@ -556,9 +556,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
     $scope.test = function (test) {
-        alert(test);
-        console.log("tet", test);
-        console.log("escope", $scope);
+        $scope.OrderCreatProduct();
     };
 
     $scope.demo = function(){
@@ -1369,32 +1367,32 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                     $mdSidenav("NEXT").open();
                 }
                 /*else if(!$scope.FormAprobCompras.$valid && !$scope.FormAprobCompras.$pristine ){
-                    $scope.NotifAction("error",
-                        "¿Desea cancelar la aprobacion de la"+$scope.formMode.name+" ?"
-                        ,[{name:"si",
-                            action:function (){
-                                $mdSidenav("NEXT").open();
-                                $scope.document.nro_doc= null;
-                                $scope.document.fecha_aprob_compra= null;
-                                $scope.FormAprobCompras.$setDirty();
+                 $scope.NotifAction("error",
+                 "¿Desea cancelar la aprobacion de la"+$scope.formMode.name+" ?"
+                 ,[{name:"si",
+                 action:function (){
+                 $mdSidenav("NEXT").open();
+                 $scope.document.nro_doc= null;
+                 $scope.document.fecha_aprob_compra= null;
+                 $scope.FormAprobCompras.$setDirty();
 
-                            }
-                        }, {name:"No",
-                            action:function (){
-                                $timeout(function(){
-                                    var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                                    if(inval[0]){
-                                        inval[0].focus();
-                                    }else{
-                                        inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                                        console.log(" terro ", inval)
-                                        inval[0].focus();
-                                    }
-                                },0);
+                 }
+                 }, {name:"No",
+                 action:function (){
+                 $timeout(function(){
+                 var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                 if(inval[0]){
+                 inval[0].focus();
+                 }else{
+                 inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                 console.log(" terro ", inval)
+                 inval[0].focus();
+                 }
+                 },0);
 
-                            }
-                        }],{autohidden:autohidden});
-                }*/
+                 }
+                 }],{autohidden:autohidden});
+                 }*/
 
             } else if($scope.module.layer == 'listProducProv'){
                 if (!$scope.listProductoItems.$valid && $scope.module.layer== 'listProducProv') {
@@ -2087,27 +2085,27 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.saveWithPreview= function (){
         $scope.openMailPreview(
             function(isSend){
-            if(isSend){
-                console.log("llamado a calback");
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                    if (response.success) {
-                        $timeout(function(){
-                            var layer=angular.element("#"+$scope.layer);
-                            layer[0].click();
-
-                        },0);
-
-                        $scope.updateProv(function(){
-                            $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
+                if(isSend){
+                    console.log("llamado a calback");
+                    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                        if (response.success) {
                             $timeout(function(){
-                                $scope.LayersAction({close:{first:true, search:true}});
-                            },1500);
+                                var layer=angular.element("#"+$scope.layer);
+                                layer[0].click();
 
-                        });
+                            },0);
 
-                    }});
+                            $scope.updateProv(function(){
+                                $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
+                                $timeout(function(){
+                                    $scope.LayersAction({close:{first:true, search:true}});
+                                },1500);
+
+                            });
+
+                        }});
+                }
             }
-        }
         );
     };
 
@@ -2286,9 +2284,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.closeAddAnswer= function(e){
 
         if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
-                /*
-                 jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
-                 */
+            /*
+             jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
+             */
             $scope.isOpenaddAnswer &&
             !angular.element(e.target).is("#ngf-AnswerfileInput")) {
 
@@ -3598,29 +3596,29 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     };
-   /* $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
+    /* $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
 
-        /!* if (nuevo[0] && !nuevo[1]) {
+     /!* if (nuevo[0] && !nuevo[1]) {
 
-         $scope.document.prov_id = $scope.provSelec.id;
-         Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
-         $scope.FormCancelDoc.$setPristine();
+     $scope.document.prov_id = $scope.provSelec.id;
+     Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
+     $scope.FormCancelDoc.$setPristine();
 
-         if (response.success && response.accion == 'new') {
-         $scope.NotifAction("ok","Cancelado",[],{autohidden:autohidden});
-         }
+     if (response.success && response.accion == 'new') {
+     $scope.NotifAction("ok","Cancelado",[],{autohidden:autohidden});
+     }
 
-         });
-         }*!/
+     });
+     }*!/
 
 
-    });*/
+     });*/
 
     $scope.$watchGroup(['FormAprobCompras.$valid', 'FormAprobCompras.$pristine'],function(newVal){
         if(!newVal[1]){
 
         }
-       });
+    });
     $scope.Docsession.msmAprobComTrue= false;
     $scope.Docsession.msmAprobComfalse= false;
 
@@ -3630,22 +3628,22 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.sendAprob = function(){
         var state= 'waith';
         var  saveAprob = function(){
-                state='finish';
-                if($scope.FormAprobCompras.$valid ){
-                    $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
+            state='finish';
+            if($scope.FormAprobCompras.$valid ){
+                $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
 
-                }else{
-                    $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se a aprobado",[/*{name:"Esta", action:function(){}} */],{autohidden:1500});
-                    $timeout(function(){
-                        var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                        if(inval[0]){
-                            inval[0].focus();
-                        }else{
-                            inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                            inval[0].focus();
-                        }
-                    },1500);
-                }
+            }else{
+                $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se a aprobado",[/*{name:"Esta", action:function(){}} */],{autohidden:1500});
+                $timeout(function(){
+                    var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                    if(inval[0]){
+                        inval[0].focus();
+                    }else{
+                        inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                        inval[0].focus();
+                    }
+                },1500);
+            }
 
         };
 
@@ -3799,6 +3797,42 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
 
+//OrderlistProducProv
+MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','form', function ($scope,Order) {
+
+
+    $scope.change = function (data) {
+
+        if(!data.asignado){
+            $scope.$parent.OrderCreatProduct(data);
+        }else{
+            $scope.NotifAction("alert","Esta seguro de remover el producto",
+                [
+                    {name:"Cancelar", action:function () {
+
+                    }
+                    },
+                    {name:"Si, estoy seguro", action:function () {
+
+                    }
+                    }
+                ]
+                ,{block:true}) ;
+        }
+    }
+
+    $scope.showNext = function () {
+        if (!$scope.listProductoItems.$valid) {
+
+            $scope.NotifAction("error",
+                "No se pueden asignar productos sin asignarle una cantidad verifique que todos los productos tienen cantidad correctas"
+                ,[],{autohidden:2000});
+
+            return false;
+        }
+        return true;
+    }
+}]);
 /**
  * controller for mdsidenav mail type popUp, this controller is responsable de send correo option, this is used for send text,
  * in lieu of de template
@@ -4016,6 +4050,106 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','set
     }
 }]);
 
+MyApp.controller('OrderCreatProductCtrl',['$scope','$mdSidenav','Order','form',  function($scope, $mdSidenav,Order, formSrv){
+
+
+    //inicilizar
+    $scope.block= false;
+    $scope.next = undefined;
+    $scope.isOpen = false;
+    $scope.select ={};
+    $scope.event =undefined;
+
+    // constructor
+    $scope.$parent.OrderCreatProduct = function (data) {
+
+        if(!$scope.select.id){
+            $scope.select= data.item;
+            $mdSidenav("OrderminiCreatProduct").open().then(function(){
+                $scope.isOpen = true;
+            });
+        }else{
+            $scope.event = data.event;
+            $scope.question(function () {
+
+            });
+
+        }
+
+
+
+    };
+
+    $scope.question = function (fn) {
+
+        if(!$scope.select.saldo){
+            $scope.NotifAction("alert","No se puede guardar el producto ¿Que desea hacer?",
+                [{name:"Dejame corregirlo", action:function () {
+
+                }},
+                    {name:"Cancelar", action:function () {
+
+                        $scope.inCloset(fn);
+                    }}
+                ]
+            );
+        }else if( parseFloat($scope.select.saldo == 0)){
+            $scope.NotifAction("alert","Si asigna 0  como valor el producto sera removido ¿esta seguro?",
+                [
+                    {name:"Dejame corregirlo", action:function () {
+
+                    }
+                    },
+                    {name:"Eliminar", action:function () {
+
+                    }
+                    },
+                    {name:"Cancelar", action:function () {
+                        $scope.inCloset();
+                    }}
+                ]
+            );
+        }else{
+            $scope.save(fn);
+        }
+    }
+
+
+    // close
+    $scope.close = function (event) {
+        if( $scope.isOpen){
+            if(
+                $scope.prod.$pristine && angular.element(event.target).parents("[OrderCreatProduct]").length == 0 ){
+                $scope.inCloset();
+            }else if( angular.element(event.target).parents("[OrderCreatProduct]").length > 0  && !$scope.prod.$pristine){
+
+            }
+        }
+
+
+    };
+
+    $scope.save = function (fn) {
+        $scope.NotifAction("alert","Agregado",[]);
+    };
+    $scope.delete = function (fn) {
+        $scope.NotifAction("alert","Agregado",[]);
+    };
+    $scope.inCloset = function (event) {
+
+        $mdSidenav("OrderminiCreatProduct").close().then(function(){
+            $scope.isOpen = false;
+            $scope.select = {};
+        });
+
+    };
+
+    $scope.setData = function (data) {
+        $scope.select = data;
+    }
+
+
+}]);
 
 MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEmail','SYSTEM','App', function($scope,$sce, setGetOrder,Order,IsEmail,SYSTEM, App){
 
@@ -4352,6 +4486,20 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
     }
 });
 
+/*
+ MyApp.service('vlMiniSideNav',function () {
+ var obj = function (key ) {
+ var bind  = {estado:false, key:key}
+ return {}
+ }
+
+ return function ( key, data) {
+ var model =  new obj(key);
+ angular.forEach(data, function (v, k) {
+ model[k] = v;
+ })
+ };
+ });*/
 
 
 /*
@@ -4802,30 +4950,30 @@ MyApp.controller('vlNextCtrl', ['$scope','$mdSidenav','vlNextSrv', function ($sc
 
 
     $scope.showNext = function (e, click, show, all) {
-     if (e ) {
-         vlNextSrv.set({click:click,show:show, all: all});
-         if(show){
-             console.log("tiene show", e);
-             if(show()){
+        if (e ) {
+            vlNextSrv.set({click:click,show:show, all: all});
+            if(show){
+                console.log("tiene show", e);
+                if(show()){
 
-                 if(show()){
-                     $mdSidenav("NEXT").open().then(function () {
-                     });
-                 }
-             }
-         }
-     }else{
-        $mdSidenav("NEXT").close().then(function () {
+                    if(show()){
+                        $mdSidenav("NEXT").open().then(function () {
+                        });
+                    }
+                }
+            }
+        }else{
+            $mdSidenav("NEXT").close().then(function () {
 
-        });
+            });
         }
-     }
+    }
 
-     // en el scopde de next
-     $scope.clicker = function (e) {
-           var event = vlNextSrv.get();
+    // en el scopde de next
+    $scope.clicker = function (e) {
+        var event = vlNextSrv.get();
         event.click(event);
-     }
+    }
 
 }]);
 
