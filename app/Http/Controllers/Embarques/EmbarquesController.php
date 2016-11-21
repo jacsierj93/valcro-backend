@@ -78,11 +78,11 @@ class EmbarquesController extends BaseController
     public function getUncloset(){
         return json_encode(Shipment::whereNotNull('session_id')->whereNull('comentario_cancelacion')->get());
     }
-/*
- private function outputDate($databd){
-        return  date_format(date_create($databd),'d-m-Y');
-    }
-*/
+    /*
+     private function outputDate($databd){
+            return  date_format(date_create($databd),'d-m-Y');
+        }
+    */
 
     public function testPdf (Request $req){
 
@@ -97,7 +97,7 @@ class EmbarquesController extends BaseController
         $send->doc_id = $model->id;
         $send->tipo = 'to' ;
         $send->save();
-         return $model->sendMail();
+        return $model->sendMail();
     }
 
 
@@ -544,150 +544,178 @@ class EmbarquesController extends BaseController
         $originShae= $model->sha256;
         $newShae=$model->getSha256();
         $result = ['accion'=>'close'];
-        $notis = NotificationModule::where('modulo','embarques')
-            ->where('doc_id', $req->id)
-            ->where('doc_tipo_id',$this->doc_tipo)
-            ->get();
 
+
+        //************************* Correo principal ***********************************/
+        $sender = ['subject'=>'demo','to'=>
+            [ new App\Models\Sistema\MailModels\MailModuleDestinations(['tipo'=>'to','doc_id'=>'78','email'=>'meqh1992@gmail.com','nombre'=>'Miguel'])]
+        ];
+        $email = new MailModule();
+        $email->doc_id= $req->doc_id;
+        $email->tipo_origen_id= $req->tipo_origen_id;
+        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model]);
 
         if($originShae == null){
-            $noti = new NotificationModule();
-            $noti->doc_id= $model->id;
-            $noti->doc_tipo_id=24;
-            $noti->asunto='creacion de embarque';
-            $noti->clave='creacion';
-            $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-            $noti->plantilla = 'emails/modules/Embarques/Internal/resumen';
-            $noti->save();
-
-            $sender = new  NotificationSenders();
-            $sender->email = 'meqh1992@gmail.com';
-            $sender->nombre = 'Miguel E.';
-            $sender->tipo='to';
-            $sender->noti_modulo_id = $noti->id;
-            $sender->save();
-
-            $notiData= new NotificationData();
-            $notiData->key ='accion';
-            $notiData->value ='Creacion de documento';
-            $notiData->noti_modulo_id = $noti->id;
-            $notiData->save();
-            $result['msm'][] ='Creado';
-
-
-
+            $email->asunto='Creacion de embarque';
+            $email->clave='creacion';
         }else if($newShae != $originShae){
-            /* $result['msm'][] ='Modificado';
-             $noti = new NotificationModule();
-             $noti->doc_id= $model->id;
-             $noti->doc_tipo_id=24;
-             $noti->descripcion='modificacion de embarque';
-             $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-             $noti->send_mail('Embarques','Internal.ResumenDoc', [''], [],'modificacion');*/
-
+            $email->asunto='Modificacion de embarque';
+            $email->clave='update';
+        }
+        $result['mail']= $email->sendMail($html, $sender);
+        if( $result['mail']['is'] == false){
+            return $result;
         }
 
+        //************************* Alerts  ***********************************/
+        $notis = MailModule::where('modulo','embarques')
+            ->where('doc_id', $req->id)
+            ->where('tipo_origen_id',24)
+            ->get();
 
-// carga
-        /*   if($model->usuario_conf_f_carga != null && $notis->where('clave','usuario_conf_f_carga')->first() == null){
-               $result['msm'][] ='confirmacion de carga ';
+        if($model->usuario_conf_f_carga != null && $notis->where('clave','usuario_conf_f_carga')->first() == null){
+            $result['alerts'][] ='confirmacion de carga';
+            $alert = new MailAlert();
+            $alert->tipo_origen_id = '24';
+            $alert->doc_origen_id = $req->id;
+            $alert->plantilla = "emails.modules.Embarques.Internal.Alert";
+            $alert->texto= "Por favor confirmar fecha carga";
+            $alert->clave= "usuario_conf_f_carga";
+            $alert->save();
+            $send = new MailAlertDestinations();
+            $send->email = "meqh1992@gmail.com";
+            $send->nombre = "Miguel";
+            $send->doc_id = $model->id;
+            $send->tipo = 'to' ;
+            $send->save();
 
-               $noti = new NotificationModule();
-               $noti->doc_id= $model->id;
-               $noti->doc_tipo_id=24;
-               $noti->descripcion='creacion de embarque';
-               $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-
-               $noti->send_mail('Embarques','Internal.aprobacion', [''], [],'usuario_conf_f_carga');
-
-           }
-           if($model->usuario_conf_f_carga == null && $notis->where('clave','usuario_conf_f_carga')->first() != null){
-               $result['msm'][] ='eliminacion de confirmacion de carga ';
-               NotificationModule::destroy($notis->where('clave','usuario_conf_f_carga')->first()->id);
+        }
+        if($model->usuario_conf_f_carga == null && $notis->where('clave','usuario_conf_f_carga')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de carga ';
+            MailAlert::destroy($notis->where('clave','usuario_conf_f_carga')->first()->id);
 
 
-           }
-           // venezuela
-           if($model->usuario_conf_f_vnz != null && $notis->where('clave','usuario_conf_f_vnz')->first() == null){
-               $result['msm'][] ='confirmacion de en venezuela ';
-               $noti = new NotificationModule();
-               $noti->doc_id= $model->id;
-               $noti->doc_tipo_id=24;
-               $noti->descripcion='creacion de embarque';
-               $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-               $noti->send_mail('Embarques','Internal.aprobacion', [''], [],'usuario_conf_f_carga');
+        }
+        // venezuela
+        if($model->usuario_conf_f_vnz != null && $notis->where('clave','usuario_conf_f_vnz')->first() == null){
+            $result['msm'][] ='confirmacion de en venezuela ';
+            $alert = new MailAlert();
+            $alert->tipo_origen_id = '24';
+            $alert->doc_origen_id = $req->id;
+            $alert->plantilla = "emails.modules.Embarques.Internal.Alert";
+            $alert->texto= "Por favor confirmar la fecha de llagada a venezuela";
+            $alert->clave= "usuario_conf_f_vnz";
 
-           }
-           if($model->usuario_conf_f_vnz == null && $notis->where('clave','usuario_conf_f_vnz')->first() != null){
-               $result['msm'][] ='eliminacion de confirmacion de venezuela ';
-               NotificationModule::destroy($notis->where('clave','usuario_conf_f_carga')->first()->id);
+            $alert->save();
+            $send = new MailAlertDestinations();
+            $send->email = "meqh1992@gmail.com";
+            $send->nombre = "Miguel";
+            $send->doc_id = $model->id;
+            $send->tipo = 'to' ;
+            $send->save();
 
-           }
-           // tienda
-           if($model->usuario_conf_f_tienda != null && $notis->where('clave','usuario_conf_f_tienda')->first() == null){
-               $result['msm'][] ='confirmacion de tienda ';
-               $noti = new NotificationModule();
-               $noti->doc_id= $model->id;
-               $noti->doc_tipo_id=24;
-               $noti->descripcion='creacion de embarque';
-               $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-               $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_f_tienda');
-               $model->fecha_finalizacion = Carbon::now();
+        }
+        if($model->usuario_conf_f_vnz == null && $notis->where('clave','usuario_conf_f_vnz')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de venezuela ';
+            MailAlert::destroy($notis->where('clave','usuario_conf_f_carga')->first()->id);
 
-           }
-           if($model->usuario_conf_f_tienda == null && $notis->where('clave','usuario_conf_f_tienda')->first() != null){
-               $result['msm'][] ='eliminacion de confirmacion de eliminacion de llegada en tienda ';
-               NotificationModule::destroy($notis->where('clave','usuario_conf_f_tienda')->first()->id);
-           }
+        }
+        // tienda
+        if($model->usuario_conf_f_tienda != null && $notis->where('clave','usuario_conf_f_tienda')->first() == null){
+            $result['msm'][] ='confirmacion de tienda ';
+            $alert = new MailAlert();
+            $alert->tipo_origen_id = '24';
+            $alert->doc_origen_id = $req->id;
+            $alert->plantilla = "emails.modules.Embarques.Internal.Alert";
+            $alert->texto= "Por favor confirmar la fecha de llagada a venezuela ";
+            $alert->clave= "usuario_conf_f_tienda";
 
-           //monto flete terrestre
-           if($model->usuario_conf_monto_ft_tt != null && $notis->where('clave','usuario_conf_monto_ft_tt')->first() == null){
-               $result['msm'][] ='confirmacion de en aprobacion de monto flete terrestre ';
-               $noti = new NotificationModule();
-               $noti->doc_id= $model->id;
-               $noti->doc_tipo_id=24;
-               $noti->descripcion='creacion de embarque';
-               $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-               $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_monto_ft_tt');
+            $alert->save();
+            $send = new MailAlertDestinations();
+            $send->email = "meqh1992@gmail.com";
+            $send->nombre = "Miguel";
+            $send->doc_id = $model->id;
+            $send->tipo = 'to' ;
+            $send->save();
 
-           }
-           if($model->usuario_conf_monto_ft_tt == null && $notis->where('clave','usuario_conf_monto_ft_tt')->first() != null){
-               $result['msm'][] ='eliminacion de confirmacion de  monto flete terrestre ';
-               NotificationModule::destroy($notis->where('clave','usuario_conf_monto_ft_tt')->first()->id);
+        }
+        if($model->usuario_conf_f_tienda == null && $notis->where('clave','usuario_conf_f_tienda')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de eliminacion de llegada en tienda ';
+            MailAlert::destroy($notis->where('clave','usuario_conf_f_tienda')->first()->id);
+        }
 
-           }
-           //monto flete nacional
-           if($model->usuario_conf_monto_nac != null && $notis->where('clave','usuario_conf_monto_nac')->first() == null){
-               $result['msm'][] ='confirmacion de en aprobacion de monto flete terrestre ';
-               $noti = new NotificationModule();
-               $noti->doc_id= $model->id;
-               $noti->doc_tipo_id=24;
-               $noti->descripcion='creacion de embarque';
-               $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-               $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_monto_nac');
+        //monto flete terrestre
+        if($model->usuario_conf_monto_ft_tt != null && $notis->where('clave','usuario_conf_monto_ft_tt')->first() == null){
+            $result['msm'][] ='confirmacion de en aprobacion de monto flete terrestre ';
+            $alert = new MailAlert();
+            $alert->tipo_origen_id = '24';
+            $alert->doc_origen_id = $req->id;
+            $alert->plantilla = "emails.modules.Embarques.Internal.Alert";
+            $alert->texto= "Por favor confirmar monto de flete terrestre ";
+            $alert->clave= "usuario_conf_monto_ft_tt";
 
-           }
-           if($model->usuario_conf_monto_nac == null && $notis->where('clave','usuario_conf_monto_nac')->first() != null){
-               $result['msm'][] ='eliminacion de confirmacion de  monto flete terrestre ';
-               NotificationModule::destroy($notis->where('clave','usuario_conf_monto_nac')->first()->id);
+            $alert->save();
+            $send = new MailAlertDestinations();
+            $send->email = "meqh1992@gmail.com";
+            $send->nombre = "Miguel";
+            $send->doc_id = $model->id;
+            $send->tipo = 'to' ;
+            $send->save();
 
-           }
-           //monto flete nacional
-           if($model->usuario_conf_monto_dua != null && $notis->where('clave','usuario_conf_monto_dua')->first() == null){
-               $result['msm'][] ='confirmacion de en aprobacion de monto flete de aduanda ';
-               $noti = new NotificationModule();
-               $noti->doc_id= $model->id;
-               $noti->doc_tipo_id=24;
-               $noti->descripcion='creacion de embarque';
-               $noti->usuario_id = $req->session()->get('DATAUSER')['id'];
-               $noti->send_mail('Embarques','Internal.cancelacion', [''], [],'usuario_conf_monto_dua');
+        }
+        if($model->usuario_conf_monto_ft_tt == null && $notis->where('clave','usuario_conf_monto_ft_tt')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de  monto flete terrestre ';
+            MailAlert::destroy($notis->where('clave','usuario_conf_monto_ft_tt')->first()->id);
 
-           }
-           if($model->usuario_conf_monto_dua == null && $notis->where('clave','usuario_conf_monto_dua')->first() != null){
-               $result['msm'][] ='eliminacion de confirmacion de  monto flete aduanda ';
-               NotificationModule::destroy($notis->where('clave','usuario_conf_monto_dua')->first()->id);
+        }
+        //monto flete nacional
+        if($model->usuario_conf_monto_nac != null && $notis->where('clave','usuario_conf_monto_nac')->first() == null){
+            $result['msm'][] ='confirmacion de en aprobacion de monto flete terrestre ';
+            $alert = new MailAlert();
+            $alert->tipo_origen_id = '24';
+            $alert->doc_origen_id = $req->id;
+            $alert->plantilla = "emails.modules.Embarques.Internal.Alert";
+            $alert->texto= "Por favor confirmar monto de flete nacional ";
+            $alert->clave= "usuario_conf_monto_nac";
 
-           }*/
+            $alert->save();
+            $send = new MailAlertDestinations();
+            $send->email = "meqh1992@gmail.com";
+            $send->nombre = "Miguel";
+            $send->doc_id = $model->id;
+            $send->tipo = 'to' ;
+            $send->save();
+
+        }
+        if($model->usuario_conf_monto_nac == null && $notis->where('clave','usuario_conf_monto_nac')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de  monto flete terrestre ';
+            MailAlert::destroy($notis->where('clave','usuario_conf_monto_nac')->first()->id);
+
+        }
+        //monto flete nacional
+        if($model->usuario_conf_monto_dua != null && $notis->where('clave','usuario_conf_monto_dua')->first() == null){
+            $result['msm'][] ='confirmacion de en aprobacion de monto flete de aduanda ';
+            $alert = new MailAlert();
+            $alert->tipo_origen_id = '24';
+            $alert->doc_origen_id = $req->id;
+            $alert->plantilla = "emails.modules.Embarques.Internal.Alert";
+            $alert->texto= "Por favor confirmar monto del documento unico de aduanda ";
+            $alert->clave= "usuario_conf_monto_dua";
+
+            $alert->save();
+            $send = new MailAlertDestinations();
+            $send->email = "meqh1992@gmail.com";
+            $send->nombre = "Miguel";
+            $send->doc_id = $model->id;
+            $send->tipo = 'to' ;
+            $send->save();
+
+        }
+        if($model->usuario_conf_monto_dua == null && $notis->where('clave','usuario_conf_monto_dua')->first() != null){
+            $result['msm'][] ='eliminacion de confirmacion de  monto flete aduanda ';
+            MailAlert::destroy($notis->where('clave','usuario_conf_monto_dua')->first()->id);
+
+        }
 
         $model->sha256 = $newShae;
 
@@ -1514,7 +1542,7 @@ class EmbarquesController extends BaseController
                 $aux = App\Models\Sistema\Order\OrderItem::findOrFail($aux->origen_item_id);
             }else{
                 $aux =
-                PurchaseItem::findOrFail($aux->origen_item_id);
+                    PurchaseItem::findOrFail($aux->origen_item_id);
             }
 
             $i = $i +1;
@@ -1576,7 +1604,7 @@ class EmbarquesController extends BaseController
         $items = $model->items()
             ->where('tipo_origen_id', '23')
             ->get();
-      //  dd($items);
+        //  dd($items);
         if(sizeof($items) >  0 ){
             $maxf = Purchase::selectRaw('max(fecha_produccion) as max')
                 ->join('tbl_embarque_item','tbl_embarque_item.doc_origen_id','=', 'tbl_compra_orden.id' )
@@ -1649,7 +1677,7 @@ class EmbarquesController extends BaseController
     public function example_sen_mail (Request $req){
 
         $sender = ['subject'=>'demo','to'=>
-            [ new MailModuleSenders(['tipo'=>'to','doc_id'=>'78','email'=>'luisnavarro.dg@gmail.com','nombre'=>'luis'])]
+            [ new MailAlertDestinations(['tipo'=>'to','doc_id'=>'78','email'=>'luisnavarro.dg@gmail.com','nombre'=>'luis'])]
         ];
         $email = new MailModule();
         $email->doc_id= $req->doc_id;
