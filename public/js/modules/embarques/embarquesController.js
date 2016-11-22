@@ -1,14 +1,16 @@
-MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','$filter','form', 'shipment','setGetShipment','filesService', function ($scope, $mdSidenav,$timeout,$interval,$filter,form,$resource, $model, filesService) {
+MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','$filter','form', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,$interval,$filter,form,$resource, $model) {
 
     //?review
-    filesService.setFolder('orders');
 
     $scope.list ='provider';
 
-    $scope.paisSelec = undefined;
+
     $scope.alerts =[];
     $scope.provs =[];
     $scope.paises =[];
+
+
+
     $scope.shipment ={objs:{}};
     $scope.bindShipment =$model.bind();
     $scope.session = {global:'new', isblock: false};
@@ -22,8 +24,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $timeout(function () {
         $resource.query({type:"Countrys"}, {}, function(response){$scope.paises= response; });
     },0);
-
-
     $scope.test = function () {
       $scope.NotifAction("alert",'demo',[
             {name:"a",action:function () {
@@ -147,6 +147,9 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                             paso = false;
                         }
                     }
+                    if($scope.paisSelec && $scope.paisSelec.providers){
+                        paso = $scope.paisSelec.providers.indexOf(current.id) != -1;
+                    }
                     return paso;
 
                 });
@@ -248,6 +251,9 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                             paso = false;
                         }
                     }
+                    if($scope.provSelec && $scope.provSelec.countrys){
+                        paso = $scope.provSelec.countrys.indexOf(current.id) != -1;
+                    }
                     return paso;
 
                 });
@@ -256,7 +262,8 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         //  return data;
     };
 
-    $scope.setProvedor = function(prov){
+    $scope.setProvedor = function(prov, e){
+        console.log('evento e ',e);
 
         if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
             $scope.provSelec = prov;
@@ -270,10 +277,15 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                 $model.change('document','prov_id',  prov.id);
                 $scope.save();
             }else {
+
                 $model.setNext(function () {
                     $scope.LayersAction({close:{all:true, after:function () {
-                        $scope.provSelec = prov;
-                        $scope.listShipmentCtrl({prov_id: prov.id});
+                        $timeout(function () {
+                          var element = angular.element(e.target);
+                            console.log("click", element);
+                            element.click();
+                        },1);
+
                     }}})
 
                 });
@@ -283,10 +295,11 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }else{
 
             $model.setNext(function () {
-                $scope.LayersAction({close:{all:true, after:function () {
-                    $scope.provSelec = prov;
-                    $scope.listShipmentCtrl(prov);
-                }}})
+                $timeout(function () {
+                    var element = angular.element(e.target);
+                    console.log("click", element);
+                    element.click();
+                },1);
 
             });
             $model.exit();
@@ -384,6 +397,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.reloadCountry= function (fn) {
         if( $scope.paisSelec && $scope.paisSelec.id){
             $resource.get({type:"Country",id:$scope.paisSelec.id}, {}, function(response){
+                $scope.paisSelec = {};
                 angular.forEach(response, function (v,k) {
                     $scope.paisSelec[k]=v;
                 });
@@ -558,11 +572,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                     $scope.provSelec = $scope.shipment.objs.prov_id;
                 }
             },0);
-
-
-
-
-        }
+       }
     });
 
     $scope.$watchGroup(['module.layer', 'module.index'] ,function(newVal){
@@ -572,10 +582,10 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $timeout(function () {
                 $model.clear();
                 $scope.reloadProv(function () {
-                    $scope.provSelec= undefined
+                    $scope.provSelec = {countrys:[]};
                 });
                 $scope.reloadCountry(function () {
-                    $scope.paisSelec= undefined;
+                    $scope.paisSelec = {providers:[]};
                 });
 
 
@@ -585,6 +595,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }
     });
 
+    /**@deprecated*/
     $scope.isModif = function () {
         var isModif = false;
         if($model.getInternalState() == 'new'){
@@ -682,7 +693,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             if(dias== 0){
                 item.text = " hoy ";
             }else{
-                item.text = " hace " + dias+" dias ";
+                item.text = "" + dias+" dias ";
             }
         }else{
             item.show = false;
@@ -704,7 +715,8 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         var send = {type:"Shipments" };
         angular.forEach(data, function (v, k) {
             send[k]= v;
-        })
+        });
+        console.log("send ", send);
         $resource.query(send,{}, function (response) {
             angular.forEach(response, function (v, k) {
                 $scope.tbl.data.push(v);
@@ -1089,20 +1101,25 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
 
             var cambiar = function () {
                 $timeout(function () {
-                    $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
-                        [
-                            {
-                                name:"Si, es la definitiva",action : function () {
-                                $scope.fechas.send.fecha_vnz.confirm = true;
-                                $scope.fechas.bind.estado = true;
+                    if($scope.$parent.shipment.fechas.fecha_vnz.value <= new Date() && $scope.$parent.shipment.fechas.fecha_carga.confirm){
+                        $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
+                            [
+                                {
+                                    name:"Si, es la definitiva",action : function () {
+                                    $scope.fechas.send.fecha_vnz.confirm = true;
+                                    $scope.fechas.bind.estado = true;
+                                }
+                                },{
+                                name:"No no es la definitiva",action : function () {
+                                    $scope.fechas.bind.estado = true;
+                                }
                             }
-                            },{
-                            name:"No no es la definitiva",action : function () {
-                                $scope.fechas.bind.estado = true;
-                            }
-                        }
-                        ]
-                        , {block:true});
+                            ]
+                            , {block:true});
+                    }else{
+                        $scope.fechas.bind.estado = true;
+                    }
+
                 },0);
 
             } ;
@@ -1188,7 +1205,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
 
         var cambiar = function () {
             $timeout(function () {
-                if($scope.$parent.shipment.fechas.fecha_tienda.value <= new Date()){
+                if($scope.$parent.shipment.fechas.fecha_tienda.value <= new Date() && $scope.$parent.shipment.fechas.fecha_vnz.confirm){
                     $scope.setSend ({fecha_tienda:{value: angular.copy($scope.$parent.shipment.fechas.fecha_tienda.value),isManual:true,confirm: false}},undefined, true);
                     $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
                         [
@@ -1229,7 +1246,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                     }
                     }
                     ]
-                    ,{block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                    ,{block:true,save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
             }else{
                 cambiar();
             }
@@ -1258,41 +1275,150 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
         $scope.pagos[k].val=  (v) ? v: undefined;
 
     };
-    $scope.outPay = function (v, k, e) {
-
-
+    $scope.outPayMar = function () {
         var save = function () {
             $scope.$parent.save(function () {
                 $scope.pago.$setPristine();
-
             });
         };
-
-        if(!$scope.pago.$pristine &&  $scope.$parent.shipment.criterios[k] && v){
-            var range = $scope.$parent.shipment.criterios[k];
-            var val = parseFloat(v);
-            if(val < range.min || val > range.max){
-                var focus= angular.element(":focus");
-                $scope.$parent.NotifAction("alert", "El monto ideal se encuentra entre "+range.min+" y "+ range.max +
-                    " ¿Esta seguro que el monto es correcto?",
+        if(!$scope.pago.$pristine &&  $scope.$parent.shipment.criterios.flete_maritimo ){
+            var range = $scope.$parent.shipment.criterios.flete_maritimo;
+            var val = parseFloat($scope.$parent.shipment.flete_maritimo);
+            if(val < range.min ){
+                var focus= angular.element("#detailShipment #flete_maritimo");
+                $scope.$parent.NotifAction("alert", "¡Parece muy bueno para ser cierto! el monto que colocaste es un poco bajo" +
+                    " para un flete maritimo. Por favor confirmanos que esta bien ",
                     [
-                        {name:"Si, estoy seguro", action: function () {
-                            $scope.pagos[k].confirm = true;
+                        {name:"Si, Es lo que muestra la factura ", action: function () {
+                            $scope.pagos.flete_maritimo.confirm = true;
                             save();
                         }},
-                        {name:"No, dejame corregirlo", action: function () {
+                        {name:"Corregir", action: function () {
                             focus.focus();
-                            $scope.pagos[k].confirm = false;
+                            $scope.pagos.flete_maritimo.confirm = false;
+                            $scope.$parent.shipment.flete_maritimo = angular.copy($scope.pagos.flete_maritimo.val);
                         }
                         }
                     ]
-                    ,{block:true, save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                    ,{block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+            } if(val > range.max ){
+                $scope.$parent.NotifAction("alert", "¡Parece que es mas de un contenedor! el monto que colocaste es un poco alto" +
+                    " para un flete maritimo. Por favor confirmanos que está bien ",
+                    [
+                        {name:"Si, Es mas de un contenedor ", action: function () {
+                            $scope.pagos.flete_maritimo.confirm = true;
+                            save();
+                        }},
+                        {name:"Corregir", action: function () {
+                            focus.focus();
+                            $scope.pagos.flete_maritimo.confirm = false;
+                            $scope.$parent.shipment.flete_maritimo = angular.copy($scope.pagos.flete_maritimo.val);
+                        }
+                        }
+                    ]
+                    ,{block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
             }else{
                 save();
             }
-
         }
     }
+
+    $scope.outPayTerre = function () {
+        var save = function () {
+            $scope.$parent.save(function () {
+                $scope.pago.$setPristine();
+            });
+        };
+        if(!$scope.pago.$pristine &&  $scope.$parent.shipment.criterios.flete_tt ){
+            var range = $scope.$parent.shipment.criterios.flete_tt;
+            var val = parseFloat($scope.$parent.shipment.flete_tt);
+            if(val < range.min ){
+                var focus= angular.element("#detailShipment #flete_tt");
+                $scope.$parent.NotifAction("alert", "¡Parece muy bueno para ser cierto! el monto que colocaste es un poco bajo" +
+                    ". Por favor confirmanos que esta bien ",
+                    [
+                        {name:"Si, Es lo que muestra la factura ", action: function () {
+                            $scope.pagos.flete_tt.confirm = true;
+                            save();
+                        }},
+                        {name:"Corregir", action: function () {
+                            focus.focus();
+                            $scope.pagos.flete_tt.confirm = false;
+                            $scope.$parent.shipment.flete_tt = angular.copy($scope.pagos.flete_tt.val);
+                        }
+                        }
+                    ]
+                    ,{block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+            } if(val > range.max ){
+                $scope.$parent.NotifAction("alert", "¡Parece que es mas de un contenedor! el monto que colocaste es un poco alto" +
+                    ". Por favor confirmanos que está bien ",
+                    [
+                        {name:"Si, Es mas de un contenedor ", action: function () {
+                            $scope.pagos.flete_tt.confirm = true;
+                            save();
+                        }},
+                        {name:"Corregir", action: function () {
+                            focus.focus();
+                            $scope.pagos.flete_tt.confirm = false;
+                            $scope.$parent.shipment.flete_tt = angular.copy($scope.pagos.flete_tt.val);
+                        }
+                        }
+                    ]
+                    ,{block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+            }else{
+                save();
+            }
+        }
+    }
+
+    $scope.outPayNac = function () {
+        var save = function () {
+            $scope.$parent.save(function () {
+                $scope.pago.$setPristine();
+            });
+        };
+        if(!$scope.pago.$pristine &&  $scope.$parent.shipment.criterios.nacionalizacion ){
+            var range = $scope.$parent.shipment.criterios.nacionalizacion;
+            var val = parseFloat($scope.$parent.shipment.nacionalizacion);
+            if(val < range.min ){
+                var focus= angular.element("#detailShipment #nacionalizacion");
+                $scope.$parent.NotifAction("alert", "¡Parece muy bueno para ser cierto! En estos ultimos embarques hemos tenido muchos gastos y el monto que colocates es " +
+                    " un poco bajo. Por favor confirmanos que esta bien",
+                    [
+                        {name:"Si", action: function () {
+                            $scope.pagos.nacionalizacion.confirm = true;
+                            save();
+                        }},
+                        {name:"Corregir", action: function () {
+                            focus.focus();
+                            $scope.pagos.nacionalizacion.confirm = false;
+                            $scope.$parent.shipment.nacionalizacion = angular.copy($scope.pagos.nacionalizacion.val);
+                        }
+                        }
+                    ]
+                    ,{block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+            } if(val > range.max ){
+                $scope.$parent.NotifAction("alert", "¡Son muchos gastos! Parece que tuvimos algunos inconvenientes con este embarque" +
+                    " . Por favor confirmanos que el monto que colocaste esta bien ",
+                    [
+                        {name:"Si", action: function () {
+                            $scope.pagos.nacionalizacion.confirm = true;
+                            save();
+                        }},
+                        {name:"Corregir", action: function () {
+                            focus.focus();
+                            $scope.pagos.nacionalizacion.confirm = false;
+                            $scope.$parent.shipment.nacionalizacion = angular.copy($scope.pagos.nacionalizacion.val);
+                        }
+                        }
+                    ]
+                    ,{block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+            }else{
+                save();
+            }
+        }
+    }
+
 
     $scope.aprobFlete = function(){
         if($scope.$parent.shipment.flete_tt){
@@ -1452,7 +1578,7 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
     $scope.tarifaSelect = {};
 
     $scope.$parent.listTariffCtrl = function(fn){
-        $resource.queryMod({type:"Provider",mod:"Dir", id:$scope.$parent.provSelec.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
+      //  $resource.queryMod({type:"Provider",mod:"Dir", id:$scope.$parent.provSelec.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
         $scope.LayersAction({open:{name:"listTariff",
             before:function(){
                 if($scope.$parent.shipment.tarifa_id  != null && $scope.$parent.shipment.objs.tarifa_id.model){
@@ -1697,7 +1823,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                     }
                     }
                 ]
-                , {block:true, save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}}
+                , {block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}}
             );
         }
 
@@ -1718,7 +1844,7 @@ MyApp.controller('miniContainerCtrl',['$scope','$mdSidenav','$timeout','form','s
                     }
                     }
                 ]
-                , {block:true, save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                , {block:true, save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
 
 
         }else{
@@ -2319,9 +2445,6 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
 
         }
     };
-
-
-
     $scope.Update = function(){
         console.log(" eit en upadte 2");
         $scope.model ={document:{},items:[], odcs:[], containers:[], pagos:{}, tarifa:{}, fechas:{fecha_carga:{},fecha_vnz:{},fecha_tienda:{}}};
@@ -2439,7 +2562,6 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
         });
         if( $scope.isModif){
             console.log("final form", $scope.model);
-
             if($scope.$parent.module.layer!=  'updateShipment'){
                 $scope.LayersAction({open:{name:"updateShipment", before: function(){
 
@@ -2470,12 +2592,7 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
                     ]
                     , {block:true});
             }
-
-
-
-
         }else{
-
             $model.getNext()();
         }
     };
@@ -3055,7 +3172,7 @@ MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$in
                     }
                 }
                 ]
-                , {block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                , {block:true,save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
         };
 
     }]);
@@ -3546,13 +3663,14 @@ MyApp.controller('moduleMsmCtrl',['$scope','$mdSidenav','shipment','setGetShipme
 
 }]);
 
-MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment', function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource){
+MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment','fileSrv','setGetShipment',   function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource, fileSrv, $model){
     $scope.isOpen = false;
     $scope.isLoad =false;
     $scope.data ={adjs:[]};
     $scope.form='';
     $scope.model ={};
     $scope.process = false;
+    $scope.bindFiles = fileSrv.bin();
 
     $scope.ff =[];
     $scope.ffSelect =null;
@@ -3572,7 +3690,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.puertos =[];
     $scope.puertoSelect =null;
     $scope.puertoText =undefined;
-
+    $scope.mode = 'list';
     $scope.$parent.CreatTariff = function(){
         $scope.process = false;
         $scope.head.$setPristine();
@@ -3583,6 +3701,10 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         $scope.nvText = undefined;
         $scope.moneda_idText = undefined;
         $scope.model.diasd_tt = undefined;
+        $scope.model.adjs = [];
+        $scope.mode = 'list';
+        $scope.upf = false;
+        $scope.model.uid = Math.random();
 
         $mdSidenav("miniCreatTariff").open().then(function(){
             $scope.isOpen = true;
@@ -3597,42 +3719,89 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         });
     };
 
+    $scope.save = function (fn) {
+
+        if($scope.ffSelect == null){
+            $scope.model.ff= $scope.ffText;
+        }
+        if($scope.nvSelect == null){
+            $scope.model.nav= $scope.nvText;
+        }
+        $resource.postMod({type:"Tariff",mod:"Save"},$scope.model,function (response) {
+            $scope.$parent.NotifAction("ok", "Tarifa creada",[],{autohidden:1500});
+            tarifForm.set(response.model);
+            tarifForm.setState("created");
+            if($scope.$parent.shipment.objs.tarifa_id== null){
+                $scope.$parent.shipment.objs.tarifa_id ={};
+            }
+
+            $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = response.model.objs.freight_forwarder_id;
+            $scope.$parent.shipment.objs.tarifa_id.naviera = response.model.objs.naviera_id;
+            $scope.$parent.shipment.tarifa_id = response.model.id;
+            $scope.$parent.save();
+            $scope.inClose();
+            $timeout(function () {
+                formSrv.setState("continue");$scope.inClose();
+
+            },1500);
+            if(fn){
+                fn(response);
+            }
+        });
+    }
     $scope.close= function(e){
         if($scope.isOpen && !$scope.process){
 
-            if($scope.head.$pristine && $scope.bond.$pristine  ){
+            if($scope.head.$pristine && $scope.bond.$pristine &&  !$scope.upf ){
                 $scope.inClose();
             }else {
                 $scope.process = true;
+                formSrv.setState("process");
                 if($scope.head.$valid && $scope.bond.$valid ){
-                    formSrv.setState("process");
-                    if($scope.ffSelect == null){
-                        $scope.model.ff= $scope.ffText;
+                    var msm = [];
+                    if($scope.$parent.shipment.pais_id && $scope.$parent.shipment.pais_id != $scope.paisSelec.id){
+                        msm.push(" que el pais de la nueva tarifa es diferente al elegido anteriormente ");
                     }
-                    if($scope.nvSelect == null){
-                        $scope.model.nav= $scope.nvText;
+                    if($scope.$parent.shipment.puerto_id && $scope.$parent.shipment.puerto_id != $scope.puertoSelect.id){
+                        msm.push(" que el puerto de la nueva tarifa es diferente al elegido anteriormente ");
                     }
-                    $resource.postMod({type:"Tariff",mod:"Save"},$scope.model,function (response) {
-                        $scope.$parent.NotifAction("ok", "Tarifa creada",[],{autohidden:1500});
-                        tarifForm.set(response.model);
-                        tarifForm.setState("created");
-                        if($scope.$parent.shipment.objs.tarifa_id== null){
-                            $scope.$parent.shipment.objs.tarifa_id ={};
-                        }
 
-                        $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = response.model.objs.freight_forwarder_id;
-                        $scope.$parent.shipment.objs.tarifa_id.naviera = response.model.objs.naviera_id;
-                        $scope.$parent.shipment.tarifa_id = response.model.id;
-                        $scope.$parent.save();
-                        $scope.inClose();
-                        $timeout(function () {
-                            formSrv.setState("continue");$scope.inClose();
+                    if(msm.length > 0){
+                        var txt = 'Disculpe hemos notado ';
+                        angular.forEach(msm, function (v, k) {
+                            txt += v;
+                            if(k < msm.length -1){
+                                txt += 'y '
+                            }
+                        });
+                        txt+="¿ Esta seguro que la informacion en correcta ?";
+                        $scope.NotifAction("alert", txt,
+                            [{name:"Si",
+                                action:function () {
+                                    $scope.$parent.shipment.objs.pais_id= angular.copy($scope.paisSelec);
+                                    $scope.$parent.shipment.pais_id= $scope.paisSelec.id;
+                                    $model.change("tarifa", 'pais_id', $scope.paisSelec.id);
+                                    $scope.$parent.shipment.objs.puerto_id= angular.copy($scope.puertoSelect);
+                                    $scope.$parent.shipment.puerto_id= $scope.puertoSelect.id;
+                                    $model.change("tarifa", 'puerto_id', $scope.puertoSelect.id);
+                                    $scope.save();
 
-                        },1500)
-                    });
+                                }},
+                                {name:"No",
+                                    action:function () {
+                                        formSrv.setState("cancel");
+                                    }}
+                                ]
+                            ,{block:true})
+
+                    }else{
+                        $scope.save();
+                    }
+
+
 
                 }else {
-                    formSrv.setState("process");
+
                     $scope.$parent.NotifAction("alert", "No se puede crear las tarifa con los datos suministrados ¿Que desea hacer?",
                         [
                             {name:"Cancelar la creacion ", default:10,action:
@@ -3640,7 +3809,9 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
                             },
                             {name:"Corregir", action:function () {
+                                $scope.mode = 'list';
                                 formSrv.back= function () {
+
                                     $timeout(function () {
                                         var elem = angular.element("#miniCreatTariff ng-invalid");
                                         console.log("invlaid", elem);
@@ -3649,6 +3820,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
                                     },0);
                                 }
                                 formSrv.setState("cancel");
+                                $scope.process = false;
 
                             }}
                         ]
@@ -3701,14 +3873,64 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         }
 
     };
+
+
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
         $scope.paisSelec=newVal;
 
     });
 
-    $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
-        if(newVal){
-            $scope.puertoSelect=newVal;
+
+    $scope.$watch('puertoSelect', function(newVal){
+        if(newVal && !$scope.head.$pristine){
+
+        }
+    });
+
+    // files
+    $scope.fileUp= function (file) {
+        console.log("file", file);
+        console.log("model", $scope.model);
+        $scope.upf = true;
+
+        $resource.postMod({type:"Tariff", mod:"Attachment"},{archivo_id:file.id, uid:  $scope.model.uid}, function (response) {
+
+        }, function (error) {
+            console.log("error", error);
+        });
+
+    };
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            fileSrv.storage("shipments");
+           fileSrv.setKey("miniHblCtrl");
+            angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+
+                $scope.model.adjs.push(v);
+            });
+        }
+    });
+
+    $scope.$watch('bindFiles.estado', function (newVal) {
+        if(fileSrv.getKey() == 'miniHblCtrl'){
+            console.log("newVall");
+            var result = angular.copy(fileSrv.get());
+            if(newVal == 'finish'){
+                var texto = '';
+                //{succeces:[], error:[], total:[],upload:{}};
+                if(result.succeces.length > 0){
+                    texto += " Se agregaron "+result.succeces.length +" archivos";
+                }
+                if(result.error.length > 0){
+                    texto += " fallaron "+result.error.length +" archivos";
+                }                if(result.total.length > 0){
+                    texto += " de  "+result.total.length +" ";
+                }
+                if(texto.length > 1){
+                    $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+                }
+
+            }
         }
     });
 

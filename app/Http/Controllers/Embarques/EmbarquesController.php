@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Embarques;
-
-
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Line;
@@ -23,6 +21,8 @@ use App\Models\Sistema\Shipments\ShipmentItem;
 use App\Models\Sistema\Tariffs\FreigthForwarder;
 use App\Models\Sistema\Tariffs\Naviera;
 use App\Models\Sistema\Tariffs\Tariff;
+use App\Models\Sistema\Tariffs\TariffDoc;
+use App\Models\Sistema\Tariffs\TariffAttachment;
 use App\Models\Sistema\User;
 use  App\Models\Sistema\Product\ProductStorage;
 use Carbon\Carbon;
@@ -35,9 +35,6 @@ use PDF;
 use App;
 use Illuminate\Support\Facades\Mail;
 use Storage;
-
-
-
 
 class EmbarquesController extends BaseController
 {
@@ -86,18 +83,7 @@ class EmbarquesController extends BaseController
 
     public function testPdf (Request $req){
 
-        $model = new MailAlert();
-        $model->tipo_origen_id = '24';
-        $model->doc_origen_id = 248;
-        $model->plantilla = "emails.modules.Embarques.Internal.Alert";
-        $model->save();
-        $send = new MailAlertDestinations();
-        $send->email = "meqh1992@gmail.com";
-        $send->nombre = "Miguel";
-        $send->doc_id = $model->id;
-        $send->tipo = 'to' ;
-        $send->save();
-        return $model->sendMail();
+        dd( Country::findOrFail($req->id)->providers()->get());
     }
 
 
@@ -123,12 +109,12 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.prov_id = tbl_proveedor.id ) AS deuda,'.
-            '('.$this->generateEmit("emision","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("emision"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_tienda","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("fecha_tienda"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
             .
             '('.$this->generateReview("updated_at","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as review0 ,".
             '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review7, ".
@@ -138,6 +124,9 @@ class EmbarquesController extends BaseController
             '('.$this->generateReview("updated_at"," > 90 ","tbl_proveedor.id = tbl_embarque.prov_id").") as review100 ";
 
         $prov  = Provider::selectraw($select)->get();
+        foreach ($prov as $aux ){
+            $aux->countrys = $aux->country()->lists('tbl_pais.id');
+        }
         return $prov;
     }
     public  function  getProvDir(Request $req){
@@ -173,12 +162,12 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.prov_id = tbl_proveedor.id ) AS deuda,'.
-            '('.$this->generateEmit("emision","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("emision"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_tienda","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("fecha_tienda"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
             .
             '('.$this->generateReview("updated_at","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as review0 ,".
             '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review7, ".
@@ -188,10 +177,11 @@ class EmbarquesController extends BaseController
             '('.$this->generateReview("updated_at"," > 90 ","tbl_proveedor.id = tbl_embarque.prov_id").") as review100 ";
 
         $prov  = Provider::selectraw($select)->where('tbl_proveedor.id',$req->id)->first();
+        $prov->countrys = $prov->country()->lists('tbl_pais.id');
         return $prov;
     }
 
-    /************************* Countrye ***********************************/
+    /************************* Country ***********************************/
 
     public function getCountryList(){
         $select = 'distinct tbl_pais.id,'
@@ -210,12 +200,12 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.pais_id = tbl_pais.id ) AS deuda,'.
-            '('.$this->generateEmit("emision","<=0","tbl_pais.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("emision"," > 90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_tienda","<=0","tbl_pais.id= tbl_embarque.prov_id").") as emit0 ,".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as emit7, ".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as emit30,".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as emit60, ".
+            '('.$this->generateEmit("fecha_tienda"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit90, ".
+            '('.$this->generateEmit("fecha_tienda"," > 90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit100, "
             .
             '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.prov_id").") as review0 ,".
             '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as review7, ".
@@ -226,6 +216,9 @@ class EmbarquesController extends BaseController
         $model  =  Country::selectRaw($select)
             ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
             ->get();
+        foreach ($model as $aux){
+            $aux->providers = $aux->providers()->lists('tbl_provedor.id');
+        }
         return $model;
     }
     public function getCountry(Request $req){
@@ -262,6 +255,7 @@ class EmbarquesController extends BaseController
             ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
             ->where('tbl_pais.id', $req->id)
             ->first();
+        $model->providers = $model->providers()->lists('tbl_provedor.id');
         return $model;
     }
 
@@ -443,8 +437,11 @@ class EmbarquesController extends BaseController
     public function saveTariff(Request $req){
         $model = new Tariff();
         $ff = new FreigthForwarder();
+        $doc = new TariffDoc();
         $nav = new Naviera();
         $rs = ['accion'=>'new'];
+        $doc->comentario  = 'creado desde embarques';
+        $doc->save();
         if($req->has("freight_forwarder_id")){
             $ff = FreigthForwarder::findOrFail($req->freight_forwarder_id);
         }else{
@@ -460,8 +457,8 @@ class EmbarquesController extends BaseController
             $nav->usuario_created_id = $req->session()->get('DATAUSER')['id'];
             $nav->save();
             $rs['created nav']= true;
-
         }
+
 
         $model->pais_id = $req->pais_id ;
         $model->puerto_id = $req->puerto_id ;
@@ -469,6 +466,7 @@ class EmbarquesController extends BaseController
         $model->vencimiento = $req->vencimiento ;
         $model->naviera_id= $nav->id;
         $model->freight_forwarder_id= $ff->id;
+        $model->doc_id= $doc->id;
 
 
         if($req->has("dias_tt")){
@@ -508,8 +506,25 @@ class EmbarquesController extends BaseController
 
         $rs['model'] = $fModel;
 
-        return $rs;
+        $adjs = TariffAttachment::where('uid', $req->uid)->get();
+        foreach ($adjs as $aux){
+            $aux->doc_id=$model->id;
+            $aux->save();
+        }
 
+       return $rs;
+
+    }
+
+    public function setTarrifAttachment(Request $req){
+        $model = new App\Models\Sistema\Tariffs\TariffAttachment();
+        $model->archivo_id = $req->archivo_id;
+        $model->uid = $req->uid;
+        if($req->has('doc_id')){
+            $model->doc_id = $req->doc_id;
+        }
+        $model->save();
+        return ['accion'=>'new', 'id'=>$model->id];
     }
 
     /************************* CONTAINERS ***********************************/
@@ -825,10 +840,10 @@ class EmbarquesController extends BaseController
         $fechas = $this->shipmentDates($model->id);
         $data['fechas']=$fechas;
 
-        $criterios['nacionalizacion']=['min'=>1, 'max'=>1000];
+        $criterios['nacionalizacion']=['min'=>40000, 'max'=>100000];
         $criterios['dua']=['min'=>1, 'max'=>1000];
-        $criterios['flete_tt']=['min'=>1, 'max'=>1000];
-        $criterios['flete_maritimo']=['min'=>1, 'max'=>1000];
+        $criterios['flete_tt']=['min'=>4000, 'max'=>6000];
+        $criterios['flete_maritimo']=['min'=>2000, 'max'=>8000];
 
         $data['criterios']= $criterios;
 
@@ -885,7 +900,35 @@ class EmbarquesController extends BaseController
     }
 
     public  function  getShipments(Request $req){
-        return ($req->has('prov_id')) ? json_encode(Shipment::where('prov_id',$req->prov_id)->whereNull('comentario_cancelacion')->get()) :json_encode(Shipment::where('pais_id',$req->pais_id)->whereNull('comentario_cancelacion')->get());
+        $select ='*,'.
+            '(CASE WHEN `tbl_embarque`.fecha_tienda IS not NULL THEN 
+               CASE WHEN DATEDIFF(fecha_tienda, CURDATE()) <=0 THEN 0 
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 1 and  7 THEN 7
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 8 and  30 THEN 30
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 31 and  60 THEN 60 
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 61 and  90 THEN 90
+               WHEN DATEDIFF(fecha_tienda,  CURDATE()) > 91  THEN 100 end ELSE -1 end 
+               ) as catfecha_tienda ,'.
+            '(CASE WHEN `tbl_embarque`.fecha_carga IS not NULL THEN 
+               CASE WHEN DATEDIFF(fecha_carga, CURDATE()) <=0 THEN 0 
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 1 and  30 THEN 7
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 8 and  30 THEN 30
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 31 and  60 THEN 60 
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 61 and  90 THEN 90
+               WHEN DATEDIFF(fecha_carga,  CURDATE()) > 91  THEN 100 end ELSE -1 end 
+               ) as catfecha_carga,'.
+            '(CASE WHEN `tbl_embarque`.fecha_vnz IS not NULL THEN 
+               CASE WHEN DATEDIFF(fecha_vnz, CURDATE()) <=0 THEN 0 
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 1 and  30 THEN 7
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 8 and  30 THEN 30
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 31 and  60 THEN 60 
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 61 and  90 THEN 90
+               WHEN DATEDIFF(fecha_vnz,  CURDATE()) > 91  THEN 100 end ELSE -1 end 
+               ) as catfecha_vnz'
+
+        ;
+        $models = ($req->has('prov_id')) ? json_encode(Shipment::selectRaw($select)->where('prov_id',$req->prov_id)->whereNull('comentario_cancelacion')->get()) :json_encode(Shipment::selectRaw($select)->where('pais_id',$req->pais_id)->whereNull('comentario_cancelacion')->get());
+        return $models;
     }
 
 
@@ -1686,6 +1729,21 @@ class EmbarquesController extends BaseController
         return $email->sendMail($html, $sender);
     }
 
+    public function example_sen_alert (){
+
+        $model = new MailAlert();
+        $model->tipo_origen_id = '24';
+        $model->doc_origen_id = 248;
+        $model->plantilla = "emails.modules.Embarques.Internal.Alert";
+        $model->save();
+        $send = new MailAlertDestinations();
+        $send->email = "meqh1992@gmail.com";
+        $send->nombre = "Miguel";
+        $send->doc_id = $model->id;
+        $send->tipo = 'to' ;
+        $send->save();
+        return $model->sendMail();
+    }
 
 
 }

@@ -584,7 +584,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                 if(attrs.info){
                     $timeout(function() {
                         if(old.element!=element[0]){
-                            setNotif.addNotif("info",attrs.info,[],{autohidden:5000});
+                            setNotif.addNotif((attrs.tipo)? attrs.tipo : 'info',attrs.info,[],{autohidden:5000});
                             old.element = element[0];
                             old.info = attrs.info;
                         }

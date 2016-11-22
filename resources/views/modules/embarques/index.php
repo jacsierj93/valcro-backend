@@ -178,7 +178,7 @@
 
 
             <div id="listado" flex  style="overflow-y:auto;word-break: break-all;"  ng-show="list == 'provider'">
-                <div class="boxList"  layout="column" flex ng-repeat="item in search()  "  list-box ng-click="setProvedor(item, this)"
+                <div class="boxList"  layout="column" flex ng-repeat="item in search() as provFilter "  list-box ng-click="setProvedor(item, $event)"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
@@ -189,7 +189,7 @@
                         <div style="font-size:14px;"  id="dot-show{{item.id}}" layout="column" flex ng-show="item.show">
                             <spand layout="row" >{{item.text}}</spand>
                             <div layout="row" style="font-size:12px;">
-                                <div flex="70"  >Emitidos: </div>
+                                <div flex="70"  >En tienda: </div>
                                 <div flex class="text{{item.dias}}">{{item.emit}}</div>
                             </div>
 
@@ -233,13 +233,13 @@
                     </div>
 
                     <div style="height:40px;" layout="row" layout-align="space-between center">
-                        <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
+                        <div flex="" style="overflow: hidden; margin-right: 1px;white-space: nowrap;">{{item.deuda| number:2}}</div>
 
-                        <div flex="30" layout="row" style="height: 19px;" layout-align="end center" >
+                        <div flex="30" layout="row" style="height: 19px;white-space: nowrap;" layout-align="end center" >
                             <div >{{item.puntoCompra}}</div>
                             <img  style="float: left;" src="images/punto_compra.png"/>
                         </div>
-                        <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" >
+                        <div flex="30" layout="row"  layout-align="end center" style="height: 19px;white-space: nowrap;" >
                             <div >{{item.contraPedido}}</div>
                             <img  style="float: left;" src="images/contra_pedido.png"/>
                         </div>
@@ -249,7 +249,7 @@
             </div>
 
             <div id="listado" flex  style="overflow-y:auto;word-break: break-all;" ng-show="list == 'country'"  >
-                <div class="boxList"  layout="column" flex ng-repeat="item in searchCountry()  "  list-box
+                <div class="boxList"  layout="column" flex ng-repeat="item in searchCountry() as countryFilter"  list-box
                      class="boxList" ng-click="setPais(item)" ng-class="{'listSel' : (item.id == paisSelec.id)}"
                 >
 
@@ -322,8 +322,8 @@
             <div class="botonera" layout="row" layout-align="space-between center">
                 <!-- botonera left -->
                 <div style="width: 240px;" layout="row">
-<!--                    <div layout="column" layout-align="center center" ng-click="test()">  <span >test </span></div>
--->
+                    <div layout="column" layout-align="center center"> </div>
+
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listShipment') && permit.created)" layout-align="center center" ng-click="OpenShipmentCtrl()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
@@ -525,9 +525,9 @@
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.id}}</div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.nro_factura}}</div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.titulo}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.fecha_carga |  date:'dd/MM/yyyy' }}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.fecha_vnz | date:'dd/MM/yyyy'}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.fecha_tienda| date:'dd/MM/yyyy'}}</div>
+                                    <div flex class="cellGrid" ng-click="setData(item)"> <div class=" date {{'emit'+item.catfecha_tienda}}">{{item.fecha_carga |  date:'dd/MM/yyyy' }}</div></div>
+                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'emit'+item.catfecha_vnz}}" >{{item.fecha_vnz | date:'dd/MM/yyyy'}}</div></div>
+                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'emit'+item.catfecha_tienda}}">{{item.fecha_tienda| date:'dd/MM/yyyy'}}</div></div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.flete_tt}}</div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.nacionalizacion}}</div>
                                 </div>
@@ -882,7 +882,7 @@
                                                      required
                                                      ng-disabled="( session.isblock || $parent.shipment.tarifa_id)"
                                                      md-search-text="provSelecText "
-                                                     md-items="item in $parent.provs | stringKey : provSelecText : 'razon_social' "
+                                                     md-items="item in $parent.provFilter | stringKey : provSelecText : 'razon_social' "
                                                      md-item-text="item.razon_social"
                                                      md-no-asterisk
                                                      md-min-length="0"
@@ -981,8 +981,8 @@
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_carga.value"
                                                    ng-change="changeFecha_carga()"
                                                    ng-disabled="$parent.shipment.fechas.fecha_carga.confirm || session.isblock"
-
-                                                   info="fecha en que se realizo termino de cargar el embarcar, cambiar solo cuando se este seguro de que el embarque esta cargado"
+                                                   tipo="alert"
+                                                   info="fecha en que se comenzo  la carga,esta fecha modificara la fecha de llagada a venezuela y la fecha de llegada a la tienda"
                                     ></md-datepicker >
                                 </div>
 
@@ -996,6 +996,9 @@
                                                    ng-disabled="$parent.shipment.fechas.fecha_vnz.confirm || session.isblock"
                                                    ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                    md-min-date="$parent.shipment.fechas.fecha_carga.plus"
+                                                   tipo="alert"
+                                                   info="fecha de llegada a venezuela, esta fecha modificara la fecha de llegada a la tienda"
+
                                                    skip-tab
                                     ></md-datepicker >
 
@@ -1093,23 +1096,6 @@
                             </div>
                             <div layout="row" class="row" ng-show="formOptions.pago.expand" >
 
-                                <div layout="row" flex class="vlc-option ">
-
-                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_tt,'flete_tt')"  >
-                                        <label>Terrestre</label>
-                                        <input  ng-model="$parent.shipment.flete_tt"
-                                                skip-tab
-                                                ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_ft_tt)"
-                                                minlength="2"
-                                                decimal
-                                                ng-change="toEdit('flete_tt',$parent.shipment.flete_tt)"
-                                                ng-blur="outPay($parent.shipment.flete_tt,'flete_maritimo', $event )"
-                                        >
-                                    </md-input-container>
-                                    <div class="adj-box-rigth" ng-click="aprobFlete()">
-                                        <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':($parent.shipment.conf_monto_ft_tt)}"  style="float:left">A</div>
-                                    </div>
-                                </div>
                                 <div layout="row" flex>
 
                                     <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_maritimo,'flete_maritimo')"  >
@@ -1120,7 +1106,8 @@
                                                 decimal
                                                 minlength="2"
                                                 ng-change="toEditHead('dua',$parent.shipment.nacionalizacion)"
-                                                ng-blur="outPay($parent.shipment.flete_maritimo,'flete_maritimo', $event )"
+                                                ng-blur="outPayMar($parent.shipment.flete_maritimo,'flete_maritimo', $event )"
+                                                id="flete_maritimo"
 
                                         >
                                     </md-input-container>
@@ -1128,6 +1115,25 @@
                                         <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':$parent.shipment.conf_monto_dua}"  style="float:left">A</div>
                                     </div>
                                 </div>
+                                <div layout="row" flex class="vlc-option ">
+
+                                    <md-input-container class="md-block" ng-click="inPay($parent.shipment.flete_tt,'flete_tt')"  >
+                                        <label>Terrestre</label>
+                                        <input  ng-model="$parent.shipment.flete_tt"
+                                                skip-tab
+                                                ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_ft_tt)"
+                                                minlength="2"
+                                                decimal
+                                                ng-change="toEdit('flete_tt',$parent.shipment.flete_tt)"
+                                                ng-blur="outPayTerre()"
+                                                id="flete_tt"
+                                        >
+                                    </md-input-container>
+                                    <div class="adj-box-rigth" ng-click="aprobFlete()">
+                                        <div  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block),'vlc-buttom-aprob':($parent.shipment.conf_monto_ft_tt)}"  style="float:left">A</div>
+                                    </div>
+                                </div>
+
                                 <div layout="row"  flex >
 
                                     <md-input-container class="md-block"  ng-click="inPay($parent.shipment.nacionalizacion,'nacionalizacion')" >
@@ -1138,7 +1144,8 @@
                                                 decimal
                                                 minlength="2"
                                                 ng-change="toEditHead('conf_monto_nac',$parent.shipment.conf_monto_nac)"
-                                                ng-blur="outPay($parent.shipment.nacionalizacion,'nacionalizacion', $event )"
+                                                ng-blur="outPayNac($parent.shipment.nacionalizacion,'nacionalizacion', $event )"
+                                                id="nacionalizacion"
                                         >
                                     </md-input-container>
                                     <div class="adj-box-rigth" ng-click="aprobNac()">
@@ -1693,7 +1700,7 @@
                                                      skip-tab
                                                      md-search-text="pais_idText"
                                                      md-auto-select="true"
-                                                     md-items="item in $parent.provSelec.direcciones | stringKey : pais_idText : 'short_name' "
+                                                     md-items="item in $parent.countryFilter | stringKey : pais_idText : 'short_name' "
                                                      md-item-text="item.short_name"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
@@ -3585,7 +3592,7 @@
         >
             <md-content   layout="row" flex class="sideNavContent"   ng-controller="CreatTariffCtrl"  >
                 <div  layout="column" flex class="layerColumn"   click-out="close($event)">
-                    <form  ng-click="form = 'head'" name="head" ng-class="{'focused':form== 'head'}" >
+                    <form ng-show="mode == 'list'"  ng-click="form = 'head'" name="head" ng-class="{'focused':form== 'head'}" >
                         <div  id="head">
                             <div layout="row" class="form-row-head "  ng-class="{'form-row-head-select': form == 'head' }" style="margin-left: 12px;" >
                                 <div class="titulo_formulario" flex>
@@ -3593,8 +3600,11 @@
                                         Tarifa
                                     </div>
                                 </div>
+                                <div style="width: 24px;" layout="column" layout-align="center center" ng-click="(mode == 'list') ? mode = 'adjs' : mode = 'list' "><img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}"> </div>
+
+
                             </div>
-                            <div layout="column"   ng-class="{'form-row-head-select': form == 'head' ,'form-body-select':form == 'head'}" ng-show="form == 'head'">
+                            <div  layout="column"  ng-class="{'form-row-head-select': form == 'head' ,'form-body-select':form == 'head'}" ng-show="form == 'head'">
                                 <div style="padding-left: 12px ; padding-right: 4px;" >
 
                                     <div layout="row" class="row">
@@ -3607,7 +3617,7 @@
                                                              required
                                                              skip-tab
                                                              md-search-text="pais_idText"
-                                                             md-items="item in $parent.provSelec.direcciones | stringKey : pais_idText : 'short_name' "
+                                                             md-items="item in $parent.countryFilter | stringKey : pais_idText : 'short_name' "
                                                              md-item-text="item.short_name"
                                                              md-autoselect = "true"
                                                              md-no-asterisk
@@ -3615,6 +3625,7 @@
                                                              md-no-cache="true"
                                                              md-select-on-match
                                                              md-selected-item-change="model.pais_id = paisSelec.id ;loadPorts(paisSelec);"
+                                                             ng-disabled="( session.isblock  || $parent.shipment.fechas.fecha_carga.confirm || $parent.shipment.tarifa_id )"
                                             >
                                                 <md-item-template>
                                                     <span>{{item.short_name}}</span>
@@ -3639,7 +3650,7 @@
                                                              md-min-length="0"
                                                              md-no-cache="true"
                                                              md-selected-item-change="model.puerto_id = puertoSelect.id ;"
-                                                             ng-disabled="paisSelec == null"
+                                                             ng-disabled="( session.isblock  || $parent.shipment.fechas.fecha_carga.confirm || $parent.shipment.tarifa_id  || paisSelec == null)"
 
                                             >
                                                 <md-item-template>
@@ -3769,7 +3780,7 @@
                             </div>
                         </div>
                     </form>
-                    <form  name="bond" ng-class="{'focused':form== 'bond'}" flex layout="column" ng-click="form = 'bond'" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
+                    <form   ng-show="mode == 'list'"  name="bond" ng-class="{'focused':form== 'bond'}" flex layout="column" ng-click="form = 'bond';" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
                         <div layout="row" class="form-row-head " style="margin-left: 12px ;" ng-class="{'form-row-head-select': form == 'bond' ,'form-body-select':form == 'bond'}">
                             <div class="titulo_formulario" flex>
                                 <div>
@@ -3865,6 +3876,32 @@
                             </div>
                         </div>
                     </form>
+                    <div layout="column" flex ng-show="mode == 'adjs'">
+                        <div layout="row" class="form-row-head form-row-head-select" style="margin-left: 12px ;" >
+                            <div class="titulo_formulario" flex>
+                                <div>
+                                    Adjuntos
+                                </div>
+                            </div>
+                            <div style="width: 24px;" layout="column" layout-align="center center" ng-click="(mode == 'list') ? mode = 'adjs' : mode = 'list' "><img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}"> </div>
+
+                        </div>
+                        <div style="padding: 2px;; min-height: 56px;" layout="row"  ng-show="!$parent.session.isblock " >
+                            <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                                 ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+                                Insertar archivo
+                            </div>
+                        </div>
+                        <div flex class="gridContent" style="padding: 2px;">
+                            <div class="imgItem" ng-repeat="item in model.adjs track by $index" >
+                                <vl-thumb ng-model="item" vl-up="fileUp" ></vl-thumb>
+                            </div>
+                            <div layout="column" layout-align="center center" flex ng-show=" model.adjs == 0"  style="height:100%;">
+                                No hay adjuntos cargados
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </md-content>
         </md-sidenav>

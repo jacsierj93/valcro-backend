@@ -73,6 +73,14 @@ div[ng-click] * {
     padding-top: 0px;
     margin-top: -2px !important
 }
+.cellGrid div.date{
+    height: 16px;
+    border-radius: 5px 5px 5px 5px;
+    text-align: center;
+    color: white;
+    font-weight: bold !important;
+    margin-right: 8px;
+}
 
 .cellGrid-input{
     border-bottom:  1px solid #999999 ;
