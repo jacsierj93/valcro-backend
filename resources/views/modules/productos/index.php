@@ -372,6 +372,7 @@
                                                 <md-input-container class="md-block" flex >
                                                     <label>info</label>
                                                     <input skip-tab
+                                                           class="Frm-value"
                                                            ng-model="opcValue.info.valor"
                                                            ng-blur="checkSave($event)"
                                                     >
@@ -379,24 +380,27 @@
                                             </div>
                                         </div>
 
-                                        <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                            <div layout="column" class="optHolder" flex tabindex="0" id="prevReq">
+                                        <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px" >
+                                            <div layout="column" flex tabindex="0" id="prevReq">
                                                 <md-input-container class="md-block" flex>
 
                                                     <md-switch ng-model="opcValue.req.valor"
                                                                ng-blur="checkSave($event)"
+                                                               class="Frm-value"
                                                     >
                                                         &nbsp;Requerido
                                                     </md-switch>
                                                 </md-input-container>
+                                                <md-input-container class="md-block" flex ng-show="opcValue.req.valor != ''">
+                                                    <label>Requerido mensaje</label>
+                                                    <input skip-tab
+                                                           ng-model="opcValue.req.msg"
+                                                           class="Frm-msg"
+                                                           ng-blur="checkSave($event)"
+                                                    >
+                                                </md-input-container>
                                             </div>
-                                            <md-input-container class="md-block" flex ng-show="opcValue.req.valor != ''">
-                                                <label>Requerido mensaje</label>
-                                                <input skip-tab
-                                                       ng-model="opcValue.req.msg"
-                                                       ng-blur="checkSave($event)"
-                                                >
-                                            </md-input-container>
+
                                         </div>
                                         <div ng-show="critField.type == 2" >
 
@@ -406,17 +410,20 @@
                                                         <label>Minimo</label>
                                                         <input skip-tab
                                                                ng-model="opcValue.min.valor"
+                                                               class="Frm-value"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                    <md-input-container class="md-block" flex ng-show="opcValue.min.valor != ''">
+                                                        <label>mensaje de Minimo</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.min.msg"
+                                                               class="Frm-msg"
                                                                ng-blur="checkSave($event)"
                                                         >
                                                     </md-input-container>
                                                 </div>
-                                                <md-input-container class="md-block" flex ng-show="opcValue.min.valor != ''">
-                                                    <label>mensaje de Minimo</label>
-                                                    <input skip-tab
-                                                           ng-model="opcValue.min.msg"
-                                                           ng-blur="checkSave($event)"
-                                                    >
-                                                </md-input-container>
+
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
                                                 <div layout="column" class="optHolder" flex tabindex="0" id="prevMax">
@@ -424,17 +431,19 @@
                                                         <label>Maximo</label>
                                                         <input skip-tab
                                                                ng-model="opcValue.max.valor"
+                                                               class="Frm-value"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                    <md-input-container class="md-block" flex ng-show="opcValue.max.valor != ''">
+                                                        <label>mensaje</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.max.msg"
+                                                               class="Frm-msg"
                                                                ng-blur="checkSave($event)"
                                                         >
                                                     </md-input-container>
                                                 </div>
-                                                <md-input-container class="md-block" flex ng-show="opcValue.max.valor != ''">
-                                                    <label>mensaje</label>
-                                                    <input skip-tab
-                                                           ng-model="opcValue.max.msg"
-                                                           ng-blur="checkSave($event)"
-                                                    >
-                                                </md-input-container>
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
                                                 <div layout="column" class="optHolder" flex tabindex="0" id="prevMinI">
@@ -442,17 +451,19 @@
                                                         <label>Minimo Imposible</label>
                                                         <input skip-tab
                                                                ng-model="opcValue.minI.valor"
+                                                               class="Frm-value"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                    <md-input-container class="md-block" flex ng-show="opcValue.minI.valor != ''">
+                                                        <label>mensaje</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.minI.msg"
+                                                               class="Frm-msg"
                                                                ng-blur="checkSave($event)"
                                                         >
                                                     </md-input-container>
                                                 </div>
-                                                <md-input-container class="md-block" flex ng-show="opcValue.minI.valor != ''">
-                                                    <label>mensaje</label>
-                                                    <input skip-tab
-                                                           ng-model="opcValue.minI.msg"
-                                                           ng-blur="checkSave($event)"
-                                                    >
-                                                </md-input-container>
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
                                                 <div layout="column" class="optHolder" flex tabindex="0" id="prevMaxI">
@@ -460,17 +471,19 @@
                                                         <label>Maximo  Imposible</label>
                                                         <input skip-tab
                                                                ng-model="opcValue.maxI.valor"
+                                                               class="Frm-value"
+                                                               ng-blur="checkSave($event)"
+                                                        >
+                                                    </md-input-container>
+                                                    <md-input-container class="md-block" flex ng-show="opcValue.maxI.valor != ''">
+                                                        <label>mensaje</label>
+                                                        <input skip-tab
+                                                               ng-model="opcValue.maxI.msg"
+                                                               class="Frm-msg"
                                                                ng-blur="checkSave($event)"
                                                         >
                                                     </md-input-container>
                                                 </div>
-                                                <md-input-container class="md-block" flex ng-show="opcValue.maxI.valor != ''">
-                                                    <label>mensaje</label>
-                                                    <input skip-tab
-                                                           ng-model="opcValue.maxI.msg"
-                                                           ng-blur="checkSave($event)"
-                                                    >
-                                                </md-input-container>
                                             </div>
 
                                         </div>
@@ -493,6 +506,7 @@
                                                                          md-no-asterisk
                                                                          md-min-length="0"
                                                                          vl-no-clear
+                                                                         class="Frm-value"
                                                         >
                                                             <input >
                                                             <md-item-template>
@@ -516,7 +530,7 @@
                                             </div>
 
                                             <md-content>
-                                                <div ng-repeat="opt in opcValue.opts.valor" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                                <div ng-repeat="opt in opcValue.opts.valor track by $index" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                                     {{getoptSet(opt).nombre}}
                                                 </div>
                                             </md-content>

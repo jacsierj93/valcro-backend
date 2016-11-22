@@ -113,7 +113,6 @@ MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidena
 }]);
 
 MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
-
     $scope.nxtAction = null;
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
@@ -200,12 +199,51 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
 
-    $scope.checkSave = function(e){
-        var id = angular.element(e.currentTarget).parents(".optHolder").first().attr("id");
-        if(angular.element(e.relatedTarget).parents("#"+id).length!=0){
-           return false;
+    $scope.checkSave = function(e,model){
+        var self = angular.element(e.currentTarget).parents(".optHolder").first();
+        var parent = angular.element(e.relatedTarget).parents("#"+self.attr("id"));
+        if(parent.length!=0 || (self.find(".Frm-value").hasClass("ng-pristine") && self.find(".Frm-msg").hasClass("ng-pristine"))){
+            return false;
         }
-        saveOptions($scope.opcValue)
+        if(self.find(".Frm-value").val()==""){
+            setNotif.addNotif("alert", "el campo esta vacio, el valor no se guardara", [
+                {
+                    name: "deacuerdo",
+                    action: function () {
+                       
+                    }
+                },
+                {
+                    name: "Dejame Cambiarlos",
+                    action: function () {
+                        self.find(".Frm-value").focus();
+                    }
+                }
+            ]);
+            return false;
+        }
+
+        if(self.find(".Frm-value").val()!="" && self.find(".Frm-msg").val()=="" ){
+
+            setNotif.addNotif("alert", "no has especificado un mensaje para esta opcion, seguro deseas continuar?", [
+                {
+                    name: "Si, continuare",
+                    action: function () {
+                        saveOptions($scope.opcValue);
+                    }
+                },
+                {
+                    name: "Dejame Cambiarlos",
+                    action: function () {
+                        self.find(".Frm-msg").focus();
+                    }
+                }
+            ]);
+        }else{
+            saveOptions($scope.opcValue);
+        }
+
+
     };
 
     $scope.getoptSet = function(id){
@@ -227,17 +265,12 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
             angular.forEach(data, function(value, key){
                 if(key.match(/^[^\$]/g) && ("id" in value)) {
-                    /*$.grep($scope.opcValue, function(e){
-                       if(e.opc_id == value.opc_id){
-                           e.id = value.id;
-                           return true;
-                       }
-                    });
-                    */
                     $scope.opcValue[key].id = value.id;
                     critForm.updOptions($scope.opcValue[key]);
                 }
             });
+            setNotif.addNotif("ok", "GUARDADO!!", [
+            ],{autohidden:1000});
 
         });
     };
@@ -262,8 +295,8 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                     }
                 }else{
                     angular.forEach($filter("filterSearch")($scope.critField.opcs,[value.opc_id]), function(valor, key){
-                        value.valor.push(valor.id);
-                    })
+                        value.valor.push(valor.pivot.value);
+                    });
                 }
 
             });
@@ -291,11 +324,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         criterios.put({type:"saveNewItemList"},{name:nuevo},function(data){
             setNotif.addNotif("ok", "item creado", [
             ],{autohidden:3000});
-           /* $scope.listOptions.push({
-                id:data.id,
-                nombre:nuevo
-            });*/
-
         });
     }
 
@@ -444,7 +472,7 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
                 })[0];
             }else{
                 return $filter("customFind")(obj.options,[filt.id],function(c,v){
-                    return c.descripcion == obj.tipo && c.id == v[0];
+                    return c.descripcion == obj.tipo && c.pivot.value == v[0];
                 }).length > 0;
             }
         }

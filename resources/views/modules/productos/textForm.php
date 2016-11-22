@@ -7,8 +7,8 @@
            autocomplete="off"
            name="razon_social"
            maxlength="80"
-           ng-minlength="3"
-           required
+           ng-minlength="get(true,{tipo:'Requerido',options:field.options}).pivot.value"
+           ng-required="get(true,{tipo:'Requerido',options:field.options}).pivot.value"
            md-no-asterisk
            id="{{field.id}}">
 
@@ -37,6 +37,6 @@
 
 </md-input-container>
 
-<div vlc-buttomGroup layout="row" ng-show="(field.type.directive == 'prevRadio')">
-    <div ng-repeat="item in [222,33,4,5,51,21]" class="rad-button" flex >{{item}}</div>
+<div class="rad-contain" layout="row" ng-show="(field.type.directive == 'prevRadio')">
+    <div ng-repeat="item in listOptions | customFind : {tipo:'Opcion',options:field.options} : get" class="rad-button" flex layout="column" layout-align="center center">{{item.nombre}}</div>
 </div>

@@ -147,6 +147,7 @@ class CritController extends BaseController
                 $opt->save();
                 $ret[$k]["id"] = $opt->id;
             }else{
+                /*elimina todos los registros que no esten en el array que se recibe del request*/
                 Options::where("lct_id",$rq['field_id'])->where("opc_id",$rq['opc_id'])->whereNotIn("value",$rq['valor'])->delete();
 
                 $regs = Options::where("lct_id",$rq['field_id'])->where("opc_id",$rq['opc_id'])->lists("value");
@@ -154,7 +155,7 @@ class CritController extends BaseController
                 foreach ($rq['valor'] as $opcion){
 
                     if(!$regs->contains($opcion)){
-                        echo"dasdasdasd";
+               
                         $opt = new Options();
                         $opt->lct_id = $rq['field_id'];
                         $opt->opc_id = $rq['opc_id'];
