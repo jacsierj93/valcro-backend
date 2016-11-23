@@ -200,34 +200,34 @@
                         </div>
                     </div>
                     <div layout="row" class="dotRow">
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit100,item.review100,100)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.dot1,item.review100,100)">
                             <div layout layout-align="center center" class="dot-item emit100" >
-                                {{item.emit100}}
+                                {{item.dot1}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit90,item.review90,90)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.dot2,item.review90,90)">
                             <div layout layout-align="center center" class="dot-item emit90" >
-                                {{item.emit90}}
+                                {{item.dot2}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit60,item.review60,60)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.dot3,item.review60,60)">
                             <div layout layout-align="center center" class="dot-item emit60">
-                                {{item.emit60}}
+                                {{item.dot3}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit30,item.review30,30)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.dot4,item.review30,30)">
                             <div layout layout-align="center center" class="dot-item emit30" >
-                                {{item.emit30}}
+                                {{item.dot4}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit7,item.review7,7)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.dot5,item.review7,7)">
                             <div layout layout-align="center center" class="dot-item emit7" >
-                                {{item.emit7}}
+                                {{item.dot5}}
                             </div>
                         </div>
-                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit0,item.review0,0)">
+                        <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.dot6,item.review0,0)">
                             <div layout layout-align="center center" class="dot-item emit0">
-                                {{item.emit0}}
+                                {{item.dot6}}
                             </div>
                         </div>
                     </div>
@@ -271,32 +271,32 @@
                     <div layout="row" class="dotRow">
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit100,item.review100,100)">
                             <div layout layout-align="center center" class="dot-item emit100" >
-                                {{item.emit100}}
+                                {{item.dot1}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit90,item.review90,90)">
                             <div layout layout-align="center center" class="dot-item emit90" >
-                                {{item.emit90}}
+                                {{item.dot2}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) "ng-mouseenter = "showDotData(item,item.emit60,item.review60,60)">
                             <div layout layout-align="center center" class="dot-item emit60">
-                                {{item.emit60}}
+                                {{item.dot3}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit30,item.review30,30)">
                             <div layout layout-align="center center" class="dot-item emit30" >
-                                {{item.emit30}}
+                                {{item.dot4}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit7,item.review7,7)">
                             <div layout layout-align="center center" class="dot-item emit7" >
-                                {{item.emit7}}
+                                {{item.dot5}}
                             </div>
                         </div>
                         <div flex layout layout-align="center center"  ng-mouseleave ="showDotData(item) " ng-mouseenter = "showDotData(item,item.emit0,item.review0,0)">
                             <div layout layout-align="center center" class="dot-item emit0">
-                                {{item.emit0}}
+                                {{item.dot6}}
                             </div>
                         </div>
                     </div>
@@ -321,7 +321,7 @@
         <div layout="column" flex class="md-whiteframe-1dp">
             <div class="botonera" layout="row" layout-align="space-between center">
                 <!-- botonera left -->
-                <div style="width: 240px;" layout="row">
+                <div  layout="row" layout-align="start center">
                     <div layout="column" layout-align="center center"> </div>
 
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listShipment') && permit.created)" layout-align="center center" ng-click="OpenShipmentCtrl()">
@@ -357,6 +357,12 @@
                             Cancelar embarque
                         </md-tooltip>
                     </div>
+                    <div layout="column" layout-align="center center" ng-click="miniCancelShipment()" ng-show="shipment.id" >
+                        <span class="icon-checkMark" style="font-size: 24px"></span>
+                        <md-tooltip >
+                            Aprobar embarque
+                        </md-tooltip>
+                    </div>
                     <!-- <div layout="column" layout-align="center center" ng-click="test()">
                         <span  style="font-size: 24px">tss</span>
                         <md-tooltip >
@@ -367,18 +373,51 @@
                 </div>
 
                 <!-- botonera center -->
-                <div layout="row" flex layout-align="start center "></div>
+                <div layout="row"  layout-align="start center " flex style="padding: 0 8px 0 8px;">
+                    <div layout="row" class="vl-progress" layout-align="right center" ng-repeat="i in [0,1,2,3,4,5,6,7] as progress" id="progress_{{i}}" ng-style="$index < (progress.length -1) ? {'width' : '100%'} : {} " >
+                       <!-- <vl-progress ng-model="i" ></vl-progress>-->
+                         <div info="{{i}}" class="iconCircle" ng-click="line=true;">
+                             <div class="progress-bubble" ng-class="{'progress-bubble-first':($index == 0),'progress-bubble-last':($index == (progress.length -1 ))  }">
+                                 <div>{{$index}} / {{progress.length}}</div>
+                                 <div style="" layout="row" class="progress-bubble-arrow" ><div></div></div>
+                             </div>
+                         </div>
+                        <div class="line" style="" flex ng-show="$index < (progress.length -1) " >
+                            <div class="load_area" style="" ></div>
+                        </div>
+                    </div>
+
+                </div>
 
                 <!-- botonera rigth -->
-                <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show= "module.index == 0">
-                    <div class="{{(alerts.length > 0 ) ? 'animation-arrow' : 'animation-arrow-disable'}}" ng-click="moduleMsmCtrl()" id="noti-button"
-                         layout="column" layout-align="center center"  style=text-align:center; >
-                        <img ng-src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
+                <div layout="row"  layout-align="end center " >
+                    <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show= "module.index == 0">
+                        <div class="{{(alerts.length > 0 ) ? 'animation-arrow' : 'animation-arrow-disable'}}" ng-click="moduleMsmCtrl()" id="noti-button"
+                             layout="column" layout-align="center center"  style=text-align:center; >
+                            <img ng-src="images/btn_prevArrow.png" style="width: 14px;margin-top: 8px;" />
+                        </div>
+                        <md-tooltip>
+                            {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
+                        </md-tooltip>
                     </div>
-                    <md-tooltip>
-                        {{alerts.length > 0 ? 'Tiene notificaciones pendiente por revisar, haz click aqui para verlas' : 'Sin Notificaciones por revisar, gracias por estar pendiente '}}
-                    </md-tooltip>
+<!--                    <div layout="column" layout-align="center center" >
+                        <div layout="column" layout-align="center center"  style="background-color: rgb(92, 183, 235);color: white;" >
+                        <span class="icon-checkMark" style="font-size: 24px"></span>
+                        <md-tooltip >
+                           Aprobar
+                        </md-tooltip>
+                        </div>
+                    </div>
+                    <div layout="column" layout-align="center center" >
+                        <div layout="column" layout-align="center center"  style="background-color: rgb(232, 129, 0);color: white;" >
+                            <span class="icon-checkMark" style="font-size: 24px"></span>
+                            <md-tooltip >
+                                Aprobado
+                            </md-tooltip>
+                        </div>
+                    </div>-->
                 </div>
+
 
                 <!-- <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show="module.layer == 'detalleDoc'">
                      Cl
@@ -525,9 +564,9 @@
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.id}}</div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.nro_factura}}</div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.titulo}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)"> <div class=" date {{'emit'+item.catfecha_tienda}}">{{item.fecha_carga |  date:'dd/MM/yyyy' }}</div></div>
-                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'emit'+item.catfecha_vnz}}" >{{item.fecha_vnz | date:'dd/MM/yyyy'}}</div></div>
-                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'emit'+item.catfecha_tienda}}">{{item.fecha_tienda| date:'dd/MM/yyyy'}}</div></div>
+                                    <div flex class="cellGrid" ng-click="setData(item)"> <div class=" date {{'green'+item.catfecha_carga}}">{{item.fecha_carga |  date:'dd/MM/yyyy' }}</div></div>
+                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'green'+item.catfecha_vnz}}" >{{item.fecha_vnz | date:'dd/MM/yyyy'}}</div></div>
+                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'green'+item.catfecha_tienda}}">{{item.fecha_tienda| date:'dd/MM/yyyy'}}</div></div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.flete_tt}}</div>
                                     <div flex class="cellGrid" ng-click="setData(item)">{{item.nacionalizacion}}</div>
                                 </div>
@@ -3062,81 +3101,6 @@
             </md-content>
         </md-sidenav>
 
-        <!------------------------------------------- mini layer historial de producto ------------------------------------------------------------------------->
-        <!--        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
-                            md-disable-backdrop="true" md-component-id="miniHistoryProd" id="miniHistoryProd"
-                >
-                    <md-content   layout="row" flex class="sideNavContent" ng-controller="historyProductCtrl"    >
-                        <div  layout="column" flex class="layerColumn"   click-out="close($event)" style="padding-left: 12px">
-                            <div layout="row"  class="form-row-head form-row-head-select"  >
-                                <div class="titulo_formulario" style="height:39px;">
-                                    <div>
-                                        Historial
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div layout="row" style="padding-right: 4px;">
-                                <md-input-container class="md-block" flex  >
-                                    <label>Tipo</label>
-                                    <md-autocomplete md-selected-item="tipo.select"
-                                                     info="Tipo de container"
-                                                     required
-                                                     skip-tab
-                                                     md-search-text="tipo.text"
-                                                     md-auto-select="true"
-                                                     md-items="item in containers | filter :tipo.text"
-                                                     md-item-text="item.razon_social"
-                                                     md-autoselect = "true"
-                                                     md-no-asterisk
-                                                     md-min-length="0"
-                                                     md-require-match="true"
-                                                     md-no-cache="true"
-                                                     md-select-on-match
-                                    >
-                                        <md-item-template>
-                                            <span>{{item.nombre}}</span>
-                                        </md-item-template>
-                                    </md-autocomplete>
-                                </md-input-container>
-                                <md-input-container flex>
-                                    <label>Embarque </label>
-                                    <input  ng-model="filter.embarque_id" skip-tab
-                                    >
-                                </md-input-container>
-
-                                <md-input-container flex>
-                                    <label>Fecha</label>
-                                    <input  ng-model="container.updated_at" skip-tab
-                                    >
-                                </md-input-container>
-
-                                <md-input-container flex>
-                                    <label>Cantidad</label>
-                                    <input  ng-model="container.cantidad" skip-tab
-                                    >
-                                </md-input-container>
-                                <md-input-container flex>
-                                    <label>Costo</label>
-                                    <input  ng-model="container.cantidad" skip-tab
-                                    >
-                                </md-input-container>
-                            </div>
-                            <form flex layout="column" class="gridContent">
-                                <div ng-repeat="item in tbl.data" >
-                                    <div layout="row" class="cellGridHolder" >
-                                        <div flex class="cellGrid" >{{item.embarque_id}} </div>
-                                        <div flex class="cellGrid"> {{item.update_at}}</div>
-                                        <div flex class="cellGrid"> {{item.saldo}}</div>
-                                        <div flex class="cellGrid"> {{item.costo}}</div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </md-content>
-                </md-sidenav>-->
-
-
         <!------------------------------------------- mini layer master bill landing------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="miniMbl" id="miniMbl"
@@ -3189,7 +3153,6 @@
                             <div flex class="gridContent" ng-show="$parent.shipment.nro_mbl.adjs.length > 0">
                                 <div class="imgItem" ng-repeat="item in $parent.shipment.nro_mbl.adjs  track by $index" ng-click="selectImg(item)" >
                                     <vl-thumb ng-model="item" vl-up="fileUp" vl-fail="" progress="" ></vl-thumb>
-                                    <!-- <img ng-src="images/thumbs/{{item.thumb}}" alt="Load"/>-->
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" flex ng-show="$parent.shipment.nro_mbl.adjs.length == 0" >
@@ -3209,30 +3172,22 @@
                     md-disable-backdrop="true" md-component-id="miniCancelShipment" id="miniCancelShipment"
         >
             <md-content   layout="row" flex class="sideNavContent"  ng-controller="miniCancelShipmentCtrl"  >
-                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)" >
                     <div  layout="column" flex style="padding-left: 12px">
                         <form name="form" layout="column" flex="" class="focused">
                             <div layout="row"  class="form-row-head form-row-head-select"  >
-                                <div class="titulo_formulario" style="color:rgb(84, 180, 234);">
+                                <div class="titulo_formulario" style="color:rgb(84, 180, 234);" flex>
                                     <div>
-                                        Motivo de cancelacion
+                                        {{(mode == 'list') ? 'Motivo de cancelacion' : 'Adjunto'}}
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="drop-box-content" style="" layout="row" >
-                                <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
-                                     ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
-                                    Insertar archivo
-                                </div>
-
-                                <div class ="vlc-buttom"  layout="column" layout-align = "center center">
-                                    <span>{{model.adjs.length || '0' }}</span>
+                                <div style="width: 24px;" layout="column" layout-align="center center" ng-click="(mode == 'list') ? mode = 'adjs' : mode = 'list' ">
+                                    <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
                                 </div>
                             </div>
+                            <!--------- modo lis --------->
 
-
-                            <div flex class="gridContent" >
+                            <div flex class="gridContent" ng-show="mode == 'list'">
                                 <textarea ng-model="model.texto"  skip-tab
                                           id="textarea"
                                           required
@@ -3242,8 +3197,23 @@
 
                                 ></textarea>
                             </div>
+                            <div layout="column" flex ng-show="mode != 'list'">
+                                <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="!$parent.session.isblock ">
+                                    <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"
+                                         ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+                                        Insertar archivo
+                                    </div>
+                                </div>
+                                <div flex class="gridContent" >
+                                    <div class="imgItem" ng-repeat="item in model.adjs track by $index" >
+                                        <vl-thumb ng-model="item" vl-up="fileUp" vl-fail="" progress="" ></vl-thumb>
+                                    </div>
+                                    <div  style="height: 100%;" layout="column" layout-align = "center center" flex ng-show="model.adjs.length == 0" >
+                                        No hay adjuntos cargados
+                                    </div>
 
-
+                                </div>
+                            </div>
                         </form>
                     </div>
 
@@ -3591,10 +3561,10 @@
                     md-disable-backdrop="true" md-component-id="miniCreatTariff" id="miniCreatTariff"
         >
             <md-content   layout="row" flex class="sideNavContent"   ng-controller="CreatTariffCtrl"  >
-                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)" style="padding-left: 12px">
                     <form ng-show="mode == 'list'"  ng-click="form = 'head'" name="head" ng-class="{'focused':form== 'head'}" >
                         <div  id="head">
-                            <div layout="row" class="form-row-head "  ng-class="{'form-row-head-select': form == 'head' }" style="margin-left: 12px;" >
+                            <div layout="row" class="form-row-head "  ng-class="{'form-row-head-select': form == 'head' }"  >
                                 <div class="titulo_formulario" flex>
                                     <div>
                                         Tarifa

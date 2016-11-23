@@ -109,12 +109,12 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.prov_id = tbl_proveedor.id ) AS deuda,'.
-            '('.$this->generateEmit("fecha_tienda","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("fecha_tienda"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_vnz","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as dot1 ,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot2, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot3,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot4, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot5, ".
+            '('.$this->generateEmit("fecha_vnz"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot6, "
             .
             '('.$this->generateReview("updated_at","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as review0 ,".
             '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review7, ".
@@ -162,12 +162,12 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.prov_id = tbl_proveedor.id ) AS deuda,'.
-            '('.$this->generateEmit("fecha_tienda","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("fecha_tienda"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_vnz","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as dot1 ,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot2, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 7 and  30 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot3,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 31 and  60 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot4, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 61 and  90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot5, ".
+            '('.$this->generateEmit("fecha_vnz"," > 90 ","tbl_proveedor.id= tbl_embarque.prov_id").") as dot6, "
             .
             '('.$this->generateReview("updated_at","<=0","tbl_proveedor.id= tbl_embarque.prov_id").") as review0 ,".
             '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_proveedor.id= tbl_embarque.prov_id").") as review7, ".
@@ -200,19 +200,19 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.pais_id = tbl_pais.id ) AS deuda,'.
-            '('.$this->generateEmit("fecha_tienda","<=0","tbl_pais.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("fecha_tienda"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("fecha_tienda"," > 90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_vnz","<=0","tbl_pais.id= tbl_embarque.pais_id").") as dot1 ,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.pais_id").") as dot2, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 8 and  30 ","tbl_pais.id= tbl_embarque.pais_id").") as dot3,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.pais_id").") as dot4, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.pais_id").") as dot5, ".
+            '('.$this->generateEmit("fecha_vnz"," > 90 ","tbl_pais.id= tbl_embarque.pais_id").") as dot6, "
             .
-            '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.prov_id").") as review0 ,".
-            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as review7, ".
-            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as review30,".
-            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as review60, ".
-            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as review90, ".
-            '('.$this->generateReview("updated_at"," > 90 ","tbl_pais.id = tbl_embarque.prov_id").") as review100 ";
+            '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.pais_id").") as review0 ,".
+            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.pais_id").") as review7, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.pais_id").") as review30,".
+            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.pais_id").") as review60, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.pais_id").") as review90, ".
+            '('.$this->generateReview("updated_at"," > 90 ","tbl_pais.id = tbl_embarque.pais_id").") as review100 ";
         $model  =  Country::selectRaw($select)
             ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
             ->get();
@@ -238,19 +238,19 @@ class EmbarquesController extends BaseController
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
             ' FROM tbl_embarque te WHERE te.deleted_at IS NULL  AND te.pais_id = tbl_pais.id ) AS deuda,'.
-            '('.$this->generateEmit("emision","<=0","tbl_pais.id= tbl_embarque.prov_id").") as emit0 ,".
-            '('.$this->generateEmit("emision"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as emit7, ".
-            '('.$this->generateEmit("emision"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as emit30,".
-            '('.$this->generateEmit("emision"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as emit60, ".
-            '('.$this->generateEmit("emision"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit90, ".
-            '('.$this->generateEmit("emision"," > 90 ","tbl_pais.id= tbl_embarque.prov_id").") as emit100, "
+            '('.$this->generateEmit("fecha_vnz","<=0","tbl_pais.id= tbl_embarque.pais_id").") as dot1 ,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.pais_id").") as dot2, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 8 and  30 ","tbl_pais.id= tbl_embarque.pais_id").") as dot3,".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.pais_id").") as dot4, ".
+            '('.$this->generateEmit("fecha_vnz"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.pais_id").") as dot5, ".
+            '('.$this->generateEmit("fecha_vnz"," > 90 ","tbl_pais.id= tbl_embarque.pais_id").") as dot6, "
             .
-            '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.prov_id").") as review0 ,".
-            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.prov_id").") as review7, ".
-            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.prov_id").") as review30,".
-            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.prov_id").") as review60, ".
-            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.prov_id").") as review90, ".
-            '('.$this->generateReview("updated_at"," > 90 ","tbl_pais.id = tbl_embarque.prov_id").") as review100 ";
+            '('.$this->generateReview("updated_at","<=0","tbl_pais.id= tbl_embarque.pais_id").") as review0 ,".
+            '('.$this->generateReview("updated_at"," BETWEEN 1 and  7 ","tbl_pais.id= tbl_embarque.pais_id").") as review7, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 7 and  30 ","tbl_pais.id= tbl_embarque.pais_id").") as review30,".
+            '('.$this->generateReview("updated_at"," BETWEEN 31 and  60 ","tbl_pais.id= tbl_embarque.pais_id").") as review60, ".
+            '('.$this->generateReview("updated_at"," BETWEEN 61 and  90 ","tbl_pais.id= tbl_embarque.pais_id").") as review90, ".
+            '('.$this->generateReview("updated_at"," <=0 ","tbl_pais.id = tbl_embarque.pais_id").") as review100 ";
         $model  =  Country::selectRaw($select)
             ->join('tbl_prov_direccion','tbl_prov_direccion.pais_id','=','tbl_pais.id' )
             ->where('tbl_pais.id', $req->id)
@@ -900,30 +900,30 @@ class EmbarquesController extends BaseController
     }
 
     public  function  getShipments(Request $req){
-        $select ='*,'.
+        $select ='*, DATEDIFF(fecha_carga,  CURDATE()) as cat,'.
             '(CASE WHEN `tbl_embarque`.fecha_tienda IS not NULL THEN 
-               CASE WHEN DATEDIFF(fecha_tienda, CURDATE()) <=0 THEN 0 
-               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 1 and  7 THEN 7
-               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 8 and  30 THEN 30
-               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 31 and  60 THEN 60 
-               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 61 and  90 THEN 90
-               WHEN DATEDIFF(fecha_tienda,  CURDATE()) > 91  THEN 100 end ELSE -1 end 
+               CASE WHEN DATEDIFF(fecha_tienda, CURDATE()) < 0 THEN 1 
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 1 and  7 THEN 2
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 8 and  30 THEN 3
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 31 and  60 THEN 4 
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 61 and  90 THEN 5
+               WHEN DATEDIFF(fecha_tienda,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
                ) as catfecha_tienda ,'.
             '(CASE WHEN `tbl_embarque`.fecha_carga IS not NULL THEN 
-               CASE WHEN DATEDIFF(fecha_carga, CURDATE()) <=0 THEN 0 
-               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 1 and  30 THEN 7
-               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 8 and  30 THEN 30
-               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 31 and  60 THEN 60 
-               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 61 and  90 THEN 90
-               WHEN DATEDIFF(fecha_carga,  CURDATE()) > 91  THEN 100 end ELSE -1 end 
+               CASE WHEN DATEDIFF(fecha_carga, CURDATE()) <=0 THEN 1 
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 1 and  30 THEN 2
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 8 and  30 THEN 3
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 31 and  60 THEN 4 
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 61 and  90 THEN 5
+               WHEN DATEDIFF(fecha_carga,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
                ) as catfecha_carga,'.
             '(CASE WHEN `tbl_embarque`.fecha_vnz IS not NULL THEN 
-               CASE WHEN DATEDIFF(fecha_vnz, CURDATE()) <=0 THEN 0 
-               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 1 and  30 THEN 7
-               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 8 and  30 THEN 30
-               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 31 and  60 THEN 60 
-               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 61 and  90 THEN 90
-               WHEN DATEDIFF(fecha_vnz,  CURDATE()) > 91  THEN 100 end ELSE -1 end 
+               CASE WHEN DATEDIFF(fecha_vnz, CURDATE()) <=0 THEN 1 
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 1 and  30 THEN 2
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 8 and  30 THEN 3
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 31 and  60 THEN 4 
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 61 and  90 THEN 5
+               WHEN DATEDIFF(fecha_vnz,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
                ) as catfecha_vnz'
 
         ;
@@ -1405,14 +1405,18 @@ class EmbarquesController extends BaseController
 
         $model->comentario_cancelacion = $req->texto;
 
+
         if($req->has('adjs')){
             foreach ($req->adjs as $aux){
-                $att = new ShipmentAttachment();
-                $att->doc_id= $model->id;
-                $att->documento ='cancelacion';
-                $att->archivo_id	 = $aux['id'];
-                $att->comentario	 = (array_key_exists('comentario', $aux) ? $aux['comentario'] : null );
-                $att->save();
+               if(array_key_exists('id', $aux)){
+                   $att = new ShipmentAttachment();
+                   $att->doc_id= $model->id;
+                   $att->documento ='cancelacion';
+                   $att->archivo_id	 = $aux['id'];
+                   $att->comentario	 = (array_key_exists('comentario', $aux) ? $aux['comentario'] : null );
+                   $att->save();
+               }
+
             }
         }
         $model->save();
@@ -1552,7 +1556,7 @@ class EmbarquesController extends BaseController
 
     /************************* Private master ***********************************/
     private function generateEmit($campo, $condicion, $where){
-        $q= "IFNULL((select sum(case WHEN datediff( curdate(),".$campo.") ".$condicion." then 1 else 0 END) from "
+        $q= "IFNULL((select sum(case WHEN datediff( ".$campo.",curdate()) ".$condicion." then 1 else 0 END) from "
             ." tbl_embarque where ".$where." and tbl_embarque.deleted_at is null and tbl_embarque.comentario_cancelacion is null),0) "
             .""
         ;

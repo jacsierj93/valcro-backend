@@ -2,12 +2,23 @@
 .image{
     float: right;
 }
+
+/*
+reemplace
+*/
 .emit100{ background-color: #006837;}/** llegada en <=0 */
 .emit90{ background-color: #00862c;}/** llegada en <=0 */
 .emit60{ background-color: #00a421;}/** llegada en <=0 */
 .emit30{ background-color: #00c316;}/** llegada en <=0 */
 .emit7{ background-color: #00e10b;}/** llegada en <=0 */
 .emit0{ background-color: #00ff00;}/** llegada en <=0 */
+
+.green1{ background-color: #006837;}/** llegada en <=0 */
+.green2{ background-color: #00862c;}/** llegada en <=0 */
+.green3{ background-color: #00a421;}/** llegada en <=0 */
+.green4{ background-color: #00c316;}/** llegada en <=0 */
+.green5{ background-color: #00e10b;}/** llegada en <=0 */
+.green6{ background-color: #00ff00;}/** llegada en <=0 */
 
 .text100{ color: #006837;}/** llegada en <=0 */
 .text90{ color: #00862c;}/** llegada en <=0 */
@@ -312,8 +323,8 @@ md-sidenav .md-sidenav-right.md-locked-open{
 .final-nav img{
     width: 8px;
 }.final-nav img:first-child{
-   margin-left: 2px;
-}
+     margin-left: 2px;
+ }
 
 
 .md-datepicker-input{
@@ -548,4 +559,73 @@ md-autocomplete > md-autocomplete-wrap{
     100% {
         background: #fdd44c;
     }
+}
+
+/***/
+
+.vl-progress{
+
+}
+.vl-progress div.iconCircle{
+    margin-left: 0px;
+    height: 12px;
+    width: 12px;
+    background-color: rgb(204,204,204);
+}
+.vl-progress div.line{
+    height: 2px;
+    background: #ccc;
+}
+
+.line div.load_area{
+    height: 100%; width:0%;
+    background: #5cb85c;
+}
+
+.progress-bubble{
+    position: absolute;
+    top: 12px;
+    width: 200px !important;
+    height: 45px !important;
+    margin-left: -100px;
+    border: solid 1.5px rgb(0, 255, 0);
+    background: white;
+    border-radius: 5px 5px 5px 5px;
+
+}
+.progress-bubble > div:first-child {
+    width: 100%;
+    height: 100%;
+    font-size: 14px;
+    overflow: hidden;
+}
+.progress-bubble-arrow{
+    height:5px !important;
+    width: 100%;
+    margin-top: -1.5px;
+    margin-left: 88px;
+}
+.progress-bubble-arrow > div:first-child {
+    width:0px !important;
+    height:0px !important;
+    border-style: solid;
+    border-width: 8px;
+    border-bottom-width:0px;
+    border-color: rgb(0, 255, 0) transparent transparent transparent;
+    margin-left: 8px;
+    margin-top: 2px;
+}
+
+.progress-bubble-first{
+    margin-left: -8px;
+}
+
+.progress-bubble-first div.progress-bubble-arrow{
+     margin-left: -4px;
+}
+.progress-bubble-last{
+    right: 4px;
+}
+.progress-bubble-last div.progress-bubble-arrow{
+    margin-left: 128px;
 }

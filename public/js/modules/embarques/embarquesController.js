@@ -1,19 +1,13 @@
 MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$interval','$filter','form', 'shipment','setGetShipment', function ($scope, $mdSidenav,$timeout,$interval,$filter,form,$resource, $model) {
-
-    //?review
-
     $scope.list ='provider';
-
-
     $scope.alerts =[];
     $scope.provs =[];
     $scope.paises =[];
-
-
-
     $scope.shipment ={objs:{}};
     $scope.bindShipment =$model.bind();
-    $scope.session = {global:'new', isblock: false};
+    $scope.session = {global:'new', isblock: false, complete: [{id:''},{id:''},{id:''},{id:''},{id:''}]};
+
+    $scope.complete = {data:[{id:''},{id:''},{id:''},{id:''},{id:''}]};
     $scope.permit={
         created:true
     };
@@ -25,26 +19,26 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         $resource.query({type:"Countrys"}, {}, function(response){$scope.paises= response; });
     },0);
     $scope.test = function () {
-      $scope.NotifAction("alert",'demo',[
+        $scope.NotifAction("alert",'demo',[
             {name:"a",action:function () {
                 console.log("a")
-                }
+            }
             },{name:"b",action:function () {
-              console.log("b")
-          }
-          }
+                console.log("b")
+            }
+            }
         ],{save:{doc_origen_id:$scope.shipment.id, tipo_origen_id:25,comentario:"hola mundo"}});
     };
 
 
 
-/*    $scope.search = function(){
-        var data =[];
-        if($scope.provs.length > 0){
-            return $scope.provs;
-        }
-        return data;
-    }*/
+    /*    $scope.search = function(){
+     var data =[];
+     if($scope.provs.length > 0){
+     return $scope.provs;
+     }
+     return data;
+     }*/
 
     $scope.search = function(){
         var data  =[];
@@ -147,7 +141,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                             paso = false;
                         }
                     }
-                    if($scope.paisSelec && $scope.paisSelec.providers){
+                    if($scope.paisSelec && $scope.paisSelec.providersn && $scope.paisSelec.id){
                         paso = $scope.paisSelec.providers.indexOf(current.id) != -1;
                     }
                     return paso;
@@ -251,7 +245,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                             paso = false;
                         }
                     }
-                    if($scope.provSelec && $scope.provSelec.countrys){
+                    if($scope.provSelec && $scope.provSelec.countrys && $scope.provSelec.id){
                         paso = $scope.provSelec.countrys.indexOf(current.id) != -1;
                     }
                     return paso;
@@ -263,8 +257,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     };
 
     $scope.setProvedor = function(prov, e){
-        console.log('evento e ',e);
-
         if($scope.module.index == 0 || $scope.module.layer == 'listShipment'  ){
             $scope.provSelec = prov;
             $scope.shipment.prov_id= prov.id;
@@ -281,7 +273,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                 $model.setNext(function () {
                     $scope.LayersAction({close:{all:true, after:function () {
                         $timeout(function () {
-                          var element = angular.element(e.target);
+                            var element = angular.element(e.target);
                             console.log("click", element);
                             element.click();
                         },1);
@@ -380,7 +372,6 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     };
 
     $scope.reloadProv= function (fn) {
-        console.log('$scope.provSelec', $scope.provSelec)
         if( $scope.provSelec && $scope.provSelec.id){
             $resource.get({type:"Provider", id:$scope.provSelec.id}, {}, function(response){
                 angular.forEach(response, function (v,k) {
@@ -542,7 +533,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
 
     $scope.unblock = function (id) {
-        console.log("inblock", id);
+        //console.log("inblock", id);
         $scope.session.isblock =false;
     };
 
@@ -568,11 +559,17 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         if(newVal){
             $timeout(function () {
                 $scope.shipment = $model.getData();
-                if( $scope.shipment.objs){
-                    $scope.provSelec = $scope.shipment.objs.prov_id;
+                if( $scope.shipment.objs ){
+                    /*if( $scope.shipment.objs.prov_id){
+                     $scope.provSelec = $scope.shipment.objs.prov_id;
+                     }
+                     if( $scope.shipment.objs.pais_id){
+                     $scope.provSelec = $scope.shipment.objs.prov_id;
+                     }*/
+
                 }
             },0);
-       }
+        }
     });
 
     $scope.$watchGroup(['module.layer', 'module.index'] ,function(newVal){
@@ -587,13 +584,16 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                 $scope.reloadCountry(function () {
                     $scope.paisSelec = {providers:[]};
                 });
-
-
                 $scope.session.global = 'new';
                 $scope.session.isblock = true;
             },0);
         }
+        if(newVal[0] == 'listShipment'){
+            $model.clear();
+        }
     });
+
+
 
     /**@deprecated*/
     $scope.isModif = function () {
@@ -685,6 +685,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     };
 
     $scope.showDotData= function(item,emit,review, dias){
+
         if(emit && review){
             item.emit= angular.copy(emit);
             item.review= angular.copy(review);
@@ -716,7 +717,7 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         angular.forEach(data, function (v, k) {
             send[k]= v;
         });
-        console.log("send ", send);
+        // console.log("send ", send);
         $resource.query(send,{}, function (response) {
             angular.forEach(response, function (v, k) {
                 $scope.tbl.data.push(v);
@@ -845,7 +846,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
     $scope.$watch("fechas.bind.estado", function (newVal, oldVal) {
         if(newVal){
             $scope.fechas.bind.estado = false;
-            console.log("cambio a las fechas", $scope.fechas );
             $scope.fechas.send.id= angular.copy($scope.shipment.id);
 
             if($scope.fechas.calc){
@@ -949,8 +949,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                     $model.setData({id:response.id});
                     $scope.$parent.unblock({doc_id:response.id});
                 });
-
-
             }
         }}});
     };
@@ -1578,22 +1576,22 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
     $scope.tarifaSelect = {};
 
     $scope.$parent.listTariffCtrl = function(fn){
-      //  $resource.queryMod({type:"Provider",mod:"Dir", id:$scope.$parent.provSelec.id}, {}, function(response){$scope.$parent.provSelec.direcciones= response;});
-        $scope.LayersAction({open:{name:"listTariff",
-            before:function(){
-                if($scope.$parent.shipment.tarifa_id  != null && $scope.$parent.shipment.objs.tarifa_id.model){
-                    angular.forEach($scope.$parent.shipment.objs.tarifa_id.model, function(v,k){
-                        $scope.tarifaSelect[k] =v;
-                    });
-                }else{
-                    $scope.tarifaSelect ={};
-                }
-            },after: function () {
-                $timeout(function () {
-                    var ele = angular.element("#listTariff input").first();
-                    ele.focus();
-                },0);
-            }
+        if($scope.$parent.shipment.tarifa_id  != null && $scope.$parent.shipment.objs.tarifa_id.model){
+            angular.forEach($scope.$parent.shipment.objs.tarifa_id.model, function(v,k){
+                $scope.tarifaSelect[k] =v;
+            });
+        }else{
+            $scope.tarifaSelect ={};
+        }
+        if( !$scope.pais_idSelec ||  $scope.pais_idSelec.id || $scope.puerto_idSelec ||  $scope.puerto_idSelec.id){
+            $scope.tbl.data.splice(0, $scope.tbl.data.length);
+        }
+        $scope.LayersAction({open:{name:"listTariff",after: function () {
+            $timeout(function () {
+                var ele = angular.element("#listTariff input").first();
+                ele.focus();
+            },0);
+        }
         }});
     };
 
@@ -1694,11 +1692,12 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
         if(newVal ){
 
             $scope.tbl.data.splice(0,  $scope.tbl.data.length);
-            $scope.$parent.save();
+
         }
         if( $scope.$parent.module.layer == 'listTariff'){
             $model.change('tarifa', 'pais_id',(newVal) ? newVal.id: undefined);
             $scope.puerto_idText  = undefined;
+            $scope.$parent.save();
         }
 
     })
@@ -1721,12 +1720,13 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
     $scope.$watch('$parent.shipment.objs.pais_id', function(newVal){
 
         $scope.pais_idSelec=newVal;
-        if(newVal && newVal!= null ){
+        if(newVal && newVal!= null && newVal.id ){
+
 
             $resource.query({type:"Country", mod:"Ports", pais_id:newVal.id},{}, function(response){
                 $scope.pais_idSelec.ports = response;
             });
-            $scope.$parent.save();
+            //$scope.$parent.save();
 
         }
     });
@@ -1743,12 +1743,13 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
             $resource.queryMod({type:"Tariff",mod:"List", puerto_id:$scope.puerto_idSelec.id},{}, function (response) {
                 $scope.tbl.data= response;
             });
-            $scope.$parent.save();
+
 
 
         }
         if( $scope.$parent.module.layer == 'listTariff'){
             $model.change('tarifa', 'puerto_id',(newVal) ? newVal.id: undefined);
+            $scope.$parent.save();
         }
     });
     $scope.$watchGroup(['tariffF1.$valid', 'tariffF1.$pristine'], function(newVal){
@@ -2724,7 +2725,6 @@ MyApp.controller('listProductAddCtrl',['$scope','$filter','shipment','form', 'se
 
 }]);
 
-
 MyApp.controller('CreatProductCtrl',['$scope','$mdSidenav','$timeout','masters','form','shipment', 'setGetShipment',function($scope,$mdSidenav, $timeout,masters, formSrv, $resource, $model){
     $scope.isOpen = false;
 
@@ -3074,108 +3074,113 @@ MyApp.controller('miniExpAduanaCtrl',['$scope','$mdSidenav','$timeout','$interva
     };
 }]);
 
-//
-MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$interval','fileSrv','shipment','setGetShipment',
-    function($scope,$mdSidenav,$timeout, $interval,fileSrv, $resource,$model){
-        $scope.bindFiles = fileSrv.bin();
-        $scope.$parent.miniCancelShipment = function () {
-            $scope.model = {adjs:[]};
-            $mdSidenav("miniCancelShipment").open().then(function(){
-                $scope.isOpen = true;
-            });
-        };
+MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$interval','fileSrv','shipment','setGetShipment',function($scope,$mdSidenav,$timeout, $interval,fileSrv, $resource,$model){
 
-        $scope.$watch('files.length', function(newValue){
-            if(newValue > 0){
-                fileSrv.storage("shipments");
-                fileSrv.setKey("miniCancelShipmentCtrl");
-                angular.forEach(fileSrv.upload($scope.files), function (v, k) {
-                    $scope.model.adjs.push(v);
-                });
-            }
+    $scope.bindFiles = fileSrv.bin();
+
+    $scope.$parent.miniCancelShipment = function () {
+        $scope.model = {adjs:[]};
+        $scope.mode = 'list';
+        $mdSidenav("miniCancelShipment").open().then(function(){
+            $scope.isOpen = true;
         });
+    };
 
-        $scope.$watch('bindFiles.estado', function (newVal) {
-            if(fileSrv.getKey() == 'miniCancelShipmentCtrl'){
-                var result = angular.copy(fileSrv.get());
-                if(newVal == 'finish'){
-                    var texto = '';
-                    //{succeces:[], error:[], total:[],upload:{}};
-                    if(result.succeces.length > 0){
-                        texto += " Se agregaron "+result.succeces.length +" archivos";
-                    }
-                    if(result.error.length > 0){
-                        texto += " fallaron "+result.error.length +" archivos";
-                    }                if(result.total.length > 0){
-                        texto += " de  "+result.total.length +" ";
-                    }
-                    if(texto.length > 1){
-                        $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
-                    }
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            fileSrv.storage("shipments");
+            fileSrv.setKey("miniCancelShipmentCtrl");
+            angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+                $scope.model.adjs.push(v);
+            });
+        }
+    });
+
+    $scope.$watch('bindFiles.estado', function (newVal) {
+        if(fileSrv.getKey() == 'miniCancelShipmentCtrl'){
+            var result = angular.copy(fileSrv.get());
+            if(newVal == 'finish'){
+                var texto = '';
+                //{succeces:[], error:[], total:[],upload:{}};
+                if(result.succeces.length > 0){
+                    texto += " Se agregaron "+result.succeces.length +" archivos";
+                }
+                if(result.error.length > 0){
+                    texto += " fallaron "+result.error.length +" archivos";
+                }                if(result.total.length > 0){
+                    texto += " de  "+result.total.length +" ";
+                }
+                if(texto.length > 1){
+                    $scope.$parent.NotifAction("ok", texto, [],{autohidden:4000})
+                }
+
+            }
+        }
+    });
+    $scope.inClose = function () {
+        $mdSidenav("miniCancelShipment").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+
+    $scope.close = function () {
+        if( $scope.isOpen){
+            if(!$scope.form.$pristine){
+                if($scope.form.$valid){
+                    $scope.save();
+                }else{
+                    $scope.$parent.NotifAction("alert", "No se agrego el motivo de cancelacion",
+                        [
+                            {name:"Corregir", action:function () {}},
+                            {name:"Cancelar", action:function (){$scope.inClose();}
+                            }
+                        ]
+                        ,{block:true});
 
                 }
+
+            }else{
+                $scope.inClose();
             }
-        });
-        $scope.inClose = function () {
-            $mdSidenav("miniCancelShipment").close().then(function(){
-                $scope.isOpen = false;
-            });
-        };
+        }
+    };
 
-        $scope.close = function () {
-            if( $scope.isOpen){
-                if(!$scope.form.$pristine){
-                    if($scope.form.$valid){
-                        $scope.save();
-                    }else{
-                        $scope.$parent.NotifAction("alert", "No se agrego el motivo de cancelacion",
-                            [
-                                {name:"Corregir", action:function () {}},
-                                {name:"Cancelar", action:function (){$scope.inClose();}
-                                }
-                            ]
-                            ,{block:true});
 
+    $scope.send = function () {
+        $scope.model.id=$scope.$parent.shipment.id;
+        $resource.postMod({type:"Shipment", mod:"Cancel"},$scope.model, function (response) {
+            $scope.inClose();
+            $scope.$parent.NotifAction("ok", "Se ha cancelado el documento",[],{autohidden:2000});
+            if($scope.module.historia[1] == 'detailShipment'){
+                $scope.LayersAction({close:{all:true}});
+            }else{
+                $scope.LayersAction({close:{first:true, search:true}});
+            }
+
+        })
+    };
+    $scope.save = function () {
+
+        $scope.$parent.NotifAction("alert", " ¿Esta seguro de Cancelar el embarque conl os datos suministrados? ",
+            [
+                {name:"Si, estoy completamente seguro", action:
+                    function(){
+                        $scope.send();
                     }
-
-                }else{
+                },{name:"Olvide colocar algo, dejarme terminar", action:
+                function(){
+                    $scope.inClose();
+                }
+            },{name:"Cancelar", action:
+                function(){
                     $scope.inClose();
                 }
             }
-        };
+            ]
+            , {block:true,save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+    };
 
-
-        $scope.send = function () {
-            $scope.model.id=$scope.$parent.shipment.id;
-            $resource.postMod({type:"Shipment", mod:"Cancel"},$scope.model, function (response) {
-                $scope.inClose();
-                $scope.$parent.NotifAction("ok", "Documento cancelado",[],{autohidden:2000});
-                if($scope.module.historia[1] == 'detailShipment'){
-                    $scope.LayersAction({close:{all:true}});
-                }else{
-                    $scope.LayersAction({close:{first:true, search:true}});
-                }
-
-            })
-        };
-        $scope.save = function () {
-
-            $scope.$parent.NotifAction("alert", " ¿Esta seguro de Cancelar el embarque? ",
-                [
-                    {name:"Si, estoy complemtamente seguro", action:
-                        function(){
-                            $scope.send();
-                        }
-                    },{name:"Cancelar", action:
-                    function(){
-
-                    }
-                }
-                ]
-                , {block:true,save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
-        };
-
-    }]);
+}]);
 
 MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','form', function($scope, DateParse,$resource, form){
     $scope.isOpen = false;
@@ -3791,7 +3796,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
                                     action:function () {
                                         formSrv.setState("cancel");
                                     }}
-                                ]
+                            ]
                             ,{block:true})
 
                     }else{
@@ -3846,7 +3851,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     };
 
     $scope.loadPorts = function(pais){
-        if(pais != null){
+        if(pais != null && pais && pais.id){
             $resource.queryMod({type:"Country",mod:"Ports",pais_id:pais.id},{},function (response) {
                 $scope.puertos =response;
             });
@@ -3879,6 +3884,10 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         $scope.paisSelec=newVal;
 
     });
+    $scope.$watch('$parent.shipment.objs.puerto_id', function(newVal){
+        $scope.puertoSelect=newVal;
+
+    });
 
 
     $scope.$watch('puertoSelect', function(newVal){
@@ -3903,7 +3912,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.$watch('files.length', function(newValue){
         if(newValue > 0){
             fileSrv.storage("shipments");
-           fileSrv.setKey("miniHblCtrl");
+            fileSrv.setKey("miniHblCtrl");
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
 
                 $scope.model.adjs.push(v);
@@ -4726,8 +4735,6 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
  */
 
 MyApp.directive('vlThumb', function( fileSrv) {
-
-
     return {
         replace: true,
         transclude: true,
@@ -4736,10 +4743,8 @@ MyApp.directive('vlThumb', function( fileSrv) {
             'up' : "=vlUp",
             /*'fail' : "=vlFail",
              'progress' : "=vlLoad"*/
-
-        },
+       },
         link: function(scope, elem, attr, ctrl){
-
             scope.$watch('model.state', function (newVal,oldVal) {
                 if(newVal == 'up'){
                     delete scope.model.up;
@@ -4755,21 +4760,38 @@ MyApp.directive('vlThumb', function( fileSrv) {
                      }*/
                 }
             });
-
             scope.reinten = function (item) {
                 fileSrv.upFile(item);
             }
-
         },
         template: function () {
 
             return '<div layout="column"  layout-align="center center" style="background-color: rgba(88, 181, 234,{{( model.up)/100}}); height: 100%">'  +
                 '<img ng-src="images/thumbs/{{model.thumb}}"/>' +
-                ' <div style="position: absolute; vertical-align: middle;" ng-show="model.up">{{model.up}}%</div> ' +
+                ' <div style="position: absolute; vertical-align: middle;" ng-show="model.up && !model.fail">{{model.up}}%</div> ' +
                 ' <div style="position: absolute; vertical-align: bottom; background-color: #0a6ebd;" ng-show="model.fail" ng-click="reinten(model)">fail</div> ' +
                 '</div>'
         }
     };
+});
+
+MyApp.directive('vlProgress', function( fileSrv) {
+    return {
+        replace: true,
+        transclude: true,
+        scope:{
+            'model' : "=ngModel"
+       },
+        link: function(scope, elem, attr, ctrl){
+           console.log("scope", scope)
+        },
+        template: function () {
+
+            return '' +
+                '<div info="{{i}}" class="iconCircle" ng-click="line=true;"> <div class="progress-bubble" ng-class="{\'progress-bubble-first\':($index == 0),\'progress-bubble-last\':($index == (progress.length -1 ))  }">' +
+                '<div>{{$index}} / {{progress.length}}</div> <div style="" layout="row" class="progress-bubble-arrow" ><div></div></div>      </div>  </div>          <div class="line" style="" flex ng-show="$index < (progress.length -1) " >' +
+                ' <div class="load_area" style="" ></div></div>'
+        }    };
 });
 
 
