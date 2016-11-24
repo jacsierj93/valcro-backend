@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Masters;
 use App\Models\Sistema\Alerts\Alert;
 use App\Models\Sistema\Alerts\AlertItem;
 use App\Models\Sistema\Masters\StoreValcro;
-use App\Models\Sistema\Masters\SubLine;
+use App\Models\Sistema\Product\SubLine;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderReason;
 use App\Models\Sistema\Order\OrderStatus;

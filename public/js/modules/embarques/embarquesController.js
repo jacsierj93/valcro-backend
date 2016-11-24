@@ -5,7 +5,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
     $scope.paises =[];
     $scope.shipment ={objs:{}};
     $scope.bindShipment =$model.bind();
-    $scope.session = {global:'new', isblock: false, complete: [{id:''},{id:''},{id:''},{id:''},{id:''}]};
+    $scope.session = {global:'new', isblock: false};
 
     $scope.complete = {data:[{id:''},{id:''},{id:''},{id:''},{id:''}]};
     $scope.permit={
@@ -29,6 +29,17 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             }
         ],{save:{doc_origen_id:$scope.shipment.id, tipo_origen_id:25,comentario:"hola mundo"}});
     };
+
+    $scope.progreso = {index:0,
+        data:[
+            {index:1, st:'false', text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+            {index:2, st:'false' ,text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+            {index:3, st:'false' ,text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+            {index:4, st:'false', text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+            {index:5, st:'false',text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+            {index:6, st:'false', text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+        ]};
+
 
 
 
@@ -276,7 +287,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                             var element = angular.element(e.target);
                             console.log("click", element);
                             element.click();
-                        },1);
+                        },500);
 
                     }}})
 
@@ -746,6 +757,95 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
 
 
 
+}]);
+
+MyApp.controller('superAprobCtrl', ['$scope', function ($scope) {
+
+    $scope.basic = function () {
+        console.log("in aprob")
+        if($scope.$parent.shipment.prov_id && $scope.$parent.shipment.pais_id && $scope.$parent.shipment.puerto_id && $scope.$parent.shipment.tarifa_id  ){
+            return true;
+        }
+        return false;
+    };
+    $scope.fechas = function () {
+        if($scope.shipment.fechas.fecha_carga.value && $scope.shipment.fechas.fecha_vnz.value && $scope.shipment.fechas.fecha_tienda.value){
+            return true;
+        }
+        return false;
+    };
+    $scope.monto = function () {
+        if($scope.$parent.shipment.flete_maritimo){
+            return true;
+        }
+        return false;
+    };
+    $scope.articulos = function () {
+        if($scope.$parent.shipment.items.length > 0){
+            return true;
+        }
+        return false;
+    };
+
+    $scope.save = function () {
+        $scope.$parent.shipment.aprob_superior = true;
+        $scope.$parent.save(function () {
+            $scope.NotifAction("ok","Documento aprobado",[], {autohidden:2000});
+        })
+
+    };
+    $scope.aprob = function () {
+        console.log("in aprob", $scope.$parent.shipment);
+        var save = function () {
+            $scope.NotifAction("alert","Despues de aprobar el embarque no se podran agregar nuevos productos, ¿Esta seguro de Aprobar el embarque?",
+                [
+                    {name:"Aprobar", action: function () {
+                        $scope.save();
+                    }
+                    },
+                    {name:"Aprobar y agregar comentario", action: function () {
+                        $scope.$parent.miniAprobShipment();
+                    }
+                    },
+                    {name:"Cancelar", action:function () {}}]
+                ,{block:true})
+        };
+        if($scope.$parent.shipment.criterios.isAprobable && !$scope.$parent.shipment.aprob_superior){
+            if(!$scope.basic()){
+                $scope.NotifAction("error", "¡Hay muy pocos datos!. Debes colocar al menos un proveedor, una tarifa un puerto y en pais de origen " ,[], {autohidden:3000});
+            }else if(!$scope.articulos()){
+                $scope.NotifAction("error", "¡No hay articulos!. Todo embarque debe tener algun articulo " ,[], {autohidden:3000});
+            }else if(!$scope.fechas()){
+                $scope.NotifAction("alert", "¡Faltan algunas fechas!. " +
+                    " Se suelen colocar fechas aproximadas de carga, de llagada a Venezuela y de llegada a la tienda, " +
+                    "por favor confirmanos que deseas dejar fechas en blanco" ,
+                    [
+                        {name:"Si, Dejalas en blanco, luego justificare el motivo",
+                            action: function () {
+                               $scope.$parent.miniAprobShipment();
+                            }
+                        },{name:"Cancelar", action:function () {}}
+                    ],{block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+
+            }else if( !$scope.monto()){
+                $scope.NotifAction("alert", "¡No se le ha colocado un monto maritimo!. " +
+                    "Se recomienda colocar un monto para el flete maritimo. Por favor confirmanos que lo deseas dejarlo el blanco" ,
+                    [
+                        {name:"Si, Dejalo en blanco, luego justificare el motivo",
+                            action: function () {
+                                $scope.$parent.miniAprobShipment();
+                            }
+                        },{name:"Cancelar", action:function () {}}
+                    ],{block:true,save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
+            }else{
+
+                save();
+            }
+        }else if(!$scope.$parent.shipment.criterios.isAprobable ){
+            $scope.NotifAction("error", "No tienes permisos para aprobar este documento",[],
+                {autohidden:2000,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+        }
+    }
 }]);
 
 MyApp.controller('listShipmentUnclosetCtrl', ['$scope','shipment','setGetShipment','DateParse' , function ($scope,$resource, $model, DateParse) {
@@ -1597,56 +1697,59 @@ MyApp.controller('listTariffCtrl',['$scope','$timeout', 'DateParse', 'shipment',
 
 
     $scope.setData = function(data){
-        if($scope.tarifaSelect.id != data.id){
+        if($scope.$parent.shipment.aprob_superior && $scope.shipment.tarifa_id){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y su tarifa no puede ser modificada",[], {autohidden:2000});
+        }else{
+            if($scope.tarifaSelect.id != data.id){
+                if(!$scope.$parent.shipment.fechas.confirm){
+                    if($scope.$parent.shipment.tarifa_id &&
+                        ($scope.$parent.shipment.fechas.fecha_vnz.isManual || $scope.$parent.shipment.fechas.fecha_tienda.isManual) &&
+                        $scope.$parent.shipment.objs.tarifa_id.model.dias_tt != data.dias_tt){
+                        var text = (parseFloat($scope.$parent.shipment.objs.tarifa_id.model.dias_tt) < parseFloat(data.dias_tt)) ? 'aumentara' : 'disminuira';
 
+                        $scope.$parent.NotifAction("alert", "La tarifa selecionada "+ text+ " la fecha de llegada a Venezuela y la fecha de llegada a la tienda",
+                            [
+                                {name:"Ajustar la fecha segun la nueva tarifa", action:function () {
+                                    $scope.setTarif(data);
+                                    $scope.$parent.shipment.tarifa_id = data.id;
+                                    $scope.$parent.save(function () {
+                                        $resource.getMod({type:"Shipment",mod:"Dates", from:'fecha_vnz', id: $scope.$parent.shipment.id}, {},function (response) {
+                                            var send = response;
+                                            send.id = $scope.$parent.shipment.id;
+                                            $resource.postMod({type:"Shipment",mod:"SaveDates"}, send,function (response) {
+                                                $model.setDates(response);
+                                                $scope.$parent.NotifAction("ok", "Tarifa asignada las fechas fueron actualizadas",[], {autohidden:2000});
+                                            });
 
-            if(!$scope.$parent.shipment.fechas.confirm){
-                if($scope.$parent.shipment.tarifa_id &&
-                    ($scope.$parent.shipment.fechas.fecha_vnz.isManual || $scope.$parent.shipment.fechas.fecha_tienda.isManual) &&
-                    $scope.$parent.shipment.objs.tarifa_id.model.dias_tt != data.dias_tt){
-                    var text = (parseFloat($scope.$parent.shipment.objs.tarifa_id.model.dias_tt) < parseFloat(data.dias_tt)) ? 'aumentara' : 'disminuira';
-
-                    $scope.$parent.NotifAction("alert", "La tarifa selecionada "+ text+ " la fecha de llegada a Venezuela y la fecha de llegada a la tienda",
-                        [
-                            {name:"Ajustar la fecha segun la nueva tarifa", action:function () {
-                                $scope.setTarif(data);
-                                $scope.$parent.shipment.tarifa_id = data.id;
-                                $scope.$parent.save(function () {
-                                    $resource.getMod({type:"Shipment",mod:"Dates", from:'fecha_vnz', id: $scope.$parent.shipment.id}, {},function (response) {
-                                        var send = response;
-                                        send.id = $scope.$parent.shipment.id;
-                                        $resource.postMod({type:"Shipment",mod:"SaveDates"}, send,function (response) {
-                                            $model.setDates(response);
-                                            $scope.$parent.NotifAction("ok", "Tarifa asignada las fechas fueron actualizadas",[], {autohidden:2000});
                                         });
-
                                     });
-                                });
-                            }
-                            },
-                            {name:"Mantener la fechas actuales", action :function () {
-                                $scope.$parent.shipment.tarifa_id = data.id;
-                                $scope.setTarif(data);
+                                }
+                                },
+                                {name:"Mantener la fechas actuales", action :function () {
+                                    $scope.$parent.shipment.tarifa_id = data.id;
+                                    $scope.setTarif(data);
 
-                                $scope.$parent.save();
-                            }
-                            },
-                            {name:"Cancelar", action: function () {
+                                    $scope.$parent.save();
+                                }
+                                },
+                                {name:"Cancelar", action: function () {
 
-                            }}
-                        ]
-                        ,{block:true})
+                                }}
+                            ]
+                            ,{block:true})
+                    }else{
+                        $scope.setTarif(data, function () {
+
+                            $scope.$parent.NotifAction("ok","Tarifa asignada ",[],{autohidden:1000});
+                            $scope.$parent.reloadDates();
+                        });
+                    }
                 }else{
-                    $scope.setTarif(data, function () {
-
-                        $scope.$parent.NotifAction("ok","Tarifa asignada ",[],{autohidden:1000});
-                        $scope.$parent.reloadDates();
-                    });
+                    console.log("cambio forsoso")
                 }
-            }else{
-                console.log("cambio forsoso")
             }
         }
+
     };
 
     $scope.setTarif = function (data,fn) {
@@ -2200,94 +2303,98 @@ MyApp.controller('listOrderAddCtrl',['$scope','shipment','DateParse','$timeout',
     }
 
     $scope.changeAsig = function (data) {
-        console.log("data");
-        if(data.asignado){
-            if(!$scope.$parent.shipment.fechas.fecha_carga.confirm){
-                if($scope.$parent.shipment.fechas.fecha_carga.isManual){
-                    $resource.getMod({type:"Order", mod:"Order", id:data.id, doc_id:$scope.$parent.shipment.id},{},function (response){
-                        var maxDate = DateParse.toDate(response.maxProducion);
-                        if(maxDate > $scope.$parent.shipment.fechas.fecha_carga.value){
-                            $scope.$parent.NotifAction("alert",
-                                "Esta orden de compra no estara lista para la fecha de carga asignada ¿Que desea hacer?",
-                                [
-                                    {name:"Agregar y mantener fecha de carga ",default:15,action:
-                                        function(){
+        if($scope.$parent.shipment.aprob_superior){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y sus articulos no se pueden modificar",[], {autohidden:3500});
+        }else{
+            if(data.asignado){
+                if(!$scope.$parent.shipment.fechas.fecha_carga.confirm){
+                    if($scope.$parent.shipment.fechas.fecha_carga.isManual){
+                        $resource.getMod({type:"Order", mod:"Order", id:data.id, doc_id:$scope.$parent.shipment.id},{},function (response){
+                            var maxDate = DateParse.toDate(response.maxProducion);
+                            if(maxDate > $scope.$parent.shipment.fechas.fecha_carga.value){
+                                $scope.$parent.NotifAction("alert",
+                                    "Esta orden de compra no estara lista para la fecha de carga asignada ¿Que desea hacer?",
+                                    [
+                                        {name:"Agregar y mantener fecha de carga ",default:15,action:
+                                            function(){
 
-                                            $scope.addOrder(data, function () {
-                                                $scope.$parent.reloadDates();
-                                            });
-                                        }
-                                    },
-                                    {name:"Agregar y ajustar fechas",action:
-                                        function(){
-                                            $scope.addOrder(data, function () {
-                                                $timeout(function () {
-                                                    $resource.getMod({type:"Shipment",mod:"Dates", from:"fecha_carga", id: $scope.$parent.shipment.id}, {},function (response) {
-                                                        var send = response;
-                                                        send.id = $scope.$parent.shipment.id;
-                                                        $resource.postMod({type:"Shipment",mod:"SaveDates"}, send,function (response) {
-                                                            $model.setDates(response);
-                                                            $scope.$parent.NotifAction("ok", "Las fechas fueron actualizadas",[], {autohidden:1500});
-                                                            $scope.$parent.reloadDates();
+                                                $scope.addOrder(data, function () {
+                                                    $scope.$parent.reloadDates();
+                                                });
+                                            }
+                                        },
+                                        {name:"Agregar y ajustar fechas",action:
+                                            function(){
+                                                $scope.addOrder(data, function () {
+                                                    $timeout(function () {
+                                                        $resource.getMod({type:"Shipment",mod:"Dates", from:"fecha_carga", id: $scope.$parent.shipment.id}, {},function (response) {
+                                                            var send = response;
+                                                            send.id = $scope.$parent.shipment.id;
+                                                            $resource.postMod({type:"Shipment",mod:"SaveDates"}, send,function (response) {
+                                                                $model.setDates(response);
+                                                                $scope.$parent.NotifAction("ok", "Las fechas fueron actualizadas",[], {autohidden:1500});
+                                                                $scope.$parent.reloadDates();
+                                                            });
                                                         });
-                                                    });
-                                                },1000);
-                                            });
-                                        }
-                                    },
-                                    {name:"Cancelar",action:
-                                        function(){
+                                                    },1000);
+                                                });
+                                            }
+                                        },
+                                        {name:"Cancelar",action:
+                                            function(){
 
+                                            }
                                         }
-                                    }
-                                ],
-                                {block:true}
-                            );
-                        }else{
-                            $scope.addOrder(data, function () {
-                                $scope.$parent.reloadDates();
-                            });
+                                    ],
+                                    {block:true}
+                                );
+                            }else{
+                                $scope.addOrder(data, function () {
+                                    $scope.$parent.reloadDates();
+                                });
 
-                        }
-                    });
+                            }
+                        });
+                    }else{
+                        $scope.addOrder(data, function () {
+                            $scope.$parent.reloadDates();
+                        });
+                    }
                 }else{
-                    $scope.addOrder(data, function () {
-                        $scope.$parent.reloadDates();
-                    });
+                    alert("en processo");
                 }
             }else{
-                alert("en processo");
+
+                $scope.$parent.NotifAction("alert", "¿Esta seguro de remover el pedido y todos sus elementos?",
+                    [
+                        {name:"Si, estoy seguro", default:6, action:
+                            function () {
+                                $resource.postMod({type:"Order", mod:"Delete"},{doc_origen_id:data.id},function (response) {
+                                    $scope.$parent.NotifAction("ok", "El pedido fue removido",[],{autohidden:1500});
+                                    var index = -1;
+                                    angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
+                                        if(data.id == v.id){
+                                            index = k;
+                                            return 0;
+                                        }
+                                    } );
+
+                                    console.log("index", index);
+                                    $model.change("odcs"+data.id,'id',undefined);
+                                    $scope.$parent.shipment.odcs.splice(index,1);
+
+
+                                });
+                            }},
+                        {name:"No", action: function () {
+                            data.asignado = true;
+                        }}
+
+                    ],
+                    {block:true});
             }
-        }else{
-
-            $scope.$parent.NotifAction("alert", "¿Esta seguro de remover el pedido y todos sus elementos?",
-                [
-                    {name:"Si, estoy seguro", default:6, action:
-                        function () {
-                            $resource.postMod({type:"Order", mod:"Delete"},{doc_origen_id:data.id},function (response) {
-                                $scope.$parent.NotifAction("ok", "El pedido fue removido",[],{autohidden:1500});
-                                var index = -1;
-                                angular.forEach($scope.$parent.shipment.odcs,function (v, k) {
-                                    if(data.id == v.id){
-                                        index = k;
-                                        return 0;
-                                    }
-                                } );
-
-                                console.log("index", index);
-                                $model.change("odcs"+data.id,'id',undefined);
-                                $scope.$parent.shipment.odcs.splice(index,1);
-
-
-                            });
-                        }},
-                    {name:"No", action: function () {
-                        data.asignado = true;
-                    }}
-
-                ],
-                {block:true});
         }
+
     };
 
     $scope.addOrder = function (data, fn) {
@@ -2373,33 +2480,32 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
     };
 
     $scope.update = function () {
-        if(!$scope.select.id){
-            $scope.$parent.NotifAction("error", "Por favor selecione un articulo primero", [], {autohidden:2000});
+        if($scope.$parent.shipment.aprob_superior){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y sus articulos no se pueden modificar",[], {autohidden:3500});
         }else{
-
-            formSrv.name= 'DetailProductProducShip';
-            var data = {
-                embarque_item_id:$scope.select.id,
-                tipo_origen_id:$scope.select.tipo_origen_id,
-                descripcion:$scope.select.descripcion,
-                origen_item_id:$scope.select.origen_item_id,
-                producto_id:$scope.select.producto_id,
-                saldo:$scope.select.cantidad,
-                cantidad:$scope.select.cantidad,
-                codigo_fabrica:$scope.select.codigo_fabrica,
-                disponible:$scope.select.disponible,
-                codigo:$scope.select.codigo,
-                doc_origen_id:$scope.select.doc_origen_id,
-                uid:$scope.select.uid
-            };
-
-            console.log("data en upadtea", data);
-            $scope.$parent.DetailProductShipment(data);
-
-
+            if(!$scope.select.id){
+                $scope.$parent.NotifAction("error", "Por favor selecione un articulo primero", [], {autohidden:3500});
+            }else{
+                formSrv.name= 'DetailProductProducShip';
+                var data = {
+                    embarque_item_id:$scope.select.id,
+                    tipo_origen_id:$scope.select.tipo_origen_id,
+                    descripcion:$scope.select.descripcion,
+                    origen_item_id:$scope.select.origen_item_id,
+                    producto_id:$scope.select.producto_id,
+                    saldo:$scope.select.cantidad,
+                    cantidad:$scope.select.cantidad,
+                    codigo_fabrica:$scope.select.codigo_fabrica,
+                    disponible:$scope.select.disponible,
+                    codigo:$scope.select.codigo,
+                    doc_origen_id:$scope.select.doc_origen_id,
+                    uid:$scope.select.uid
+                };
+                console.log("data en upadtea", data);
+                $scope.$parent.DetailProductShipment(data);
+            }
         }
-
-    }
+    };
 
     $scope.created = function () {
         formSrv.name= 'DetailProductCreate';
@@ -2408,7 +2514,7 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
 
     $scope.historia = function () {
         if(!$scope.select.id){
-            $scope.$parent.NotifAction("error", "Por favor selecione un articulo primero", [], {autohidden:2000});
+            $scope.$parent.NotifAction("error", "Por favor selecione un articulo primero", [], {autohidden:3500});
         }else{}
     }
 }]);
@@ -2447,7 +2553,7 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
         }
     };
     $scope.Update = function(){
-        console.log(" eit en upadte 2");
+        console.log(" eit en upadte 2", $model.getForm());
         $scope.model ={document:{},items:[], odcs:[], containers:[], pagos:{}, tarifa:{}, fechas:{fecha_carga:{},fecha_vnz:{},fecha_tienda:{}}};
         var form = $model.getForm();
         $scope.isModif = false;
@@ -2530,11 +2636,11 @@ MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$t
                 }
             }
             if(k.startsWith("item")){
-                if(v.total.estado !='new' || v.saldo.estado !='new'  || v.disponible.estado !='new' || v.id.estado !='new'){
-                    if(v.total.estado == 'upd' || v.saldo.estado == 'upd' ||  v.saldo.estado =='upd'){
+                if((v.total && v.total.estado !='new') || (v.saldo && v.saldo.estado !='new')  || (v.disponible && v.disponible.estado !='new') || (v.id && v.id.estado) !='new'){
+                    if((v.total && v.total.estado == 'upd') || v.saldo.estado == 'upd' ||  v.saldo.estado =='upd'){
                         v.estado='upd'
                     }
-                    if(v.total.estado == 'created' || v.saldo.estado == 'created' ||  v.disponible.estado =='created'){
+                    if((v.total && v.total.estado == 'created') || v.saldo.estado == 'created' ||  v.disponible.estado =='created'){
                         v.estado='created'
                     }
                     if( v.id.estado == 'del'){
@@ -2662,46 +2768,51 @@ MyApp.controller('listProductAddCtrl',['$scope','$filter','shipment','form', 'se
 
     /**change asignado en clik espcial */
     $scope.changeAsig = function (data) {
-
-        if(!data.asignado){
-
-            formSrv.name= 'DetailProductProduc';
-            $scope.$parent.DetailProductShipment(data);
-            $scope.select = data;
+        if($scope.$parent.shipment.aprob_superior){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y sus articulos no se pueden modificar",[], {autohidden:3500});
         }else{
-            $scope.$parent.NotifAction("alert", "¿Esta seguro de eliminar el producto ?",
-                [
-                    {name:"Si, estoy seguro", action:
-                        function () {
-                            var send = {id:data.embarque_item_id};
-                            $resource.postMod({type:"OrderItem", mod:"Delete"},send,function (response){
-                                $scope.$parent.NotifAction("ok", "El producto fue removido",[], {autohidden:1500});
-                                var index = -1;
-                                angular.forEach($scope.$parent.shipment.items,function (v, k) {
-                                    if(data.embarque_item_id == v.id){
-                                        index = k;
-                                        return 0;
-                                    }
-                                } );
-                                $scope.select.asignado= false;
-                                $scope.select.cantidad= response.cantidad;
-
-                                console.log(" hola mundo", index);
-                                $scope.$parent.shipment.items.splice(index,1);
-                                $model.change("item"+data.embarque_item_id,'id', undefined);
+            if(!data.asignado){
 
 
-                            });
+                formSrv.name= 'DetailProductProduc';
+                $scope.$parent.DetailProductShipment(data);
+                $scope.select = data;
+            }else{
+                $scope.$parent.NotifAction("alert", "¿Esta seguro de eliminar el producto ?",
+                    [
+                        {name:"Si, estoy seguro", action:
+                            function () {
+                                var send = {id:data.embarque_item_id};
+                                $resource.postMod({type:"OrderItem", mod:"Delete"},send,function (response){
+                                    $scope.$parent.NotifAction("ok", "El producto fue removido",[], {autohidden:1500});
+                                    var index = -1;
+                                    angular.forEach($scope.$parent.shipment.items,function (v, k) {
+                                        if(data.embarque_item_id == v.id){
+                                            index = k;
+                                            return 0;
+                                        }
+                                    } );
+                                    $scope.select.asignado= false;
+                                    $scope.select.cantidad= response.cantidad;
+
+                                    console.log(" hola mundo", index);
+                                    $scope.$parent.shipment.items.splice(index,1);
+                                    $model.change("item"+data.embarque_item_id,'id', undefined);
+
+
+                                });
+
+                            }
+                        },
+                        {name:"No", action:function () {
 
                         }
-                    },
-                    {name:"No", action:function () {
-
-                    }
-                    }
-                ],
-                {block:true});
+                        }
+                    ],
+                    {block:true});
+            }
         }
+
     }
     $scope.filterProd = function (key) {
         console.log("key", key);
@@ -3182,6 +3293,75 @@ MyApp.controller('miniCancelShipmentCtrl',['$scope','$mdSidenav','$timeout','$in
 
 }]);
 
+MyApp.controller('miniAprobShipmentCtrl',['$scope','$mdSidenav','shipment','setGetShipment','form',function($scope,$mdSidenav,$resource,$model,formSrv){
+
+
+    $scope.$parent.miniAprobShipment = function () {
+        $scope.block = false;
+
+        $mdSidenav("miniAprobShipment").open().then(function(){
+            $scope.isOpen = true;
+        });
+    };
+
+    $scope.inClose = function () {
+        $mdSidenav("miniAprobShipment").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+
+    $scope.save = function (fn ) {
+        $scope.$parent.shipment.aprob_superior_comentario= angular.copy($scope.model.texto);
+        $scope.$parent.save(function () {
+            $scope.block = false;
+            $scope.NotifAction("ok","Documento aprobado",[], {autohidden:2000});
+            if(fn){
+                fn();
+            }
+
+        })
+    };
+
+    $scope.close = function () {
+        if( $scope.isOpen){
+            if(!$scope.block){
+                $scope.block = true;
+                if(!$scope.form.$pristine){
+                    if($scope.form.$valid){
+                        $scope.save(function () {
+                            $scope.inClose();
+
+                        });
+                    }else{
+                        formSrv.setState("process");
+                        $scope.$parent.NotifAction("alert", "!No has colocado el comentario¡ ¿Esta seguro de salir ?",
+                            [{name:"Salir, y no aprobar", action:function () {
+                                $scope.$parent.shipment.aprob_superior = false;  $scope.save(function () {
+                                    $scope.inClose();
+                                    formSrv.setState("continue");
+                                });
+                            }},{name:"Salir, y aprobar sin agregar un comentario", action:function () {
+                                $scope.$parent.shipment.aprob_superior = true; $scope.save(function () {
+                                    $scope.inClose();
+                                    formSrv.setState("continue");
+                                });
+                            }},{name:"Corregir", action:function () {
+                                formSrv.setState("cancel");
+                            }}
+
+                            ]
+                            , {block:true});
+                    }
+                }else{
+                    $scope.inClose();
+                }
+            }
+
+        }
+    };
+
+}]);
+
 MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','form', function($scope, DateParse,$resource, form){
     $scope.isOpen = false;
     $scope.tbl ={data:[]};
@@ -3228,7 +3408,6 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','for
 
             });
             $scope.select.prods = [];
-
             angular.forEach(response.prods, function (v) {
                 var aux = {};
                 angular.forEach(v, function (v2, k) {
@@ -3243,34 +3422,33 @@ MyApp.controller('detailOrderShipmentCtrl',['$scope','DateParse','shipment','for
                 });
                 $scope.select.prods.push(aux);
             });
-
         } );
-
         $scope.$parent.LayersAction({open:{name:"detailOrder", after: function(){
 
         }}});
-
     };
     $scope.open = function (model) {
-        form.name = 'DetailProductShip';
+        if($scope.$parent.shipment.aprob_superior){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y sus articulos no se pueden modificar",[], {autohidden:3500});
+        }else{
+            form.name = 'DetailProductShip';
+            $scope.prodSelect=model;
+            var data = {
+                embarque_item_id:$scope.prodSelect.embarque_item_id,
+                tipo_origen_id:23,
+                descripcion:$scope.prodSelect.descripcion,
+                origen_item_id:$scope.prodSelect.id,
+                producto_id:$scope.prodSelect.producto_id,
+                saldo:$scope.prodSelect.saldo,
+                codigo_fabrica:$scope.prodSelect.codigo_fabrica,
+                disponible:$scope.prodSelect.disponible,
+                codigo:$scope.prodSelect.codigo,
+                uid:$scope.prodSelect.uid,
+                doc_origen_id:$scope.select.id
+            };
+            $scope.$parent.DetailProductShipment(data);
+        }
 
-        $scope.prodSelect=model;
-        var data = {
-            embarque_item_id:$scope.prodSelect.embarque_item_id,
-            tipo_origen_id:23,
-            descripcion:$scope.prodSelect.descripcion,
-            origen_item_id:$scope.prodSelect.id,
-            producto_id:$scope.prodSelect.producto_id,
-            saldo:$scope.prodSelect.saldo,
-            codigo_fabrica:$scope.prodSelect.codigo_fabrica,
-            disponible:$scope.prodSelect.disponible,
-            codigo:$scope.prodSelect.codigo,
-            uid:$scope.prodSelect.uid,
-            doc_origen_id:$scope.select.id
-        };
-
-
-        $scope.$parent.DetailProductShipment(data);
     }
 
 
@@ -3367,62 +3545,71 @@ MyApp.controller('detailOrderAddCtrl',['$scope','shipment','DateParse','form', '
 
     $scope.openProd = function (model) {
         $scope.calc= undefined;
-        console.log("data original", model);
-        if(
-            !$scope.$parent.shipment.fechas.fecha_carga.confirm
-        ){
-            if(!model.asignado && ($scope.$parent.shipment.fechas.fecha_vnz.isManual || $scope.$parent.shipment.fechas.fecha_tienda.isManual || $scope.$parent.shipment.fechas.fecha_carga.isManual  )){
+        if($scope.$parent.shipment.aprob_superior){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y sus articulos no se pueden modificar",[], {autohidden:3500});
+        }else{
+            if(
+                !$scope.$parent.shipment.fechas.fecha_carga.confirm
+            ){
+                if(!model.asignado && ($scope.$parent.shipment.fechas.fecha_vnz.isManual || $scope.$parent.shipment.fechas.fecha_tienda.isManual || $scope.$parent.shipment.fechas.fecha_carga.isManual  )){
 
-                if (!model.asignado && model.maxProducion > $scope.$parent.shipment.fechas.fecha_carga.value){
-                    $scope.$parent.NotifAction("alert", "Este producto tarda entre "+model.min_dias+" y "+model.max_dias +
-                        " dias en fabricarse y no estaria listo para la fecha de carga establecida ¿Que desea hacer?",
-                        [
-                            {name:"Agregar sin modificar fechas", action:function(){
+                    if (!model.asignado && model.maxProducion > $scope.$parent.shipment.fechas.fecha_carga.value){
+                        $scope.$parent.NotifAction("alert", "Este producto tarda entre "+model.min_dias+" y "+model.max_dias +
+                            " dias en fabricarse y no estaria listo para la fecha de carga establecida ¿Que desea hacer?",
+                            [
+                                {name:"Agregar sin modificar fechas", action:function(){
+                                    $scope.setProduct(model);
+                                }
+                                }
+                                ,{name:"Agregar y ajustar fechas", action:function(){
+                                $scope.calc = "fecha_carga";
                                 $scope.setProduct(model);
                             }
-                            }
-                            ,{name:"Agregar y ajustar fechas", action:function(){
-                            $scope.calc = "fecha_carga";
-                            $scope.setProduct(model);
-                        }
-                        },
-                            {name:"Cancelar", action:function(){
+                            },
+                                {name:"Cancelar", action:function(){
 
-                            }
-                            }
+                                }
+                                }
 
-                        ]
-                        ,{block:true});
+                            ]
+                            ,{block:true});
+                    }else{
+                        $scope.setProduct(model);
+                    }
                 }else{
                     $scope.setProduct(model);
                 }
             }else{
-                $scope.setProduct(model);
-            }
-        }else{
 
+            }
         }
+
 
 
     }
 
     $scope.setProduct = function(model){
-        form.name= 'DetailProductAdd';
-        $scope.prdSelect=model;
-        var data = {
-            embarque_item_id:$scope.prdSelect.embarque_item_id,
-            tipo_origen_id:23,
-            descripcion:$scope.prdSelect.descripcion,
-            origen_item_id:$scope.prdSelect.id,
-            producto_id:$scope.prdSelect.producto_id,
-            saldo:$scope.prdSelect.saldo,
-            codigo_fabrica:$scope.prdSelect.codigo_fabrica,
-            disponible:$scope.prdSelect.disponible,
-            codigo:$scope.prdSelect.codigo,
-            uid:$scope.prdSelect.uid,
-            doc_origen_id:$scope.select.id
-        };
-        $scope.$parent.DetailProductShipment(data);
+        if($scope.$parent.shipment.aprob_superior){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y sus articulos no se pueden modificar",[], {autohidden:3500});
+        }else{
+            form.name= 'DetailProductAdd';
+            $scope.prdSelect=model;
+            var data = {
+                embarque_item_id:$scope.prdSelect.embarque_item_id,
+                tipo_origen_id:23,
+                descripcion:$scope.prdSelect.descripcion,
+                origen_item_id:$scope.prdSelect.id,
+                producto_id:$scope.prdSelect.producto_id,
+                saldo:$scope.prdSelect.saldo,
+                codigo_fabrica:$scope.prdSelect.codigo_fabrica,
+                disponible:$scope.prdSelect.disponible,
+                codigo:$scope.prdSelect.codigo,
+                uid:$scope.prdSelect.uid,
+                doc_origen_id:$scope.select.id
+            };
+            $scope.$parent.DetailProductShipment(data);
+        }
+
     }
 
 }]);
@@ -3697,31 +3884,36 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.puertoText =undefined;
     $scope.mode = 'list';
     $scope.$parent.CreatTariff = function(){
-        $scope.process = false;
-        $scope.head.$setPristine();
-        $scope.bond.$setPristine();
-        $scope.head.$setUntouched();
-        $scope.bond.$setUntouched();
-        $scope.ffText = undefined;
-        $scope.nvText = undefined;
-        $scope.moneda_idText = undefined;
-        $scope.model.diasd_tt = undefined;
-        $scope.model.adjs = [];
-        $scope.mode = 'list';
-        $scope.upf = false;
-        $scope.model.uid = Math.random();
+        if($scope.$parent.shipment.aprob_superior && $scope.shipment.tarifa_id){
+            $scope.NotifAction("error","Disculpe este embarque ya a sido aprobado y su tarifa no puede ser modificada",[], {autohidden:3500});
+        }else{
+            $scope.process = false;
+            $scope.head.$setPristine();
+            $scope.bond.$setPristine();
+            $scope.head.$setUntouched();
+            $scope.bond.$setUntouched();
+            $scope.ffText = undefined;
+            $scope.nvText = undefined;
+            $scope.moneda_idText = undefined;
+            $scope.model.diasd_tt = undefined;
+            $scope.model.adjs = [];
+            $scope.mode = 'list';
+            $scope.upf = false;
+            $scope.model.uid = Math.random();
 
-        $mdSidenav("miniCreatTariff").open().then(function(){
-            $scope.isOpen = true;
-            $timeout(function () {
-                var elem = angular.element("#miniCreatTariff #head");
-                elem[0].click();
-            },0);
-            formSrv.name = "CreatTariff";
-            $scope.loadFF();
-            $scope.loadData();
-            $scope.loadNv();
-        });
+            $mdSidenav("miniCreatTariff").open().then(function(){
+                $scope.isOpen = true;
+                $timeout(function () {
+                    var elem = angular.element("#miniCreatTariff #head");
+                    elem[0].click();
+                },0);
+                formSrv.name = "CreatTariff";
+                $scope.loadFF();
+                $scope.loadData();
+                $scope.loadNv();
+            });
+        }
+
     };
 
     $scope.save = function (fn) {
@@ -3948,6 +4140,9 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 }]);
 
+MyApp.controller('vlProgresCtrl', ['$scope', function ($scope) {
+
+}]);
 
 MyApp.factory('shipment', ['$resource',
     function ($resource) {
@@ -4743,7 +4938,7 @@ MyApp.directive('vlThumb', function( fileSrv) {
             'up' : "=vlUp",
             /*'fail' : "=vlFail",
              'progress' : "=vlLoad"*/
-       },
+        },
         link: function(scope, elem, attr, ctrl){
             scope.$watch('model.state', function (newVal,oldVal) {
                 if(newVal == 'up'){
@@ -4775,22 +4970,57 @@ MyApp.directive('vlThumb', function( fileSrv) {
     };
 });
 
-MyApp.directive('vlProgress', function( fileSrv) {
+MyApp.directive('vlProgress', function( $timeout) {
+
+    var next = function (item, index, last) {
+        if(item){
+            $timeout(function () {
+                item.st = (!last) ? 'true' : 'this';
+            }, 500 * index);
+        }
+    };
+    var back = function (item, index, last) {
+        if(item){
+            $timeout(function () {
+                item.st = (!last) ? 'false' : 'this';
+            }, 500 * index);
+        }
+    };
     return {
-        replace: true,
         transclude: true,
+        replace: true,
         scope:{
-            'model' : "=ngModel"
-       },
+            'model' : "=ngModel",
+            'index':'=vlIndex'
+        },
         link: function(scope, elem, attr, ctrl){
-           console.log("scope", scope)
+            scope.actual=0;
+            scope.$watch('index', function (newVal,oldVall) {
+                var i = 0;
+                if(newVal > scope.actual){
+                    for( i = 0;  i <= newVal ; i++){
+                        next(scope.model[scope.actual + i], i, ( i == newVal) );
+                    }
+                    scope.actual = scope.actual + i;
+                }else{
+
+                    for( i = scope.actual ;  i > newVal ; i--){
+                        back(scope.model[scope.actual - i], i, ( i == newVal) );
+                    }
+                    scope.actual  = newVal;
+                    //scope.actual = scope.actual + i;
+                }
+            });
         },
         template: function () {
-
-            return '' +
-                '<div info="{{i}}" class="iconCircle" ng-click="line=true;"> <div class="progress-bubble" ng-class="{\'progress-bubble-first\':($index == 0),\'progress-bubble-last\':($index == (progress.length -1 ))  }">' +
-                '<div>{{$index}} / {{progress.length}}</div> <div style="" layout="row" class="progress-bubble-arrow" ><div></div></div>      </div>  </div>          <div class="line" style="" flex ng-show="$index < (progress.length -1) " >' +
-                ' <div class="load_area" style="" ></div></div>'
+            return '<div layout="row"  layout-align="start center " flex style="padding: 0 4px 0 4px;">' +
+                '<div layout="row" class="vl-progress" layout-align="right center" ng-repeat="item in model" id="progress_{{i}}" ' +
+                ' > ' +
+                '<div info="{{item.text}}" class="iconCircle {{item.st}}" id="progress{{$index}}"  ng-class="{\'circleAnimate\':line}">' +
+                '<div class="progress-bubble {{item.st}}" ng-class="{\'progress-bubble-first\':($index == 0),\'progress-bubble-last\':($index == (model.length -1 ))  }" >' +
+                '<div>{{item.text[item.st]}}</div> <div style="" layout="row" class="progress-bubble-arrow {{item.st}} " ><div></div></div></div></div><div class="line {{item.st}}" style="" flex ng-show="$index < (model.length -1) " >' +
+                '<div class="load_area" style="" ng-class="{\'lineAnimate\':item.st == \'rigth\'}" >' +
+                '</div> </div> </div> </div>'
         }    };
 });
 

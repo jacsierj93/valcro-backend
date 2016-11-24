@@ -562,24 +562,48 @@ md-autocomplete > md-autocomplete-wrap{
 }
 
 /***/
-
-.vl-progress{
-
+/**  div**/
+div.vl-progress:last-child{
+    width: 12px !important;
+}div.row div.vl-progress{
+    width: 100%;
 }
+.vl-progress{
+    height: 0 !important;
+    width: 100% !important;
+}
+/**  estado normal **/
 .vl-progress div.iconCircle{
     margin-left: 0px;
     height: 12px;
     width: 12px;
     background-color: rgb(204,204,204);
 }
+/**  estado asignado **/
+.vl-progress div.iconCircle.true{
+    background-color:rgb(84, 180, 234);
+}
+/**  estado esta aqui **/
+.vl-progress div.iconCircle.this{
+    background-color:rgb(84, 180, 234);
+}
+
+/**  linea default**/
 .vl-progress div.line{
     height: 2px;
     background: #ccc;
+}
+/**  linea asignado**/
+.vl-progress div.line.true{
+    background: rgb(84, 180, 234);
 }
 
 .line div.load_area{
     height: 100%; width:0%;
     background: #5cb85c;
+}
+div.iconCircle:hover div.progress-bubble{
+    display: block;
 }
 
 .progress-bubble{
@@ -588,10 +612,16 @@ md-autocomplete > md-autocomplete-wrap{
     width: 200px !important;
     height: 45px !important;
     margin-left: -100px;
-    border: solid 1.5px rgb(0, 255, 0);
-    background: white;
+    border: solid 1.5px #999999;
+    background-color: #999999;
     border-radius: 5px 5px 5px 5px;
+    display: none;
+}
 
+.progress-bubble div{
+    color: white;
+}.progress-bubble.true div{
+    color: #999999;
 }
 .progress-bubble > div:first-child {
     width: 100%;
@@ -599,6 +629,21 @@ md-autocomplete > md-autocomplete-wrap{
     font-size: 14px;
     overflow: hidden;
 }
+
+.progress-bubble.true{
+     background-color: white;
+    color: #999999;
+    border: solid 1.5px #999999;
+}
+.progress-bubble.this{
+     background-color: rgb(84, 180, 234);
+    color: white;
+    border: solid 1.5px rgb(84, 180, 234);
+}
+.progress-bubble.this div{
+    color: white;
+}
+
 .progress-bubble-arrow{
     height:5px !important;
     width: 100%;
@@ -611,9 +656,14 @@ md-autocomplete > md-autocomplete-wrap{
     border-style: solid;
     border-width: 8px;
     border-bottom-width:0px;
-    border-color: rgb(0, 255, 0) transparent transparent transparent;
+    border-color: #999999 transparent transparent transparent;
     margin-left: 8px;
     margin-top: 2px;
+}
+.progress-bubble-arrow.true > div:first-child {
+    border-color: #999999 transparent transparent transparent;
+}.progress-bubble-arrow.this > div:first-child {
+    border-color:  rgb(84, 180, 234) transparent transparent transparent;
 }
 
 .progress-bubble-first{

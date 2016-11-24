@@ -321,8 +321,8 @@
         <div layout="column" flex class="md-whiteframe-1dp">
             <div class="botonera" layout="row" layout-align="space-between center">
                 <!-- botonera left -->
-                <div  layout="row" layout-align="start center">
-                    <div layout="column" layout-align="center center"> </div>
+                <div  layout="row" layout-align="start center" style="width: 200px;">
+                    <div layout="column" layout-align="center center" ng-click = " progreso.index = (progreso.index == 3) ? 0 : 3 ;"> </div>
 
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listShipment') && permit.created)" layout-align="center center" ng-click="OpenShipmentCtrl()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
@@ -331,6 +331,12 @@
                         </md-tooltip>
                     </div>
 
+                   <!-- <div layout="column" layout-align="center center" ng-show="!shipment.id" >
+                        <img src="images/solicitud_icon_48x48.gif">
+                        <md-tooltip >
+
+                        </md-tooltip>
+                    </div>-->
                     <div layout="column" ng-show="(module.layer == 'listOrdershipment')" layout-align="center center" ng-click="listOrderAdd()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
@@ -357,12 +363,13 @@
                             Cancelar embarque
                         </md-tooltip>
                     </div>
-                    <div layout="column" layout-align="center center" ng-click="miniCancelShipment()" ng-show="shipment.id" >
+                    <div ng-controller="superAprobCtrl" layout="column" layout-align="center center" ng-click="aprob()" ng-show="shipment.id" style=" background-color: {{ (shipment.aprob_superior) ? 'rgb(84, 180, 234)' : 'transparent'}}">
                         <span class="icon-checkMark" style="font-size: 24px"></span>
                         <md-tooltip >
                             Aprobar embarque
                         </md-tooltip>
                     </div>
+
                     <!-- <div layout="column" layout-align="center center" ng-click="test()">
                         <span  style="font-size: 24px">tss</span>
                         <md-tooltip >
@@ -373,22 +380,7 @@
                 </div>
 
                 <!-- botonera center -->
-                <div layout="row"  layout-align="start center " flex style="padding: 0 8px 0 8px;">
-                    <div layout="row" class="vl-progress" layout-align="right center" ng-repeat="i in [0,1,2,3,4,5,6,7] as progress" id="progress_{{i}}" ng-style="$index < (progress.length -1) ? {'width' : '100%'} : {} " >
-                       <!-- <vl-progress ng-model="i" ></vl-progress>-->
-                         <div info="{{i}}" class="iconCircle" ng-click="line=true;">
-                             <div class="progress-bubble" ng-class="{'progress-bubble-first':($index == 0),'progress-bubble-last':($index == (progress.length -1 ))  }">
-                                 <div>{{$index}} / {{progress.length}}</div>
-                                 <div style="" layout="row" class="progress-bubble-arrow" ><div></div></div>
-                             </div>
-                         </div>
-                        <div class="line" style="" flex ng-show="$index < (progress.length -1) " >
-                            <div class="load_area" style="" ></div>
-                        </div>
-                    </div>
-
-                </div>
-
+                <vl-progress ng-model="progreso.data" vl-index="progreso.index" ></vl-progress>
                 <!-- botonera rigth -->
                 <div layout="row"  layout-align="end center " >
                     <div style="width: 48px;" layout="column"   layout-align="center center" id="noti-button" ng-show= "module.index == 0">
@@ -919,7 +911,7 @@
                                                      info="Seleccione el proveedor del embarque"
                                                      skip-tab
                                                      required
-                                                     ng-disabled="( session.isblock || $parent.shipment.tarifa_id)"
+                                                     ng-disabled="( session.isblock || $parent.shipment.tarifa_id || $parent.shipment.aprob_superior)"
                                                      md-search-text="provSelecText "
                                                      md-items="item in $parent.provFilter | stringKey : provSelecText : 'razon_social' "
                                                      md-item-text="item.razon_social"
@@ -957,7 +949,7 @@
                                     <label>Titulo</label>
                                     <input  ng-model="$parent.shipment.titulo"
                                             ng-change="toEditHead('titulo', $parent.shipment.titulo ) "
-                                            ng-disabled="( session.isblock )"
+                                            ng-disabled="( session.isblock || $parent.shipment.aprob_superior)"
                                             required
                                             info="Escriba un titulo para facilitar identificacion del embarque"
                                             skip-tab
@@ -1141,7 +1133,7 @@
                                         <label>Maritimo</label>
                                         <input  ng-model="$parent.shipment.flete_maritimo"
                                                 skip-tab
-                                                ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_dua)"
+                                                ng-disabled="(!$parent.shipment.tarifa_id && $parent.shipment.conf_monto_dua) || $parent.shipment.aprob_superior"
                                                 decimal
                                                 minlength="2"
                                                 ng-change="toEditHead('dua',$parent.shipment.nacionalizacion)"
@@ -3213,6 +3205,37 @@
                                     </div>
 
                                 </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </md-content>
+        </md-sidenav>
+        <!------------------------------------------- mini layer aprobar documento------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="miniAprobShipment" id="miniAprobShipment"
+        >
+            <md-content   layout="row" flex class="sideNavContent"  ng-controller="miniAprobShipmentCtrl"  >
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)" >
+                    <div  layout="column" flex style="padding-left: 12px">
+                        <form name="form" layout="column" flex="" class="focused">
+                            <div layout="row"  class="form-row-head form-row-head-select"  >
+                                <div class="titulo_formulario" style="color:rgb(84, 180, 234);" flex>
+                                    <div>
+                                       Aprobacion de embarque
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div flex class="gridContent">
+                                <textarea ng-model="model.texto"  skip-tab
+                                          id="textarea"
+                                          required
+                                          flex
+                                          placeholder="Ingrese aqui el motivo de cancelacion del documento "
+                                          style=""
+                                ></textarea>
                             </div>
                         </form>
                     </div>

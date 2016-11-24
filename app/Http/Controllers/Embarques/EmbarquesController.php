@@ -92,19 +92,14 @@ class EmbarquesController extends BaseController
 
     /************************* PROVIDER ***********************************/
     public  function  getProvList(){
-        $select = 'tbl_proveedor.id,'.
+        $select = 'tbl_proveedor.id, '.
             'tbl_proveedor.razon_social ,'.
-            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
-            'INNER JOIN '.
-            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
-            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
-            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
-            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
-            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
-            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
-            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
-            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.prov_id = tbl_proveedor.id  GROUP BY todos.uid) '.
-            'as contraPedido ,'.
+            '(SELECT COUNT(tbl_embarque_item.id) FROM tbl_embarque_item '.
+            'INNER JOIN tbl_contra_pedido_item ON tbl_embarque_item.uid = tbl_contra_pedido_item.uid '.
+            'INNER JOIN tbl_embarque ON tbl_embarque_item.doc_id = tbl_embarque.id '.
+            ' WHERE tbl_embarque.prov_id = tbl_proveedor.id AND tbl_embarque_item.deleted_at IS NULL '.
+            'AND tbl_contra_pedido_item.deleted_at IS NULL   GROUP BY tbl_contra_pedido_item.uid)'.
+            '  as contraPedido ,'.
             '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
@@ -145,19 +140,14 @@ class EmbarquesController extends BaseController
     }
 
     public function getProvider(Request $req){
-        $select = 'tbl_proveedor.id,'.
+        $select = 'tbl_proveedor.id, '.
             'tbl_proveedor.razon_social ,'.
-            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
-            'INNER JOIN '.
-            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
-            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
-            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
-            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
-            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
-            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
-            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
-            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.prov_id = tbl_proveedor.id  GROUP BY todos.uid) '.
-            'as contraPedido ,'.
+            '(SELECT COUNT(tbl_embarque_item.id) FROM tbl_embarque_item '.
+            'INNER JOIN tbl_contra_pedido_item ON tbl_embarque_item.uid = tbl_contra_pedido_item.uid '.
+            'INNER JOIN tbl_embarque ON tbl_embarque_item.doc_id = tbl_embarque.id '.
+            ' WHERE tbl_embarque.prov_id = tbl_proveedor.id AND tbl_embarque_item.deleted_at IS NULL '.
+            'AND tbl_contra_pedido_item.deleted_at IS NULL   GROUP BY tbl_contra_pedido_item.uid)'.
+            '  as contraPedido ,'.
             '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
@@ -186,16 +176,12 @@ class EmbarquesController extends BaseController
     public function getCountryList(){
         $select = 'distinct tbl_pais.id,'
             .' tbl_pais.short_name ,'.
-            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
-            'INNER JOIN '.
-            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
-            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
-            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
-            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
-            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
-            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
-            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
-            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.pais_id = tbl_pais.id  GROUP BY todos.uid) as contraPedido ,'.
+            '(SELECT COUNT(tbl_embarque_item.id) FROM tbl_embarque_item '.
+            'INNER JOIN tbl_contra_pedido_item ON tbl_embarque_item.uid = tbl_contra_pedido_item.uid '.
+            'INNER JOIN tbl_embarque ON tbl_embarque_item.doc_id = tbl_embarque.id '.
+            ' WHERE tbl_embarque.pais_id = tbl_pais.id AND tbl_embarque_item.deleted_at IS NULL '.
+            'AND tbl_contra_pedido_item.deleted_at IS NULL   GROUP BY tbl_contra_pedido_item.uid)'.
+            '  as contraPedido ,'.
             '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
@@ -224,16 +210,12 @@ class EmbarquesController extends BaseController
     public function getCountry(Request $req){
         $select = 'distinct tbl_pais.id,'
             .' tbl_pais.short_name ,'.
-            '(SELECT COUNT(tei.id) FROM tbl_embarque_item tei '.
-            'INNER JOIN '.
-            '(SELECT todos.uid,todos.tipo_origen_id, todos.id'.
-            ' FROM ( SELECT tbl_compra_orden_item.id , tbl_compra_orden_item.tipo_origen_id ,  tbl_compra_orden_item.uid '.
-            ' from tbl_compra_orden_item  WHERE tbl_compra_orden_item.deleted_at IS NULL '.
-            ' UNION SELECT  tbl_solicitud_item.id , tbl_solicitud_item.tipo_origen_id , tbl_solicitud_item.uid  from tbl_solicitud_item '.
-            ' WHERE tbl_solicitud_item.deleted_at IS NULL 
-            UNION SELECT tbl_pedido_item.id , tbl_pedido_item.tipo_origen_id ,  tbl_pedido_item.uid from tbl_pedido_item'.
-            ' WHERE tbl_pedido_item.deleted_at  IS NULL ) AS todos) AS todos ON tei.uid = todos.uid'.
-            ' INNER JOIN tbl_embarque te ON tei.doc_id = te.id WHERE te.pais_id = tbl_pais.id  GROUP BY todos.uid) as contraPedido ,'.
+            '(SELECT COUNT(tbl_embarque_item.id) FROM tbl_embarque_item '.
+            'INNER JOIN tbl_contra_pedido_item ON tbl_embarque_item.uid = tbl_contra_pedido_item.uid '.
+            'INNER JOIN tbl_embarque ON tbl_embarque_item.doc_id = tbl_embarque.id '.
+            ' WHERE tbl_embarque.pais_id = tbl_pais.id AND tbl_embarque_item.deleted_at IS NULL '.
+            'AND tbl_contra_pedido_item.deleted_at IS NULL   GROUP BY tbl_contra_pedido_item.uid)'.
+            '  as contraPedido ,'.
             '(SELECT  IFNULL(SUM(CASE WHEN te.usuario_conf_monto_ft_tt IS NULL then 0 ELSE IFNULL(te.flete_tt,0) END ),0) +'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_nac IS NULL then 0 ELSE IFNULL(te.nacionalizacion,0) END ),0)+'.
             ' IFNULL(SUM(CASE WHEN te.usuario_conf_monto_dua IS NULL then 0 ELSE IFNULL(te.dua,0) END ),0)'.
@@ -756,9 +738,7 @@ class EmbarquesController extends BaseController
             $tarifa->objs = $tarifa->objs();
 
         }
-
         $data = [];
-
         $data['id'] = $model->id;
         $data['emision'] = $model->emision;
         $data['prov_id'] = $model->prov_id;
@@ -767,30 +747,29 @@ class EmbarquesController extends BaseController
         $data['pais_id'] = $model->pais_id;
         $data['puerto_id'] = $model->puerto_id;
         $data['tarifa_id'] = $model->tarifa_id;
+        $data['aprob_superior_comentario'] =$model->aprob_superior_comentario;
 
         // pagos
         $data['nacionalizacion'] = $model->nacionalizacion;
         $data['dua'] = $model->dua;
         $data['flete_tt'] = $model->flete_tt;
         $data['flete_maritimo'] = $model->flete_maritimo;
-
         $data['moneda_id'] = $model->flete_dua;
         $data['containers'] = $model->containers()->get();
-
         // aprobaciones
         $data['conf_f_carga'] = ($model->usuario_conf_f_carga == null )? false: true;
+        $data['aprob_superior'] = ($model->aprob_superior == null )? false: true;
         $data['conf_f_vnz'] = ($model->usuario_conf_f_vnz == null )? false: true;
         $data['conf_f_tienda'] = ($model->usuario_conf_f_tienda == null )? false: true;
-        $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null )? false: true;
+        $data['conf_monto_ft_tt'] = ($model->usuario_conf_monto_ft_tt == null ) ? false: true;
         $data['conf_monto_ft_maritimo'] = ($model->usuario_conf_monto_ft_maritimo == null )? false: true;
         $data['conf_monto_nac'] = ($model->usuario_conf_monto_nac == null )? false: true;
         $data['conf_monto_dua'] = ($model->usuario_conf_monto_dua == null )? false: true;
-
+        //aprob_superior_comentario
         // adjuntos
         $data['nro_mbl'] = ['documento'=>$model->nro_mbl,'emision'=> $model->emision_mbl,'adjs'=> $model->attachmentsFile("nro_mbl") ];
         $data['nro_hbl'] = ['documento'=>$model->nro_hbl,'emision'=> $model->emision_hbl, 'adjs'=> $model->attachmentsFile("nro_hbl") ];
         $data['nro_eaa'] = ['documento'=>$model-> nro_eaa, 'emision'=> $model->emision_dua,'adjs'=> $model->attachmentsFile("nro_eaa") ];
-
         // items
         $Mitems  =ShipmentItem::selectRaw(
             'tbl_embarque_item.id,'.
@@ -819,12 +798,9 @@ class EmbarquesController extends BaseController
             }
             $data['items'][] = $aux;
         }
-
-
         // odc
         $odcs = $this->getOrdersAsignmentModel($model->id);
         $data['odcs']= $odcs;
-
         // foraneos
         $data['objs'] =[
             'pais_id'=>($model->pais_id == null) ? null: Country::find($model->pais_id),
@@ -839,14 +815,28 @@ class EmbarquesController extends BaseController
         ];
         $fechas = $this->shipmentDates($model->id);
         $data['fechas']=$fechas;
-
         $criterios['nacionalizacion']=['min'=>40000, 'max'=>100000];
         $criterios['dua']=['min'=>1, 'max'=>1000];
         $criterios['flete_tt']=['min'=>4000, 'max'=>6000];
         $criterios['flete_maritimo']=['min'=>2000, 'max'=>8000];
+        $criterios['isAprobable']=true;
+        /*
+        (
+            $model->prov_id != null &&
+            $model->tarifa_id != null &&
+            $model->puerto_id != null &&
+            $model->fecha_carga != null &&
+            $model->fecha_vnz != null &&
+            $model->fecha_tienda != null &&
+            $model->flete_maritimo != null &&
+            sizeof( $data['items']) > 0 &&
+            sizeof( $data['containers']) > 0
+
+        );
+
+        */
 
         $data['criterios']= $criterios;
-
 
         return $data ;
     }
@@ -964,6 +954,7 @@ class EmbarquesController extends BaseController
         if($req->has('pais_id')){ $model->pais_id= $req->pais_id;}
         if($req->has('puerto_id')){ $model->puerto_id= $req->puerto_id;}
         if($req->has('tarifa_id')){ $model->tarifa_id= $req->tarifa_id;}
+        if($req->has('aprob_superior_comentario')){ $model->aprob_superior_comentario= $req->aprob_superior_comentario;}
 
         if($req->has('flete_tt')){ $model->flete_tt= $req->flete_tt;}
         if($req->has('flete_maritimo')){ $model->flete_maritimo= $req->flete_maritimo;}
@@ -987,6 +978,13 @@ class EmbarquesController extends BaseController
                 $model->usuario_conf_monto_nac= null;
             }
         }
+        if($req->has('aprob_superior')){
+            if($req->aprob_superior){
+                $model->aprob_superior= $req->session()->get('DATAUSER')['id'];
+            }else{
+                $model->aprob_superior= null;
+            }
+        }
         if($req->has('conf_monto_dua')){
             if($req->conf_monto_dua){
                 $model->usuario_conf_monto_dua= $req->session()->get('DATAUSER')['id'];
@@ -1001,7 +999,6 @@ class EmbarquesController extends BaseController
                 $model->usuario_conf_monto_maritimo= null;
             }
         }
-
         if($req->has('nro_mbl')){
             if(array_key_exists('documento',$req->nro_mbl)){
                 $model->nro_mbl=$req->nro_mbl['documento'];
@@ -1029,12 +1026,7 @@ class EmbarquesController extends BaseController
                 $model->emision_dua=$req-> nro_eaa['emision'];
             }
         }
-
         $model->save();
-
-
-
-
         $return['id']= $model->id;
         $return['session_id']=  $model->session_id;
         return $return ;

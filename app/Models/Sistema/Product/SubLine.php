@@ -6,7 +6,7 @@
  * Time: 17:24
  */
 
-namespace App\Models\Sistema\Masters;
+namespace App\Models\Sistema\Product;
 use App\Quotation;
 use DB;
 use Illuminate\Database\Eloquent\Model;
