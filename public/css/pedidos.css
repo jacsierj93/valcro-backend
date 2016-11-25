@@ -429,7 +429,7 @@ textarea{
 }
 
 .table-filter-head{
-    padding: 0 4px 0 4px;
+    padding: 0 4px 0 0;
 }
 .table-filter-order-by img {
     width: 8px;

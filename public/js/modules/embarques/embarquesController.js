@@ -32,45 +32,45 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     $scope.progreso =$model.timeline();
     /*$scope.progreso = {index:0,
-        data:[
-            {index:1, st:'false', text:
-            {
-                true:'Felicidades se han llenado los minimos datos para la aprobacion',
-                false:'Disculpa aun no has llenado los datos minimos para solicitar la aprobacion',
-                'this':'Estamos esperando la aprobacion de este embarque'
-            }
-            },
-            {index:2, st:'false' ,text:
-            {
-                true:'¡EL embarque ya fue aprobado!',
-                false:'¡Aun no se ha aprobado el embarque!',
-                'this':'Estamos esperando el cumplimiento de la fecha de carga'
-            }
-            },
-            {index:3, st:'false' ,        text:
-            {
-                true:'Ya se cargo el embarque',
-                false:'Aun no se ha empezado ha cargar el embarque',
-                'this':'En espera de la llegada a venezuela'
-            }
-            },
-            {index:4, st:'false', text:
-            {
-                true:'Ya esta en Venezuela',
-                false:'Aun no ha llegado a Venezuela',
-                'this':'Esperando la llegada a la tienda'
-            }
-            },
-            {index:5, st:'false',text:
-            {
-                true:'Ya esta en la tienda',
-                false:'Aun no ha llegado a la tienda',
-                'this':'Finalizado, Por favor confirmar recepcion'
-            }
-            }
-        ]};
+     data:[
+     {index:1, st:'false', text:
+     {
+     true:'Felicidades se han llenado los minimos datos para la aprobacion',
+     false:'Disculpa aun no has llenado los datos minimos para solicitar la aprobacion',
+     'this':'Estamos esperando la aprobacion de este embarque'
+     }
+     },
+     {index:2, st:'false' ,text:
+     {
+     true:'¡EL embarque ya fue aprobado!',
+     false:'¡Aun no se ha aprobado el embarque!',
+     'this':'Estamos esperando el cumplimiento de la fecha de carga'
+     }
+     },
+     {index:3, st:'false' ,        text:
+     {
+     true:'Ya se cargo el embarque',
+     false:'Aun no se ha empezado ha cargar el embarque',
+     'this':'En espera de la llegada a venezuela'
+     }
+     },
+     {index:4, st:'false', text:
+     {
+     true:'Ya esta en Venezuela',
+     false:'Aun no ha llegado a Venezuela',
+     'this':'Esperando la llegada a la tienda'
+     }
+     },
+     {index:5, st:'false',text:
+     {
+     true:'Ya esta en la tienda',
+     false:'Aun no ha llegado a la tienda',
+     'this':'Finalizado, Por favor confirmar recepcion'
+     }
+     }
+     ]};
 
-*/
+     */
 
 
     /*    $scope.search = function(){
@@ -407,7 +407,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
                         $model.setDates(response);
 
-                       ;
+                        ;
                     });
             });
 
@@ -603,9 +603,9 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
 
         $timeout(function () {
-           /* $scope.progreso.index= $model.completed();
-            console.log("recargando line time", $scope.progreso.index);*/
-           $model.timelineUpdate();
+            /* $scope.progreso.index= $model.completed();
+             console.log("recargando line time", $scope.progreso.index);*/
+            $model.timelineUpdate();
         }, 100);
 
 
@@ -621,7 +621,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
                 $timeout(function () {
 
-                   $scope.reloadTimeLineShipment();
+                    $scope.reloadTimeLineShipment();
 
                 },500);
 
@@ -4105,7 +4105,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
     $scope.loadFF = function () {
         if($scope.$parent.shipment.pais_id){
-            $resource.queryMod({type:"Freight_Forwarder", mod:"List", pais_id:$scope.$parent.shipment.pais_id},{}, function (response) {
+            $resource.queryMod({type:"Freight_Forwarder", mod:"List"},{}, function (response) {
                 $scope.ff= response;
             });
         }
@@ -4138,14 +4138,12 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
     // files
     $scope.fileUp= function (file) {
-        console.log("file", file);
-        console.log("model", $scope.model);
         $scope.upf = true;
 
         $resource.postMod({type:"Tariff", mod:"Attachment"},{archivo_id:file.id, uid:  $scope.model.uid}, function (response) {
 
         }, function (error) {
-            console.log("error", error);
+
         });
 
     };
@@ -4188,38 +4186,267 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 }]);
 
-MyApp.controller('listGlobalTarifCtrl',['$scope','shipment',  function ($scope,$resource) {
+MyApp.controller('miniAdjsCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment','fileSrv','setGetShipment',   function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource, fileSrv, $model){
+    $scope.isOpen = false;
+    $scope.bindFiles = fileSrv.bin();
+
+    $scope.$parent.miniAdjs = function(storage,adjs,fileUp, finish){
+        $scope.fileUp = fileUp;
+        $scope.finish = finish;
+        $scope.storage = storage;
+        $scope.model = {adjs:[]};
+        angular.forEach(adjs, function (v, k) {
+            $scope.model.adjs.push(v);
+        });
+        $mdSidenav("miniAdjs").open().then(function(){
+            $scope.isOpen= true;
+        });
+    };
+
+    $scope.save = function (fn) {  };
+    $scope.close= function(e){
+        if($scope.isOpen){ $scope.inClose(); }
+    };
+    $scope.inClose= function () {
+        $mdSidenav("miniAdjs").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+    $scope.$watch('files.length', function(newValue){
+        if(newValue > 0){
+            fileSrv.storage($scope.storage);
+            fileSrv.setKey('miniAdjsCtrl');
+            angular.forEach(fileSrv.upload($scope.files), function (v, k) {
+               $scope.model.adjs.push(v);
+            });
+        }
+    });
+
+    $scope.$watch('bindFiles.estado', function (newVal,oldVal) {
+        if(fileSrv.getKey() == 'miniAdjsCtrl'){
+            $scope.finish(newVal,oldVal);
+        }
+    });
+
+
+
+
+}]);
+
+MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment','fileSrv','setGetShipment',   function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource, fileSrv, $model){
+    $scope.isOpen = false;
+    $scope.model= {};
+    $scope.monedas =[];
+    $scope.moneda_idSelect =null;
+    $scope.moneda_idText = undefined;
+    $scope.puertos =[];
+    $scope.puertoSelect =null;
+    $scope.puertoText =undefined;
+    masters.query({type:"getCoins"},{}, function (response) {
+        $scope.monedas = response;
+    });
+    $scope.$parent.miniTariffItems = function(doc){
+        $scope.doc= doc;
+        $scope.form = 'head';
+        $mdSidenav("miniTariffItems").open().then(function(){
+            $scope.isOpen = true;
+        });
+        $scope.loadNv();
+
+    };
+    $scope.loadPorts = function(pais){
+        if(pais != null && pais && pais.id){
+            $resource.queryMod({type:"Country",mod:"Ports",pais_id:pais.id},{},function (response) {
+                $scope.puertos =response;
+            });
+        }else{
+            $scope.puertos.splice(0,$scope.puertos.length);
+            $scope.puertoSelect =null;
+            $scope.puertoText =undefined
+        }
+
+    };    $scope.save = function (fn) {
+
+    };
+    $scope.loadNv = function () {
+            $resource.queryMod({type:"Naviera", mod:"List"},{}, function (response) {
+                $scope.nv= response;
+            });
+
+
+    };
+    $scope.close= function(e){
+        if($scope.isOpen){
+            fileSrv.setState("waith");
+            if($scope.head.$pristine && $scope.bond.$pristine &&  !$scope.upf ){
+                $scope.inClose();
+            }else {
+                if(!$scope.head.$valid || !$scope.bond.$valid){
+
+                }else{
+
+                }
+            }
+
+        }
+    };
+    $scope.inClose= function () {
+        $mdSidenav("miniTariffItems").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+
+    $scope.save = function (fn) {
+
+    }
+}]);
+
+MyApp.controller('listGlobalTarifCtrl',['$scope','DateParse','shipment',  function ($scope,DateParse,$resource) {
     $scope.tbl = {order:'id', data:[]};
+
     $scope.$parent.listGlobalTarif = function (fn) {
         $scope.tbl = {order:'id', data:[]};
         $scope.select = {};
+        console.log('data');
+        $resource.query({type:"TariffDocs"},{}, function (response) {
+            $scope.tbl.data.splice(0, $scope.tbl.data.length);
+            angular.forEach(response, function (v,k) {
+                v.created_at = DateParse.toDate(v.created_at);
+                $scope.tbl.data.push(v);
+            });
 
-        $resource.query({type:"Tariff", mod:'Docs'},{}, function (response) {
-            $scope.tbl.data = response;
+            //$scope.tbl.data = response;
+            console.log('data',$scope.tbl);
         });
         $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
     }
 
     $scope.setData = function (data) {
-        console.log('tarifa', data);
+        $scope.$parent.detailGlobalTarif(data);
     }
 }])
 
-MyApp.controller('detailGlobalTarifCtrl',['$scope','shipment',  function ($scope,$resource) {
+MyApp.controller('detailGlobalTarifCtrl',['$scope','$timeout','shipment','form',  function ($scope,$timeout,$resource,formSrv) {
     $scope.tbl = {order:'id', data:[]};
-    $scope.$parent.listGlobalTarif = function (fn) {
-        $scope.tbl = {order:'id', data:[]};
-        $scope.select = {};
+    $scope.model ={};
+    $scope.sesion = {};
+    $scope.bindForm = formSrv.bind();
 
-        $resource.query({type:"Tariff", mod:'Docs'},{}, function (response) {
-            $scope.tbl.data = response;
+    $timeout(function () {
+        $resource.queryMod({type:"Freight_Forwarder", mod:"List"},{}, function (response) {
+            $scope.ff= response;
         });
-        $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
+    },2000);
+
+    $scope.$parent.detailGlobalTarif = function (data) {
+        $scope.model ={uid:Math.random()};
+        $scope.sesion = {mod:'new'};
+
+
+        if(data){
+            $scope.sesion.mod='upd';
+            $resource.get({type:"TariffDoc",id:data.id},{}, function (response) {
+                angular.forEach(response, function (v, k) {
+                    if(typeof v != 'array' && typeof v != 'object' ||  typeof v == 'string'){
+                        $scope.model[k]= v;
+                    }
+                    $scope.tbl.data = response.items;
+                });
+                $scope.model.adjs= response.adjs;
+                if($scope.tbl.data.length > 0){
+                    $scope.ffSelect= $scope.tbl.data[0].objs.freight_forwarder_id;
+                }
+            });
+        }else{
+            $scope.save()
+        }
+        $scope.$parent.LayersAction({open:{name:"detailGlobalTarif"}});
     }
 
-    $scope.setData = function (data) {
-        console.log('tarifa', data);
+    $scope.openAdjs = function () {
+        $scope.$parent.miniAdjs('shipments', $scope.model.adjs,$scope.fileUp, $scope.finish);
     }
+
+    $scope.openItems = function () {
+        if(!$scope.ffSelect){
+            if($scope.ffText){
+                $scope.NotifAction("alert","Tienes que colocar un Freight Forwarder" +$scope.ffText ,
+                    [
+                        {name:"Crear "+$scope.ffText, action:function () {
+                            $scope.createdFreightForwarder(function () {
+                                $scope.openSideItem();
+                            });
+
+                        }},
+                        {name:"Corregir", action:function () { }}
+                    ]
+                    ,{autohidden:2500});
+
+            }else{
+                $scope.NotifAction("error","Tienes que colocar un Freight Forwarder ",[],{autohidden:2500});
+            }
+
+        }else{
+            $scope.openSideItem();
+        }
+
+    };
+
+    $scope.createdFreightForwarder = function (fn) {
+        $resource.post({type:"TariffDoc",mod:"Save"},{nombre:$scope.ffText, oo:'dadfs'}, function (response) {
+            $scope.ffSelect = response;
+            $scope.ff.push(response);
+            if(fn){
+                fn(response);
+            }
+
+        });
+    };
+
+    $scope.openSideItem = function (fn) {
+        if(fn){
+            fn();
+        }
+        $scope.$parent.miniTariffItems($scope.model);
+    };
+
+    $scope.fileUp = function (file) {
+        formSrv.setState("process");
+        $scope.upd= true;
+        $resource.postMod({type:"Tariff", mod:"Attachment"},{archivo_id:file.id, uid:  $scope.model.uid}, function (response) {});
+    };
+
+    $scope.finish = function (newVal, oldVal) {
+        console.log("newVall",newVal);
+    };
+
+    $scope.itemUp = function (file) {
+        console.log("hola", file);
+    }
+
+
+    $scope.save = function () {
+/*
+        $resource.post({type:"TariffDoc"}, $scope.model, function (response) {
+        });
+*/
+    };
+
+    $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
+        if(!newVal[1]){
+            $scope.save();
+        }
+    });
+
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+        if(newVal && formSrv.name == 'detailGlobalTarifCtrl'){
+            var data = formSrv.getData();
+            console.log("dasfasdf", data);
+            $scope.$parent.reloadDates();
+
+
+        }
+    });
 }])
 
 MyApp.controller('vlProgresCtrl', ['$scope', function ($scope) {
@@ -4947,7 +5174,7 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
         ,storage : function (data) {
             folder = data;
         }
-        , clear : function () {
+        ,clear : function () {
 
             clear();
         }

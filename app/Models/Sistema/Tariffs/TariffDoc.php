@@ -7,6 +7,7 @@
  */
 
 namespace App\Models\Sistema\Tariffs;
+use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Monedas;
 use App\Models\Sistema\Masters\Ports;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,30 @@ class TariffDoc extends Model
     public function attachments() {
         return $this->hasMany('App\Models\Sistema\Tariffs\TariffAttachment', 'doc_id');
     }
+
+    public function attachmentsFile(){
+        $models= $this->attachments()->get();
+        $data = [];
+
+        foreach($models as $aux){
+            $att = [];
+            $file= FileModel::findOrFail($aux->archivo_id);
+            $att['id'] = $aux->id;
+            $att['archivo_id'] = $aux->archivo_id;
+            $att['documento'] = $aux->documento;
+            $att['comentario'] = $aux->comentario;
+            $att['thumb']=$file->getThumbName();
+            $att['tipo']=$file->tipo;
+            $att['file'] = $file->archivo;
+            $data[]= $att;
+        }
+        return $data;
+    }
+    public function shipments() {
+            return $this->hasMany('App\Models\Sistema\Tariffs\Tariff', 'doc_id');
+    }
+
+
 
 
 

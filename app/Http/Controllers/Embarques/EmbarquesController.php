@@ -391,6 +391,19 @@ class EmbarquesController extends BaseController
 
         return $models;
     }
+    public  function getTariffDoc(Request $req){
+        $model = TariffDoc::findOrFail($req->id);
+        $model->adjs =  $model->attachmentsFile();
+        $items =[];
+
+        foreach ( $model->items()->get() as $aux){
+            $aux->objs = $aux->objs();
+            $items[]= $aux;
+        }
+        $model->items = $items;
+        return $model;
+    }
+
     public function getPortCountry(Request $req){
         return json_encode(Ports::select("id","Main_port_name","pais_id")->where('pais_id', $req->pais_id)->get());
     }
@@ -492,7 +505,7 @@ class EmbarquesController extends BaseController
             $aux->save();
         }
 
-       return $rs;
+        return $rs;
 
     }
 
@@ -505,6 +518,100 @@ class EmbarquesController extends BaseController
         }
         $model->save();
         return ['accion'=>'new', 'id'=>$model->id];
+    }
+
+    public function saveTariffDoc(Request $req){
+        $result = ['accion'=>'new'];
+        $model= new TariffDoc();
+        if($req->id){
+            $model = $model->findOrFail($req->id);
+        }
+        if($req->has('comentario')){
+            $model->comentario = $req->comentario;
+        }
+        if($req->has('comentario')){
+            $model->comentario = $req->comentario;
+        }
+        $result['id'] = $model->id;
+        return $result;
+    }
+
+    public function saveTariffDocItem(Request $req){
+        $model = new Tariff();
+        $nav = new Naviera();
+        $rs = ['accion'=>'new'];
+
+        $rs['createdff']= true;
+        if($req->has("naviera_id")){
+            $nav = Naviera::findOrFail($req->naviera_id);
+        }else{
+            $nav->nombre = $req->nav;
+            $nav->usuario_created_id = $req->session()->get('DATAUSER')['id'];
+            $nav->save();
+            $rs['created nav']= true;
+        }
+
+
+        $model->pais_id = $req->pais_id ;
+        $model->puerto_id = $req->puerto_id ;
+        $model->moneda_id = $req->moneda_id ;
+        $model->vencimiento = $req->vencimiento ;
+        $model->naviera_id= $nav->id;
+        $model->freight_forwarder_id= $req->freight_forwarder_id;
+
+        if($req->has("dias_tt")){
+            $model->dias_tt = $req->dias_tt ;
+        }
+
+        if($req->has("grt")){
+            $model->grt = $req->grt ;
+        }
+        if($req->has("documento")){
+            $model->documento = $req->documento ;
+        }
+        if($req->has("mensajeria")){
+            $model->mensajeria = $req->mensajeria ;
+        }
+        if($req->has("seguros")){
+            $model->seguros = $req->seguros ;
+        }
+        if($req->has("consolidadion")){
+            $model->consolidadion = $req->consolidadion ;
+        }
+        if($req->has("sd20")){
+            $model->sd20 = $req->sd20 ;
+        }
+        if($req->has("sd40")){
+            $model->sd40 = $req->sd40 ;
+        }
+        if($req->has("hc40")){
+            $model->hc40 = $req->hc40 ;
+        }
+        if($req->has("ot40")){
+            $model->ot40 = $req->ot40 ;
+        }
+        $model->save();
+        $fModel = Tariff::findOrFail($model->id);
+        $fModel->objs =  $fModel->objs();
+
+        $rs['model'] = $fModel;
+
+        $adjs = TariffAttachment::where('uid', $req->uid)->get();
+        foreach ($adjs as $aux){
+            $aux->doc_id=$model->id;
+            $aux->save();
+        }
+
+        return $rs;
+
+    }
+
+
+    public function saveFreightForwarder(Request $req){
+        $model  = new FreigthForwarder();
+        $model->nombre = $req->nombre;
+        $model->save();
+        return $model;
     }
 
 
@@ -1400,14 +1507,14 @@ class EmbarquesController extends BaseController
 
         if($req->has('adjs')){
             foreach ($req->adjs as $aux){
-               if(array_key_exists('id', $aux)){
-                   $att = new ShipmentAttachment();
-                   $att->doc_id= $model->id;
-                   $att->documento ='cancelacion';
-                   $att->archivo_id	 = $aux['id'];
-                   $att->comentario	 = (array_key_exists('comentario', $aux) ? $aux['comentario'] : null );
-                   $att->save();
-               }
+                if(array_key_exists('id', $aux)){
+                    $att = new ShipmentAttachment();
+                    $att->doc_id= $model->id;
+                    $att->documento ='cancelacion';
+                    $att->archivo_id	 = $aux['id'];
+                    $att->comentario	 = (array_key_exists('comentario', $aux) ? $aux['comentario'] : null );
+                    $att->save();
+                }
 
             }
         }

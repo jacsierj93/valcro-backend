@@ -8,12 +8,17 @@ $app->get('embarques/Test', 'Embarques\EmbarquesController@testPdf');
 
 $app->get('embarques/Country/Ports', 'Embarques\EmbarquesController@getPortCountry');
 $app->get('embarques/Freight_Forwarder/List', 'Embarques\EmbarquesController@getFreightForwarder');
+$app->get('embarques/Freight_Forwarder/Save', 'Embarques\EmbarquesController@saveFreightForwarder');
 $app->get('embarques/Naviera/List', 'Embarques\EmbarquesController@getNaviera');
 $app->get('embarques/Tariff/List', 'Embarques\EmbarquesController@getTariffs');
-$app->get('embarques/Tariff/Docs', 'Embarques\EmbarquesController@getTariffDocs');
 $app->post('embarques/Tariff/Save', 'Embarques\EmbarquesController@saveTariff');
 $app->post('embarques/Tariff/Attachment', 'Embarques\EmbarquesController@setTarrifAttachment');
 
+// tarfficct doc
+$app->get('embarques/TariffDocs', 'Embarques\EmbarquesController@getTariffDocs');
+$app->get('embarques/TariffDoc', 'Embarques\EmbarquesController@getTariffDoc');
+$app->get('embarques/TariffDoc/Save', 'Embarques\EmbarquesController@saveTariffDoc');
+$app->get('embarques/TariffDocItem/Save', 'Embarques\EmbarquesController@saveTariffDocItem');
 
 
 // containers
