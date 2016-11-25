@@ -35,7 +35,11 @@ class CritController extends BaseController
     }*/
 
     public function getCampos(){
-        return json_encode(Campos::all());
+        $fields  = Campos::all();
+        foreach ($fields as $field ){
+            $field["lineas"] = $field->getLine()->lists("linea");
+        }
+        return json_encode($fields);
     }
     public function getListType(){
         return json_encode(Lista::all());

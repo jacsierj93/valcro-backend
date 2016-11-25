@@ -154,6 +154,13 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             valor: '',
             msg: ''
         },
+        place: {
+            opc_id: 9,
+            field_id: $scope.critField.id,
+            id: false,
+            valor: '',
+            msg: ''
+        },
         req: {
             opc_id: 3,
             field_id: $scope.critField.id,
@@ -254,7 +261,8 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         
         if(id){
             $scope.opcValue.opts.valor.unshift(id);
-            $timeout(function(){$scope.ctrl.searchOpctions = null},0);
+            console.log($scope.ctrl);
+            $timeout(function(){$scope.ctrl.searchOptions = null},0);
             saveOptions($scope.opcValue)
         }
 
@@ -294,6 +302,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                         value.msg=v.pivot.message || "";
                     }
                 }else{
+                    value.valor = [];
                     angular.forEach($filter("filterSearch")($scope.critField.opcs,[value.opc_id]), function(valor, key){
                         value.valor.push(valor.pivot.value);
                     });
@@ -325,7 +334,12 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             setNotif.addNotif("ok", "item creado", [
             ],{autohidden:3000});
         });
-    }
+    };
+    $scope.addDepend = function(){
+        $mdSidenav("lyrConfig").open();
+        angular.element("#lyrConst3").animate({"width": (angular.element("#lyrConst3").width()+468)+"px"},500)
+    };
+
 
 }]);
 
@@ -410,18 +424,19 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                 });
                 angular.forEach(valAux, function(value, key) {
                     aux.options.push({
-                        camp_tipo: "txt",
+                        camp_tipo: "array",
                         descripcion: "Opcion",
-                        id: value.opc_id,
+                        id: opt.opc_id,
                         pivot: {
-                            id: value.id,
-                            lct_id: value.field_id,
-                            opc_id: value.opc_id,
-                            value: value.valor,
-                            message: value.msg
+                            id: opt.id,
+                            lct_id: opt.field_id,
+                            opc_id: opt.opc_id,
+                            value: value,
+                            message: ""
                         }
                     })
                 });
+
             }else{
                 var upd =  $filter("filterSearch")(aux.options,[opt.opc_id])[0];
                 if(upd){
@@ -491,9 +506,46 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     }
 }]);
 
+
+MyApp.controller('treeViewController',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
+    $scope.line = critForm.getLine();
+    $scope.$watch("line.id",function(){
+        $scope.criteria = critForm.get();
+    });
+  
+}]);
+
+MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter) {
+    $scope.line = critForm.getLine();
+    $scope.$watch("line.id",function(){
+        $scope.criteria = critForm.get();
+    });
+
+    $scope.configDep = {
+        id:false,
+        lct_id:false,
+        parent_id:false,
+        operator:false,
+        action:null
+    }
+
+}]);
+
 MyApp.directive('formPreview', function() {
         return {
             templateUrl: function(elem, attr) {
+                return 'modules/productos/textForm';
+            }
+        };
+});
+MyApp.directive('treeBranch', function() {
+
+        return {
+            scope: { branch: '=treeBranch' },
+            templateUrl: function(elem, attr) {
+
+                console.log(attr);
+                console.log(elem);
                 return 'modules/productos/textForm';
             }
         };

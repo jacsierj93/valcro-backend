@@ -1,9 +1,9 @@
+<div> {{branch}}</div>
 
-
-<md-input-container id="text" class="md-block" flex prevText ng-show="(field.type.directive == 'prevText' || field.type.directive == null)" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
-    <label>{{field.field.descripcion}}{{field.type.directive}}</label>
+<md-input-container id="text" class="md-block" flex prevText ng-if="(field.type.directive == 'prevText' || field.type.directive == null)" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
+    <label>{{get(true,{tipo:'Info',options:field.options}).pivot.value || ''}}</label>
     <input skip-tab
-           info="{{get(true,{tipo:'Info',options:field.options}).pivot.value}}"
+           info="{{get(true,{tipo:'placeholder',options:field.options}).pivot.value}}"
            autocomplete="off"
            name="razon_social"
            maxlength="80"
@@ -15,8 +15,8 @@
 </md-input-container>
 
 
-<md-input-container flex prevAutocomplete  ng-show="(field.type.directive == 'prevAutocomplete')">
-    <label>{{field.field.descripcion}}</label>
+<md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')">
+    <label>{{get(true,{tipo:'placeholder',options:field.options}).pivot.value || ''}}</label>
     <md-autocomplete md-selected-item="ctrl.lang"
                      flex
                      skip-tab

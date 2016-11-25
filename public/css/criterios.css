@@ -6,6 +6,10 @@
     padding:4px;
 }
 
+.itemCrit{
+    border-bottom: 1px solid #eee;
+}
+
 .rad-contain{
     height: 100%;
 }
