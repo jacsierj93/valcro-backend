@@ -740,7 +740,10 @@ body {
     height: 48px;
     color: #999999;
 }
-
+.botonera div.blue {
+    background-color:rgb(84, 180, 234);
+    color: white;
+}
 .boxList {
     height: 176px;
     padding: 8px;

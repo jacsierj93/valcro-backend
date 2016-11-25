@@ -80,6 +80,7 @@ div[ng-click] * {
     cursor:pointer !important;
 }
 
+
 .cellGrid md-switch{
     padding-top: 0px;
     margin-top: -2px !important
@@ -625,9 +626,11 @@ div.iconCircle:hover div.progress-bubble{
 }
 .progress-bubble > div:first-child {
     width: 100%;
-    height: 100%;
-    font-size: 14px;
+    height: 42px;
+    font-size: 11px;
     overflow: hidden;
+    line-height: 1;
+    padding: 2px 1px 1px 1px;
 }
 
 .progress-bubble.true{

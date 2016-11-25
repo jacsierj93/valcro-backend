@@ -30,17 +30,47 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         ],{save:{doc_origen_id:$scope.shipment.id, tipo_origen_id:25,comentario:"hola mundo"}});
     };
 
-    $scope.progreso = {index:0,
+    $scope.progreso =$model.timeline();
+    /*$scope.progreso = {index:0,
         data:[
-            {index:1, st:'false', text: {true:'texto asignado', false:'texto none','this':'texto this'}},
-            {index:2, st:'false' ,text: {true:'texto asignado', false:'texto none','this':'texto this'}},
-            {index:3, st:'false' ,text: {true:'texto asignado', false:'texto none','this':'texto this'}},
-            {index:4, st:'false', text: {true:'texto asignado', false:'texto none','this':'texto this'}},
-            {index:5, st:'false',text: {true:'texto asignado', false:'texto none','this':'texto this'}},
-            {index:6, st:'false', text: {true:'texto asignado', false:'texto none','this':'texto this'}},
+            {index:1, st:'false', text:
+            {
+                true:'Felicidades se han llenado los minimos datos para la aprobacion',
+                false:'Disculpa aun no has llenado los datos minimos para solicitar la aprobacion',
+                'this':'Estamos esperando la aprobacion de este embarque'
+            }
+            },
+            {index:2, st:'false' ,text:
+            {
+                true:'¡EL embarque ya fue aprobado!',
+                false:'¡Aun no se ha aprobado el embarque!',
+                'this':'Estamos esperando el cumplimiento de la fecha de carga'
+            }
+            },
+            {index:3, st:'false' ,        text:
+            {
+                true:'Ya se cargo el embarque',
+                false:'Aun no se ha empezado ha cargar el embarque',
+                'this':'En espera de la llegada a venezuela'
+            }
+            },
+            {index:4, st:'false', text:
+            {
+                true:'Ya esta en Venezuela',
+                false:'Aun no ha llegado a Venezuela',
+                'this':'Esperando la llegada a la tienda'
+            }
+            },
+            {index:5, st:'false',text:
+            {
+                true:'Ya esta en la tienda',
+                false:'Aun no ha llegado a la tienda',
+                'this':'Finalizado, Por favor confirmar recepcion'
+            }
+            }
         ]};
 
-
+*/
 
 
     /*    $scope.search = function(){
@@ -298,11 +328,11 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         }else{
 
             $model.setNext(function () {
-                $timeout(function () {
-                    var element = angular.element(e.target);
-                    console.log("click", element);
-                    element.click();
-                },1);
+                if($scope.module.historia[1] == 'detailShipment'){
+                    $scope.LayersAction({close:{all:true}});
+                }else{
+                    $scope.LayersAction({close:{first:true, search:true}});
+                }
 
             });
             $model.exit();
@@ -365,6 +395,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         if(from){
             $resource.getMod({type:"Shipment", mod:"Dates", id:$scope.shipment.id,from:from}, {}, function (response) {
                 $model.setDates(response);
+
                 $resource.postMod({type:"Shipment", mod:"SaveDates"},
                     { id:$scope.shipment.id,
                         fecha_carga:response.fecha_carga,
@@ -373,9 +404,13 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
                     }
                     , function (response) {
 
+
                         $model.setDates(response);
+
+                       ;
                     });
             });
+
         }
 
 
@@ -564,6 +599,17 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
         return true;
     };
 
+    $scope.reloadTimeLineShipment = function () {
+
+
+        $timeout(function () {
+           /* $scope.progreso.index= $model.completed();
+            console.log("recargando line time", $scope.progreso.index);*/
+           $model.timelineUpdate();
+        }, 100);
+
+
+    };
 
     $scope.$watch('bindShipment.estado', function(newVal){
 
@@ -571,14 +617,15 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $timeout(function () {
                 $scope.shipment = $model.getData();
                 if( $scope.shipment.objs ){
-                    /*if( $scope.shipment.objs.prov_id){
-                     $scope.provSelec = $scope.shipment.objs.prov_id;
-                     }
-                     if( $scope.shipment.objs.pais_id){
-                     $scope.provSelec = $scope.shipment.objs.prov_id;
-                     }*/
-
                 }
+
+                $timeout(function () {
+
+                   $scope.reloadTimeLineShipment();
+
+                },500);
+
+
             },0);
         }
     });
@@ -590,17 +637,19 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $timeout(function () {
                 $model.clear();
                 $scope.reloadProv(function () {
-                    $scope.provSelec = {countrys:[]};
+                    $scope.provSelec = undefined;
                 });
                 $scope.reloadCountry(function () {
-                    $scope.paisSelec = {providers:[]};
+                    $scope.paisSelec =undefined;
                 });
                 $scope.session.global = 'new';
                 $scope.session.isblock = true;
+                $scope.reloadTimeLineShipment();
             },0);
         }
         if(newVal[0] == 'listShipment'){
             $model.clear();
+            $scope.reloadTimeLineShipment();
         }
     });
 
@@ -822,7 +871,7 @@ MyApp.controller('superAprobCtrl', ['$scope', function ($scope) {
                     [
                         {name:"Si, Dejalas en blanco, luego justificare el motivo",
                             action: function () {
-                               $scope.$parent.miniAprobShipment();
+                                $scope.$parent.miniAprobShipment();
                             }
                         },{name:"Cancelar", action:function () {}}
                     ],{block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
@@ -957,6 +1006,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                             $model.setDates(response);
 
                             $scope.$parent.NotifAction("ok", "Las fechas fueron actualizadas",[], {autohidden:1500});
+
                         });
                     })
                 })
@@ -1182,7 +1232,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
                         }
                         }
                         ]
-                        ,{block:true,save:{mod:'embarque',doc_tipo_id:"24", doc_id:$scope.$parent.shipment.id}});
+                        ,{block:true,save:{mod:'embarque',tipo_origen_id:"24", doc_origen_id:$scope.$parent.shipment.id}});
                 }else{
                     cambiarRv();
                 }
@@ -1195,7 +1245,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
     $scope.changeFecha_vnz = function () {
 
         if(!$scope.date.$pristine){
-            console.log("fechas",$scope.$parent.shipment.fechas);
 
             var cambiar = function () {
                 $timeout(function () {
@@ -1267,8 +1316,6 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
             if($scope.$parent.shipment.fechas.fecha_vnz.max){
 
                 var max = DateParse.toDate($scope.$parent.shipment.fechas.fecha_vnz.max);
-                console.log("max", max);
-
                 if($scope.$parent.shipment.fechas.fecha_vnz.value > max){
                     $scope.$parent.NotifAction("alert", "La fecha ideal para la llegada a venezuela, es "+ max.getDate()+"/"+max.getMonth()+"/"+max.getFullYear()+" ¿Esta seguro que la fecha es correcta?",
                         [
@@ -3329,6 +3376,7 @@ MyApp.controller('miniAprobShipmentCtrl',['$scope','$mdSidenav','shipment','setG
                 if(!$scope.form.$pristine){
                     if($scope.form.$valid){
                         $scope.save(function () {
+                            $scope.$parent.shipment.aprob_superior = true;
                             $scope.inClose();
 
                         });
@@ -4140,6 +4188,40 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 }]);
 
+MyApp.controller('listGlobalTarifCtrl',['$scope','shipment',  function ($scope,$resource) {
+    $scope.tbl = {order:'id', data:[]};
+    $scope.$parent.listGlobalTarif = function (fn) {
+        $scope.tbl = {order:'id', data:[]};
+        $scope.select = {};
+
+        $resource.query({type:"Tariff", mod:'Docs'},{}, function (response) {
+            $scope.tbl.data = response;
+        });
+        $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
+    }
+
+    $scope.setData = function (data) {
+        console.log('tarifa', data);
+    }
+}])
+
+MyApp.controller('detailGlobalTarifCtrl',['$scope','shipment',  function ($scope,$resource) {
+    $scope.tbl = {order:'id', data:[]};
+    $scope.$parent.listGlobalTarif = function (fn) {
+        $scope.tbl = {order:'id', data:[]};
+        $scope.select = {};
+
+        $resource.query({type:"Tariff", mod:'Docs'},{}, function (response) {
+            $scope.tbl.data = response;
+        });
+        $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
+    }
+
+    $scope.setData = function (data) {
+        console.log('tarifa', data);
+    }
+}])
+
 MyApp.controller('vlProgresCtrl', ['$scope', function ($scope) {
 
 }]);
@@ -4255,6 +4337,44 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
     var Shipment={};
     var next = undefined;
     var bindin ={estado:false};
+    var progress ={index:0,
+        data:[
+            {index:1, st:'false', text:
+            {
+                true:'Felicidades se han llenado los minimos datos para la aprobacion',
+                false:'Disculpa aun no has llenado los datos minimos para solicitar la aprobacion',
+                'this':'Estamos esperando la aprobacion de este embarque'
+            }
+            },
+            {index:2, st:'false' ,text:
+            {
+                true:'¡EL embarque ya fue aprobado!',
+                false:'¡Aun no se ha aprobado el embarque!',
+                'this':'Estamos esperando el cumplimiento de la fecha de carga'
+            }
+            },
+            {index:3, st:'false' ,        text:
+            {
+                true:'Ya se cargo el embarque',
+                false:'Aun no se ha empezado ha cargar el embarque',
+                'this':'En espera de la llegada a venezuela'
+            }
+            },
+            {index:4, st:'false', text:
+            {
+                true:'Ya esta en Venezuela',
+                false:'Aun no ha llegado a Venezuela',
+                'this':'Esperando la llegada a la tienda'
+            }
+            },
+            {index:5, st:'false',text:
+            {
+                true:'Ya esta en la tienda',
+                false:'Aun no ha llegado a la tienda',
+                'this':'Finalizado, Por favor confirmar recepcion'
+            }
+            }
+        ]};;
 
     var change = function(form,fiel, value){
 
@@ -4318,8 +4438,58 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
 
     };
+    var progresso = function () {
+        var index = 0;
+        if(
+            !(Shipment.prov_id &&
+            Shipment.pais_id &&
+            Shipment.puerto_id &&
+            Shipment.tarifa_id &&
+            Shipment.fechas.fecha_carga.value &&
+            Shipment.fechas.fecha_vnz.value &&
+            Shipment.fechas.fecha_tienda.value &&
+            Shipment.flete_maritimo &&
+            Shipment.items.length > 0)
+        ){
+
+            return index ;
+        }else{
+            index = 0;
+            if(Shipment.aprob_superior){
+                index = 1;
+                if(Shipment.fechas.fecha_carga.value <= new Date()){
+                    index  = 2;
+                    if(Shipment.fechas.fecha_carga.value == new Date()){
+                        return index;
+                    }
+
+                }
+                if(Shipment.fechas.fecha_vnz.value <= new Date()){
+                    index  = 3;
+                    if(Shipment.fechas.fecha_vnz.value == new Date()){
+                        return index;
+                    }
+
+                }
+                if(Shipment.fechas.fecha_tienda.value <= new Date()){
+                    index  = 4;
+                    if(Shipment.fechas.fecha_tienda.value == new Date()){
+                        return index;
+                    }
+
+                }
+            }
+        }
+        return index;
+    };
     return {
 
+        timeline : function () {
+            return progress;
+        },
+        timelineUpdate: function () {
+            progress.index = progresso();
+        },
         bind: function(){
             return  bindin;
         },
@@ -4593,6 +4763,8 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 change('fecha_vnz','isManual',Shipment.fechas.fecha_vnz.isManual);
                 change('fecha_vnz','value',Shipment.fechas.fecha_vnz.value.toString());
             }
+            progress.index = progresso();
+            console.log(" progress.index", progress.index);
 
         },
         reloadItems : function () {
@@ -4635,11 +4807,11 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
 
             if(Shipment.objs){
                 angular.forEach(Shipment.objs,function (v, k) {
-                    Shipment.objs[k]=null;
+                    Shipment.objs[k]=undefined;
                 });
             }
             angular.forEach(Shipment,function (v, k) {
-                if(typeof v =='string'){
+                if(typeof v !='array' && typeof v !='object' || typeof v =='string'){
                     Shipment[k]= undefined;
                 }
             });
@@ -4647,6 +4819,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
             forms ={};
             interno= 'new';
             externo= 'new';
+            progress.index = progresso();
 
         },
         setNext : function (data) {
@@ -4972,18 +5145,19 @@ MyApp.directive('vlThumb', function( fileSrv) {
 
 MyApp.directive('vlProgress', function( $timeout) {
 
-    var next = function (item, index, last) {
+    var next = function (item, time, last) {
         if(item){
             $timeout(function () {
                 item.st = (!last) ? 'true' : 'this';
-            }, 500 * index);
+            }, time);
         }
     };
-    var back = function (item, index, last) {
+    var back = function (item, time, last) {
+        console.log("item ", item)
         if(item){
             $timeout(function () {
                 item.st = (!last) ? 'false' : 'this';
-            }, 500 * index);
+            }, time);
         }
     };
     return {
@@ -4997,18 +5171,25 @@ MyApp.directive('vlProgress', function( $timeout) {
             scope.actual=0;
             scope.$watch('index', function (newVal,oldVall) {
                 var i = 0;
-                if(newVal > scope.actual){
-                    for( i = 0;  i <= newVal ; i++){
-                        next(scope.model[scope.actual + i], i, ( i == newVal) );
+                if(newVal >oldVall){
+                    var i = oldVall;
+                    while(i != newVal){
+                        next(scope.model[i], (100 * i), ( i == newVal) );
+                        i++;
                     }
-                    scope.actual = scope.actual + i;
-                }else{
+                    next(scope.model[newVal], (100 * newVal), true );
 
-                    for( i = scope.actual ;  i > newVal ; i--){
-                        back(scope.model[scope.actual - i], i, ( i == newVal) );
+                }else if(newVal < oldVall){
+
+                    var i = oldVall;
+                    while(i != newVal){
+                        back(scope.model[i], 100* (i - oldVall),false );
+                        i--;
                     }
+                    back(scope.model[newVal], 100* (i - newVal),(newVal > 0 ));
+
+
                     scope.actual  = newVal;
-                    //scope.actual = scope.actual + i;
                 }
             });
         },

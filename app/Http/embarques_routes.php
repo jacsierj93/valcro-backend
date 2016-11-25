@@ -5,12 +5,16 @@ $app->get('embarques/Uncloset', 'Embarques\EmbarquesController@getUncloset');
 $app->get('embarques/Test', 'Embarques\EmbarquesController@testPdf');
 
 //Tariff
+
 $app->get('embarques/Country/Ports', 'Embarques\EmbarquesController@getPortCountry');
-$app->get('embarques/Tariff/List', 'Embarques\EmbarquesController@getTariffs');
-$app->post('embarques/Tariff/Attachment', 'Embarques\EmbarquesController@setTarrifAttachment');
 $app->get('embarques/Freight_Forwarder/List', 'Embarques\EmbarquesController@getFreightForwarder');
 $app->get('embarques/Naviera/List', 'Embarques\EmbarquesController@getNaviera');
+$app->get('embarques/Tariff/List', 'Embarques\EmbarquesController@getTariffs');
+$app->get('embarques/Tariff/Docs', 'Embarques\EmbarquesController@getTariffDocs');
 $app->post('embarques/Tariff/Save', 'Embarques\EmbarquesController@saveTariff');
+$app->post('embarques/Tariff/Attachment', 'Embarques\EmbarquesController@setTarrifAttachment');
+
+
 
 // containers
 $app->post('embarques/Container/Save', 'Embarques\EmbarquesController@saveContainer');

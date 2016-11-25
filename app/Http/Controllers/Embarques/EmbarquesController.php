@@ -87,9 +87,6 @@ class EmbarquesController extends BaseController
     }
 
 
-
-
-
     /************************* PROVIDER ***********************************/
     public  function  getProvList(){
         $select = 'tbl_proveedor.id, '.
@@ -389,12 +386,14 @@ class EmbarquesController extends BaseController
     }
 
     /************************* TARIFF ***********************************/
+    public  function getTariffDocs(){
+        $models = TariffDoc::get();
 
+        return $models;
+    }
     public function getPortCountry(Request $req){
         return json_encode(Ports::select("id","Main_port_name","pais_id")->where('pais_id', $req->pais_id)->get());
     }
-
-
 
     public function getFreightForwarder(Request $req){
         return FreigthForwarder::get();
@@ -403,7 +402,6 @@ class EmbarquesController extends BaseController
     public function getNaviera(Request $req){
         return Naviera::get();
     }
-
 
     public function getTariffs(Request $req){
         $data= [];
@@ -509,6 +507,8 @@ class EmbarquesController extends BaseController
         return ['accion'=>'new', 'id'=>$model->id];
     }
 
+
+
     /************************* CONTAINERS ***********************************/
     public function saveContainer(Request $req){
         $model = new Container();
@@ -548,8 +548,8 @@ class EmbarquesController extends BaseController
             [ new App\Models\Sistema\MailModels\MailModuleDestinations(['tipo'=>'to','doc_id'=>'78','email'=>'meqh1992@gmail.com','nombre'=>'Miguel'])]
         ];
         $email = new MailModule();
-        $email->doc_id= $req->doc_id;
-        $email->tipo_origen_id= $req->tipo_origen_id;
+        $email->doc_id= $model->id;
+        $email->tipo_origen_id= 24;
         $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model]);
 
         if($originShae == null){
