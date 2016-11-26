@@ -35,5 +35,11 @@ class Tariff extends Model
       }
       return $return;
   }
+
+    public function shipments() {
+        return $this->hasMany('App\Models\Sistema\Shipments\Shipment', 'tarifa_id');
+    }
+
+
 }
 

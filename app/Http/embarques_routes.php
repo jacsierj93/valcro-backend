@@ -17,8 +17,9 @@ $app->post('embarques/Tariff/Attachment', 'Embarques\EmbarquesController@setTarr
 // tarfficct doc
 $app->get('embarques/TariffDocs', 'Embarques\EmbarquesController@getTariffDocs');
 $app->get('embarques/TariffDoc', 'Embarques\EmbarquesController@getTariffDoc');
-$app->get('embarques/TariffDoc/Save', 'Embarques\EmbarquesController@saveTariffDoc');
-$app->get('embarques/TariffDocItem/Save', 'Embarques\EmbarquesController@saveTariffDocItem');
+$app->post('embarques/TariffDoc/Save', 'Embarques\EmbarquesController@saveTariffDoc');
+$app->post('embarques/TariffDocItem/Save', 'Embarques\EmbarquesController@saveTariffDocItem');
+$app->post('embarques/TariffDocItem/Delete', 'Embarques\EmbarquesController@deleteTariffDocItem');
 
 
 // containers

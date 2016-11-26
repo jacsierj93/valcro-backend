@@ -386,23 +386,7 @@ class EmbarquesController extends BaseController
     }
 
     /************************* TARIFF ***********************************/
-    public  function getTariffDocs(){
-        $models = TariffDoc::get();
 
-        return $models;
-    }
-    public  function getTariffDoc(Request $req){
-        $model = TariffDoc::findOrFail($req->id);
-        $model->adjs =  $model->attachmentsFile();
-        $items =[];
-
-        foreach ( $model->items()->get() as $aux){
-            $aux->objs = $aux->objs();
-            $items[]= $aux;
-        }
-        $model->items = $items;
-        return $model;
-    }
 
     public function getPortCountry(Request $req){
         return json_encode(Ports::select("id","Main_port_name","pais_id")->where('pais_id', $req->pais_id)->get());
@@ -512,27 +496,53 @@ class EmbarquesController extends BaseController
     public function setTarrifAttachment(Request $req){
         $model = new App\Models\Sistema\Tariffs\TariffAttachment();
         $model->archivo_id = $req->archivo_id;
-        $model->uid = $req->uid;
         if($req->has('doc_id')){
             $model->doc_id = $req->doc_id;
         }
+        if($req->has('uid')){
+            $model->uid = $req->uid;
+        }
         $model->save();
-        return ['accion'=>'new', 'id'=>$model->id];
+        return ['accion'=>'new', 'id'=>$model->id ,'model'=>$model->attachmentFile()];
     }
 
+
+    public  function getTariffDocs(){
+        $models = TariffDoc::get();
+
+        return $models;
+    }
+    public  function getTariffDoc(Request $req){
+        $model = TariffDoc::findOrFail($req->id);
+        $model->adjs =  $model->attachmentsFile();
+        $items =[];
+
+        foreach ( $model->items()->get() as $aux){
+            $aux->objs = $aux->objs();
+            $aux->embarques = $aux->shipments()->count();
+            $items[]= $aux;
+        }
+        $model->items = $items;
+        $model->embarques = $model->countShipments();
+        return $model;
+    }
     public function saveTariffDoc(Request $req){
         $result = ['accion'=>'new'];
         $model= new TariffDoc();
-        if($req->id){
+
+        if($req->has('id')){
             $model = $model->findOrFail($req->id);
+            $result['accion']= 'upd';
+
         }
         if($req->has('comentario')){
             $model->comentario = $req->comentario;
         }
-        if($req->has('comentario')){
-            $model->comentario = $req->comentario;
+        if($req->has('freight_forwarder_id')){
+            $model->freight_forwarder_id = $req->freight_forwarder_id;
         }
         $result['id'] = $model->id;
+        $result['embarques'] = $model->countShipments();
         return $result;
     }
 
@@ -544,14 +554,13 @@ class EmbarquesController extends BaseController
         $rs['createdff']= true;
         if($req->has("naviera_id")){
             $nav = Naviera::findOrFail($req->naviera_id);
+
         }else{
             $nav->nombre = $req->nav;
             $nav->usuario_created_id = $req->session()->get('DATAUSER')['id'];
             $nav->save();
             $rs['created nav']= true;
         }
-
-
         $model->pais_id = $req->pais_id ;
         $model->puerto_id = $req->puerto_id ;
         $model->moneda_id = $req->moneda_id ;
@@ -593,19 +602,19 @@ class EmbarquesController extends BaseController
         $model->save();
         $fModel = Tariff::findOrFail($model->id);
         $fModel->objs =  $fModel->objs();
-
+        $fModel->embarques = $fModel->shipments()->count();
         $rs['model'] = $fModel;
-
-        $adjs = TariffAttachment::where('uid', $req->uid)->get();
-        foreach ($adjs as $aux){
-            $aux->doc_id=$model->id;
-            $aux->save();
-        }
 
         return $rs;
 
     }
 
+    public function deleteTariffDocItem(Request $req){
+        $result = ['accion'=>'del'];
+        $model = Tariff::findOrFail($req->id);
+        $result['response'] = Tariff::destroy($model->id);
+        return $result;
+    }
 
     public function saveFreightForwarder(Request $req){
         $model  = new FreigthForwarder();

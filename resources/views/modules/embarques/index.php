@@ -336,8 +336,8 @@
                             Nuevo Documento
                         </md-tooltip>
                     </div>
-                    <div layout="column" ng-show="module.index == 0 " layout-align="center center" ng-click="listGlobalTarif()">
-                        <img src="images/solicitud_icon_48x48.gif" height="34px">
+                    <div layout="column" ng-show="module.index == 0 " layout-align="center center" ng-click="listGlobalTarif()" style="margin-bottom:6px;">
+                        <img src="images/solicitud_icon_48x48.gif" height="31px">
                         <md-tooltip >
                             Tarifas
                         </md-tooltip>
@@ -857,9 +857,14 @@
                                 </div>
                             </div>
 
-                            <div layout="column" flex id="resss" style="width: 1634px;overflow-y: auto;">
+                            <div layout="column" flex id="resss" style="width: 1658px;overflow-y: auto;">
                                 <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict as filter "   id="row{{$index}}" ng-click="setData(item)" >
-                                    <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(tarifaSelect.id == item.id)}" style="width: 1634px;">
+                                    <div layout="row" class="cellGridHolder" ng-class="{'table-row-select':(tarifaSelect.id == item.id)}" style="width: 1658px;">
+                                        <div style="width: 24px;padding-top: 15px;border: none;">
+                                            <div  layout="column" layout-align="center center"  ng-click="delete(item, $index)"  >
+                                                <span class="icon-Eliminar" style="font-size: 12px"></span>
+                                            </div>
+                                        </div>
                                         <div style="width: 250px;min-width: 250px;  " class="cellGrid" >{{item.objs.naviera_id.nombre}}</div>
                                         <div style="width: 250px;min-width: 250px;  " class="cellGrid" >{{item.objs.puerto_id.Main_port_name}}</div>
                                         <div style="width: 98px;min-width: 98px; " class="cellGrid" >{{item.dias_tt}}</div>
@@ -4481,7 +4486,7 @@
                                 Insertar archivo
                             </div>
                         </div>
-                        <div flex class="gridContent" style="padding: 2px;">
+                        <div flex class="gridContent" style="padding: 0 4px 0 4px">
                             <div class="imgItem" ng-repeat="item in model.adjs track by $index" >
                                 <vl-thumb ng-model="item" vl-up="fileUp" ></vl-thumb>
                             </div>

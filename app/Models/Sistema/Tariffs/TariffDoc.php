@@ -44,8 +44,17 @@ class TariffDoc extends Model
         }
         return $data;
     }
+
     public function shipments() {
             return $this->hasMany('App\Models\Sistema\Tariffs\Tariff', 'doc_id');
+    }
+
+    public function countShipments(){
+       return $this->items()
+            ->join('tbl_embarque','tbl_embarque.tarifa_id','=','tbl_tarifa.id' )
+            ->where('tbl_tarifa.doc_id', $this->id)
+            ->whereNull('tbl_embarque.deleted_at')
+            ->count('tbl_tarifa.id');
     }
 
 

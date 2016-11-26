@@ -4186,6 +4186,326 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 }]);
 
+/*************************  MODULO DE TARIFA *******************************/
+
+MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form','masters', 'shipment', function($scope,$mdSidenav,$timeout,formSrv,masters ,$resource){
+    $scope.isOpen = false;
+    $scope.model= {};
+    $scope.monedas =[];
+    $scope.moneda_idSelect =null;
+    $scope.moneda_idText = undefined;
+    $scope.puertos =[];
+    $scope.puertoSelect =null;
+    $scope.puertoText =undefined;
+    masters.query({type:"getCoins"},{}, function (response) {
+        $scope.monedas = response;
+    });
+
+    $scope.$parent.miniTariffItems = function(doc, itemplus){
+        $scope.doc= doc;
+        $scope.plus= itemplus;
+        $scope.form = 'head';
+        $mdSidenav("miniTariffItems").open().then(function(){
+            $scope.isOpen = true;
+        });
+        angular.forEach($scope.model,function (v, k) {
+            $scope.model[k]= undefined;
+        });
+        $scope.model= {};
+        $scope.loadNv();
+
+    };
+    $scope.loadPorts = function(pais){
+        if(pais != null && pais && pais.id){
+            $resource.queryMod({type:"Country",mod:"Ports",pais_id:pais.id},{},function (response) {
+                $scope.puertos =response;
+            });
+        }else{
+            $scope.puertos.splice(0,$scope.puertos.length);
+            $scope.puertoSelect =null;
+            $scope.puertoText =undefined
+        }
+
+    };
+
+    $scope.loadNv = function () {
+            $resource.queryMod({type:"Naviera", mod:"List"},{}, function (response) {
+                $scope.nv= response;
+            });
+
+
+    };
+
+    $scope.close= function(e){
+        var save = function () {
+
+            $scope.save(function () {
+                $scope.NotifAction("ok"," !Felicidades! la tarifa se a cargado satisfactoriamente ¿Desea agregar otra?",
+                [{name:"Si, no quites lo que llene", default:5, accion:function () {
+
+                }},
+                    {name:"Si,pero quitame lo que llene ", accion:function () {
+                        angular.forEach($scope.model,function (v, k) {
+                            $scope.model[k]= undefined;
+                        });
+                        $scope.model= {};
+                        $timeout(function () {
+                          var el = angular.element("miniTariffItems [step]").first();
+                            console.log("ele", el);
+                            el.focus();
+                        },0);
+                    }},
+                    {name:"No, ya he terminado", accion:function () {
+                            $scope.inClose();
+                    }}
+
+                ]
+                ,{block:true});
+            });
+
+        };
+        if($scope.isOpen){
+            formSrv.setState("waith");
+            if($scope.head.$pristine && $scope.bond.$pristine &&  !$scope.upf ){
+                $scope.inClose();
+            }else {
+                formSrv.setState('process');
+                if(!$scope.head.$valid || !$scope.bond.$valid){
+                    $scope.NotifAction("error", "¡Colocaste muy poco!, No se colaste suficientes datos com para crear una tarifa",[
+                        {name:"Corregir", action:function () {
+                            formSrv.setState('cancel');
+                            $timeout(function () {
+                                var el = angular.element("miniTariffItems [step]").first();
+                                console.log("ele", el);
+                                el.focus();
+                            },0);
+                        }},{name:"Cancelar", action:function () {
+                            $scope.inClose();
+                            formSrv.setState('continue');
+                        }}
+                        ]);
+                }else{
+                    save();
+
+                }
+            }
+
+        }
+    };
+
+    $scope.inClose= function () {
+        $mdSidenav("miniTariffItems").close().then(function(){
+            $scope.isOpen = false;
+        });
+    };
+
+    $scope.save = function (fn) {
+        $scope.head.$setPristine();
+        $scope.bond.$setPristine();
+        $scope.head.$setUntouched();
+        $scope.bond.$setUntouched();
+        $scope.model.freight_forwarder_id = angular.copy($scope.doc.freight_forwarder_id);
+        $scope.model.doc_id = angular.copy($scope.doc.id);
+        $resource.post({type:"TariffDocItem", mod:'Save'}, $scope.model, function (response) {
+            if(fn){
+                fn();
+            }
+            $scope.plus(response);
+
+        });
+    }
+}]);
+
+MyApp.controller('listGlobalTarifCtrl',['$scope','DateParse','shipment',  function ($scope,DateParse,$resource) {
+    $scope.tbl = {order:'id', data:[]};
+
+    $scope.$parent.listGlobalTarif = function (fn) {
+        $scope.tbl = {order:'id', data:[]};
+        $scope.select = {};
+        $resource.query({type:"TariffDocs"},{}, function (response) {
+            $scope.tbl.data.splice(0, $scope.tbl.data.length);
+            angular.forEach(response, function (v,k) {
+                v.created_at = DateParse.toDate(v.created_at);
+                $scope.tbl.data.push(v);
+            });
+
+       });
+        $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
+    }
+
+    $scope.setData = function (data) {
+        $scope.$parent.detailGlobalTarif(angular.copy(data));
+    }
+}])
+
+MyApp.controller('detailGlobalTarifCtrl',['$scope','$timeout','shipment','form',  function ($scope,$timeout,$resource,formSrv) {
+    $scope.tbl = {order:'id', data:[]};
+    $scope.model ={};
+    $scope.sesion = {};
+    $scope.bindForm = formSrv.bind();
+    $scope.model ={};
+    $resource.queryMod({type:"Freight_Forwarder", mod:"List"},{}, function (response) {
+        $scope.ff= response;
+    });
+
+    $scope.$parent.detailGlobalTarif = function (data) {
+
+        if(data){
+            $scope.sesion.mod='upd';
+            $resource.get({type:"TariffDoc",id:data.id},{}, function (response) {
+                angular.forEach(response, function (v, k) {
+                    if(typeof v != 'array' && typeof v != 'object' ||  typeof v == 'string' ||  typeof v == 'number'){
+                        $scope.model[k]= v;
+                    }
+                    $scope.tbl.data = response.items;
+                });
+                $scope.model.adjs= response.adjs;
+                if($scope.tbl.data.length > 0){
+                    $scope.ffSelect= $scope.tbl.data[0].objs.freight_forwarder_id;
+                }
+            });
+        }else{
+            $scope.ffText= undefined;
+            $scope.model= {adjs:[], item:[]};
+            $scope.tbl.data =[];
+            $scope.save()
+        }
+
+        $scope.$parent.LayersAction({open:{name:"detailGlobalTarif"}});
+    }
+
+    $scope.openSideItem = function (fn) {
+        if(fn){
+            fn();
+        }
+        $scope.$parent.miniTariffItems($scope.model,  $scope.itemUp);
+    };
+
+    $scope.fileUp = function (file) {
+        $scope.upd= true;
+        $resource.postMod({type:"Tariff", mod:"Attachment"},{archivo_id:file.id, doc_id:  $scope.model.id}, function (response) {
+            $scope.model.adjs.push(response.model);
+        });
+    };
+
+    $scope.finish = function (newVal, oldVal, result) {
+
+        if(newVal == 'finish'){
+            var index = 1;
+            if(result.succeces.length > 0){
+                index++;
+                $scope.$parent.NotifAction("ok", 'Se agregaron '+result.succeces.length +' de '+result.total.length, [],{autohidden:2000})
+            }
+            if(result.error.length > 0){
+                $timeout(function () {
+                    $scope.$parent.NotifAction("error", 'fallaron '+result.succeces.length +' de '+result.total.length, [],{autohidden:2000})
+                },2000 * index)
+
+            }
+
+        }
+
+    };
+
+    $scope.itemUp = function (response) {
+        $scope.tbl.data.push(response.model);
+    };
+
+    $scope.openAdjs = function () {
+        $scope.$parent.miniAdjs('shipments', $scope.model.adjs,$scope.fileUp, $scope.finish);
+    };
+
+    $scope.openItems = function () {
+        if(!$scope.ffSelect){
+            if($scope.ffText){
+                $scope.NotifAction("alert","¡Tienes que colocar un Freight Forwarder! o ¿Quieres crear el Freight Forwarder " +$scope.ffText +" ?",
+                    [
+                        {name:"Crear "+$scope.ffText, action:function () {
+                            $scope.createdFreightForwarder(function () {
+                                $scope.openSideItem();
+                            });
+
+                        }},
+                        {name:"Cancelar ", action:function () { }}
+                    ]
+                    ,{});
+
+            }else{
+                $scope.NotifAction("error","Tienes que colocar un Freight Forwarder ",[],{autohidden:2500});
+            }
+
+        }else{
+            $scope.openSideItem();
+        }
+
+    };
+
+    $scope.createdFreightForwarder = function (fn) {
+        $resource.post({type:"TariffDoc",mod:"Save"},{nombre:$scope.ffText, oo:'dadfs'}, function (response) {
+            $scope.ffSelect = response;
+            $scope.ff.push(response);
+            if(fn){
+                fn(response);
+            }
+
+        });
+    };
+
+    $scope.save = function (fn) {
+        $resource.post({type:"TariffDoc",mod:'Save'}, $scope.model, function (response) {
+            $scope.model.embarques =  response.embarques;
+            $scope.model.id =  response.id;
+            if(fn){
+                fn(response);
+            }
+        });
+    };
+
+    $scope.delete = function (item, index) {
+
+        if(item.embarques > 0){
+           $scope.NotifAction("error", "Lo sentimos no puedes eliminar tarifa que esten siendo usadas en un embarque. ",[], {autohidden:3000});
+        }else{
+            $scope.NotifAction("alert", "Por favor confirmanos que en realidad quieres eliminar esta tarifa",
+                [
+                    {name:"Si, deseo eliminarla", action: function () {
+                        $scope.del(item, index);
+                    }},
+                    {name:"Cancelar", action: function () {
+
+                    }}
+                ]
+                , {block:true,save:{doc_origen_id:$scope.model.id, tipo_origen_id:25}});
+        }
+    };
+
+    $scope.del = function (item,index) {
+        $resource.post({type:"TariffDocItem", mod:"Delete"},{id:item.id}, function (response) {
+            $scope.tbl.data.splice(index,1);
+        });
+    }
+
+    $scope.$watchGroup(['head.$valid', 'head.$pristine'], function(newVal){
+        if(!newVal[1]){
+            $scope.save(function (head) {
+                $scope.head.$setPristine();
+            });
+
+
+        }
+    });
+
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+        if(newVal && formSrv.name == 'detailGlobalTarifCtrl'){
+            var data = formSrv.getData();
+            console.log("dasfasdf", data);
+
+        }
+    });
+}]);
+
+
+
 MyApp.controller('miniAdjsCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment','fileSrv','setGetShipment',   function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource, fileSrv, $model){
     $scope.isOpen = false;
     $scope.bindFiles = fileSrv.bin();
@@ -4217,239 +4537,19 @@ MyApp.controller('miniAdjsCtrl',['$scope','$mdSidenav','$timeout','form','tarifF
             fileSrv.storage($scope.storage);
             fileSrv.setKey('miniAdjsCtrl');
             angular.forEach(fileSrv.upload($scope.files), function (v, k) {
-               $scope.model.adjs.push(v);
+                $scope.model.adjs.push(v);
             });
         }
     });
 
     $scope.$watch('bindFiles.estado', function (newVal,oldVal) {
         if(fileSrv.getKey() == 'miniAdjsCtrl'){
-            $scope.finish(newVal,oldVal);
+            $scope.finish(newVal,oldVal, fileSrv.get());
         }
     });
 
 
 
-
-}]);
-
-MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment','fileSrv','setGetShipment',   function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource, fileSrv, $model){
-    $scope.isOpen = false;
-    $scope.model= {};
-    $scope.monedas =[];
-    $scope.moneda_idSelect =null;
-    $scope.moneda_idText = undefined;
-    $scope.puertos =[];
-    $scope.puertoSelect =null;
-    $scope.puertoText =undefined;
-    masters.query({type:"getCoins"},{}, function (response) {
-        $scope.monedas = response;
-    });
-    $scope.$parent.miniTariffItems = function(doc){
-        $scope.doc= doc;
-        $scope.form = 'head';
-        $mdSidenav("miniTariffItems").open().then(function(){
-            $scope.isOpen = true;
-        });
-        $scope.loadNv();
-
-    };
-    $scope.loadPorts = function(pais){
-        if(pais != null && pais && pais.id){
-            $resource.queryMod({type:"Country",mod:"Ports",pais_id:pais.id},{},function (response) {
-                $scope.puertos =response;
-            });
-        }else{
-            $scope.puertos.splice(0,$scope.puertos.length);
-            $scope.puertoSelect =null;
-            $scope.puertoText =undefined
-        }
-
-    };    $scope.save = function (fn) {
-
-    };
-    $scope.loadNv = function () {
-            $resource.queryMod({type:"Naviera", mod:"List"},{}, function (response) {
-                $scope.nv= response;
-            });
-
-
-    };
-    $scope.close= function(e){
-        if($scope.isOpen){
-            fileSrv.setState("waith");
-            if($scope.head.$pristine && $scope.bond.$pristine &&  !$scope.upf ){
-                $scope.inClose();
-            }else {
-                if(!$scope.head.$valid || !$scope.bond.$valid){
-
-                }else{
-
-                }
-            }
-
-        }
-    };
-    $scope.inClose= function () {
-        $mdSidenav("miniTariffItems").close().then(function(){
-            $scope.isOpen = false;
-        });
-    };
-
-    $scope.save = function (fn) {
-
-    }
-}]);
-
-MyApp.controller('listGlobalTarifCtrl',['$scope','DateParse','shipment',  function ($scope,DateParse,$resource) {
-    $scope.tbl = {order:'id', data:[]};
-
-    $scope.$parent.listGlobalTarif = function (fn) {
-        $scope.tbl = {order:'id', data:[]};
-        $scope.select = {};
-        console.log('data');
-        $resource.query({type:"TariffDocs"},{}, function (response) {
-            $scope.tbl.data.splice(0, $scope.tbl.data.length);
-            angular.forEach(response, function (v,k) {
-                v.created_at = DateParse.toDate(v.created_at);
-                $scope.tbl.data.push(v);
-            });
-
-            //$scope.tbl.data = response;
-            console.log('data',$scope.tbl);
-        });
-        $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
-    }
-
-    $scope.setData = function (data) {
-        $scope.$parent.detailGlobalTarif(data);
-    }
-}])
-
-MyApp.controller('detailGlobalTarifCtrl',['$scope','$timeout','shipment','form',  function ($scope,$timeout,$resource,formSrv) {
-    $scope.tbl = {order:'id', data:[]};
-    $scope.model ={};
-    $scope.sesion = {};
-    $scope.bindForm = formSrv.bind();
-
-    $timeout(function () {
-        $resource.queryMod({type:"Freight_Forwarder", mod:"List"},{}, function (response) {
-            $scope.ff= response;
-        });
-    },2000);
-
-    $scope.$parent.detailGlobalTarif = function (data) {
-        $scope.model ={uid:Math.random()};
-        $scope.sesion = {mod:'new'};
-
-
-        if(data){
-            $scope.sesion.mod='upd';
-            $resource.get({type:"TariffDoc",id:data.id},{}, function (response) {
-                angular.forEach(response, function (v, k) {
-                    if(typeof v != 'array' && typeof v != 'object' ||  typeof v == 'string'){
-                        $scope.model[k]= v;
-                    }
-                    $scope.tbl.data = response.items;
-                });
-                $scope.model.adjs= response.adjs;
-                if($scope.tbl.data.length > 0){
-                    $scope.ffSelect= $scope.tbl.data[0].objs.freight_forwarder_id;
-                }
-            });
-        }else{
-            $scope.save()
-        }
-        $scope.$parent.LayersAction({open:{name:"detailGlobalTarif"}});
-    }
-
-    $scope.openAdjs = function () {
-        $scope.$parent.miniAdjs('shipments', $scope.model.adjs,$scope.fileUp, $scope.finish);
-    }
-
-    $scope.openItems = function () {
-        if(!$scope.ffSelect){
-            if($scope.ffText){
-                $scope.NotifAction("alert","Tienes que colocar un Freight Forwarder" +$scope.ffText ,
-                    [
-                        {name:"Crear "+$scope.ffText, action:function () {
-                            $scope.createdFreightForwarder(function () {
-                                $scope.openSideItem();
-                            });
-
-                        }},
-                        {name:"Corregir", action:function () { }}
-                    ]
-                    ,{autohidden:2500});
-
-            }else{
-                $scope.NotifAction("error","Tienes que colocar un Freight Forwarder ",[],{autohidden:2500});
-            }
-
-        }else{
-            $scope.openSideItem();
-        }
-
-    };
-
-    $scope.createdFreightForwarder = function (fn) {
-        $resource.post({type:"TariffDoc",mod:"Save"},{nombre:$scope.ffText, oo:'dadfs'}, function (response) {
-            $scope.ffSelect = response;
-            $scope.ff.push(response);
-            if(fn){
-                fn(response);
-            }
-
-        });
-    };
-
-    $scope.openSideItem = function (fn) {
-        if(fn){
-            fn();
-        }
-        $scope.$parent.miniTariffItems($scope.model);
-    };
-
-    $scope.fileUp = function (file) {
-        formSrv.setState("process");
-        $scope.upd= true;
-        $resource.postMod({type:"Tariff", mod:"Attachment"},{archivo_id:file.id, uid:  $scope.model.uid}, function (response) {});
-    };
-
-    $scope.finish = function (newVal, oldVal) {
-        console.log("newVall",newVal);
-    };
-
-    $scope.itemUp = function (file) {
-        console.log("hola", file);
-    }
-
-
-    $scope.save = function () {
-/*
-        $resource.post({type:"TariffDoc"}, $scope.model, function (response) {
-        });
-*/
-    };
-
-    $scope.$watchGroup(['detailShipmenthead.$valid', 'detailShipmenthead.$pristine'], function(newVal){
-        if(!newVal[1]){
-            $scope.save();
-        }
-    });
-
-    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-        if(newVal && formSrv.name == 'detailGlobalTarifCtrl'){
-            var data = formSrv.getData();
-            console.log("dasfasdf", data);
-            $scope.$parent.reloadDates();
-
-
-        }
-    });
-}])
-
-MyApp.controller('vlProgresCtrl', ['$scope', function ($scope) {
 
 }]);
 
@@ -5076,7 +5176,6 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
     var bin = {estado:'wait', data: undefined};
     var upload =  {succeces:[], error:[], total:[],upload:{}};
     var start = function () {
-        console.log("start", upload.upload)
         angular.forEach( upload.upload, function (v, k) {
             if(v.state == "wait"){
                 var copy = upFile;
@@ -5100,8 +5199,10 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
             bin.estado= 'finish';
 
             $timeout(function () {
+
                 bin.estado= 'wait';
                 bin.data= undefined;
+
                 clear();
             },500);
 
@@ -5141,8 +5242,9 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
 
     var clear = function () {
         folder = 'none';
-        key = '';
-        bin = {estado:'wait', data: undefined};
+
+        bin.estado= 'wait';
+        bin.data = undefined;
         upload.succeces.splice(0,upload.succeces.length);
         upload.error.splice(0,upload.error.length);
         upload.total.splice(0,upload.total.length);
@@ -5154,7 +5256,7 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
             return bin;
         },
         setKey: function (data) {
-            key= data;
+            key = angular.copy(data);
         },
         getKey: function () {
             return key;
