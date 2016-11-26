@@ -45,6 +45,8 @@ $app->post('embarques/Shipment/Cancel', 'Embarques\EmbarquesController@cancelShi
 $app->get('embarques/Shipment/Items', 'Embarques\EmbarquesController@getShipmentItems');
 $app->get('embarques/Item/History', 'Embarques\EmbarquesController@getItemHistory');
 $app->get('embarques/Shipments', 'Embarques\EmbarquesController@getShipments');
+$app->get('embarques/Shipments/Finalize', 'Embarques\EmbarquesController@getShipmentsFinalize');
+$app->get('embarques/Shipment/End', 'Embarques\EmbarquesController@getShipmentsEnd');
 $app->get('embarques/Shipment/Dates', 'Embarques\EmbarquesController@CalShipmentDates');
 $app->post('embarques/Shipment/SaveDates', 'Embarques\EmbarquesController@saveShipmentDates');
 $app->post('embarques/Save', 'Embarques\EmbarquesController@saveShipment');

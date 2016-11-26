@@ -513,17 +513,14 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     $scope.showNext = function (status) {
         if (status) {
-
-            if($model.getInternalState() != 'new'){
-                $mdSidenav("NEXT").open();
-            }
+            $mdSidenav("NEXT").open();
         } else {
             $mdSidenav("NEXT").close()
         }
 
     };
 
-    $scope.next = function () {
+    $scope.next = function (e) {
         if($scope.module.layer== 'detailShipment'  ){
 
             $model.setNext(function () {
@@ -538,7 +535,9 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
             $model.exit();
 
         }else{
-
+            if($scope.setNext){
+                $scope.setNext(e);
+            }
         }
 
     };
@@ -603,8 +602,7 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
 
         $timeout(function () {
-            /* $scope.progreso.index= $model.completed();
-             console.log("recargando line time", $scope.progreso.index);*/
+
             $model.timelineUpdate();
         }, 100);
 
@@ -771,6 +769,7 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
         data:[]
     };
 
+    $scope.data;
     $scope.load = function (data) {
         $scope.tbl.data.splice(0, $scope.tbl.data.length);
         var send = {type:"Shipments" };
@@ -786,27 +785,27 @@ MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  fun
     };
 
     $scope.$parent.listShipmentCtrl = function(data, fn){
-
-
+        $scope.data = data;
         $scope.LayersAction({search:{name:"listShipment", after: function () {
             $scope.load(data);
             if(fn){
                 fn();
             }
         }}});
-
-
-
     };
-
     $scope.setData = function (data){
         setGetShipment.setData(data);
         $scope.summaryShipmentCtrl();
     }
 
-
+    $scope.ShipmentFinish = function () {
+        console.log("llamo correcto");
+        $scope.$parent.listShipmentFinish( angular.copy($scope.data));
+    }
 
 }]);
+
+
 
 MyApp.controller('superAprobCtrl', ['$scope', function ($scope) {
 
@@ -2566,6 +2565,8 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
     }
 }]);
 
+
+
 MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$timeout','form','clickerTime',function ($scope,$resource,$model,$timeout,formSrv,clickerTime) {
 
     $scope.isModif = false;
@@ -4186,6 +4187,78 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 }]);
 
+/*************************  MODULO DE CERRADO DE EMBARQUE *******************************/
+
+MyApp.controller('detailShipmentFinalizeCtrl', ['$scope', '$timeout','shipment','DateParse','setGetShipment',function($scope,$timeout ,$resource,DateParse,$model){
+
+    $scope.$parent.detailShipmentFinalize = function (data) {
+        $scope.model = {};
+        $resource.get({type:"Shipment", mod:"End", id:data.id},{}, function (response) {
+
+            angular.forEach(response, function (v, k) {
+                if(typeof v != 'array' && typeof v != 'object' ||  typeof v == 'string' ||  typeof v == 'number'){
+                    $scope.model[k]= v;
+                }
+                $scope.model.fecha_tienda = DateParse.toDate( $scope.model.fecha_tienda);
+                $scope.model.item = response.items;
+                $scope.model.provider = response.provider;
+            });
+        });
+
+        $scope.$parent.LayersAction({open:{name:"detailShipmentFinalize"}});
+    }
+
+    $scope.open= function (item) {
+
+    }
+
+    $scope.chequeado = function(value){
+        return 'Sin decidir'
+    }
+    $scope.calida = function(value){
+        return 'Sin revisar'
+    }
+    $scope.exhibicion = function(value){
+        return 'Sin decidir'
+    }
+
+}]);
+
+MyApp.controller('listShipmentFinalizeCtrl', ['$scope','shipment','setGetShipment',  function ($scope,$resource, setGetShipment) {
+    $scope.tbl ={
+        order:"id",
+        filter:{},
+        data:[]
+    };
+
+    $scope.select ={};
+    $scope.load = function (data) {
+        $scope.tbl.data.splice(0, $scope.tbl.data.length);
+        var send = {type:"Shipments", mod:"Finalize" };
+        angular.forEach(data, function (v, k) {
+            send[k]= v;
+        });
+        // console.log("send ", send);
+        $resource.query(send,{}, function (response) {
+            angular.forEach(response, function (v, k) {
+                $scope.tbl.data.push(v);
+            })
+        })
+    };
+
+    $scope.$parent.listShipmentFinish = function(data, fn){
+        $scope.LayersAction({search:{name:"listShipmentFinalize", after: function () {
+            $scope.load(data);
+            if(fn){
+                fn();
+            }
+        }}});
+    };
+    $scope.setData = function (data){
+        $scope.select=data;
+        $scope.$parent.detailShipmentFinalize(data);
+    }
+}]);
 /*************************  MODULO DE TARIFA *******************************/
 
 MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form','masters', 'shipment', function($scope,$mdSidenav,$timeout,formSrv,masters ,$resource){
@@ -4357,8 +4430,9 @@ MyApp.controller('detailGlobalTarifCtrl',['$scope','$timeout','shipment','form',
                     if(typeof v != 'array' && typeof v != 'object' ||  typeof v == 'string' ||  typeof v == 'number'){
                         $scope.model[k]= v;
                     }
-                    $scope.tbl.data = response.items;
+
                 });
+                $scope.tbl.data = response.items;
                 $scope.model.adjs= response.adjs;
                 if($scope.tbl.data.length > 0){
                     $scope.ffSelect= $scope.tbl.data[0].objs.freight_forwarder_id;
@@ -4784,21 +4858,21 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
             index = 0;
             if(Shipment.aprob_superior){
                 index = 1;
-                if(Shipment.fechas.fecha_carga.value <= new Date()){
+                if(Shipment.fechas.fecha_carga.value <= new Date() && Shipment.fechas.fecha_carga.confirm){
                     index  = 2;
                     if(Shipment.fechas.fecha_carga.value == new Date()){
                         return index;
                     }
 
                 }
-                if(Shipment.fechas.fecha_vnz.value <= new Date()){
+                if(Shipment.fechas.fecha_vnz.value <= new Date()&& Shipment.fechas.fecha_vnz.confirm){
                     index  = 3;
                     if(Shipment.fechas.fecha_vnz.value == new Date()){
                         return index;
                     }
 
                 }
-                if(Shipment.fechas.fecha_tienda.value <= new Date()){
+                if(Shipment.fechas.fecha_tienda.value <= new Date()&& Shipment.fechas.fecha_tienda.confirm){
                     index  = 4;
                     if(Shipment.fechas.fecha_tienda.value == new Date()){
                         return index;
@@ -5553,21 +5627,6 @@ MyApp.directive('gridOrderBy', function($timeout) {
     };
 });
 
-/**
-
- <div layout="row" layout-align="end center" class="table-filter ng-isolate-scope layout-align-end layout-column ng-valid" ng-click="test()" ng-model="tbl" key="emision" role="button" tabindex="0" aria-invalid="false" style="margin-left: -8px;">
-
- <img src="images/TrianguloUp.png" style="
- margin-bottom: -4px;
- "><div style="
- border-bottom: solid 1.5px rgb(225, 225, 225);
- margin-bottom: 18px;
- "><img src="images/TrianguloDown.png">
- </div>
-
- </div>
-
- */
 MyApp.controller("orderByCtrl", ['$scope', function($scope){
     console.log("$scope", $scope);
 }]);

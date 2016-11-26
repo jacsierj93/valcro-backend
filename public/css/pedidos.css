@@ -87,11 +87,15 @@ div[ng-click] * {
 }
 .cellGrid div.date{
     height: 16px;
-    border-radius: 5px 5px 5px 5px;
+    border-radius:8px;
     text-align: center;
     color: white;
     font-weight: bold !important;
     margin-right: 8px;
+    font-size:13px;;
+}
+.int{
+    width: 98px;
 }
 
 .cellGrid-input{
@@ -576,8 +580,8 @@ div.vl-progress:last-child{
 /**  estado normal **/
 .vl-progress div.iconCircle{
     margin-left: 0px;
-    height: 12px;
-    width: 12px;
+    height: 5px;
+    width: 5px;
     background-color: rgb(204,204,204);
 }
 /**  estado asignado **/
@@ -591,7 +595,7 @@ div.vl-progress:last-child{
 
 /**  linea default**/
 .vl-progress div.line{
-    height: 2px;
+    height: 1px;
     background: #ccc;
 }
 /**  linea asignado**/

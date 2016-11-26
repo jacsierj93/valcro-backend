@@ -1037,6 +1037,65 @@ class EmbarquesController extends BaseController
         return $models;
     }
 
+    public  function  getShipmentsFinalize(Request $req){
+        $return = [];
+        $select ='*, DATEDIFF(fecha_carga,  CURDATE()) as cat,'.
+            '(CASE WHEN `tbl_embarque`.fecha_tienda IS not NULL THEN 
+               CASE WHEN DATEDIFF(fecha_tienda, CURDATE()) < 0 THEN 1 
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 1 and  7 THEN 2
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 8 and  30 THEN 3
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 31 and  60 THEN 4 
+               WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 61 and  90 THEN 5
+               WHEN DATEDIFF(fecha_tienda,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
+               ) as catfecha_tienda,CURDATE() ,'.
+        '(CASE WHEN `tbl_embarque`.fecha_carga IS not NULL THEN 
+               CASE WHEN DATEDIFF(fecha_carga, CURDATE()) <=0 THEN 1 
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 1 and  30 THEN 2
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 8 and  30 THEN 3
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 31 and  60 THEN 4 
+               WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 61 and  90 THEN 5
+               WHEN DATEDIFF(fecha_carga,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
+               ) as catfecha_carga,'.
+        '(CASE WHEN `tbl_embarque`.fecha_vnz IS not NULL THEN 
+               CASE WHEN DATEDIFF(fecha_vnz, CURDATE()) <=0 THEN 1 
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 1 and  30 THEN 2
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 8 and  30 THEN 3
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 31 and  60 THEN 4 
+               WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 61 and  90 THEN 5
+               WHEN DATEDIFF(fecha_vnz,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
+               ) as catfecha_vnz'
+
+        ;
+        $models = ($req->has('prov_id')) ?
+            Shipment::selectRaw($select)
+            ->where('prov_id',$req->prov_id)->whereNull('comentario_cancelacion')
+            :
+            Shipment::selectRaw($select)
+            ->where('pais_id',$req->pais_id)->whereNull('comentario_cancelacion');
+        $models = $models
+            ->whereNotNull('usuario_conf_f_tienda')
+            ->get();
+
+        foreach ($models as $aux){
+            $aux->countItems = $aux->items()->count();
+            $return[]= $aux;
+        }
+        return $models;
+    }
+
+    public function getShipmentsEnd (Request $req){
+        $model = Shipment::findOrFail($req->id);
+        $model->provider;
+
+        $items = [];
+
+        foreach ($model->items() as $aux){
+            $items[]= $aux;
+        }
+        $model->items = $items;
+
+        return $model;
+    }
 
     public function saveShipment(Request $req){
         $return = ['accion'=>'new'];
