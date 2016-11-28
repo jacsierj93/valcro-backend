@@ -1,0 +1,35 @@
+/*
+Soporte para el correo
+*/
+.mail-preview-head{
+ font-size: 13px;
+ padding: 4px 4px 4px 0;
+ height: 24px;
+ color: rgb(92, 183, 235);
+ border-bottom: solid 1.5px;
+}
+.mail-preview-content div[ng-bind-html]{
+ width: 100%;
+ height: 100%;
+}
+/*.action {
+  width: 24px;
+ color: rgb(92, 183, 235);
+ }*/
+
+.actions div {
+  width: 24px;
+ color: rgb(92, 183, 235);
+ font-size: 13px;
+ }
+.actions {
+
+ }
+.mail-preview-content{
+ overflow: auto;
+}
+ .mail-preview-content *[contenteditable="true"]{
+  cursor:text;
+ } .mail-preview-content *{
+  cursor:default;
+ }

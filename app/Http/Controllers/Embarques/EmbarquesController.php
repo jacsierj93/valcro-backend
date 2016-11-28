@@ -83,7 +83,14 @@ class EmbarquesController extends BaseController
 
     public function testPdf (Request $req){
 
-        dd( Country::findOrFail($req->id)->providers()->get());
+
+    }
+    public function html (Request $req){
+        $model = Shipment::findOrfail($req->id);
+        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model])->render();
+
+        $result = ['body'=>$html];
+       return $result;
     }
 
 

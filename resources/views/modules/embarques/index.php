@@ -322,7 +322,7 @@
             <div class="botonera" layout="row" layout-align="space-between center">
                 <!-- botonera left -->
                 <div  layout="row" layout-align="start center" style="width: 200px;">
-                    <div layout="column" layout-align="center center" ng-click = " progreso.index = (progreso.index == 3) ? 0 : 3 ;"> </div>
+                    <div layout="column" layout-align="center center" ng-click = "mailDemo();"> </div>
 
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listShipment') && permit.created)" layout-align="center center" ng-click="OpenShipmentCtrl()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
@@ -444,6 +444,42 @@
 
             </div>
         </div>
+
+        <!-------------------------------------------  ------------------------------------------------------------------------->
+        <!--######################################################## mini moduloe de email#####################################-->
+        <!-------------------------------------------  ------------------------------------------------------------------------->
+        <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="mailDemo" id="mailDemo"   >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller= "mailDemoCtrl" >
+
+                <div layout="column" flex style="overflow: auto; margin-left: 4px;" >
+                    <div layout="row" class=" mail-preview-head" layout-align="end start">
+                        <div layout="column " layout-align="center start" flex class="title">{{title}}</div>
+                        <!--<div layout="column " layout-align="center center" >Opciones:</div>
+
+                        <div layout="row" class=" mail-preview-options"    style="overflow-x: auto;" flex>
+                            <div layout="column " layout-align="center center" class="" ng-click="load()">L</div>
+                        </div>-->
+                        <div  layout="row" class="actions">
+                            <div layout="column " layout-align="center center"  class="action" ng-click="load()"  >L</div>
+                            <div layout="column " layout-align="center center"  class="action">A</div>
+                            <div layout="column " layout-align="center center"   class="action" ng-click="load()">C</div>
+                            <div layout="column " layout-align="center center"   class="action" ng-click="back()" ng-show="changes.index && changes.index > 0"><</div>
+                            <div layout="column " layout-align="center center"   class="action" ng-click="next()">></div>
+                        </div>
+                    </div>
+                    <div layout="column "  flex class="mail-preview-content" id="content">
+                        <div id="templateContent" ng-bind-html="template"  style="" ng-show="state == 'load'" ng-click="listener($event)" >
+                        </div>
+                        <div flex ng-show="state != 'load'" style="width: 100%;" layout="column " layout-align="center center" class="loading">
+                            <div layout="column"  layout-align="center center" style="color: rgb(92,183,235);">
+                               {{centerText}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </md-content>
+        </md-sidenav>
 
         <!------------------------------------------- lista de embarques creados ------------------------------------------------------------------------->
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="listShipment" id="listShipment"   >

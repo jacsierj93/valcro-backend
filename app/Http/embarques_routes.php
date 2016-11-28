@@ -3,6 +3,7 @@
 $app->get('embarques/Notification', 'Embarques\EmbarquesController@getNotifications');
 $app->get('embarques/Uncloset', 'Embarques\EmbarquesController@getUncloset');
 $app->get('embarques/Test', 'Embarques\EmbarquesController@testPdf');
+$app->get('embarques/html', 'Embarques\EmbarquesController@html');
 
 //Tariff
 
@@ -35,7 +36,6 @@ $app->get('embarques/Provider/Dir', 'Embarques\EmbarquesController@getProvDir');
 // country
 $app->get('embarques/Countrys', 'Embarques\EmbarquesController@getCountryList');
 $app->get('embarques/Country', 'Embarques\EmbarquesController@getCountry');
-
 
 
 //Shipment

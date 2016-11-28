@@ -4200,6 +4200,106 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 
 }]);
+/*************************  MODULO DE mail *******************************/
+MyApp.controller('mailDemoCtrl',['$scope','$timeout','$sce','Layers','vlResource',function($scope,$timeout, $sce,Layers,$resource){
+
+    $scope.$parent.mailDemo = function () {
+        Layers.setAccion({open:{name:'mailDemo'}});
+    };
+
+    $scope.changes= {};
+    $scope.state = 'wait';
+    $scope.template = '<div></div>';
+    $scope.centerText ='Sin cargar';
+    $scope.title ='Hola mundo';
+    $scope.origen = {mod:'embarques',lv1:'html',id:'316'};
+    $scope.options = {
+        titulo:
+            {
+            change: function (e) {
+             //   e.preventDefault();
+            }
+    }};
+
+    $scope.load = function () {
+        $scope.state = 'loading';
+        $scope.centerText= 'cargando';
+        $scope.template= '<div></div>';
+        $resource.html($scope.origen,{},function(response){
+            $scope.centerText= 'Dibujando';
+            $timeout(function () {
+                $scope.template= $sce.trustAsHtml(response.body);
+                $scope.state = 'load';
+                $scope.changes = {index:-1, trace:[]};
+
+            },2000);
+
+        });
+    };
+
+    $scope.change = function (e) {
+        var el = angular.element(e.currentTarget);
+        var k =  el.attr('id');
+        if( $scope.options[k] && $scope.options[k].change){
+            $scope.options[k] && $scope.options[k].change(e);
+        }
+
+    };
+
+    $scope.blur = function (e) {
+        var el = angular.element(e.currentTarget);
+        if(el.is('[contenteditable="true"]')){
+            var n = {ele:el[0],value: el[0].innerText};
+             if(!angular.equals(n,$scope.changes.trace[$scope.changes.index])){
+                $scope.changes.index ++;
+                $scope.changes.trace[$scope.changes.index] = n;
+            }
+        }
+        console.log("changes ",  $scope.changes);
+
+    };
+
+    $scope.listener = function (e) {
+        var el = angular.element(e.target);
+
+       if(el.is('[contenteditable="true"]')){
+           if( !el.attr('bind')){
+               el.bind("keydown", $scope.change);
+               el.bind("blur", $scope.blur);
+               el.attr('bind', true);
+               var n = {ele:el[0],value: el[0].innerText};
+               if(!angular.equals(n,$scope.changes.trace[$scope.changes.index])){
+                   $scope.changes.index ++;
+                   $scope.changes.trace[$scope.changes.index] = n;
+               }
+           }
+
+       }
+    };
+
+    $scope.back = function () {
+        $timeout(function () {
+            if( $scope.changes.index != 0){
+                var el = $scope.changes.trace[$scope.changes.index -1 ].ele;
+                el.innerText =  $scope.changes.trace[$scope.changes.index -1 ].value;
+                $scope.changes.index--;
+            }
+        },500);
+    }
+    $scope.next = function () {
+        console.log("sdfsadfsdf" , $scope.changes.index);
+        console.log("sdfsadfsdf" , $scope.changes.trace);
+        $timeout(function () {
+            if( $scope.changes.index < 0 && $scope.changes.trace.length > 0 && ($scope.changes.index != $scope.changes.trace.length)){
+                var el = $scope.changes.trace[$scope.changes.index + 1 ].ele;
+                el.innerText =  $scope.changes.trace[$scope.changes.index +1 ].value;
+                $scope.changes.index++;
+            }
+        },500);
+    }
+}]) ;
+
+
 
 /*************************  MODULO DE CERRADO DE EMBARQUE *******************************/
 
@@ -4237,6 +4337,7 @@ MyApp.controller('detailShipmentFinalizeCtrl', ['$scope', '$timeout','shipment',
     }
 
 }]);
+
 
 MyApp.controller('listShipmentFinalizeCtrl', ['$scope','shipment','setGetShipment',  function ($scope,$resource, setGetShipment) {
     $scope.tbl ={
@@ -5257,6 +5358,16 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
     };
 });
 
+/****/
+
+MyApp.factory('vlResource', ['$resource',
+    function ($resource) {
+        return $resource(':mod/:lv1/:lv2/:lv3/', {}, {
+            html: {method: 'GET',params: {mod:"sistema",lv1:"",lv2:"",lv3:""},isArray: false ,headers: { 'Content-Type': 'text/html' }}
+
+        });
+    }
+]);
 MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upload,$timeout,$interval,$filter) {
     var folder = 'none';
     var key = '';
@@ -5373,150 +5484,6 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
     }
 }]);
 
-/*
- MyApp.service('setGet', function(DateParse, shipment) {
-
- var forms ={};
- var interno= 'new';
- var externo= 'new';
- var data={};
- var bindin ={estado:false, comit:"none"};
-
- var change = function(form,fiel, value){
-
- var exist= true;
-
- if(!forms[form]){
- forms[form]={};
- exist=false;
- }
-
- if(!forms[form][fiel] ){
- if(typeof (value) == 'object'){
-
- angular.forEach(value, function(v2,k2){
- if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
- forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
- }
- });
- }else{
- forms[form][fiel] = {original:value, v:value, estado:'created',trace:[]};
- }
- exist=false;
- console.log("from ", form);
- console.log("fiel ", fiel);
- console.log("value ", value);
- interno='upd';
- };
-
- if( exist){
- if(typeof (value) == 'undefined'){
- forms[form][fiel].estado='del';
- forms[form][fiel].trace.push();
- }else if(forms[form][fiel].original != value  ){
- forms[form][fiel].v= value;
- forms[form][fiel].trace.push(value);
- forms[form][fiel].estado='upd';
- interno='upd';
-
- }else
- if(forms[form][fiel].original == value ){
- forms[form][fiel].estado='new';
- forms[form][fiel].trace.push(value);
- forms[form][fiel].v= value;
- var band= "new";
- if(interno != 'new'){
- angular.forEach(forms[form], function(v,k){
- angular.forEach(v, function(v2,k2){
- if(forms[form][fiel].estado != 'new' ){
- band='upd'
- }
- });
- });
- interno=band;
- }
-
- }
- }
-
-
- };
- return {
-
- bind:bindin,
- setBindState: function (data) {
- bindin.estado= data;
- },
- addForm: function(k, field){
- if(!forms[k]){
- forms[k]={};
- angular.forEach(field, function(v,k2){
- if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
- forms[k][k2]={original:v, v:v, estado:'new',trace:new Array()};
- }
-
- });
- }else{
- /!*angular.forEach(field, function(v,k2){
- if(v!=null && typeof (v) != 'object' && typeof (v) != 'array' && typeof (k) !='numer' && !angular.isNumber(k)){
- forms[k][k2].v= v;
- forms[k][k2].estado='upd';
- forms[k][k2].trace.push(v);
- }
-
- });*!/
- }
- },
- change:function(form,fiel, value){
- externo='upd';
- change(form,fiel, value);
-
- },
- getForm: function(name){
- if(name){
- return forms[name];
- }
- else{
- return forms;
- }
- },
- restore: function(){
- forms={};
- interno='new';
- externo= 'new';
- Shipment ={};
- },
- setState : function(val){
- externo= val;
- },
- getState: function(){
- return externo;
- },
- getInternalState: function(){
- return interno;
- },
- setData : function(doc){
- data=doc;
- },
- reload: function(doc){
- bindin.estado=false;
- bindin.estado=true;
- },
- getData : function(){
- return data;
- },
- clear: function(){
- forms ={};
- interno= 'new';
- externo= 'new';
- Shipment={};
- bindin.estado=false;
- }
-
-
- };
- });
- */
 
 MyApp.directive('vlThumb', function( fileSrv) {
     return {
@@ -5558,6 +5525,25 @@ MyApp.directive('vlThumb', function( fileSrv) {
         }
     };
 });
+
+MyApp.directive('vlLoadMsm', function( fileSrv) {
+    return {
+        replace: true,
+        transclude: true,
+        scope:{
+            'model' : "=ngModel",
+        },
+        link: function(scope, elem, attr, ctrl){
+
+        },
+        template: function () {
+
+            return ''
+        }
+    };
+});
+
+
 
 MyApp.directive('vlProgress', function( $timeout) {
 
