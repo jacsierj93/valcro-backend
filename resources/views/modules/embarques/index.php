@@ -370,7 +370,7 @@
                         </md-tooltip>
                     </div>
 
-                    <div ng-controller="superAprobCtrl" layout="column" layout-align="center center" ng-click="aprob()" ng-show="shipment.id"  ng-class="{'blue':'shipment.aprob_superior'}" >
+                    <div ng-controller="superAprobCtrl" layout="column" layout-align="center center" ng-click="aprob()" ng-show="shipment.id"  ng-class="{'blue':shipment.aprob_superior}" >
                         <span class="icon-checkMark" style="font-size: 24px"></span>
                         <md-tooltip >
                             Aprobar embarque
@@ -1463,9 +1463,9 @@
                                     </div>
 
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_vnz.value"
-                                                   ng-change="changeFecha_vnz()"
+                                                   ng-change="changeFecha_vnz(); $parent.addDays($parent.shipment.fechas.fecha_carga.plus,$parent.shipment.fechas.fecha_carga.value,2)"
                                                    ng-disabled="$parent.shipment.fechas.fecha_vnz.confirm || session.isblock"
-                                                   ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
+                                                   ng-click="($parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
                                                    md-min-date="$parent.shipment.fechas.fecha_carga.plus"
                                                    tipo="alert"
                                                    info="fecha de llegada a venezuela, esta fecha modificara la fecha de llegada a la tienda"
@@ -1483,11 +1483,11 @@
                                     </div>
 
                                     <md-datepicker ng-model="$parent.shipment.fechas.fecha_tienda.value"
-                                                   ng-change="changeFecha_tienda()"
+                                                   ng-change="changeFecha_tienda();"
                                                    ng-disabled="$parent.shipment.fechas.fecha_tienda.confirm || session.isblock"
-                                                   ng-click="(!$parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_vnz() : 0"
+                                                   ng-click="($parent.shipment.fechas.fecha_tienda.confirm) ? desblockFecha_tienda() : 0"
                                                    skip-tab
-                                                   md-min-date="$parent.shipment.fechas.fecha_carga.plus"
+                                                   md-min-date="$parent.shipment.fechas.fecha_vnz.plus"
                                     ></md-datepicker >
 
 
@@ -1825,16 +1825,6 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="descripcion"></grid-order-by>
 
-                            </div>
-                            <div flex layout="row" class="table-filter-head">
-                                <md-input-container class="md-block"  flex>
-                                    <label>Cantidad</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.saldo"
-                                           skip-tab
-                                    >
-                                </md-input-container>
-                                <grid-order-by ng-model="tbl" key="saldo"></grid-order-by>
                             </div>
                             <div flex layout="row" class="table-filter-head">
                                 <md-input-container class="md-block"  flex>

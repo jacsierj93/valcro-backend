@@ -1089,7 +1089,7 @@ class EmbarquesController extends BaseController
 
         $items = [];
 
-        foreach ($model->items() as $aux){
+        foreach ($model->items()->get() as $aux){
             $items[]= $aux;
         }
         $model->items = $items;

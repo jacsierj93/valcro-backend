@@ -760,6 +760,19 @@ MyApp.controller('embarquesController', ['$scope', '$mdSidenav','$timeout','$int
 
     };
 
+    $scope.addDays = function (model,compare, plus) {
+        if(model && compare){
+            model = new Date(compare.getFullYear(),
+                compare.getMonth(),
+                compare.getDate()+ plus,
+                compare.getHours(),
+                compare.getMinutes(),
+                compare.getSeconds()
+            );
+        }
+
+    }
+
 }]);
 
 MyApp.controller('listShipmentCtrl', ['$scope','shipment','setGetShipment',  function ($scope,$resource, setGetShipment) {
@@ -1135,6 +1148,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
             $scope.fechas.send ={};
         }
 
+        console.log('set', fecha);
         angular.forEach(fecha, function (v, k) {
             $scope.fechas.send[k]=v;
         })
@@ -1345,12 +1359,14 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
 
         }
     };
+
     $scope.changeFecha_tienda = function () {
 
         var cambiar = function () {
             $timeout(function () {
+                $scope.fechas.calc = undefined;
+                $scope.setSend ({fecha_tienda:{value: angular.copy($scope.$parent.shipment.fechas.fecha_tienda.value),isManual:true,confirm: false}},undefined, true);
                 if($scope.$parent.shipment.fechas.fecha_tienda.value <= new Date() && $scope.$parent.shipment.fechas.fecha_vnz.confirm){
-                    $scope.setSend ({fecha_tienda:{value: angular.copy($scope.$parent.shipment.fechas.fecha_tienda.value),isManual:true,confirm: false}},undefined, true);
                     $scope.$parent.NotifAction("alert","Esta fecha es definitiva",
                         [
                             {
@@ -1377,7 +1393,7 @@ MyApp.controller('OpenShipmentCtrl', ['$scope', '$timeout','shipment','DateParse
             var max = DateParse.toDate($scope.$parent.shipment.fechas.fecha_tienda.max);
 
             if($scope.$parent.shipment.fechas.fecha_tienda.value > max){
-                $scope.$parent.NotifAction("alert", "La fecha ideal  es "+ max.getDate()+"/"+max.getMonth()+"/"+max.getFullYear()+" ¿Esta seguro que la fecha es correcta?",
+                $scope.$parent.NotifAction("alert", "La fecha de tienda ideal  es "+ max.getDate()+"/"+max.getMonth()+"/"+max.getFullYear()+" ¿Esta seguro que la fecha es correcta?",
                     [
                         {name:"Si, estoy seguro", action: function ()
                         {
@@ -2564,8 +2580,6 @@ MyApp.controller('listProducttshipmentCtrl',['$scope','form', function($scope, f
         }else{}
     }
 }]);
-
-
 
 MyApp.controller('updateShipmentCtrl',['$scope','shipment','setGetShipment', '$timeout','form','clickerTime',function ($scope,$resource,$model,$timeout,formSrv,clickerTime) {
 
@@ -4200,7 +4214,7 @@ MyApp.controller('detailShipmentFinalizeCtrl', ['$scope', '$timeout','shipment',
                     $scope.model[k]= v;
                 }
                 $scope.model.fecha_tienda = DateParse.toDate( $scope.model.fecha_tienda);
-                $scope.model.item = response.items;
+                $scope.model.items = response.items;
                 $scope.model.provider = response.provider;
             });
         });
@@ -4976,25 +4990,23 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                 if(response.fechas){
                     Shipment.fechas= {fecha_carga:{}, fecha_tienda:{},fecha_vnz:{}};
                     if(response.fechas.fecha_carga.value){
-
                         Shipment.fechas.fecha_carga={};
                         Shipment.fechas.fecha_carga.confirm=response.fechas.fecha_carga.confirm;
                         Shipment.fechas.fecha_carga.isManual=response.fechas.fecha_carga.isManual;
                         Shipment.fechas.fecha_carga.value = DateParse.toDate(response.fechas.fecha_carga.value);
                         Shipment.fechas.fecha_carga.max = (response.fechas.fecha_carga.max) ? DateParse.toDate(response.fechas.fecha_carga.max) : undefined;
+                        Shipment.fechas.fecha_carga.plus = DateParse.plusDays(Shipment.fechas.fecha_carga.value,2);
                         forms['fecha_carga']['confirm']={original:Shipment.fechas.fecha_carga.confirm, v:Shipment.fechas.fecha_carga.confirm, estado:'new',trace:[]};
                         forms['fecha_carga']['isManual']={original:Shipment.fechas.fecha_carga.isManual, v:Shipment.fechas.fecha_carga.isManual, estado:'new',trace:[]};
                         forms['fecha_carga']['value']={original:Shipment.fechas.fecha_carga.value, v:Shipment.fechas.fecha_carga.value, estado:'new',trace:[]};
-
                     }
-
                     if(response.fechas.fecha_tienda.value){
                         Shipment.fechas.fecha_tienda={};
                         Shipment.fechas.fecha_tienda.confirm=response.fechas.fecha_tienda.confirm;
                         Shipment.fechas.fecha_tienda.isManual=response.fechas.fecha_tienda.isManual;
                         Shipment.fechas.fecha_tienda.value = DateParse.toDate(response.fechas.fecha_tienda.value);
                         Shipment.fechas.fecha_tienda.max = (response.fechas.fecha_tienda.max) ? DateParse.toDate(response.fechas.fecha_tienda.max) : undefined;
-
+                        Shipment.fechas.fecha_tienda.plus = DateParse.plusDays(Shipment.fechas.fecha_tienda.value,2);
                         forms['fecha_tienda']['confirm']={original:Shipment.fechas.fecha_tienda.confirm, v:Shipment.fechas.fecha_tienda.confirm, estado:'new',trace:[]};
                         forms['fecha_tienda']['isManual']={original:Shipment.fechas.fecha_tienda.isManual, v:Shipment.fechas.fecha_tienda.isManual, estado:'new',trace:[]};
                         forms['fecha_tienda']['value']={original:Shipment.fechas.fecha_tienda.value, v:Shipment.fechas.fecha_tienda.value, estado:'new',trace:[]};
@@ -5006,6 +5018,7 @@ MyApp.service('setGetShipment', function(DateParse, shipment) {
                         Shipment.fechas.fecha_vnz.isManual=response.fechas.fecha_vnz.isManual;
                         Shipment.fechas.fecha_vnz.value = DateParse.toDate(response.fechas.fecha_vnz.value);
                         Shipment.fechas.fecha_vnz.max = (response.fechas.fecha_vnz.max) ? DateParse.toDate(response.fechas.fecha_vnz.max) : undefined;
+                        Shipment.fechas.fecha_vnz.plus = DateParse.plusDays(Shipment.fechas.fecha_vnz.value,2);
 
                         forms['fecha_vnz']['confirm']={original:Shipment.fechas.fecha_vnz.confirm, v:Shipment.fechas.fecha_vnz.confirm, estado:'new',trace:[]};
                         forms['fecha_vnz']['isManual']={original:Shipment.fechas.fecha_vnz.isManual, v:Shipment.fechas.fecha_vnz.isManual, estado:'new',trace:[]};

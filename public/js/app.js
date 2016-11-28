@@ -1397,6 +1397,7 @@ MyApp.service('Layers' , function(){
  * @return  Date
  * **/
 MyApp.service('DateParse', function() {
+
     this.toDate = function (text) {
         var aux= text;
         if(typeof (text) != 'undefined'){
@@ -1406,9 +1407,48 @@ MyApp.service('DateParse', function() {
             return new Date(Date.parse(aux));
         }
 
-    }
+    };
+   this.plusDays =  function (compare, plus) {
+        if(compare){
+            return   new Date(compare.getFullYear(),
+                compare.getMonth(),
+                compare.getDate()+ plus,
+                compare.getHours(),
+                compare.getMinutes(),
+                compare.getSeconds()
+            )
+        }
+   }
 });
+/*
+ MyApp.service('DateParse', function() {
+ var todate = function (text) {
+ var aux= text;
+ if(typeof (text) != 'undefined'){
+ if(text.length >= 10){
+ aux=text.substring(0, 10).replace("-","/");
+ }
+ return new Date(Date.parse(aux));
+ };
+ return {
+ toDate : todate,
+ plusDays : function (compare, plus) {
+ if(compare){
+ return   new Date(compare.getFullYear(),
+ compare.getMonth(),
+ compare.getDate()+ plus,
+ compare.getHours(),
+ compare.getMinutes(),
+ compare.getSeconds()
+ );
+ }
 
+ }
+ }
+ }
+
+ });
+*/
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
