@@ -1,14 +1,14 @@
 <div> {{branch}}</div>
 
 <md-input-container id="text" class="md-block" flex prevText ng-if="(field.type.directive == 'prevText' || field.type.directive == null)" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
-    <label>{{get(true,{tipo:'Info',options:field.options}).pivot.value || ''}}</label>
+    <label>{{get(true,{tipo:'placeholder',options:field.options}).pivot.value || ''}}</label>
     <input skip-tab
            info="{{get(true,{tipo:'placeholder',options:field.options}).pivot.value}}"
            autocomplete="off"
            name="razon_social"
            maxlength="80"
-           ng-minlength="get(true,{tipo:'Requerido',options:field.options}).pivot.value"
-           ng-required="get(true,{tipo:'Requerido',options:field.options}).pivot.value"
+           ng-minlength="{{get(true,{tipo:'Requerido',options:field.options}).pivot.value}}"
+           ng-required="{{get(true,{tipo:'Requerido',options:field.options}).pivot.value}}"
            md-no-asterisk
            id="{{field.id}}">
 

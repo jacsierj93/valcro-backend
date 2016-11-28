@@ -322,40 +322,7 @@
                                 </div>
                                 <!--<div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>-->
                             </div>
-<!--                            <md-input-container class="row">
-                                <label>Campo</label>
-                                <md-autocomplete md-selected-item="ctrl.selOption"
-                                                 flex
-                                                 skip-tab
-                                                 ng-required="(cnt.languaje.length==0)"
-                                                 md-selected-item-change="setOptSel(ctrl.selOption.id)"
-                                                 info="opcion a agregar"
-                                                 md-search-text="ctrl.searchOpctions"
-                                                 md-items="item in fields | stringKey : ctrl.searchOpctions: 'nombre'"
-                                                 md-item-text="item.nombre"
-                                                 md-no-asterisk
-                                                 md-min-length="0"
-                                                 vl-no-clear
-                                                 class="Frm-value"
-                                >
-                                    <input >
-                                    <md-item-template>
-                                        <div layout="column" class="row">
-                                            <div flex layout-align="start start">{{item.descripcion}}</div>
 
-                                            <div style="font-size:12px; color:#999;" flex layout-align="start center" layout="row" >
-                                                <div ng-repeat="line in item.lineas" flex> {{line}}, </div>
-                                            </div>
-                                        </div>
-
-                                    </md-item-template>
-                                    <md-not-found>
-                                        <a ng-click="createNewIten(ctrl.searchOpctions)">la opcion {{ctrl.searchOpctions}}, no existe
-                                            crearla?</a>
-                                    </md-not-found>
-                                </md-autocomplete>
-
-                            </md-input-container>-->
                             <md-content flex>
                                 <div ng-repeat="field in fields" class="row" ng-class="{'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                     <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
@@ -629,8 +596,8 @@
 
                                 </div>
                                 <div flex layout="column">
-                                    <md-content >
-                                        <div ng-repeat="field in criteria" id="cfg_{{field.id}}" class="row itemCrit" layout="column" layout-align="center center">
+                                    <md-content v>
+                                        <div ng-repeat="field in criteria" id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center center">
                                             {{field.field.descripcion}}
                                         </div>
                                     </md-content>
@@ -641,8 +608,8 @@
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
                                 <div flex layout="column">
                                     <md-content >
-                                        <div ng-repeat="oper in ['igual a...','diferente a...','mayor que...','menor que...']" id="cfg_{{field.id}}" class="row itemCrit" layout="column" layout-align="center center">
-                                            {{oper}}
+                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
+                                            {{oper.descripcion}}
                                         </div>
                                     </md-content>
                                 </div>
@@ -657,18 +624,21 @@
                                         </md-switch>
                                     </md-input-container>
                                     <div class="row"></div>
-                                    <div class="row">
-                                        <div class="titulo_formulario row" layout="row" layout-align="start start" >
-                                            <div>
-                                                Valores posibles
+                                    <div flex ng-if="currentCrit.type.descripcion == 'selector' || currentCrit.type.descripcion == 'opciones'">
+                                        <div class="row">
+                                            <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                                <div>
+                                                    Valores posibles
+                                                </div>
                                             </div>
                                         </div>
+                                        <md-content flex>
+                                            <div ng-repeat="" id="cfg_{{field.id}}" class="row itemCrit" layout="column" layout-align="center center">
+                                                {{oper}}
+                                            </div>
+                                        </md-content>
                                     </div>
-                                    <md-content flex ng-if="criteria.type.descripcion == 'opciones' ">
-                                        <div ng-repeat="oper in ['igual a...','diferente a...','mayor que...','menor que...']" id="cfg_{{field.id}}" class="row itemCrit" layout="column" layout-align="center center">
-                                            {{oper}}
-                                        </div>
-                                    </md-content>
+
                                 </div>
                             </div>
                         </div>

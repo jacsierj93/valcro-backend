@@ -472,7 +472,6 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         $scope.criteria = critForm.get();
     });
     $scope.setEdit = function(campo){
-
         $scope.openConstruct(function () {
             critForm.setEdit(campo);
         });
@@ -484,7 +483,7 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
             if(obj.tipo != "Opcion"){
                 return $filter("customFind")(obj.options,[obj.tipo],function(c,v){
                     return c.descripcion == v[0];
-                })[0];
+                })[0] || {pivot:{value:""}};
             }else{
                 return $filter("customFind")(obj.options,[filt.id],function(c,v){
                     return c.descripcion == obj.tipo && c.pivot.value == v[0];
@@ -520,14 +519,39 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     $scope.$watch("line.id",function(){
         $scope.criteria = critForm.get();
     });
-
-    $scope.configDep = {
-        id:false,
-        lct_id:false,
-        parent_id:false,
-        operator:false,
-        action:null
-    }
+    $scope.currentLct = critForm.getEdit();
+    $scope.$watch("currentLct.id",function(nvo){
+        $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
+        $scope.configDep = {
+            id:false,
+            lct_id:nvo,
+            parent_id:false,
+            operator:'',
+            action:null
+        };
+        console.log($scope.currentCrit);
+    });
+    $scope.operator = [
+        {
+            op:"=",
+            descripcion:"es Igual"
+        },{
+            op:">",
+            descripcion:"es Mayor"
+        },{
+            op:"<",
+            descripcion:"es Menor"
+        },{
+            op:"!=",
+            descripcion:"es diferente"
+        },{
+            op:">>",
+            descripcion:"existe en"
+        }
+    ];
+    $scope.setCfg = function(cfg,val){
+        $scope.configDep[cfg] = val;
+    };
 
 }]);
 
@@ -538,14 +562,12 @@ MyApp.directive('formPreview', function() {
             }
         };
 });
+
 MyApp.directive('treeBranch', function() {
 
         return {
             scope: { branch: '=treeBranch' },
             templateUrl: function(elem, attr) {
-
-                console.log(attr);
-                console.log(elem);
                 return 'modules/productos/textForm';
             }
         };
