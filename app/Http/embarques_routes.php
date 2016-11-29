@@ -40,6 +40,7 @@ $app->get('embarques/Country', 'Embarques\EmbarquesController@getCountry');
 
 //Shipment
 $app->get('embarques/Shipment', 'Embarques\EmbarquesController@getShipment');
+$app->get('embarques/Shipment/templates', 'Embarques\EmbarquesController@getTemplates');
 $app->post('embarques/Shipment/Close', 'Embarques\EmbarquesController@closeShipment');
 $app->post('embarques/Shipment/Cancel', 'Embarques\EmbarquesController@cancelShipment');
 $app->get('embarques/Shipment/Items', 'Embarques\EmbarquesController@getShipmentItems');

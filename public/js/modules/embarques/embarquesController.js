@@ -4201,102 +4201,29 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
 }]);
 /*************************  MODULO DE mail *******************************/
-MyApp.controller('mailDemoCtrl',['$scope','$timeout','$sce','Layers','vlResource',function($scope,$timeout, $sce,Layers,$resource){
+MyApp.controller('sendShipmentCtrl',['$scope','$timeout','$sce','Layers','vlResource',function($scope,$timeout, $sce,Layers,$resource){
 
-    $scope.$parent.mailDemo = function () {
+    $scope.origenes = {};
+    $scope.$parent.sendShipment = function () {
         Layers.setAccion({open:{name:'mailDemo'}});
-    };
+        $scope.centerText ='Cargando recursos por favor espere ';
 
-    $scope.changes= {};
-    $scope.state = 'wait';
-    $scope.template = '<div></div>';
-    $scope.centerText ='Sin cargar';
-    $scope.title ='Hola mundo';
-    $scope.origen = {mod:'embarques',lv1:'html',id:'316'};
+    };
+    $scope.origenes = {1:{
+        lang:'Español',
+        iso_lang:'es-es',
+        body:"<div>hola mundo</div>"
+
+    }};
+    $scope.centerText ='';
     $scope.options = {
         titulo:
-            {
+        {
             change: function (e) {
-             //   e.preventDefault();
+                //   e.preventDefault();
             }
-    }};
+        }};
 
-    $scope.load = function () {
-        $scope.state = 'loading';
-        $scope.centerText= 'cargando';
-        $scope.template= '<div></div>';
-        $resource.html($scope.origen,{},function(response){
-            $scope.centerText= 'Dibujando';
-            $timeout(function () {
-                $scope.template= $sce.trustAsHtml(response.body);
-                $scope.state = 'load';
-                $scope.changes = {index:-1, trace:[]};
-
-            },2000);
-
-        });
-    };
-
-    $scope.change = function (e) {
-        var el = angular.element(e.currentTarget);
-        var k =  el.attr('id');
-        if( $scope.options[k] && $scope.options[k].change){
-            $scope.options[k] && $scope.options[k].change(e);
-        }
-
-    };
-
-    $scope.blur = function (e) {
-        var el = angular.element(e.currentTarget);
-        if(el.is('[contenteditable="true"]')){
-            var n = {ele:el[0],value: el[0].innerText};
-             if(!angular.equals(n,$scope.changes.trace[$scope.changes.index])){
-                $scope.changes.index ++;
-                $scope.changes.trace[$scope.changes.index] = n;
-            }
-        }
-        console.log("changes ",  $scope.changes);
-
-    };
-
-    $scope.listener = function (e) {
-        var el = angular.element(e.target);
-
-       if(el.is('[contenteditable="true"]')){
-           if( !el.attr('bind')){
-               el.bind("keydown", $scope.change);
-               el.bind("blur", $scope.blur);
-               el.attr('bind', true);
-               var n = {ele:el[0],value: el[0].innerText};
-               if(!angular.equals(n,$scope.changes.trace[$scope.changes.index])){
-                   $scope.changes.index ++;
-                   $scope.changes.trace[$scope.changes.index] = n;
-               }
-           }
-
-       }
-    };
-
-    $scope.back = function () {
-        $timeout(function () {
-            if( $scope.changes.index != 0){
-                var el = $scope.changes.trace[$scope.changes.index -1 ].ele;
-                el.innerText =  $scope.changes.trace[$scope.changes.index -1 ].value;
-                $scope.changes.index--;
-            }
-        },500);
-    }
-    $scope.next = function () {
-        console.log("sdfsadfsdf" , $scope.changes.index);
-        console.log("sdfsadfsdf" , $scope.changes.trace);
-        $timeout(function () {
-            if( $scope.changes.index < 0 && $scope.changes.trace.length > 0 && ($scope.changes.index != $scope.changes.trace.length)){
-                var el = $scope.changes.trace[$scope.changes.index + 1 ].ele;
-                el.innerText =  $scope.changes.trace[$scope.changes.index +1 ].value;
-                $scope.changes.index++;
-            }
-        },500);
-    }
 }]) ;
 
 
@@ -4693,8 +4620,6 @@ MyApp.controller('detailGlobalTarifCtrl',['$scope','$timeout','shipment','form',
     });
 }]);
 
-
-
 MyApp.controller('miniAdjsCtrl',['$scope','$mdSidenav','$timeout','form','tarifForm','masters','shipment','fileSrv','setGetShipment',   function($scope,$mdSidenav,$timeout,formSrv,tarifForm,masters ,$resource, fileSrv, $model){
     $scope.isOpen = false;
     $scope.bindFiles = fileSrv.bin();
@@ -4741,6 +4666,10 @@ MyApp.controller('miniAdjsCtrl',['$scope','$mdSidenav','$timeout','form','tarifF
 
 
 }]);
+
+
+/******************************************/
+
 
 MyApp.factory('shipment', ['$resource',
     function ($resource) {
@@ -5526,22 +5455,6 @@ MyApp.directive('vlThumb', function( fileSrv) {
     };
 });
 
-MyApp.directive('vlLoadMsm', function( fileSrv) {
-    return {
-        replace: true,
-        transclude: true,
-        scope:{
-            'model' : "=ngModel",
-        },
-        link: function(scope, elem, attr, ctrl){
-
-        },
-        template: function () {
-
-            return ''
-        }
-    };
-});
 
 
 
@@ -5626,6 +5539,116 @@ MyApp.directive('gridOrderBy', function($timeout) {
     };
 });
 
-MyApp.controller("orderByCtrl", ['$scope', function($scope){
-    console.log("$scope", $scope);
-}]);
+/*************************  MODULO DE mail *******************************/
+MyApp.directive('vldhtmlPreview', function($timeout) {
+
+    return {
+        controller:'vldChtmlPreview',
+        replace: true,
+        scope:{
+            'origenes' : "=load",
+            'centerText' : "=?text",
+            'title' : "=?title",
+            'options' : "=?optionId",
+            'template' : "=?template",
+            'state' : "=?state"
+        },
+        transclude: true,
+        link: function(scope, elem, attr, ctrl){},
+        templateUrl: function(elem, attr){
+            return 'modules/directives/htmlPreview';
+        }
+    };
+});
+MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','Layers','vlResource',function($scope,$timeout, $sce,Layers,$resource){
+
+    $scope.changes= {};
+    $scope.state = 'wait';
+    $scope.template = '<div></div>';
+    /*$scope.centerText ='Sin cargar';*/
+   // $scope.title ='Hola mundo';
+   /* $scope.origen = {mod:'embarques',lv1:'html',id:'316'};*/
+
+
+
+    $scope.load = function (key) {
+        $scope.state = 'loading';
+        $scope.centerText= 'cargando';
+       // $scope.template= '<div></div>';
+       /* $resource.html($scope.origen,{},function(response){
+            $scope.centerText= 'Dibujando';
+            $timeout(function () {
+                $scope.template= $sce.trustAsHtml(response.body);
+                $scope.state = 'load';
+                $scope.changes = {index:-1, trace:[]};
+
+            },2000);
+
+        });*/
+    };
+
+    $scope.selectLang = function (id) {
+        $scope.template= '<div></div>';
+        $scope.centerText= 'Dibujando';
+        $scope.template= $sce.trustAsHtml(angular.copy($scope.origenes[id].body));
+        $scope.state = 'load';
+    };
+    $scope.change = function (e) {
+        var el = angular.element(e.currentTarget);
+        var k =  el.attr('id');
+        if( $scope.options[k] && $scope.options[k].change){
+            $scope.options[k] && $scope.options[k].change(e);
+        }
+
+    };
+
+    $scope.blur = function (e) {
+        var el = angular.element(e.currentTarget);
+        if(el.is('[contenteditable="true"]')){
+            var n = {ele:el[0],value: el[0].innerText};
+            if(!angular.equals(n,$scope.changes.trace[$scope.changes.index])){
+                $scope.changes.index ++;
+                $scope.changes.trace[$scope.changes.index] = n;
+            }
+        }
+        console.log("changes ",  $scope.changes);
+
+    };
+
+    $scope.listener = function (e) {
+        var el = angular.element(e.target);
+        if(el.is('[contenteditable="true"]')){
+            if( !el.attr('bind')){
+                el.bind("keydown", $scope.change);
+                el.bind("blur", $scope.blur);
+                el.attr('bind', true);
+                var n = {ele:el[0],value: el[0].innerText};
+                if(!angular.equals(n,$scope.changes.trace[$scope.changes.index])){
+                    $scope.changes.index ++;
+                    $scope.changes.trace[$scope.changes.index] = n;
+                }
+            }
+        }
+    };
+
+    $scope.back = function () {
+        $timeout(function () {
+            if( $scope.changes.index != 0){
+                var el = $scope.changes.trace[$scope.changes.index -1 ].ele;
+                el.innerText =  $scope.changes.trace[$scope.changes.index -1 ].value;
+                $scope.changes.index--;
+            }
+        },500);
+    }
+    $scope.next = function () {
+        $timeout(function () {
+            if($scope.changes.trace.length > 0 && (($scope.changes.index + 1 ) <= $scope.changes.trace.length)){
+
+                var el = $scope.changes.trace[$scope.changes.index + 1 ].ele;
+                console.log("el entro " ,el);
+                el.innerText =  $scope.changes.trace[$scope.changes.index + 1 ].value;
+                $scope.changes.index++;
+            }
+        },500);
+    }
+}]) ;

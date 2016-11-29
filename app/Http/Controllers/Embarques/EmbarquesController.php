@@ -5,9 +5,11 @@ use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\Masters\FileModel;
 use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Masters\Ports;
+use  App\Models\Sistema\Masters\Language;
 use App\Models\Sistema\MailModels\MailModule;
 use  App\Models\Sistema\MailModels\MailAlert;
 use App\Models\Sistema\MailModels\MailAlertDestinations;
+use App\Models\Sistema\MailModels\MailPart;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\Providers\Provider;
@@ -42,6 +44,7 @@ class EmbarquesController extends BaseController
     private $minAproxDay = 100;
     private $diasTienda = 15;
     private $doc_tipo= 23;
+
     /***
     model shipmente
 
@@ -82,15 +85,15 @@ class EmbarquesController extends BaseController
     */
 
     public function testPdf (Request $req){
-
+        dd(emails_templates_lang('Embarques','sumary') );
 
     }
     public function html (Request $req){
         $model = Shipment::findOrfail($req->id);
-        $html = View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model])->render();
+        $html = View::make('emails/Embarques/sumary/es',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model]);
 
         $result = ['body'=>$html];
-       return $result;
+        return $html;
     }
 
 
@@ -1055,7 +1058,7 @@ class EmbarquesController extends BaseController
                WHEN DATEDIFF(fecha_tienda,  CURDATE())  BETWEEN 61 and  90 THEN 5
                WHEN DATEDIFF(fecha_tienda,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
                ) as catfecha_tienda,CURDATE() ,'.
-        '(CASE WHEN `tbl_embarque`.fecha_carga IS not NULL THEN 
+            '(CASE WHEN `tbl_embarque`.fecha_carga IS not NULL THEN 
                CASE WHEN DATEDIFF(fecha_carga, CURDATE()) <=0 THEN 1 
                WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 1 and  30 THEN 2
                WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 8 and  30 THEN 3
@@ -1063,7 +1066,7 @@ class EmbarquesController extends BaseController
                WHEN DATEDIFF(fecha_carga,  CURDATE())  BETWEEN 61 and  90 THEN 5
                WHEN DATEDIFF(fecha_carga,  CURDATE()) > 91  THEN 6 end ELSE -1 end 
                ) as catfecha_carga,'.
-        '(CASE WHEN `tbl_embarque`.fecha_vnz IS not NULL THEN 
+            '(CASE WHEN `tbl_embarque`.fecha_vnz IS not NULL THEN 
                CASE WHEN DATEDIFF(fecha_vnz, CURDATE()) <=0 THEN 1 
                WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 1 and  30 THEN 2
                WHEN DATEDIFF(fecha_vnz,  CURDATE())  BETWEEN 8 and  30 THEN 3
@@ -1075,10 +1078,10 @@ class EmbarquesController extends BaseController
         ;
         $models = ($req->has('prov_id')) ?
             Shipment::selectRaw($select)
-            ->where('prov_id',$req->prov_id)->whereNull('comentario_cancelacion')
+                ->where('prov_id',$req->prov_id)->whereNull('comentario_cancelacion')
             :
             Shipment::selectRaw($select)
-            ->where('pais_id',$req->pais_id)->whereNull('comentario_cancelacion');
+                ->where('pais_id',$req->pais_id)->whereNull('comentario_cancelacion');
         $models = $models
             ->whereNotNull('usuario_conf_f_tienda')
             ->get();
@@ -1604,7 +1607,30 @@ class EmbarquesController extends BaseController
         return $result;
     }
 
+// mail
+    public function getTemplates(Request $req){
+        $files =emails_templates_lang('Embarques','sumary') ;
+        $model = Shipment::findOrfail(250);
+        $templates =MailPart::where('modulo','embarques')->where('proposito','sumary')->first();
 
+        $html = View::make('emails/Embarques/sumary/es',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model]);
+
+        $result = [];
+
+        foreach ($files as $aux){
+           $lang = new Language();
+            $lang=$lang->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->first();
+            $result[$aux['iso_lang']] = [
+                'lang'=>$lang->lang,
+                'iso_lang'=>$lang->iso_lang,
+                'body'=>''
+            ];
+
+        }
+
+
+        return $html;
+    }
     /************************* products  ***********************************/
 
     public function getLineas(){
