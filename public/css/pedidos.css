@@ -368,12 +368,6 @@ md-sidenav .md-sidenav-right.md-locked-open{
 }
 
 
-.mail-attaments div{color:  rgb(84, 180, 234);width: 24px; padding: 2px;border-bottom: solid 1px;margin: 0 2px 0 2px;}
-.mail-option div{color:  rgb(84, 84, 85); ;margin: 8px 2px 0 2px;}
-.mail-option-select{
-    color: rgb(84, 180, 234);
-    border-bottom: solid 1px rgb(84, 180, 234);
-}
 .row-min{
     height: 30px;
 }

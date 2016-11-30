@@ -5,7 +5,6 @@ Soporte para el correo
  font-size: 13px;
  padding: 4px 4px 4px 0;
  color: rgb(92, 183, 235);
- border-bottom: solid 1.5px;
 }
 .mail-preview-content div[ng-bind-html]{
  width: 100%;
@@ -29,3 +28,46 @@ Soporte para el correo
 .dot-gold {
   border-color: gold;
 }
+.mail-option{
+    /*position: fixed;*/
+}
+
+.mail-attaments div{color:  rgb(84, 180, 234);width: 24px; padding: 2px;border-bottom: solid 1px;margin: 0 2px 0 2px;}
+.mail-option div{
+    color: rgb(204, 204, 204);
+    font-size: 12px;
+    padding: 0 4px 0 4px;
+    margin-right: 2px;
+    height: 18px;
+}
+.mail-option div:last-child {
+    margin-right: 8px;
+}
+.mail-option-select{
+    color: rgb(84, 180, 234);
+    border-bottom: solid 1px rgb(84, 180, 234);
+}
+
+.mail-contacts{
+    padding: 4px 8px  0px 4px;
+}
+
+.mail-contacts > div{
+     width: 100%;
+ }
+
+.mail-contacts  > md-chips{
+     width: 100%;
+ }.mail-contacts  >  div  >md-chips{
+     width: 100%;
+ }
+.mail-contacts  >  div  > md-input-container{
+     width: 100%;
+ }
+.mail-contacts > div > md-input-container > md-autocomplete {
+    padding-right: 8px !important;
+}
+.mail-contacts  > div >  div > md-chips{
+     width: 100%;
+ }
+

@@ -2,9 +2,10 @@
     <div layout="row" class=" mail-preview-head" layout-align="end start">
         <div layout="row" layout-align="start center" flex >
             <div  ng-repeat="(id, value) in origenes" style="color:rgb(204, 204, 204);" ng-click="selectLang(id)" >
-                <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group  ng-class="{'iconActive':select == id, 'dot-gold':def == id}"
+                <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group
+                      ng-class="{'iconActive':lang == id, 'dot-gold':id == prf }" info="{{lang}}"
                     >
-                    {{value.lang.substring(0,2)}}
+                   {{value.lang.substring(0,2)}}
                 </span>
             </div>
 

@@ -4204,26 +4204,45 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 MyApp.controller('sendShipmentCtrl',['$scope','$timeout','$sce','Layers','shipment',function($scope,$timeout, $sce,Layers,$resource){
 
     $scope.origenes = {};
+    $scope.correos = [];
+    $scope.out = [];
+    $scope.destinos = [];
+    $scope.langs = {};
+    $scope.prfLang = '';
+    $scope.asuntos  = ['demo 1', 'demo 2', 'demo 3'];
+$scope.lang = undefined;
+    $scope.test= function () {
+        console.log('$scope.to',$scope.out);
+    };
+
+
 
     $scope.$parent.sendShipment = function () {
+        for(var i =0 ;i< 12 ; i++){
+            var op = {
+                nombre:"demo"+i,
+                correo:'mail'+i+'@'+i+'.com',
+                langs:[(Math.round(Math.random()) % 2) == 0 ? 'es' : 'en']
+
+            };
+            $scope.correos.push(op);
+        }
+        $scope.correos.push({nombre:'demoest',mail:'dasdfasdf@ddd.net',langs:['an']});
         Layers.setAccion({open:{name:'sendShipment'}});
         $scope.centerText ='Cargando recursos por favor espere ';
         $timeout(function () {
             $resource.get({type:'Shipment', mod:'templates', id:250},{}, function (response) {
+
                 $scope.origenes= response.good;
+                $scope.centerText ='Selecione un idioma';
+
             });
         },0);
 
     };
 
     $scope.centerText ='';
-    $scope.options = {
-        titulo:
-        {
-            change: function (e) {
-                //   e.preventDefault();
-            }
-        }};
+
 
 }]) ;
 
@@ -4345,9 +4364,9 @@ MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form',
     };
 
     $scope.loadNv = function () {
-            $resource.queryMod({type:"Naviera", mod:"List"},{}, function (response) {
-                $scope.nv= response;
-            });
+        $resource.queryMod({type:"Naviera", mod:"List"},{}, function (response) {
+            $scope.nv= response;
+        });
 
 
     };
@@ -4357,26 +4376,26 @@ MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form',
 
             $scope.save(function () {
                 $scope.NotifAction("ok"," !Felicidades! la tarifa se a cargado satisfactoriamente ¿Desea agregar otra?",
-                [{name:"Si, no quites lo que llene", default:5, accion:function () {
+                    [{name:"Si, no quites lo que llene", default:5, accion:function () {
 
-                }},
-                    {name:"Si,pero quitame lo que llene ", accion:function () {
-                        angular.forEach($scope.model,function (v, k) {
-                            $scope.model[k]= undefined;
-                        });
-                        $scope.model= {};
-                        $timeout(function () {
-                          var el = angular.element("miniTariffItems [step]").first();
-                            console.log("ele", el);
-                            el.focus();
-                        },0);
                     }},
-                    {name:"No, ya he terminado", accion:function () {
+                        {name:"Si,pero quitame lo que llene ", accion:function () {
+                            angular.forEach($scope.model,function (v, k) {
+                                $scope.model[k]= undefined;
+                            });
+                            $scope.model= {};
+                            $timeout(function () {
+                                var el = angular.element("miniTariffItems [step]").first();
+                                console.log("ele", el);
+                                el.focus();
+                            },0);
+                        }},
+                        {name:"No, ya he terminado", accion:function () {
                             $scope.inClose();
-                    }}
+                        }}
 
-                ]
-                ,{block:true});
+                    ]
+                    ,{block:true});
             });
 
         };
@@ -4399,7 +4418,7 @@ MyApp.controller('miniTariffItemsCtrl',['$scope','$mdSidenav','$timeout','form',
                             $scope.inClose();
                             formSrv.setState('continue');
                         }}
-                        ]);
+                    ]);
                 }else{
                     save();
 
@@ -4445,7 +4464,7 @@ MyApp.controller('listGlobalTarifCtrl',['$scope','DateParse','shipment',  functi
                 $scope.tbl.data.push(v);
             });
 
-       });
+        });
         $scope.$parent.LayersAction({open:{name:"listGlobalTarif"}});
     }
 
@@ -4581,7 +4600,7 @@ MyApp.controller('detailGlobalTarifCtrl',['$scope','$timeout','shipment','form',
     $scope.delete = function (item, index) {
 
         if(item.embarques > 0){
-           $scope.NotifAction("error", "Lo sentimos no puedes eliminar tarifa que esten siendo usadas en un embarque. ",[], {autohidden:3000});
+            $scope.NotifAction("error", "Lo sentimos no puedes eliminar tarifa que esten siendo usadas en un embarque. ",[], {autohidden:3000});
         }else{
             $scope.NotifAction("alert", "Por favor confirmanos que en realidad quieres eliminar esta tarifa",
                 [
@@ -5550,9 +5569,11 @@ MyApp.directive('vldhtmlPreview', function($timeout) {
             'origenes' : "=load",
             'centerText' : "=?text",
             'title' : "=?title",
-            'def' : "=?default",
             'options' : "=?optionId",
             'template' : "=?template",
+            'langs' : "=?langs",
+            'lang' : "=?lang",
+            'contacts': "=?contacts",
             'state' : "=?state"
         },
         transclude: true,
@@ -5562,12 +5583,13 @@ MyApp.directive('vldhtmlPreview', function($timeout) {
         }
     };
 });
+
 MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',function($scope,$timeout, $sce,setNotif){
 
     $scope.changes= {trace:[], index:0};
     $scope.state = 'wait';
     $scope.template = '<div></div>';
-    $scope.select = '';
+    $scope.prf= undefined;
 
 
     $scope.load = function (key) {
@@ -5577,35 +5599,82 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
 
     $scope.selectLang = function (id) {
         console.log("index",$scope.changes );
+        console.log("out ",$scope.contacts );
         if(id != $scope.select){
-            if($scope.changes.index > 0){
-                setNotif.addNotif("alert","!Perderas los cambios! ¿Estas seguro de cambiar la plantilla?",
-                    [
-                        {
-                            name:"Si, estoy seguro", action: function () {
-                            $scope.changeLang(id);
-                            }
-                        },{
-                            name:"Cancelar", action: function () {
+            if($scope.contacts && $scope.contacts.length > 0){
+                if( !$scope.reviewContact(id)){
+                    setNotif.addNotif("alert", 'Segun nuestros datos '+$scope.error.nombre +" no habla este idioma ¿estas seguro de cambiar el idioma ?" ,
 
-                            }
-                        }
-                    ]
-                    ,{block:true});
+                        [
+                            {name:"Si, estoy seguro", action :function () {
+                                $scope.confirmChange(id);
+                            }},
+                            {name:"Cancelar ", action :function () {
+
+                            }}
+                        ]
+                        ,{});
+                 }else{
+                    $scope.confirmChange(id);
+                }
             }else{
-                $scope.changeLang (id);
+                $scope.confirmChange(id);
             }
+
         }
     };
 
+    $scope.reviewContact = function (id) {
+        var paso = true;
+        $scope.error = undefined;
+        angular.forEach($scope.contacts, function (v, k) {
+            if(v.langs  && v.langs.length > 0){
+                paso=false;
+
+                angular.forEach(v.langs, function (lang) {
+
+                    if(lang == id){
+                        paso=true;
+                    }
+                });
+                if(!paso){
+                    $scope.error = v;
+                    return false ;
+                }
+
+            }
+        });
+        return paso;
+    };
+    $scope.confirmChange = function (id) {
+        if($scope.changes.index > 0){
+            setNotif.addNotif("alert","!Perderas los cambios! ¿Estas seguro de cambiar la plantilla?",
+                [
+                    {
+                        name:"Si, estoy seguro", action: function () {
+                        $scope.changeLang(id);
+                    }
+                    },{
+                    name:"Cancelar", action: function () {
+
+                    }
+                }
+                ]
+                ,{block:true});
+        }else{
+            $scope.changeLang (id);
+        }
+    };
     $scope.changeLang = function (id) {
-        $scope.select = id;
+        $scope.lang = id;
         $scope.template= '<div></div>';
         $scope.centerText= 'Dibujando';
         $scope.template= $sce.trustAsHtml(angular.copy($scope.origenes[id].body));
         $scope.state = 'load';
         $scope.changes= {trace:[], index:0};
+        console.log("langs", $scope.langs);
     };
+
     $scope.change = function (e) {
         var el = angular.element(e.currentTarget);
         var k =  el.attr('id');
@@ -5659,10 +5728,194 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
         $timeout(function () {
             if($scope.changes.trace.length > 0 && $scope.changes.trace[$scope.changes.index + 1 ] && (($scope.changes.index + 1 ) <= $scope.changes.trace.length) ){
 
-               var el = $scope.changes.trace[$scope.changes.index + 1 ].ele;
+                var el = $scope.changes.trace[$scope.changes.index + 1 ].ele;
                 el.innerText =  $scope.changes.trace[$scope.changes.index + 1 ].value;
                 $scope.changes.index++;
             }
         },10);
     }
+
+    $scope.$watchCollection(
+        "langs",
+        function( newValue, oldValue ) {
+            console.log('new colletion');
+            if(newValue){
+                var prf =undefined;
+                var mayor =  -1;
+                var fallidos = [];
+                angular.forEach(newValue, function (v, k) {
+                    if(!$scope.origenes[k]){
+                        fallidos.push(k);
+                    }else{
+                        if(v > mayor){
+                            mayor = v;
+                            prf = k;
+                        }
+                    }
+
+                });
+                $scope.prf  = prf;
+                console.log(fallidos);
+                console.log(newValue);
+                console.log($scope.prf);
+
+
+
+            }
+        }
+    );
 }]) ;
+
+MyApp.directive('vldhMailContacts', function($timeout) {
+
+    return {
+        controller:'vldChMailContacts',
+        replace: true,
+        scope:{
+            'out' : "=contacts",
+            'correos' : "=?correos",
+            'asuntos' : "=?asuntos",
+            'asunto' : "=?asunto",
+            'addlangs' : "=?langs",
+            'lang' : "=?lang"
+        },
+        transclude: true,
+        link: function(scope, elem, attr, ctrl){},
+        templateUrl: function(elem, attr){
+            return 'modules/directives/mailContacts';
+        }
+    };
+});
+MyApp.controller('vldChMailContacts',['$scope','$timeout','$sce','$filter','IsEmail','setNotif',function($scope,$timeout, $sce,$filter,IsEmail,setNotif){
+
+
+    $scope.destinos = [];
+    $scope.addlangs = {};
+    $scope.to = [];
+    $scope.cc = [];
+    $scope.ccb = [];
+
+    $scope.all  = function () {
+        if(!$scope.correos){
+            return [];
+        }
+        return $filter("customFind")($scope.correos,{} ,
+            function(c,cp){
+                return  $scope.destinos.indexOf(c.correo) == -1;
+            });
+    };
+    $scope.isAddMail = function(val){
+        return  $scope.destinos.indexOf(val.correo) === -1;
+    };
+    if(!$scope.asuntos){
+        $scope.asuntos = [];
+    }
+    $scope.transformChip = function(chip) {
+        if (angular.isObject(chip) && $scope.destinos.indexOf(chip.correo) === -1) {
+            return chip;
+        }
+        if(IsEmail(chip)!= null &&  $scope.isAddMail({correo:chip}) ){
+            return {nombre:chip,correo:chip,lang:[]};
+        }
+        return null;
+    };
+    $scope.addEmail = function(chip, tipo){
+        chip.tipo= tipo;
+        $scope.destinos.push(chip.correo);
+        $scope.out.push(chip);
+        if($scope.lang){
+            $scope.reviewContact(chip, tipo);
+        }
+        $timeout(function () {
+            $scope.$apply();
+        },20);
+    };
+
+    $scope.reviewContact = function (chip, tipo) {
+        var paso = true;
+        if(chip.langs && chip.langs.length > 0){
+            paso= false;
+            angular.forEach(chip.langs, function (v, k) {
+                if (v == $scope.lang){
+                    paso= true;
+                }
+            });
+        }
+
+        if(!paso){
+            setNotif.addNotif("alert", "Segun nuestra informacion "+ chip.nombre+" no habla el idioma selecionado ¿Esta seguro de agregarlo?",
+                [
+                    {name:"Si, estoy seguro", action: function(){
+
+                    }},
+                    {name:"Cancelar", action: function () {
+                      var index = -1;
+                        angular.forEach($scope[tipo], function (v, k) {
+                            if(v.correo == chip.correo){
+                                index  = k;
+                            }
+                        });
+                        $scope[tipo].splice( index  , 1);
+                        $scope.removeEmail(chip,tipo);
+
+                    }
+
+                    }
+                ]
+            ,{block:true})
+        }
+    };
+
+
+    $scope.removeEmail = function(chip){
+        $scope.destinos.splice($scope.destinos.indexOf(chip.correo),1);
+        $scope.out.splice($scope.out.indexOf(chip.correo),1);
+        angular.forEach(chip.langs, function (v, k) {
+            $scope.addlangs[v] -- ;
+        });
+    };
+
+
+    $scope.$watch('to.length', function (newVall, oldVall) {
+        if(newVall){
+            if( newVall > 0 && newVall > oldVall  && $scope.addlangs){
+
+                angular.forEach($scope.to[newVall - 1].langs, function (v, k) {
+                    console.log("to", newVall);
+                    if( $scope.addlangs[v]){
+                        $scope.addlangs[v] ++;
+                    }else{
+                        $scope.addlangs[v] = 1;
+                    }
+
+                });
+            }
+        }
+    });
+    $scope.$watch('cc.length', function (newVall, oldVall) {
+        if(newVall){
+            if( newVall > 0 && newVall > oldVall  && $scope.addlangs){
+                angular.forEach($scope.to[newVall - 1].langs, function (v, k) {
+                    if( $scope.addlangs[v]){
+                        $scope.addlangs[v] ++;
+                    }else{
+                        $scope.addlangs[v] = 1;
+                    }
+                });
+            }
+        }
+    });
+    $scope.$watch('ccb.length', function (newVall, oldVall) {
+        if(newVall){
+            if( newVall > 0 && newVall > oldVall  && $scope.addlangs){
+                angular.forEach($scope.to[newVall - 1].langs, function (v, k) {
+                    if( $scope.addlangs[v]){
+                        $scope.addlangs[v] ++;
+                    }else{
+                        $scope.addlangs[v] = 1;
+                    }
+                });
+            }
+        }
+    });
+}]);

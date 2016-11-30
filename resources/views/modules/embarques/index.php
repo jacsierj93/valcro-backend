@@ -451,7 +451,14 @@
         <md-sidenav class="md-sidenav-right md-whiteframe-2dp md-sidenav-layer" md-disable-backdrop="true" md-component-id="sendShipment" id="sendShipment"   >
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "sendShipmentCtrl" >
 
-                <vldhtml-preview load="origenes" text="centerText"></vldhtml-preview>
+                <div layout="column"  flex>
+                    <!--<div style="width: 24px; height: 24px; background-color: rebeccapurple" ng-click="test();"> {{langdf}}</div>-->
+
+                    <vldh-mail-contacts correos="correos" contacts="out" langs="langs" class="mail-contacts"  lang="lang" asuntos="asuntos"> </vldh-mail-contacts>
+                    <vldhtml-preview load="origenes" contacts="out" langs="langs" text="centerText" lang="lang" ></vldhtml-preview>
+                </div>
+
+
 
 
             </md-content>
