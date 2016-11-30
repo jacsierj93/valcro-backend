@@ -23,12 +23,12 @@
                     <tbody>
                     <tr style="margin: 0;padding:0">
                         <td align="center" width="30%" style="color: rgb(140,140,140);margin: 0;padding: 10px;; text-align: left;"><img width="150px"  style="margin: 0;padding:0" src='http://valcro.com.ve/images/logo-head.png' ></td>
-                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Emision:
+                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Emit:
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                 {{vl_db_out_put_date($model->emision)}}
                             </p>
                         </td>
-                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px; font-weight: bold;">Nro.
+                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px; font-weight: bold;">Number.
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0; font-weight: normal;">
                                 {{$model->id}}
                             </p>
@@ -53,7 +53,7 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tbody>
                     <tr>
-                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo:
+                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Title:
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" id="titulo">
                                 {{$model->titulo}}
                             </p>
@@ -81,13 +81,13 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tbody>
                     <tr style="margin: 0;padding:0">
-                        <td width="50%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Proveedor:
+                        <td width="50%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Provider:
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                 {{$model->provider->razon_social}}
                             </p></td>
-                        <td width="30" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Pais:
+                        <td width="30" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Country:
                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
-                                @if($model->country) {{$model->country->short_name}} @else No asignado @endif
+                                @if($model->country) {{$model->country->short_name}} @else is not asigment @endif
 
                             </p>
                         </td>
@@ -98,7 +98,7 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tbody>
                     <tr>
-                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; text-align: center;">Articulos
+                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; text-align: center;">Articules
 
                         </td>
                     </tr>
@@ -109,9 +109,9 @@
                     <tbody>
                     <tr style="color: rgb(140,140,140); height: 32px;font-weight: bold;">
                         <td width="5%" style="text-align: left;"> </td>
-                        <td width="20%" style="text-align: left;">Codigo </td>
-                        <td  style="text-align: left;">Descripcion</td>
-                        <td  width="20%"style="text-align: left;">Cantidad</td>
+                        <td width="20%" style="text-align: left;">Code </td>
+                        <td  style="text-align: left;">Descriptio</td>
+                        <td  width="20%"style="text-align: left;">Qualitty</td>
                     </tr>
                     @for ($i = 0; $i < sizeof($model->items()->get()); $i++)
                         <tr style="height: 32px;font-weight: normal; font-size: 13px; @if($i % 2 == 0)  color: #000000;background: rgb(241,241,241) @endif">

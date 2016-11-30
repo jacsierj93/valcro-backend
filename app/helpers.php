@@ -23,7 +23,8 @@ if ( ! function_exists('vl_db_out_put_date'))
      */
     function vl_db_out_put_date($databd)
     {
-        return  date_format(date_create($databd),'d/m/Y');
+
+        return  ($databd != null)?  date_format(date_create($databd),'d/m/Y') : $databd;
     }
 }
 if ( ! function_exists('emails_path'))

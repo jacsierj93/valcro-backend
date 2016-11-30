@@ -11,24 +11,21 @@ Soporte para el correo
  width: 100%;
  height: 100%;
 }
-/*.action {
-  width: 24px;
- color: rgb(92, 183, 235);
- }*/
-
 .actions div {
   width: 24px;
  color: rgb(92, 183, 235);
  font-size: 13px;
  }
-.actions {
 
- }
 .mail-preview-content{
  overflow: auto;
 }
  .mail-preview-content *[contenteditable="true"]{
   cursor:text;
- } .mail-preview-content *{
+ }
+.mail-preview-content *{
   cursor:default;
  }
+.dot-gold {
+  border-color: gold;
+}

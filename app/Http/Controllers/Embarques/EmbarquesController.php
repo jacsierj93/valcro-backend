@@ -1612,24 +1612,33 @@ class EmbarquesController extends BaseController
         $files =emails_templates_lang('Embarques','sumary') ;
         $model = Shipment::findOrfail(250);
         $templates =MailPart::where('modulo','embarques')->where('proposito','sumary')->first();
-
-        $html = View::make('emails/Embarques/sumary/es',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>$model]);
-
-        $result = [];
+        $good = [];
+        $bad = [];
 
         foreach ($files as $aux){
-           $lang = new Language();
-            $lang=$lang->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->first();
-            $result[$aux['iso_lang']] = [
-                'lang'=>$lang->lang,
-                'iso_lang'=>$lang->iso_lang,
-                'body'=>''
-            ];
+            $lang = new Language();
+            $lang = $lang->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->first();
+            $subjet = $templates->subjets()->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->orderByRaw('rand()')->first();
+            if($lang != null && $subjet !=null){
+                $content = [
+                    'lang'=>$lang->lang,
+                    'iso_lang'=>$lang->iso_lang,
+                    'subjet'=>$subjet->texto,
+                    'body'=>
+                        View::make('emails/Embarques/sumary/'.$aux['iso_lang'],[
+                            'subjet'=>$subjet,
+                            'model'=>$model
+                        ])->render()
+                ];
+                $good[$aux['iso_lang']] = $content;
+            }else{
+                $bad[$aux['iso_lang']] = ['lang'=>$lang ,'$subjet'=>$subjet];
+            }
 
         }
 
 
-        return $html;
+        return ['good'=>$good,'bad'=>$bad];
     }
     /************************* products  ***********************************/
 
