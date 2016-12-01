@@ -685,7 +685,7 @@
 
                     </div>
                 </md-content>
-                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()">
+                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?1$parent.showNext(true,saveDependency):showAlert()">
                 </div>
             </div>
 
