@@ -24,6 +24,8 @@ use App\Models\Sistema\Criterios\CritLinCamTip as Criterio;
 use App\Models\Sistema\Criterios\CritCampoOption as Options;
 use App\Models\Sistema\Criterios\OpcionList as Lista ;
 use App\Models\Sistema\Criterios\CritOption;
+use App\Models\Sistema\Criterios\CritDependency;
+use App\Models\Sistema\Criterios\CritDependencyAction;
 
 
 class CritController extends BaseController
@@ -174,5 +176,34 @@ class CritController extends BaseController
         }
         return $ret;
 
+    }
+
+    public function saveDependency(Request $rq){
+        $ret = array("action"=>"new","id"=>false,"ready"=>false);
+        if($rq->id){
+            $dep = CritDependency::find($rq->id);
+            $ret["action"]="upd";
+
+        }else{
+            $dep = CritDependency::where("lct_id",$rq->parent_id)->where("operador",$rq->operator)->where("valor",$rq->condition)->first();
+           // dd($dep);
+            if($dep){
+                $ret["action"]="upd";
+
+            }else{
+                $dep = new CritDependency();
+            }
+        }
+
+        if($ret["action"]=="new"){
+            $dep->lct_id = $rq->parent_id;
+            $dep->operador = $rq->operator;
+            $dep->valor = $rq->condition;
+            $dep->accion = $rq->action;
+            $dep->sub_lct_id = $rq->lct_id;
+            $dep->save();
+            $ret['id'] = $dep->id;
+        }
+        return $ret;
     }
 }

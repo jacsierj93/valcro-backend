@@ -15,3 +15,4 @@ $app->post("criterio/save",'Criterio\CritController@saveCritField');
 $app->post("criterio/saveOptions",'Criterio\CritController@saveOptions');
 $app->post("criterio/createLine",'Criterio\CritController@createLine');
 $app->post("criterio/saveNewItemList",'Criterio\CritController@createOptionList');
+$app->post("criterio/saveDep",'Criterio\CritController@saveDependency');

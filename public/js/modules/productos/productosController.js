@@ -94,7 +94,6 @@ MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidena
     $scope.over = false;
     $scope.showMsg = function(){
         $scope.over = true;
-        console.log($scope.over);
         $timeout(function(){
            if($scope.over){
                if($scope.LineProd.$pristine){
@@ -335,11 +334,24 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             ],{autohidden:3000});
         });
     };
+
+    $scope.opendDep = false;
     $scope.addDepend = function(){
-        $mdSidenav("lyrConfig").open();
+        $mdSidenav("lyrConfig").open().then(function(){
+            $scope.opendDep = true;
+        });
         angular.element("#lyrConst3").animate({"width": (angular.element("#lyrConst3").width()+468)+"px"},500)
     };
 
+    $scope.closeDepend = function(){
+        if($scope.opendDep){
+            $mdSidenav("lyrConfig").close().then(function(){
+                $scope.opendDep = false;
+            });
+            angular.element("#lyrConst3").animate({"width": (angular.element("#lyrConst3").width()-468)+"px"},500)
+        }
+
+    };
 
 }]);
 
@@ -514,8 +526,9 @@ MyApp.controller('treeViewController',['$scope', 'setNotif','masters','critForm'
   
 }]);
 
-MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter) {
+MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter','criterios',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter,criterios) {
     $scope.line = critForm.getLine();
+    $scope.listOptions = critForm.getOptions();
     $scope.$watch("line.id",function(){
         $scope.criteria = critForm.get();
     });
@@ -527,31 +540,64 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
             lct_id:nvo,
             parent_id:false,
             operator:'',
+            condition:"",
             action:null
         };
-        console.log($scope.currentCrit);
     });
+
+    $scope.saveDependency = function(){
+        criterios.put({type:"saveDep"},$scope.configDep,function(data){
+            $scope.configDep.id = data.id;
+            setNotif.addNotif("ok", "GUARDADO!!", [
+            ],{autohidden:1000});
+            $scope.$parent.closeDepend();
+        });
+    };
+
+
+    $scope.getoptSet = function(id){
+        return $filter("filterSearch")($scope.listOptions ,[id])[0];
+    };
+
+    $scope.checkValid = function(){
+        return ($scope.configDep.parent_id && $scope.configDep.operator!='' && $scope.configDep.condition != '' && $scope.configDep.condition != null);
+    };
+    
+    $scope.showAlert = function(){
+        setNotif.addNotif("error", "datos incomṕletos", [
+        ],{autohidden:1000});
+    };
+
     $scope.operator = [
         {
             op:"=",
+            cfg:"all",
             descripcion:"es Igual"
         },{
             op:">",
+            cfg:"texto",
             descripcion:"es Mayor"
         },{
             op:"<",
+            cfg:"texto",
             descripcion:"es Menor"
         },{
             op:"!=",
+            cfg:"texto",
             descripcion:"es diferente"
         },{
             op:">>",
+            cfg:"texto",
             descripcion:"existe en"
         }
     ];
     $scope.setCfg = function(cfg,val){
         $scope.configDep[cfg] = val;
     };
+
+    $scope.$watch("configDep.parent_id",function(nvo){
+        $scope.currentParent = $filter("filterSearch")($scope.criteria,[nvo])[0];
+    })
 
 }]);
 

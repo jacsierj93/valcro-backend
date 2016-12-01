@@ -569,20 +569,20 @@
 
                         </div>
                     </md-content>
-                    <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
-                    </div>
+                    <!--<div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
+                    </div>-->
                 </div>
             </md-sidenav>
 
         </div>
-        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 952px); z-index:80;" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConfig" id="lyrConfig" >
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 952px); z-index:80;" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" click-out="closeDepend()" md-component-id="lyrConfig" id="lyrConfig" >
             <!-- 11) ########################################## MINI LAYER SELECTOR TIPO DE CAMPO ########################################## -->
 
             <input type="hidden" md-autofocus>
-            <div layout="row" flex>
+            <div layout="row" flex ng-controller="dependencyController">
                 <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
 
-                    <div style="padding: 0 8px 0 8px !important" layout="column" flex ng-controller="dependencyController">
+                    <div style="padding: 0 8px 0 8px !important" layout="column" flex>
                         <div class="titulo_formulario row" layout="row" layout-align="start start" >
                             <div>
                                 Configuraciones
@@ -597,7 +597,7 @@
                                 </div>
                                 <div flex layout="column">
                                     <md-content v>
-                                        <div ng-repeat="field in criteria" id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center center">
+                                        <div ng-repeat="field in criteria | filterSelect: configDep.lct_id" id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center center">
                                             {{field.field.descripcion}}
                                         </div>
                                     </md-content>
@@ -608,7 +608,7 @@
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
                                 <div flex layout="column">
                                     <md-content >
-                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
+                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || oper.cfg==currentParent.type.descripcion" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
                                             {{oper.descripcion}}
                                         </div>
                                     </md-content>
@@ -618,26 +618,66 @@
                             <div layout="row" flex>
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
                                 <div flex layout="column">
-                                    <md-input-container class="md-block" class="row">
-                                        <md-switch>
-                                            &nbsp;Visibilidad
-                                        </md-switch>
-                                    </md-input-container>
-                                    <div class="row"></div>
-                                    <div flex ng-if="currentCrit.type.descripcion == 'selector' || currentCrit.type.descripcion == 'opciones'">
-                                        <div class="row">
+                                    <div style="height: 160px: border-bottom:1px solid #ccc">
+
                                             <div class="titulo_formulario row" layout="row" layout-align="start start" >
                                                 <div>
-                                                    Valores posibles
+                                                    Condicion
                                                 </div>
                                             </div>
-                                        </div>
-                                        <md-content flex>
-                                            <div ng-repeat="" id="cfg_{{field.id}}" class="row itemCrit" layout="column" layout-align="center center">
-                                                {{oper}}
-                                            </div>
-                                        </md-content>
+                                            <md-content flex  ng-if="currentParent.type.descripcion == 'selector' || currentParent.type.descripcion == 'opciones'">
+                                                <div
+                                                    ng-repeat="opt in currentCrit.options track by $index"
+                                                    ng-if="opt.camp_tipo == 'array'"
+                                                    ng-click="setCfg('condition',opt.pivot.id)"
+                                                    class="row"
+                                                    ng-class="{'field-sel':configDep.condition == opt.pivot.id}"
+                                                    layout="column"
+                                                    layout-align="center center"
+                                                    style="border-bottom: 1px solid #ccc">
+                                                    {{getoptSet(opt.pivot.value).nombre}}
+                                                </div>
+                                            </md-content>
+                                            <md-input-container id="text" class="md-block" flex prevText ng-if="currentParent.type.descripcion == 'texto'" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
+                                                <label>????</label>
+                                                <input skip-tab
+                                                       info="ingrese el valor contra el que se comparara"
+                                                       autocomplete="off"
+                                                       ng-model="configDep.condition"
+                                                       md-no-asterisk
+                                                       >
+
+                                            </md-input-container>
+
                                     </div>
+                                    <div flex>
+                                        <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                            <div>
+                                                Acciones
+                                            </div>
+                                        </div>
+                                        <md-input-container class="md-block" class="row">
+                                            <md-switch ng-model="configDep.action">
+                                                &nbsp;Visibilidad
+                                            </md-switch>
+                                        </md-input-container>
+                                        <div class="row"></div>
+                                        <div flex ng-if="currentCrit.type.descripcion == 'selector' || currentCrit.type.descripcion == 'opciones'">
+                                            <div class="row">
+                                                <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                                    <div>
+                                                        Valores posibles
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <md-content flex>
+                                                <div ng-repeat="opt in currentCrit.options track by $index" ng-if="opt.camp_tipo == 'array'" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                                    {{getoptSet(opt.pivot.value).nombre}}
+                                                </div>
+                                            </md-content>
+                                        </div>
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -645,7 +685,10 @@
 
                     </div>
                 </md-content>
+                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()">
+                </div>
             </div>
+
         </md-sidenav>
     </div>
     <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
