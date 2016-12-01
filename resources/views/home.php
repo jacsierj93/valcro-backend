@@ -102,5 +102,6 @@
 <?= HTML::script('js/modules/embarques/embarquesController.js') ?>
 <?= HTML::script('js/modules/productos/productosController.js') ?>
 <?= HTML::script('js/modules/main/notificacionesController.js') ?>
+<?= HTML::script('js/modules/main/directives.js') ?>
 </body>
 </html>

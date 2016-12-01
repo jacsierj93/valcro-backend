@@ -452,10 +452,36 @@
             <md-content  layout="row" flex class="sideNavContent" ng-controller= "sendShipmentCtrl" >
 
                 <div layout="column"  flex>
-                    <!--<div style="width: 24px; height: 24px; background-color: rebeccapurple" ng-click="test();"> {{langdf}}</div>-->
 
-                    <vldh-mail-contacts correos="correos" contacts="out" langs="langs" class="mail-contacts"  lang="lang" asuntos="asuntos"> </vldh-mail-contacts>
-                    <vldhtml-preview load="origenes" contacts="out" langs="langs" text="centerText" lang="lang" ></vldhtml-preview>
+                    <vld-mail-with-adj
+                        load="origenes" text="centerText"
+                        correos="correos" contacts="out" langs="langs"  lang="lang"  up-model="adjsUp"
+                        key="mailDemo" storage="shipments" fn-file-up="upfileFinis" fn-up-watch="upFiles" titulo="Prueba de correo"
+                    ></vld-mail-with-adj>
+                    <!-- <div layout ="column" flex>
+                         <div  layout="row"  layout-align="start center" style="    height: 32px;color: rgb(92,183,235);border-bottom: solid 1.5px;  margin-left: 4px;   padding-left: 4px;">
+                             <div flex style="margin-top : 8px;">
+                                 hola
+                             </div>
+                             <div style="width: 24px;" layout="column" layout-align="center center" ng-click="(mode == 'list') ? mode = 'adjs' : mode = 'list' ">
+                                 <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
+                             </div>
+                         </div>
+
+
+                         <div layout ="column" flex >
+
+                         <div  ng-controller="vldCMailWithAdj"  layout ="column" flex >
+                               <vldh-mail-contacts correos="correos" contacts="out" langs="langs"  lang="lang"  > </vldh-mail-contacts>
+                               <vldhtml-preview load="origenes" contacts="out" langs="langs" text="centerText" lang="lang"  ng-show="mode == 'list'"  asuntos="asuntos"  ></vldhtml-preview>
+                               <vld-file-up-img  ng-show="mode != 'list'" up-model="adjsUp"  key="mailDemo" storage="shipments" fn-file-up="upfileFinis" fn-up-watch="upFiles" ></vld-file-up-img>
+                           </div
+
+                         </div>>
+
+
+                     </div>-->
+
                 </div>
 
 
@@ -3788,6 +3814,7 @@
 
                                 ></textarea>
                             </div>
+                            <!--------- modo adj --------->
                             <div layout="column" flex ng-show="mode != 'list'">
                                 <div style="padding: 2px;; min-height: 56px;" layout="row" ng-show="!$parent.session.isblock ">
                                     <div ngf-drop ngf-select  ng-model="files" class="drop-box" ngf-drag-over-class="dragover"

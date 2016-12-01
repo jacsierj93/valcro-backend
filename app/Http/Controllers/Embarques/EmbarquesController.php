@@ -1624,6 +1624,7 @@ class EmbarquesController extends BaseController
                     'lang'=>$lang->lang,
                     'iso_lang'=>$lang->iso_lang,
                     'subjet'=>$subjet->texto,
+                    'subjets'=>$templates->subjets()->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->orderByRaw('rand()')->lists('texto'),
                     'body'=>
                         View::make('emails/Embarques/sumary/'.$aux['iso_lang'],[
                             'subjet'=>$subjet,
@@ -1638,7 +1639,7 @@ class EmbarquesController extends BaseController
         }
 
 
-        return ['good'=>$good,'bad'=>$bad];
+        return ['good'=>$good,'bad'=>$bad, 'subjets'=>$templates->subjets()->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->orderByRaw('rand()')->lists('texto')];
     }
     /************************* products  ***********************************/
 

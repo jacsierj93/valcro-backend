@@ -1,4 +1,4 @@
-<div layout="column" >
+<div layout="column" class="mail-contacts"  >
     <div flex layout="row"  layout-align="end start" class="mail-option">
         <div layout="row" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
             Cc
@@ -74,7 +74,7 @@
         </md-chips>
 
         <md-input-container class="md-block"  >
-            <label>Asunto</label>
+            <label style="width: calc(100% - 4px );">Asunto</label>
             <md-autocomplete md-selected-item="subject"
                              info="Asunto del correo"
                              required
