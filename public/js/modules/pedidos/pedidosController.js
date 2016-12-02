@@ -124,16 +124,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     $scope.docOrder ={};
     $scope.docOrder.order ='id';
-    Order.get({type:"OrderProvList"},{},function(response){
-        $scope.todos = response.proveedores;
-        $scope.paises = response.paises;
-        /*$timeout(function(){
-         angular.forEach(response, function(v){
-         /!*angular.forEach(function(v.paises))*!/
-         });
-
-         }, 100);*/
-
+    Order.query({type:"OrderProvList"},{},function(response){
+        $scope.todos = response;
     });
 
     $timeout(function(){$scope.init();
@@ -147,8 +139,10 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
     },0);
+    /**final @deprecated*/
+    $scope.setProvedor =function(prov, all) {
 
-
+    };
 
     $scope.getAlerts = function(){
         Order.query({type:'Notifications'},{}, function(response){
@@ -777,123 +771,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     };
 
-    // documentos
-    $scope.filterDocuments = function (data, obj){
 
-        if(data){
-
-
-            if(data.length > 0 && obj){
-                data = $filter("customFind")(data, obj,function(current,compare){
-                    if(compare.id ){
-                        if(current.id.toLowerCase().indexOf(compare.id)== -1){
-                            return false;
-                        }
-                    }
-                    if(compare.documento && compare.documento != '-1'){
-                        if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
-                            return false;
-                        }
-                    }
-
-                    if(compare.titulo){
-                        if( current.titulo.toLowerCase().indexOf(compare.titulo)== -1){
-                            return false;
-                        }
-                    }
-
-                    if(compare.nro_proforma){
-                        if(!current.nro_proforma){
-                            return false;
-                        }
-                        if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
-                            return false;
-                        }
-
-                    }
-                    if(compare.proveedor){
-                        if(!current.proveedor){
-                            return false;
-                        }
-                        if(current.toLowerCase().indexOf(compare.proveedor) == -1){
-                            return false;
-                        };
-                    }
-                    if(compare.nro_factura ){
-                        if(!current.nro_factura){
-                            return false;
-                        }
-                        if(current.nro_factura.toLowerCase().indexOf(compare.nro_factura) == -1){
-                            return false;
-                        }
-
-                    }
-                    if(compare.emision){
-                        var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
-                        if( patern.test(compare.emision)){
-                            var dc=new Date(Date.parse(current.emision));
-                            var m;
-                            if ((m = patern.exec(compare.emision)) !== null) {
-                                var aux, dcp;
-                                if(m[0].indexOf('-') != -1){
-                                    aux = m[0].split('-');
-                                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
-                                    return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear()
-
-                                }else if(m[0].indexOf('/') != -1){
-                                    aux = m[0].split('/');
-                                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
-                                }
-                                if(dc.getDate() != dcp.getDate() || dc.getMonth() != dc.getMonth() || dcp.getFullYear() != dcp.getFullYear()){
-                                    return false;
-                                }
-
-                            }
-                        }else{
-                            var date=DateParse.toDate(current.emision);
-
-                            return date.getDay().toString().toLowerCase().indexOf(compare.emision)!= -1
-                                || (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.emision)!= -1
-                                || ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.emision)!= -1
-                                || ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.emision)!= -1
-                                || date.getDate().toString().toLowerCase().indexOf(compare.emision)!= -1
-                                || date.getFullYear().toString().toLowerCase().indexOf(compare.emision)!= -1
-                                || date.toString().toLowerCase().indexOf(compare.emision)!= -1;
-                        }
-                    }
-
-                    if(compare.diasEmit && compare.diasEmit != '-1'){
-                        if( current.diasEmit != compare.diasEmit){
-                            return false;
-                        }
-                    }
-                    if(compare.monto){
-                        if(!current.monto){
-                            return false;
-                        }
-                        if(current.monto.toString().toLowerCase().indexOf(compare.monto) == -1){
-                            return false;
-                        }
-
-                    }
-                    if(compare.comentario){
-                        if(!current.comentario){
-                            return false;
-                        }
-                        if(current.comentario.toLowerCase().indexOf(compare.comentario) == -1){
-
-                            return false;
-                        }
-
-                    }
-
-                    return true;
-                });
-
-            }
-        }
-        return data;
-    };
 
     // productos del documentos
     $scope.filterProdDoc = function(data, obj){
@@ -1144,9 +1022,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
             $scope.document.id = response.id;
             setGetOrder.setOrder({id:response.id,tipo:$scope.formMode.value});
             setGetOrder.setState('select');
-
-
         });
+
         $scope.navCtrl.value="detalleDoc";
         $scope.navCtrl.estado= true;
 
@@ -1233,104 +1110,87 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     /** al pulsar la flecha siguiente
      *  working
      * **/
-    $scope.next = function () {
-        $scope.showNext(false);
-        switch($scope.module.layer){
-            case "resumenPedido":
-                setGetOrder.setOrder(angular.copy($scope.resumen));
-                $scope.Docsession.isCopyableable = true;
+    $scope.next = function (data) {
+        if(data){
+            data();
+        }else{
 
-                $scope.formMode= $scope.forModeAvilable.getXname($scope.resumen.documento);
-                $scope.navCtrl.value = "detalleDoc" ;
-                $scope.navCtrl.estado= true;
-                return;
-                break;
-            case "detalleDoc":
-                $scope.LayersAction({search:{name:"listProducProv",
-                    before:function(){
-                        $scope.providerProds = [];
-                        Order.query({type:"ProviderProds", id:$scope.provSelec.id,tipo:$scope.formMode.value, doc_id:$scope.document.id},{}, function(response){
-                            // var data =[];
-                            // var aux ={};
-                            angular.forEach(response , function(v,k){
-                                //aux ={};
-                                //aux = v;
-                                v.saldo=parseFloat(v.saldo);
-                                $scope.providerProds.push(v);
-                            });
-                            // $scope.providerProds= data;
-                        });
-                    },
-                    after: function(){
-                        //if(setGetOrder.getState() == 'new');
-                        //$timeout(function(){
-                        //    //setGetOrder.setOrder($scope.document);
-                        //},0)
+
+            switch($scope.module.layer){
+                case "resumenPedido":
+                    setGetOrder.setOrder(angular.copy($scope.resumen));
+                    $scope.Docsession.isCopyableable = true;
+
+                    $scope.formMode= $scope.forModeAvilable.getXname($scope.resumen.documento);
+                    $scope.navCtrl.value = "detalleDoc" ;
+                    $scope.navCtrl.estado= true;
+                    return;
+                    break;
+                case "detalleDoc":
+
+                    /*  $scope.navCtrl.value = "listProducProv" ;
+                     $scope.navCtrl.estado= true;*/
+                    break;
+                case "listProducProv":
+
+
+
+                    $scope.LayersAction({search:{name:"agrPed",before: function(){}}});
+
+                    break;
+                case "agrPed":
+
+                    if($scope.document.productos.todos.length == 0
+                        && $scope.document.productos.contraPedido.length == 0
+                        && $scope.document.productos.kitchenBox.length  == 0
+                        && $scope.document.productos.pedidoSusti.length  == 0
+                        && !$scope.Docsession.block
+                    )
+                    {
+                        $scope.NotifAction("alert",
+                            "No se a selecionado ningun documento para la "+$scope.formMode.name+ " ¿desea continuar de todas formas? "
+                            ,[
+                                {name:"Cancelar", action: function(){}}
+                                ,{name:"Continuar",action: function(){
+                                    $scope.navCtrl.value = "finalDoc" ;
+                                    $scope.navCtrl.estado= true;
+
+                                }}
+                            ],{block:true});
                     }
-                }});
-                /*  $scope.navCtrl.value = "listProducProv" ;
-                 $scope.navCtrl.estado= true;*/
-                break;
-            case "listProducProv":
+
+                    else{
+                        $scope.navCtrl.value = "finalDoc" ;
+                        $scope.navCtrl.estado= true;
+                    }
+
+                    break;
+                case "finalDoc":
+
+                    if($scope.finalDoc.productos.length == 0 && !$scope.Docsession.block)
+                    {
+                        $scope.NotifAction("alert",
+                            "No se ha cargado ningun articulo para la "+$scope.formMode.name+ " ¿desea continuar? "
+                            ,[
+                                {name:"Cancelar", action: function(){}}
+                                ,{name:"Continuar",action: function(){
+
+                                    $scope.navCtrl.value = "close" ;
+                                    $scope.navCtrl.estado= true;
+
+                                }}
+                            ],{block:true});
+                    }else{
+                        $scope.navCtrl.value = "close";
+                        $scope.navCtrl.estado= true;
+                    }
+                    break;
+                case "previewEmail":
+                    $scope.sendPreviewEmail();
 
 
-
-                $scope.LayersAction({search:{name:"agrPed",before: function(){}}});
-
-                break;
-            case "agrPed":
-
-                if($scope.document.productos.todos.length == 0
-                    && $scope.document.productos.contraPedido.length == 0
-                    && $scope.document.productos.kitchenBox.length  == 0
-                    && $scope.document.productos.pedidoSusti.length  == 0
-                    && !$scope.Docsession.block
-                )
-                {
-                    $scope.NotifAction("alert",
-                        "No se a selecionado ningun documento para la "+$scope.formMode.name+ " ¿desea continuar de todas formas? "
-                        ,[
-                            {name:"Cancelar", action: function(){}}
-                            ,{name:"Continuar",action: function(){
-                                $scope.navCtrl.value = "finalDoc" ;
-                                $scope.navCtrl.estado= true;
-
-                            }}
-                        ],{block:true});
-                }
-
-                else{
-                    $scope.navCtrl.value = "finalDoc" ;
-                    $scope.navCtrl.estado= true;
-                }
-
-                break;
-            case "finalDoc":
-
-                if($scope.finalDoc.productos.length == 0 && !$scope.Docsession.block)
-                {
-                    $scope.NotifAction("alert",
-                        "No se ha cargado ningun articulo para la "+$scope.formMode.name+ " ¿desea continuar? "
-                        ,[
-                            {name:"Cancelar", action: function(){}}
-                            ,{name:"Continuar",action: function(){
-
-                                $scope.navCtrl.value = "close" ;
-                                $scope.navCtrl.estado= true;
-
-                            }}
-                        ],{block:true});
-                }else{
-                    $scope.navCtrl.value = "close";
-                    $scope.navCtrl.estado= true;
-                }
-                break;
-            case "previewEmail":
-                $scope.sendPreviewEmail();
-
-
+            }
         }
-        $scope.showNext(false);
 
 
 
@@ -1344,54 +1204,28 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.showNext = function (status) {
         if (status) {
             if($scope.module.layer == 'detalleDoc'){
-                if (!$scope.FormHeadDocument.$valid && $scope.module.layer == 'detalleDoc') {
-                    $scope.NotifAction("error",
-                        "Existen campos pendientes por completar, por favor verifica que información le falta."
-                        ,[],{autohidden:autohidden});
-
-                    $timeout(function(){
-                        var inval = angular.element(" form[name=FormHeadDocument] .ng-invalid ");
-                        if(inval[0]){
-                            inval[0].focus();
-                        }else{
-                            inval = angular.element(" form[name=FormHeadDocument] ng-untouched");
-                            console.log(" terro ", inval)
-                            inval[0].focus();
-                        }
-                    },0);
-
-
-                }else  if($scope.module.layer == 'detalleDoc' && !$scope.FormAprobCompras.$pristine)
-                {
-                } else{
-                    $mdSidenav("NEXT").open();
-                }
-                /*else if(!$scope.FormAprobCompras.$valid && !$scope.FormAprobCompras.$pristine ){
+                $mdSidenav("NEXT").open();
+                /*if (!$scope.FormHeadDocument.$valid && $scope.module.layer == 'detalleDoc') {
                  $scope.NotifAction("error",
-                 "¿Desea cancelar la aprobacion de la"+$scope.formMode.name+" ?"
-                 ,[{name:"si",
-                 action:function (){
-                 $mdSidenav("NEXT").open();
-                 $scope.document.nro_doc= null;
-                 $scope.document.fecha_aprob_compra= null;
-                 $scope.FormAprobCompras.$setDirty();
+                 "Existen campos pendientes por completar, por favor verifica que información le falta."
+                 ,[],{autohidden:autohidden});
 
-                 }
-                 }, {name:"No",
-                 action:function (){
                  $timeout(function(){
-                 var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
+                 var inval = angular.element(" form[name=FormHeadDocument] .ng-invalid ");
                  if(inval[0]){
                  inval[0].focus();
                  }else{
-                 inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
+                 inval = angular.element(" form[name=FormHeadDocument] ng-untouched");
                  console.log(" terro ", inval)
                  inval[0].focus();
                  }
                  },0);
 
-                 }
-                 }],{autohidden:autohidden});
+
+                 }else  if($scope.module.layer == 'detalleDoc' && !$scope.FormAprobCompras.$pristine)
+                 {
+                 } else{
+                 $mdSidenav("NEXT").open();
                  }*/
 
             } else if($scope.module.layer == 'listProducProv'){
@@ -1890,80 +1724,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     /*********************************************** EVENTOS FOCUS LOST ***********************************************/
 
 
-    $scope.setProvedor =function(prov) {
 
-        if( $scope.module.index == 0){
-            $scope.LayersAction({open:{name:"listPedido", after:function(){
-                $scope.ctrl.provSelec = prov;
-                loadPedidosProvedor(prov.id);
-            }}});
-        }else if($scope.module.layer == "listPedido"){
-
-            $scope.ctrl.provSelec = prov;
-            loadPedidosProvedor(prov.id);
-        }else if($scope.module.layer == "detalleDoc"){
-            if($scope.document.uid != null){
-                if($scope.ctrl.provSelec == null){
-                    $scope.ctrl.provSelec=prov;
-                }else if($scope.ctrl.provSelec.id != prov.prov_id){
-                    $scope.ctrl.provSelec=prov;
-                }
-            }else{
-                $timeout(function(){
-                    var elem=angular.element("#prov"+$scope.ctrl.provSelec.id);
-                    angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
-                    elem[0].focus();
-                },1);
-            }
-
-        }else if($scope.module.layer != "listPedido" && !$scope.provSelec.id){
-
-            $scope.LayersAction({close:{init:true, after: function(){
-                $scope.LayersAction({open:{name:"listPedido", after:function(){
-                    $scope.ctrl.provSelec = prov;
-                    loadPedidosProvedor(prov.id);
-                }}});
-            }}});
-        }
-        else if($scope.module.layer != "listPedido" && $scope.provSelec.id){
-            if( setGetOrder.getInternalState() == 'new'){
-                $scope.LayersAction({close:{all:true, after: function(){
-                    $scope.LayersAction({open:{name:"listPedido", after:function(){
-                        $scope.ctrl.provSelec = prov;
-                        loadPedidosProvedor(prov.id);
-                    }}});
-                }}});
-            }else{
-                var focus = angular.element(":focus");
-                $scope.NotifAction("alert","Se han realizado cambio en la "+$scope.formMode.name+ " ¿esta seguro de salir sin culminar?",[
-                    {
-                        name:"No",
-                        action: function(){
-                            focus.focus();
-                        }
-                    },
-                    {
-                        name:"Si",
-                        action: function(){
-                            $scope.LayersAction({close:{all:true, after: function(){
-                                $scope.LayersAction({open:{name:"listPedido", after:function(){
-                                    $scope.ctrl.provSelec = prov;
-                                    loadPedidosProvedor(prov.id);
-                                }}});
-                            }}});
-
-
-                        }
-                    }
-
-                ],{block:true});
-
-            }
-
-
-
-        }
-    };
 
     $scope.closeSide = function(){
 
@@ -1985,33 +1746,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     };
 
-    $scope.DtPedido = function (doc) {
-        // setGetOrder.clear();
-        $scope.gridView= 1;
-        var  paso=  true;
-        if ($mdSidenav("addAnswer").isOpen()){
-            paso=false;
 
-        }
-
-        var aux= angular.copy(doc);
-        if(doc && $scope.module.index <2 && paso){
-            if (segurity('editPedido')) {
-                //$scope.document = aux;;
-                setGetOrder.setOrder(aux);
-                setGetOrder.setState("select");
-                $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-                $scope.Docsession.global='upd';
-                $scope.preview=false;
-                $scope.navCtrl.value="detalleDoc";
-                $scope.navCtrl.estado=true;
-                $scope.Docsession.isCopyableable = true;
-                $scope.Docsession.block = true;
-
-            }
-
-        }
-    };
 
     $scope.openTempDoc = function(doc){
         $scope.gridView= 1;
@@ -3762,30 +3497,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     };
 
-    function loadPedidosProvedor(id, callback){
-        $scope.provDocs = [];
-        Order.query({type:"OrderProvOrder", id:id}, {},function(response){
 
-            angular.forEach(response, function (v, k) {
-                v.emision= DateParse.toDate(v.emision);
-                v.monto= parseFloat(v.monto);
-                v.tasa= parseFloat(v.tasa);
-                if(v.ult_revision){
-                    v.ult_revision= DateParse.toDate(v.ult_revision);
-                }
-                // v.isNew=false;
-                $scope.provDocs.push(v);
-
-            });
-            if(callback){
-                callback();
-            }
-
-
-
-            // $scope.provSelec.pedidos=items;
-        });
-    }
 
     /*********************************  peticiones  guardado $http ********************* ************/
 
@@ -3795,16 +3507,286 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 });
 
+/***lista de documentos  de un proveedor*/
+MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse','clickCommitSrv','Order', function ($scope,$timeout,$filter,DateParse,commitSrv, Order) {
 
+    $scope.clikBind = commitSrv.bind();
+    $scope.tbl = {
+        data: [],
+        order:'id'
+    };
+
+    $scope.$parent.OrderlistPedidoCtrl = function (prov) {
+        $scope.LayersAction({open:{name:"listPedido", after:function(){
+            $scope.load( $scope.$parent.ctrl.provSelec.id);
+        }}});
+    };
+
+    $scope.load = function(id){
+        $scope.tbl.data.splice(0, $scope.tbl.data.length);
+        Order.query({type:"OrderProvOrder", id:id}, {},function(response){
+
+            angular.forEach(response, function (v, k) {
+                v.emision= DateParse.toDate(v.emision);
+                v.monto= parseFloat(v.monto);
+                v.tasa= parseFloat(v.tasa);
+                if(v.ult_revision){
+                    v.ult_revision= DateParse.toDate(v.ult_revision);
+                }
+                $scope.tbl.data.push(v);
+            });
+        });
+    };
+
+    $scope.$watch('clikBind.state', function (newVal) {
+        if(newVal){
+            $timeout(function () {
+                var data = commitSrv.get();
+                commitSrv.setState(false);
+                if(data.commiter == 'setProveedor'){
+                    if($scope.$parent.module.index == 0){
+                        $scope.$parent.ctrl.provSelec = data.scope.item;
+                        $scope.$parent.OrderlistPedidoCtrl ();
+                        commitSrv.setState(false);
+                    }else if($scope.$parent.module.layer == 'listPedido'){
+                        $scope.$parent.ctrl.provSelec = data.scope.item;
+                        $scope.load(data.scope.item.id);
+                        commitSrv.setState(false);
+                    }
+
+                }
+            },0);
+
+        }
+    });
+    $scope.filterDocuments = function (data, obj){
+
+        if(data){
+
+
+            if(data.length > 0 && obj){
+                data = $filter("customFind")(data, obj,function(current,compare){
+                    if(compare.id ){
+                        if(current.id.toLowerCase().indexOf(compare.id)== -1){
+                            return false;
+                        }
+                    }
+                    if(compare.documento && compare.documento != '-1'){
+                        if($scope.forModeAvilable.getXname(current.documento).value != compare.documento){
+                            return false;
+                        }
+                    }
+
+                    if(compare.titulo){
+                        if( current.titulo.toLowerCase().indexOf(compare.titulo)== -1){
+                            return false;
+                        }
+                    }
+
+                    if(compare.nro_proforma){
+                        if(!current.nro_proforma){
+                            return false;
+                        }
+                        if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
+                            return false;
+                        }
+
+                    }
+                    if(compare.proveedor){
+                        if(!current.proveedor){
+                            return false;
+                        }
+                        if(current.toLowerCase().indexOf(compare.proveedor) == -1){
+                            return false;
+                        };
+                    }
+                    if(compare.nro_factura ){
+                        if(!current.nro_factura){
+                            return false;
+                        }
+                        if(current.nro_factura.toLowerCase().indexOf(compare.nro_factura) == -1){
+                            return false;
+                        }
+
+                    }
+                    if(compare.emision){
+                        var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
+                        if( patern.test(compare.emision)){
+                            var dc=new Date(Date.parse(current.emision));
+                            var m;
+                            if ((m = patern.exec(compare.emision)) !== null) {
+                                var aux, dcp;
+                                if(m[0].indexOf('-') != -1){
+                                    aux = m[0].split('-');
+                                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+                                    return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear()
+
+                                }else if(m[0].indexOf('/') != -1){
+                                    aux = m[0].split('/');
+                                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
+                                }
+                                if(dc.getDate() != dcp.getDate() || dc.getMonth() != dc.getMonth() || dcp.getFullYear() != dcp.getFullYear()){
+                                    return false;
+                                }
+
+                            }
+                        }else{
+                            var date=DateParse.toDate(current.emision);
+
+                            return date.getDay().toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || (date.getMonth() + 1).toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || ("0"+(date.getMonth() + 1).toString().toLowerCase()).indexOf(compare.emision)!= -1
+                                || ("0"+(date.getDate() ).toString().toLowerCase()).indexOf(compare.emision)!= -1
+                                || date.getDate().toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || date.getFullYear().toString().toLowerCase().indexOf(compare.emision)!= -1
+                                || date.toString().toLowerCase().indexOf(compare.emision)!= -1;
+                        }
+                    }
+
+                    if(compare.diasEmit && compare.diasEmit != '-1'){
+                        if( current.diasEmit != compare.diasEmit){
+                            return false;
+                        }
+                    }
+                    if(compare.monto){
+                        if(!current.monto){
+                            return false;
+                        }
+                        if(current.monto.toString().toLowerCase().indexOf(compare.monto) == -1){
+                            return false;
+                        }
+
+                    }
+                    if(compare.comentario){
+                        if(!current.comentario){
+                            return false;
+                        }
+                        if(current.comentario.toLowerCase().indexOf(compare.comentario) == -1){
+
+                            return false;
+                        }
+
+                    }
+
+                    return true;
+                });
+
+            }
+        }
+        return data;
+    };
+
+    $scope.DtPedido = function (doc) {
+        $scope.OrderDetalleCtrl(doc);
+        // setGetOrder.clear();
+        /*   $scope.gridView= 1;
+         var  paso=  true;
+         if ($mdSidenav("addAnswer").isOpen()){
+         paso=false;
+
+         }
+
+         var aux= angular.copy(doc);
+         if(doc && $scope.module.index <2 && paso){
+         if (segurity('editPedido')) {
+         //$scope.document = aux;;
+         setGetOrder.setOrder(aux);
+         setGetOrder.setState("select");
+         $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
+         $scope.Docsession.global='upd';
+         $scope.preview=false;
+         $scope.navCtrl.value="detalleDoc";
+         $scope.navCtrl.estado=true;
+         $scope.Docsession.isCopyableable = true;
+         $scope.Docsession.block = true;
+
+         }
+
+         }*/
+    };
+}]);
+
+/***lista de documentos  de un proveedor*/
+MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order','setGetOrder',  function ($scope,$timeout,DateParse, Order, setGetOrder) {
+
+
+    $scope.$parent.OrderDetalleCtrl = function (data) {
+        $scope.FormHeadDocument.$setUntouched();
+        $scope.FormEstatusDoc.$setUntouched();
+        $scope.FormAprobCompras.$setUntouched();
+        $scope.FormCancelDoc.$setUntouched();
+        $scope.isTasaFija=true;
+
+
+        if(data){
+            $scope.gridView= 1;
+            setGetOrder.setOrder({id:data.id, tipo:data.tipo});
+            setGetOrder.setState("select");
+            $scope.$parent.formMode= $scope.$parent.forModeAvilable.getXname(data.documento);
+            $scope.$parent.Docsession.global='upd';
+            $scope.$parent.preview = false;
+            $scope.$parent.Docsession.isCopyableable = true;
+            $scope.$parent.Docsession.block = true;
+        }
+        $scope.LayersAction({search:{name:"detalleDoc" }});
+
+
+        $scope.canNext = function () {
+            if (!$scope.FormHeadDocument.$valid) {
+                $scope.NotifAction("error",
+                    "Existen campos pendientes por completar, por favor verifica que información le falta."
+                    ,[],{autohidden:autohidden});
+
+                $timeout(function(){
+                    var inval = angular.element(" form[name=FormHeadDocument] .ng-invalid ");
+                    if(inval[0]){
+                        inval[0].focus();
+                    }else{
+                        inval = angular.element(" form[name=FormHeadDocument] ng-untouched");
+                        console.log(" terro ", inval)
+                        inval[0].focus();
+                    }
+                },0);
+
+                return false;
+
+            }
+            return true;
+        }
+    }
+
+}]);
 
 //OrderlistProducProv
-MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','form', function ($scope,Order) {
+MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','clickCommitSrv', function ($scope,Order,masters,clickCommitSrv) {
 
+    masters.query({type:"prodLines"},{}, function (response) {
+        $scope.lineas= response;
+    });
 
-    $scope.change = function (data) {
+    $scope.$parent.OrderlistProducProvCtrl = function () {
+        $scope.LayersAction({search:{name:"listProducProv",
+            before:function(){
+                $scope.providerProds = [];
+                Order.query({type:"ProviderProds", id:$scope.$parent.ctrl.provSelec.id,tipo:$scope.$parent.formMode.value, doc_id:$scope.document.id},{}, function(response){
+
+                    angular.forEach(response , function(v,k){
+
+                        v.saldo=parseFloat(v.saldo);
+                        $scope.providerProds.push(v);
+                    });
+                });
+            },
+            after: function(){
+            }
+        }});
+    };
+
+    $scope.change = function (data, event) {
 
         if(!data.asignado){
-            $scope.$parent.OrderCreatProduct(data);
+            clickCommitSrv.commit('OrderCreatProductCtrl', data,event);
+
         }else{
             $scope.NotifAction("alert","Esta seguro de remover el producto",
                 [
@@ -3819,7 +3801,7 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','form', function ($
                 ]
                 ,{block:true}) ;
         }
-    }
+    };
 
     $scope.showNext = function () {
         if (!$scope.listProductoItems.$valid) {
@@ -3831,7 +3813,16 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','form', function ($
             return false;
         }
         return true;
-    }
+    };
+
+    $scope.$watch('lineaSelec', function (newVal, oldVal) {
+        if(newVal ){
+            masters.query({type:"prodSubLines", linea_id: newVal.id},{}, function (response) {
+                $scope.subLineas =response;
+            });
+
+        }
+    });
 }]);
 /**
  * controller for mdsidenav mail type popUp, this controller is responsable de send correo option, this is used for send text,
@@ -4050,36 +4041,16 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','set
     }
 }]);
 
-MyApp.controller('OrderCreatProductCtrl',['$scope','$mdSidenav','Order','form',  function($scope, $mdSidenav,Order, formSrv){
+MyApp.controller('OrderCreatProductCtrl',['$scope','$timeout','$mdSidenav','Order','clickCommitSrv','form',  function($scope, $timeout,$mdSidenav,Order,commitSrv, formSrv){
 
 
-    //inicilizar
+    $scope.clikBind = commitSrv.bind();
+
     $scope.block= false;
     $scope.next = undefined;
     $scope.isOpen = false;
     $scope.select ={};
     $scope.event =undefined;
-
-    // constructor
-    $scope.$parent.OrderCreatProduct = function (data) {
-
-        if(!$scope.select.id){
-            $scope.select= data.item;
-            $mdSidenav("OrderminiCreatProduct").open().then(function(){
-                $scope.isOpen = true;
-            });
-        }else{
-            $scope.event = data.event;
-            $scope.question(function () {
-
-            });
-
-        }
-
-
-
-    };
-
     $scope.question = function (fn) {
 
         if(!$scope.select.saldo){
@@ -4113,27 +4084,53 @@ MyApp.controller('OrderCreatProductCtrl',['$scope','$mdSidenav','Order','form', 
             $scope.save(fn);
         }
     }
-
-
     // close
     $scope.close = function (event) {
-        if( $scope.isOpen){
-            if(
-                $scope.prod.$pristine && angular.element(event.target).parents("[OrderCreatProduct]").length == 0 ){
-                $scope.inCloset();
-            }else if( angular.element(event.target).parents("[OrderCreatProduct]").length > 0  && !$scope.prod.$pristine){
+        $timeout(function () {
+            if( $scope.isOpen && !$scope.inRow){
 
+                if(!$scope.prod.$pristine ){
+                    if(!$scope.validateModel()){
+                        $scope.NotifAction("alert", "¡Muy pocos datos! No has colocado suficentes datos como para guardar el producto ",
+                            [
+                                {name:"Descartar", action: function () {
+                                    $scope.inCloset();
+
+                                }},
+                                {name:"Corregir", action: function () {
+
+                                }}
+                            ]
+                            ,{block:true})
+
+                    }else{
+                        $scope.save(function () {
+                            $scope.inCloset();
+                        });
+                    }
+
+                }else {
+                    $scope.inCloset();
+                }
             }
-        }
+
+        },1)
 
 
     };
 
+    $scope.validateModel = function (fn) {
+        return $scope.prod.$valid;
+    };
     $scope.save = function (fn) {
-        $scope.NotifAction("alert","Agregado",[]);
+        $scope.NotifAction("ok","Actualizado",[],{autohidden:1500});
+        $scope.select.asignado= true;
+        if(fn){
+            fn();
+        }
     };
     $scope.delete = function (fn) {
-        $scope.NotifAction("alert","Agregado",[]);
+        $scope.NotifAction("alert","Eliminado",[],{autohidden:1500});
     };
     $scope.inCloset = function (event) {
 
@@ -4144,10 +4141,67 @@ MyApp.controller('OrderCreatProductCtrl',['$scope','$mdSidenav','Order','form', 
 
     };
 
+    $scope.validate = function () {
+
+    };
     $scope.setData = function (data) {
         $scope.select = data;
-    }
+    };
 
+    $scope.open = function () {
+
+    };
+    $scope.$watch('clikBind.state', function (newVal) {
+        if(newVal){
+            $timeout(function () {
+                var data = commitSrv.get();
+                commitSrv.setState(false);
+                if(data.commiter == 'OrderCreatProductCtrl'){
+                    $scope.inRow = true;
+                    if(!$scope.isOpen ){
+                        $scope.prod.$setPristine();
+                        $scope.prod.$setUntouched();
+                        $scope.select= data.scope;
+                        $scope.copy = angular.copy(data.scope);
+                        $mdSidenav("OrderminiCreatProduct").open().then(function(){
+                            $scope.isOpen = true;
+                            $scope.inRow= false;
+                        });
+                    }else{
+                        if($scope.prod.$pristine || !$scope.prod.$valid ){
+                            $scope.select= data.scope;
+                            $scope.copy = angular.copy(data.scope);
+                        }else  if(!angular.equals($scope.select,$scope.copy )) {
+                            if($scope.validateModel()){
+                                $scope.NotifAction("alert","¿Deseas guardar las cambios realizados?",
+                                    [
+                                        {name:"Guardar", action: function () {
+                                            $scope.save(function () {
+                                                $scope.select= data.scope;
+                                                $scope.copy = angular.copy(data.scope);
+                                            });
+                                        }},
+                                        {name:"Descartar", action: function () {
+                                            $scope.prod.$setPristine();
+                                            $scope.prod.$setUntouched();
+                                            $scope.select= data.scope;
+                                            $scope.copy = angular.copy(data.scope);
+
+                                        }}
+                                    ]
+                                );
+                            }else{
+
+                            }
+                        }
+
+                    }
+
+                }
+            },0);
+
+        }
+    });
 
 }]);
 
@@ -4326,19 +4380,20 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
             var arg = $scope.accion.data;
             $timeout(function () {
                 $scope.accion.estado=false;
-            },0)
+            },0);
+            $timeout(function () {
+                if(arg.open){
+                    open(arg.open, module);
+                }else
+                if(arg.close){
 
-            if(arg.open){
-                open(arg.open, module);
-            }else
-            if(arg.close){
+                    close(arg.close,module);
+                }else
+                if(arg.search){
+                    search(arg.search, module);
+                }
+            },0);
 
-                close(arg.close,module);
-            }else
-            if(arg.search){
-                search(arg.search, module);
-            }else {
-            }
 
         }
     });

@@ -356,8 +356,8 @@ class OrderController extends BaseController
      */
     public function getProviderList()
     {
-        $data =[];
-        $cPaises =[];
+    /*    $data =[];
+        $cPaises =[];*/
 
         $rawn = "id, razon_social ,contrapedido,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
@@ -382,7 +382,7 @@ class OrderController extends BaseController
         $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
 
         $provs = Provider::selectRaw($rawn)->whereRaw("(select count(id) from tbl_prov_moneda where prov_id = tbl_proveedor.id) > 0 ")->get();
-        foreach($provs as $aux){
+   /*     foreach($provs as $aux){
             $paises= [];
             foreach( $aux->getCountry() as $p){
                 $paises[] = $p->short_name;
@@ -391,14 +391,11 @@ class OrderController extends BaseController
                 }
             }
             $aux['paises'] =$paises ;
-            // $provs['paises'] =
-
-
         }
         $data['proveedores'] = $provs;
-        $data['paises'] = $cPaises;
+        $data['paises'] = $cPaises;*/
 
-        return $data;
+        return $provs;
     }
 
     /**
@@ -1654,32 +1651,23 @@ class OrderController extends BaseController
         $model = $model->findOrFail($req->doc_id);
         $modelIts= $model->items()->where('tipo_origen_id', '1')->get();
         foreach($items as $aux){
-            $temp= array();
-            $temp['id'] = $aux->id;
-            $temp['descripcion'] = $aux->descripcion;
-            $temp['codigo'] = $aux->codigo;
-            $temp['codigo_fabrica'] =$aux->codigo_fabrica;
-            $temp['puntoCompra'] = false;
-            $temp['cantidad'] =0;
-            $temp['saldo'] =0;
-            /*            $temp['stock'] = $i;*/
-            $temp['tipo_producto_id'] = $aux->tipo_producto_id;
-            $temp['tipo_producto'] = $types->where('id',$aux->tipo_producto_id)->first()->descripcion;
-            $temp['asignado'] = false;
-            if($aux->descripcion == null){
-                $temp['descripcion'] = "Profit ".$aux->descripcion_profit;
-            }
+            $aux->puntoCompra = false;
+            $aux->cantidad =0;
+            $aux->saldo =0;
+            $aux->tipo_producto = $types->where('id',$aux->tipo_producto_id)->first()->descripcion;
+            $aux->asignado = false;
             $itMo=$modelIts->where('producto_id',$aux->id)->first();
-            $temp['otre']=$itMo;
+            $aux->otre=$itMo;
+            $aux->descripcion  =  ($aux->descripcion == null || $aux->descripcion == '' )?  $aux->descripcion_profit : $aux->descripcion;
+
             if($itMo != null){
-                $temp['asignado'] = true;
-                $temp['saldo'] = $itMo->saldo;
-                $temp['reng_id'] = $itMo->id;
+                $aux->asignado = true;
+                $aux->saldo = $itMo->saldo;
+                $aux->reng_id = $itMo->id;
+                $aux->costo_unitario = $itMo->costo_unitario;
 
             }
-            $data[]=$temp;
-
-
+            $data[]=$aux;
         }
         return $data;
 
@@ -1718,6 +1706,9 @@ class OrderController extends BaseController
         return $temp;
     }
 
+    public function  ProviderProductSave(Request $req){
+
+    }
 
     /*********************** SOLICITUD ************************/
 

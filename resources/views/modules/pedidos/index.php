@@ -103,11 +103,12 @@
                 </div>
             </div>
 
-            <div id="listado" flex  style="overflow-y:auto;"  >
+            <div id="listado" flex  style="overflow-y:auto;">
                 <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
+                     click-commit="{{index == 0}} " key="setProveedor"
                 >
 
                     <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
@@ -295,7 +296,6 @@
 
             </div>
         </div>
-
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listImport" id="listImport">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" >
@@ -523,211 +523,173 @@
         <!-- ########################################## LAYER LISTA DE PEDIDOS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listPedido" id="listPedido">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent" >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistPedidoCtrl">
                 <div layout="column" flex>
-                    <form layout="row">
-                        <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
-                        <div class="titulo_formulario" style="height: 39px; margin-left: 24px;" flex>
-                            <div>
-                                <span style="color: #000;">{{provSelec.razon_social}}</span>
+                    <div layout="row" class="focused">
+                        <div active-left ></div>
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                <div>
+                                    <span >{{provSelec.razon_social}}</span>
+                                </div>
                             </div>
                         </div>
-                    </form>
-                    <form layout="row">
-                        <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
-                        <div layout="row" flex ng-init="docOrder.order == id " tabindex="0">
-                            <div class="cellEmpty"> </div>
-                            <div layout="row" style="width: 80px;">
-                                <div class="cell-filter-order"  layout-align="center center" layout="column" >
-                                    <div flex ng-click="docOrder.order = 'documento' "><img ng-src="{{(docOrder.order == 'documento') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div flex ng-click="docOrder.order = '-documento' "><img ng-src="{{( (docOrder.order == '-documento')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-                                <md-input-container class="md-block"  flex>
-                                    <md-select ng-model="docOrder.filter.documento" ng-init="docOrder.filter.documento ='-1'">
+                    </div>
 
-                                        <md-option value="-1" layout="row">
-                                            <img ng-src="images/Documentos.png" style="width:20px;">
+                    <div layout="row" class="table-filter">
+                        <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
+                        <div layout="row" class="row" flex ng-init="docOrder.order == id " tyle="padding-right: 4px;">
+                            <div class="cellEmpty"> </div>
+                            <div layout="row" style="width: 120px;" >
+                                    <md-select ng-model="tbl.filter.documento" ng-init="tbl.filter.documento ='-1'" flex style="">
+                                        <md-option value="-1" layout="row" style="overflow: hidden;">
+                                            <img ng-src="images/Documentos.png" style="width:20px;"/> Todos
                                         </md-option>
                                         <md-option value="21" layout="row" >
-                                            <img ng-src="images/solicitud_icon_48x48.gif" style="width:20px;">
+                                            <img ng-src="images/solicitud_icon_48x48.gif" style="width:20px;">Solicitud
                                         </md-option>
                                         <md-option value="22" layout="row">
-                                            <img ng-src="images/proforma_icon_48x48.gif" style="width:20px;">
+                                            <img ng-src="images/proforma_icon_48x48.gif" style="width:20px;">Proforma
 
                                         </md-option>
                                         <md-option value="23" layout="row">
-                                            <img ng-src="images/odc_icon_48x48.gif" style="width:20px;">
+                                            <img ng-src="images/odc_icon_48x48.gif" style="width:20px;">ODC
                                         </md-option>
                                     </md-select>
-
-                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="documento"></grid-order-by>
                             </div>
 
                             <div flex layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="docOrder.order = 'titulo' "><img ng-src="{{(docOrder.order == 'titulo') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-titulo' " ><img ng-src="{{( (docOrder.order == '-titulo')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Titulo</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="docOrder.filter.titulo"
+                                           ng-model="tbl.filter.titulo"
                                            skip-tab
                                     >
                                 </md-input-container>
-
-
+                                <grid-order-by ng-model="tbl" key="titulo"></grid-order-by>
                             </div>
                             <div flex="10" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="docOrder.order = 'nro_proforma' "><img ng-src="{{(docOrder.order == 'nro_proforma') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-nro_proforma' "><img ng-src="{{( (docOrder.order == '-nro_proforma')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Proforma</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="docOrder.filter.nro_proforma"
+                                           ng-model="tbl.filter.nro_proforma"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="nro_proforma"></grid-order-by>
 
                             </div>
                             <div flex="10" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="docOrder.order = 'emision' " ><img ng-src="{{(docOrder.order == 'emision') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-emision' " ><img ng-src="{{( (docOrder.order == '-emision')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Emision</label>
                                     <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="docOrder.filter.emision"
+                                           ng-model="tbl.filter.emision"
                                            skip-tab
                                     >
                                 </md-input-container >
-
+                                <grid-order-by ng-model="tbl" key="emision"></grid-order-by>
 
                             </div>
-                            <div style="width: 80px;" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="docOrder.order = 'diasEmit' " ><img ng-src="{{(docOrder.order == 'diasEmit') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-diasEmit' " ><img ng-src="{{( (docOrder.order == '-diasEmit')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-                                <md-input-container class="md-block"  flex>
-                                    <label></label>
-                                    <md-select ng-model="docOrder.filter.diasEmit"  ng-init="docOrder.filter.diasEmit = '-1'">
-                                        <md-option value="-1">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item" style="border: 1px solid #bbb9b9;color: #bbb9b9;">
-                                                    All
-                                                </div>
+                            <div style="width: 80px; color: white;" layout="row">
+                                <md-select ng-model="tbl.filter.diasEmit"  ng-init="tbl.filter.diasEmit = '-1'">
+                                    <md-option value="-1">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item" style="border: 1px solid #bbb9b9;color: #bbb9b9;">
+                                                All
                                             </div>
-                                        </md-option>
-                                        <md-option value="100">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit100 " >
-                                                    +
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="100">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit100 " >
+                                                +
                                             </div>
-                                        </md-option>
-                                        <md-option value="90">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit90 " >
-                                                    90
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="90">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit90 " >
+                                                90
                                             </div>
-                                        </md-option>
-                                        <md-option value="60">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit60 " >
-                                                    60
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="60">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit60 " >
+                                                60
                                             </div>
-                                        </md-option>
-                                        <md-option value="30">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit30 " >
-                                                    30
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="30">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit30 " >
+                                                30
                                             </div>
-                                        </md-option>
-                                        <md-option value="7">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit7 " >
-                                                    7
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="7">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit7 " >
+                                                7
                                             </div>
-                                        </md-option>
-                                        <md-option value="0">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit0" >
-                                                    Hoy
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="0">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit0" >
+                                                Hoy
                                             </div>
-                                        </md-option>
-                                    </md-select>
-                                </md-input-container>
-
+                                        </div>
+                                    </md-option>
+                                </md-select>
+                                       <grid-order-by ng-model="tbl" key="diasEmit"></grid-order-by>
 
                             </div>
                             <div flex="10" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="docOrder.order = 'nro_factura' " ><img ng-src="{{(docOrder.order == 'nro_factura') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-nro_factura' " ><img ng-src="{{( (docOrder.order == '-nro_factura')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Factura</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="docOrder.filter.nro_factura"
+                                           ng-model="tbl.filter.nro_factura"
                                            skip-tab
                                     >
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl" key="nro_factura"></grid-order-by>
 
 
                             </div>
                             <div flex="" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div  ng-click="docOrder.order = 'monto' " ><img ng-src="{{(docOrder.order == 'monto') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-monto' "><img ng-src="{{( (docOrder.order == '-monto')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="docOrder.filter.monto"
+                                           ng-model="tbl.filter.monto"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="monto"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
-                                <div class="cell-filter-order" layout-align="center center"  >
-                                    <div  ng-click="docOrder.order = 'comentario' " ><img ng-src="{{(docOrder.order == 'comentario') ? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}" ></div>
-                                    <div ng-click="docOrder.order = '-comentario' " ><img ng-src="{{( (docOrder.order == '-comentario')) ?'images/TrianguloDown.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
                                 <md-input-container class="md-block"  flex>
                                     <label>Comentario</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="docOrder.filter.comentario"
+                                           ng-model="tbl.filter.comentario"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="comentario"></grid-order-by>
 
                             </div>
                             <div style="width: 80px;"></div>
-
-
-
                         </div>
-                    </form>
+                    </div>
                     <form layout="row"  class="gridContent" flex>
                         <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
                         <div layout="column" flex="" ng-mouseleave="hoverLeave(false)"  >
-                            <div   ng-repeat="item in filterDocuments(provDocs, docOrder.filter) | orderBy : docOrder.order as docsFiltering"   id="doc{{$index}}"  >
+                            <div   ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : docOrder.order as filter"   id="doc{{$index}}"  >
                                 <div layout="row" class="cellGridHolder" >
                                     <div  class=" cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)"  ng-click="DtPedido(item)"> </div>
-                                    <div style="width: 80px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
+                                    <div style="width: 120px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
 
                                         <div layout-align="center center"  style="text-align: center; width: 100%; ">
                                             <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
@@ -755,7 +717,7 @@
 
                                 </div>
                             </div>
-                            <div layout="column" layout-align="center center" ng-show="docsFiltering.length == 0 " flex>
+                            <div layout="column" layout-align="center center" ng-show="filter.length == 0 " flex>
                                 No hay datos para mostrar
                             </div>
                         </div>
@@ -1130,7 +1092,7 @@
         <!-- ) ########################################## LAYER  FORMULARIO INFORMACION DEL DOCUMENTO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="detalleDoc" id="detalleDoc">
 
-            <md-content  layout="row" flex class="sideNavContent" >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderDetalleDocCtrl" >
                 <div  layout="column" flex="" layout-align=" none" >
                     <form name="FormHeadDocument" layout="row" ng-class="{focused: gridView == 1}" ng-style="(gridView != 5 && tbl_dtDoc.extend == 0 ) ? {'min-height' : '320px'} : {} ">
                         <div active-left></div>
@@ -1154,7 +1116,7 @@
                             <div   ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex ng-click="allowEdit()" >
                                     <label>Proveedor</label>
-                                    <md-autocomplete md-selected-item="ctrl.provSelec"
+                                    <md-autocomplete md-selected-item="$parent.ctrl.provSelec"
                                                      info="Seleccione un proveedor para el documento"
                                                      required
                                                      ng-disabled="( document.uid == null  )"
@@ -1196,7 +1158,7 @@
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container   ng-show="( gridView != 5 )"  class="md-block" flex ng-click="allowEdit()" >
                                     <label>Titulo</label>
-                                    <input  ng-model="document.titulo"
+                                    <input  ng-model="$parent.document.titulo"
                                             ng-change=" toEditHead('titulo', document.titulo ) "
                                             ng-disabled="( Docsession.block )"
                                             required
@@ -1212,7 +1174,7 @@
 
                                 <md-input-container class="md-block" flex="40" ng-click="allowEdit()"  alert="{'none':'No hay data para '+provSelec.razon_social} " alert-show="(formData.paises.length > 0) ? '': 'none'" >
                                     <label>Pais</label>
-                                    <md-autocomplete md-selected-item="document.objs.pais_id"
+                                    <md-autocomplete md-selected-item="$parent.document.objs.pais_id"
                                                      info="'Selecione el pais de origen de los productos'"
                                                      ng-disabled="( Docsession.block || !provSelec.id )"
                                                      ng-click="toEditHead('pais_id', document.pais_id)"
@@ -1237,7 +1199,7 @@
                                 </md-input-container>
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()" alert="{'none':'No se le han creado direciones de facturacion a '+provSelec.razon_social} " alert-show="(formData.direccionesFact.length > 0) ? '': 'none'" >
                                     <label>Direccion Facturacion</label>
-                                    <md-autocomplete md-selected-item="document.objs.direccion_facturacion_id"
+                                    <md-autocomplete md-selected-item="$parent.document.objs.direccion_facturacion_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id)"
                                                      ng-click="toEditHead('direccion_facturacion_id', document.direccion_facturacion_id)"
                                                      info="Selecione la direccion que debe especificarse en la factura "
@@ -1269,7 +1231,7 @@
 
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()"  alert="{'none':'No se la han asignado direcciones de almacen a'+provSelec.razon_social} " alert-show="(formData.direcciones.length > 0) ? '': 'none'">
                                     <label>Direccion almacen</label>
-                                    <md-autocomplete md-selected-item="document.objs.direccion_almacen_id"
+                                    <md-autocomplete md-selected-item="$parent.document.objs.direccion_almacen_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id  || document.objs.pais_id ==  null )"
                                                      ng-click="toEditHead('direccion_almacen_id', document.direccion_almacen_id)"
                                                      info="'Selecione la direccion que debe especificarse en la factura"
@@ -1297,7 +1259,7 @@
                                 </md-input-container>
                                 <md-input-container class="md-block"  flex ng-click="allowEdit()" alert="{'none':'No se le han asignado puertos a'+provSelec.razon_social} " alert-show="(formData.puertos.length > 0) ? '': 'none'">
                                     <label>Puerto</label>
-                                    <md-autocomplete md-selected-item="document.objs.puerto_id"
+                                    <md-autocomplete md-selected-item="$parent.document.objs.puerto_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id || document.objs.direccion_almacen_id == null)"
                                                      ng-click="toEditHead('puerto_id', document.puerto_id)"
                                                      info=" Selecione la direccion que debe especificarse en la factura "
@@ -1326,7 +1288,7 @@
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex="15" ng-click="allowEdit()">
                                     <label>Monto</label>
-                                    <input  ng-model="document.monto"
+                                    <input  ng-model="$parent.document.monto"
                                             decimal
                                             ng-disabled="( Docsession.block )"
                                             required
@@ -1339,7 +1301,7 @@
 
                                 <md-input-container class="md-block" flex="10" ng-click="allowEdit()" alert="{'none':'No se le han asignado monedas a'+provSelec.razon_social} " alert-show="(formData.monedas.length > 0) ? '': 'none'">
                                     <label>Moneda</label>
-                                    <md-autocomplete md-selected-item="document.objs.prov_moneda_id"
+                                    <md-autocomplete md-selected-item="$parent.document.objs.prov_moneda_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id )"
                                                      required
                                                      ng-click="toEditHead('prov_moneda_id', document.prov_moneda_id)"
@@ -1381,7 +1343,7 @@
 
                                 <md-input-container class="md-block" flex="" ng-click="allowEdit()" alert="{'none':'No se le ha asignado condiciones de pago a '+provSelec.razon_social} " alert-show="(formData.condicionPago.length > 0) ? '': 'none'">
                                     <label>Condicion de pago</label>
-                                    <md-autocomplete md-selected-item = "document.objs.condicion_pago_id"
+                                    <md-autocomplete md-selected-item = "$parent.document.objs.condicion_pago_id"
                                                      ng-disabled = "( Docsession.block  || !provSelec.id)"
                                                      ng-click="toEditHead('condicion_pago_id', document.condicion_pago_id)"
                                                      info="Seleccione una condicion para la realizacion del pago"
@@ -1411,7 +1373,7 @@
 
                                 <md-input-container class="md-block" flex  >
                                     <label>N° Factura:</label>
-                                    <input ng-model="document.nro_factura"  ng-disabled="( Docsession.block)"
+                                    <input ng-model="$parent.document.nro_factura"  ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('nro_factura', document.nro_factura)"
                                            info="Introducir Nro de factura en caso de tenerla"
                                            skip-tab
@@ -1426,7 +1388,7 @@
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
-                                    <input ng-model="document.nro_proforma"  ng-disabled="( Docsession.block)"
+                                    <input ng-model="$parent.document.nro_proforma"  ng-disabled="( Docsession.block)"
                                            ng-required ="(formMode.value == 22 || formMode.value == 23 )"
                                            ng-change="toEditHead('nro_proforma', document.nro_proforma)"
                                            info="Introducir Nro de proforma en caso de tenerla"
@@ -1442,7 +1404,7 @@
 
                                 <md-input-container class="md-block" flex="10">
                                     <label>Mt3</label>
-                                    <input ng-model="document.mt3"  name="mt3"
+                                    <input ng-model="$parent.document.mt3"  name="mt3"
                                            ng-model="number" decimal
                                            ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('mt3', document.mt3)"
@@ -1453,7 +1415,7 @@
 
                                 <md-input-container class="md-block" flex="10" >
                                     <label>Peso</label>
-                                    <input ng-model="document.peso" name="peso" decimal
+                                    <input ng-model="$parent.document.peso" name="peso" decimal
                                            ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('peso', document.peso)"
                                            info="Sumatoria de los pesos de productos"
@@ -1466,7 +1428,7 @@
                             <div ng-show="( gridView != 5 && tbl_dtDoc.extend == 0 )"  layout="row" class="row" >
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
-                                    <input ng-model="document.comentario"  ng-disabled="( Docsession.block)"
+                                    <input ng-model="$parent.document.comentario"  ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('nro_proforma', document.nro_proforma)"
                                            info="Algun texto adicional referente al documento"
                                            skip-tab
@@ -1479,7 +1441,7 @@
                     <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
                         <div active-left></div>
                         <div layout="column" flex >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" ng->
+                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" >
                                 <div class="titulo_formulario" style="height:39px;" flex ng-click="gridView = 2" >
                                     <div>
                                         Aprobacion de Gerente
@@ -1487,20 +1449,11 @@
                                 </div>
 
                             </div>
-                            <!--<div layout="row" flex class="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}"  >
-                                <div class="titulo_formulario" layout="Column" layout-align="start start" ng-click=" gridView = 2">
-                                    <div>
-                                        Aprobacion de Gerente
-                                    </div>
-                                </div>
-
-                            </div>-->
-
                             <div layout="row" ng-show="( gridView == 2 )" class="row"  id="estatusDoc">
 
                                 <md-input-container class="md-block" flex="">
                                     <label>Estatus</label>
-                                    <md-select ng-model="document.estado_id"
+                                    <md-select ng-model="$parent.document.estado_id"
                                                ng-disabled="( gridView != 2 ||  Docsession.block  || !document.permit.aprob_gerencia )"
                                                ng-change="toEditHead('estado_id', document.estado_id)"
                                                skip-tab
@@ -1530,14 +1483,6 @@
                                 </div>
 
                             </div>
-                           <!-- <div layout="row" flex class="row"  class="form-row-head" ng-class="{'form-row-head-select':gridView == 3}" >
-                                <div class="titulo_formulario"  layout="column" layout-align="start start" ng-click=" gridView = 3">
-                                    <div>
-                                        Aprobación
-                                    </div>
-                                </div>
-                            </div>-->
-
                             <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
 
 
@@ -1546,7 +1491,7 @@
                                         <div>Fecha Aprobación: </div>
                                     </div>
                                     <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="document.fecha_aprob_compra" md-placeholder="Fecha"
+                                        <md-datepicker ng-model="$parent.document.fecha_aprob_compra" md-placeholder="Fecha"
                                                        ng-disabled="(Docsession.block)"
                                                        skip-tab
                                                        required
@@ -1559,7 +1504,7 @@
 
                                 <md-input-container class="md-block" >
                                     <label>N° Documento</label>
-                                    <input ng-model="document.nro_doc"  ng-disabled="(Docsession.block)"
+                                    <input ng-model="$parent.document.nro_doc"  ng-disabled="(Docsession.block)"
                                            ng-change="toEditHead('nro_doc', document.nro_doc)"
                                            required
                                            skip-tab
@@ -1572,13 +1517,6 @@
                                         {{ (document.adjuntos | stringKey :'AprobCompras': 'documento' ).length || 0 }}
                                     </div>
                                 </div>
-                                <!--<div layout="column" layout-align="center center"
-                                      >
-                                    <span  style="font-size: 24px">(/)</span>
-                                    <md-tooltip>Cancelar aprobacion
-                                    </md-tooltip>
-                                </div>-->
-
                             </div>
                         </div>
 
@@ -1594,18 +1532,10 @@
                                 </div>
 
                             </div>
-                            <!--<div layout="row" flex class="row" >
-
-                                <div class="titulo_formulario" layout="column"  id="docCancel" layout-align="start start" ng-click=" gridView = 4">
-                                    <div>
-                                        Cancelacion
-                                    </div>
-                                </div>
-                            </div>-->
 
                             <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
                                 <label>Motivo de cancelacion </label>
-                                <input  ng-model="document.comentario_cancelacion"
+                                <input  ng-model="$parent.document.comentario_cancelacion"
                                         ng-disabled="(Docsession.block)"
                                         id="mtvCancelacion"
                                         ng-change="toEditHead('comentario_cancelacion', document.comentario_cancelacion)"
@@ -1626,7 +1556,7 @@
                                 </div>
                             </div>
                             <div layout-align="center center" layout="column">
-                                <span style="color: #1f1f1f" ng-show="(document.productos.todos.length > 0 )">
+                                <span style="color: #1f1f1f" ng-show="($parent.document.productos.todos.length > 0 )">
                                         ({{document.productos.todos.length}})</span>
                             </div>
 
@@ -1728,10 +1658,8 @@
 
                 </div>
                 <div   id="expand"></div>
-               <!-- <div style="width: 16px;"   ng-mouseover="showNext(true)"  ng-mouseenter="(gridView == 3) ? saveAprobCompras(): 0" > </div>-->
-                <vl-next click="next" vl-show="testShow"></vl-next>
+                <div style="width: 16px;"  ng-mouseenter="(gridView == 3) ? saveAprobCompras(): 0 ; (canNext()) ? $parent.showNext(true) :0 ;$parent.nextLayer = $parent.OrderlistProducProvCtrl" > </div>
             </md-content>
-
 
         </md-sidenav>
 
@@ -1855,23 +1783,65 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listProducProv" id="listProducProv">
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistProducProvCtrl">
                 <div  layout="column" flex class="layerColumn" >
-                    <div  layout="row" class="focused form-style">
-                        <!----FILTROS ---->
+                    <div layout="row" class="focused">
                         <div active-left ></div>
-                        <div class="titulo_formulario md-block"  layout="row" >
-
-                            <div>
-                                Productos
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                <div>
+                                    <span >  Productos</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-style" name="newProd" layout="row">
-                        <!----FILTROS ---->
+                    <div  layout="row" class="row">
+                        <div active-left ></div>
+                        <md-input-container class="md-block"  flex >
+                            <label>Linea</label>
+                            <md-autocomplete md-selected-item="lineaSelec"
+                                             info="Linea del producto "
+                                             skip-tab
+                                             md-search-text="lineaText"
+                                             md-auto-select="true"
+                                             md-items="item in lineas | stringKey : lineaText : 'linea' "
+                                             md-item-text="item.linea"
+                                             md-autoselect = "true"
+                                             md-no-asterisk
+                                             md-min-length="0"
+                                             md-require-match="true"
+                                             md-no-cache="true"
+                                             md-select-on-match
+                                             md-selected-item-change="tbl_listProducProv.filter.linea_id = (lineaSelec.id && lineaSelec.id != 0 ) ? lineaSelec.id : undefined ;"
+                            >
+                                <md-item-template>
+                                    <span>{{item.linea}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+                        </md-input-container>
+                        <md-input-container class="md-block"   flex>
+                            <label>Sub-Linea</label>
+                            <md-autocomplete md-selected-item="SublineaSelec"
+                                             info="Sub linea  del producto "
+                                             skip-tab
+                                             md-search-text="SublineaText"
+                                             md-items="item in subLineas | stringKey : lineaText : 'linea'  "
+                                             md-item-text="item.sublinea"
+                                             md-min-length="0"
+                                             md-no-cache="true"
+                                             md-select-on-match
+                                             md-selected-item-change="tbl_listProducProv.filter.sub_linea = SublineaSelec.id;"
+                                             ng-disabled="!lineaSelec"
+                            >
+                                <md-item-template>
+                                    <span>{{item.sublinea}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+                        </md-input-container>
+                    </div>
+                    <div  layout="row" class="row">
                         <div active-left ></div>
                         <div layout="column" flex>
                             <div layout="row" class="headGridHolder" ng-init="tbl_listProducProv.order = 'id' ">
                                 <div flex="5" class=""></div>
-
                                 <div layout="row" flex="20">
                                     <md-input-container class="md-block"  flex>
                                         <label>Codigo</label>
@@ -1882,7 +1852,6 @@
                                     </md-input-container>
                                     <grid-order-by ng-model="tbl_listProducProv" key="codigo"></grid-order-by>
                                 </div>
-
                                 <div layout="row" flex="20">
 
                                     <md-input-container class="md-block" flex>
@@ -1909,9 +1878,6 @@
                                     </md-input-container>
                                     <grid-order-by ng-model="tbl_listProducProv" key="descripcion"></grid-order-by>
                                 </div>
-
-                                <!--<div flex="10" ng-disabled="(prodResult && prodResult.length == 0 )"></div>-->
-
                                 <div layout="row" flex="15">
 
 
@@ -1935,7 +1901,7 @@
                         <div active-left ></div>
                         <div  flex layout="column">
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order  as filterProductProv"
-                                   ng-mouseenter = "mouseEnterProd(item) " row-select ng-click="change({item:item,event:$event})" OrderCreatProduct >
+                                   ng-mouseenter = "mouseEnterProd(item) " row-select ng-click="change(item, $event)" OrderCreatProduct >
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellEmpty cellSelect">
                                         <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(true)" ng-model="item.asignado"></md-switch>
@@ -1966,8 +1932,9 @@
 
                     </form>
                 </div>
-                <vl-next click="next" vl-show="showNext"></vl-next>
-                <!--<div style="width: 16px;" ng-mouseover="showNext(true)" > </div>-->
+                <div style="width: 16px;"  ng-mouseenter="(canNext()) ? $parent.showNext(true) :0 ;$parent.nextLayer = $parent.next" > </div>
+
+
 
             </md-content>
         </md-sidenav>
@@ -4177,7 +4144,7 @@
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderminiCreatProduct" id="OrderminiCreatProduct"
         >
-            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderCreatProductCtrl" style="padding-left: 12px" >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderCreatProductCtrl" style="padding-left: 12px"  click-out="close($event)" >
                 <div  layout="column" flex class="layerColumn"   click-out="close($event)">
                     <div layout="row" class="form-row-head form-row-head-select" >
 
@@ -4206,7 +4173,7 @@
                                 <div layout="column" layout-align="center center">Costo unitario </div>
                             </div>
                             <md-input-container class="md-block rms" flex >
-                                <input skip-tab  id="input" type="text" ng-model="select.precio" range minVal="0.1" maxVal="{{select.cantidad}}"   >
+                                <input skip-tab ng-required="$parent.document.nro_proforma" id="input" type="text" ng-model="select.costo_unitario" decimal   >
                             </md-input-container>
 
                             <md-tooltip >Monto a pagar por unidad</md-tooltip>
@@ -4777,7 +4744,8 @@
             layout="column" layout-align="center center" class="md-sidenav-right"
             md-disable-backdrop="true" md-component-id="NEXT" id="NEXT"
            >
-            <div  style="width: 100%;" ng-controller="vlNextCtrl"   ng-mouseleave="showNext()"  layout="column" layout-align="center center" flex ng-click="clicker(this)"> <?= HTML::image("images/btn_nextArrow.png") ?></div>
+            <div  style="width: 100%;" ng-mouseleave="showNext()"  layout="column" layout-align="center center" flex ng-click="next(nextLayer)">
+                <?= HTML::image("images/btn_nextArrow.png") ?></div>
 
         </md-sidenav>
 

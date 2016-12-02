@@ -426,8 +426,17 @@ textarea{
     margin-bottom: 10px;
 }
 
-.table-filter-head{
-    padding: 0 4px 0 0;
+.table-filter{
+    padding-right: 4px;
+    color: #999999;
+}
+
+.table-filter * {
+    color: #999999;
+}
+.table-filter div md-select{
+    margin: 0; height: 30px;
+
 }
 .table-filter-order-by img {
     width: 8px;

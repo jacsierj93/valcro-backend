@@ -3,6 +3,9 @@
  */
 /*************************  e-mail *******************************/
 
+/**
+ * directiva que genera preciew rederizado de un string html editable
+ * */
 MyApp.directive('vldhtmlPreview', function() {
 
     return {
@@ -211,6 +214,9 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
     );
 }]) ;
 
+/**
+ * crear los campos to , cc,ccb de envio de correos
+ * */
 MyApp.directive('vldhMailContacts', function() {
 
     return {
@@ -366,6 +372,10 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
     });
 }]);
 
+/**
+ * combina  vldhtmlPreview con vldCMailContacts para generar un visisro de envio de correos
+
+ * */
 MyApp.directive('vldMailWithAdj', function() {
 
     return {
@@ -413,6 +423,7 @@ MyApp.directive('vldMailWithAdj', function() {
         }
     };
 });
+
 MyApp.controller('vldCMailWithAdj',['$scope',function($scope){
     $scope.mode ='list';
 
@@ -420,7 +431,10 @@ MyApp.controller('vldCMailWithAdj',['$scope',function($scope){
     ]
 );
 
-/************************* files  *******************************/
+/**
+ * sube archivos al sevidor y muestra el  preview y barra de carga
+ *
+ * */
 MyApp.directive('vldFileUpImg', function() {
 
     return {
@@ -463,3 +477,42 @@ MyApp.controller('vldCFileUpImg',['$scope','fileSrv',function($scope, fileSrv){
         }
     });
 }]);
+
+MyApp.directive('clickCommit', function(clickCommitSrv) {
+
+    return {
+        link: function(scope, elem, attr){
+            elem.bind('click', function (e) {
+                clickCommitSrv.commit(attr.key, scope, e);
+            });
+        }
+
+    };
+});
+MyApp.service('clickCommitSrv', function($timeout) {
+    var event = undefined;
+    var scope = undefined;
+    var key = '';
+    var  bind = {state:false}
+    return {
+        bind: function () {
+            return bind;
+        },
+        commit: function (k,sp,e) {
+            if( !bind.state ){
+                key= k;
+                scope= sp;
+                event= e;
+                bind.state=true;
+            }
+
+        },
+        setState: function (data) {
+            bind.state=data;
+        },
+        get: function () {
+            return {event:event, scope:scope,commiter:key}
+        }
+
+    }
+});

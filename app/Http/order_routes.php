@@ -32,7 +32,10 @@ $app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); //
 
 $app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el correo
 
-//$app->get("Order/CloseAction",'Orders\OrderController@closeAction'); ///obtiene los correo de un proveedor
+//***productos */
+$app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtiene los produtos de un proveedor
+$app->post ("Order/Product/Save",'Orders\OrderController@ProviderProductSave'); ///obtiene los produtos de un proveedor
+$app->post ("Order/Product/Delete",'Orders\OrderController@ProviderProductDelete'); ///obtiene los produtos de un proveedor
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated
@@ -46,7 +49,6 @@ $app->get("Order/ProviderPaymentCondition",'Orders\OrderController@getProviderPa
 $app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressStore'); ///@deprecated
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine lospuertos de un proveedor
-$app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtine los produtos de un proveedor
 $app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
 
