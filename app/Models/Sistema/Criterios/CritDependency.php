@@ -16,4 +16,9 @@ class CritDependency extends Model
     use SoftDeletes;
     protected $table = "tbl_crit_dependencia";
 
+
+    public function parent(){
+        return $this->hasOne('App\Models\Sistema\Criterios\CritLinCamTip','id','lct_id')
+            ->join('tbl_crit_campos','campo_id',"=",'tbl_crit_campos.id');
+    }
 }

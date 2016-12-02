@@ -18,6 +18,11 @@
     background:rgba(84, 180, 234,0.8);
 }
 
+.bigRow{
+    height: 80px;
+
+}
+
 #critConstruct md-sidenav{
     z-index:70;
 }

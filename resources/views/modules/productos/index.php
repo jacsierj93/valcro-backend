@@ -561,10 +561,16 @@
 
                             <div flex>
                                 <div class="titulo_formulario row" layout="column" layout-align="start start">
-                                    <div ng-click="addDepend()">
+                                    <div ng-click="addDepend(false)">
                                         Dependencias
                                     </div>
                                 </div>
+                                <md-content flex>
+                                    <div ng-repeat="dep in selCrit.deps track by $index" ng-click="addDepend(dep)" class="row" layout="row" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                        {{dep.parent.descripcion}} {{dep.operador}} {{dep.valor}}
+                                    </div>
+                                </md-content>
+
                             </div>
 
                         </div>
@@ -685,7 +691,7 @@
 
                     </div>
                 </md-content>
-                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?1$parent.showNext(true,saveDependency):showAlert()">
+                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()">
                 </div>
             </div>
 

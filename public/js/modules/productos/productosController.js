@@ -143,6 +143,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
+
     $scope.listOptions = critForm.getOptions();
 
     $scope.opcValue = {
@@ -260,7 +261,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         
         if(id){
             $scope.opcValue.opts.valor.unshift(id);
-            console.log($scope.ctrl);
             $timeout(function(){$scope.ctrl.searchOptions = null},0);
             saveOptions($scope.opcValue)
         }
@@ -285,11 +285,17 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.$watch("critField.type",function(val){
         $scope.options = (val)?$filter("filterSearch")($scope.tipos ,[val])[0].cfg:[];
     });
+    $scope.$watch("line.id",function(val){
+        $scope.criteria = critForm.get();
+    });
     $scope.$watch("critField.id",function(val){
-        $timeout(function(){
 
+
+        $timeout(function(){
+            $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
+            console.log( $scope.selCrit)
             angular.forEach($scope.opcValue, function(value, key){
-                value.field_id = val
+                value.field_id = val;
                 if(key!="opts"){
                     var v =  $filter("customFind")($scope.critField.opcs,[value.opc_id],function(c,v){
                         return c.pivot.opc_id == v[0];
@@ -336,7 +342,11 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
     $scope.opendDep = false;
-    $scope.addDepend = function(){
+    $scope.addDepend = function(deps){
+        if(deps){
+            critForm.setDepend(deps)
+        }
+
         $mdSidenav("lyrConfig").open().then(function(){
             $scope.opendDep = true;
         });
@@ -381,6 +391,16 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         field:null,
         opcs:[]
     };
+
+    var dependency = {
+        id:false,
+        lct_id:edit.id,
+        parent_id:false,
+        operator:'',
+        condition:"",
+        action:null
+    };
+
     return {
         setLine:function(elem){
             curLine.id = elem.id;
@@ -469,6 +489,29 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         },
         getOptions:function () {
             return ListOptions;
+        },
+
+        setDepend : function(depend){
+            if(depend){
+                dependency.id = depend.id || false;
+                dependency.parent_id = depend.lct_id || false;
+                dependency.lct_id = depend.sub_lct_id || false;
+                dependency.operator = depend.operador || "";
+                dependency.condition = depend.valor || "";
+                dependency.action = depend.accion || null;
+            }else{
+                dependency.id = false;
+                dependency.parent_id = false;
+                dependency.lct_id = false;
+                dependency.operator = "";
+                dependency.condition = "";
+                dependency.action = null;
+            }
+
+        },
+
+        getDepend : function(){
+            return dependency;
         }
 
     }
@@ -533,16 +576,10 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         $scope.criteria = critForm.get();
     });
     $scope.currentLct = critForm.getEdit();
+    $scope.configDep = critForm.getDepend();
     $scope.$watch("currentLct.id",function(nvo){
         $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
-        $scope.configDep = {
-            id:false,
-            lct_id:nvo,
-            parent_id:false,
-            operator:'',
-            condition:"",
-            action:null
-        };
+
     });
 
     $scope.saveDependency = function(){

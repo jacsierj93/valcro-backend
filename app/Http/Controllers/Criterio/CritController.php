@@ -74,6 +74,10 @@ class CritController extends BaseController
             $field->field;
             $field->type;
             $field['options'] = $field->options()->get();
+            $field['deps'] = $field->dependency()->get();
+            foreach ($field['deps'] as $dep){
+                $dep['parent'] = $dep->parent()->first();
+            }
         }
         return  json_encode($crit);
     }
