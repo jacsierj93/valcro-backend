@@ -177,13 +177,7 @@ class OrderController extends BaseController
         $docsUnclose[2] = Purchase::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion');
 
-     /* if($this->user->cargo_id == $this->profile['trabajador']){
-          $docsUnclose[0] = $docsUnclose[0]->where('usuario_id',$req->session()->get('DATAUSER')['id']);
-          $docsUnclose[1] =$docsUnclose[1]->where('usuario_id',$req->session()->get('DATAUSER')['id']);
-          $docsUnclose[2] =$docsUnclose[2]->where('usuario_id',$req->session()->get('DATAUSER')['id']);
-
-      }*/
-        $docsUnclose[0] = $docsUnclose[0]->get();
+       $docsUnclose[0] = $docsUnclose[0]->get();
         $docsUnclose[1] = $docsUnclose[1]->get();
         $docsUnclose[2] = $docsUnclose[2]->get();
         foreach($docsUnclose as $docs){
@@ -221,10 +215,9 @@ class OrderController extends BaseController
         $result = [];
         $oldReviewDays = $this->oldReview();
 
-        /**********  slicitudes sin cerrar   ***/
-
         $aux= Solicitude::selectRaw("count(id) as cantidad")
             -> whereNotNull("final_id")
+            -> OrwhereNull("ult_revision")
             ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
             ->get();
 
@@ -1836,8 +1829,6 @@ class OrderController extends BaseController
 
             // op
             if($req->tipo_origen_id == 1){
-
-            }else{
 
             }
 
@@ -5358,6 +5349,7 @@ class OrderController extends BaseController
         }if($model->emision == null || !$req->has('emision')){
             $model->emision =  Carbon::now();
         }
+
         $model->edit_usuario_id =$req->session()->get('DATAUSER')['id'];
 
         if($req->has('monto')){

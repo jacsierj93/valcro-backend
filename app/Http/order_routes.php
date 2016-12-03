@@ -34,8 +34,7 @@ $app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el corr
 
 //***productos */
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtiene los produtos de un proveedor
-$app->post ("Order/Product/Save",'Orders\OrderController@ProviderProductSave'); ///obtiene los produtos de un proveedor
-$app->post ("Order/Product/Delete",'Orders\OrderController@ProviderProductDelete'); ///obtiene los produtos de un proveedor
+
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated
