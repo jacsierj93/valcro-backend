@@ -655,3 +655,11 @@ MyApp.directive('treeBranch', function() {
             }
         };
 });
+
+MyApp.directive('lmbRadio', function() {
+
+    return {
+        scope: { itens: '=itens' },
+        template: '<div ng-repeat="item in itens " class="rad-button" flex layout="column" layout-align="center center">{{item.nombre}}</div>'
+    };
+});

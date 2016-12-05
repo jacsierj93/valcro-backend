@@ -37,6 +37,6 @@
 
 </md-input-container>
 
-<div class="rad-contain" layout="row" ng-show="(field.type.directive == 'prevRadio')">
-    <div ng-repeat="item in listOptions | customFind : {tipo:'Opcion',options:field.options} : get" class="rad-button" flex layout="column" layout-align="center center">{{item.nombre}}</div>
+<div class="rad-contain" layout="row" lmb-radio itens="listOptions | customFind : {tipo:'Opcion',options:field.options} : get" ng-show="(field.type.directive == 'prevRadio')">
+
 </div>
