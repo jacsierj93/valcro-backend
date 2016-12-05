@@ -921,7 +921,7 @@
 
         <!-- ########################################## LAYER MENU AGREGAR DOCUMENTO  ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="menuAgr" id="menuAgr">
-            <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
+
             <md-content  layout="row" flex class="sideNavContent" flex ng-controller="OrderMenuAgrCtrl"  >
                 <div active-left before="verificExit" ></div>
                 <div style="width: 96px" layout="column" layout-align="space-between start">
@@ -1661,10 +1661,30 @@
                 <div active-left></div>
                 <div layout="row" flex>
                     <div layout="column" flex>
-                        <div layout="row" style="padding: 0 8px 0 0;">
+                        <div layout="row" class="form-row-head form-row-head-select " >
+
+
+
+                            <div class="titulo_formulario" style="height:39px;" flex >
+                                <div>
+                                    Contrapedidos
+                                </div>
+                            </div>
+                            <div layout=""  layout-align="center center"  ng-click="openCp()">
+                                <div layout layout-align="center center" class="circle" >
+                                    {{document.productos.contraPedido.length}}
+                                </div>
+                            </div>
+                            <!--<div layout="column" layout-align="center center" id="btnAgrCp" style="width:24px;">
+                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                            </div>-->
+
+                        </div>
+                        <!--<div layout="row" style="padding: 0 8px 0 0;">
                             <div layout="column" layout-align="center center" id="btnAgrCp" ng-click="openSide('agrContPed')" style="width:24px;">
                                 <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                             </div>
+
                             <div flex class="titulo_formulario md-block"  layout="row"  >
                                 <div flex>
                                     Contrapedidos
@@ -1676,7 +1696,7 @@
                                 </div>
                             </div>
 
-                        </div>
+                        </div>-->
                         <form  layout="column" class="gridContent" flex  style="margin-left: 8px; margin-top: 8px;">
                             <div >
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.contraPedido as filteragrePed">
@@ -1774,6 +1794,7 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listProducProv" id="listProducProv">
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistProducProvCtrl">
                 <div  layout="column" flex class="layerColumn" >
+
                     <div layout="row" class="focused">
                         <div active-left ></div>
                         <div layout="row" flex class="form-row-head form-row-head-select">
@@ -1888,32 +1909,19 @@
                             </div>
                         </div>
                     </div>
-                    <form  name="listProductoItems" class="gridContent"  layout="row" flex >
+                    <form  name="listProductoItems" class="gridContent"  layout="row" flex OrderCreatProductCtrl >
                         <div active-left ></div>
                         <div  flex layout="column">
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order  as filterProductProv"
-                                   ng-mouseenter = "mouseEnterProd(item) " row-select ng-click="change(item, $event)" OrderCreatProduct >
+                                   ng-mouseenter = "mouseEnterProd(item) " row-select >
                                 <div layout="row" class="cellGridHolder" >
                                     <div flex="5" class="cellEmpty cellSelect">
-                                        <md-switch class="md-primary"  ng-change=" addRemoveProd(item) " ng-disabled="(true)" ng-model="item.asignado"></md-switch>
+                                        <md-switch class="md-primary"  ng-click="change(item, $event)"  ng-disabled="(true)" ng-model="item.asignado"></md-switch>
                                     </div>
-                                    <div flex="20" class="cellGrid" > {{item.codigo}}</div>
-                                    <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
-                                    <div flex class="cellGrid" > {{item.descripcion}}</div>
-                                    <div flex="15" class="cellGrid" > {{item.saldo}}</div>
-                                    <!--<div flex="10" class="cellGrid" >
-                                        <md-switch class="md-primary" ng-disabled="true" ng-model="item.puntoCompra"></md-switch>
-                                    </div>-->
-                                    <!--<div flex="15" class="cellGrid cellGrid-input {{(provRow ==  item.id) ? 'cellGrid-input-focus' : 'cellGrid-input-no-focus'}}"
-
-                                    >
-                                        <input  ng-model="item.saldo" ng-change=" changeProducto(item) "
-                                                type="number" range="{{item.asignado}}" minVal="1" maxVal="6" id="p{{item.id}}"
-                                                ng-disabled="(!item.asignado || Docsession.block) " ng-focus="provRow = item.id "  ng-blur="provRow = '-1'" />
-                                    </div>-->
-
-
-
+                                    <div flex="20" class="cellGrid" ng-click="openItem(item)"> {{item.codigo}}</div>
+                                    <div flex="20" class="cellGrid" ng-click="openItem(item)"> {{item.codigo_fabrica}}</div>
+                                    <div flex class="cellGrid" ng-click="openItem(item)"> {{item.descripcion}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="openItem(item)"> {{item.cantidad}}</div><!--cantidad total asignada -->
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" ng-show="filterProductProv.length == 0 " flex>
@@ -1932,117 +1940,90 @@
 
         <!-- 16) ########################################## LAYER (6) Agregar Contrapedidos ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrContPed" id="agrContPed">
-            <!-- ) ########################################## CONTENDOR Agregar Contrapedidos ########################################## -->
-            <md-content layout="row" class="sideNavContent" flex>
+            <md-content layout="row" class="sideNavContent" flex ng-controller="OrderAgrContPed">
                 <div  layout="column" flex class="layerColumn" >
-                    <form layout="row">
-                        <div active-left></div>
-                        <div layout="row" flex>
-                            <div flex class="titulo_formulario" layout="Column" layout-align="start start">
+                    <div layout="row" class="focused">
+                        <div active-left ></div>
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                 <div>
-                                    Agregar Contrapedidos
+                                    <span >Agregar ContraPedidos</span>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <form layout="row" ng-init="tbl_agrContPed.order = 'id' ">
+                    </div>
+                    <div layout="row" ng-init="tbl.order = 'id' ">
                         <div active-left></div>
                         <div layout="row" flex>
                             <div flex="5" layout="row"  ></div>
-                            <div flex="10" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'fecha' " ><img ng-src="{{(tbl_agrContPed.order == 'fecha')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-fecha' "><img ng-src="{{(tbl_agrContPed.order == '-fecha')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div layout="row" flex="10">
                                 <md-input-container class="md-block"  flex>
                                     <label>Fecha</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrContPed.filter.fecha"
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="codigo"></grid-order-by>
                             </div>
-                            <div flex layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'titulo' " ><img ng-src="{{(tbl_agrContPed.order == 'titulo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-titulo' "><img ng-src="{{(tbl_agrContPed.order == '-titulo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div layout="row" flex="">
                                 <md-input-container class="md-block"  flex>
                                     <label>Titulo</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrContPed.filter.titulo"
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.codigo"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="titulo"></grid-order-by>
                             </div>
-                            <div flex="10" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'fecha_aprox_entrega' "><img ng-src="{{(tbl_agrContPed.order == 'fecha_aprox_entrega')? 'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-fecha_aprox_entrega' " ><img ng-src="{{(tbl_agrContPed.order == '-fecha_aprox_entrega')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div layout="row" flex="10">
                                 <md-input-container class="md-block"  flex>
                                     <label>Entrega</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrContPed.filter.fecha_aprox_entrega"
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.fecha_aprox_entrega"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="fecha_aprox_entrega"></grid-order-by>
                             </div>
-                            <div flex="15" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'monto' " ><img ng-src="{{(tbl_agrContPed.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-monto' "><img ng-src="{{(tbl_agrContPed.order == '-monto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div layout="row" flex="15">
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrContPed.filter.monto"
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.monto"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="monto"></grid-order-by>
                             </div>
-
-                            <div flex="" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_agrContPed.order = 'comentario' "> <img ng-src="{{(tbl_agrContPed.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_agrContPed.order = '-comentario' " ><img ng-src="{{(tbl_agrContPed.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div layout="row" flex="">
                                 <md-input-container class="md-block"  flex>
                                     <label>Comentario</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrContPed.filter.comentario"
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.comentario"
                                            skip-tab
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="comentario"></grid-order-by>
                             </div>
                         </div>
-                    </form>
-                    <form flex name="addContraPedidos" class="gridContent" layout="row" >
+                    </div>
+                    <div flex name="addContraPedidos" class="gridContent" layout="row" >
                         <div active-left></div>
                         <div flex >
-                            <div layout="row" class="cellGridHolder" ng-repeat="item in filterContraPed(formData.contraPedido,tbl_agrContPed.filter) | orderBy: tbl_agrContPed.order">
-                                <div class="cellEmpty" flex="5" ng-click="allowEdit()">
-                                    <md-switch class="md-primary" ng-model="item.asignado" ng-change="changeContraP(item)" ng-disabled="(Docsession.block || !document.permit.update)"></md-switch>
+                            <div layout="row" class="cellGridHolder" ng-repeat="item in filterContraPed(tbl.data,tbl.filter) | orderBy: tbl.order">
+                                <div class="cellEmpty" flex="5" ng-click="change(item)">
+                                    <md-switch class="md-primary" ng-disabled="true" ng-model="item.asignado" ></md-switch>
                                 </div>
-                                <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
-                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.titulo}}</div>
-                                <div flex="10" class="cellGrid" ng-click="selecContraP(item)"> {{item.fecha_aprox_entrega | date:'dd/MM/yyyy' }}</div>
-                                <div flex="15" class="cellGrid" ng-click="selecContraP(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
-                                <div flex class="cellGrid" ng-click="selecContraP(item)"> {{item.comentario}}</div>
+                                <div flex="10" class="cellGrid" ng-click="open(item)"> {{item.fecha | date:'dd/MM/yyyy' }}</div>
+                                <div flex class="cellGrid" ng-click="open(item)"> {{item.titulo}}</div>
+                                <div flex="10" class="cellGrid" ng-click="open(item)"> {{item.fecha_aprox_entrega | date:'dd/MM/yyyy' }}</div>
+                                <div flex="15" class="cellGrid" ng-click="open(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
+                                <div flex class="cellGrid" ng-click="open(item)"> {{item.comentario}}</div>
 
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </md-content>
         </md-sidenav>
@@ -2311,8 +2292,8 @@
 
         <!-- 14) ########################################## LAYER (5) RESUMEN CONTRA PEDIDO ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenContraPedido" id="resumenContraPedido" >
-            <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE CONTRA PEDIDO ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent" >
+
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderResumenContraPedido" >
                 <div layout="column" flex>
                     <form  layout="row" >
                         <div active-left></div>

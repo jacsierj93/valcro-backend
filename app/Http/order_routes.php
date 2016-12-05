@@ -137,7 +137,10 @@ $app->get("Order/Purchase/EmailSummary",'Orders\OrderController@EmailSummaryDocP
 
 // solicitudes
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
-$app->post("Order/Solicitude/AdddRemoveItem",'Orders\OrderController@addRemoveSolicitudItem'); ///asigna y remove item a l solicitud
+
+$app->post("Order/Solicitude/SaveItem",'Orders\OrderController@saveSolicitudItem'); ///asigna y remove item a l solicitud
+
+
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
 $app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido
 $app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido

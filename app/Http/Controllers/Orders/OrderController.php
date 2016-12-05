@@ -1656,8 +1656,11 @@ class OrderController extends BaseController
             if($itMo != null){
                 $aux->asignado = true;
                 $aux->saldo = $itMo->saldo;
+                $aux->cantidad =$itMo->cantidad;
+
                 $aux->reng_id = $itMo->id;
                 $aux->costo_unitario = $itMo->costo_unitario;
+                $aux->uid = $itMo->uid;
 
             }
             $data[]=$aux;
@@ -1697,10 +1700,6 @@ class OrderController extends BaseController
 
 
         return $temp;
-    }
-
-    public function  ProviderProductSave(Request $req){
-
     }
 
     /*********************** SOLICITUD ************************/
@@ -1812,31 +1811,38 @@ class OrderController extends BaseController
     }
 
     /**agrega o quita item de la solicitud*/
-    public function addRemoveSolicitudItem(Request $req){
+    public function saveSolicitudItem(Request $req){
         $resul['accion']= "new";
-        if($req->asignado){
-            $model = new SolicitudeItem();
-            $model->tipo_origen_id = $req->tipo_origen_id;
-            $model->doc_id = $req->doc_id;
-            $model->origen_item_id= $req->id;
-            $model->doc_origen_id= $req->doc_origen_id;
-            $model->producto_id= $req->producto_id;
-            $model->descripcion= $req->descripcion;
-            $model->saldo= $req->saldo;
-            $model->cantidad = $req->has('cantidad') ? $model->cantidad :   $model->cantidad =$req->saldo ;
-            $resul['response']=$model->save();
-            $resul['renglon_id']=$model->id;
-
-            // op
-            if($req->tipo_origen_id == 1){
-
-            }
-
-
-        }else{
-            $resul['accion']= "del";
-            //  $resul['response']=SolicitudeItem::destroy($req->renglon_id);
+        $model = new SolicitudeItem();
+        if($req->has('reng_id')){
+            $model =SolicitudeItem::findOrFail($req->reng_id);
+            $resul['accion']= 'upd';
         }
+        $model->tipo_origen_id = $req->tipo_origen_id;
+        $model->doc_id = $req->doc_id;
+        $model->origen_item_id= $req->id;
+
+        $model->doc_origen_id= $req->has('doc_origen_id') ? $req->doc_origen_id : null;
+        $model->costo_unitario= $req->has('costo_unitario') ? $req->costo_unitario : null;
+        $model->producto_id= $req->producto_id;
+        $model->descripcion= $req->descripcion;
+        $model->uid = $req->has('uid') ? $req->uid : uniqid('', true);
+
+
+        if($resul['accion'] == 'new' ||  $model->cantidad == $model->saldo){
+            $model->cantidad = $req->saldo;
+            $model->saldo = $req->saldo;
+        }else{
+           $dif = floatval($req->saldo) -  floatval($model->cantidad);
+            $model->saldo = floatval( $model->saldo) + $dif;
+            $model->cantidad = $req->saldo;
+        }
+
+        $resul['response']=$model->save();
+        $resul['reng_id']=$model->id;
+        $resul['cantidad']=$model->cantidad;
+        $resul['saldo']=$model->saldo;
+
         return $resul;
     }
 
