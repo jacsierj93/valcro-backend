@@ -21,14 +21,9 @@ class CustomOrder extends Model
     /**
      */
     public function CustomOrderItem(){
-        return $this->hasMany('App\Models\Sistema\CustomOrders\CustomOrderItem', 'contra_pedido_id', 'id');
+        return $this->hasMany('App\Models\Sistema\CustomOrders\CustomOrderItem', 'doc_id', 'id');
     }
-    /**
-     * @deprecated
-     */
-    public function order(){
-        return $this->belongsToMany('App\Models\Sistema\Order\Order', 'tbl_pedido_contrapedido', 'contra_pedido_id','pedido_id');
-    }
+
 /*
     public function getfechaAttribute($value)
     {

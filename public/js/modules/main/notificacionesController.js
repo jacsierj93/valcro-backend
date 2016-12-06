@@ -9,8 +9,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     $scope.alerts = setNotif.listNotif();
 
     $scope.ok = function(call, data){
-        console.log("call", call);
-        console.log("title", data);
+
         if(call.opc.action){
             call.opc.action(call,data);
             $scope.saveAnswer(call,data );
@@ -164,7 +163,6 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
 
             $timeout(function () {
-                console.log('seccion',App.getSeccion());
                 var send = {
                     texto:data.noti.content,modulo: App.getSeccion().secc};
 

@@ -48,9 +48,12 @@ $app->get("Order/ProviderPaymentCondition",'Orders\OrderController@getProviderPa
 $app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressStore'); ///@deprecated
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine lospuertos de un proveedor
+
 $app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
 
+$app->get("Order/KitchenBox",'Orders\OrderController@getKitchenBox'); ///trae tod el detalle de kitchenbox
+$app->get("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
 
 // import
 $app->get("Order/SolicitudeToImport",'Orders\OrderController@getSolicitudeToImport'); /// obtiens las solicitudes aptas para importar
@@ -138,12 +141,16 @@ $app->get("Order/Purchase/EmailSummary",'Orders\OrderController@EmailSummaryDocP
 // solicitudes
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
 
-$app->post("Order/Solicitude/SaveItem",'Orders\OrderController@saveSolicitudItem'); ///asigna y remove item a l solicitud
+$app->post("Order/Solicitude/SaveProductItem",'Orders\OrderController@saveSolicitudItemProduc'); ///guarda y asinga el dproducto a la solicutud
+$app->post("Order/Solicitude/DeleteProductItem",'Orders\OrderController@DeleteSolicitudItemProduc'); ///guarda y asinga el dproducto a la solicutud
+$app->post("Order/Solicitude/SaveCustomOrderItem",'Orders\OrderController@saveSolicitudItemCustomOrder'); ///asigna un iten de contra pedido
+$app->post("Order/Solicitude/DeleteCustomOrderItem",'Orders\OrderController@DeleteSolicitudItemCustomOrder'); ///elimna
+
+$app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido
+$app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido
 
 
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
-$app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido
-$app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido
 $app->post("Order/Solicitude/AddkitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///agrega u kitchen box
 $app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekitchenBoxSolicitude'); ///quita  kitchen box
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
@@ -186,8 +193,7 @@ $app->post("Order/RemoveCustomOrderItem",'Orders\OrderController@removeCustomOrd
 // kitchenBox
 $app->get("Order/KitchenBoxReview",'Orders\OrderController@getKitchenBoxReview'); ///trae tod el detalle de kitchenbo @deprecated
 
-$app->get("Order/KitchenBox",'Orders\OrderController@getKitchenBox'); ///trae tod el detalle de kitchenbox
-$app->get("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
+
 $app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); /// obtiene las kitchen box de proveedor@deprecated
 $app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); /// obtiene las kitchen box de proveedor@deprecated
 
