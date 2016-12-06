@@ -36,7 +36,7 @@
     </md-autocomplete>
 
 </md-input-container>
+<!--
+<lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-itens="listOptions | customFind : {tipo:'Opcion',options:field.options} : get" ng-show="(field.type.directive == 'prevRadio')">
 
-<div class="rad-contain" layout="row" lmb-radio itens="listOptions | customFind : {tipo:'Opcion',options:field.options} : get" ng-show="(field.type.directive == 'prevRadio')">
-
-</div>
+</lmb-collection>-->

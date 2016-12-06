@@ -143,6 +143,9 @@ MyApp.factory('masters', ['$resource',
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
     return function(arr1, arr2) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        if(!arr2){
+            return [];
+        }
         return arr1.filter(function(val) {
             return arr2.indexOf(val.id) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });

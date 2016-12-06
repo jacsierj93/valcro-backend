@@ -347,11 +347,19 @@
                                 </div>
                                 <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
                             </div>
-                            <md-content flex>
+                            <lmb-collection
+                                lmb-type="list"
+                                lmb-model="type"
+                                lmb-itens="tipos"
+                                flex
+                            >
+
+                            </lmb-collection>
+                            <!--<md-content flex>
                                 <div ng-repeat="type in tipos" ng-class="{'field-sel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                     <div ng-click="createField(type,'type')" >{{type.descripcion}}</div>
                                 </div>
-                            </md-content>
+                            </md-content>-->
                         </div>
                         <div flex ></div>
                     </md-content>

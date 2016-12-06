@@ -557,7 +557,8 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         $timeout(function(){
             $mdSidenav("lyrConst3").open().then(callback)
         },500);
-    }
+    };
+    $scope.item = [];
 }]);
 
 
@@ -656,10 +657,43 @@ MyApp.directive('treeBranch', function() {
         };
 });
 
-MyApp.directive('lmbRadio', function() {
+MyApp.directive('lmbCollection', function() {
 
     return {
-        scope: { itens: '=itens' },
-        template: '<div ng-repeat="item in itens " class="rad-button" flex layout="column" layout-align="center center">{{item.nombre}}</div>'
+        replace: true,
+        transclude: true,
+        scope: {
+            itens: '=lmbItens',
+            model: '=lmbModel'
+        },
+        controller:function($scope){
+            $scope.setIten=function(dat){
+                if($scope.model.indexOf(dat.id) != -1){
+                    $scope.model.splice($scope.model.indexOf(dat.id),1);
+                }else{
+                    $scope.model.push(dat.id);
+                }
+            };
+
+            $scope.exist = function(dat){
+                return $scope.model.indexOf(dat.id) != -1;
+            };
+        },
+        template: function(elem,attr){
+           /* switch(attr.lmbCollection){
+                case "items":*/
+            if(attr.lmbType=="items"){
+                return '<div><div ng-repeat="item in itens" ng-click="setIten(item)" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.nombre}}</div></div>';
+            }else{
+                return '<md-content flex layout="column">'+
+                    '<div ng-repeat="field in itens" class="row" ng-class="{\'field-sel\':field.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{field.descripcion}} </div>'
+                +'</md-content>';
+            }
+                
+               
+            //}
+            
+        }
+
     };
 });
