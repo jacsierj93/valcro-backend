@@ -66,15 +66,15 @@ class OrderController extends BaseController
 
     private $defaulString = '';
     private $defaulInt = 0;
-    private $request ;
-    private $emailTemplate =['ProviderEstimate'=>[
-        'default'=>'emails.modules.Order.External.ProviderEstimate',
-        'es'=>'emails.modules.Order.External.es.ProviderEstimate',
-        'en'=>'emails.modules.Order.External.en.ProviderEstimate'
+    private $request;
+    private $emailTemplate = ['ProviderEstimate' => [
+        'default' => 'emails.modules.Order.External.ProviderEstimate',
+        'es' => 'emails.modules.Order.External.es.ProviderEstimate',
+        'en' => 'emails.modules.Order.External.en.ProviderEstimate'
     ]];
 
-    private $profile  =['gerente'=>'6', 'trabajador'=>'10' ,'jefe'=>'9'];
-    private $departamentos  =['compras'=>'17', 'propetario'=>'18' ,'auditoria'=>'22'];
+    private $profile = ['gerente' => '6', 'trabajador' => '10', 'jefe' => '9'];
+    private $departamentos = ['compras' => '17', 'propetario' => '18', 'auditoria' => '22'];
     private $user = null;
 
 
@@ -82,73 +82,76 @@ class OrderController extends BaseController
     {
 
         /*        $this->middleware('auth');*/
-        $this->request= $req;
-        if($this->user == null){
+        $this->request = $req;
+        if ($this->user == null) {
             $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
-                ->join('tbl_cargo','tbl_usuario.cargo_id','=','tbl_cargo.id')->where('tbl_usuario.id',$req->session()->get('DATAUSER')['id'])->first();
+                ->join('tbl_cargo', 'tbl_usuario.cargo_id', '=', 'tbl_cargo.id')->where('tbl_usuario.id', $req->session()->get('DATAUSER')['id'])->first();
         }
     }
 
-    public function testPdf (Request $req){
-        $data =$this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
-        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
-        $view = View::make("emails/modules/Order/Internal/Simple",$data)->render();
+    public function testPdf(Request $req)
+    {
+        $data = $this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
+        $data['accion'] = ($req->has('accion')) ? $req->accion : 'demo';
+        $view = View::make("emails/modules/Order/Internal/Simple", $data)->render();
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadHTML($view);
 
-        return View::make("emails/modules/Order/Internal/Simple",$data);
+        return View::make("emails/modules/Order/Internal/Simple", $data);
 
     }
 
     /*********************** SYSTEM ************************/
 
-    public function getPermision(){
-        if($this->user->departamento_id == 22){
-            return ['created'=>false];
-        }else{
-            return ['created'=>true, 'profile'=>$this->user];
+    public function getPermision()
+    {
+        if ($this->user->departamento_id == 22) {
+            return ['created' => false];
+        } else {
+            return ['created' => true, 'profile' => $this->user];
         }
     }
 
     /**
      * trae los documentos que estan si revisar
      */
-    public function getOldReviewDoc(Request $req){
+    public function getOldReviewDoc(Request $req)
+    {
         $allDocs = array();
         $oldDocs = array();
         $monedas = Monedas::get();
         $oldReviewDays = $this->oldReview();
-        $data ['dias'] =$oldReviewDays;
+        $data ['dias'] = $oldReviewDays;
 
         $allDocs[0] = Solicitude::selectRaw("*, datediff( curdate(),ult_revision) as review ")
-            -> whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+            ->whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
             ->get();
 
         $allDocs[1] = Order::
         selectRaw("*, datediff( curdate(),ult_revision) as review ")
-            -> whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
+            ->whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
             ->get();
         $allDocs[2] = Purchase::selectRaw("*, datediff( curdate(),ult_revision) as review ")
-            -> whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."" )
+            ->whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
             ->get();
 
-        foreach($allDocs as $docs){
-            foreach($docs  as $aux){
-                $temp= array();
-                $temp['id']=$aux->id;
+        foreach ($allDocs as $docs) {
+            foreach ($docs as $aux) {
+                $temp = array();
+                $temp['id'] = $aux->id;
                 $temp['documento'] = $aux->getTipo();
                 $temp['tipo'] = $aux->getTipoId();
                 $temp['titulo'] = $aux->titulo;
                 $temp['monto'] = $aux->monto;
-                $temp['symbol'] = $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                $temp['symbol'] = $monedas->where('id', $aux->prov_moneda_id)->first()->simbolo;
                 $temp['emision'] = $aux->emision;
                 $temp['comentario'] = $aux->comentario;
                 $temp['prov_id'] = $aux->prov_id;
                 $temp['review'] = $aux->review;
-                $temp['prov_id'] =$aux->prov_id;
+                $temp['prov_id'] = $aux->prov_id;
                 $temp['proveedor'] = Provider::findOrFail($aux->prov_id)->razon_social;
                 $temp['productos'] = $this->getProductoItem($aux);
 
@@ -157,34 +160,35 @@ class OrderController extends BaseController
 
             }
         }
-        $data['docs']=$oldDocs;
+        $data['docs'] = $oldDocs;
         return $data;
     }
 
     /**
      * trae los documentos que no fueron fnalizados
      */
-    public function getUnClosetDocument(Request $req){
+    public function getUnClosetDocument(Request $req)
+    {
         $docsUnclose = array();
         $data = array();
         $monedas = Monedas::get();
 
 
-        $docsUnclose[0] = Solicitude::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
+        $docsUnclose[0] = Solicitude::whereNull("final_id")->where('edit_usuario_id', $req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion');
-        $docsUnclose[1] = Order::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
+        $docsUnclose[1] = Order::whereNull("final_id")->where('edit_usuario_id', $req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion');
-        $docsUnclose[2] = Purchase::whereNull("final_id")->where('edit_usuario_id',$req->session()->get('DATAUSER')['id'])
+        $docsUnclose[2] = Purchase::whereNull("final_id")->where('edit_usuario_id', $req->session()->get('DATAUSER')['id'])
             ->whereNull('cancelacion');
 
         $docsUnclose[0] = $docsUnclose[0]->get();
         $docsUnclose[1] = $docsUnclose[1]->get();
         $docsUnclose[2] = $docsUnclose[2]->get();
-        foreach($docsUnclose as $docs){
-            foreach($docs  as $aux){
+        foreach ($docsUnclose as $docs) {
+            foreach ($docs as $aux) {
                 $prov = Provider::find($aux->prov_id);
-                $temp= array();
-                $temp['id']=$aux->id;
+                $temp = array();
+                $temp['id'] = $aux->id;
                 $temp['documento'] = $aux->getTipo();
                 $temp['tipo'] = $aux->getTipoId();
                 $temp['titulo'] = $aux->titulo;
@@ -192,11 +196,11 @@ class OrderController extends BaseController
                 $temp['monto'] = $aux->monto;
                 $temp['uid'] = $aux->uid;
 
-                $temp['symbol'] = ($aux->prov_moneda_id !=null && $aux->prov_moneda_id != 0 ) ? $monedas->where('id',$aux->prov_moneda_id)->first()->simbolo : '';
+                $temp['symbol'] = ($aux->prov_moneda_id != null && $aux->prov_moneda_id != 0) ? $monedas->where('id', $aux->prov_moneda_id)->first()->simbolo : '';
                 $temp['emision'] = $aux->emision;
                 $temp['comentario'] = $aux->comentario;
                 $temp['prov_id'] = $aux->prov_id;
-                $temp['proveedor'] = ($prov == null ) ?  '':$prov->razon_social;
+                $temp['proveedor'] = ($prov == null) ? '' : $prov->razon_social;
                 $temp['productos'] = $this->getProductoItem($aux);
 
 
@@ -211,90 +215,89 @@ class OrderController extends BaseController
     /**
      * trae las notificaciones del sistema
      */
-    public function getNotifications (Request $req){
+    public function getNotifications(Request $req)
+    {
         $result = [];
         $oldReviewDays = $this->oldReview();
 
-        $aux= Solicitude::selectRaw("count(id) as cantidad")
-            -> whereNotNull("final_id")
-            -> OrwhereNull("ult_revision")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+        $aux = Solicitude::selectRaw("count(id) as cantidad")
+            ->whereNotNull("final_id")
+            ->OrwhereNull("ult_revision")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
             ->get();
 
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>'Solicitudes con mas de '. $oldReviewDays. " dias sin revisar ",'key'=>'priorityDocs', 'cantidad'=>$aux[0][0]);
+        if ($aux[0][0] > 0) {
+            $result[] = array('titulo' => 'Solicitudes con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux[0][0]);
         }
 
-        $aux= Order::selectRaw("count(id)")
-            -> whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+        $aux = Order::selectRaw("count(id)")
+            ->whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
             ->get();
 
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>'Proformas con mas de '. $oldReviewDays. " dias sin revisar ",'key'=>'priorityDocs', 'cantidad'=>$aux[0][0]);
+        if ($aux[0][0] > 0) {
+            $result[] = array('titulo' => 'Proformas con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux[0][0]);
         }
 
-        $aux= Purchase::selectRaw("count(id)")
-            -> whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=". $oldReviewDays."")
+        $aux = Purchase::selectRaw("count(id)")
+            ->whereNotNull("final_id")
+            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
             ->get();
 
 
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>'Ordenes de compra con mas de '. $oldReviewDays. " dias sin revisar ", 'key'=>'priorityDocs','cantidad' =>$aux[0][0]);
+        if ($aux[0][0] > 0) {
+            $result[] = array('titulo' => 'Ordenes de compra con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux[0][0]);
         }
 
         // sin culminar
-        $aux=  Solicitude::selectRaw("count(id)")
+        $aux = Solicitude::selectRaw("count(id)")
             ->whereNull("final_id")
             ->whereNull('cancelacion')
-            ->where('edit_usuario_id',$req->session()->get('DATAUSER')['id']);
+            ->where('edit_usuario_id', $req->session()->get('DATAUSER')['id']);
 
-        $aux= $aux->get();
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>"Solicitudes sin culminar", 'key'=>'unclosetDoc','cantidad'=>$aux[0][0]);
+        $aux = $aux->get();
+        if ($aux[0][0] > 0) {
+            $result[] = array('titulo' => "Solicitudes sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux[0][0]);
         }
 
-        $aux=  Order::selectRaw("count(id)")
+        $aux = Order::selectRaw("count(id)")
             ->whereNull("final_id")
             ->whereNull('cancelacion')
-            ->where('edit_usuario_id',$req->session()->get('DATAUSER')['id']);
-        $aux= $aux->get();
+            ->where('edit_usuario_id', $req->session()->get('DATAUSER')['id']);
+        $aux = $aux->get();
 
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>"Proformas sin culminar",'key'=>'unclosetDoc', 'cantidad'=>$aux[0][0]);
+        if ($aux[0][0] > 0) {
+            $result[] = array('titulo' => "Proformas sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux[0][0]);
         }
 
-        $aux=  Purchase::selectRaw("count(id)")
+        $aux = Purchase::selectRaw("count(id)")
             ->whereNull("final_id")
             ->whereNull('cancelacion')
-            ->where('edit_usuario_id',$req->session()->get('DATAUSER')['id']);
-        $aux= $aux->get();
-        if($aux[0][0] > 0){
-            $result[] = array('titulo'=>"Ordenes de compra sin culminar",'key'=>'unclosetDoc','cantidad'=>$aux[0][0]);
+            ->where('edit_usuario_id', $req->session()->get('DATAUSER')['id']);
+        $aux = $aux->get();
+        if ($aux[0][0] > 0) {
+            $result[] = array('titulo' => "Ordenes de compra sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux[0][0]);
         }
 
         return $result;
 
 
-
-
     }
 
 
-    public  function closeActionSolicitude(Request $req){
-        $model= Solicitude::findOrFail($req->id);
+    public function closeActionSolicitude(Request $req)
+    {
+        $model = Solicitude::findOrFail($req->id);
 
-        if($this->user->cargo_id == $this->profile['gerente']) {
+        if ($this->user->cargo_id == $this->profile['gerente']) {
             return ['action' => 'question'];
 
-        }
-        else if($this->user->cargo_id ==  $this->profile['jefe']){
+        } else if ($this->user->cargo_id == $this->profile['jefe']) {
 
             $userCreate = User::findOrFail($model->usuario_id);
-            if($userCreate->cargo_id == $this->profile['trabajador'] ){
+            if ($userCreate->cargo_id == $this->profile['trabajador']) {
 
-                if($model->fecha_aprob_compra != null && $model->fecha_envio == null){
+                if ($model->fecha_aprob_compra != null && $model->fecha_envio == null) {
                     return ['action' => 'send'];
                 }
             }
@@ -302,18 +305,19 @@ class OrderController extends BaseController
         }
         return ['action' => 'save'];
     }
-    public  function closeActionOrder(Request $req){
-        $model= Order::findOrFail($req->id);
-        if($this->user->cargo_id == $this->profile['gerente']) {
+
+    public function closeActionOrder(Request $req)
+    {
+        $model = Order::findOrFail($req->id);
+        if ($this->user->cargo_id == $this->profile['gerente']) {
             return ['action' => 'question'];
-        }
-        else if($this->user->cargo_id ==  $this->profile['jefe']){
+        } else if ($this->user->cargo_id == $this->profile['jefe']) {
             $userCreate = User::findOrFail($model->usuario_id);
             $userModif = User::findOrFail($model->edit_usuario_id);
-            if($userCreate->cargo_id == $this->profile['trabajador'] ){
-                if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
-                    if(sizeof($notif->where('clave','send_provider')->get()) == 0){
+            if ($userCreate->cargo_id == $this->profile['trabajador']) {
+                if ($model->fecha_aprob_compras != null) {
+                    $notif = NotificationModule::where('doc_id', $req->id)->where('doc_tipo_id', 21);
+                    if (sizeof($notif->where('clave', 'send_provider')->get()) == 0) {
                         return ['action' => 'send'];
                     }
                 }
@@ -322,18 +326,19 @@ class OrderController extends BaseController
         }
         return ['action' => 'save'];
     }
-    public  function closeActionPurchase(Request $req){
-        $model= Purchase::findOrFail($req->id);
-        if($this->user->cargo_id == $this->profile['gerente']) {
+
+    public function closeActionPurchase(Request $req)
+    {
+        $model = Purchase::findOrFail($req->id);
+        if ($this->user->cargo_id == $this->profile['gerente']) {
             return ['action' => 'question'];
-        }
-        else if($this->user->cargo_id ==  $this->profile['jefe']){
+        } else if ($this->user->cargo_id == $this->profile['jefe']) {
             $userCreate = User::findOrFail($model->usuario_id);
             $userModif = User::findOrFail($model->edit_usuario_id);
-            if($userCreate->cargo_id == $this->profile['trabajador'] ){
-                if($model->fecha_aprob_compras != null ){
-                    $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
-                    if(sizeof($notif->where('clave','send_provider')->get()) == 0){
+            if ($userCreate->cargo_id == $this->profile['trabajador']) {
+                if ($model->fecha_aprob_compras != null) {
+                    $notif = NotificationModule::where('doc_id', $req->id)->where('doc_tipo_id', 21);
+                    if (sizeof($notif->where('clave', 'send_provider')->get()) == 0) {
                         return ['action' => 'send'];
                     }
                 }
@@ -355,24 +360,24 @@ class OrderController extends BaseController
         $rawn = "id, razon_social ,contrapedido,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
          where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
-        $rawn .=" ,(select count(id) from tbl_compra_orden where prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null
+        $rawn .= " ,(select count(id) from tbl_compra_orden where prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null
          and final_id is null and fecha_sustitucion is null and fecha_aprob_compra != null
          and fecha_aprob_gerencia != null and estado_id != 3
          ) as contraPedidos ";
 
-        $rawn .= " , (".$this->generateProviderEmit("emision","<=0").") as emit0 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 1 and  7 ").") as emit7 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 7 and  30 ").") as emit30 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 31 and  60 ").") as emit60 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 61 and  90 ").") as emit90 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," > 90 ").") as emit100 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", "<=0") . ") as emit0 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 1 and  7 ") . ") as emit7 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 7 and  30 ") . ") as emit30 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 31 and  60 ") . ") as emit60 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 61 and  90 ") . ") as emit90 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " > 90 ") . ") as emit100 ";
 
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision","<=0").") as review0 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 1 and  7 ").") as review7 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 7 and  30 ").") as review30 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 31 and  60 ").") as review60 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 61 and  90 ").") as review90 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", "<=0") . ") as review0 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 1 and  7 ") . ") as review7 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 7 and  30 ") . ") as review30 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 31 and  60 ") . ") as review60 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 61 and  90 ") . ") as review90 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " > 90 ") . ") as review100 ";
 
         $provs = Provider::selectRaw($rawn)->whereRaw("(select count(id) from tbl_prov_moneda where prov_id = tbl_proveedor.id) > 0 ")->get();
         /*     foreach($provs as $aux){
@@ -395,9 +400,10 @@ class OrderController extends BaseController
      * deprecated
      * cuentas los provedores que pueden hacer pedidos
      */
-    public function countProvider(){
+    public function countProvider()
+    {
         //$data =Provider::selectRaw("count('id')")->get()->get(0)[0];
-        $data['value'] =Provider::selectRaw("count('id')")->get()->get(0)[0];
+        $data['value'] = Provider::selectRaw("count('id')")->get()->get(0)[0];
 
         return $data;
     }
@@ -405,7 +411,8 @@ class OrderController extends BaseController
     /**@depreccated
      * traue a los provedores
      */
-    public function getProviders(Request $req){
+    public function getProviders(Request $req)
+    {
         $data = array();
         $provs = Provider::
         //   where('id', 2)->
@@ -417,10 +424,10 @@ class OrderController extends BaseController
         $data = array();
         //  $auxCp= Collection::make(array());
 
-        foreach($provs as $prv){
-            $paso= true;
-            if(sizeof($prv->getCountry())>0){
-                $paso= true;
+        foreach ($provs as $prv) {
+            $paso = true;
+            if (sizeof($prv->getCountry()) > 0) {
+                $paso = true;
             }
             /* if($req->has('skitProv')){
                  $exclu = json_decode($req->skitProv);
@@ -431,32 +438,32 @@ class OrderController extends BaseController
                     }
                 }
              }*/
-            if($paso){
+            if ($paso) {
                 $temp["id"] = $prv->id;
                 $temp["razon_social"] = $prv->razon_social;
-                $temp['deuda']= $prv->purchase()->whereNotNull('final_id')->sum('monto');
+                $temp['deuda'] = $prv->purchase()->whereNotNull('final_id')->sum('monto');
                 //  $temp['productos']= $prv->proveedor_product()->get();
                 $temp['paises'] = $prv->getCountry();
-                $peds=$prv->getOrderDocuments();
+                $peds = $prv->getOrderDocuments();
 
 
-                $nCp=0;
-                $nE0=0;
-                $nE7=0;
-                $nE30=0;
-                $nE60=0;
-                $nE90=0;
-                $nE100=0;
+                $nCp = 0;
+                $nE0 = 0;
+                $nE7 = 0;
+                $nE30 = 0;
+                $nE60 = 0;
+                $nE90 = 0;
+                $nE100 = 0;
 
-                $nR0=0;
-                $nR7=0;
-                $nR30=0;
-                $nR60=0;
-                $nR90=0;
-                $nR100=0;
+                $nR0 = 0;
+                $nR7 = 0;
+                $nR30 = 0;
+                $nR60 = 0;
+                $nR90 = 0;
+                $nR100 = 0;
 
-                foreach($peds as $ped){
-                    $arrival=$ped->daysCreate();
+                foreach ($peds as $ped) {
+                    $arrival = $ped->daysCreate();
 
                     if ($arrival == 0) {
                         $nE0++;
@@ -468,11 +475,11 @@ class OrderController extends BaseController
                         $nE60++;
                     } else if ($arrival == 90) {
                         $nE90++;
-                    } else if($arrival == 100 ){
+                    } else if ($arrival == 100) {
                         $nE100++;
                     }
-                    if($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 &&   $ped->aprob_gerencia == 0){
-                        $review=$ped->catLastReview();
+                    if ($ped->comentario_cancelacion == null && $ped->aprob_compras == 0 && $ped->aprob_gerencia == 0) {
+                        $review = $ped->catLastReview();
                         if ($review == 0) {
                             $nR0++;
                         } else if ($review == 7) {
@@ -483,34 +490,34 @@ class OrderController extends BaseController
                             $nR60++;
                         } else if ($arrival == 90) {
                             $nR90++;
-                        } else if($review == 100 ){
+                        } else if ($review == 100) {
                             $nR100++;
                         }
                     }
 
-                    if($ped->getTipoId() == 23){
-                        $nCp +=$ped->getNumItem(2);
+                    if ($ped->getTipoId() == 23) {
+                        $nCp += $ped->getNumItem(2);
                     }
 
 
                 }
-                $temp['emit0']=$nE0;
-                $temp['emit7']=$nE7;
-                $temp['emit30']=$nE30;
-                $temp['emit60']=$nE60;
-                $temp['emit90']=$nE90;
-                $temp['emit100']=$nE100;
+                $temp['emit0'] = $nE0;
+                $temp['emit7'] = $nE7;
+                $temp['emit30'] = $nE30;
+                $temp['emit60'] = $nE60;
+                $temp['emit90'] = $nE90;
+                $temp['emit100'] = $nE100;
 
-                $temp['review0']=$nE0;
-                $temp['review7']=$nE7;
-                $temp['review30']=$nE30;
-                $temp['review60']=$nE60;
-                $temp['review90']=$nE90;
-                $temp['review100']=$nE100;
+                $temp['review0'] = $nE0;
+                $temp['review7'] = $nE7;
+                $temp['review30'] = $nE30;
+                $temp['review60'] = $nE60;
+                $temp['review90'] = $nE90;
+                $temp['review100'] = $nE100;
 
 
-                $temp['contraPedido']= $nCp;
-                $data[] =$temp;
+                $temp['contraPedido'] = $nCp;
+                $data[] = $temp;
             }
 
         }
@@ -521,37 +528,39 @@ class OrderController extends BaseController
     /**
      * traue a los provedores
      */
-    public function getProvider(Request $req){
+    public function getProvider(Request $req)
+    {
         $rawn = "id, razon_social ,contrapedido,(select sum(monto)
          from tbl_proveedor as proveedor inner join tbl_compra_orden on proveedor.id = tbl_compra_orden.prov_id
          where tbl_compra_orden.prov_id = tbl_proveedor.id and tbl_compra_orden.deleted_at is null  ) as deuda";
 
-        $rawn .= " , (".$this->generateProviderEmit("emision","<=0").") as emit0 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 1 and  7 ").") as emit7 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 7 and  30 ").") as emit30 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 31 and  60 ").") as emit60 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," BETWEEN 61 and  90 ").") as emit90 ";
-        $rawn .= " , (".$this->generateProviderEmit("emision"," > 90 ").") as emit100 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", "<=0") . ") as emit0 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 1 and  7 ") . ") as emit7 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 7 and  30 ") . ") as emit30 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 31 and  60 ") . ") as emit60 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " BETWEEN 61 and  90 ") . ") as emit90 ";
+        $rawn .= " , (" . $this->generateProviderEmit("emision", " > 90 ") . ") as emit100 ";
 
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision","<=0").") as review0 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 1 and  7 ").") as review7 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 7 and  30 ").") as review30 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 31 and  60 ").") as review60 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," BETWEEN 61 and  90 ").") as review90 ";
-        $rawn .= " , (".$this->generateProviderQuery("ult_revision"," > 90 ").") as review100 ";
-        $prov = Provider::selectRaw($rawn)->where('id',$req->id)->first();
-
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", "<=0") . ") as review0 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 1 and  7 ") . ") as review7 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 7 and  30 ") . ") as review30 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 31 and  60 ") . ") as review60 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 61 and  90 ") . ") as review90 ";
+        $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " > 90 ") . ") as review100 ";
+        $prov = Provider::selectRaw($rawn)->where('id', $req->id)->first();
 
 
         return $prov;
     }
 
-    public  function getProviderEmails(Request $req){
-        return ContactField::where('prov_id',$req->prov_id)->where('campo', 'email')->get();
+    public function getProviderEmails(Request $req)
+    {
+        return ContactField::where('prov_id', $req->prov_id)->where('campo', 'email')->get();
     }
 
-    public function  getAddressrPort(Request $req){
-        return  (!$req->has('id')) ? ProviderAddress::findOrfail($req->direccion_id)->ports()->get() : Ports::where('id',$req->id)->get();
+    public function getAddressrPort(Request $req)
+    {
+        return (!$req->has('id')) ? ProviderAddress::findOrfail($req->direccion_id)->ports()->get() : Ports::where('id', $req->id)->get();
 
     }
 
@@ -561,170 +570,166 @@ class OrderController extends BaseController
      */
     public function getProviderListOrder(Request $req)
     {
-        $prov= Provider::findOrFail($req->id);
+        $prov = Provider::findOrFail($req->id);
 
-        $docs= Collection::make(array());
-        $solic= $prov->solicitude()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null)->whereNull('uid');
-        $odc=  $prov->purchase()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null)->whereNull('uid');
-        $order=  $prov->Order()->whereNotNull('final_id')->where('fecha_sustitucion',null)->where('comentario_cancelacion', null)->whereNull('uid');
-        if($this->user->cargo_id == $this->profile['trabajador'] ){
-            $solic=$solic->where('usuario_id',$req->session()->get('DATAUSER')['id']);
-            $odc= $odc->where('usuario_id',$req->session()->get('DATAUSER')['id']);
-            $order= $odc ->where('usuario_id',$req->session()->get('DATAUSER')['id']);
+        $docs = Collection::make(array());
+        $solic = $prov->solicitude()->whereNotNull('final_id')->where('fecha_sustitucion', null)->where('comentario_cancelacion', null)->whereNull('uid');
+        $odc = $prov->purchase()->whereNotNull('final_id')->where('fecha_sustitucion', null)->where('comentario_cancelacion', null)->whereNull('uid');
+        $order = $prov->Order()->whereNotNull('final_id')->where('fecha_sustitucion', null)->where('comentario_cancelacion', null)->whereNull('uid');
+        if ($this->user->cargo_id == $this->profile['trabajador']) {
+            $solic = $solic->where('usuario_id', $req->session()->get('DATAUSER')['id']);
+            $odc = $odc->where('usuario_id', $req->session()->get('DATAUSER')['id']);
+            $order = $odc->where('usuario_id', $req->session()->get('DATAUSER')['id']);
         }
 
         $docs->push($solic->get());
         $docs->push($odc->get());
         $docs->push($order->get());
-        $docs=$docs->collapse();
+        $docs = $docs->collapse();
 
 
-        $data=Array();
+        $data = Array();
         $items = $docs;
         $type = OrderType::get();
         $coin = Monedas::get();
         $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        $paises= Country::get();
-        foreach($items as $aux){
+        $prioridad = OrderPriority::get();
+        $estados = OrderStatus::get();
+        $paises = Country::get();
+        foreach ($items as $aux) {
             //para maquinas
             $tem = array();
-            $tem['id']=$aux->id;
+            $tem['id'] = $aux->id;
             //$tem['tipo_id']=$aux->tipo_pedido_id;
-            $tem['pais_id']=$aux->pais_id;
-            $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-            $tem['condicion_pago_id']=$aux->condicion_pago_id;
-            $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-            $tem['prioridad_id']=$aux->prioridad_id;
-            $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-            $tem['prov_moneda_id']=$aux->prov_moneda_id;
-            $tem['estado_id']=$aux->estado_id;
-            $tem['final_id']=$aux->final_id;
-            $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['nro_factura']=$aux->nro_factura;
-            $tem['tasa']=$aux->tasa;
-            $tem['ult_revision']=$aux->ult_revision;
+            $tem['pais_id'] = $aux->pais_id;
+            $tem['direccion_almacen_id'] = $aux->direccion_almacen_id;
+            $tem['condicion_pago_id'] = $aux->condicion_pago_id;
+            $tem['motivo_pedido_id'] = $aux->motivo_pedido_id;
+            $tem['prioridad_id'] = $aux->prioridad_id;
+            $tem['condicion_pedido_id'] = $aux->condicion_pedido_id;
+            $tem['prov_moneda_id'] = $aux->prov_moneda_id;
+            $tem['estado_id'] = $aux->estado_id;
+            $tem['final_id'] = $aux->final_id;
+            $tem['nro_proforma'] = $aux->nro_proforma;
+            $tem['nro_factura'] = $aux->nro_factura;
+            $tem['tasa'] = $aux->tasa;
+            $tem['ult_revision'] = $aux->ult_revision;
             // $tem['tipo_value']=$aux->typevalue;
             // pra humanos
-            $tem['comentario']=$aux->comentario;
-            $tem['tasa']=$aux->tasa;
-            $tem['proveedor']=$prov->razon_social;
-            $tem['titulo']=$aux->titulo;
-            $tem['documento']= $aux->getTipo();
-            $tem['tipo']= $aux->getTipoId();
-            $tem['diasEmit']=$aux->daysCreate();
-            $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-            $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-            $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-            $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+            $tem['comentario'] = $aux->comentario;
+            $tem['tasa'] = $aux->tasa;
+            $tem['proveedor'] = $prov->razon_social;
+            $tem['titulo'] = $aux->titulo;
+            $tem['documento'] = $aux->getTipo();
+            $tem['tipo'] = $aux->getTipoId();
+            $tem['diasEmit'] = $aux->daysCreate();
+            $tem['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
+            $tem['fecha_aprob_compra'] = $aux->fecha_aprob_compra;
+            $tem['fecha_aprob_gerencia'] = $aux->fecha_aprob_compra;
+            $tem['img_aprob'] = $aux->fecha_aprob_compra;
 
-            if($aux->motivo_id){
-                $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+            if ($aux->motivo_id) {
+                $tem['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
             }
-            if($aux->pais_id){
-                $tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+            if ($aux->pais_id) {
+                $tem['pais'] = $paises->where('id', $aux->pais_id)->first()->short_name;
             }
-            if($aux->prioridad_id){
-                $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+            if ($aux->prioridad_id) {
+                $tem['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
             }
-            if($aux->prov_moneda_id){
-                $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+            if ($aux->prov_moneda_id) {
+                $tem['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
             }
-            if($aux->prov_moneda_id){
-                $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+            if ($aux->prov_moneda_id) {
+                $tem['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
             }
-            if($aux->tipo_id != null){
-                $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+            if ($aux->tipo_id != null) {
+                $tem['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
             }
-
-
-
 
 
             $tem['productos'] = $this->getProductoItem($aux);
 
 
-
-
-            $tem['nro_proforma']=$aux->nro_proforma;
-            $tem['nro_factura']=$aux->nro_factura;
-            $tem['img_proforma']=$aux->img_proforma;
-            $tem['img_factura']=$aux->img_factura;
-            $tem['mt3']=$aux->mt3;
-            $tem['peso']=$aux->peso;
-            $tem['emision']=$aux->emision;
-            $tem['monto']=$aux->monto;
+            $tem['nro_proforma'] = $aux->nro_proforma;
+            $tem['nro_factura'] = $aux->nro_factura;
+            $tem['img_proforma'] = $aux->img_proforma;
+            $tem['img_factura'] = $aux->img_factura;
+            $tem['mt3'] = $aux->mt3;
+            $tem['peso'] = $aux->peso;
+            $tem['emision'] = $aux->emision;
+            $tem['monto'] = $aux->monto;
 
             /**actualizar cuando este el final**/
-            $tem['almacen']="Desconocido";
+            $tem['almacen'] = "Desconocido";
 
             // modificar cuando se sepa la logica
-            $tem['aero']=1;
-            $tem['version']=1;
-            $tem['maritimo']=1;
-            $data[]=$tem;
+            $tem['aero'] = 1;
+            $tem['version'] = 1;
+            $tem['maritimo'] = 1;
+            $data[] = $tem;
         }
 
         return $data;
 
     }
 
-    public function  getProviderContacts(Request $req){
-        $resut=[];
+    public function getProviderContacts(Request $req)
+    {
+        $resut = [];
         $lang = Collection::make([]);
         $contacts = Provider::findOrFail($req->prov_id)->contacts()->get();
-        $es=Language::findOrFail(27);
-        $en=Language::findOrFail(186);
-        $eval=[];
+        $es = Language::findOrFail(27);
+        $en = Language::findOrFail(186);
+        $eval = [];
 
-        $default=$es;
+        $default = $es;
 
-        foreach($contacts as $contc){
-            $eml['nombre']= $contc->nombre;
-            $eml['id']= $contc->id;
-            $eml['email']=$contc->campos()->where('campo', 'email')->get() ;
-            $ls= $contc->idiomas()->get();
-            $eml['idiomas']=$ls;
+        foreach ($contacts as $contc) {
+            $eml['nombre'] = $contc->nombre;
+            $eml['id'] = $contc->id;
+            $eml['email'] = $contc->campos()->where('campo', 'email')->get();
+            $ls = $contc->idiomas()->get();
+            $eml['idiomas'] = $ls;
 
-            foreach( $ls as $l){
-                $eval[]=$l;
-                if(array_key_exists($l->iso_lang,$this->emailTemplate['ProviderEstimate'])){
-                }else{
-                    if(strpos($l->iso_lang ,'es')){
+            foreach ($ls as $l) {
+                $eval[] = $l;
+                if (array_key_exists($l->iso_lang, $this->emailTemplate['ProviderEstimate'])) {
+                } else {
+                    if (strpos($l->iso_lang, 'es')) {
                         $lang->push($es);
-                    }else{
+                    } else {
                         $lang->push($en);
-                        $default =$en;
+                        $default = $en;
                     }
                 }
             }
-            $resut[]=$eml;
+            $resut[] = $eml;
         }
 
-        return ['contactos'=>$resut,'idiomas'=>$lang->unique()->values(), 'default'=>$default, 'eval'=>$eval, 'all'=>$lang];
+        return ['contactos' => $resut, 'idiomas' => $lang->unique()->values(), 'default' => $default, 'eval' => $eval, 'all' => $lang];
     }
 
 
     /*********************** Create  ************************/
-    public  function CreateSolicitude(Request $req){
-        $model= Solicitude::findOrFail($req->id);
-        $response =[];
-        $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro'],['email'=>'mquevedo.sistemas@valcro.co','name'=>'Miguel Eduadro']]
-            ,'cc'=>[],'ccb'=>[]
-            ,'asunto'=>'Notificacion de creacion de solicitud'];
+    public function CreateSolicitude(Request $req)
+    {
+        $model = Solicitude::findOrFail($req->id);
+        $response = [];
+        $sender = ['to' => [['email' => 'meqh1992@gmail.com', 'name' => 'Miguel Eduadro'], ['email' => 'mquevedo.sistemas@valcro.co', 'name' => 'Miguel Eduadro']]
+            , 'cc' => [], 'ccb' => []
+            , 'asunto' => 'Notificacion de creacion de solicitud'];
 
-        $data =$this->parseDocToSummaryEmail($model);
-        $data['accion']=$sender['asunto'];
-        $this->sendNotificacion($data,$sender);
+        $data = $this->parseDocToSummaryEmail($model);
+        $data['accion'] = $sender['asunto'];
+        $this->sendNotificacion($data, $sender);
 
-        $response['success']= 'enviado';
-        $response['to']= $sender['to'];
-        $response['cc']= $sender['cc'];
-        $response['ccb']= $sender['ccb'];
-        $response['noti']=$req->session()->get('DATAUSER')['email'];
+        $response['success'] = 'enviado';
+        $response['to'] = $sender['to'];
+        $response['cc'] = $sender['cc'];
+        $response['ccb'] = $sender['ccb'];
+        $response['noti'] = $req->session()->get('DATAUSER')['email'];
         return $response;
-
 
 
     }
@@ -732,56 +737,61 @@ class OrderController extends BaseController
 
     /*********************** Approved Purchases ************************/
 
-    public function  ApprovedPurchasesSolicitude(Request $req){
+    public function ApprovedPurchasesSolicitude(Request $req)
+    {
 
         $response = [];
 
         $model = Solicitude::findOrFail($req->id);
-        if($req->has("fecha_aprob_compra")&& $req->has("nro_doc")){
-            $model->fecha_aprob_compra= $req->fecha_aprob_compra;
-            $model->nro_doc=$req->nro_doc;
-            $response['accion']=  ($model->fecha_aprob_compra == null ) ? 'new' :'upd';
-        }else{
-            $model->fecha_aprob_compra= null;
-            $response['accion']=  'cancel' ;
-            $model->nro_doc=null;
+        if ($req->has("fecha_aprob_compra") && $req->has("nro_doc")) {
+            $model->fecha_aprob_compra = $req->fecha_aprob_compra;
+            $model->nro_doc = $req->nro_doc;
+            $response['accion'] = ($model->fecha_aprob_compra == null) ? 'new' : 'upd';
+        } else {
+            $model->fecha_aprob_compra = null;
+            $response['accion'] = 'cancel';
+            $model->nro_doc = null;
 
         }
-        $response['response']=$model->save();
+        $response['response'] = $model->save();
 
-        $response['success']='Solicitud aprobada';
+        $response['success'] = 'Solicitud aprobada';
 
         return $response;
 
     }
-    public function  ApprovedPurchasesOrder(Request $req){
+
+    public function ApprovedPurchasesOrder(Request $req)
+    {
 
         $response = [];
         $model = Order::findOrFail($req->id);
 
-        $model->fecha_aprob_compra= $req->fecha_aprob_compra;
-        $model->nro_doc= $req->nro_doc;
+        $model->fecha_aprob_compra = $req->fecha_aprob_compra;
+        $model->nro_doc = $req->nro_doc;
 
-        $response['response']=$model->save();
+        $response['response'] = $model->save();
 
-        $response['success']='Pedido aprobado';
-        $response['accion']=  'upd';
+        $response['success'] = 'Pedido aprobado';
+        $response['accion'] = 'upd';
 
         return $response;
 
     }
-    public function  ApprovedPurchasesPurchase(Request $req){
+
+    public function ApprovedPurchasesPurchase(Request $req)
+    {
 
         $response = [];
         $model = Purchase::findOrFail($req->id);
 
-        $model->fecha_aprob_compra= $req->fecha_aprob_compra;
-        $model->nro_doc= $req->nro_doc;
-        $response['response']=$model->save();
+        $model->fecha_aprob_compra = $req->fecha_aprob_compra;
+        $model->nro_doc = $req->nro_doc;
+        $response['response'] = $model->save();
 
-        $response['success']='ODC aprobada';
+        $response['success'] = 'ODC aprobada';
 
-        $response['accion']= $model->fecha_aprob_compra == null ? 'new' : 'upd';
+        $response['accion'] = $model->fecha_aprob_compra == null ? 'new' : 'upd';
         return $response;
 
     }
@@ -789,18 +799,19 @@ class OrderController extends BaseController
 
     /*********************** cancel  ************************/
 
-    public function  cancelSolicitude(Request $req){
+    public function cancelSolicitude(Request $req)
+    {
 
         $response = [];
         $model = Solicitude::findOrFail($req->id);
-        $sendEmail = ($model->comentario_cancelacion== null);
+        $sendEmail = ($model->comentario_cancelacion == null);
 
-        $model->comentario_cancelacion= $req->comentario_cancelacion;
-        $model->final_id=$this->getFinalId($model);
-        $response['response']=$model->save();
+        $model->comentario_cancelacion = $req->comentario_cancelacion;
+        $model->final_id = $this->getFinalId($model);
+        $response['response'] = $model->save();
 
-        $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
-        $response['success']='Solicitud Cancelada';
+        $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
+        $response['success'] = 'Solicitud Cancelada';
         /*        if($sendEmail){
                     $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
                         ,'cc'=>[],'ccb'=>[],
@@ -814,19 +825,21 @@ class OrderController extends BaseController
         return $response;
 
     }
-    public function  cancelOrder(Request $req){
+
+    public function cancelOrder(Request $req)
+    {
 
         $response = [];
         $model = Order::findOrFail($req->id);
-        $sendEmail = ($model->comentario_cancelacion== null);
+        $sendEmail = ($model->comentario_cancelacion == null);
 
-        $model->comentario_cancelacion= $req->comentario_cancelacion;
-        $model->final_id=$this->getFinalId($model);
+        $model->comentario_cancelacion = $req->comentario_cancelacion;
+        $model->final_id = $this->getFinalId($model);
 
-        $response['response']=$model->save();
+        $response['response'] = $model->save();
 
-        $response['success']='Pedido Cancelado';
-        $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        $response['success'] = 'Pedido Cancelado';
+        $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
         /* if($sendEmail){
              $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
                  ,'cc'=>[],'ccb'=>[],'asunto'=>'Notificacion de Cancelacion'];
@@ -838,17 +851,19 @@ class OrderController extends BaseController
         return $response;
 
     }
-    public function  cancelPurchase(Request $req){
+
+    public function cancelPurchase(Request $req)
+    {
 
         $response = [];
         $model = Purchase::findOrFail($req->id);
-        $sendEmail = ($model->comentario_cancelacion== null);
-        $model->comentario_cancelacion= $req->comentario_cancelacion;
-        $model->final_id=$this->getFinalId($model);
+        $sendEmail = ($model->comentario_cancelacion == null);
+        $model->comentario_cancelacion = $req->comentario_cancelacion;
+        $model->final_id = $this->getFinalId($model);
 
-        $response['response']=$model->save();
-        $response['success']='ODC Cancelada';
-        $response['accion']= $model->comentario_cancelacion == null ? 'new' : 'upd';
+        $response['response'] = $model->save();
+        $response['success'] = 'ODC Cancelada';
+        $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
         /*if($sendEmail){
             $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
                 ,'cc'=>[],'ccb'=>[],'asunto'=>'Notificacion de Cancelacion por compras '];
@@ -865,29 +880,32 @@ class OrderController extends BaseController
 
     /*********************** UPDATE ************************/
 
-    public  function UpdateOrder(Request $req){
-        $resul['action']="upd";
-        $model  = Order::findOrFail($req->id);
+    public function UpdateOrder(Request $req)
+    {
+        $resul['action'] = "upd";
+        $model = Order::findOrFail($req->id);
         $model->final_id = null;
-        $model->edit_usuario_id= $this->user->id;
+        $model->edit_usuario_id = $this->user->id;
         $model->save();
         return $resul;
     }
 
-    public  function PurchaseUpdate(Request $req){
-        $resul['action']="upd";
-        $model  = Purchase::findOrFail($req->id);
-        $model->edit_usuario_id= $this->user->id;
+    public function PurchaseUpdate(Request $req)
+    {
+        $resul['action'] = "upd";
+        $model = Purchase::findOrFail($req->id);
+        $model->edit_usuario_id = $this->user->id;
 
         $model->final_id = null;
         $model->save();
         return $resul;
     }
 
-    public  function SolicitudeUpdate(Request $req){
-        $resul['action']="upd";
-        $model  = Solicitude::findOrFail($req->id);
-        $model->edit_usuario_id= $this->user->id;
+    public function SolicitudeUpdate(Request $req)
+    {
+        $resul['action'] = "upd";
+        $model = Solicitude::findOrFail($req->id);
+        $model->edit_usuario_id = $this->user->id;
 
         $model->final_id = null;
         $model->save();
@@ -899,9 +917,10 @@ class OrderController extends BaseController
     /**
      * obtiene los pedidos que se pueden inportar
      */
-    public  function getOrderToImport(Request $req){
+    public function getOrderToImport(Request $req)
+    {
         $data = array();
-        $items = Order::where('id', "<>" ,$req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
+        $items = Order::where('id', "<>", $req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
             //  ->where('aprob_compras' ,1)
             //  ->where("aprob_gerencia", 1)
             ->whereNull("comentario_cancelacion");
@@ -911,79 +930,80 @@ class OrderController extends BaseController
         $prov = Provider::findOrFail($req->prov_id);
         $coin = Monedas::get();
         $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        $paises= Country::get();
+        $prioridad = OrderPriority::get();
+        $estados = OrderStatus::get();
+        $paises = Country::get();
         $purchase = Purchase::get();
-        foreach($items as $aux){
-            $paso= true;
-            if(sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id','21'))>0){
-                $paso=false;
+        foreach ($items as $aux) {
+            $paso = true;
+            if (sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id', '21')) > 0) {
+                $paso = false;
             }
-            if($paso){
+            if ($paso) {
                 //para maquinas
                 $tem = array();
-                $tem['id']=$aux->id;
+                $tem['id'] = $aux->id;
                 //$tem['tipo_id']=$aux->tipo_pedido_id;
-                $tem['pais_id']=$aux->pais_id;
-                $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-                $tem['condicion_pago_id']=$aux->condicion_pago_id;
-                $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-                $tem['prioridad_id']=$aux->prioridad_id;
-                $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-                $tem['prov_moneda_id']=$aux->prov_moneda_id;
-                $tem['estado_id']=$aux->estado_id;
+                $tem['pais_id'] = $aux->pais_id;
+                $tem['direccion_almacen_id'] = $aux->direccion_almacen_id;
+                $tem['condicion_pago_id'] = $aux->condicion_pago_id;
+                $tem['motivo_pedido_id'] = $aux->motivo_pedido_id;
+                $tem['prioridad_id'] = $aux->prioridad_id;
+                $tem['condicion_pedido_id'] = $aux->condicion_pedido_id;
+                $tem['prov_moneda_id'] = $aux->prov_moneda_id;
+                $tem['estado_id'] = $aux->estado_id;
                 // $tem['tipo_value']=$aux->typevalue;
                 // pra humanos
-                $tem['comentario']=$aux->comentario;
-                $tem['titulo']=$aux->titulo;
-                $tem['tasa']=$aux->tasa;
-                $tem['proveedor']=$prov->razon_social;
-                $tem['documento']= $aux->getTipo();
-                $tem['diasEmit']=$aux->daysCreate();
-                $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-                $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-                $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-                $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+                $tem['comentario'] = $aux->comentario;
+                $tem['titulo'] = $aux->titulo;
+                $tem['tasa'] = $aux->tasa;
+                $tem['proveedor'] = $prov->razon_social;
+                $tem['documento'] = $aux->getTipo();
+                $tem['diasEmit'] = $aux->daysCreate();
+                $tem['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
+                $tem['fecha_aprob_compra'] = $aux->fecha_aprob_compra;
+                $tem['fecha_aprob_gerencia'] = $aux->fecha_aprob_compra;
+                $tem['img_aprob'] = $aux->fecha_aprob_compra;
 
 
-                if($aux->motivo_id){
-                    $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+                if ($aux->motivo_id) {
+                    $tem['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
                 }
-                if($aux->pais_id){
+                if ($aux->pais_id) {
                     //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
                 }
-                if($aux->prioridad_id){
-                    $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+                if ($aux->prioridad_id) {
+                    $tem['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
                 }
-                if($aux->prov_moneda_id){
-                    $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+                if ($aux->prov_moneda_id) {
+                    $tem['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
                 }
-                if($aux->prov_moneda_id){
-                    $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                if ($aux->prov_moneda_id) {
+                    $tem['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
                 }
-                if($aux->tipo_id != null){
-                    $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+                if ($aux->tipo_id != null) {
+                    $tem['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
                 }
 
 
-                $tem['nro_proforma']=$aux->nro_proforma;
-                $tem['nro_factura']=$aux->nro_factura;
-                $tem['img_proforma']=$aux->img_proforma;
-                $tem['img_factura']=$aux->img_factura;
-                $tem['mt3']=$aux->mt3;
-                $tem['peso']=$aux->peso;
-                $tem['emision']=$aux->emision;
-                $tem['monto']=$aux->monto;
+                $tem['nro_proforma'] = $aux->nro_proforma;
+                $tem['nro_factura'] = $aux->nro_factura;
+                $tem['img_proforma'] = $aux->img_proforma;
+                $tem['img_factura'] = $aux->img_factura;
+                $tem['mt3'] = $aux->mt3;
+                $tem['peso'] = $aux->peso;
+                $tem['emision'] = $aux->emision;
+                $tem['monto'] = $aux->monto;
 
                 /**actualizar cuando este el final**/
-                $tem['almacen']="Desconocido";
+                $tem['almacen'] = "Desconocido";
 
                 // modificar cuando se sepa la logica
-                $tem['aero']=1;
-                $tem['version']=$aux->version;
-                $tem['maritimo']=1;
-                $data[]=$tem;}
+                $tem['aero'] = 1;
+                $tem['version'] = $aux->version;
+                $tem['maritimo'] = 1;
+                $data[] = $tem;
+            }
         }
 
 
@@ -993,10 +1013,10 @@ class OrderController extends BaseController
     /**
      * obtiene las solicitudes actas para importacion
      */
-    public  function getSolicitudeToImport(Request $req){
+    public function getSolicitudeToImport(Request $req)
+    {
         $data = array();
-        $items = Solicitude::where('id', "<>" ,$req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
-
+        $items = Solicitude::where('id', "<>", $req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
             //where('aprob_compras' ,1)
             //  ->where("aprob_gerencia", 1)
 
@@ -1006,85 +1026,85 @@ class OrderController extends BaseController
         $prov = Provider::findOrFail($req->prov_id);
         $coin = Monedas::get();
         $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        $paises= Country::get();
+        $prioridad = OrderPriority::get();
+        $estados = OrderStatus::get();
+        $paises = Country::get();
         $ord = Order::get();
         $purchase = Order::get();
-        foreach($items as $aux){
-            $paso =true;
+        foreach ($items as $aux) {
+            $paso = true;
             $tem = array();
 
-            if(sizeof($ord->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id','21'))>0){
-                $paso=false;
+            if (sizeof($ord->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id', '21')) > 0) {
+                $paso = false;
             }
-            if(sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id','21'))>0){
-                $paso=false;
+            if (sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id', '21')) > 0) {
+                $paso = false;
             }
 
-            if($paso){
+            if ($paso) {
                 //para maquinas
-                $tem['id']=$aux->id;
+                $tem['id'] = $aux->id;
                 //$tem['tipo_id']=$aux->tipo_pedido_id;
-                $tem['pais_id']=$aux->pais_id;
-                $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-                $tem['condicion_pago_id']=$aux->condicion_pago_id;
-                $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-                $tem['prioridad_id']=$aux->prioridad_id;
-                $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-                $tem['prov_moneda_id']=$aux->prov_moneda_id;
-                $tem['estado_id']=$aux->estado_id;
+                $tem['pais_id'] = $aux->pais_id;
+                $tem['direccion_almacen_id'] = $aux->direccion_almacen_id;
+                $tem['condicion_pago_id'] = $aux->condicion_pago_id;
+                $tem['motivo_pedido_id'] = $aux->motivo_pedido_id;
+                $tem['prioridad_id'] = $aux->prioridad_id;
+                $tem['condicion_pedido_id'] = $aux->condicion_pedido_id;
+                $tem['prov_moneda_id'] = $aux->prov_moneda_id;
+                $tem['estado_id'] = $aux->estado_id;
                 // $tem['tipo_value']=$aux->typevalue;
                 // pra humanos
-                $tem['comentario']=$aux->comentario;
-                $tem['tasa']=$aux->tasa;
-                $tem['proveedor']=$prov->razon_social;
-                $tem['titulo']=$aux->titulo;
-                $tem['documento']= $aux->getTipo();
-                $tem['diasEmit']=$aux->daysCreate();
-                $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-                $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-                $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-                $tem['img_aprob'] =$aux->fecha_aprob_compra ;
+                $tem['comentario'] = $aux->comentario;
+                $tem['tasa'] = $aux->tasa;
+                $tem['proveedor'] = $prov->razon_social;
+                $tem['titulo'] = $aux->titulo;
+                $tem['documento'] = $aux->getTipo();
+                $tem['diasEmit'] = $aux->daysCreate();
+                $tem['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
+                $tem['fecha_aprob_compra'] = $aux->fecha_aprob_compra;
+                $tem['fecha_aprob_gerencia'] = $aux->fecha_aprob_compra;
+                $tem['img_aprob'] = $aux->fecha_aprob_compra;
 
 
-                if($aux->motivo_id){
-                    $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
+                if ($aux->motivo_id) {
+                    $tem['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
                 }
-                if($aux->pais_id){
-                    $tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
+                if ($aux->pais_id) {
+                    $tem['pais'] = $paises->where('id', $aux->pais_id)->first()->short_name;
                 }
-                if($aux->prioridad_id){
-                    $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
+                if ($aux->prioridad_id) {
+                    $tem['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
                 }
-                if($aux->prov_moneda_id){
-                    $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
+                if ($aux->prov_moneda_id) {
+                    $tem['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
                 }
-                if($aux->prov_moneda_id){
-                    $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
+                if ($aux->prov_moneda_id) {
+                    $tem['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
                 }
-                if($aux->tipo_id != null){
-                    $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
+                if ($aux->tipo_id != null) {
+                    $tem['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
                 }
 
 
-                $tem['nro_proforma']=$aux->nro_proforma;
-                $tem['nro_factura']=$aux->nro_factura;
-                $tem['img_proforma']=$aux->img_proforma;
-                $tem['img_factura']=$aux->img_factura;
-                $tem['mt3']=$aux->mt3;
-                $tem['peso']=$aux->peso;
-                $tem['emision']=$aux->emision;
-                $tem['monto']=$aux->monto;
+                $tem['nro_proforma'] = $aux->nro_proforma;
+                $tem['nro_factura'] = $aux->nro_factura;
+                $tem['img_proforma'] = $aux->img_proforma;
+                $tem['img_factura'] = $aux->img_factura;
+                $tem['mt3'] = $aux->mt3;
+                $tem['peso'] = $aux->peso;
+                $tem['emision'] = $aux->emision;
+                $tem['monto'] = $aux->monto;
 
                 /**actualizar cuando este el final**/
-                $tem['almacen']="Desconocido";
+                $tem['almacen'] = "Desconocido";
 
                 // modificar cuando se sepa la logica
-                $tem['aero']=1;
-                $tem['version']=1;
-                $tem['maritimo']=1;
-                $data[]=$tem;
+                $tem['aero'] = 1;
+                $tem['version'] = 1;
+                $tem['maritimo'] = 1;
+                $data[] = $tem;
             }
         }
 
@@ -1095,92 +1115,64 @@ class OrderController extends BaseController
 
     /*********************** SUMMARY ************************/
 
-    /**
-     * contrulle el resumen preliminar de la solicitud
-     */
-    public function getSolicitudeSummary(Request $req){
-        $data = array();
-        $prod = array();
-        $model= Solicitude::findOrFail($req->id);
-        $provProd = Product::where('prov_id',$model->prov_id)->get();
-        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
-        $atts =$model->attachments()->get();
-        foreach($items as $aux){
-            $temp= array();
-            $p= $provProd->where('id',$aux->producto_id.'')->first();
-            $temp['id']=$aux->id;
-            $temp['producto_id']=$aux->producto_id;
-            $temp['codigo']=$p->codigo;
-            $temp['codigo_fabrica']=$p->codigo_fabrica;
-            $temp['descripcion']=$aux->descripcion;
-            $temp['cantidad']=$aux->cant;
-            $temp['extra']= $p;
-            $prod[]= $temp;
-        }
-
-
-        $data['adjuntos']= $atts;
-        $data['productos']= $prod;
-
-        return $data;
-    }
-
 
     /**
      * construye el resumen preliminar del pedido
      */
-    public function getOrderSummary(Request $req){
+    public function getOrderSummary(Request $req)
+    {
         $data = array();
         $prod = array();
-        $model= Order::findOrFail($req->id);
-        $provProd = Product::where('prov_id',$model->prov_id)->get();
-        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
-        $atts =$model->attachments()->get();
+        $model = Order::findOrFail($req->id);
+        $provProd = Product::where('prov_id', $model->prov_id)->get();
+        $items = $model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $atts = $model->attachments()->get();
 
-        foreach($items as $aux){
-            $temp= array();
+        foreach ($items as $aux) {
+            $temp = array();
             //$p= $provProd->where('id',$aux->producto_id)->first();
-            $temp['id']=$aux->id;
-            $temp['producto_id']=$aux->producto_id;
-            $temp['codigo']=$aux->product->codigo;
-            $temp['codigo_fabrica']=$aux->product->codigo_fabrica;
-            $temp['descripcion']=$aux->descripcion;
-            $temp['cantidad']=$aux->cant;
-            $temp['extra']= $aux->product;
-            $prod[]= $temp;
+            $temp['id'] = $aux->id;
+            $temp['producto_id'] = $aux->producto_id;
+            $temp['codigo'] = $aux->product->codigo;
+            $temp['codigo_fabrica'] = $aux->product->codigo_fabrica;
+            $temp['descripcion'] = $aux->descripcion;
+            $temp['cantidad'] = $aux->cant;
+            $temp['extra'] = $aux->product;
+            $prod[] = $temp;
         }
 
-        $data['adjuntos']= $atts;
-        $data['productos']= $prod;
+        $data['adjuntos'] = $atts;
+        $data['productos'] = $prod;
         return $data;
     }
 
     /**
      * construye el resumen preliminar del pedido
      */
-    public function getPurchaseSummary(Request $req){
+    public function getPurchaseSummary(Request $req)
+    {
         $data = array();
         $prod = array();
-        $model= Purchase::findOrFail($req->id);
-        $provProd = Product::where('prov_id',$model->prov_id)->get();
-        $items =$model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
-        $atts =$model->attachments()->get();
-        foreach($items as $aux){
-            $temp= array();
+        $model = Purchase::findOrFail($req->id);
+        $provProd = Product::where('prov_id', $model->prov_id)->get();
+        $items = $model->items()->selectRaw("*, sum(saldo) as cant")->groupBy('producto_id')->get();
+        $atts = $model->attachments()->get();
+        foreach ($items as $aux) {
+            $temp = array();
             // $p= $provProd->where('id',$aux->producto_id)->first();
-            $temp['id']=$aux->id;
-            $temp['producto_id']=$aux->producto_id;
-            $temp['codigo']=$aux->product->codigo;
-            $temp['codigo_fabrica']=$aux->product->codigo_fabrica;
-            $temp['descripcion']=$aux->descripcion;
-            $temp['cantidad']=$aux->cant;
-            $temp['extra']= $aux->product;
-            $temp['condicion_pago']= PurchaseItemCondition::where('item_id',$aux->id)->get();
-            $prod[]= $temp;
+            $temp['id'] = $aux->id;
+            $temp['producto_id'] = $aux->producto_id;
+            $temp['codigo'] = $aux->product->codigo;
+            $temp['codigo_fabrica'] = $aux->product->codigo_fabrica;
+            $temp['descripcion'] = $aux->descripcion;
+            $temp['cantidad'] = $aux->cant;
+            $temp['extra'] = $aux->product;
+            $temp['condicion_pago'] = PurchaseItemCondition::where('item_id', $aux->id)->get();
+            $prod[] = $temp;
         }
 
-        $data['adjuntos']= $atts;
-        $data['productos']= $prod;
+        $data['adjuntos'] = $atts;
+        $data['productos'] = $prod;
         return $data;
     }
 
@@ -1190,64 +1182,67 @@ class OrderController extends BaseController
     /***
      * adjuntos para la solicitud
      **/
-    public function addAttachmentsSolicitude (Request $req){
-        $resul= array();
-        $attacs= array();
-        $id=null;
-        if(!$req->has('id')){
-            if($req->has('tempId')){
-                $id= $req->tempId;
-            }else{
-                $id=uniqid('', true);
+    public function addAttachmentsSolicitude(Request $req)
+    {
+        $resul = array();
+        $attacs = array();
+        $id = null;
+        if (!$req->has('id')) {
+            if ($req->has('tempId')) {
+                $id = $req->tempId;
+            } else {
+                $id = uniqid('', true);
             }
         }
-        foreach($req->adjuntos  as $aux){
-            $attac=  new SolicitudeAttachment();
+        foreach ($req->adjuntos as $aux) {
+            $attac = new SolicitudeAttachment();
             $attac->archivo_id = $aux['id'];
-            $attac->uid= $id;
-            if($req->has('id')){
+            $attac->uid = $id;
+            if ($req->has('id')) {
                 $attac->doc_id = $req->id;
             }
             $attac->documento = strtoupper($aux['documento']);
             $attac->save();
-            $attacs[]= $attac;
+            $attacs[] = $attac;
 
         }
 
-        $resul['accion']= "new";
-        $resul['items']= $attacs;
-        $resul['id']=$id;
+        $resul['accion'] = "new";
+        $resul['items'] = $attacs;
+        $resul['id'] = $id;
         return $resul;
     }
 
     /**
      * adjuntos para el pedido
      **/
-    public function addAttachmentsOrder(Request $req){
-        $resul= array();
-        $id=null;
-        $attacs= array();
+    public function addAttachmentsOrder(Request $req)
+    {
+        $resul = array();
+        $id = null;
+        $attacs = array();
 
-        if(!$req->has('id')){
-            if($req->has('tempId')){
-                $id= $req->tempId;
-            }else{
-                $id=uniqid('', true);
+        if (!$req->has('id')) {
+            if ($req->has('tempId')) {
+                $id = $req->tempId;
+            } else {
+                $id = uniqid('', true);
             }
         }
-        foreach($req->adjuntos  as $aux){
-            $attac=  new OrderAttachment();
+        foreach ($req->adjuntos as $aux) {
+            $attac = new OrderAttachment();
             $attac->archivo_id = $aux['id'];
-            $attac->uid= $id;
-            if($req->has('id')){
+            $attac->uid = $id;
+            if ($req->has('id')) {
                 $attac->doc_id = $req->id;
-            }            $attac->documento = strtoupper($aux['documento']);
+            }
+            $attac->documento = strtoupper($aux['documento']);
             $attac->save();
-            $attacs[]= $attac;
+            $attacs[] = $attac;
         }
-        $resul['accion']= "new";
-        $resul['items']= $attacs;
-        $result['id']=$id;
+        $resul['accion'] = "new";
+        $resul['items'] = $attacs;
+        $result['id'] = $id;
         return $resul;
     }
 
@@ -1255,32 +1250,33 @@ class OrderController extends BaseController
     /**
      * adjuntos para la ordern de compra
      **/
-    public function addAttachmentsPurchase(Request $req){
-        $resul= array();
-        $id=null;
-        $attacs= array();
-        if(!$req->has('id')){
-            if($req->has('tempId')){
-                $id= $req->tempId;
-            }else{
-                $id=uniqid('', true);
+    public function addAttachmentsPurchase(Request $req)
+    {
+        $resul = array();
+        $id = null;
+        $attacs = array();
+        if (!$req->has('id')) {
+            if ($req->has('tempId')) {
+                $id = $req->tempId;
+            } else {
+                $id = uniqid('', true);
             }
         }
-        foreach($req->adjuntos  as $aux){
-            $attac=  new PurchaseAttachment();
+        foreach ($req->adjuntos as $aux) {
+            $attac = new PurchaseAttachment();
             $attac->archivo_id = $aux['id'];
-            $attac->uid= $id;
-            if($req->has('id')){
+            $attac->uid = $id;
+            if ($req->has('id')) {
                 $attac->doc_id = $req->id;
             }
 
             $attac->documento = strtoupper($aux['documento']);
             $attac->save();
-            $attacs[]= $attac;
+            $attacs[] = $attac;
         }
-        $resul['accion']= "new";
-        $resul['items']= $attacs;
-        $resul['id']=$id;
+        $resul['accion'] = "new";
+        $resul['items'] = $attacs;
+        $resul['id'] = $id;
         return $resul;
     }
 
@@ -1288,68 +1284,69 @@ class OrderController extends BaseController
     /**
      *  compara una solicitud  y un pedido y muestra las diferencias por campos entre ellos
      */
-    public function getDiffbetweenSolicitudToOrder (Request $req){
-        $data  = array();
+    public function getDiffbetweenSolicitudToOrder(Request $req)
+    {
+        $data = array();
         $error = array();
         $asigna = array();
         $values = array();
-        $compare =array('titulo', 'pais_id',  'motivo_id','prov_moneda_id','mt3','peso',
-            'direccion_almacen_id','direccion_facturacion_id','puerto_id','condicion_id','tasa', 'comentario'
+        $compare = array('titulo', 'pais_id', 'motivo_id', 'prov_moneda_id', 'mt3', 'peso',
+            'direccion_almacen_id', 'direccion_facturacion_id', 'puerto_id', 'condicion_id', 'tasa', 'comentario'
         );
         $princi = Order::findOrFail($req->princ_id);// id de la proforma
         $import = Solicitude::findOrFail($req->impor_id);// id de la solicitud
-        $asigna['monto'] =$princi->monto + $import->monto;
-        $asigna['mt3'] =$princi->mt3 + $import->mt3;
+        $asigna['monto'] = $princi->monto + $import->monto;
+        $asigna['mt3'] = $princi->mt3 + $import->mt3;
 
-        foreach($compare as $aux){
+        foreach ($compare as $aux) {
             $ordval = $princi->getAttributeValue($aux);
             $solval = $import->getAttributeValue($aux);
-            $data['comp'][]= array('ord' =>$ordval, 'solv' => $solval ,'key' => $aux);
-            if($solval == null &&  $ordval != null) {
+            $data['comp'][] = array('ord' => $ordval, 'solv' => $solval, 'key' => $aux);
+            if ($solval == null && $ordval != null) {
                 $asigna[$aux] = $ordval;
-            }else if($solval != null &&  $ordval == null){
+            } else if ($solval != null && $ordval == null) {
                 $asigna[$aux] = $solval;
-            }else
-                if($solval != null &&  $ordval != null) {
+            } else
+                if ($solval != null && $ordval != null) {
 
-                    if($solval != $ordval){
+                    if ($solval != $ordval) {
                         $temp0 = array();
                         $temp1 = array();
                         $temp0['key'] = $solval;
-                        $temp1['key'] =$ordval;
+                        $temp1['key'] = $ordval;
 
-                        switch($aux){
+                        switch ($aux) {
 
                             case "prov_moneda_id":
-                                $mon=Monedas::findOrFail($solval);
-                                $mon2=Monedas::findOrFail($ordval);
-                                $temp0['text'] =$mon->nombre;
-                                $temp1['text'] =$mon2->nombre;
+                                $mon = Monedas::findOrFail($solval);
+                                $mon2 = Monedas::findOrFail($ordval);
+                                $temp0['text'] = $mon->nombre;
+                                $temp1['text'] = $mon2->nombre;
                                 break;
                             case "pais_id":
-                                $mon=Country::find($solval);
-                                $mon2=Country::find($ordval);
-                                if($mon!=null){
-                                    $temp0['text'] =$mon->short_name;
+                                $mon = Country::find($solval);
+                                $mon2 = Country::find($ordval);
+                                if ($mon != null) {
+                                    $temp0['text'] = $mon->short_name;
                                 }
-                                if($mon2!=null){
-                                    $temp1['text'] =$mon2->short_name;
+                                if ($mon2 != null) {
+                                    $temp1['text'] = $mon2->short_name;
                                 }
                                 break;
                             case "motivo_id":
-                                $mon=OrderReason::findOrFail($solval);
-                                $mon2=OrderReason::findOrFail($ordval);
-                                $temp0['text'] =$mon->motivo;
-                                $temp1['text'] =$mon2->motivo;
+                                $mon = OrderReason::findOrFail($solval);
+                                $mon2 = OrderReason::findOrFail($ordval);
+                                $temp0['text'] = $mon->motivo;
+                                $temp1['text'] = $mon2->motivo;
                                 break;
-                            case "direccion_almacen_id"  ||  "direccion_facturacion_id":
-                                $mon=ProviderAddress::find($solval);
-                                $mon2=ProviderAddress::find($ordval);
-                                if($mon!=null){
-                                    $temp0['text'] =$mon->short_name;
+                            case "direccion_almacen_id" || "direccion_facturacion_id":
+                                $mon = ProviderAddress::find($solval);
+                                $mon2 = ProviderAddress::find($ordval);
+                                if ($mon != null) {
+                                    $temp0['text'] = $mon->short_name;
                                 }
-                                if($mon2!=null){
-                                    $temp1['text'] =$mon2->short_name;
+                                if ($mon2 != null) {
+                                    $temp1['text'] = $mon2->short_name;
                                 }
 
                                 break;
@@ -1360,30 +1357,30 @@ class OrderController extends BaseController
                                        $temp1['text'] =$mon2->direccion;
                                        break;*/
                             case "puerto_id" :
-                                $mon=Ports::findOrFail($solval);
-                                $mon2=Ports::findOrFail($ordval);
-                                $temp0['text'] =$mon->Main_port_name;
-                                $temp1['text'] =$mon2->Main_port_name;
+                                $mon = Ports::findOrFail($solval);
+                                $mon2 = Ports::findOrFail($ordval);
+                                $temp0['text'] = $mon->Main_port_name;
+                                $temp1['text'] = $mon2->Main_port_name;
                                 break;
                             case "condicion_id" :
-                                $mon=OrderCondition::findOrFail($solval);
-                                $mon2=OrderCondition::findOrFail($ordval);
-                                $temp0['text'] =$mon->Main_port_name;
-                                $temp1['text'] =$mon2->Main_port_name;
+                                $mon = OrderCondition::findOrFail($solval);
+                                $mon2 = OrderCondition::findOrFail($ordval);
+                                $temp0['text'] = $mon->Main_port_name;
+                                $temp1['text'] = $mon2->Main_port_name;
                                 break;
 
 
                         }
-                        $error[$aux][] =$temp0;
-                        $error[$aux][] =$temp1;
+                        $error[$aux][] = $temp0;
+                        $error[$aux][] = $temp1;
 
                     }
                 }
         }
         $data['error'] = $error;
         $data['asignado'] = $asigna;
-        $solItms= $import->items()->get();
-        $data['items']=  $solItms;
+        $solItms = $import->items()->get();
+        $data['items'] = $solItms;
 
 
         return $data;
@@ -1392,68 +1389,69 @@ class OrderController extends BaseController
     /**
      * moetod que compara un pedido  y una orden de compra y muestra las diferencias por campos entre ellos
      */
-    public function getDiffbetweenOrderToPurchase (Request $req){
-        $data  = array();
+    public function getDiffbetweenOrderToPurchase(Request $req)
+    {
+        $data = array();
         $error = array();
         $asigna = array();
-        $compare =array('titulo', 'pais_id',  'motivo_id','prov_moneda_id','mt3','peso',
-            'direccion_almacen_id','direccion_facturacion_id','puerto_id','condicion_id','tasa', 'comentario'
+        $compare = array('titulo', 'pais_id', 'motivo_id', 'prov_moneda_id', 'mt3', 'peso',
+            'direccion_almacen_id', 'direccion_facturacion_id', 'puerto_id', 'condicion_id', 'tasa', 'comentario'
         );
         $prin = Purchase::findOrFail($req->princ_id);// id de la proforma
         $import = Order::findOrFail($req->impor_id);// id de la solicitud princ_id
-        $asigna['monto'] =$prin->monto + $import->monto;
-        $asigna['mt3'] =$prin->mt3 + $import->mt3;
-        foreach($compare as $aux){
+        $asigna['monto'] = $prin->monto + $import->monto;
+        $asigna['mt3'] = $prin->mt3 + $import->mt3;
+        foreach ($compare as $aux) {
             $ordval = $prin->getAttributeValue($aux);
             $solval = $import->getAttributeValue($aux);
-            $data['comp'][]= array('ord' =>$ordval, 'solv' => $solval ,'key' => $aux);
-            if($solval == null &&  $ordval != null) {
+            $data['comp'][] = array('ord' => $ordval, 'solv' => $solval, 'key' => $aux);
+            if ($solval == null && $ordval != null) {
                 $asigna[$aux] = $ordval;
-            }else  if($solval != null &&  $ordval == null) {
+            } else if ($solval != null && $ordval == null) {
                 $asigna[$aux] = $solval;
             }
-            if($solval != null &&  $ordval != null) {
+            if ($solval != null && $ordval != null) {
 
 
-                if($solval != $ordval){
+                if ($solval != $ordval) {
                     $temp0 = array();
                     $temp1 = array();
 
                     $temp0['key'] = $solval;
-                    $temp1['key'] =$ordval;
+                    $temp1['key'] = $ordval;
 
-                    switch($aux){
+                    switch ($aux) {
                         case "prov_moneda_id":
-                            $mon=Monedas::findOrFail($solval);
-                            $mon2=Monedas::findOrFail($ordval);
-                            $temp0['text'] =$mon->nombre;
-                            $temp1['text'] =$mon2->nombre;
+                            $mon = Monedas::findOrFail($solval);
+                            $mon2 = Monedas::findOrFail($ordval);
+                            $temp0['text'] = $mon->nombre;
+                            $temp1['text'] = $mon2->nombre;
                             break;
                         case "pais_id":
-                            $mon=Country::find($solval);
-                            $mon2=Country::find($ordval);
-                            if($mon !=null ){
-                                $temp0['text'] =$mon->short_name;
-                                $temp1['text'] =$mon2->short_name;
+                            $mon = Country::find($solval);
+                            $mon2 = Country::find($ordval);
+                            if ($mon != null) {
+                                $temp0['text'] = $mon->short_name;
+                                $temp1['text'] = $mon2->short_name;
                             }
-                            if($mon2 !=null ){
-                                $temp1['text'] =$mon2->short_name;
+                            if ($mon2 != null) {
+                                $temp1['text'] = $mon2->short_name;
                             }
 
 
                             break;
                         case "motivo_id":
-                            $mon=OrderReason::findOrFail($solval);
-                            $mon2=OrderReason::findOrFail($ordval);
-                            $temp0['text'] =$mon->motivo;
-                            $temp1['text'] =$mon2->motivo;
+                            $mon = OrderReason::findOrFail($solval);
+                            $mon2 = OrderReason::findOrFail($ordval);
+                            $temp0['text'] = $mon->motivo;
+                            $temp1['text'] = $mon2->motivo;
                             break;
-                        case "direccion_almacen_id"  ||  "direccion_facturacion_id":
-                            if($solval != 0 &&  $ordval !=0){
-                                $mon=ProviderAddress::findOrFail($solval);
-                                $mon2=ProviderAddress::findOrFail($ordval);
-                                $temp0['text'] =$mon->direccion;
-                                $temp1['text'] =$mon2->direccion;
+                        case "direccion_almacen_id" || "direccion_facturacion_id":
+                            if ($solval != 0 && $ordval != 0) {
+                                $mon = ProviderAddress::findOrFail($solval);
+                                $mon2 = ProviderAddress::findOrFail($ordval);
+                                $temp0['text'] = $mon->direccion;
+                                $temp1['text'] = $mon2->direccion;
                             }
 
                             break;
@@ -1464,36 +1462,36 @@ class OrderController extends BaseController
                                    $temp1['text'] =$mon2->direccion;
                                    break;*/
                         case "puerto_id" :
-                            $mon=Ports::findOrFail($solval);
-                            $mon2=Ports::findOrFail($ordval);
-                            $temp0['text'] =$mon->Main_port_name;
-                            $temp1['text'] =$mon2->Main_port_name;
+                            $mon = Ports::findOrFail($solval);
+                            $mon2 = Ports::findOrFail($ordval);
+                            $temp0['text'] = $mon->Main_port_name;
+                            $temp1['text'] = $mon2->Main_port_name;
                             break;
                         case "condicion_id" :
-                            $mon=OrderCondition::findOrFail($solval);
-                            $mon2=OrderCondition::findOrFail($ordval);
-                            $temp0['text'] =$mon->Main_port_name;
-                            $temp1['text'] =$mon2->Main_port_name;
+                            $mon = OrderCondition::findOrFail($solval);
+                            $mon2 = OrderCondition::findOrFail($ordval);
+                            $temp0['text'] = $mon->Main_port_name;
+                            $temp1['text'] = $mon2->Main_port_name;
                             break;
 
 
                     }
-                    $error[$aux][] =$temp0;
-                    $error[$aux][] =$temp1;
+                    $error[$aux][] = $temp0;
+                    $error[$aux][] = $temp1;
 
                 }
             }
         }
 
 
-        $solItms= $import->items()->get();
-        if(sizeof($solItms) > 0 ){
-            $prods=  array();
+        $solItms = $import->items()->get();
+        if (sizeof($solItms) > 0) {
+            $prods = array();
         }
 
         $data['error'] = $error;
         $data['asignado'] = $asigna;
-        $data['items']= $solItms;
+        $data['items'] = $solItms;
         return $data;
     }
 
@@ -1506,41 +1504,42 @@ class OrderController extends BaseController
      * @param id del documento a copiar
      * @param tipo de documento
      */
-    public  function copySolicitude(Request $req){
-        $resul["action"] ="copy";
-        $newItems= array();
-        $newAtt= array();
-        $newModel= new Solicitude();
-        $oldModel= Solicitude::findOrFail($req->id);
+    public function copySolicitude(Request $req)
+    {
+        $resul["action"] = "copy";
+        $newItems = array();
+        $newAtt = array();
+        $newModel = new Solicitude();
+        $oldModel = Solicitude::findOrFail($req->id);
 
-        $newModel = $this->transferDataDoc($oldModel,$newModel);
-        $newModel->parent_id=$oldModel->id;
-        $newModel->version=$oldModel->version+1;
+        $newModel = $this->transferDataDoc($oldModel, $newModel);
+        $newModel->parent_id = $oldModel->id;
+        $newModel->version = $oldModel->version + 1;
         $newModel->save();
-        $oldModel->cancelacion= Carbon::now();
-        $oldModel->comentario_cancelacion= "#sistema: copiado por new id#".$newModel->id;
+        $oldModel->cancelacion = Carbon::now();
+        $oldModel->comentario_cancelacion = "#sistema: copiado por new id#" . $newModel->id;
         $oldModel->save();
 
-        foreach($oldModel->items()->get() as $aux){
-            $it= new  SolicitudeItem();
-            $it->tipo_origen_id =$aux->tipo_origen_id;
-            $it->doc_id =$newModel->id;
-            $it->origen_item_id =$aux->origen_item_id;
-            $it->doc_origen_id =$aux->doc_origen_id;
-            $it->cantidad =$aux->cantidad;
-            $it->saldo =$aux->saldo;
-            $it->producto_id =$aux->producto_id;
-            $it->descripcion =$aux->descripcion;
+        foreach ($oldModel->items()->get() as $aux) {
+            $it = new  SolicitudeItem();
+            $it->tipo_origen_id = $aux->tipo_origen_id;
+            $it->doc_id = $newModel->id;
+            $it->origen_item_id = $aux->origen_item_id;
+            $it->doc_origen_id = $aux->doc_origen_id;
+            $it->cantidad = $aux->cantidad;
+            $it->saldo = $aux->saldo;
+            $it->producto_id = $aux->producto_id;
+            $it->descripcion = $aux->descripcion;
             $it->save();
-            $newItems[]=$it;
+            $newItems[] = $it;
 
         }
 
         // $newModel->items()->saveMany($newItems);
-        $resul['id']= $newModel->id;
-        $resul['doc']= $newModel;
-        $resul['adjs']= $newAtt;
-        $resul['oldItems']= $newItems;
+        $resul['id'] = $newModel->id;
+        $resul['doc'] = $newModel;
+        $resul['adjs'] = $newAtt;
+        $resul['oldItems'] = $newItems;
         return $resul;
 
     }
@@ -1550,37 +1549,38 @@ class OrderController extends BaseController
      * @param id del documento a copiar
      * @param tipo de documento
      */
-    public  function copyOrder(Request $req){
-        $resul["action"] ="copy";
-        $newItems= array();
-        $newAtt= array();
-        $newModel= new Order();
-        $oldModel= Order::findOrFail($req->id);
+    public function copyOrder(Request $req)
+    {
+        $resul["action"] = "copy";
+        $newItems = array();
+        $newAtt = array();
+        $newModel = new Order();
+        $oldModel = Order::findOrFail($req->id);
 
-        $newModel = $this->transferDataDoc($oldModel,$newModel);
-        $newModel->parent_id=$oldModel->id;
-        $newModel->version=$oldModel->version+1;
+        $newModel = $this->transferDataDoc($oldModel, $newModel);
+        $newModel->parent_id = $oldModel->id;
+        $newModel->version = $oldModel->version + 1;
         $newModel->save();
-        $oldModel->cancelacion= Carbon::now();
-        $oldModel->comentario_cancelacion= "#sistema: copiado por new id#".$newModel->id;
+        $oldModel->cancelacion = Carbon::now();
+        $oldModel->comentario_cancelacion = "#sistema: copiado por new id#" . $newModel->id;
         $oldModel->save();
 
-        foreach($oldModel->items()->get() as $aux){
-            $it= new OrderItem();
-            $it->tipo_origen_id =$aux->tipo_origen_id;
-            $it->doc_id =$newModel->id;
-            $it->origen_item_id =$aux->origen_item_id;
-            $it->doc_origen_id =$aux->doc_origen_id;
-            $it->cantidad =$aux->cantidad;
-            $it->saldo =$aux->saldo;
-            $it->producto_id =$aux->producto_id;
-            $it->descripcion =$aux->descripcion;
+        foreach ($oldModel->items()->get() as $aux) {
+            $it = new OrderItem();
+            $it->tipo_origen_id = $aux->tipo_origen_id;
+            $it->doc_id = $newModel->id;
+            $it->origen_item_id = $aux->origen_item_id;
+            $it->doc_origen_id = $aux->doc_origen_id;
+            $it->cantidad = $aux->cantidad;
+            $it->saldo = $aux->saldo;
+            $it->producto_id = $aux->producto_id;
+            $it->descripcion = $aux->descripcion;
             $it->save();
-            $newItems[]=$it;
+            $newItems[] = $it;
 
         }
 
-        $resul['id']= $newModel->id;
+        $resul['id'] = $newModel->id;
         /*        $resul['doc']= $newModel;
                 $resul['adjs']= $newAtt;
                 $resul['items']= $newItems;*/
@@ -1593,37 +1593,38 @@ class OrderController extends BaseController
      * @param id del documento a copiar
      * @param tipo de documento
      */
-    public  function copyPurchase(Request $req){
-        $resul["action"] ="copy";
-        $newItems= array();
-        $newAtt= array();
-        $newModel= new Purchase();
-        $oldModel= Purchase::findOrFail($req->id);
+    public function copyPurchase(Request $req)
+    {
+        $resul["action"] = "copy";
+        $newItems = array();
+        $newAtt = array();
+        $newModel = new Purchase();
+        $oldModel = Purchase::findOrFail($req->id);
 
-        $newModel = $this->transferDataDoc($oldModel,$newModel);
-        $newModel->parent_id=$oldModel->id;
-        $newModel->version=$oldModel->version+1;
+        $newModel = $this->transferDataDoc($oldModel, $newModel);
+        $newModel->parent_id = $oldModel->id;
+        $newModel->version = $oldModel->version + 1;
         $newModel->save();
-        $oldModel->cancelacion= Carbon::now();
-        $oldModel->comentario_cancelacion= "#sistema: copiado por new id#".$newModel->id;
+        $oldModel->cancelacion = Carbon::now();
+        $oldModel->comentario_cancelacion = "#sistema: copiado por new id#" . $newModel->id;
         $oldModel->save();
 
-        foreach($oldModel->items()->get() as $aux){
-            $it= new PurchaseItem();
-            $it->tipo_origen_id =$aux->tipo_origen_id;
-            $it->doc_id =$newModel->id;
-            $it->origen_item_id =$aux->origen_item_id;
-            $it->doc_origen_id =$aux->doc_origen_id;
-            $it->cantidad =$aux->cantidad;
-            $it->saldo =$aux->saldo;
-            $it->producto_id =$aux->producto_id;
-            $it->descripcion =$aux->descripcion;
+        foreach ($oldModel->items()->get() as $aux) {
+            $it = new PurchaseItem();
+            $it->tipo_origen_id = $aux->tipo_origen_id;
+            $it->doc_id = $newModel->id;
+            $it->origen_item_id = $aux->origen_item_id;
+            $it->doc_origen_id = $aux->doc_origen_id;
+            $it->cantidad = $aux->cantidad;
+            $it->saldo = $aux->saldo;
+            $it->producto_id = $aux->producto_id;
+            $it->descripcion = $aux->descripcion;
             $it->save();
-            $newItems[]=$it;
+            $newItems[] = $it;
 
         }
 
-        $resul['id']= $newModel->id;
+        $resul['id'] = $newModel->id;
         /*        $resul['doc']= $newModel;
                 $resul['adjs']= $newAtt;
                 $resul['items']= $newItems;*/
@@ -1632,7 +1633,8 @@ class OrderController extends BaseController
     }
 
     /*********************** PRODUCTOS ************************/
-    public function getProviderProducts(Request $req){
+    public function getProviderProducts(Request $req)
+    {
         $data = array();
         $items = Provider::findOrFail($req->id)
             ->proveedor_product()
@@ -1640,30 +1642,30 @@ class OrderController extends BaseController
             ->get();
         $types = ProductType::get();
 
-        $model= $this->getDocumentIntance($req->tipo);
+        $model = $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->doc_id);
-        $modelIts= $model->items()->where('tipo_origen_id', '1')->get();
-        foreach($items as $aux){
+        $modelIts = $model->items()->where('tipo_origen_id', '1')->get();
+        foreach ($items as $aux) {
             $aux->puntoCompra = false;
-            $aux->cantidad =0;
-            $aux->saldo =0;
-            $aux->tipo_producto = $types->where('id',$aux->tipo_producto_id)->first()->descripcion;
+            $aux->cantidad = 0;
+            $aux->saldo = 0;
+            $aux->tipo_producto = $types->where('id', $aux->tipo_producto_id)->first()->descripcion;
             $aux->asignado = false;
-            $itMo=$modelIts->where('producto_id',$aux->id)->first();
-            $aux->otre=$itMo;
-            $aux->descripcion  =  ($aux->descripcion == null || $aux->descripcion == '' )?  $aux->descripcion_profit : $aux->descripcion;
+            $itMo = $modelIts->where('producto_id', $aux->id)->first();
+            $aux->otre = $itMo;
+            $aux->descripcion = ($aux->descripcion == null || $aux->descripcion == '') ? $aux->descripcion_profit : $aux->descripcion;
 
-            if($itMo != null){
+            if ($itMo != null) {
                 $aux->asignado = true;
                 $aux->saldo = $itMo->saldo;
-                $aux->cantidad =$itMo->cantidad;
+                $aux->cantidad = $itMo->cantidad;
 
                 $aux->reng_id = $itMo->id;
                 $aux->costo_unitario = $itMo->costo_unitario;
                 $aux->uid = $itMo->uid;
 
             }
-            $data[]=$aux;
+            $data[] = $aux;
         }
         return $data;
 
@@ -1672,13 +1674,14 @@ class OrderController extends BaseController
     /**
      * crea un producto temporarl
      */
-    public function createTemp(Request $req){
+    public function createTemp(Request $req)
+    {
         $prodTemp = MasterProductController::createProduct($req->all());
-        $temp= array();
+        $temp = array();
         $temp['id'] = $prodTemp->id;
         $temp['descripcion'] = $prodTemp->descripcion;
-        $temp['codigo'] = "(demo".")";
-        $temp['codigo_fabrica'] =$prodTemp->codigo_fabrica;
+        $temp['codigo'] = "(demo" . ")";
+        $temp['codigo_fabrica'] = $prodTemp->codigo_fabrica;
         $temp['puntoCompra'] = false;
         $temp['cantidad'] = 0;
         $temp['saldo'] = 0;
@@ -1688,15 +1691,13 @@ class OrderController extends BaseController
         $temp['tipo_producto_id'] = $prodTemp->tipo_producto_id;
         $temp['tipo_producto'] = ProductType::findOrFail($prodTemp->tipo_producto_id)->descripcion;
         $temp['asignado'] = false;
-        if($prodTemp->descripcion == null){
-            $temp['descripcion'] = "Profit ".$prodTemp->descripcion_profit;
+        if ($prodTemp->descripcion == null) {
+            $temp['descripcion'] = "Profit " . $prodTemp->descripcion_profit;
         }
-        if($req->has('saldo')){
+        if ($req->has('saldo')) {
             $temp['cantidad'] = $req->saldo;
             $temp['saldo'] = $req->saldo;
         }
-
-
 
 
         return $temp;
@@ -1708,14 +1709,14 @@ class OrderController extends BaseController
     public function saveSolicitude(Request $req)
     {
 
-        $result =  [];
-        $result["action"]="new";
+        $result = [];
+        $result["action"] = "new";
         $model = new Solicitude();
-        $uid=null;
+        $uid = null;
 
         if ($req->has('id')) {
             $model = $model->findOrFail($req->id);
-            $result["action"]="edit";
+            $result["action"] = "edit";
         }
         $validator = Validator::make($req->all(), [
             'prov_id' => 'required',
@@ -1726,19 +1727,19 @@ class OrderController extends BaseController
         ]);
         if ($validator->fails()) {
             $result = array("error" => "errores en campos de formulario");
-            if($model->uid == null){
-                $model->uid =uniqid('', true);
+            if ($model->uid == null) {
+                $model->uid = uniqid('', true);
             }
 
-        }else{
-            $result['success']= "Registro guardado con éxito";
-            $model->uid= null;
+        } else {
+            $result['success'] = "Registro guardado con éxito";
+            $model->uid = null;
         }
-        $model= $this->setDocItem($model, $req);
+        $model = $this->setDocItem($model, $req);
         $model->save();
-        $result['id']= $model->id;
-        $result['user']= $model->usuario_id;
-        $result['uid']=$model->uid ;
+        $result['id'] = $model->id;
+        $result['user'] = $model->usuario_id;
+        $result['uid'] = $model->uid;
         return $result;
 
     }
@@ -1747,43 +1748,45 @@ class OrderController extends BaseController
     /**
      * agrega un producto a la solicitud
      */
-    public function saveSolicitudItemProduc(Request $req){
-        $resul['accion']= "new";
+    public function saveSolicitudItemProduc(Request $req)
+    {
+        $resul['accion'] = "new";
         $model = new SolicitudeItem();
-        if($req->has('reng_id')){
-            $model =SolicitudeItem::findOrFail($req->reng_id);
-            $resul['accion']= 'upd';
+        if ($req->has('reng_id')) {
+            $model = SolicitudeItem::findOrFail($req->reng_id);
+            $resul['accion'] = 'upd';
         }
         $model->tipo_origen_id = $req->tipo_origen_id;
         $model->doc_id = $req->doc_id;
-        $model->origen_item_id= $req->id;
+        $model->origen_item_id = $req->id;
 
-        $model->doc_origen_id= $req->has('doc_origen_id') ? $req->doc_origen_id : null;
-        $model->costo_unitario= $req->has('costo_unitario') ? $req->costo_unitario : null;
-        $model->producto_id= $req->producto_id;
-        $model->descripcion= $req->descripcion;
+        $model->doc_origen_id = $req->has('doc_origen_id') ? $req->doc_origen_id : null;
+        $model->costo_unitario = $req->has('costo_unitario') ? $req->costo_unitario : null;
+        $model->producto_id = $req->producto_id;
+        $model->descripcion = $req->descripcion;
         $model->uid = $req->has('uid') ? $req->uid : uniqid('', true);
 
 
-        if($resul['accion'] == 'new' ||  $model->cantidad == $model->saldo){
+        if ($resul['accion'] == 'new' || $model->cantidad == $model->saldo) {
             $model->cantidad = $req->saldo;
             $model->saldo = $req->saldo;
-        }else{
-            $dif = floatval($req->saldo) -  floatval($model->cantidad);
-            $model->saldo = floatval( $model->saldo) + $dif;
+        } else {
+            $dif = floatval($req->saldo) - floatval($model->cantidad);
+            $model->saldo = floatval($model->saldo) + $dif;
             $model->cantidad = $req->saldo;
         }
 
-        $resul['response']=$model->save();
-        $resul['reng_id']=$model->id;
-        $resul['cantidad']=$model->cantidad;
-        $resul['saldo']=$model->saldo;
+        $resul['response'] = $model->save();
+        $resul['reng_id'] = $model->id;
+        $resul['cantidad'] = $model->cantidad;
+        $resul['saldo'] = $model->saldo;
 
         return $resul;
     }
 
-    public function  DeleteSolicitudItemProduc(Request $req){
-        $result['accion']= 'del';
+    public function DeleteSolicitudItemProduc(Request $req)
+    {
+        $result['accion'] = 'del';
         $result['response'] = SolicitudeItem::destroy($req->id);
         $result['id'] = $req->id;
         return $result;
@@ -1794,21 +1797,23 @@ class OrderController extends BaseController
      * asigna el contra pedido
      *
      **/
-    public function addCustomOrderSolicitud(Request $req){
+    public function addCustomOrderSolicitud(Request $req)
+    {
 
-        $model= CustomOrder::findOrFail($req->id);
+        $model = CustomOrder::findOrFail($req->id);
         $items = $model->CustomOrderItem()->get();
-        $resul= array();
-        $resul['action']= "new";
-        $newItems= array();
-        $oldItems= array();
-        $doc =Solicitude::findOrFail($req->doc_id);
+        $resul = array();
+        $resul['action'] = "new";
+        $newItems = array();
+        $oldItems = array();
+        $doc = Solicitude::findOrFail($req->doc_id);
 
-        $docItms= $doc->items()->where("tipo_origen_id",2)->get();
-        foreach($items as $aux){
-            if(
-                sizeof($docItms->where('origen_item_id',$aux->id)->where('doc_origen_id',$req->id)) == 0){
-                $item= $doc->newItem();
+        $docItms = $doc->items()->where("tipo_origen_id", 2)->get();
+        foreach ($items as $aux) {
+            if (
+                sizeof($docItms->where('origen_item_id', $aux->id)->where('doc_origen_id', $req->id)) == 0
+            ) {
+                $item = $doc->newItem();
                 $item->tipo_origen_id = 2;
                 $item->doc_id = $req->doc_id;
                 $item->origen_item_id = $aux->id;
@@ -1816,50 +1821,52 @@ class OrderController extends BaseController
                 $item->saldo = $aux->saldo;
                 $item->descripcion = $aux->descripcion;
                 $item->producto_id = $aux->producto_id;
-                $item->doc_origen_id =$model->id;
-                $item->uid =$aux->uid;
-                $oldItems[]=$aux;
-                $newItems[]=$item;
+                $item->doc_origen_id = $model->id;
+                $item->uid = $aux->uid;
+                $oldItems[] = $aux;
+                $newItems[] = $item;
             }
         }
-        $resul['newitems']=$newItems;
-        $resul['oldItems']=$oldItems;
+        $resul['newitems'] = $newItems;
+        $resul['oldItems'] = $oldItems;
         $doc->items()->saveMany($newItems);
         $model->CustomOrderItem()->saveMany($oldItems);
         return $resul;
     }
+
     /**
      * remueve el contra pedido de la solictud
      **/
-    public function RemoveCustomOrderSolicitud(Request $req){
-        $resul["accion"]= "del";
+    public function RemoveCustomOrderSolicitud(Request $req)
+    {
+        $resul["accion"] = "del";
         $model = SolicitudeItem::where('doc_origen_id', $req->id)
-            ->where('doc_id',$req->doc_id)
-            ->where('tipo_origen_id',2)
+            ->where('doc_id', $req->doc_id)
+            ->where('tipo_origen_id', 2)
             ->get();
         $ids = array();
 
-        foreach($model as $aux){
-            $ids[]= $aux->id;
+        foreach ($model as $aux) {
+            $ids[] = $aux->id;
         }
 
         SolicitudeItem::destroy($ids);
-        $resul["keys"]=$ids;
+        $resul["keys"] = $ids;
         return $resul;
 
     }
 
-
     /**
      * agreaga el iten de cotnra pedido a la solicutud
      */
-    public function saveSolicitudItemCustomOrder(Request $req){
-        $resul['accion']= "new";
+    public function saveSolicitudItemCustomOrder(Request $req)
+    {
+        $resul['accion'] = "new";
         $model = new SolicitudeItem();
         $co = App\Models\Sistema\CustomOrders\CustomOrderItem::findOrFail($req->origen_item_id);
-        if($req->has('reng_id')){
-            $model =SolicitudeItem::findOrFail($req->reng_id);
-            $resul['accion']= 'upd';
+        if ($req->has('reng_id')) {
+            $model = SolicitudeItem::findOrFail($req->reng_id);
+            $resul['accion'] = 'upd';
         }
 
         $model->tipo_origen_id = 2;
@@ -1867,22 +1874,22 @@ class OrderController extends BaseController
         $model->origen_item_id = $co->id;
         $model->descripcion = $co->descripcion;
         $model->producto_id = $co->producto_id;
-        $model->doc_origen_id =$co->doc_id;
-        $model->uid =$co->uid;
-        if($resul['accion'] == 'new' ||  $model->cantidad == $model->saldo){
+        $model->doc_origen_id = $co->doc_id;
+        $model->uid = $co->uid;
+        if ($resul['accion'] == 'new' || $model->cantidad == $model->saldo) {
             $model->cantidad = $req->saldo;
             $model->saldo = $req->saldo;
-        }else{
-            $dif = floatval($req->saldo) -  floatval($model->cantidad);
-            $model->saldo = floatval( $model->saldo) + $dif;
+        } else {
+            $dif = floatval($req->saldo) - floatval($model->cantidad);
+            $model->saldo = floatval($model->saldo) + $dif;
             $model->cantidad = $req->saldo;
         }
         $model->save();
 
         $resul['reng_id'] = $model->id;
-        $resul['disponible'] =  floatval($co->saldo) + floatval($model->cantidad);
-        $resul['inDoc'] = $co->cantidad ;;
-        $resul['inDocBlock'] =floatval($co->cantidad) -  floatval($model->saldo );
+        $resul['disponible'] = floatval($co->saldo) + floatval($model->cantidad);
+        $resul['inDoc'] = $co->cantidad;;
+        $resul['inDocBlock'] = floatval($co->cantidad) - floatval($model->saldo);
         /* $model = new SolicitudeItem();
          if($req->has('reng_id')){
              $model =SolicitudeItem::findOrFail($req->reng_id);
@@ -1916,8 +1923,9 @@ class OrderController extends BaseController
         return $resul;
     }
 
-    public function  DeleteSolicitudItemCustomOrder(Request $req){
-        $result['accion']= 'del';
+    public function DeleteSolicitudItemCustomOrder(Request $req)
+    {
+        $result['accion'] = 'del';
         $result['response'] = SolicitudeItem::destroy($req->id);
         $result['id'] = $req->id;
         return $result;
@@ -1926,29 +1934,140 @@ class OrderController extends BaseController
     /**
      * asigna un kitchenbox a un pedido
      **/
-    public function addkitchenBoxSolicitude(Request $req){
-        $doc =Solicitude::findOrFail($req->doc_id);
-        $k= KitchenBox::findOrFail($req->id);
+    public function addkitchenBoxSolicitude(Request $req)
+    {
+        $doc = Solicitude::findOrFail($req->doc_id);
+        $k = KitchenBox::findOrFail($req->id);
         $item = new SolicitudeItem();
-        $resul['action']="new";
-        if($req->has('reng_id')){
+        $resul['action'] = "new";
+        if ($req->has('reng_id')) {
             $resul['action'] = 'upd';
-            $item  = SolicitudeItem::findOrFail($req->reng_id);
+            $item = SolicitudeItem::findOrFail($req->reng_id);
         }
         $item->tipo_origen_id = 3;
         $item->doc_id = $req->doc_id;
         $item->origen_item_id = $k->id;
         $item->cantidad = 1;
         $item->saldo = 1;
-        $item->descripcion = $req->has('descripcion')  ? $req->descripcion : $k->titulo;
+        $item->descripcion = $req->has('descripcion') ? $req->descripcion : $k->titulo;
         $item->producto_id = $k->producto_id;
         $item->uid = $req->uid;
         $item->costo_unitario = $req->costo_unitario;
         $item->doc_origen_id = $k->id;/// reemplazr cuando se sepa la logica
-        $resul['response']=$item->save();
-        $resul['item']=$item;
+        $resul['response'] = $item->save();
+        $resul['item'] = $item;
         return $resul;
     }
+
+    /**
+     * elimina el kitchenbox de un pedido
+     **/
+    public function removekitchenBoxSolicitude(Request $req)
+    {
+        $resul["accion"] = "del";
+        $model = SolicitudeItem::findOrFail($req->id);
+        SolicitudeItem::destroy($model->id);
+        $resul["id"] = $req->id;
+        return $resul;
+    }
+
+    // sustitute
+
+    /**
+     * obtiene todos las solicitudes que son sustituibles
+     **/
+
+    public function getSolicitudeSubstitutes(Request $req)
+    {
+        $data = array();
+        $items = Solicitude::where('id', '<>', $req->doc_id)
+            ->where('prov_id', $req->prov_id)
+            ->whereNotNull('final_id')
+            ->get();
+        $type = OrderType::get();
+        $coin = Monedas::get();
+        $motivo = OrderReason::get();
+        $prioridad = OrderPriority::get();
+        $estados = OrderStatus::get();
+        $paises = Country::get();
+        $model = Solicitude::findOrFail($req->doc_id);
+
+        $docItems = $model->items()->get();
+
+        foreach ($items as $aux) {
+            $paso = true;
+
+            //para maquinas
+            $aux['asignado'] = false;
+            if ($aux->fecha_sustitucion != null) {
+                if ($aux->id == $model->parent_id) {
+                    $aux['asignado'] = true;
+                } else {
+                    $paso = false;
+                }
+            }
+
+            if (sizeof($docItems->where('tipo_origen_id', '21')->where('doc_origen_id', $aux->id)->get()) > 0) {
+                $aux['asignado'] = true;
+            }
+
+            if ($paso) {
+
+                $aux['documento'] = $aux->getTipo();
+                $aux['diasEmit'] = $aux->daysCreate();
+                $aux['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
+
+                if ($aux->motivo_id) {
+                    $aux['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
+                }
+                if ($aux->pais_id) {
+                    $aux['pais'] = $paises->where('id', $aux->pais_id)->first()->short_name;
+                }
+                if ($aux->prioridad_id) {
+                    $aux['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
+                }
+                if ($aux->prov_moneda_id) {
+                    $aux['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
+                }
+                if ($aux->prov_moneda_id) {
+                    $aux['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
+                }
+                if ($aux->tipo_id != null) {
+                    $aux['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
+                }
+                $data[] = $aux;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * contrulle el resumen preliminar de la solicitud
+     */
+    public function getSolicitudeSummary(Request $req){
+        $data = array();
+        $prod = array();
+        $model= Solicitude::findOrFail($req->id);
+        $provProd = Product::where('prov_id',$model->prov_id)->get();
+        $items =$model->items()->get();
+      //  $atts =$model->attachments()->list('archivo_id');
+        foreach($items as $aux){
+            $p= $provProd->where('id',$aux->producto_id)->first();
+            $aux['cantidad']=$aux->cant;
+            if($p != null){
+                $aux['codigo']=$p->codigo;
+                $aux['codigo_fabrica']=$p->codigo_fabrica;
+            }
+            $prod[]= $aux;
+        }
+
+
+        //$data['adjuntos']= $atts;
+        $data['productos']= $prod;
+
+        return $data;
+    }
+
 
     /**
      * @deprecated
@@ -3271,114 +3390,6 @@ class OrderController extends BaseController
     }
 
     /**
-     * obtiene todos las solicitudes que son sustituibles
-     **/
-
-    public function getSolicitudeSubstitutes(Request $req){
-        $data = array();
-        $items = Solicitude::where('id','<>', $req->doc_id)
-            ->where('prov_id', $req->prov_id)
-            ->whereNotNull('final_id')
-            ->get();
-        $type = OrderType::get();
-        $coin = Monedas::get();
-        $motivo = OrderReason::get();
-        $prioridad= OrderPriority::get();
-        $estados= OrderStatus::get();
-        $paises= Country::get();
-        $model = Solicitude::findOrFail($req->doc_id);
-
-        foreach($items as $aux){
-            $paso =true;
-
-            //para maquinas
-            $tem = array();
-            $tem['asignado']=false;
-            if($aux->fecha_sustitucion != null){
-                if($aux->id == $model->parent_id){
-                    $tem['asignado']=true;
-                }else{
-                    $paso= false;
-                }
-            }
-            if(sizeof($model->items()->where('tipo_origen_id', '21')->where('doc_origen_id', $aux->id)->get()) > 0){
-                $tem['asignado']=true;
-
-            }
-
-            if($paso){
-
-
-                $tem['id']=$aux->id;
-                //$tem['tipo_id']=$aux->tipo_pedido_id;
-                $tem['pais_id']=$aux->pais_id;
-                $tem['direccion_almacen_id']=$aux->direccion_almacen_id;
-                $tem['condicion_pago_id']=$aux->condicion_pago_id;
-                $tem['motivo_pedido_id']=$aux->motivo_pedido_id;
-                $tem['prioridad_id']=$aux->prioridad_id;
-                $tem['condicion_pedido_id']=$aux->condicion_pedido_id;
-                $tem['prov_moneda_id']=$aux->prov_moneda_id;
-                $tem['estado_id']=$aux->estado_id;
-                $tem['prov_id']=$aux->prov_id;
-
-                // $tem['tipo_value']=$aux->typevalue;
-                // pra humanos
-                $tem['comentario']=$aux->comentario;
-                $tem['tasa']=$aux->tasa;
-                $tem['documento']= $aux->getTipo();
-                $tem['diasEmit']=$aux->daysCreate();
-                $tem['estado']=$estados->where('id',$aux->estado_id)->first()->estado;
-                $tem['fecha_aprob_compra'] =$aux->fecha_aprob_compra ;
-                $tem['fecha_aprob_gerencia'] =$aux->fecha_aprob_compra ;
-                $tem['img_aprob'] =$aux->fecha_aprob_compra ;
-                $tem['aprob_compras'] =$aux->aprob_compras ;
-                $tem['cancelacion'] =$aux->cancelacion ;
-                $tem['parent_id'] =$aux->parent_id ;
-
-
-
-                if($aux->motivo_id){
-                    $tem['motivo']=$motivo->where('id',$aux->motivo_id)->first()->motivo;
-                }
-                if($aux->pais_id){
-                    $tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
-                }
-                if($aux->prioridad_id){
-                    $tem['prioridad']=$prioridad->where('id',$aux->prioridad_id)->first()->descripcion;
-                }
-                if($aux->prov_moneda_id){
-                    $tem['moneda']=$coin->where('id',$aux->prov_moneda_id)->first()->nombre;
-                }
-                if($aux->prov_moneda_id){
-                    $tem['symbol']=$coin->where('id',$aux->prov_moneda_id)->first()->simbolo;
-                }
-                if($aux->tipo_id != null){
-                    $tem['tipo']=$type->where('id',$aux->tipo_id)->first()->tipo;
-                }
-                $tem['productos'] = $this->getProductoItem($aux);
-                $tem['nro_proforma']=$aux->nro_proforma;
-                $tem['nro_factura']=$aux->nro_factura;
-                $tem['img_proforma']=$aux->img_proforma;
-                $tem['img_factura']=$aux->img_factura;
-                $tem['mt3']=$aux->mt3;
-                $tem['peso']=$aux->peso;
-                $tem['emision']=$aux->emision;
-                $tem['monto']=$aux->monto;
-                /**actualizar cuando este el final**/
-                $tem['almacen']="Desconocido";
-                // modificar cuando se sepa la logica
-                $tem['aero']=1;
-                $tem['version']=1;
-                $tem['maritimo']=1;
-
-
-                $data[]=$tem;
-            }
-        }
-        return $data;
-    }
-
-    /**
      * obtiene todos las ordenes de compras que son sustituibles
      **/
     public function getPurchaseSubstitutes(Request $req){
@@ -3592,11 +3603,6 @@ class OrderController extends BaseController
         }
         return $data;
     }
-
-    /**
-     * obtiene todos los pedido que son sustituibles
-     **/
-
 
     /**
      * obtine el pedido con sus item sin separar
@@ -4190,42 +4196,42 @@ class OrderController extends BaseController
      * agrega un contra pedido al documento
      *
      */
-   /* public  function addCustomOrderItem(Request $req){
+    /* public  function addCustomOrderItem(Request $req){
 
-        $resul= array();
+         $resul= array();
 
 
-//        $cpIt= CustomOrderItem::findOrFail($req->id);
-//        $item = new OrderItem();
-//        if($req->has('renglon_id')){
-//            $item = OrderItem:: findOrFail($req->renglon_id);
-//
-//        }else{
-//            $item->cantidad = $req->saldo;
-//        }
-//        $item->tipo_origen_id = 2;
-//        $item->pedido_id =  $req->pedido_id;
-//        $item->doc_origen_id =  $req->doc_origen_id;
-//        $item->origen_item_id = $req->id;
-//        $item->descripcion = $req->descripcion;
-//        $item->saldo = $req->saldo;
-//
-//        if($req->saldo >= $req->cantidad){
-//            $cpIt->saldo=0;
-//        }else{
-//            $cpIt->saldo = $req->cantidad - $req->saldo;
-//        }
-//        $cpIt->save();
-//        $item->save();
+ //        $cpIt= CustomOrderItem::findOrFail($req->id);
+ //        $item = new OrderItem();
+ //        if($req->has('renglon_id')){
+ //            $item = OrderItem:: findOrFail($req->renglon_id);
+ //
+ //        }else{
+ //            $item->cantidad = $req->saldo;
+ //        }
+ //        $item->tipo_origen_id = 2;
+ //        $item->pedido_id =  $req->pedido_id;
+ //        $item->doc_origen_id =  $req->doc_origen_id;
+ //        $item->origen_item_id = $req->id;
+ //        $item->descripcion = $req->descripcion;
+ //        $item->saldo = $req->saldo;
+ //
+ //        if($req->saldo >= $req->cantidad){
+ //            $cpIt->saldo=0;
+ //        }else{
+ //            $cpIt->saldo = $req->cantidad - $req->saldo;
+ //        }
+ //        $cpIt->save();
+ //        $item->save();
 
-        //   return $item;
+         //   return $item;
 
-    }*/
-/*
-    public  function removeCustomOrderItem(Request $req){
-        $item = OrderItem:: findOrFail($req->id);
-        $item->destroy($item->id);
-    }*/
+     }*/
+    /*
+        public  function removeCustomOrderItem(Request $req){
+            $item = OrderItem:: findOrFail($req->id);
+            $item->destroy($item->id);
+        }*/
 
 
     /**
@@ -4732,16 +4738,6 @@ class OrderController extends BaseController
         $resul['item']=$item;
     }
 
-    /**
-     * elimina el kitchenbox de un pedido
-     **/
-    public function removekitchenBoxSolicitude(Request $req){
-        $resul["accion"]= "del";
-        $model = SolicitudeItem::findOrFail($req->id);
-         SolicitudeItem::destroy($model->id);
-        $resul["id"]=$req->id;
-        return $resul;
-    }
 
     /**
      * elimina el kitchenbox de un pedido

@@ -196,7 +196,7 @@
                         </md-tooltip>
                     </div>
                     <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center" ng-show=" module.layer == 'listProducProv' && !Docsession.block">
-                        <div ng-click="openCreateProduct()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
+                        <div ng-click="OrderCreateProdCtrl()" style="width: 24px; margin-top:8px;" ng-show="(!Docsession.block)" ng-disabled="(Docsession.block)">
                             <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
                         </div skip-tab >
                         <md-tooltip >
@@ -1700,7 +1700,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <form  layout="column" class="gridContent" flex  style="margin-top: 8px;">
                             <div>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.kitchenBox as filteragrKicthe" ng-class="{resalt : overSusitu == item.sustituto }">
@@ -1715,28 +1714,19 @@
 
                     </div>
 
-                    <div layout="column" flex>
-                        <div layout="row">
-                            <div
-                                layout="column" layout-align="center center"
-                                id="btnAgrPedSusti"
-                                ng-click="openSide('agrPedPend')"
-                                style="width: 24px;">
-                                <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-                            </div>
-                            <div flex class="titulo_formulario md-block"  layout="row" >
-                                <div flex>
+                    <div layout="column" flex  style="margin-left: 4px;" >
+                        <div layout="row" class="form-row-head form-row-head-select " >
+                            <div class="titulo_formulario" style="height:39px;" flex >
+                                <div>
                                     {{formMode.name}} a Sustituir
                                 </div>
                             </div>
-                            <div layout layout-align="center center">
+                            <div layout=""  layout-align="center center"  ng-click="openSust()">
                                 <div layout layout-align="center center" class="circle" >
                                     {{document.productos.pedidoSusti.length}}
                                 </div>
                             </div>
-
                         </div>
-
                         <form  layout="column" class="gridContent" flex  style="margin-top: 8px;">
                             <div>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in document.productos.pedidoSusti as filteragrPed" ng-mouseover = "overSusitu =  item.id">
@@ -2092,111 +2082,72 @@
         </md-sidenav>
 
         <!-- 17) ########################################## LAYER (8) Pedidos Pendientes########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrPedPend" id="agrPedPend">
-            <!-- ) ########################################## CONTENDOR  Pedidos Pendientes # ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="OrderAgrPedPend" id="OrderAgrPedPend">
+
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderAgrPedPendCtrl">
                 <div layout="column" flex>
-                    <form layout="row" class="focused">
+                    <div layout="row" class="focused">
                         <div active-left></div>
-                        <div layout="row" flex>
-                            <div class="titulo_formulario" layout="Column" layout-align="start start">
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                 <div>
-                                    {{formMode.name}} Pendientes
+                                    <span >  {{formMode.name}} Pendientes</span>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <form layout="row ">
+                    </div>
+                    <div layout="row ">
                         <div active-left></div>
                         <div layout="row" flex>
                             <div flex="5"></div>
 
-                            <div flex="10" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'nro_proforma' " ><img ng-src="{{(tbl_agrPedPend.order == 'nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-nro_proforma' " ><img ng-src="{{(tbl_agrPedPend.order == '-nro_proforma') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Proforma</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrPedPend.filter.nro_proforma"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.nro_proforma"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="nro_proforma"></grid-order-by>
                             </div>
-
-                            <div flex="10" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'emision' " ><img ng-src="{{(tbl_agrPedPend.order == 'emision')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-emision' " ><img ng-src="{{(tbl_agrPedPend.order == '-emision')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Fecha</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrPedPend.filter.emision"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.emision"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="emision"></grid-order-by>
                             </div>
-
-                            <div flex="15" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'nro_factura' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'nro_factura')}"><img ng-src="{{(tbl_agrPedPend.order == 'nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-nro_factura' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-nro_factura')}"><img ng-src="{{(tbl_agrPedPend.order == '-nro_factura') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="15" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Factura</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrPedPend.filter.nro_factura"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.nro_factura"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="nro_factura"></grid-order-by>
                             </div>
-
-                            <div flex="10" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'monto' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'monto')}"><img ng-src="{{(tbl_agrPedPend.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-monto' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-monto')}"><img ng-src="{{(tbl_agrPedPend.order == 'monto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="15" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Monto</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrPedPend.filter.monto"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.monto"
                                     >
                                 </md-input-container>
-
-                            </div>
-                            <div flex layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_agrPedPend.order = 'comentario' " ng-class="{'filter-select':(tbl_agrPedPend.order == 'comentario')}"><img ng-src="{{(tbl_agrPedPend.order == 'comentario')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_agrPedPend.order = '-comentario' " ng-class="{'filter-select':(tbl_agrPedPend.order == '-comentario')}"><img ng-src="{{(tbl_agrPedPend.order == '-comentario')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                                <grid-order-by ng-model="tbl" key="monto"></grid-order-by>
+                            </div><div flex="" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_agrPedPend.filter.comentario"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.comentario"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="comentario"></grid-order-by>
                             </div>
                         </div>
 
-                    </form>
-                    <form name="gridPagosPendientes"  class="gridContent" layout="row" >
+                    </div>
+                    <div name=""  class="gridContent" layout="row" >
                         <div active-left></div>
                         <div  layout="column" flex>
                             <div flex>
-                                <div layout="row" class="cellGridHolder" ng-repeat="item in docsSustitos | filter:tbl_agrPedPend.filter:strict | orderBy: tbl_agrPedPend.order " >
+                                <div layout="row" class="cellGridHolder" ng-repeat="item in tbl.data | filter:tbl.filter:strict | orderBy: tbl.order " >
                                     <div flex="5" class="cellEmpty" ng-click="allowEdit()">
                                         <md-switch class="md-primary" ng-model="item.asignado"
                                                    ng-change="changePedidoSustituto(item)"
@@ -2210,7 +2161,7 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
 
             </md-content>
@@ -2943,273 +2894,255 @@
         <!--  ##########################################  FINAL DOCUMENTO########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px;" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="finalDoc" id="finalDoc">
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderfinalDocCtrl">
-                <div flex="35"layout="column" id="headFinalDoc"  >
-                    <form layout="row" >
+                <div flex="35"layout="column" id="headFinalDoc"   style="margin-right: 4px;" class="focused">
+                    <div layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 1 }">
                         <div active-left> </div>
                         <div layout="column" flex>
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 1" >
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 1 }" ng-click="gridViewFinalDoc = 1;">
+                                <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 1) ? 'color:#ccc' : ''}}" flex >
                                     <div>
-                                        {{formMode.name}}
+                                       Datos de {{formMode.name}}
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
-                                               ng-show="switchBack.head.change"
-                                    >
-                                    </md-switch>
+                                <div layout=""  layout-align="center center"  >
+                                    <div  layout="row"  layout-align="end start">
+                                        <md-switch class="md-primary"
+                                                   ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                                   ng-show="switchBack.head.change"
+                                        >
+                                        </md-switch>
+                                    </div>
                                 </div>
                             </div>
-                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1">
-                                <div class="rowRsmTitle" flex="40"> Creado: </div>
+                            <div layout="column" flex class="gridContent">
+                                <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1">
+                                    <div class="rowRsmTitle" flex="40"> Creado: </div>
 
-                                <div class="rms" flex  layout="row" layout-align="space-between center">
-                                    <div>{{document.emision | date:'dd/MM/yyyy' }}</div>
-                                    <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
-                                         class="emit{{document.diasEmit}}"></div>
+                                    <div class="rms" flex  layout="row" layout-align="space-between center">
+                                        <div>{{document.emision | date:'dd/MM/yyyy' }}</div>
+                                        <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
+                                             class="emit{{document.diasEmit}}"></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
+                                <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
 
-                                <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm"
-                                         ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
-                                         layout-align="center center">
-                                        <span class="icon-Agregar" ></span>
-                                    </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
+                                    <div layout="row" flex="40">
+                                        <div layout="column" class="divIconRsm"
+                                             ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                             layout-align="center center">
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
 
-                                    <div class="rowRsmTitle">Titulo</div>
+                                        <div class="rowRsmTitle">Titulo</div>
+                                    </div>
+                                    <div class="rms" flex> {{document.titulo  }}</div>
                                 </div>
-                                <div class="rms" flex> {{document.titulo  }}</div>
-                            </div>
-                            <div layout="row" flex  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
+                                <div layout="row" flex  class="rowRsm" ng-show="(document.ult_revision && gridViewFinalDoc == 1) ">
 
-                                <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.ult_revision.estado == 'new' && finalDoc.titulo.trace.length > 0"
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                    <div layout="row" flex="40">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.ult_revision.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.ult_revision.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Revisado </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.ult_revision.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle"> Revisado </div>
+                                    <div  class="rms" > {{finalDoc.ult_revision | date:'dd/MM/yyyy' }}</div>
                                 </div>
-                                <div  class="rms" > {{finalDoc.ult_revision | date:'dd/MM/yyyy' }}</div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
-                                <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
+                                    <div layout="row" flex="40">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Estado </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle"> Estado </div>
+                                    <div class="rms" flex> {{document.estado }}</div>
                                 </div>
-                                <div class="rms" flex> {{document.estado }}</div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.prioridad && gridViewFinalDoc == 1 )">
-                                <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'created'"
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                <div layout="row"  class="rowRsm" ng-show="(document.prioridad && gridViewFinalDoc == 1 )">
+                                    <div layout="row" flex="40">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle" flex> Prioridad </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prioridad_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle" flex> Prioridad </div>
+                                    <div class="rms" > {{document.prioridad}} </div>
                                 </div>
-                                <div class="rms" > {{document.prioridad}} </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
-                                <div class="rowRsmTitle" flex="40"> Proveedor: </div>
-                                <div  class="rms" flex > {{document.proveedor}} </div>
-                            </div>
-                            <div layout="row" class="rowRsm" ng-show="(document.pais_id && gridViewFinalDoc == 1)" >
-                                <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'created' && finalDoc.pais_id.trace.length"
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
-                                    </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle"> Pais </div>
+                                <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
+                                    <div class="rowRsmTitle" flex="40"> Proveedor: </div>
+                                    <div  class="rms" flex > {{document.proveedor}} </div>
                                 </div>
-                                <div class="rms" flex> {{document.pais}} </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
-                                <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'created'"
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                <div layout="row" class="rowRsm" ng-show="(document.pais_id && gridViewFinalDoc == 1)" >
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'created' && finalDoc.pais_id.trace.length"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Pais </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle"> Almacen </div>
+                                    <div class="rms" flex> {{document.pais}} </div>
                                 </div>
-                                <div class="rms" flex> {{document.almacen}} </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.puerto_id && gridViewFinalDoc == 1)">
-                                <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'created'"
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Almacen </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle"> Puerto </div>
+                                    <div class="rms" flex> {{document.almacen}} </div>
                                 </div>
-                                <div class="rms" flex> {{document.puerto_id}} </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && (document.nro_proforma ||finalDoc.adjProforma.length > 0 ))" >
-                                <div layout="row" flex="40"  >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'new' && finalDoc.nro_proforma.trace.length > 0 "
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                <div layout="row"  class="rowRsm" ng-show="(document.puerto_id && gridViewFinalDoc == 1)">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Puerto </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle" flex> Proforma </div>
+                                    <div class="rms" flex> {{document.puerto_id}} </div>
                                 </div>
-                                <div class="rms" flex  layout="row" layout-align="space-between center">
-                                    <div>{{document.nro_proforma}}</div>
-                                    <div class="circle" ng-click="openAdj('proforma')" ng-show="finalDoc.adjProforma.length > 0">{{finalDoc.adjProforma.length}}</div>
-                                </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura || finalDoc.adjFactura.length > 0) )">
-                                <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'created'"
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
+                                <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && (document.nro_proforma ||finalDoc.adjProforma.length > 0 ))" >
+                                    <div layout="row" flex="40"  >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'new' && finalDoc.nro_proforma.trace.length > 0 "
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle" flex> Proforma </div>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
+                                    <div class="rms" flex  layout="row" layout-align="space-between center">
+                                        <div>{{document.nro_proforma}}</div>
+                                        <div class="circle" ng-click="openAdj('proforma')" ng-show="finalDoc.adjProforma.length > 0">{{finalDoc.adjProforma.length}}</div>
                                     </div>
-                                    <div class="rowRsmTitle"> Factura </div>
                                 </div>
-                                <div class="rms" flex  layout="row" layout-align="space-between center">
-                                    <div>{{document.nro_factura}}</div>
-                                    <div class="circle"  ng-click="openAdj('factura')" ng-show="finalDoc.adjFactura.length > 0" >{{finalDoc.adjFactura.length}}</div>
+                                <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura || finalDoc.adjFactura.length > 0) )">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Factura </div>
+                                    </div>
+                                    <div class="rms" flex  layout="row" layout-align="space-between center">
+                                        <div>{{document.nro_factura}}</div>
+                                        <div class="circle"  ng-click="openAdj('factura')" ng-show="finalDoc.adjFactura.length > 0" >{{finalDoc.adjFactura.length}}</div>
 
+                                    </div>
+                                </div>
+                                <div layout="row"  class="rowRsm"  ng-show="( document.monto && gridViewFinalDoc == 1) ">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.monto.estado == 'new' && finalDoc.monto.trace.length > 0 "
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Monto </div>
+                                    </div>
+                                    <div class="rms" flex> {{document.monto}} </div>
+                                </div>
+                                <div layout="row"  class="rowRsm" ng-show="(document.moneda_prov_id && gridViewFinalDoc == 1 ) ">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'new' && finalDoc.prov_moneda_id.trace.length > 0 "
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle" flex> Moneda </div>
+                                    </div>
+                                    <div class="rms"> {{document.moneda}} </div>
                                 </div>
                             </div>
-                            <div layout="row"  class="rowRsm"  ng-show="( document.monto && gridViewFinalDoc == 1) ">
-                                <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.monto.estado == 'new' && finalDoc.monto.trace.length > 0 "
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
-                                    </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle"> Monto </div>
-                                </div>
-                                <div class="rms" flex> {{document.monto}} </div>
-                            </div>
-                            <div layout="row"  class="rowRsm" ng-show="(document.moneda_prov_id && gridViewFinalDoc == 1 ) ">
-                                <div layout="row" flex="40" >
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'new' && finalDoc.prov_moneda_id.trace.length > 0 "
-                                         layout-align="center center" >
-                                        <span class="icon-Agregar" ></span>
-                                    </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'upd'" layout-align="center center">
-                                        <span class="icon-Actualizar" ></span>
-                                    </div>
-                                    <div class="rowRsmTitle" flex> Moneda </div>
-                                </div>
-                                <div class="rms"> {{document.moneda}} </div>
-                            </div>
-
                         </div>
-                    </form>
-                    <form  layout="row" ng-show="finaldoc.fecha_aprob_compras">
+                    </div>
+                 <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }">
                         <div active-left> </div>
                         <div layout="column" flex >
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario">
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }" ng-click="gridViewFinalDoc = 2" >
+                                <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 2) ? 'color:#ccc' : ''}} " flex >
                                     <div>
-                                        Compras
+                                        Aprobacion compras
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.aproba_compras.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
-                                               ng-show="(switchBack.aproba_compras.change)"
-
-                                    >
-                                    </md-switch>
-                                </div>
-                            </div>
-
-                        </div>
-                    </form>
-                    <form  layout="row" ng-show="finaldoc.fecha_aprob_gerencia">
-                        <div active-left> </div>
-                        <div layout="column" flex >
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario">
-                                    <div>
-                                        Gerencia
+                                <div layout=""  layout-align="center center"  >
+                                    <div  layout="row"  layout-align="end start">
+                                        <md-switch class="md-primary"
+                                                   ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                                   ng-show="switchBack.head.change"
+                                        >
+                                        </md-switch>
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.aproba_compras.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
-                                               ng-show="(switchBack.aproba_compras.change)"
-
-                                    >
-                                    </md-switch>
-                                </div>
                             </div>
-
                         </div>
-                    </form>
-                    <form  layout="row" ng-show="finalDoc.cancelacion">
+                    </div>
+                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" >
                         <div active-left> </div>
                         <div layout="column" flex >
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario">
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" ng-click="gridViewFinalDoc = 3" >
+                                <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 3) ? 'color:#ccc' : ''}} " flex >
                                     <div>
-                                        Cancelacion
+                                        Aprobacion Gerencia
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.aproba_compras.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
-                                               ng-show="(switchBack.aproba_compras.change)"
-
-                                    >
-                                    </md-switch>
+                                <div layout=""  layout-align="center center"  >
+                                    <div  layout="row"  layout-align="end start">
+                                        <md-switch class="md-primary"
+                                                   ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                                   ng-show="switchBack.head.change"
+                                        >
+                                        </md-switch>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-                    </form>
-
-                    <form   layout="row" ng-show="document.productos.contraPedido.length > 0">
+                    </div>
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" layout="row">
                         <div active-left> </div>
                         <div layout="column" flex >
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario"ng-click=" gridViewFinalDoc = 2">
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" ng-click="gridViewFinalDoc = 4" >
+                                <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 4) ? 'color:#ccc' : ''}} " flex >
                                     <div>
                                         ContraPedido
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.contraPedido.model"  ng-change ="(switchBack.contraPedido.model)? 0:toSideNave(switchBack.contraPedido,'¿Desea revisar los cambio realizados en contraPedido?',['#agrPed div.activeleft ','#agrPed div#btnAgrCp'])"
-                                               ng-show="(switchBack.contraPedido.change)"
-
-                                    >
-                                    </md-switch>
+                                <div layout=""  layout-align="center center"  >
+                                    <div  layout="row"  layout-align="end start">
+                                        <md-switch class="md-primary"
+                                                   ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                                   ng-show="switchBack.head.change"
+                                        >
+                                        </md-switch>
+                                    </div>
                                 </div>
                             </div>
                             <div flex ng-show="gridViewFinalDoc == 2" >
@@ -3234,26 +3167,28 @@
 
                         </div>
 
-                    </form>
-                    <form   layout="row" ng-show="document.productos.kitchenBox.length > 0" >
+                    </div>
+                    <div    class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" layout="row"  >
                         <div active-left> </div>
                         <div layout="column" flex>
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 3" >
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" ng-click="gridViewFinalDoc = 5" >
+                                <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 5) ? 'color:#ccc' : ''}} " flex >
                                     <div>
                                         KitchenBox
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.kichenBox.model"  ng-change ="(switchBack.kichenBox.model)? 0:toSideNave(switchBack.kichenBox,'¿Desea revisar los cambio realizados en kitchenbox?',['#agrPed div.activeleft ','#agrPed div#btnAgrKitchen'])"
-                                               ng-show="(switchBack.kichenBox.change)"
-
-                                    >
-                                    </md-switch>
+                                <div layout=""  layout-align="center center"  >
+                                    <div  layout="row"  layout-align="end start">
+                                        <md-switch class="md-primary"
+                                                   ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                                   ng-show="switchBack.head.change"
+                                        >
+                                        </md-switch>
+                                    </div>
                                 </div>
                             </div>
-                            <div flex ng-show="gridViewFinalDoc == 3">
+
+                            <div flex ng-show="gridViewFinalDoc == 5">
                                 <md-content style="margin: 4px;">
                                     <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.kitchenBox  track by $index " layout-align="space-between center" >
                                         <div layout="row" >
@@ -3275,26 +3210,28 @@
                             </div>
 
                         </div>
-                    </form>
-                    <form   layout="row" ng-show="document.productos.pedidoSusti.length > 0">
+                    </div>
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row" >
                         <div active-left> </div>
                         <div layout="column" flex>
-                            <div layout="row" class="row">
-                                <div class="titulo_formulario" ng-click=" gridViewFinalDoc = 4" >
+                            <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" ng-click="gridViewFinalDoc = 6" >
+                                <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 6) ? 'color:#ccc' : ''}} " flex >
                                     <div>
-                                        {{formMode.name}}
+                                        {{formMode.name}} sustituidos
                                     </div>
                                 </div>
-                                <div flex layout="row"  layout-align="end start">
-                                    <md-switch class="md-primary"
-                                               ng-model="switchBack.pedidoSusti.model"  ng-change ="(switchBack.pedidoSusti.model)? 0:toSideNave(switchBack.pedidoSusti,'¿Desea Verificar los cambios en pedidos a sustituir?',['#agrPed div.activeleft ','#agrPed div#btnAgrPedSusti'])"
-                                               ng-show="(switchBack.pedidoSusti.change)"
-
-                                    >
-                                    </md-switch>
+                                <div layout=""  layout-align="center center"  >
+                                    <div  layout="row"  layout-align="end start">
+                                        <md-switch class="md-primary"
+                                                   ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                                   ng-show="switchBack.head.change"
+                                        >
+                                        </md-switch>
+                                    </div>
                                 </div>
                             </div>
-                            <div flex ng-show="gridViewFinalDoc == 4">
+
+                            <div flex ng-show="gridViewFinalDoc == 6">
                                 <md-content style="margin: 4px;">
 
                                     <div layout="row" class="cellGridHolder "  ng-repeat=" item in finalDoc.pedidoSusti  track by $index " layout-align="space-between center" >
@@ -3317,18 +3254,28 @@
                             </div>
 
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div flex layout="column">
-                    <form layout="row" class="focused">
-                        <div flex layout="row">
-                            <div class="titulo_formulario" style="height:39px;">
+                    <div layout="row" class="focused" >
+                        <div layout="row" flex class="form-row-head form-row-head-select "  >
+                            <div class="titulo_formulario" style="height:39px;" flex >
                                 <div>
                                     Productos
                                 </div>
                             </div>
+                            <div layout=""  layout-align="center center"  >
+                                <div  layout="row"  layout-align="end start">
+                                    <md-switch class="md-primary"
+                                               ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
+                                               ng-show="switchBack.head.change"
+                                    >
+                                    </md-switch>
+                                </div>
+                            </div>
                         </div>
-                    </form>
+
+                    </div>
                     <form layout="row" ng-init="tbl_finalDoc.order = 'codigo'">
                         <div layout="row" flex>
                             <div flex="20" layout="row"  >
@@ -3397,7 +3344,7 @@
 
                         </div>
                     </form>
-                    <form layout="row"  class="gridContent">
+                    <div layout="row"  class="gridContent">
                         <div  layout="column" flex>
                             <div flex >
                                 <div  ng-repeat="item in finalDoc.productos | filter:tbl_finalDoc.filter:strict |orderBy : tbl_finalDoc  "  >
@@ -3419,7 +3366,7 @@
                             </div>
 
                         </div>
-                    </form>
+                    </div>
 
                 </div>
                 <div   id="expand"></div>
@@ -4576,13 +4523,146 @@
                     class="md-sidenav-right md-whiteframe-2dp popUp"
                     md-disable-backdrop="true" md-component-id="OrderCreateProd" id="OrderCreateProd"
         >
+            <md-content   layout="row" flex  ng-controller="OrderCreateProdCtrl" style="padding-left: 12px"  >
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                    <div layout="row" class="form-row-head form-row-head-select" >
+                        <div class="titulo_formulario">
+                            <div>
+                                Crear producto
+                            </div>
+                        </div>
+                    </div>
+                    <form name="formProduct" class="focused">
+                        <div flex class="gridContent" layout="column" style="padding-right:4px">
+
+                            <md-input-container class="md-block" >
+                                <label>Cod. Fabrica</label>
+                                <input  type="text" ng-model="model.codigo_fabrica" required skip-tab info="Codigo de fabrica del producto" >
+
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Descripcion Fabrica</label>
+                                <input  type="text" ng-model="model.descripcion" required skip-tab info="Descripcion fabrica del producto" >
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Cod. Profit</label>
+                                <input  type="text" ng-model="model.codigo_profit"  skip-tab info="Codigo en profit"  >
+
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Descripcion Profit</label>
+                                <input  type="text" ng-model="model.descripcion_profit"  skip-tab info="Descripcion de porfit del producto" >
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Cantidad</label>
+                                <input  required type="text" ng-model="model.cantidad" decimal skip-tab >
+                            </md-input-container>
+
+                            <md-input-container class="md-block"   >
+                                <label>Linea</label>
+                                <md-autocomplete md-selected-item="lineaSelec"
+                                                 info="Linea del producto "
+                                                 required
+                                                 skip-tab
+                                                 md-search-text="lineaText"
+                                                 md-auto-select="true"
+                                                 md-items="item in lineas | stringKey : lineaText : 'linea' "
+                                                 md-item-text="item.linea"
+                                                 md-autoselect = "true"
+                                                 md-no-asterisk
+                                                 md-min-length="0"
+                                                 md-require-match="true"
+                                                 md-no-cache="true"
+                                                 md-select-on-match
+                                                 md-selected-item-change="model.linea_id = lineaSelec.id;"
+                                >
+                                    <md-item-template>
+                                        <span>{{item.linea}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </md-input-container>
+                            <md-input-container class="md-block"   >
+                                <label>Sub-Linea</label>
+                                <md-autocomplete md-selected-item="SublineaSelec"
+                                                 info="Sub linea  del producto "
+
+                                                 skip-tab
+                                                 md-search-text="SublineaText"
+                                                 md-items="item in subLineas | stringKey : lineaText : 'linea'  "
+                                                 md-item-text="item.sublinea"
+                                                 md-min-length="0"
+                                                 md-no-cache="true"
+                                                 md-select-on-match
+                                                 md-selected-item-change="model.sublinea_id = SublineaSelec.id;"
+                                                 ng-disabled="!lineaSelec"
+                                >
+                                    <md-item-template>
+                                        <span>{{item.sublinea}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </md-input-container>
+                            <md-input-container class="md-block" >
+                                <label>Precio</label>
+                                <input  type="text" ng-model="model.precio"  decimal skip-tab >
+                            </md-input-container>
+                            <div layout="column" flex>
+                                <md-input-container class="md-block"   >
+                                    <label>Almacen</label>
+                                    <md-autocomplete md-selected-item="almacnSelect"
+                                                     info="Almacen de llegada del producto "
+                                                     skip-tab
+                                                     md-search-text="almacnText"
+                                                     md-items="item in almacn | stringKey : almacnText : 'nombre' | customFind : almacnAdd : isAddAlmacen "
+                                                     md-item-text="item.nombre"
+                                                     md-autoselect = "true"
+                                                     md-no-asterisk
+                                                     md-min-length="0"
+                                                     md-no-cache="true"
+                                                     md-select-on-match
+                                                     md-selected-item-change="model.almacen_id = almacnSelect.id;addAlmacen(almacnSelect)"
+                                    >
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+                                </md-input-container>
+                                <div flex class="gridContent" skip-tab>
+                                    <div ng-repeat="item in model.almcenes"   >
+                                        <div layout="row" class="cellGridHolder"  >
+                                            <div style="width: 24px;padding-top: 15px;border: none;" ng-click="removeAlmacen(item, $index)" omit-out>
+                                                <div  layout="column" layout-align="center center"   omit-out >
+                                                    <span class="icon-Eliminar" style="font-size: 12px"omit-out ></span>
+                                                </div>
+                                            </div>
+                                            <div flex class="cellGrid" >{{item.nombre}} </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+        <!-- ########################################## LAYER crear nuevo producto ########################################## -->
+
+<!--        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                    class="md-sidenav-right md-whiteframe-2dp popUp"
+                    md-disable-backdrop="true" md-component-id="OrderCreateProd" id="OrderCreateProd"
+        >
             <md-content   layout="row" flex  ng-controller="OrderCreateProdCtrl" >
                 <div  layout="column" flex="" class="layerColumn"   click-out="CloseCreateProduct($event)" >
                     <form layout="row" class="focused" name="createdProd" >
                         <div layout="column" flex>
-                            <div class="titulo_formulario" >
-                                <div>
-                                    Crear Producto
+                            <div layout="row" class="form-row-head form-row-head-select" >
+
+                                <div class="titulo_formulario">
+                                    <div>
+                                      Crear producto
+                                    </div>
                                 </div>
                             </div>
                             <md-input-container class="md-block"  >
@@ -4621,7 +4701,7 @@
 
             </md-content>
         </md-sidenav>
-
+-->
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
             style="margin-top:96px;

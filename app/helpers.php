@@ -43,6 +43,13 @@ if ( ! function_exists('emails_path'))
 
 if ( ! function_exists('emails_templates_lang'))
 {
+    /**
+     * Get the  email lang  paths
+     *
+     * @param  string $mod the module
+     * @param  string $accion the accion or function
+     * @return string
+     */
     function emails_templates_lang($mod,$accion)
     {
         $files = scandir(emails_path($mod.'/'.$accion));
@@ -53,6 +60,34 @@ if ( ! function_exists('emails_templates_lang'))
             $data[] = ['iso_lang'=>$f,'file'=>$aux];
         }
         return $data;
+
+    }
+}
+
+
+if ( ! function_exists('attachments_file'))
+{
+    /**
+     * Get the  email lang  paths
+     *
+     * @param  string $mod the module
+     * @param  string $accion the accion or function
+     * @return string
+     */
+    function attachments_file($keys)
+    {
+        foreach($keys as $aux){
+            $att = [];
+            $file= \App\Models\Sistema\Masters\FileModel::findOrFail($aux);
+            $att['id'] = $aux->id;
+            $att['archivo_id'] = $aux->archivo_id;
+            $att['documento'] = $aux->documento;
+            $att['comentario'] = $aux->comentario;
+            $att['thumb']=$file->getThumbName();
+            $att['tipo']=$file->tipo;
+            $att['file'] = $file->archivo;
+            $data[]= $att;
+        }
 
     }
 }

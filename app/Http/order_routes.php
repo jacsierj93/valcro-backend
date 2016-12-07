@@ -139,6 +139,9 @@ $app->get("Order/Purchase/EmailSummary",'Orders\OrderController@EmailSummaryDocP
 
 
 // solicitudes
+
+$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
+
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
 
 $app->post("Order/Solicitude/SaveProductItem",'Orders\OrderController@saveSolicitudItemProduc'); ///guarda y asinga el dproducto a la solicutud
@@ -172,7 +175,6 @@ $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude');
 $app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 
 
-$app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
 $app->get("Order/Solicitude/Versions",'Orders\OrderController@getOldSolicitude'); /// trae todas las versiones que a generado el documento
 $app->get("Order/Solicitude/EmailEstimate",'Orders\OrderController@EmailEstimateSolicitude'); ///trau preview del  presupuesto a enviar al provedor
@@ -193,15 +195,13 @@ $app->post("Order/RemoveCustomOrderItem",'Orders\OrderController@removeCustomOrd
 // kitchenBox
 $app->get("Order/KitchenBoxReview",'Orders\OrderController@getKitchenBoxReview'); ///trae tod el detalle de kitchenbo @deprecated
 
-
-$app->post("Order/AddkitchenBox",'Orders\OrderController@addkitchenBox'); /// obtiene las kitchen box de proveedor@deprecated
-$app->post("Order/RemovekitchenBox",'Orders\OrderController@removekitchenBox'); /// obtiene las kitchen box de proveedor@deprecated
-
 // pedido a  sustituir
+$app->get("Order/Substitutes",'Orders\OrderController@getOrderSustitute'); // detalle del documento a sustituir
+
+
 $app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina todo el pedido sustituto @deprecated
 $app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega todo el pedido sustituto @deprecated
 $app->post("Order/AddOrderSubstituteItem",'Orders\OrderController@OrderSubstituteItem'); ///agrega todo el pedido sustituto@deprecated
-$app->get("Order/OrderSubstitute",'Orders\OrderController@getOrderSustitute'); ///agrega el pedido sustituto
 
 // sin uso
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido @deprecated
