@@ -1922,6 +1922,33 @@ class OrderController extends BaseController
         $result['id'] = $req->id;
         return $result;
     }
+// kitchen box
+    /**
+     * asigna un kitchenbox a un pedido
+     **/
+    public function addkitchenBoxSolicitude(Request $req){
+        $doc =Solicitude::findOrFail($req->doc_id);
+        $k= KitchenBox::findOrFail($req->id);
+        $item = new SolicitudeItem();
+        $resul['action']="new";
+        if($req->has('reng_id')){
+            $resul['action'] = 'upd';
+            $item  = SolicitudeItem::findOrFail($req->reng_id);
+        }
+        $item->tipo_origen_id = 3;
+        $item->doc_id = $req->doc_id;
+        $item->origen_item_id = $k->id;
+        $item->cantidad = 1;
+        $item->saldo = 1;
+        $item->descripcion = $req->has('descripcion')  ? $req->descripcion : $k->titulo;
+        $item->producto_id = $k->producto_id;
+        $item->uid = $req->uid;
+        $item->costo_unitario = $req->costo_unitario;
+        $item->doc_origen_id = $k->id;/// reemplazr cuando se sepa la logica
+        $resul['response']=$item->save();
+        $resul['item']=$item;
+        return $resul;
+    }
 
     /**
      * @deprecated
@@ -4637,77 +4664,21 @@ class OrderController extends BaseController
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
         $docIts = $doc->items()->get();
-        $remplace= $docIts->where('tipo_origen_id', $req->tipo);
-        $imports= array();
-        if($req->tipo == 22){
-            $imports = $docIts->where('tipo_origen_id','21');
-        }
-        if($req->tipo == 23){
-            $imports = $docIts->where('tipo_origen_id','22');
 
-        }
+
         foreach($items as $aux){
-            $paso=true;
-            $tem['asignado'] =false;
+            $aux['asignado'] =false;
 
-            // fue asignado
-            if(sizeof($docIts->where('doc_origen_id', $aux->id)->where('tipo_origen_id','3'))>0){
-                $tem['asignado'] = true;
+            $it = $docIts->where('uid', $aux->uid)->first();
+
+            if($it != null){
+
+                $aux['asignado'] = true;
+                $aux['reng_id'] = $it->id;
+                $aux['costo_unitario'] = $it->costo_unitario;
             }
+            $data[]= $aux;
 
-            // vino de otro docuemento igual?
-            if(sizeof($remplace->where('doc_origen_id', $aux->id))>0){
-                $tem['asignado'] = true;
-            }
-
-            // fue importado
-            foreach($imports as $imps){
-                $first= $this->getFirstProducto($imps);
-                if($first->tipo_origen_id == 2 && $first->doc_origen_id == $aux->id){
-                    $tem['asignado'] = true;
-                    $tem['import'] = $imps;
-                }
-            }
-
-            if($paso){
-                $tem['id']=$aux->id;
-                $tem['prov_id']=$aux->prov_id;
-                $tem['nro_proforma']=$aux->nro_proforma;
-                $tem['img_proforma']=$aux->img_proforma;
-                $tem['monto']=$aux->monto;
-                $tem['moneda_id']=$aux->moneda_id;
-                $tem['precio_bs']=$aux->precio_bs;
-                $tem['tipo_envio_id']=$aux->tipo_envio_id;
-                $tem['fecha_aprox_entrega']=$aux->fecha_aprox_entrega;
-                $tem['prioridad_id']=$aux->prioridad_id;
-                $tem['condicion_pago_id']=$aux->condicion_pago_id;
-                $tem['comentario']=$aux->comentario;
-                $tem['fecha_ref_profit']=$aux->fecha_ref_profit;
-                $tem['codigo_ref_profit']=$aux->codigo_ref_profit;
-                $tem['descripcion_ref_profit']=$aux->descripcion_ref_profit;
-                $tem['clientes_id']=$aux->clientes_id;
-                $tem['monto_abono']=$aux->monto_abono;
-                $tem['fecha_abono']=$aux->fecha_abono;
-                $tem['img_abono']=$aux->img_abono;
-                $tem['fecha_pedido']=$aux->fecha_pedido;
-                $tem['img_ada']=$aux->img_ada;
-                $tem['fecha_conf_fabrica']=$aux->fecha_conf_fabrica;
-                $tem['img_conf_fabrica']=$aux->img_conf_fabrica;
-                $tem['fecha_conf_gerente']=$aux->fecha_conf_gerente;
-                $tem['img_conf_gerente']=$aux->img_conf_gerente;
-                $tem['fecha_conf_valcro']=$aux->fecha_conf_valcro;
-                $tem['img_conf_valcro']=$aux->img_conf_valcro;
-                $tem['fecha_evaluacion']=$aux->fecha_evaluacion;
-                $tem['descripcion']=$aux->descripcion;
-                $tem['tipo_origen_id']=$aux->tipo_origen_id;
-                $tem['producto_id']=$aux->producto_id;
-                $tem['origen_id']=$aux->origen_id;
-                $tem['img_evaluacion']=$aux->img_evaluacion;
-                $tem['usuario']=$aux->usuario;
-
-
-                $data[]= $tem;
-            }
 
         }
 
@@ -4716,27 +4687,7 @@ class OrderController extends BaseController
     }
 
 
-    /**
-     * asigna un kitchenbox a un pedido
-     **/
-    public function addkitchenBoxSolicitude(Request $req){
 
-        $resul['action']="new";
-        $resul= array();
-        $doc =Solicitude::findOrFail($req->doc_id);
-        $k= kitchenBox::findOrFail($req->id);
-        $item= $doc->newItem();
-        $item->tipo_origen_id = 3;
-        $item->doc_id = $req->doc_id;// solicitud/compra/ pedido
-        $item->origen_item_id = $k->id;
-        $item->cantidad = 1;
-        $item->saldo = 1;
-        $item->descripcion = $k->descripcion;
-        $item->producto_id = $k->producto_id;
-        $item->doc_origen_id = $k->id;/// reemplazr cuando se sepa la logica
-        $resul['response']=$item->save();
-        $resul['item']=$item;
-    }
 
     /**
      * asigna un kitchenbox a un pedido
@@ -4786,18 +4737,9 @@ class OrderController extends BaseController
      **/
     public function removekitchenBoxSolicitude(Request $req){
         $resul["accion"]= "del";
-        $model = SolicitudeItem::where('doc_origen_id', $req->id)
-            ->where('doc_id',$req->doc_id)
-            ->where('tipo_origen_id', 3)
-            ->get();
-        $ids = array();
-
-        foreach($model as $aux){
-            $ids[]= $aux->id;
-        }
-
-        SolicitudeItem::destroy($ids);
-        $resul["keys"]=$ids;
+        $model = SolicitudeItem::findOrFail($req->id);
+         SolicitudeItem::destroy($model->id);
+        $resul["id"]=$req->id;
         return $resul;
     }
 

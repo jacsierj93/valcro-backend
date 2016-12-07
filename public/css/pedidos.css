@@ -412,6 +412,7 @@ md-sidenav .md-sidenav-right.md-locked-open{
 
 textarea{
     width: 100%; height: 100%; border: none; color:#9c9d9e;
+    resize: none;
 }
 .table-filter-order-by{
     margin-left: -8px;

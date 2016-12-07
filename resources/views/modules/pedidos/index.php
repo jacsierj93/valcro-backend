@@ -2002,7 +2002,7 @@
         <!-- 16) ########################################## LAYER (7) Agregar KITCHEN BOXS ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="agrKitBoxs" id="agrKitBoxs">
             <!-- ) ########################################## CONTENDOR Agregar KITCHEN BOXS ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderAgrKitBoxs">
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderAgrKitBoxsCtrl">
                 <div  layout="column" flex class="layerColumn" >
                     <div layout="row" class="focused">
                         <div active-left></div>
@@ -2074,12 +2074,12 @@
                                     <div class="cellEmpty" flex="5" ng-click="change(item)"  >
                                         <md-switch class="md-primary" ng-model="item.asignado" ng-disabled="true"></md-switch>
                                     </div>
-                                    <div flex="10" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.num_proforma}}</div>
-                                    <div flex="" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.img_proforma}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="selecKitchenBox(item)"> {{item.precio}}</div>
-                                    <div flex="10" class="cellGrid"  ng-click="selecKitchenBox(item)" > {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="open(item)"> {{item.fecha | date:'dd/MM/yyyy'}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="open(item)"> {{item.num_proforma}}</div>
+                                    <div flex="" class="cellGrid" ng-click="open(item)"> {{item.img_proforma}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="open(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="open(item)"> {{item.precio}}</div>
+                                    <div flex="10" class="cellGrid"  ng-click="open(item)" > {{item.fecha_aprox_entrega | date:'dd/MM/yyyy'}}</div>
                                 </div>
                             </div>
                         </div>
@@ -2428,35 +2428,22 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenKitchenbox" id="resumenKitchenbox" >
             <!-- ) ########################################## CONTENDOR SECCION RESUMEN DE  KICTCHEN BOX  ########################################## -->
 
-            <md-content  layout="row" flex class="sideNavContent" ng-controlle="OrderResumenKitchenboxCtrl">
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderResumenKitchenboxCtrl">
                 <div layout="column" flex>
-                    <form name="resumenContraPed" layout="row" class="focused">
+                    <div layout="row" class="focused">
+                        <div active-left ></div>
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                <div>
+                                    <span > Kitchen Box </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div  layout="row" class="focused">
                         <div active-left> </div>
                         <div  layout="column" flex >
-                            <div class="titulo_formulario" layout="Column" layout-align="start start">
-                                <div>
-                                    Kitchen Box
-                                </div>
-                            </div>
-                            <div layout="row" class="row" >
-
-                                <md-input-container class="md-block" flex >
-                                    <label>Titulo </label>
-                                    <input  ng-model="kitchenBoxSelec.titulo" ng-disabled="true">
-                                </md-input-container>
-
-
-                                <div layout="row" class="date-row">
-                                    <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>Creado: </div>
-                                    </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <div>{{kitchenBoxSelec.fecha | date:'dd/MM/yyyy'}}</div>
-                                    </div>
-                                </div>
-                            </div>
                             <div layout="row">
-
                                 <md-input-container class="md-block" flex >
                                     <label>Prioridad:</label>
                                     <md-select ng-model="kitchenBoxSelec.prioridad" ng-disabled="true">
@@ -2475,7 +2462,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div layout="row">
                                 <md-input-container class="md-block" flex="15">
                                     <label>Monto </label>
@@ -2506,7 +2492,6 @@
                                     <input ng-model="kitchenBoxSelec.condicion_pago" ng-disabled="true"/>
                                 </md-input-container>
                             </div>
-
                             <div layout="row">
                                 <md-input-container class="md-block" flex>
                                     <label>Comentario:</label>
@@ -2515,22 +2500,25 @@
                             </div>
 
                         </div>
-                    </form>
-                    <form layout="row" class="gridContent" flex>
-                        <div active-left> </div>
-                        <div layout="column" flex>
-                            <div layout="row">
-                                <div class="titulo_formulario" layout="column" layout-align="start start">
-                                    <div>
-                                        Adjuntos
-                                    </div>
+                    </div>
+                    <div layout="row" class="focused">
+                        <div active-left ></div>
+                        <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                <div>
+                                    <span > Adjuntos </span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div layout="row"  flex>
+                        <div active-left> </div>
+                        <div layout="column" flex class="gridContent" >
                             <div layout="column" flex>
 
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </md-content>
 
@@ -3458,7 +3446,7 @@
                         </div>
                     </form>
                     <div layout="row" class="table-filter">
-                        <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
+                        <div active-left  before="verificExit"></div>
                         <div layout="row" class="row" flex ng-init="docOrder.order == id " tyle="padding-right: 4px;">
                             <div active-left  before="verificExit" ></div>
                             <div layout="row" style="width: 120px;" >
@@ -3993,11 +3981,12 @@
                 <div  style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
         </md-sidenav>
-        <!------------------------------------------- mini layer crear  producto ------------------------------------------------------------------------->
+
+        <!------------------------------------------- mini layer agregar  producto ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
-                    md-disable-backdrop="true" md-component-id="OrderminiCreatProduct" id="OrderminiCreatProduct"
+                    md-disable-backdrop="true" md-component-id="OrderminiAddProduct" id="OrderminiAddProduct"
         >
-            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderCreatProductCtrl" style="padding-left: 12px"  click-out="close($event)" >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderminiAddProductCtrl" style="padding-left: 12px"  click-out="close($event)" >
                 <div  layout="column" flex class="layerColumn"   click-out="close($event)">
                     <div layout="row" class="form-row-head form-row-head-select" >
 
@@ -4078,6 +4067,52 @@
                             <md-tooltip >
                                 Descripcion del producto
                             </md-tooltip>
+                        </div>
+
+                    </form>
+                </div>
+            </md-content>
+        </md-sidenav>
+        <!------------------------------------------- mini layer agregar  kitchen box ------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderminiAddKitchenBox" id="OrderminiAddKitchenBox"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderminiAddKitchenBoxCtrl" style="padding-left: 12px"  >
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                    <div layout="row" class="form-row-head form-row-head-select" >
+
+                        <div class="titulo_formulario">
+                            <div>
+                                Agregar KitchenBox
+                            </div>
+                        </div>
+                    </div>
+                    <form name="prod" flex class="gridContent focused" layout="column" style="padding-right:4px">
+
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Monto a pagar </div>
+                            </div>
+                            <md-input-container class="md-block rms" flex >
+                                <input skip-tab required id="input" type="text" ng-model="select.costo_unitario" decimal   >
+                            </md-input-container>
+
+                            <md-tooltip >Monto a pagar por unidad</md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Descripcion</div>
+                            </div>
+                        </div>
+                        <div layout="row"  class="row gridContent" >
+
+                             <textarea ng-model="select.descripcion"
+                                       info="Descripcion del kitchem box"
+                                       required
+                                       skip-tab
+                                       placeholder="DEscripcion del kitchenBox"
+                                       flex
+                             ></textarea>
                         </div>
 
                     </form>
@@ -4539,9 +4574,9 @@
         <!-- ########################################## LAYER crear nuevo producto ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
-                    md-disable-backdrop="true" md-component-id="createProd" id="createProd"
+                    md-disable-backdrop="true" md-component-id="OrderCreateProd" id="OrderCreateProd"
         >
-            <md-content   layout="row" flex class="cntLayerHolder" layout-padding >
+            <md-content   layout="row" flex  ng-controller="OrderCreateProdCtrl" >
                 <div  layout="column" flex="" class="layerColumn"   click-out="CloseCreateProduct($event)" >
                     <form layout="row" class="focused" name="createdProd" >
                         <div layout="column" flex>

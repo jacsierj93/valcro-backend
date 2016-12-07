@@ -146,13 +146,13 @@ $app->post("Order/Solicitude/DeleteProductItem",'Orders\OrderController@DeleteSo
 $app->post("Order/Solicitude/SaveCustomOrderItem",'Orders\OrderController@saveSolicitudItemCustomOrder'); ///asigna un iten de contra pedido
 $app->post("Order/Solicitude/DeleteCustomOrderItem",'Orders\OrderController@DeleteSolicitudItemCustomOrder'); ///elimna
 
-$app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido
-$app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido
+$app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido entero
+$app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido entero
+$app->post("Order/Solicitude/SavekitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///agrega u kitchen box
+$app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekitchenBoxSolicitude'); ///quita  kitchen box
 
 
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
-$app->post("Order/Solicitude/AddkitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///agrega u kitchen box
-$app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekitchenBoxSolicitude'); ///quita  kitchen box
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
