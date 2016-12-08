@@ -74,14 +74,14 @@ class OrderController extends BaseController
     ]];
 
     private $profile = ['gerente' => '6', 'trabajador' => '10', 'jefe' => '9'];
-    private $departamentos = ['compras' => '17', 'propetario' => '18', 'auditoria' => '22'];
+    private $departamentos = ['compras' => '17', 'propetario' => '18', 'auditoria' => '22','gerente_dp' => '21','gerente_dp' => '19'];
     private $user = null;
 
 
     public function __construct(Request $req)
     {
 
-        /*        $this->middleware('auth');*/
+        $this->middleware('auth');
         $this->request = $req;
         if ($this->user == null) {
             $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
@@ -139,6 +139,7 @@ class OrderController extends BaseController
             ->get();
 
         foreach ($allDocs as $docs) {
+
             foreach ($docs as $aux) {
                 $temp = array();
                 $temp['id'] = $aux->id;
@@ -220,63 +221,69 @@ class OrderController extends BaseController
         $result = [];
         $oldReviewDays = $this->oldReview();
 
-        $aux = Solicitude::selectRaw("count(id) as cantidad")
-            ->whereNotNull("final_id")
-            ->OrwhereNull("ult_revision")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
-            ->get();
+        $aux = Solicitude::whereNotNull("final_id")
+            ->where("disponible", '1')
+            ->whereNotNull("ult_revision")
+            ->whereRaw(" datediff( ult_revision,curdate()) >" . $oldReviewDays . "")
+            ->count();
 
-        if ($aux[0][0] > 0) {
-            $result[] = array('titulo' => 'Solicitudes con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux[0][0]);
+
+        if ($aux > 0) {
+            $result[] = array('titulo' => 'Solicitudes con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux);
         }
 
         $aux = Order::selectRaw("count(id)")
-            ->whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
-            ->get();
+            ->where("disponible", '1')
+            ->whereNotNull("ult_revision")
+            ->whereRaw(" datediff( ult_revision,curdate()) >" . $oldReviewDays . "")
+            ->count();
 
-        if ($aux[0][0] > 0) {
-            $result[] = array('titulo' => 'Proformas con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux[0][0]);
+        if ($aux > 0) {
+            $result[] = array('titulo' => 'Proformas con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' =>$aux);
         }
 
         $aux = Purchase::selectRaw("count(id)")
-            ->whereNotNull("final_id")
-            ->whereRaw(" datediff( curdate(),ult_revision) >=" . $oldReviewDays . "")
-            ->get();
+            ->where("disponible", '1')
+            ->whereNotNull("ult_revision")
+            ->whereRaw(" datediff( ult_revision,curdate()) >" . $oldReviewDays . "")
+            ->count();
 
 
-        if ($aux[0][0] > 0) {
-            $result[] = array('titulo' => 'Ordenes de compra con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux[0][0]);
+        if ($aux > 0) {
+            $result[] = array('titulo' => 'Ordenes de compra con mas de ' . $oldReviewDays . " dias sin revisar ", 'key' => 'priorityDocs', 'cantidad' => $aux);
         }
 
         // sin culminar
         $aux = Solicitude::selectRaw("count(id)")
+            ->where("disponible", '1')
             ->whereNull("final_id")
             ->whereNull('cancelacion')
             ->where('edit_usuario_id', $req->session()->get('DATAUSER')['id']);
 
-        $aux = $aux->get();
-        if ($aux[0][0] > 0) {
-            $result[] = array('titulo' => "Solicitudes sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux[0][0]);
+        $aux = $aux->count();
+        if ($aux > 0) {
+            $result[] = array('titulo' => "Solicitudes sin culminar", 'key' => 'unclosetDoc', 'cantidad' =>$aux);
         }
 
         $aux = Order::selectRaw("count(id)")
+            ->where("disponible", '1')
             ->whereNull("final_id")
             ->whereNull('cancelacion')
             ->where('edit_usuario_id', $req->session()->get('DATAUSER')['id']);
-        $aux = $aux->get();
+        $aux = $aux->count();
 
-        if ($aux[0][0] > 0) {
-            $result[] = array('titulo' => "Proformas sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux[0][0]);
+        if ($aux > 0) {
+            $result[] = array('titulo' => "Proformas sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux);
         }
 
         $aux = Purchase::selectRaw("count(id)")
+            ->where("disponible", '1')
             ->whereNull("final_id")
             ->whereNull('cancelacion')
             ->where('edit_usuario_id', $req->session()->get('DATAUSER')['id']);
-        $aux = $aux->get();
-        if ($aux[0][0] > 0) {
-            $result[] = array('titulo' => "Ordenes de compra sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux[0][0]);
+        $aux = $aux->count();
+        if ($aux > 0) {
+            $result[] = array('titulo' => "Ordenes de compra sin culminar", 'key' => 'unclosetDoc', 'cantidad' => $aux);
         }
 
         return $result;
@@ -737,29 +744,6 @@ class OrderController extends BaseController
 
     /*********************** Approved Purchases ************************/
 
-    public function ApprovedPurchasesSolicitude(Request $req)
-    {
-
-        $response = [];
-
-        $model = Solicitude::findOrFail($req->id);
-        if ($req->has("fecha_aprob_compra") && $req->has("nro_doc")) {
-            $model->fecha_aprob_compra = $req->fecha_aprob_compra;
-            $model->nro_doc = $req->nro_doc;
-            $response['accion'] = ($model->fecha_aprob_compra == null) ? 'new' : 'upd';
-        } else {
-            $model->fecha_aprob_compra = null;
-            $response['accion'] = 'cancel';
-            $model->nro_doc = null;
-
-        }
-        $response['response'] = $model->save();
-
-        $response['success'] = 'Solicitud aprobada';
-
-        return $response;
-
-    }
 
     public function ApprovedPurchasesOrder(Request $req)
     {
@@ -799,32 +783,6 @@ class OrderController extends BaseController
 
     /*********************** cancel  ************************/
 
-    public function cancelSolicitude(Request $req)
-    {
-
-        $response = [];
-        $model = Solicitude::findOrFail($req->id);
-        $sendEmail = ($model->comentario_cancelacion == null);
-
-        $model->comentario_cancelacion = $req->comentario_cancelacion;
-        $model->final_id = $this->getFinalId($model);
-        $response['response'] = $model->save();
-
-        $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
-        $response['success'] = 'Solicitud Cancelada';
-        /*        if($sendEmail){
-                    $sender =['to'=>[['email'=>'meqh1992@gmail.com','name'=>'Miguel Eduadro']]
-                        ,'cc'=>[],'ccb'=>[],
-                        'asunto'=>'Notificacion de Cancelacion  '];
-                    $data =$this->parseDocToSummaryEmail($model);
-                    $data['accion']=$sender['asunto'];
-
-                    $this->sendNotificacion($data,$sender);
-                    $response['email'] ="true";
-                };*/
-        return $response;
-
-    }
 
     public function cancelOrder(Request $req)
     {
@@ -1744,6 +1702,77 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * contrulle el resumen preliminar de la solicitud
+     */
+    public function getSolicitudeSummary(Request $req){
+        $data = array();
+        $prod = array();
+        $model= Solicitude::findOrFail($req->id);
+        $provProd = Product::where('prov_id',$model->prov_id)->get();
+        $items =$model->items()->get();
+        //  $atts =$model->attachments()->list('archivo_id');
+        foreach($items as $aux){
+            $p= $provProd->where('id',$aux->producto_id)->first();
+            $aux['cantidad']=$aux->cant;
+            if($p != null){
+                $aux['codigo']=$p->codigo;
+                $aux['codigo_fabrica']=$p->codigo_fabrica;
+            }
+            $prod[]= $aux;
+        }
+
+
+        //$data['adjuntos']= $atts;
+        $data['productos']= $prod;
+
+        return $data;
+    }
+
+    /**
+     *aprueba la solicutud dependiendo del usuario logeado
+     */
+    public function ApprovedSolicitude(Request $req)
+    {
+
+        $result = [];
+        $model = Solicitude::findOrFail($req->id);
+
+        if($this->user->departamento_id == '21' || $this->user->departamento_id == '19'){
+            $model->fecha_aprob_gerencia= $req->fecha;
+            $model->nro_doc = $req->nro_doc;
+            $result['accion']='ap_gerencia';
+        }else{
+            $model->fecha_aprob_compra = $req->fecha;
+            $model->nro_doc = $req->nro_doc;
+            $result['accion']='ap_compras';
+
+        }
+        $model->save();
+
+        $result['response'] = $model->save();
+        return $result;
+
+    }
+
+    public function cancelSolicitude(Request $req)
+    {
+
+        $response = [];
+        $model = Solicitude::findOrFail($req->id);
+
+        $model->comentario_cancelacion = $req->comentario;
+        $model->final_id = $this->getFinalId($model);
+        $model->disponible = 0;
+        $response['response'] = $model->save();
+
+        $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
+        $response['success'] = 'Solicitud Cancelada';
+
+        return $response;
+
+    }
+
     // productos
     /**
      * agrega un producto a la solicitud
@@ -1783,6 +1812,7 @@ class OrderController extends BaseController
 
         return $resul;
     }
+
 
     public function DeleteSolicitudItemProduc(Request $req)
     {
@@ -1982,7 +2012,7 @@ class OrderController extends BaseController
         $data = array();
         $items = Solicitude::where('id', '<>', $req->doc_id)
             ->where('prov_id', $req->prov_id)
-            ->whereNotNull('final_id')
+            ->where('disponible','1')
             ->get();
         $type = OrderType::get();
         $coin = Monedas::get();
@@ -1991,9 +2021,7 @@ class OrderController extends BaseController
         $estados = OrderStatus::get();
         $paises = Country::get();
         $model = Solicitude::findOrFail($req->doc_id);
-
         $docItems = $model->items()->get();
-
         foreach ($items as $aux) {
             $paso = true;
 
@@ -2007,7 +2035,7 @@ class OrderController extends BaseController
                 }
             }
 
-            if (sizeof($docItems->where('tipo_origen_id', '21')->where('doc_origen_id', $aux->id)->get()) > 0) {
+            if (sizeof($docItems->where('tipo_origen_id', '21')->where('doc_origen_id', $aux->id)) > 0) {
                 $aux['asignado'] = true;
             }
 
@@ -2042,31 +2070,80 @@ class OrderController extends BaseController
     }
 
     /**
-     * contrulle el resumen preliminar de la solicitud
+     * agrega la solicitud al nuevo documento
+     * marca
      */
-    public function getSolicitudeSummary(Request $req){
-        $data = array();
-        $prod = array();
-        $model= Solicitude::findOrFail($req->id);
-        $provProd = Product::where('prov_id',$model->prov_id)->get();
-        $items =$model->items()->get();
-      //  $atts =$model->attachments()->list('archivo_id');
-        foreach($items as $aux){
-            $p= $provProd->where('id',$aux->producto_id)->first();
-            $aux['cantidad']=$aux->cant;
-            if($p != null){
-                $aux['codigo']=$p->codigo;
-                $aux['codigo_fabrica']=$p->codigo_fabrica;
-            }
-            $prod[]= $aux;
+    public  function  addSustituteSolicitude(Request $req){
+        $resul = array();
+        $destroys  = [];
+        $princi = Solicitude::findOrFail($req->princ_id);
+        $reemplaze = Solicitude::findOrFail($req->reemplace_id);
+        $model = new Solicitude();
+        $model = $this->transferDataDoc($princi,$model);
+        $princi->final_id= $this->getFinalId($princi);
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+
+
+        $princi->parent_id = $reemplaze->id;
+        $princi->version = $reemplaze->version + 1;
+
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+
+
+        $princi->fecha_sustitucion= Carbon::now();
+        $reemplaze->fecha_sustitucion= Carbon::now();
+
+        $princi->disponible= 0;
+        $reemplaze->disponible= 0;
+        $princi->save();
+        $reemplaze->save();
+        $model->save();
+        $newIts = array();
+        foreach($princi->items()->get() as $oldItem){
+            $newItem = new SolicitudeItem();
+            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newItem->uid =$oldItem->uid;
+            $newIts[] = $newItem;
+            $destroys[]= $oldItem->id;
+            $oldItem->saldo = 0;
+            $oldItem->save();
+
+        }
+        foreach($reemplaze->items()->get() as $oldItem){
+            $newItem = new SolicitudeItem();
+            $newItem->tipo_origen_id =21;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->id;
+            $newItem->doc_origen_id =$princi->id;
+            $newItem->cantidad =$oldItem->saldo;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newItem->uid =$oldItem->uid;
+            $destroys[]= $oldItem->id;
+            $newIts[] = $newItem;
+            $oldItem->saldo = 0;
+            $oldItem->save();
         }
 
+        $resul['accion']= "impor";
+        $resul['id']= $model->id;
+        $reemplaze->save();
 
-        //$data['adjuntos']= $atts;
-        $data['productos']= $prod;
+        $resul['response']= $model->items()->saveMany($newIts);
+       // SolicitudeItem::destroy($destroys);
+        return $resul;
 
-        return $data;
     }
+
 
 
     /**
@@ -2823,69 +2900,7 @@ class OrderController extends BaseController
      * obtiene las solicitudes que pueden ser reempladas
      */
 
-    /**
-     * agrega la solicitud al nuevo documento
-     * marca
-     */
-    public  function  addSustituteSolicitude(Request $req){
-        $resul = array();
-        $princi = Solicitude::findOrFail($req->princ_id);
-        $reemplaze = Solicitude::findOrFail($req->reemplace_id);
-        $model = new Solicitude();
-        $model = $this->transferDataDoc($princi,$model);
-        $princi->final_id= $this->getFinalId($princi);
-        $reemplaze->final_id= $this->getFinalId($reemplaze);
 
-
-        $princi->parent_id = $reemplaze->id;
-        $princi->version = $reemplaze->version + 1;
-
-        $model->version = $princi->version + 1;
-        $model->parent_id = $princi->id;
-
-
-        $princi->fecha_sustitucion= Carbon::now();
-        $reemplaze->fecha_sustitucion= Carbon::now();
-
-        $princi->save();
-        $reemplaze->save();
-        $model->save();
-        $newIts = array();
-        foreach($princi->items()->get() as $oldItem){
-            $newItem = new SolicitudeItem();
-            /*            $newItem->final_id =$oldItem->final_id;*/
-            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
-            $newItem->doc_id =$model->id;
-            $newItem->origen_item_id =$oldItem->origen_item_id;
-            $newItem->doc_origen_id =$oldItem->doc_origen_id;
-            $newItem->cantidad =$oldItem->cantidad;
-            $newItem->saldo =$oldItem->saldo;
-            $newItem->producto_id =$oldItem->producto_id;
-            $newItem->descripcion =$oldItem->descripcion;
-            $newIts[] = $newItem;
-        }
-        foreach($reemplaze->items()->get() as $oldItem){
-            $newItem = new SolicitudeItem();
-            /*            $newItem->final_id =$oldItem->final_id."&temp";*/
-            $newItem->tipo_origen_id =21;
-            $newItem->doc_id =$model->id;
-            $newItem->origen_item_id =$oldItem->id;
-            $newItem->doc_origen_id =$princi->id;
-            $newItem->cantidad =$oldItem->cantidad;
-            $newItem->saldo =$oldItem->saldo;
-            $newItem->producto_id =$oldItem->producto_id;
-            $newItem->descripcion =$oldItem->descripcion;
-            $newIts[] = $newItem;
-        }
-
-        $resul['accion']= "impor";
-        $resul['id']= $model->id;
-        $reemplaze->save();
-
-        $resul['response']= $model->items()->saveMany($newIts);
-        return $resul;
-
-    }
 
     /**
      * remueve la solicitud al documento
@@ -4355,9 +4370,9 @@ class OrderController extends BaseController
         $tem['titulo']= $model->titulo;
         $tem['diasEmit']=$model->daysCreate();
         $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
-        $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_compra ;
+        $tem['fecha_aprob_gerencia'] =$model->aprob_gerencia ;
         $tem['img_aprob'] =$model->fecha_aprob_compra ;
-
+        $tem['isAprobado'] = ($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null);
 
         $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
 

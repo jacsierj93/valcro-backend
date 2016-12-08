@@ -30,7 +30,6 @@ MyApp.directive('vldhtmlPreview', function() {
         }
     };
 });
-
 MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',function($scope,$timeout, $sce,setNotif){
 
     $scope.changes= {trace:[], index:0};
@@ -237,7 +236,6 @@ MyApp.directive('vldhMailContacts', function() {
         }
     };
 });
-
 MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','setNotif',function($scope,$timeout,$filter, IsEmail,setNotif){
 
 
@@ -445,7 +443,7 @@ MyApp.directive('vldFileUpImg', function() {
             'key' : "=key",
             'fileUp' : "=fnFileUp",
             'finish' : "=fnUpWatch",
-            'upAdjs' : "=?loaded"
+            'loadeds' : "=?loaded"
         },
         transclude: true,
         link: function(scope, elem, attr, ctrl){
@@ -457,11 +455,14 @@ MyApp.directive('vldFileUpImg', function() {
         }
     };
 });
-MyApp.controller('vldCFileUpImg',['$scope','fileSrv',function($scope, fileSrv){
+MyApp.controller('vldCFileUpImg',['$scope','$timeout', 'fileSrv',function($scope,$timeout, fileSrv){
     $scope.bindFiles = fileSrv.bin();
-    if(!$scope.loadeds){
-        $scope.loadeds = [];
-    }
+    $timeout(function () {
+        if(!$scope.loadeds){
+            $scope.loadeds = [];
+        }
+    },1000);
+
     $scope.$watch('adjs.length', function(newValue){
         if(newValue > 0){
             fileSrv.storage($scope.storage);
@@ -472,12 +473,18 @@ MyApp.controller('vldCFileUpImg',['$scope','fileSrv',function($scope, fileSrv){
         }
     });
     $scope.$watch('bindFiles.estado', function (newVal,oldVal) {
-        if(fileSrv.getKey() == $scope.key){
+        if(fileSrv.getKey() == $scope.key && $scope.finish){
+
             $scope.finish(newVal,oldVal, fileSrv.get());
         }
     });
 }]);
 
+/**
+ * difunde el click en un evento
+ * @param key un identificador para el consumo
+ *
+ * */
 MyApp.directive('clickCommit', function(clickCommitSrv) {
 
     return {
@@ -489,14 +496,21 @@ MyApp.directive('clickCommit', function(clickCommitSrv) {
 
     };
 });
-MyApp.service('clickCommitSrv', function($timeout) {
+MyApp.service('clickCommitSrv', function() {
     var event = undefined;
     var scope = undefined;
     var key = '';
-    var  bind = {state:false}
+    var  bind = {state:false};
+    var consume = false;
     return {
         bind: function () {
             return bind;
+        },
+        consume:function () {
+            consume= true;
+        },
+        isConsume : function () {
+            return consume;
         },
         commit: function (k,sp,e) {
             if( !bind.state ){
@@ -504,6 +518,7 @@ MyApp.service('clickCommitSrv', function($timeout) {
                 scope= sp;
                 event= e;
                 bind.state=true;
+                consume= false;
             }
 
         },
@@ -516,3 +531,4 @@ MyApp.service('clickCommitSrv', function($timeout) {
 
     }
 });
+

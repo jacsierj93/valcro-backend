@@ -540,15 +540,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     };
 
-
-    /// cancelar no definido
-    $scope.cancelDoc = function(){
-
-        clickerTime({to:['#detalleDoc div.activeleft ','#detalleDoc #docCancel', '#detalleDoc input#mtvCancelacion '],time:400, calback: function(){
-            console.log("last" );
-            angular.element("#detalleDoc input#mtvCancelacion")[0].focus();
-        }})
-    };
     $scope.delete = function(doc){
         $scope.NotifAction("alert", "¿Esta seguro  de eliminar "+doc.documento+"?",
             [
@@ -1439,27 +1430,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
 
-    $scope.changePedidoSustituto = function (item) {
-
-        if (item.asignado) {
-            Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
-                $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-                $scope.document.id = response.id;
-                setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
-
-            });
-        } else {
-            Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
-                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-                $scope.document.id = response.id;
-                setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
-                setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
-
-
-            });
-        }
-
-    };
 
     /*********************************************** EVENTOS FOCUS LOST ***********************************************/
 
@@ -2434,33 +2404,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
     });
 
-    $scope.saveCancelDoc = function(){
 
-        if($scope.FormCancelDoc.$valid && !$scope.FormCancelDoc.$pristine){
-            $scope.NotifAction("ok","¿ Esta seguro de cancelar la "+$scope.formMode.name +" ? ",[
-                {name: "Si",
-                    action:function(){
-                        Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
-                            if (response.success) {
-                                $scope.NotifAction("ok","La "+$scope.formMode.name +" a sido cancelada ",[
-                                    {name:"Ok",action:
-                                        function(){
-                                            $scope.LayersAction({close:{init:true, search:true}});
-                                        }
-                                    }
-                                ],{autohidden:autohidden});
-                            }
-                        });
-                    }},
-                {name:"No", action:
-                    function(){
-                        $scope.mtvCancelacion=undefined;
-                    }}
-            ],{block:true});
-
-        }
-
-    };
     /* $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
 
      /!* if (nuevo[0] && !nuevo[1]) {
@@ -2489,115 +2433,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
 
-
-    $scope.sendAprob = function(){
-        var state= 'waith';
-        var  saveAprob = function(){
-            state='finish';
-            if($scope.FormAprobCompras.$valid ){
-                $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
-
-            }else{
-                $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se a aprobado",[/*{name:"Esta", action:function(){}} */],{autohidden:1500});
-                $timeout(function(){
-                    var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                    if(inval[0]){
-                        inval[0].focus();
-                    }else{
-                        inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                        inval[0].focus();
-                    }
-                },1500);
-            }
-
-        };
-
-        return  {
-            save : function (){
-                console.log("save");
-                state='load';
-                saveAprob();
-            },
-            isBlock: function(){
-                return state;
-            }
-        }
-
-    };
-
-    $scope.saveAprobCompras  = function(e){
-
-        if(!$scope.FormAprobCompras.$pristine){
-            Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
-            if(e){
-                if(jQuery(e.target).parents("#lyrAlert").length == 0
-                    && jQuery(e.target).parents("#noti-button").length == 0
-                    && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
-                    && jQuery(e.target).parents(".md-calendar-date").length == 0
-                    &&  jQuery(e.target).attr("id") != "blockXLevel"){
-
-                    if($scope.FormAprobCompras.$valid ){
-                        Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
-                        $scope.NotifAction("ok", " La "+$scope.formMode.name+" a sido aprobada ",[ ],{autohidden:1500});
-
-                    }else{
-                        var focus = angular.element(":focus");
-                        $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se puede aprobar ¿Desea cancelar la aprobacion ?",[
-                            {name:"Si", action:function(){
-                                setGetOrder.change("document",'nro_doc',undefined);
-                                setGetOrder.change("document",'fecha_aprob_compra',undefined);
-                                $scope.document.nro_doc= null;
-                                $scope.document.fecha_aprob_compra= null;
-                                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
-                                focus.focus();
-
-                            }},
-                            {name:"No, dejame corregirlos", action:function(){
-                                Order.postMod({type:$scope.formMode.mod, mod:"ApprovedPurchases"},$scope.document,function(response){$scope.FormAprobCompras.$setPristine()});
-                                $timeout(function(){
-                                    var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                                    if(inval[0]){
-                                        inval[0].focus();
-                                    }else{
-                                        inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                                        inval[0].focus();
-                                    }
-                                },1500)
-                            }}
-                        ],{block:true});
-
-                    }
-                }
-            }else{
-                if(!$scope.FormAprobCompras.$valid ){
-                    var focus = angular.element(":focus");
-                    $scope.NotifAction("alert", " La "+$scope.formMode.name+" no se puede aprobar ¿Desea cancelar la aprobacion ?",[
-                        {name:"Si", action:function(){
-                            setGetOrder.change("document",'nro_doc',undefined);
-                            setGetOrder.change("document",'fecha_aprob_compra',undefined);
-                            $scope.document.nro_doc= null;
-                            $scope.document.fecha_aprob_compra= null;
-                            $mdSidenav("NEXT").open();
-                            focus.focus();
-                        }},
-                        {name:"No, dejame corregirlos", action:function(){
-                            $mdSidenav("NEXT").close();
-                            $timeout(function(){
-                                var inval = angular.element(" form[name=FormAprobCompras] .ng-invalid ");
-                                if(inval[0]){
-                                    inval[0].focus();
-                                }else{
-                                    inval = angular.element(" form[name=FormAprobCompras] ng-untouched");
-                                    inval[0].focus();
-                                }
-
-                            },1500)
-                        }}
-                    ],{block:true});
-                }
-            }
-        }
-    };
 
 
 
@@ -2759,9 +2594,9 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
 
     $scope.$parent.OrderDetalleCtrl = function (data, fn) {
         $scope.FormHeadDocument.$setUntouched();
-        $scope.FormEstatusDoc.$setUntouched();
-        $scope.FormAprobCompras.$setUntouched();
-        $scope.FormCancelDoc.$setUntouched();
+        /*        $scope.FormEstatusDoc.$setUntouched();
+         $scope.FormAprobCompras.$setUntouched();
+         $scope.FormCancelDoc.$setUntouched();*/
         $scope.isTasaFija=true;
 
 
@@ -3317,42 +3152,42 @@ MyApp.controller('OrderCreateProdCtrl',['$scope','$mdSidenav','$timeout', 'Order
     $scope.createProduct = function(item){
 
         /*if(item && item.saldo  && item.descripcion){
-            var copy= angular.copy(item);
-            copy.prov_id =$scope.provSelec.id;
-            Order.post({type:"CreateTemp"},copy,function(response){
-                var aux ={
-                    asignado:false,cantidad:parseFloat(response.cantidad),saldo:parseFloat(response.saldo),codigo:response.codigo,codigo_fabrica :response.codigo_fabrica,
-                    descripcion :response.descripcion,id: response.id,otre:null,puntoCompra:false,stock:0,tipo_producto:response.tipo_producto,
-                    tipo_producto_id:response.tipo_producto};
-                $timeout(function(){
-                    aux.asignado= true;
-                    item = {};
+         var copy= angular.copy(item);
+         copy.prov_id =$scope.provSelec.id;
+         Order.post({type:"CreateTemp"},copy,function(response){
+         var aux ={
+         asignado:false,cantidad:parseFloat(response.cantidad),saldo:parseFloat(response.saldo),codigo:response.codigo,codigo_fabrica :response.codigo_fabrica,
+         descripcion :response.descripcion,id: response.id,otre:null,puntoCompra:false,stock:0,tipo_producto:response.tipo_producto,
+         tipo_producto_id:response.tipo_producto};
+         $timeout(function(){
+         aux.asignado= true;
+         item = {};
 
-                },0);
+         },0);
 
-            });
-        }else{
-            if(!item){
-                $scope.NotifAction("error","Por favor ingrese una cantidad y una descripcion valida del producto que desea crear",[],{autohidden:autohidden});
-                $timeout(function(){
-                    angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
-                },0);
-            }else{
-                if(!item.saldo){
-                    $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
-                    $timeout(function(){
-                        angular.element.find("#listProducProv #listProducProSaldo ")[0].focus();
-                    },0);
-                }else if(!item.descripcion){
-                    $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
-                    $timeout(function(){
-                        angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
-                    },0);
-                }
-            }
+         });
+         }else{
+         if(!item){
+         $scope.NotifAction("error","Por favor ingrese una cantidad y una descripcion valida del producto que desea crear",[],{autohidden:autohidden});
+         $timeout(function(){
+         angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
+         },0);
+         }else{
+         if(!item.saldo){
+         $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
+         $timeout(function(){
+         angular.element.find("#listProducProv #listProducProSaldo ")[0].focus();
+         },0);
+         }else if(!item.descripcion){
+         $scope.NotifAction("error","Por favor ingrese una cantidad del producto que desea crear",[],{autohidden:autohidden});
+         $timeout(function(){
+         angular.element.find("#listProducProv #listProducProDescripcion ")[0].focus();
+         },0);
+         }
+         }
 
 
-        }*/
+         }*/
     };
 
     $scope.open = function(fn){
@@ -3427,6 +3262,215 @@ MyApp.controller('OrderAccCopyDoc',['$scope','Order','setGetOrder', function ($s
         });
     };
 }]);
+MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder', function ($scope,$mdSidenav,Order,setGetOrder) {
+    $scope.upModel = [];
+    $scope.loades = [];
+    $scope.model = {};
+    $scope.fnfile = function (item) {
+        $scope.model.adjs.push(item);
+    };
+    $scope.$parent.OrderAprobCtrl = function () {
+        $scope.model = {adjs:[]};
+        $scope.open();
+    };
+    $scope.open = function (fn) {
+        $mdSidenav("OrderAprob").open().then(function(){
+            $scope.isOpen = true;
+
+            if(fn){
+                fn($scope);
+            }
+        });
+    };
+    $scope.inClose = function (fn) {
+
+        $mdSidenav("OrderAprob").close().then(function(){
+            $scope.isOpen = false;
+            $scope.isProcess= false;
+            if(fn){
+                fn();
+            }
+        });
+
+    };
+    $scope.close= function (e) {
+        if($scope.isOpen && !$scope.isProcess){
+            if(!$scope.formData.$pristine){
+                if(!$scope.formData.$valid){
+                    $scope.NotifAction("alert","¡Muy pocos datos! No has colocado suficiente informacion para poder aprobar ",
+                        [
+                            {name:"Corregir",default:5, action:function () {
+
+                            }},
+
+                            {name:"Cancelar", action:function () {
+                                $scope.inClose();
+                            }}
+                        ], {block: true});
+                }else if($scope.loades.length == 0){
+                    $scope.NotifAction("alert","¡No has cargado adjuntos! es preferible que adjuntes algun documento que soporte la aprobacion.  Confirmanos que no posees ese soporte",
+                        [
+                            {name:"No tengo soporte",default:5, action:function () {
+                                $scope.save(function () {
+                                    $scope.inClose();
+                                });
+                            }},
+
+                            {name:"Dejame subirlo", action:function () {
+                                $scope.inClose();
+                            }}
+                        ], {block: true, save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}});
+                }else {
+                    $scope.save(function () {
+                        $scope.inClose();
+                    });
+                }
+            }else{
+                $scope.inClose();
+            }
+
+        }
+    }
+    $scope.save = function (fn) {
+        $scope.model.id= $scope.$parent.document.id;
+        $scope.model.adjs=angular.copy( $scope.loades);
+        Order.postMod({type:$scope.formMode.mod, mod:"Approved"},$scope.model,function(response){
+            if(response.accion == 'ap_gerencia'){
+                $scope.NotifAction("ok","Se ha realizado la aprobacion por parte de gerencia",[],{autohidden: 1500});
+                $scope.$parent.document.fecha_aprob_gerencia = angular.copy($scope.model.fecha);
+                $scope.$parent.document.isAprobado= true;
+            }
+            if(response.accion == 'ap_compras'){
+                $scope.NotifAction("ok","Se ha realizado la aprobacion por parte de compras",[],{autohidden: 1500});
+                $scope.$parent.document.fecha_aprob_compras = angular.copy($scope.model.fecha);
+                $scope.$parent.document.isAprobado= true;
+
+            }
+            if(fn){
+                fn()
+            }
+        });
+    };
+
+
+}]);
+MyApp.controller('OrderCancelDocCtrl',['$scope','$mdSidenav','$timeout',  'Order','setGetOrder', function ($scope,$mdSidenav, $timeout, Order,setGetOrder) {
+    $scope.upModel = [];
+    $scope.loades = [];
+
+
+    $scope.fnfile = function (item) {
+        $scope.model.adjs.push(item);
+    };
+    $scope.$parent.OrderCancelDocCtrl = function () {
+        $scope.mode = 'list';
+        $scope.model = {adjs:[]};
+        $scope.open();
+    };
+    $scope.open = function (fn) {
+        $mdSidenav("OrderCancel").open().then(function(){
+            $scope.isOpen = true;
+
+            if(fn){
+                fn($scope);
+            }
+        });
+    };
+    $scope.inClose = function (fn) {
+
+        $mdSidenav("OrderCancel").close().then(function(){
+            $scope.isOpen = false;
+            $scope.isProcess= false;
+            if(fn){
+                fn();
+            }
+        });
+
+    };
+    $scope.close= function (e) {
+        if($scope.isOpen && !$scope.isProcess){
+            console.log('$scope',$scope )
+            if(!$scope.formData.$pristine){
+                if(!$scope.formData.$valid){
+                    $scope.NotifAction("alert","¡Muy pocos datos! No has colocado suficiente informacion para poder canclar el documento ",
+                        [
+                            {name:"Corregir",default:10, action:function () {
+
+                            }},
+
+                            {name:"Cancelar", action:function () {
+                                $scope.inClose();
+                            }}
+                        ], {block: true});
+                }else if($scope.upModel.length == 0){
+                    $scope.NotifAction("alert","¡No has cargado adjuntos! es preferible que adjuntes algun documento que soporte la cancelacion.  Confirmanos que no posees ese soporte",
+                        [
+                            {name:"No tengo soporte",default:10, action:function () {
+                                $scope.save(function () {
+                                    $scope.inClose();
+                                });
+                            }},
+
+                            {name:"Dejame colocarlo", action:function () {
+
+                            }}
+                        ], {block: true,save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}});
+                }else {
+                    $scope.save(function () {
+                        $scope.inClose();
+                    });
+                }
+            }else{
+                $scope.inClose();
+            }
+
+        }
+    }
+    $scope.save = function (fn) {
+        $scope.model.id= $scope.$parent.document.id;
+        Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.model,function(response){
+            $scope.$parent.NotifAction("ok", "Cancelado",[],{autohidden:1500});
+            if(fn){
+                fn()
+            }
+            $timeout(function () {
+                if($scope.$parent.module.historia[1] == 'detalleDoc'){
+                    $scope.LayersAction({close:{all:true}});
+                }else{
+                    $scope.LayersAction({close:{first:true, search:true}});
+                }
+            },500);
+        });
+    };
+
+    $scope.saveCancelDoc = function(){
+
+        if($scope.FormCancelDoc.$valid && !$scope.FormCancelDoc.$pristine){
+            $scope.NotifAction("ok","¿ Esta seguro de cancelar la "+$scope.formMode.name +" ? ",[
+                {name: "Si",
+                    action:function(){
+                        Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
+                            if (response.success) {
+                                $scope.NotifAction("ok","La "+$scope.formMode.name +" a sido cancelada ",[
+                                    {name:"Ok",action:
+                                        function(){
+                                            $scope.LayersAction({close:{init:true, search:true}});
+                                        }
+                                    }
+                                ],{autohidden:autohidden});
+                            }
+                        });
+                    }},
+                {name:"No", action:
+                    function(){
+                        $scope.mtvCancelacion=undefined;
+                    }}
+            ],{block:true});
+
+        }
+
+    };
+}]);
 
 
 /**
@@ -3462,7 +3506,7 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
         data:[],
         order:'id'
     };
-    $scope.selecPedidoSust =function (item) {
+  /*  $scope.selecPedidoSust =function (item) {
         $scope.pedidoSusPedSelec ={};
         $scope.LayersAction({open:{name:"resumenPedidoSus",
             after: function(){
@@ -3473,7 +3517,7 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
 
             }}});
 
-    };
+    };*/
     $scope.load = function () {
         $scope.tbl.data.splice(0,$scope.tbl.data.length);
         Order.query({type:$scope.formMode.mod,mod:"Substitutes",tipo: $scope.$parent.formMode.value, prov_id: $scope.$parent.provSelec.id, doc_id: $scope.$parent.document.id},{}, function (response) {
@@ -3487,7 +3531,7 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
     };
 
     $scope.open = function (item) {
-
+        $scope.$parent.OrderResumenPedidoSusCtrl(item);
     };
 
     $scope.review = function (item) {
@@ -3512,7 +3556,30 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
 
     };
 
+/*
+ $scope.changePedidoSustituto = function (item) {
 
+ if (item.asignado) {
+ Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+ $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+ $scope.document.id = response.id;
+ setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
+
+ });
+ } else {
+ Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+ $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+ $scope.document.id = response.id;
+ setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
+ setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
+
+
+ });
+ }
+
+ };
+
+*/
 
 }]);
 
@@ -3939,6 +4006,101 @@ MyApp.controller('OrderResumenContraPedidoCtrl',['$scope', '$timeout','Order','f
 
 }]);
 
+MyApp.controller('OrderResumenPedidoSusCtrl',['$scope', '$timeout','Order','form',function ($scope,$timeout,Order, formSrv) {
+
+    $scope.bindForm = formSrv.bind();
+
+    $scope.tbl = {
+        data:[],
+        order:'id'
+    };
+    $scope.$parent.OrderResumenPedidoSusCtrl = function (item) {
+        $scope.model = {};
+        $scope.tbl.data.splice(0, $scope.tbl.data.length );
+        $timeout(function () {
+            Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.$parent.formMode.value,doc_id: $scope.$parent.document.id}, {},function(response){
+                $scope.pedidoSusPedSelec = response;
+                $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
+            });
+        },500);
+        $scope.LayersAction({search:{name:"resumenContraPedido" }});
+    };
+    $scope.remove = function (item) {
+        Order.post( {type:$scope.$parent.formMode.mod, mod:"DeleteProductItem"},{id:item.reng_id}, function () {
+            $scope.NotifAction("ok","Removido",[],{autohidden:1500});
+            item.asignado= false;
+            item.inDoc= 0;
+        });
+
+    };
+    $scope.change = function (data) {
+        $scope.select= data;
+        var send = {
+            reng_id: data.reng_id,
+            origen_item_id:data.id,
+            costo_unitario:data.costo_unitario,
+            descripcion: data.descripcion,
+            codigo: data.codigo,
+            codigo_fabrica: data.codigo_fabrica,
+            codigo_profit: data.codigo_fabrica,
+            doc_id: $scope.$parent.document.id,
+            disponible: data.disponible,
+            producto_id: data.producto_id,
+            uid: data.uid
+
+        };
+        if(!data.asignado){
+            if(data.asignadoOtro.length == 0){
+                formSrv.name= 'OrderResumenContraPedidoCtrl';
+                $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrderItem"});
+            }else {
+                $scope.NotifAction("alert","Este articulo ya sido agregado a otro documento,  por favor confirmanos que desea agregarlo",
+                    [
+                        {name:"Si, añadirlo ", action: function () {
+                            formSrv.name= 'OrderResumenContraPedidoCtrl';
+                            $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrder"});
+                        }},
+                        {name:"Cancelar", action: function () {
+
+                        }}
+                    ]
+                    , {block: true,  save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}} );
+            }
+        }else{
+            $scope.NotifAction("alert", "Esta seguro de remover el articulo selecionado",
+                [
+                    {name:"Si, remover el articulo", action: function () {
+                        $scope.remove(data);
+                    }}
+                    ,
+                    {name:"Cancelar", action: function () {
+                        $scope.remove(data);
+                    }}
+                ]
+                ,{block:true})
+
+        }
+    };
+
+    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+        if(newVal && formSrv.name == 'OrderResumenContraPedidoCtrl'){
+            var data = formSrv.getData();
+            $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
+            $scope.select.reng_id = data.response.reng_id;
+            $scope.select.disponible = data.response.disponible;
+            $scope.select.inDoc = data.response.inDoc;
+            $scope.select.inDocBlock = data.response.inDocBlock;
+            if(data.response.accion  == 'new'){
+                $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
+            }if(data.response.accion  == 'upd'){
+                $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
+            }
+
+        }
+    });
+
+}]);
+
 MyApp.controller('OrderResumenKitchenboxCtrl',['$scope', '$timeout','Order','form',function ($scope,$timeout,Order, formSrv) {
 
     $scope.bindForm = formSrv.bind();
@@ -4190,61 +4352,32 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','masters','setGetOrder', 
     };
 
     $scope.buildfinalDoc = function(){
-        var final={};
-        var cp= [];
-        var kit =  [];
-        var sus = [];
-        var changeItems= false;
-        console.log("$scope.switchBack",$scope.switchBack)
+        var final={contra:[],kitchen:[],pedidoSusti:[], todos:[], document:[], aprob_gerencia:[], aprob_compras:[]};
+        console.log("$scope.switchBack",$scope.switchBack);
         console.log("form",setGetOrder.getForm());
-        ///var todos = new Array();
         angular.forEach(setGetOrder.getForm(), function(v,k){
                 if(k.startsWith('contra')){
-                    cp.push(v);
-                    if(v.estado != 'new'){
-                        $scope.switchBack.contraPedido.change= true;
-                        $scope.switchBack.changeItems.change=true;
-                        changeItems= true;
-                        console.log("cambio c", v);
 
-                    }
-
-                }else
-                if(k.startsWith('kitchen')){
-                    kit.push(v);
-                    if(v.estado != 'new'){
-                        $scope.switchBack.kichenBox.change= true;
-                        $scope.switchBack.changeItems.change=true;
-                        console.log("cambio k", v);
-                        changeItems= true;
-                    }
                 }
-                else
-                if(k.startsWith('pedidoSusti')){
-                    sus.push(v);
-                    if(v.estado != 'new'){
-                        $scope.switchBack.pedidoSusti.change= true;
-                        $scope.switchBack.changeItems.change=true;
-                        console.log("cambio p", v);
 
-                        changeItems= true;
-                    }
+                if(k.startsWith('kitchen')){
+
+                }
+
+                if(k.startsWith('pedidoSusti')){
+
+                }
+                if(k.startsWith('todos')){
+
                 }
             }
         );
         angular.forEach(setGetOrder.getForm('document'), function(v,k){
-                final[k]=v;
-                if(v.estado != 'new'){
-                    $scope.switchBack.head.change= true;
-                    $scope.switchBack.changeItems.change=true;
-                }
+
             }
 
         );
-        final.contraPedido = cp;
-        final.kitchenBox = kit;
-        final.pedidoSusti = sus;
-        final.changeItems = changeItems;
+
         console.log("final ", final);
         return final;
     };
@@ -4264,7 +4397,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','masters','setGetOrder', 
             $scope.finalDoc.productos = response.productos;
         });
 
-            $scope.LayersAction({search:{name:"finalDoc",before: function(){}}});
+        $scope.LayersAction({search:{name:"finalDoc",before: function(){}}});
     };
 
     $scope.canNext = function () {
@@ -5145,9 +5278,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         if(!forms[form]){
             forms[form]={};
             exist=false;
-            console.log("from ", form);
-            console.log("fiel ", fiel);
-            console.log("value ", value);
+
 
         }
 
@@ -5155,7 +5286,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
             if(typeof (value) == 'object'){
 
                 angular.forEach(value, function(v2,k2){
-                    if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+                    if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !isNaN(k2)){
                         forms[form][k2]= {original:v2, v:v2, estado:'created',trace:[]};
                     }
                 });
@@ -5277,7 +5408,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                     angular.forEach(response,function(v,k){
                         if(!order[k]){
                             order[k]= v;
-                            if(v !=null && typeof (v) != 'object' && typeof (v) != 'array' && !angular.isNumber(k)){
+                            if(v !=null && typeof (v) != 'object' && typeof (v) != 'array' && !isNaN(k)){
                                 forms['document'][k]={original:v, v:v, estado:'new',trace:[]};
                             }
 
@@ -5287,7 +5418,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
 
                     angular.forEach(response.productos.contraPedido, function(v,k){
                         angular.forEach(v, function(v2,k2){
-                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !isNaN(k2)){
                                 if(!forms['contraPedido'+ v.id]){
                                     forms['contraPedido'+ v.id] ={};
                                 }
@@ -5298,7 +5429,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                     });
                     angular.forEach(response.productos.kitchenBox, function(v,k){
                         angular.forEach(v, function(v2,k2){
-                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !isNaN(k2)){
                                 if(!forms['kitchenBox'+ v.id]){
                                     forms['kitchenBox'+ v.id] ={};
                                 }
@@ -5310,11 +5441,22 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
 
                     angular.forEach(response.productos.pedidoSusti, function(v,k){
                         angular.forEach(v, function(v2,k2){
-                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !angular.isNumber(k2)){
+                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !isNaN(k2)){
                                 if(!forms['pedidoSusti'+ v.id]){
                                     forms['pedidoSusti'+ v.id] ={};
                                 }
                                 forms['pedidoSusti'+ v.id][k2]={original:v2, v:v2, estado:'new',trace:new Array()};
+                            }
+
+                        });
+                    });
+                    angular.forEach(response.productos.todos, function(v,k){
+                        angular.forEach(v, function(v2,k2){
+                            if(v2!=null && typeof (v2) != 'object' && typeof (v2) != 'array' && typeof (k2) !='numer' && !isNaN(k2)){
+                                if(!forms['todos'+ v.id]){
+                                    forms['todos'+ v.id] ={};
+                                }
+                                forms['todos'+ v.id][k2]={original:v2, v:v2, estado:'new',trace:[]};
                             }
 
                         });

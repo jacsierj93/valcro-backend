@@ -203,20 +203,12 @@
                             Crear Producto
                         </md-tooltip>
                     </div>
-                    <div layout="column" layout-align="center center"
-                         ng-show="( module.layer == 'delalleDoc' && !FormHeadDocument.$valid && document.permit.del )"
-                         ng-click="delete(document)" >
-                        <span class="icon-Eliminar" style="font-size: 24px"></span>
-                        <md-tooltip>
-                            Eliminar la {{formMode.name}}
-                        </md-tooltip>
-                    </div>
-                    <div layout="column" layout-align="center center"
-                         ng-show="( FormHeadDocument.$valid && Docsession.global != 'new' && document.permit.cancel)"
-                         ng-click="cancelDoc()" >
-                        <span  style="font-size: 24px">(/)</span>
-                        <md-tooltip>
-                            Cancelar la {{formMode.name}}
+                    <div layout="column"
+                         ng-show="(!document.doc_parent_id && provSelec.id && module.layer == 'detalleDoc')"
+                         layout-align="center center" ng-click="openImport()">
+                        <span class="icon-Importar" style="font-size: 24px"></span>
+                        <md-tooltip >
+                            Importar
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center" ng-controller="OrderAccCopyDoc"
@@ -224,16 +216,21 @@
                          ng-click="copyDoc()">
                         <span class="icon-Copiado" style="font-size: 24px"> </span>
                         <md-tooltip >
-                            Crear una copia de la {{formMode.name}} (Sin adjuntos)
+                            Crear una copia (Sin adjuntos)
                         </md-tooltip>
                     </div>
 
-                    <div layout="column"
-                         ng-show="(!document.doc_parent_id && provSelec.id && module.layer == 'detalleDoc')"
-                         layout-align="center center" ng-click="openImport()">
-                        <span class="icon-Importar" style="font-size: 24px"></span>
+                    <div layout="column" layout-align="center center"  ng-click="OrderAprobCtrl();" ng-class="{'blue':document.isAprobado}"  ng-show="document.id" >
+                        <span class="icon-checkMark" style="font-size: 24px"></span>
                         <md-tooltip >
-                            Importar desde {{forModeAvilable.getXValue(formMode.value - 1 ) > 21 ? 'una': 'un' }}  {{ forModeAvilable.getXValue(formMode.value - 1 ).name}}
+                            Aprobar
+                        </md-tooltip>
+                    </div>
+                    <div layout="column" layout-align="center center"
+                        ng-show="document.id"  ng-click="OrderCancelDocCtrl();" >
+                        <img src="images/CancelarDocumento.png">
+                        <md-tooltip>
+                            Cancelar
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
@@ -244,14 +241,14 @@
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
                     </div>
-                    <div layout="column" layout-align="center center"
+                    <!--<div layout="column" layout-align="center center"
 
                          ng-click="test()">
                         <span style="font-size: 24px"> TEst </span>
                         <md-tooltip >
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
-                    </div>
+                    </div>-->
 
                 </div>
 
@@ -296,6 +293,10 @@
 
             </div>
         </div>
+
+
+
+
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listImport" id="listImport">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistImportCtrl">
@@ -1441,115 +1442,117 @@
                             </div>
                         </div>
                     </form>
-                    <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
-                        <div active-left></div>
-                        <div layout="column" flex >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" >
-                                <div class="titulo_formulario" style="height:39px;" flex ng-click="gridView = 2" >
-                                    <div>
-                                        Aprobacion de Gerente
-                                    </div>
-                                </div>
 
-                            </div>
-                            <div layout="row" ng-show="( gridView == 2 )" class="row"  id="estatusDoc">
+                    <!--       <form name="FormEstatusDoc" ng-class="{'focused': gridView == 2 }" layout="row" ng-show="tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid)">
+                               <div active-left></div>
+                               <div layout="column" flex >
+                                   <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 2}" >
+                                       <div class="titulo_formulario" style="height:39px;" flex ng-click="gridView = 2" >
+                                           <div>
+                                               Aprobacion de Gerente
+                                           </div>
+                                       </div>
 
-                                <md-input-container class="md-block" flex="">
-                                    <label>Estatus</label>
-                                    <md-select ng-model="$parent.document.estado_id"
-                                               ng-disabled="( gridView != 2 ||  $parent.Docsession.block  || !$parent.document.permit.aprob_gerencia )"
-                                               ng-change="toEditHead('estado_id', $parent.document.estado_id)"
-                                               skip-tab
-                                               id="condicion_pago_id"
+                                   </div>
+                                   <div layout="row" ng-show="( gridView == 2 )" class="row"  id="estatusDoc">
 
-                                    >
-                                        <md-option ng-repeat="item in estadosDoc" value="{{item.id}}" skip-tab>
-                                            {{item.estado}}
-                                        </md-option>
+                                       <md-input-container class="md-block" flex="">
+                                           <label>Estatus</label>
+                                           <md-select ng-model="$parent.document.estado_id"
+                                                      ng-disabled="( gridView != 2 ||  $parent.Docsession.block  || !$parent.document.permit.aprob_gerencia )"
+                                                      ng-change="toEditHead('estado_id', $parent.document.estado_id)"
+                                                      skip-tab
+                                                      id="condicion_pago_id"
 
-
-                                    </md-select>
-                                </md-input-container>
-
-                            </div>
-                        </div>
-
-                    </form>
-                    <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="document.permit.aprob_compras && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras($event): 0" >
-                        <div active-left></div>
-                        <div layout="column" flex>
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 3}" >
-                                <div class="titulo_formulario" style="height:39px;" flex   ng-click="gridView = 3">
-                                    <div>
-                                        Aprobación
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
+                                           >
+                                               <md-option ng-repeat="item in estadosDoc" value="{{item.id}}" skip-tab>
+                                                   {{item.estado}}
+                                               </md-option>
 
 
-                                <div layout="row" class="date-row" flex="60">
-                                    <div layout="column" class="md-block" layout-align="center center"  >
-                                        <div>Fecha Aprobación: </div>
-                                    </div>
-                                    <div class="md-block" layout="column" layout-align="center center" >
-                                        <md-datepicker ng-model="$parent.document.fecha_aprob_compra" md-placeholder="Fecha"
-                                                       ng-disabled="($parent.Docsession.block)"
-                                                       skip-tab
-                                                       required
-                                                       ng-change="toEditHead('fecha_aprob_compra', ($parent.document.fecha_aprob_compra) ? $parent.document.fecha_aprob_compra.toString(): undefined)"
+                                           </md-select>
+                                       </md-input-container>
 
-                                        ></md-datepicker >
-                                    </div>
-                                </div>
+                                   </div>
+                               </div>
+
+                           </form>
+                           <form name="FormAprobCompras" ng-class="{focused: gridView == 3}" layout="row" ng-show="document.permit.aprob_compras && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid )" click-out="(gridView == 3) ? saveAprobCompras($event): 0" >
+                               <div active-left></div>
+                               <div layout="column" flex>
+                                   <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 3}" >
+                                       <div class="titulo_formulario" style="height:39px;" flex   ng-click="gridView = 3">
+                                           <div>
+                                               Aprobación
+                                           </div>
+                                       </div>
+
+                                   </div>
+                                   <div layout="row"  ng-show="( gridView == 3 )"  class="row" >
 
 
-                                <md-input-container class="md-block" >
-                                    <label>N° Documento</label>
-                                    <input ng-model="$parent.document.nro_doc"  ng-disabled="(Docsession.block)"
-                                           ng-change="toEditHead('nro_doc', $parent.document.nro_doc)"
-                                           required
-                                           skip-tab
+                                       <div layout="row" class="date-row" flex="60">
+                                           <div layout="column" class="md-block" layout-align="center center"  >
+                                               <div>Fecha Aprobación: </div>
+                                           </div>
+                                           <div class="md-block" layout="column" layout-align="center center" >
+                                               <md-datepicker ng-model="$parent.document.fecha_aprob_compra" md-placeholder="Fecha"
+                                                              ng-disabled="($parent.Docsession.block)"
+                                                              skip-tab
+                                                              required
+                                                              ng-change="toEditHead('fecha_aprob_compra', ($parent.document.fecha_aprob_compra) ? $parent.document.fecha_aprob_compra.toString(): undefined)"
 
-                                    >
-                                </md-input-container>
+                                               ></md-datepicker >
+                                           </div>
+                                       </div>
 
-                                <div class="adj-box">
-                                    <div ng-click="openAdj('AprobCompras')" id="adj-nro-doc" class="vlc-buttom" skip-tab info="Adjuntos para validar la aprobacion por compras" ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
-                                        {{ ($parent.document.adjuntos | stringKey :'AprobCompras': 'documento' ).length || 0 }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                    </form>
-                    <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.permit.cancel && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
-                        <div active-left></div>
-                        <div layout="column" flex  >
-                            <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}"  ng-click="gridView = 4" >
-                                <div class="titulo_formulario" style="height:39px;" flex >
-                                    <div>
-                                        Cancelacion
-                                    </div>
-                                </div>
+                                       <md-input-container class="md-block" >
+                                           <label>N° Documento</label>
+                                           <input ng-model="$parent.document.nro_doc"  ng-disabled="(Docsession.block)"
+                                                  ng-change="toEditHead('nro_doc', $parent.document.nro_doc)"
+                                                  required
+                                                  skip-tab
 
-                            </div>
+                                           >
+                                       </md-input-container>
 
-                            <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
-                                <label>Motivo de cancelacion </label>
-                                <input  ng-model="$parent.document.comentario_cancelacion"
-                                        ng-disabled="(Docsession.block)"
-                                        id="mtvCancelacion"
-                                        ng-change="$parent.toEditHead('comentario_cancelacion', $parent.document.comentario_cancelacion)"
-                                        required
-                                        ng-blur="saveCancelDoc()"
+                                       <div class="adj-box">
+                                           <div ng-click="openAdj('AprobCompras')" id="adj-nro-doc" class="vlc-buttom" skip-tab info="Adjuntos para validar la aprobacion por compras" ng-class="{'ng-disable':(Docsession.block)}" skip-tab  style="float:left">
+                                               {{ ($parent.document.adjuntos | stringKey :'AprobCompras': 'documento' ).length || 0 }}
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
 
-                                >
-                            </md-input-container>
+                           </form>
+                           <form name="FormCancelDoc" ng-class="{focused: gridView == 4}" layout="row" ng-show="document.permit.cancel && tbl_dtDoc.extend == 0 && ( Docsession.global == 'upd' && FormHeadDocument.$valid) " >
+                               <div active-left></div>
+                               <div layout="column" flex  >
+                                   <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 4}"  ng-click="gridView = 4" >
+                                       <div class="titulo_formulario" style="height:39px;" flex >
+                                           <div>
+                                               Cancelacion
+                                           </div>
+                                       </div>
 
-                        </div>
-                    </form>
+                                   </div>
+
+                                   <md-input-container class="md-block" flex  ng-show="( gridView == 4 )" class="row" >
+                                       <label>Motivo de cancelacion </label>
+                                       <input  ng-model="$parent.document.comentario_cancelacion"
+                                               ng-disabled="(Docsession.block)"
+                                               id="mtvCancelacion"
+                                               ng-change="$parent.toEditHead('comentario_cancelacion', $parent.document.comentario_cancelacion)"
+                                               required
+                                               ng-blur="saveCancelDoc()"
+
+                                       >
+                                   </md-input-container>
+
+                               </div>
+                           </form>
+                           -->
                     <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5)}" ng-show="tbl_dtDoc.extend == 0 && document.productos.todos.length > 0 ">
                         <div active-left></div>
                         <div layout="row" class="form-row-head" ng-class="{'form-row-head-select':gridView == 5}" flex>
@@ -2148,15 +2151,15 @@
                         <div  layout="column" flex>
                             <div flex>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in tbl.data | filter:tbl.filter:strict | orderBy: tbl.order " >
-                                    <div flex="5" class="cellEmpty" ng-click="allowEdit()">
+                                    <div flex="5" class="cellEmpty" ng-click="change(item)">
                                         <md-switch class="md-primary" ng-model="item.asignado"
-                                                   ng-change="changePedidoSustituto(item)"
-                                                   ng-disabled="(Docsession.block || || !document.permit.update)"></md-switch>
+
+                                                   ng-disabled="true"></md-switch>
                                     </div>
-                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_proforma}}</div>
-                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.emision | date:'dd/MM/yyyy'}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="selecPedidoSust(item)">{{item.nro_factura}}</div>
-                                    <div flex="10" class="cellGrid" ng-click="selecPedidoSust(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="open(item)">{{item.nro_proforma}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="open(item)">{{item.emision | date:'dd/MM/yyyy'}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="open(item)">{{item.nro_factura}}</div>
+                                    <div flex="10" class="cellGrid" ng-click="open(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
                                     <div flex class="cellGrid">{{item.comentario}}</div>
                                 </div>
                             </div>
@@ -2479,7 +2482,7 @@
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; "  class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedidoSus" id="resumenPedidoSus" >
             <!-- ) ########################################## CONTENDOR SECCION PEDIDO SUSTITO ########################################## -->
 
-            <md-content  layout="row" flex class="sideNavContent" >
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderResumenPedidoSusCtrl" >
                 <div layout="column" flex >
                     <form name="FormPedidoSusProduc" layout="row"  ng-style="(tbl_pediSutitut.extend == 0 ) ? {'min-height' : '204px'} : {} " ng-class="{'focused' : (tbl_pediSutitut.extend == 0 )}">
                         <div active-left></div>
@@ -2901,7 +2904,7 @@
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 1 }" ng-click="gridViewFinalDoc = 1;">
                                 <div class="titulo_formulario" style="height:39px;{{( gridViewFinalDoc != 1) ? 'color:#ccc' : ''}}" flex >
                                     <div>
-                                       Datos de {{formMode.name}}
+                                        Datos de {{formMode.name}}
                                     </div>
                                 </div>
                                 <div layout=""  layout-align="center center"  >
@@ -2917,7 +2920,6 @@
                             <div layout="column" flex class="gridContent">
                                 <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1">
                                     <div class="rowRsmTitle" flex="40"> Creado: </div>
-
                                     <div class="rms" flex  layout="row" layout-align="space-between center">
                                         <div>{{document.emision | date:'dd/MM/yyyy' }}</div>
                                         <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
@@ -3084,7 +3086,7 @@
                             </div>
                         </div>
                     </div>
-                 <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }">
+                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }" ng-click="gridViewFinalDoc = 2" >
@@ -3102,6 +3104,22 @@
                                         </md-switch>
                                     </div>
                                 </div>
+                            </div>
+                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 2" >
+
+                                <div layout="row" flex="40">
+                                    <div layout="column" class="divIconRsm"
+                                         ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                         layout-align="center center">
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+
+                                    <div class="rowRsmTitle">Aprobacion compras</div>
+                                </div>
+                                <div class="rms" flex> {{document.titulo  }}</div>
                             </div>
                         </div>
                     </div>
@@ -3123,6 +3141,22 @@
                                         </md-switch>
                                     </div>
                                 </div>
+                            </div>
+                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 2" >
+
+                                <div layout="row" flex="40">
+                                    <div layout="column" class="divIconRsm"
+                                         ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                         layout-align="center center">
+                                        <span class="icon-Agregar" ></span>
+                                    </div>
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                        <span class="icon-Actualizar" ></span>
+                                    </div>
+
+                                    <div class="rowRsmTitle">Aprobacion Gerencia</div>
+                                </div>
+                                <div class="rms" flex> {{document.titulo  }}</div>
                             </div>
                         </div>
                     </div>
@@ -3929,6 +3963,89 @@
             </md-content>
         </md-sidenav>
 
+        <!------------------------------------------- mini layer aprobar documento ------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderAprob" id="OrderAprob"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderAprobCtrl" style="padding-left: 12px"  click-out="close($event)" >
+                <div layout="column" flex>
+                    <div layout="row" class="form-row-head form-row-head-select" >
+
+                        <div class="titulo_formulario">
+                            <div>
+                                Aprobacion
+                            </div>
+                        </div>
+                    </div>
+                    <form name="formData">
+                        <div layout="row" class="date-row vlc-date row"  ng-class="{'vlc-date-no-edit':$parent.Docsession.block}"
+                        >
+                            <div layout="column" class="md-block" layout-align="center center" ng-click="($parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_carga() : 0" >
+                                <div>Fecha Aprobación</div>
+                            </div>
+                            <md-datepicker ng-model="model.fecha"
+                                           ng-disabled="($parent.Docsession.block)"
+                                           skip-tab
+                                           required
+                                           ng-change="toEditHead('fecha_aprob_compra', ($parent.document.fecha_aprob_compra) ? $parent.document.fecha_aprob_compra.toString(): undefined)"
+                            ></md-datepicker >
+                        </div>
+                        <md-input-container class="md-block row" >
+                            <label>N° Documento</label>
+                            <input ng-model="model.nro_doc"  ng-disabled="(Docsession.block)"
+                                   ng-change="toEditHead('nro_doc', $parent.document.nro_doc)"
+                                   required
+                                   skip-tab
+                            >
+                        </md-input-container>
+
+                        <vld-file-up-img up-model="upModel" fn-file-up="fnfile" key="OrderAprobCtrl" up-adjs="loades" storage="orders"></vld-file-up-img>
+                    </form>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
+        <!------------------------------------------- mini layer aprobar documento ------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderCancel" id="OrderCancel"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderCancelDocCtrl" style="padding-left: 12px"  click-out="close($event)" >
+                <div layout="column" flex>
+                    <div layout="row" class="form-row-head form-row-head-select" >
+
+                        <div class="titulo_formulario " flex>
+                            <div>
+                                Cancelacion
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="center end" class="form-row-head-option">
+                            <div flex layout="column" layout-align="center center" ng-click="mode = (mode == 'adj') ? 'list': 'adj' ">
+                                <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
+
+                                <md-tooltip >
+                                   {{(mode == 'adj')  ? 'Redactar' : 'Adjuntar' }}
+                                </md-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                    <form name="formData" ng-show="mode != 'adj' " flex>
+                       <textarea ng-model="model.comentario"
+                                 info="Por favor estable el motivo de cancelacion"
+                                 required
+                                 skip-tab
+                                 placeholder="Por favor estable el motivo de cancelacion"
+                                 flex
+                       ></textarea
+
+                      <!--  -->
+                    </form>
+                    <vld-file-up-img ng-show="mode == 'adj' " up-model="upModel" fn-file-up="fnfile" key="OrderCancelDocCtrl" up-adjs="loades" storage="orders"></vld-file-up-img>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
         <!------------------------------------------- mini layer agregar  producto ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderminiAddProduct" id="OrderminiAddProduct"
@@ -4649,59 +4766,59 @@
         </md-sidenav>
         <!-- ########################################## LAYER crear nuevo producto ########################################## -->
 
-<!--        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
-                    class="md-sidenav-right md-whiteframe-2dp popUp"
-                    md-disable-backdrop="true" md-component-id="OrderCreateProd" id="OrderCreateProd"
-        >
-            <md-content   layout="row" flex  ng-controller="OrderCreateProdCtrl" >
-                <div  layout="column" flex="" class="layerColumn"   click-out="CloseCreateProduct($event)" >
-                    <form layout="row" class="focused" name="createdProd" >
-                        <div layout="column" flex>
-                            <div layout="row" class="form-row-head form-row-head-select" >
+        <!--        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                            class="md-sidenav-right md-whiteframe-2dp popUp"
+                            md-disable-backdrop="true" md-component-id="OrderCreateProd" id="OrderCreateProd"
+                >
+                    <md-content   layout="row" flex  ng-controller="OrderCreateProdCtrl" >
+                        <div  layout="column" flex="" class="layerColumn"   click-out="CloseCreateProduct($event)" >
+                            <form layout="row" class="focused" name="createdProd" >
+                                <div layout="column" flex>
+                                    <div layout="row" class="form-row-head form-row-head-select" >
 
-                                <div class="titulo_formulario">
-                                    <div>
-                                      Crear producto
+                                        <div class="titulo_formulario">
+                                            <div>
+                                              Crear producto
+                                            </div>
+                                        </div>
                                     </div>
+                                    <md-input-container class="md-block"  >
+                                        <label>Descripcion</label>
+                                        <input ng-model="createProd.descripcion"
+                                               info="Descripción del producto "
+                                               required
+                                               skip-tab
+
+                                        />
+                                    </md-input-container>
+                                    <md-input-container class="md-block"  >
+                                        <label>Cantidad</label>
+                                        <input ng-model="createProd.saldo"
+                                               decimal info="Cantidad del producto a solicitar "
+                                               required
+                                               skip-tab
+                                               decimal
+
+                                        />
+                                    </md-input-container>
+                                    <md-input-container class="md-block"  >
+                                        <label>Cod. Fabrica</label>
+                                        <input ng-model="createProd.codigo_fabrica"
+                                               info=" Codigo  de fabrica del producto "
+                                               skip-tab
+                                               ng-keypress="($event.which === 13)? doClick('#createProd :first '): 0 "
+
+                                        />
+                                    </md-input-container>
+
                                 </div>
-                            </div>
-                            <md-input-container class="md-block"  >
-                                <label>Descripcion</label>
-                                <input ng-model="createProd.descripcion"
-                                       info="Descripción del producto "
-                                       required
-                                       skip-tab
-
-                                />
-                            </md-input-container>
-                            <md-input-container class="md-block"  >
-                                <label>Cantidad</label>
-                                <input ng-model="createProd.saldo"
-                                       decimal info="Cantidad del producto a solicitar "
-                                       required
-                                       skip-tab
-                                       decimal
-
-                                />
-                            </md-input-container>
-                            <md-input-container class="md-block"  >
-                                <label>Cod. Fabrica</label>
-                                <input ng-model="createProd.codigo_fabrica"
-                                       info=" Codigo  de fabrica del producto "
-                                       skip-tab
-                                       ng-keypress="($event.which === 13)? doClick('#createProd :first '): 0 "
-
-                                />
-                            </md-input-container>
+                            </form>
 
                         </div>
-                    </form>
 
-                </div>
-
-            </md-content>
-        </md-sidenav>
--->
+                    </md-content>
+                </md-sidenav>
+        -->
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
             style="margin-top:96px;

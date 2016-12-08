@@ -153,6 +153,9 @@ $app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOr
 $app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido entero
 $app->post("Order/Solicitude/SavekitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///agrega u kitchen box
 $app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekitchenBoxSolicitude'); ///quita  kitchen box
+$app->post("Order/Solicitude/Approved",'Orders\OrderController@ApprovedSolicitude'); ///agrega la aprobacion de compras
+$app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude'); /// cancela la solicitud
+$app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteSolicitude'); // agrega un aolicitud vieja a una nueva
 
 
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
@@ -160,14 +163,11 @@ $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveS
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // asigna un nuevo paren al docuemnto
-$app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteSolicitude'); // agrega un aolicitud vieja a una nueva
 $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
 $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
 $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
-$app->post("Order/Solicitude/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesSolicitude'); ///agrega la aprobacion de compras
-$app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude'); /// cancela la solicitud
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
@@ -181,7 +181,6 @@ $app->get("Order/Solicitude/EmailEstimate",'Orders\OrderController@EmailEstimate
 $app->get("Order/Solicitude/EmailSummary",'Orders\OrderController@EmailSummaryDocSolicitude'); ///trau preview del  presupuesto a enviar al provedor
 
 
-$app->get("Solicitude/Get",'Orders\OrderController@getSolicitude'); ///guarda el pedido @deprecated
 
 // contra pedidos
 $app->get("Order/CustomOrderReview",'Orders\OrderController@getCustomOrderReview'); ///trae tod el detalle de contraPedido
