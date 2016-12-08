@@ -100,6 +100,7 @@
 <?= HTML::script('js/modules/pagos/pagosController.js') ?>
 <?= HTML::script('js/modules/pedidos/pedidosController.js') ?>
 <?= HTML::script('js/modules/embarques/embarquesController.js') ?>
+<?= HTML::script('js/modules/criterios/criteriosController.js') ?>
 <?= HTML::script('js/modules/productos/productosController.js') ?>
 <?= HTML::script('js/modules/main/notificacionesController.js') ?>
 <?= HTML::script('js/modules/main/directives.js') ?>

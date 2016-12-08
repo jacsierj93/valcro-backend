@@ -284,6 +284,7 @@ MyApp.directive('phone', function (setNotif) {
         }
     };
 });
+
 MyApp.directive('decimal', function () {
     return {
         require: 'ngModel',
@@ -305,19 +306,9 @@ MyApp.directive('decimal', function () {
                 }
             });
 
-            /*ctrl.$validators.decimal = function(modelValue, viewValue) {
-             if(viewValue === undefined || viewValue=="" || viewValue==null){
-             return true;
-             }
-             var  num = viewValue.match(/^\-?(\d{0,3}\.?)+\,?\d{1,3}$/);
-
-             return !(num === null)
-             };*/
-
         }
     };
 });
-
 
 MyApp.directive('chip', function ($timeout) {
     return {
@@ -685,6 +676,98 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
     };
 });
 
+
+MyApp.directive('lmbMinImp', function($filter,$q,$timeout,setNotif) {
+
+    return {
+        require: '?ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            //console.log(scope, elm, attrs, ctrl)
+            //var targ = attrs.integer;
+            ctrl.$validators.minImp = function(modelValue, viewValue) {
+                if (ctrl.$isEmpty(modelValue) || ctrl.$pristine) {
+                    return true;
+                }
+                if(parseInt(modelValue) < parseInt(attrs.lmbMinImp)){
+                    return false;
+                }
+                return true;
+
+            };
+        }
+    };
+});
+
+MyApp.directive('lmbMaxImp', function($filter,$q,$timeout,setNotif) {
+
+    return {
+        require: '?ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            //var targ = attrs.integer;
+            ctrl.$validators.maxImp = function(modelValue, viewValue) {
+                if (ctrl.$isEmpty(modelValue) || ctrl.$pristine || modelValue===true) {
+                    console.log("entrooooo",modelValue)
+                    return true;
+                }
+                if(parseInt(modelValue) > parseInt(attrs.lmbMaxImp)){
+
+                    return false;
+                }
+
+                return true;
+
+            };
+        }
+    };
+});
+
+MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
+    return {
+        require: '?ngModel',
+        scope:{
+                email:"=?emailMsg",
+                max:"=?maxMsg",
+                maxlength:"=?maxlengthMsg",
+                min:"=?minMsg",
+                minlength:"=?minlengthMsg",
+                number:"=?numberMsg",
+                pattern:"=?patternMsg",
+                required:"=?requiredMsg",
+                url:"=?urlMsg",
+                date:"=?dateMsg",
+                datetimelocal:"=?datetimelocalMsg",
+                time:"=?timeMsg",
+                week:"=?weekMsg",
+                month:"=?monthMsg",
+                minImp:"=?minImpMsg",
+                maxImp:"=?maxImpMsg"
+        },
+        link: function(scope, elm, attrs, ctrl) {
+            scope.errors = ctrl.$error;
+            scope.$watchCollection("errors",function(n,o){
+
+               angular.forEach(o,function(k,v){
+                   if(!(v in n)){
+                       setNotif.hideByContent(scope[v].t,scope[v].m);
+                   }
+               });
+                angular.forEach(n,function(k,v){
+                    if((v in scope)){
+                        btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
+                            ctrl.$setValidity(v, true);
+                            console.log(ctrl.$error)
+                        }}]:[];
+
+                        setNotif.addNotif(scope[v].t,scope[v].m,btn);
+                    }
+
+                })
+            });
+
+        }
+    };
+});
+
 MyApp.directive('range', function () {
     function validateRange(viewValue,min,max){
         if(viewValue === undefined || viewValue=="" || viewValue==null){
@@ -834,6 +917,11 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
             secc: 'Pedidos',
             key:'pedidos',
             url: 'modules/pedidos/index',
+            selct: 'btnDot'
+        }, {
+            secc: 'Criterios',
+            key:'criterios',
+            url: 'modules/criterios/index',
             selct: 'btnDot'
         }, {
             secc: 'Productos',

@@ -77,6 +77,11 @@ if (Request::is('criterio/*'))
 {
     require __DIR__.'/criterio_routes.php';
 }
+//////enrutador para servicios de Productos
+if (Request::is('productos/*'))
+{
+    require __DIR__.'/products_routes.php';
+}
 
 
 

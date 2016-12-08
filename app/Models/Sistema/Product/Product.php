@@ -21,5 +21,9 @@ class Product extends Model
         return $this->hasOne('App\Models\Sistema\Product\ProductType','tipo_producto_id');
     }
 
+    public function prov(){
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider','prov_id');
+    }
+
 
 }
