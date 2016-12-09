@@ -4368,6 +4368,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','masters','setGetOrder', 
     $scope.next = function () {
         $scope.saveFinal();
     }
+
 }]);
 
 MyApp.controller('OrderMenuAgrCtrl',['$scope','Order','masters','clickCommitSrv','setGetOrder', function ($scope,Order,masters,clickCommitSrv,setGetOrder) {

@@ -4383,7 +4383,7 @@ class OrderController extends BaseController
         $tem['titulo']= $model->titulo;
         $tem['diasEmit']=$model->daysCreate();
         $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
-        $tem['fecha_aprob_gerencia'] =$model->aprob_gerencia ;
+        $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_gerencia ;
         $tem['img_aprob'] =$model->fecha_aprob_compra ;
         $tem['isAprobado'] = ($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null);
 

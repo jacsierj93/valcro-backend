@@ -3074,7 +3074,7 @@
                             </div>
                         </div>
                     </div>
-                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }">
+                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 } "  ng-show="document.fecha_aprob_compra">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }" ng-click="gridViewFinalDoc = 2" >
@@ -3093,25 +3093,21 @@
                                     </div>
                                 </div>
                             </div>
-                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 2" >
-
+                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 2">
                                 <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm"
-                                         ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
-                                         layout-align="center center">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
                                         <span class="icon-Actualizar" ></span>
                                     </div>
-
-                                    <div class="rowRsmTitle">Aprobacion compras</div>
+                                    <div class="rowRsmTitle"> Fecha </div>
                                 </div>
-                                <div class="rms" flex> {{document.titulo  }}</div>
+                                <div class="rms" flex> {{document.estado }}</div>
                             </div>
                         </div>
                     </div>
-                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" >
+                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" ng-show="document.fecha_aprob_gerencia">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" ng-click="gridViewFinalDoc = 3" >
@@ -3130,25 +3126,21 @@
                                     </div>
                                 </div>
                             </div>
-                            <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 2" >
-
+                            <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 3">
                                 <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm"
-                                         ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
-                                         layout-align="center center">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
                                         <span class="icon-Actualizar" ></span>
                                     </div>
-
-                                    <div class="rowRsmTitle">Aprobacion Gerencia</div>
+                                    <div class="rowRsmTitle"> Fecha </div>
                                 </div>
-                                <div class="rms" flex> {{document.titulo  }}</div>
+                                <div class="rms" flex> {{document.estado }}</div>
                             </div>
                         </div>
                     </div>
-                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" layout="row">
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" layout="row" ng-show="document.contraPedido && document.contraPedido.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" ng-click="gridViewFinalDoc = 4" >
@@ -3169,7 +3161,7 @@
                             </div>
                             <div flex ng-show="gridViewFinalDoc == 2" >
                                 <md-content style="margin: 4px;">
-                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contraPedido  track by $index " layout-align="space-between center" >
+                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in document.contraPedido  track by $index " layout-align="space-between center" >
                                         <div layout="row"  flex>
                                             <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
@@ -3190,7 +3182,7 @@
                         </div>
 
                     </div>
-                    <div    class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" layout="row"  >
+                    <div    class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" layout="row"  ng-show="document.kitchenBox && document.kitchenBox.length > 0"  >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" ng-click="gridViewFinalDoc = 5" >
@@ -3233,7 +3225,7 @@
 
                         </div>
                     </div>
-                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row" >
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row"  ng-show="document.pedidoSusti && document.pedidoSusti.length > 0"  >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" ng-click="gridViewFinalDoc = 6" >
