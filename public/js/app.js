@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload','io-barcode'];
 
 
 var MyApp = angular.module('MyApp', dependency, function() {

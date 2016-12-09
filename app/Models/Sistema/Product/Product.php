@@ -18,12 +18,17 @@ class Product extends Model
     protected $table = "tbl_producto";
 
     public function getType(){
-        return $this->hasOne('App\Models\Sistema\Product\ProductType','tipo_producto_id');
+        return $this->hasOne('App\Models\Sistema\Product\ProductType','id','tipo_producto_id');
     }
 
     public function prov(){
         return $this->belongsTo('App\Models\Sistema\Providers\Provider','prov_id');
     }
-
+    public function subLin(){
+        return $this->hasOne('App\Models\Sistema\Product\SubLine','id','sublinea_id');
+    }
+    public function line(){
+        return $this->hasOne('App\Models\Sistema\Masters\Line','id','linea_id');
+    }
 
 }

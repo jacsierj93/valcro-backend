@@ -27,7 +27,13 @@ class ProductController  extends BaseController
     }
     
     public function listByProv($prov){
-        return Product::with("prov")->where("prov_id",$prov)->get();
+        return Product::with("prov")
+            ->with("line")
+            ->with("subLin")
+            ->with("getType")
+            ->where("prov_id",$prov)
+            ->distinct("id")
+            ->get();
 
     }
 }

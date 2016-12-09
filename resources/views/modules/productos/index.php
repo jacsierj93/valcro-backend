@@ -1,12 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="mainProdController" >
-
-    <!-- 2) ########################################## AREA DEL MENU ########################################## -->
-    <!--<div layout="row" flex="none" class="menuBarHolder">
-
-
-
-    </div>-->
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="mainProdController" global>
 
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
@@ -88,17 +81,7 @@
                     <span class="icon-Filtro" style="font-size: 24px"></span>
                     <?/*= HTML::image("images/filtro.png") */?>
                 </div>
-                <div layout="row" layout-align="center right" flex id="progress_percent">
-                   <div layout="row" layout-align="right center" ng-repeat="i in [0,1,2,3]" flex id="progress_{{i}}">
-                       <div style="height: 5px; background: #ccc;" flex>
-                           <div class="load_area" style="height: 100%; width:0%; background: #5cb85c;" ng-class="{'lineAnimate':line}"></div>
-                       </div>
-                       <span info="{{i}}" class="iconInput iconCircle" style="margin-left: 0px;" ng-click="line=true;">
-                           {{i}}
-                       </span>
-
-                   </div>
-                </div>
+                
             </div>
 
             <div flex layout="row">
@@ -111,18 +94,18 @@
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
                 <div class="loadArea" ng-class="{'loading':list2()==0}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
                     <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; ">
-                        P
+                        Prods
                     </div>
                     <br> Selecciones un Proveedor
                 </div>
             </div>
         </div>
 
-        <!-- 15) ########################################## LAYER (2) FORMULARIO INFORMACION DEL PROVEEDOR ########################################## -->
-        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="layer1">
+        <!-- 15) ########################################## LAYER (2) GRID DE PRODUCTOS ASIGNADOS AL PROVEEDOR########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer1" id="prodLayer1">
 
             <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="gridAllController">
                 <input type="hidden" md-autofocus>
                 <div layout="column" flex>
                     <div layout="row" class="focused">
@@ -142,66 +125,67 @@
                                 <md-input-container class="md-block"  flex>
                                     <label>codigo</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.codigo"
+                                           ng-model="listByProv.filter.codigo"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="id"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="codigo"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Descripcion</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.nro_factura"
+                                           ng-model="listByProv.filter.descripcion"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="nro_factura"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="descripcion"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Proveedor</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.titulo"
+                                           ng-model="listByProv.filter.prov.razon_social"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="titulo"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="prov_id"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Linea</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.fecha_carga"
+                                           ng-model="listByProv.filter.line.linea"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="fecha_carga"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="linea_id"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Sub-Linea</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.fecha_vnz"
+                                           ng-model="listByProv.filter.sublinea_id"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="fecha_vnz"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="sublinea_id"></grid-order-by>
 
                             </div>
                             <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Stock</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.fecha_tienda"
+                                           ng-model="listByProv.filter.stock"
+                                           decimal
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="fecha_tienda"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="stock"></grid-order-by>
 
                             </div>
 
@@ -210,11 +194,12 @@
                                 <md-input-container class="md-block"  flex>
                                     <label>Precio</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.flete_tt"
+                                           ng-model="listByProv.filter.precio"
+                                           decimal
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="flete_tt"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="precio"></grid-order-by>
 
                             </div>
 
@@ -222,11 +207,11 @@
                                 <md-input-container class="md-block"  flex>
                                     <label>Tipo</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
-                                           ng-model="tbl.filter.nacionalizacion"
+                                           ng-model="listByProv.filter.tipo_producto_id"
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="nacionalizacion"></grid-order-by>
+                                <grid-order-by ng-model="listByProv" key="tipo_producto_id"></grid-order-by>
 
                             </div>
                         </div>
@@ -234,16 +219,17 @@
                     <form layout="row"  class="gridContent" flex>
                         <div active-left></div>
                         <div layout="column" flex=""   >
-                            <div   ng-repeat="item in tbl.data | filter : tbl.filter:strict | orderBy : tbl.order as filter">
-                                <div layout="row" class="cellGridHolder" >
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.id}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.nro_factura}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.titulo}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)"> <div class=" date {{'green'+item.catfecha_carga}}">{{item.fecha_carga |  date:'dd/MM/yyyy' }}</div></div>
-                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'green'+item.catfecha_vnz}}" >{{item.fecha_vnz | date:'dd/MM/yyyy'}}</div></div>
-                                    <div flex class="cellGrid" ng-click="setData(item)"><div  class="date {{'green'+item.catfecha_tienda}}">{{item.fecha_tienda| date:'dd/MM/yyyy'}}</div></div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.flete_tt}}</div>
-                                    <div flex class="cellGrid" ng-click="setData(item)">{{item.nacionalizacion}}</div>
+                            <div   ng-repeat="item in listByProv.data | filter : listByProv.filter:strict | orderBy : listByProv.order as filter">
+                                <div layout="row" class="cellGridHolder" ng-click="openProd(item)" >
+
+                                    <div flex class="cellGrid" >{{item.codigo}}</div>
+                                    <div flex class="cellGrid" >{{item.descripcion}}</div>
+                                    <div flex class="cellGrid" > {{item.prov.razon_social}}</div>
+                                    <div flex class="cellGrid" >{{item.line.linea}}</div>
+                                    <div flex class="cellGrid" >{{item.subLin.sublinea}}</div>
+                                    <div flex class="cellGrid" >{{item.stock}}</div>
+                                    <div flex class="cellGrid" >{{item.precio}}</div>
+                                    <div flex class="cellGrid" >{{item.getType.descripcion}}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" flex ng-show="filter == 0">
@@ -261,6 +247,198 @@
 
         </md-sidenav>
 
+
+        <!-- 15) ########################################## LAYER (2) GRID DE PRODUCTOS ASIGNADOS AL PROVEEDOR########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer2" id="prodLayer2">
+
+            <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="prodSumary">
+                <input type="hidden" md-autofocus>
+                <div layout="row" flex>
+                    <div flex="66" style="margin-right: 4px;" layout="column">
+                        <div layout="column" class="form-row-head form-row-head-select">
+                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                <div>
+                                    <span>Datos del Producto</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div flex layout="row">
+                            <div flex layout="column">
+                                <div style="height: 80px" layout="row">
+                                    <div flex layout="column" layout-align="start start">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                <span>Proveedor</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        {{prod.datos.prov.razon_social}}
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex layout="column" layout-align="start start">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                <span>Codigo</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        {{prod.datos.codigo}}
+                                    </div>
+                                </div>
+                                <div style="height: 80px" layout="row">
+                                    <div flex layout="column" layout-align="start start">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                <span>Descripcion</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        {{prod.datos.descripcion}}
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex layout="column" layout-align="start start">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                <span>Linea</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        {{prod.datos.line.linea}}
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex layout="column" layout-align="start start">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                <span>Sub-Linea</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        {{prod.datos.subLin.sublinea}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div flex layout="column">
+                                <div style="height: 80px" layout="row">
+                                    <div flex layout="column" layout-align="start start">  </div>
+                                    <div flex>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div flex="33" layout="column">
+                        <div flex>
+                            <div layout="row" flex class="form-row-head form-row-head-select">
+                                <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                    <div>
+                                        <span>Detalles</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex>
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Stock</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div flex>
+                                    {{prod.datos.stock}}
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex>
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Precio Venta</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div flex layout="column" layout-align="center center">
+                                    <div>{{prod.datos.precio}}</div>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex>
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Cod Barras</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div flex layout="column" layout-align="center center">
+                                   <io-barcode flex code="{{prod.datos.codigo}}" type="CODE128B" options="brcdOptions"></io-barcode>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex>
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Punto de Compra</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div flex layout="column" layout-align="center center">
+                                    <div>{{prod.datos.precio}}</div>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex>
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Punto de Saldo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div flex layout="column" layout-align="center center">
+                                    <div>{{prod.datos.precio}}</div>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex>
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Biblioteca</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div flex layout="column" layout-align="center center">
+                                    <div>{{prod.datos.precio}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div flex>
+                            <div layout="row" flex class="form-row-head form-row-head-select">
+                                <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                    <div>
+                                        <span>Complementarios</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </md-content>
+            <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,saveDependency)">
+            </div>
+        </md-sidenav>
+        <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
+            <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nxtAction(nextLyr,\$event)")) ?>
+        </md-sidenav>
     <div id="blockSection" style="
         position: absolute;
         height: 100%;

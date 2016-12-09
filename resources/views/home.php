@@ -29,6 +29,7 @@
     <?= HTML::script("components/angular-ui-mask/dist/mask.js") ?>
     <?= HTML::script("components/angular-sanitize/angular-sanitize.min.js") ?>
     <?= HTML::script("components/angular-input-masks/angular-input-masks-standalone.min.js") ?>
+    <?= HTML::script("components/angular-io-barcode/build/angular-io-barcode.min.js") ?>
     <!--    custom click-out library, more ifo in file-->
     <?= HTML::script('js/modules/main/vlcClickOut.js') ?>
 

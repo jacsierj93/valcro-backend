@@ -1,4 +1,3 @@
-<div> {{branch}}</div>
 
 <md-input-container id="text" class="md-block" flex prevText ng-if="(field.type.directive == 'prevText' || field.type.directive == null)" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
     <label>{{get(true,{tipo:'placeholder',options:field.options}).pivot.value || ''}}</label>
@@ -48,7 +47,7 @@
     </md-autocomplete>
 
 </md-input-container>
-<!--
+
 <lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-itens="listOptions | customFind : {tipo:'Opcion',options:field.options} : get" ng-show="(field.type.directive == 'prevRadio')">
 
-</lmb-collection>-->
+</lmb-collection>
