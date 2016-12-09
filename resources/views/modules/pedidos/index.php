@@ -2484,7 +2484,7 @@
 
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderResumenPedidoSusCtrl" >
                 <div layout="column" flex >
-                    <form name="FormPedidoSusProduc" layout="row"  ng-style="(tbl_pediSutitut.extend == 0 ) ? {'min-height' : '204px'} : {} " ng-class="{'focused' : (tbl_pediSutitut.extend == 0 )}">
+                    <div name="FormPedidoSusProduc" layout="row"  ng-style="(tbl_pediSutitut.extend == 0 ) ? {'min-height' : '204px'} : {} " ng-class="{'focused' : (tbl_pediSutitut.extend == 0 )}">
                         <div active-left></div>
                         <div  layout="column" flex ng-init="tbl_pediSutitut.extend = 0 ">
                             <div class="titulo_formulario" layout="Column" layout-align="start start" class="row" ng-click="tbl_pediSutitut.extend = 0 " >
@@ -2579,10 +2579,9 @@
                                 </md-input-container>
 
                             </div>
-
                         </div>
-                    </form>
-                    <form layout="row" class=""  ng-class="{'focused' : (tbl_pediSutitut.extend == 1 )}">
+                    </div>
+                    <div layout="row" class=""  ng-class="{'focused' : (tbl_pediSutitut.extend == 1 )}">
                         <div active-left></div>
                         <div layout="row" flex ng-class="{'focused' : (tbl_pediSutitut.extend == 1 )}">
                             <div class="titulo_formulario" layout="column" layout-align="start start" >
@@ -2591,88 +2590,77 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <form layout="row" ng-init="tbl_pediSutitut.order= 'cod_producto' ">
+                    </div>
+                    <div layout="row" ng-init="tbl_pediSutitut.order= 'cod_producto' ">
                         <div active-left></div>
                         <div layout="row" flex>
                             <div flex="5" ></div>
                             <div flex="15" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'cod_producto' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'cod_producto')}"><img ng-src="{{(tbl_pediSutitut.order == 'cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-cod_producto' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-cod_producto')}"><img ng-src="{{(tbl_pediSutitut.order == '-cod_producto')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
                                 <md-input-container class="md-block" flex >
                                     <label>Codigo</label>
-                                    <input  ng-model="tbl_pediSutitut.filter.cod_producto"
+                                    <input  ng-model="tbl.filter.cod_producto"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl" key="cod_producto"></grid-order-by>
                             </div>
-                            <div flex="15" layout="row" >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'codigo_fabrica')}"><img ng-src="{{(tbl_pediSutitut.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-codigo_fabrica' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-codigo_fabrica')}"><img ng-src="{{(tbl_pediSutitut.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div flex="15" layout="row">
                                 <md-input-container class="md-block" flex >
                                     <label>Cod. Fabrica</label>
-                                    <input  ng-model="tbl_pediSutitut.filter.codigo_fabrica"
+                                    <input  ng-model="tbl.filter.codigo_fabrica"
                                     >
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl" key="codigo_fabrica"></grid-order-by>
                             </div>
-                            <div flex layout="row" >
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'documento')}"><img ng-src="{{(tbl_pediSutitut.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-documento' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-documento')}"><img ng-src="{{(tbl_pediSutitut.order == '-documento')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div flex layout="row">
                                 <md-input-container class="md-block" flex >
                                     <label>Origen</label>
-                                    <input  ng-model="tbl_pediSutitut.filter.documento"
+                                    <input  ng-model="tbl.filter.codigo_fabrica"
                                     >
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl" key="codigo_fabrica"></grid-order-by>
                             </div>
-                            <div flex layout="row" >
+                            <div flex layout="row">
                                 <md-input-container class="md-block" flex >
                                     <label>Descripcion</label>
-                                    <input  ng-model="tbl_pediSutitut.filter.descripcion"
+                                    <input  ng-model="tbl.filter.descripcion"
                                     >
                                 </md-input-container>
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'descripcion' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'descripcion')}"><img ng-src="{{(tbl_pediSutitut.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-descripcion' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-descripcion')}"><img ng-src="{{(tbl_pediSutitut.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
+                                <grid-order-by ng-model="tbl" key="descripcion"></grid-order-by>
                             </div>
-                            <div flex="10" layout="row">
-                                <div class="cell-filter-order" layout-align="center center" >
-                                    <div ng-click="tbl_pediSutitut.order = 'saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == 'saldo')}"><img ng-src="{{(tbl_pediSutitut.order == 'saldo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div ng-click="tbl_pediSutitut.order = '-saldo' " ng-class="{'filter-select':(tbl_pediSutitut.order == '-saldo')}"><img ng-src="{{(tbl_pediSutitut.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}" ></div>
-                                </div>
-
+                            <div flex layout="row">
                                 <md-input-container class="md-block" flex >
-                                    <label>Cantidad</label>
-                                    <input  ng-model="tbl_pediSutitut.filter.saldo"
+                                    <label>Asignado</label>
+                                    <input  ng-model="tbl.filter.inDoc"
                                     >
                                 </md-input-container>
+                                <grid-order-by ng-model="tbl" key="saldo"></grid-order-by>
+                            </div>
+                            <div flex layout="row">
+                                <md-input-container class="md-block" flex >
+                                    <label>Disponible</label>
+                                    <input  ng-model="tbl.filter.saldo"
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="saldo"></grid-order-by>
                             </div>
                         </div>
-                    </form>
+                    </div>
                     <form class="gridContent"  layout="row" flex >
                         <div active-left></div>
                         <div layout="column" flex>
                             <div >
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in pedidoSusPedSelec.productos | filter :tbl_pediSutitut.filter:strict | orderBy :tbl_pediSutitut.order   ">
-                                    <div flex="5" class="cellEmpty" ng-click="allowEdit()">
+                                    <div flex="5" class="cellEmpty" ng-click="change(item)">
                                         <md-switch class="md-primary"
-                                                   ng-disabled="( Docsession.block || !document.permit.update )" ng-model="item.asignado" ng-change="addRemoveDocSusItem(item)">
+                                                   ng-disabled="true" ng-model="item.asignado">
                                         </md-switch>
                                     </div>
                                     <div flex="15" class="cellGrid">  {{item.codigo}}</div>
                                     <div flex="15" class="cellGrid">  {{item.codigo_fabrica}}</div>
                                     <div flex class="cellGrid"> {{item.documento}}</div>
                                     <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                    <div flex="10" class="cellGrid">{{item.saldo}}</div>
+                                    <div flex class="cellGrid">  {{item.saldo}}</div>
+                                    <div flex="10" class="cellGrid">{{item.inDoc}}</div>
                                 </div>
                             </div>
                         </div>

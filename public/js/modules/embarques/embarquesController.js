@@ -3997,6 +3997,10 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
 
             $scope.$parent.shipment.objs.tarifa_id.freight_forwarder = response.model.objs.freight_forwarder_id;
             $scope.$parent.shipment.objs.tarifa_id.naviera = response.model.objs.naviera_id;
+            $scope.$parent.shipment.objs.pais_id = angular.copy($scope.paisSelec );
+            $scope.$parent.shipment.pais_id=$scope.paisSelec.id;
+            $scope.$parent.shipment.objs.puerto_id = angular.copy($scope.puertoSelect );
+            $scope.$parent.shipment.puertoSelect=$scope.puertoSelect.id;
             $scope.$parent.shipment.tarifa_id = response.model.id;
             $scope.$parent.save();
             $scope.inClose();
@@ -4094,6 +4098,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
     $scope.inClose= function () {
         $mdSidenav("miniCreatTariff").close().then(function(){
             $scope.isOpen = false;
+
         });
     };
 
@@ -4143,6 +4148,7 @@ MyApp.controller('CreatTariffCtrl',['$scope','$mdSidenav','$timeout','form','tar
         $scope.puertoSelect=newVal;
 
     });
+
 
 
     $scope.$watch('puertoSelect', function(newVal){

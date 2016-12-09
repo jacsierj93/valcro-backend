@@ -1920,36 +1920,6 @@ class OrderController extends BaseController
         $resul['disponible'] = floatval($co->saldo) + floatval($model->cantidad);
         $resul['inDoc'] = $co->cantidad;;
         $resul['inDocBlock'] = floatval($co->cantidad) - floatval($model->saldo);
-        /* $model = new SolicitudeItem();
-         if($req->has('reng_id')){
-             $model =SolicitudeItem::findOrFail($req->reng_id);
-             $resul['accion']= 'upd';
-         }
-         $model->tipo_origen_id = $req->tipo_origen_id;
-         $model->doc_id = $req->doc_id;
-         $model->origen_item_id= $req->id;
-
-         $model->doc_origen_id= $req->has('doc_origen_id') ? $req->doc_origen_id : null;
-         $model->costo_unitario= $req->has('costo_unitario') ? $req->costo_unitario : null;
-         $model->producto_id= $req->producto_id;
-         $model->descripcion= $req->descripcion;
-         $model->uid = $req->has('uid') ? $req->uid : uniqid('', true);
-
-
-         if($resul['accion'] == 'new' ||  $model->cantidad == $model->saldo){
-             $model->cantidad = $req->saldo;
-             $model->saldo = $req->saldo;
-         }else{
-             $dif = floatval($req->saldo) -  floatval($model->cantidad);
-             $model->saldo = floatval( $model->saldo) + $dif;
-             $model->cantidad = $req->saldo;
-         }
-
-         $resul['response']=$model->save();
-         $resul['reng_id']=$model->id;
-         $resul['cantidad']=$model->cantidad;
-         $resul['saldo']=$model->saldo;*/
-
         return $resul;
     }
 
@@ -2010,9 +1980,15 @@ class OrderController extends BaseController
     public function getSolicitudeSubstitutes(Request $req)
     {
         $data = array();
+        $model = Solicitude::findOrFail($req->doc_id);
         $items = Solicitude::where('id', '<>', $req->doc_id)
             ->where('prov_id', $req->prov_id)
-            ->where('disponible','1')
+            ->Where(function($query) use ($model)  {
+                $query->where('parent_id',$model->id)
+                    ->OrwhereNull('parent_id');
+
+            })
+
             ->get();
         $type = OrderType::get();
         $coin = Monedas::get();
@@ -2020,7 +1996,7 @@ class OrderController extends BaseController
         $prioridad = OrderPriority::get();
         $estados = OrderStatus::get();
         $paises = Country::get();
-        $model = Solicitude::findOrFail($req->doc_id);
+
         $docItems = $model->items()->get();
         foreach ($items as $aux) {
             $paso = true;
@@ -2028,7 +2004,7 @@ class OrderController extends BaseController
             //para maquinas
             $aux['asignado'] = false;
             if ($aux->fecha_sustitucion != null) {
-                if ($aux->id == $model->parent_id) {
+                if ($aux->uid == $model->uid) {
                     $aux['asignado'] = true;
                 } else {
                     $paso = false;
@@ -2075,7 +2051,6 @@ class OrderController extends BaseController
      */
     public  function  addSustituteSolicitude(Request $req){
         $resul = array();
-        $destroys  = [];
         $princi = Solicitude::findOrFail($req->princ_id);
         $reemplaze = Solicitude::findOrFail($req->reemplace_id);
         $model = new Solicitude();
@@ -2085,7 +2060,7 @@ class OrderController extends BaseController
 
 
         $princi->parent_id = $reemplaze->id;
-        $princi->version = $reemplaze->version + 1;
+        $princi->version = ($reemplaze->version == 1) ? $reemplaze->version + 1 : $reemplaze->version;
 
         $model->version = $princi->version + 1;
         $model->parent_id = $princi->id;
@@ -2096,6 +2071,9 @@ class OrderController extends BaseController
 
         $princi->disponible= 0;
         $reemplaze->disponible= 0;
+
+        $princi->uid = $reemplaze->uid;
+        $model->uid = $reemplaze->uid;
         $princi->save();
         $reemplaze->save();
         $model->save();
@@ -2110,9 +2088,9 @@ class OrderController extends BaseController
             $newItem->saldo =$oldItem->saldo;
             $newItem->producto_id =$oldItem->producto_id;
             $newItem->descripcion =$oldItem->descripcion;
+            $newItem->costo_unitario =$oldItem->costo_unitario;
             $newItem->uid =$oldItem->uid;
             $newIts[] = $newItem;
-            $destroys[]= $oldItem->id;
             $oldItem->saldo = 0;
             $oldItem->save();
 
@@ -2122,13 +2100,14 @@ class OrderController extends BaseController
             $newItem->tipo_origen_id =21;
             $newItem->doc_id =$model->id;
             $newItem->origen_item_id =$oldItem->id;
-            $newItem->doc_origen_id =$princi->id;
+            $newItem->doc_origen_id =$reemplaze->id;
             $newItem->cantidad =$oldItem->saldo;
             $newItem->saldo =$oldItem->saldo;
             $newItem->producto_id =$oldItem->producto_id;
             $newItem->descripcion =$oldItem->descripcion;
+            $newItem->costo_unitario =$oldItem->costo_unitario;
             $newItem->uid =$oldItem->uid;
-            $destroys[]= $oldItem->id;
+
             $newIts[] = $newItem;
             $oldItem->saldo = 0;
             $oldItem->save();
@@ -2139,12 +2118,75 @@ class OrderController extends BaseController
         $reemplaze->save();
 
         $resul['response']= $model->items()->saveMany($newIts);
-       // SolicitudeItem::destroy($destroys);
         return $resul;
 
     }
 
 
+    /**
+     * remueve la solicitud al documento
+     */
+    public function removeSustiteSolicitude(Request $req){
+        $resul = array();
+        $princi = Solicitude::findOrFail($req->princ_id);
+        $reemplaze = Solicitude::findOrFail($req->reemplace_id);
+
+        ///dd($princi);
+        $model = new Solicitude();
+        $model = $this->transferDataDoc($princi,$model);
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+        $model->uid = $princi->uid;
+        $princi->fecha_sustitucion= Carbon::now();
+        $princi->ult_revision= Carbon::now();
+        $princi->disponible= 0;
+        $princi->final_id= $this->getFinalId($princi);
+        $princi->save();
+        $model->save();
+        $newIts= array();
+
+        $import = $princi->items()->where( function ($query) use ($reemplaze) {
+            $query->where('doc_origen_id','<>', $reemplaze->id)
+            ->orWhereNull('doc_origen_id')
+            ;
+        })->get();
+
+        foreach($import as $oldItem){
+            $newItem = new SolicitudeItem();
+            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->saldo;
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newItem->uid =$oldItem->uid;
+
+            $newIts[] = $newItem;
+
+            $oldItem->saldo = 0;
+            $oldItem->save();
+        }
+
+
+        foreach($princi->items()->where('doc_origen_id', $reemplaze->id)->get() as $oldItem){
+            $ri = $reemplaze->items()->where('id', $oldItem->origen_item_id)->first();
+            $ri->saldo = $oldItem->cantidad;
+            $oldItem->saldo = 0;
+            $oldItem->save();
+        }
+
+
+        $resul['accion']= "inpor";
+        $resul['id']= $model->id;
+        $reemplaze->fecha_sustitucion=null;
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+        $reemplaze->save();
+
+        $resul['response']= $model->items()->saveMany($newIts);
+        return $resul;
+    }
 
     /**
      * @deprecated
@@ -2902,45 +2944,6 @@ class OrderController extends BaseController
 
 
 
-    /**
-     * remueve la solicitud al documento
-     */
-    public function removeSustiteSolicitude(Request $req){
-        $resul = array();
-        $princi = Solicitude::findOrFail($req->princ_id);
-        $reemplaze = Solicitude::findOrFail($req->reemplace_id);
-
-        $model = new Solicitude();
-        $model = $this->transferDataDoc($princi,$model);
-        $model->version = $princi->version + 1;
-        $model->parent_id = $princi->id;
-        $model->save();
-        $newIts= array();
-
-        foreach($princi->items()->where('doc_origen_id','<>', $reemplaze->id)->get() as $oldItem){
-            $newItem = new SolicitudeItem();
-            $newItem->final_id =$oldItem->final_id;
-            $newItem->tipo_origen_id =$oldItem->tipo_origen_id;
-            $newItem->doc_id =$model->id;
-            $newItem->origen_item_id =$oldItem->origen_item_id;
-            $newItem->doc_origen_id =$oldItem->doc_origen_id;
-            $newItem->cantidad =$oldItem->cantidad;
-            $newItem->saldo =$oldItem->saldo;
-            $newItem->producto_id =$oldItem->producto_id;
-            $newItem->descripcion =$oldItem->descripcion;
-            $newIts[] = $newItem;
-        }
-
-
-        $resul['accion']= "inpor";
-        $resul['id']= $model->id;
-        $reemplaze->fecha_sustitucion=null;
-        $reemplaze->final_id= $this->getFinalId($reemplaze);
-        $reemplaze->save();
-
-        $resul['response']= $model->items()->saveMany($newIts);
-        return $resul;
-    }
 
     /**
      * obtiene las proformas que pueden ser reempladas
@@ -3729,10 +3732,14 @@ class OrderController extends BaseController
             $prod['cod_fabrica']= $produc->cod_fabrica;
             $prod ['documento'] = $tipos->where('id', $item->tipo_origen_id )[0]->descripcion;
             $prod['asignado']= false;
+            $prod['inDoc']= 0;
+
 
             if(sizeof($docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id))){
+                $di =  $docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id)->first();
                 $prod['asignado']= true;
-                $prod['renglon_id']= $docIts->where('tipo_origen_id', $req->tipo)->where('origen_item_id',$item->id)->first()->id;
+                $prod['reng_id']=$di->id;
+                $prod['inDoc']= $di->cantidad;
             }
 
             $prods[]=$prod;
@@ -4006,6 +4013,7 @@ class OrderController extends BaseController
             case  21:
                 $solIt = SolicitudeItem::where('tipo_origen_id', 2)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->where('doc_id','<>',$req->doc_id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4013,11 +4021,13 @@ class OrderController extends BaseController
                 }
                 $proIt = OrderItem::where('tipo_origen_id', 2)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Proforma" ,$proIt );
                 }
                 $odcIt = PurchaseItem::where('tipo_origen_id', 2)
+                    ->where('saldo','>',0)
                     ->where('doc_origen_id', $req->id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4026,6 +4036,7 @@ class OrderController extends BaseController
                 break;
             case  22:
                 $solIt = SolicitudeItem::where('tipo_origen_id', 2)
+                    ->where('saldo','>',0)
                     ->where('doc_origen_id', $req->id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4033,12 +4044,14 @@ class OrderController extends BaseController
                 }
                 $proIt = OrderItem::where('tipo_origen_id', 2)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->where('doc_id','<>',$req->doc_id)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Proforma" ,$proIt );
                 }
                 $odcIt = PurchaseItem::where('tipo_origen_id', 2)
+                    ->where('saldo','>',0)
                     ->where('doc_origen_id', $req->id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4048,12 +4061,14 @@ class OrderController extends BaseController
             case  23:
                 $solIt = SolicitudeItem::where('tipo_origen_id', 2)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Solicitud" ,$solIt );
                 }
                 $proIt = OrderItem::where('tipo_origen_id', 2)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->where('doc_id','<>',$req->doc_id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4061,6 +4076,7 @@ class OrderController extends BaseController
                 }
                 $odcIt = PurchaseItem::where('tipo_origen_id', 2)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->where('doc_id','<>',$req->doc_id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4261,9 +4277,6 @@ class OrderController extends BaseController
         where('aprobada','1')
             ->where('prov_id',$req->prov_id)
             ->get();
-        /*        $purchaIts=PurchaseItem::where('tipo_origen_id',2)->get();
-                $orderIts=OrderItem::where('tipo_origen_id',2)->get();
-                $solIts=SolicitudeItem::where('tipo_origen_id',2)->get();*/
 
         $doc= $this->getDocumentIntance($req->tipo);
         $doc = $doc->findOrFail($req->doc_id);
@@ -4596,18 +4609,21 @@ class OrderController extends BaseController
                 $solIt = SolicitudeItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
                     ->where('doc_id','<>',$req->doc_id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Solicitud" ,$solIt );
                 }
                 $proIt = OrderItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Proforma" ,$proIt );
                 }
                 $odcIt = PurchaseItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Orden de compra" ,$odcIt );
@@ -4616,6 +4632,7 @@ class OrderController extends BaseController
             case  22:
                 $solIt = SolicitudeItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Solicitud" ,$solIt );
@@ -4623,12 +4640,14 @@ class OrderController extends BaseController
                 $proIt = OrderItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
                     ->where('doc_id','<>',$req->doc_id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Proforma" ,$proIt );
                 }
                 $odcIt = PurchaseItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Orden de compra" ,$odcIt );
@@ -4637,12 +4656,14 @@ class OrderController extends BaseController
             case  23:
                 $solIt = SolicitudeItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->get();
                 if(sizeof($solIt) > 0){
                     $data[]=  array("Solicitud" ,$solIt );
                 }
                 $proIt = OrderItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->where('doc_id','<>',$req->doc_id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -4650,6 +4671,7 @@ class OrderController extends BaseController
                 }
                 $odcIt = PurchaseItem::where('tipo_origen_id', 3)
                     ->where('doc_origen_id', $req->id)
+                    ->where('saldo','>',0)
                     ->where('doc_id','<>',$req->doc_id)
                     ->get();
                 if(sizeof($solIt) > 0){
@@ -5388,8 +5410,12 @@ class OrderController extends BaseController
         $model->ult_revision = Carbon::now();
         if($model->usuario_id == null){
             $model->usuario_id = $req->session()->get('DATAUSER')['id'];
-        }if($model->emision == null || !$req->has('emision')){
+        }
+        if($model->emision == null || !$req->has('emision')){
             $model->emision =  Carbon::now();
+        }
+        if($model->uid == null ){
+            $model->uid = uniqid('',true);
         }
 
         $model->edit_usuario_id =$req->session()->get('DATAUSER')['id'];
@@ -5486,30 +5512,29 @@ class OrderController extends BaseController
     }
 
     private function transferDataDoc($oldmodel, $newModel){
-        $resul = array();
-        //$newModel->final_id = $oldmodel->final_id;
-        $newModel->nro_proforma = $oldmodel->nro_proforma;
-        $newModel->nro_factura = $oldmodel->nro_factura;
-        $newModel->img_proforma = $oldmodel->img_proforma;
-        $newModel->img_punto_compra = $oldmodel->img_punto_compra;
+/*        $newModel->nro_proforma = $oldmodel->nro_proforma;
+        $newModel->nro_factura = $oldmodel->nro_factura;*/
+        $newModel->usuario_id = $this->user->id;
+        $newModel->edit_usuario_id = $this->user->id;
+        $newModel->emision = $oldmodel->emision;
         $newModel->monto = $oldmodel->monto;
         $newModel->comentario = $oldmodel->comentario;
         $newModel->prov_id = $oldmodel->prov_id;
-        $newModel->pais_id = $oldmodel->tipo_id;
+        $newModel->pais_id = $oldmodel->pais_id;
         $newModel->condicion_pago_id = $oldmodel->condicion_pago_id;
-        $newModel->estado_id = $oldmodel->estado_id;
+     //   $newModel->estado_id = $oldmodel->estado_id;
         $newModel->prov_moneda_id = $oldmodel->prov_moneda_id;
         $newModel->direccion_almacen_id = $oldmodel->direccion_almacen_id;
         $newModel->direccion_facturacion_id = $oldmodel->direccion_facturacion_id;
         $newModel->puerto_id = $oldmodel->puerto_id;
-        $newModel->comentario_cancelacion = $oldmodel->comentario_cancelacion;
+    //    $newModel->comentario_cancelacion = $oldmodel->comentario_cancelacion;
         $newModel->condicion_id = $oldmodel->condicion_id;
         $newModel->mt3 = $oldmodel->mt3;
         $newModel->peso = $oldmodel->peso;
-        $newModel->fecha_aprob_compra = $oldmodel->fecha_aprob_compra;
-        $newModel->fecha_aprob_gerencia = $oldmodel->fecha_aprob_gerencia;
-        $newModel->aprob_compras = $oldmodel->aprob_compras;
-        $newModel->aprob_gerencia = $oldmodel->aprob_gerencia;
+   //     $newModel->fecha_aprob_compra = $oldmodel->fecha_aprob_compra;
+   //     $newModel->fecha_aprob_gerencia = $oldmodel->fecha_aprob_gerencia;
+    //    $newModel->aprob_compras = $oldmodel->aprob_compras;
+ //       $newModel->aprob_gerencia = $oldmodel->aprob_gerencia;
         $newModel->culminacion = $oldmodel->culminacion;
         $newModel->nro_doc = $oldmodel->nro_doc;
         $newModel->tasa = $oldmodel->tasa;

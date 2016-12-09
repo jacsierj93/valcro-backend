@@ -156,6 +156,7 @@ $app->post("Order/Solicitude/RemovekitchenBox",'Orders\OrderController@removekit
 $app->post("Order/Solicitude/Approved",'Orders\OrderController@ApprovedSolicitude'); ///agrega la aprobacion de compras
 $app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude'); /// cancela la solicitud
 $app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteSolicitude'); // agrega un aolicitud vieja a una nueva
+$app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
 
 
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
@@ -163,7 +164,6 @@ $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveS
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // asigna un nuevo paren al docuemnto
-$app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
 $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
@@ -195,7 +195,7 @@ $app->post("Order/RemoveCustomOrderItem",'Orders\OrderController@removeCustomOrd
 $app->get("Order/KitchenBoxReview",'Orders\OrderController@getKitchenBoxReview'); ///trae tod el detalle de kitchenbo @deprecated
 
 // pedido a  sustituir
-$app->get("Order/Substitutes",'Orders\OrderController@getOrderSustitute'); // detalle del documento a sustituir
+$app->get("Order/Susstitute",'Orders\OrderController@getOrderSustitute'); // detalle del documento a sustituir
 
 
 $app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina todo el pedido sustituto @deprecated

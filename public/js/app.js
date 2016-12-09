@@ -164,7 +164,7 @@ MyApp.filter('customFind', function() {
 
     return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
         return arr1.filter(function(val) {
-            return func(val,arr2);
+            return  (func) ? func(val,arr2) : true;
         });
     }
 });
