@@ -9,12 +9,14 @@
 namespace App\Models\Sistema\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Audittrail;
 
 
 
 class Product extends Model
 {
     use SoftDeletes;
+    use Audittrail;
     protected $table = "tbl_producto";
 
     public function getType(){
@@ -31,4 +33,5 @@ class Product extends Model
         return $this->hasOne('App\Models\Sistema\Masters\Line','id','linea_id');
     }
 
+    
 }

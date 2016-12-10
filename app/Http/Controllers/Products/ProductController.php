@@ -16,17 +16,25 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Session;
 use Validator;
-
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Product\Product;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController  extends BaseController
 {
-    public function getProviders(){
-        return Provider::has("proveedor_product")->get();
+    public function __construct()
+    {
+
+        $this->middleware('auth');
+    }
+    public function getProviders(Request $rq){
+        $prod = Product::find(66);
+        $prod->delete();
+        //return Provider::has("proveedor_product")->get();
     }
     
     public function listByProv($prov){
+
         return Product::with("prov")
             ->with("line")
             ->with("subLin")
@@ -35,5 +43,8 @@ class ProductController  extends BaseController
             ->distinct("id")
             ->get();
 
+
     }
+
+
 }
