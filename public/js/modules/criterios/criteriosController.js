@@ -40,12 +40,14 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
     $scope.listLines = mastersCrit.getLines();
 
     $scope.openCrit = function(line){
-        critForm.setLine(line);
-        $scope.$parent.LayersAction({open:{name:"layer1"}});
+        //critForm.setLine(line);
+
+        $scope.$parent.LayersAction({open:{name:"critLayer1"}});
         /*$mdSidenav("layer1").open();*/
     };
     $scope.curLine = critForm.getLine();
     $scope.filtAvaiable = function(c,v){
+        //return true;
         return c.hasCrit == v;
     };
 
@@ -681,7 +683,12 @@ MyApp.directive('lmbCollection', function() {
             };
 
             $scope.exist = function(dat){
-                return $scope.model.indexOf(dat.id) != -1;
+                if($scope.multi){
+                    return $scope.model.indexOf(dat.id) != -1;
+                }else{
+                    return $scope.model == dat.id;
+                }
+
             };
         },
         link:function(scope,elem,attr,model){

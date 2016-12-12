@@ -121,7 +121,7 @@
                         <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
                         <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                             <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                            <div class="boxList"  layout="column" list-box flex ng-repeat="line in listLines | customFind : false : filtAvaiable" id="lineId{{line.id}}" ng-click="openCrit(line)" ng-class="{'listSel' : (line.id == curLine.id)}">
+                            <div class="boxList"  layout="column" list-box flex ng-click="openCrit(line)" ng-repeat="line in listLines | customFind : false : filtAvaiable" id="lineId{{line.id}}" ng-class="{'listSel' : (line.id == curLine.id)}">
                                 <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ line.linea }}</div>
 
                             </div>
@@ -201,7 +201,7 @@
         </md-sidenav>
 
 
-        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="layer1">
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="critLayer1">
             <!-- 11) ########################################## LAYER PREVIEW DEL FORMULARIO ########################################## -->
 
             <input type="hidden" md-autofocus>

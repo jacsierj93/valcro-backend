@@ -93,7 +93,10 @@
 
 </div>
 <div ng-controller="LayersCtrl"></div>
+<!--<next-row></next-row>
 
+<div ng-controller="notificaciones" ng-include="template"></div>
+<div ng-controller="FilesController" ng-include="template"></div>-->
 
 <?= HTML::script('js/app.js') ?>
 <?= HTML::script('js/appTemp.js') ?>

@@ -51,6 +51,14 @@ MyApp.controller('gridAllController',['$scope', 'setNotif','productos','products
         $scope.listByProv.data = productos.query({type:'prodsByProv',id:n.id});
     });
 
+    $scope.testNext = function(){
+        alert("yujuuu");
+    };
+
+    $scope.isValid = function(){
+        return true;
+    };
+
     $scope.openProd = function(prd){
         $scope.$parent.LayersAction({open:{name:"prodLayer2",before:function () {
             productsServices.setProd(prd);
@@ -78,6 +86,42 @@ MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsService
     }
 }]);
 
+MyApp.controller('createProd',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
+    $scope.prod = productsServices.getProd();
+    $scope.$watchCollection("prod",function(n,o){
+
+    });
+
+    $scope.brcdOptions = {
+        width: 3,
+        height: 40,
+        displayValue: false,
+        font: 'monospace',
+        textAlign: 'center',
+        fontSize: 15,
+        backgroundColor: '#ddd',
+        lineColor: '#5cb7eb'
+    }
+}]);
+
+MyApp.controller('datCritProds',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
+    $scope.prod = productsServices.getProd();
+    $scope.$watchCollection("prod",function(n,o){
+
+    });
+
+    $scope.brcdOptions = {
+        width: 3,
+        height: 40,
+        displayValue: false,
+        font: 'monospace',
+        textAlign: 'center',
+        fontSize: 15,
+        backgroundColor: '#fff',
+        lineColor: '#000'
+    }
+}]);
+
 
 MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav',function ($scope, setNotif,productos,$mdSidenav) {
     $scope.nxtAction = null;
@@ -86,20 +130,16 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
         $scope.layerIndex = nvo[0];
         $scope.layer = nvo[0];
     });
-    $scope.showNext = function(status,to){
-        if(status){
-            $scope.nxtAction = to;
-            $mdSidenav("NEXT").open()
-        }else{
-            $mdSidenav("NEXT").close()
-        }
+    $scope.addProd = function(){
+        $scope.LayersAction({open:{name:"prodLayer3"}});
     };
     $scope.prevLayer = function(){
         $scope.LayersAction({close:true});
     };
+    $scope.items = []
 }]);
 
-/*MyApp.directive('showNext', function() {
+MyApp.directive('showNext', function() {
 
     return {
         replace: true,
@@ -108,26 +148,68 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
             nextFn:"=?onNext",
             nextValid:"=?valid"
         },
-        controller:function($scope,$mdSidenav,nxtService){
+        controller:function($scope,$mdSidenav,nxtService,Layers){
+            $scope.cfg = nxtService.getCfg();
             if(!("onNext" in  $scope)){
                 $scope.onNext = ($scope.$parent)
             }
             if(!("nextValid" in  $scope)){
-                $scope.nextValid = true;
+                $scope.nextValid = function(){return true};
             }
-            $scope.show = function(status){
-                if($scope.nextValid){
-                    if(status){
-                        $mdSidenav("NEXT").open()
-                    }else{
-                        $mdSidenav("NEXT").close()
-                    }
+
+            $scope.$watch("cfg.show",function (status) {
+                if(status){
+                    $mdSidenav("NEXT").open();
+                }else{
+                    $mdSidenav("NEXT").close()
                 }
-
-
+            });
+            $scope.show = function(){
+                if($scope.nextValid()){
+                    $scope.cfg.show = true;
+                    $scope.cfg.fn = $scope.nextFn;
+                }
             }
         },
-        template: '<div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()"> </div>'
+        template: '<div class="showNext" style="width: 16px;" ng-mouseover="show()"> </div>'
     };
-});*/
+});
+
+MyApp.directive('nextRow', function() {
+
+    return {
+
+        scope:{
+
+        },
+        controller:function($scope,$mdSidenav,nxtService){
+            $scope.cfg = nxtService.getCfg();
+            $scope.nxtAction = function(e){
+                $scope.cfg.fn();
+            };
+            $scope.hideNext = function(){
+                $scope.cfg.show = false;
+            }
+        },
+        template: '<md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url(\'images/btn_backBackground.png\');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="hideNext()">'+
+                    '<img src="images/btn_nextArrow.png" ng-click="nxtAction(\$event)"/>'+
+                    '</md-sidenav>'
+    };
+});
+
+MyApp.service("nxtService",function(){
+    var cfg = {
+        nxtFn : null,
+        show : false
+    };
+
+    return {
+      /*  setFn :function(fn){
+            cfg.fn = fn;
+        },*/
+        getCfg : function(){
+            return cfg;
+        }
+    }
+})
 

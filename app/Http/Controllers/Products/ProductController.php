@@ -28,9 +28,8 @@ class ProductController  extends BaseController
         $this->middleware('auth');
     }
     public function getProviders(Request $rq){
-        $prod = Product::find(66);
-        $prod->delete();
-        //return Provider::has("proveedor_product")->get();
+
+        return Provider::has("proveedor_product")->get();
     }
     
     public function listByProv($prov){

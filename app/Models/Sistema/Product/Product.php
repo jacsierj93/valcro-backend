@@ -9,14 +9,14 @@
 namespace App\Models\Sistema\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Http\Traits\Audittrail;
+use App\Http\Traits\Journal;
 
 
 
 class Product extends Model
 {
     use SoftDeletes;
-    use Audittrail;
+    use Journal;
     protected $table = "tbl_producto";
 
     public function getType(){
