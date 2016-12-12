@@ -196,8 +196,7 @@ class OrderController extends BaseController
                 $temp['fecha_envio'] = $aux->fecha_envio;
                 $temp['monto'] = $aux->monto;
                 $temp['uid'] = $aux->uid;
-
-                $temp['symbol'] = ($aux->prov_moneda_id != null && $aux->prov_moneda_id != 0) ? $monedas->where('id', $aux->prov_moneda_id)->first()->simbolo : '';
+                $temp['symbol'] = ($aux->prov_moneda_id != null && $aux->prov_moneda_id != 0) ? $monedas->where('id', $aux->prov_moneda_id)->first()->simbolo : '' ;
                 $temp['emision'] = $aux->emision;
                 $temp['comentario'] = $aux->comentario;
                 $temp['prov_id'] = $aux->prov_id;
@@ -1638,7 +1637,7 @@ class OrderController extends BaseController
         $temp = array();
         $temp['id'] = $prodTemp->id;
         $temp['descripcion'] = $prodTemp->descripcion;
-        $temp['codigo'] = "(demo" . ")";
+        $temp['codigo'] = $prodTemp->codigo;
         $temp['codigo_fabrica'] = $prodTemp->codigo_fabrica;
         $temp['puntoCompra'] = false;
         $temp['cantidad'] = 0;
@@ -1658,7 +1657,7 @@ class OrderController extends BaseController
         }
 
 
-        return $temp;
+        return $prodTemp;
     }
 
     /*********************** SOLICITUD ************************/
@@ -1711,10 +1710,8 @@ class OrderController extends BaseController
         $model= Solicitude::findOrFail($req->id);
         $provProd = Product::where('prov_id',$model->prov_id)->get();
         $items =$model->items()->get();
-        //  $atts =$model->attachments()->list('archivo_id');
         foreach($items as $aux){
             $p= $provProd->where('id',$aux->producto_id)->first();
-            $aux['cantidad']=$aux->cant;
             if($p != null){
                 $aux['codigo']=$p->codigo;
                 $aux['codigo_fabrica']=$p->codigo_fabrica;
@@ -1727,6 +1724,79 @@ class OrderController extends BaseController
         $data['productos']= $prod;
 
         return $data;
+    }
+    /**
+     * obtiene las versones anterioriores de la solictuc
+     */
+    public function getOldSolicitude(Request $req){
+        $model = Solicitude::findOrFail($req->id);
+        $prov = Provider::findOrFail($model->prov_id);
+        $data = [];
+        $olds = Solicitude::where('id','<>', $model->id)
+            ->where('uid', $model->uid)
+            ->get();
+
+        foreach ($olds as $aux){
+            $aux->proveedor = $prov->razon_social;
+            $aux->tipo = $aux->getTipoId();
+            $data[] = $aux;
+        }
+        return $olds;
+    }
+    /**
+     * regrese a la solicud anterior
+    **/
+    public function restoreSolicitude(Request $req){
+        $resul = array();
+        $princi = Solicitude::findOrFail($req->princ_id);
+        $reemplaze = Solicitude::findOrFail($req->reemplace_id);
+        $model = new Solicitude();
+        $model = $this->transferDataDoc($princi,$model);
+        $princi->final_id= $this->getFinalId($princi);
+        $reemplaze->final_id= $this->getFinalId($reemplaze);
+
+        $princi->version = ($princi->parent_id == null) ? $princi->version + 1 : $princi->version;
+        $princi->parent_id = $reemplaze->id;
+
+
+        $model->version = $princi->version + 1;
+        $model->parent_id = $princi->id;
+        $model->uid= $princi->uid;
+
+
+        $princi->fecha_sustitucion= Carbon::now();
+        $reemplaze->fecha_sustitucion= Carbon::now();
+        $reemplaze->ult_revision= Carbon::now();
+        $princi->ult_revision= Carbon::now();
+        $model->ult_revision= Carbon::now();
+
+        $princi->disponible= 0;
+        $reemplaze->disponible= 0;
+
+        $princi->save();
+        $reemplaze->save();
+        $model->save();
+        $newIts = array();
+        foreach($reemplaze->items()->get() as $oldItem){
+            $newItem = new SolicitudeItem();
+            $newItem->tipo_origen_id = $oldItem->tipo_origen_id;
+            $newItem->doc_id =$model->id;
+            $newItem->origen_item_id =$oldItem->origen_item_id;
+            $newItem->doc_origen_id =$oldItem->doc_origen_id;
+            $newItem->cantidad =$oldItem->cantidad;
+            $newItem->saldo =$oldItem->cantidad; // precaucion el inten se restaura con la cantidad original
+            $newItem->producto_id =$oldItem->producto_id;
+            $newItem->descripcion =$oldItem->descripcion;
+            $newItem->costo_unitario =$oldItem->costo_unitario;
+            $newIts[] = $newItem;
+        }
+
+        $resul['accion']= "impor";
+        $resul['id']= $model->id;
+        $reemplaze->save();
+
+        $resul['response']= $model->items()->saveMany($newIts);
+        return $resul;
     }
 
     /**
@@ -1749,7 +1819,8 @@ class OrderController extends BaseController
 
         }
         $model->save();
-
+        $result['fecha'] = $model->fecha_aprob_gerencia;
+        $result['nro_doc'] = $model->nro_doc;
         $result['response'] = $model->save();
         return $result;
 
@@ -2059,15 +2130,18 @@ class OrderController extends BaseController
         $reemplaze->final_id= $this->getFinalId($reemplaze);
 
 
+        $princi->version = ($princi->parent_id == null) ? $princi->version + 1 : $princi->version;
         $princi->parent_id = $reemplaze->id;
-        $princi->version = ($reemplaze->version == 1) ? $reemplaze->version + 1 : $reemplaze->version;
+
 
         $model->version = $princi->version + 1;
         $model->parent_id = $princi->id;
 
-
         $princi->fecha_sustitucion= Carbon::now();
         $reemplaze->fecha_sustitucion= Carbon::now();
+        $reemplaze->ult_revision= Carbon::now();
+        $princi->ult_revision= Carbon::now();
+        $model->ult_revision= Carbon::now();
 
         $princi->disponible= 0;
         $reemplaze->disponible= 0;
@@ -2147,7 +2221,7 @@ class OrderController extends BaseController
 
         $import = $princi->items()->where( function ($query) use ($reemplaze) {
             $query->where('doc_origen_id','<>', $reemplaze->id)
-            ->orWhereNull('doc_origen_id')
+                ->orWhereNull('doc_origen_id')
             ;
         })->get();
 
@@ -2162,6 +2236,7 @@ class OrderController extends BaseController
             $newItem->producto_id =$oldItem->producto_id;
             $newItem->descripcion =$oldItem->descripcion;
             $newItem->uid =$oldItem->uid;
+            $newItem->costo_unitario =$oldItem->costo_unitario;
 
             $newIts[] = $newItem;
 
@@ -2175,6 +2250,7 @@ class OrderController extends BaseController
             $ri->saldo = $oldItem->cantidad;
             $oldItem->saldo = 0;
             $oldItem->save();
+            $ri->save();
         }
 
 
@@ -2783,10 +2859,7 @@ class OrderController extends BaseController
 
     /*********************** HISTORIA ************************/
 
-    public function getOldSolicitude(Request $req){
-        $model = Solicitude::findOrFail($req->id);
-        return $this->oldDocs($model);
-    }
+
     public function getOldOrden(Request $req){
         $model = Order::findOrFail($req->id);
         return $this->oldDocs($model);
@@ -2798,53 +2871,6 @@ class OrderController extends BaseController
 
     /*********************** RETURN OLD VERSION ************************/
 
-    public function restoreSolicitude(Request $req){
-        $resul = array();
-        $princi = Solicitude::findOrFail($req->princ_id);
-        $reemplaze = Solicitude::findOrFail($req->reemplace_id);
-        $model = new Solicitude();
-        $model = $this->transferDataDoc($princi,$model);
-        $princi->final_id= $this->getFinalId($princi);
-        $reemplaze->final_id= $this->getFinalId($reemplaze);
-
-
-        $princi->parent_id = $reemplaze->id;
-        $princi->version = $reemplaze->version + 1;
-
-        $model->version = $princi->version + 1;
-        $model->parent_id = $princi->id;
-
-
-        $princi->fecha_sustitucion= Carbon::now();
-        $reemplaze->fecha_sustitucion= Carbon::now();
-
-        $model->comentario_cancelacion =null;
-        $model->cancelacion =null;
-
-        $princi->save();
-        $reemplaze->save();
-        $model->save();
-        $newIts = array();
-        foreach($reemplaze->items()->get() as $oldItem){
-            $newItem = new SolicitudeItem();
-            $newItem->tipo_origen_id = $oldItem->tipo_origen_id;
-            $newItem->doc_id =$model->id;
-            $newItem->origen_item_id =$oldItem->doc_origen_id;
-            $newItem->doc_origen_id =$oldItem->doc_origen_id;
-            $newItem->cantidad =$oldItem->cantidad;
-            $newItem->saldo =$oldItem->saldo;
-            $newItem->producto_id =$oldItem->producto_id;
-            $newItem->descripcion =$oldItem->descripcion;
-            $newIts[] = $newItem;
-        }
-
-        $resul['accion']= "impor";
-        $resul['id']= $model->id;
-        $reemplaze->save();
-
-        $resul['response']= $model->items()->saveMany($newIts);
-        return $resul;
-    }
 
     public function restoreOrden(Request $req){
         $resul = array();
@@ -4437,7 +4463,7 @@ class OrderController extends BaseController
 
         // modificar cuando se sepa la logica
         $tem['aero']=1;
-        $tem['version']=1;
+        $tem['version']=$model->version;
         $tem['maritimo']=1;
         $atts = array();
         //                                var data ={id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
@@ -5512,8 +5538,8 @@ class OrderController extends BaseController
     }
 
     private function transferDataDoc($oldmodel, $newModel){
-/*        $newModel->nro_proforma = $oldmodel->nro_proforma;
-        $newModel->nro_factura = $oldmodel->nro_factura;*/
+        /*        $newModel->nro_proforma = $oldmodel->nro_proforma;
+                $newModel->nro_factura = $oldmodel->nro_factura;*/
         $newModel->usuario_id = $this->user->id;
         $newModel->edit_usuario_id = $this->user->id;
         $newModel->emision = $oldmodel->emision;
@@ -5522,19 +5548,19 @@ class OrderController extends BaseController
         $newModel->prov_id = $oldmodel->prov_id;
         $newModel->pais_id = $oldmodel->pais_id;
         $newModel->condicion_pago_id = $oldmodel->condicion_pago_id;
-     //   $newModel->estado_id = $oldmodel->estado_id;
+        //   $newModel->estado_id = $oldmodel->estado_id;
         $newModel->prov_moneda_id = $oldmodel->prov_moneda_id;
         $newModel->direccion_almacen_id = $oldmodel->direccion_almacen_id;
         $newModel->direccion_facturacion_id = $oldmodel->direccion_facturacion_id;
         $newModel->puerto_id = $oldmodel->puerto_id;
-    //    $newModel->comentario_cancelacion = $oldmodel->comentario_cancelacion;
+        //    $newModel->comentario_cancelacion = $oldmodel->comentario_cancelacion;
         $newModel->condicion_id = $oldmodel->condicion_id;
         $newModel->mt3 = $oldmodel->mt3;
         $newModel->peso = $oldmodel->peso;
-   //     $newModel->fecha_aprob_compra = $oldmodel->fecha_aprob_compra;
-   //     $newModel->fecha_aprob_gerencia = $oldmodel->fecha_aprob_gerencia;
-    //    $newModel->aprob_compras = $oldmodel->aprob_compras;
- //       $newModel->aprob_gerencia = $oldmodel->aprob_gerencia;
+        //     $newModel->fecha_aprob_compra = $oldmodel->fecha_aprob_compra;
+        //     $newModel->fecha_aprob_gerencia = $oldmodel->fecha_aprob_gerencia;
+        //    $newModel->aprob_compras = $oldmodel->aprob_compras;
+        //       $newModel->aprob_gerencia = $oldmodel->aprob_gerencia;
         $newModel->culminacion = $oldmodel->culminacion;
         $newModel->nro_doc = $oldmodel->nro_doc;
         $newModel->tasa = $oldmodel->tasa;

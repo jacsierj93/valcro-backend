@@ -33,6 +33,10 @@ class Solicitude extends Model
         return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id');
     }
 
+    public function provider(){
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
+    }
+
     public function items(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
     }

@@ -100,7 +100,7 @@ class MasterProductController extends BaseController
             $prod->co_cat =$data['co_cat'];
         }
         $prod->save();
-        return $prod;
+        return Product::find($prod->id) ;
 
     }
 

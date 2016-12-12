@@ -210,52 +210,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     };
 
-    $scope.openVersions  = function (){
-        $scope.LayersAction({open:{name:"oldDocs",
-            before: function(){
-                Order.queryMod({type:$scope.formMode.mod,mod:"Versions", id:$scope.document.id},{}, function(response){
-                    if(!$scope.oldDocs){
-                        $scope.oldDocs =[];
-                    }
-                    $scope.oldDocs.splice(0, $scope.oldDocs.length);
-                    angular.forEach(response, function(v){
-                        v.emision= DateParse.toDate(v.emision);
-                        $scope.oldDocs.push(v);
-                    });
-                });
-            }, after: function(){
-            }
-        }});
-    };
-
-    $scope.openOld = function (data){
-
-        $scope.NotifAction("ok", "¿Que desea hacer?",
-            [
-                {name:"Ver la "+$scope.formMode.name ,
-                    action : function(){
-                        $scope.oldVersionSelect = data;
-                        $scope.LayersAction({open:{name:"resumenOldDoc"}});
-                    }
-                },
-                {name:"Regresar a esta version  de la "+$scope.formMode.name,
-                    action: function(){
-                        Order.postMod({type:$scope.formMode.mod, mod:"Restore"},{princ_id:$scope.document.id,reemplace_id:data.id},function(response){
-                            setGetOrder.reload({id:response.id,tipo: $scope.formMode.value});
-                            $scope.LayersAction({search:{name:"detalleDoc", search:true}});
-                        });
-                    }
-                },
-                {
-                    name:"Cancelar",
-                    action : function(){
-
-                    }
-                }
-            ],{block:true}
-        );
-    };
-
     /**Clear form head */
     $scope.clearForHead = function (){
         $scope.provSelec ={};
@@ -343,12 +297,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     /******************************************** ROLLBACK SETTER **/
 
-    $scope.toEditHead= function(id,val){
-        if( $scope.Docsession.global != 'new'){
-            setGetOrder.change("document",id,val);
-        }
-
-    };
 
 
     $scope.verificExit = function(){
@@ -403,28 +351,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     /********************************************EVENTOS ********************************************/
 
-    $scope.editTasa= function(){
-        if( $scope.isTasaFija && $scope.document.permit.update){
-            $scope.NotifAction("alert","Desea asignar una tasa unica para esta "+$scope.formMode.name,[
-                {
-                    name:"No",
-                    action: function(){
-
-                    }
-                },
-                {
-                    name:"Si",
-                    action: function(){
-                        $scope.isTasaFija=false;
-                        var mo= jQuery("#tasa");
-                        mo[0].focus();
-                    }
-                }
-
-            ],{block:true});
-
-        }
-    };
 
     /***
      * indicador de progreso
@@ -2410,6 +2336,88 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 });
 
+//}
+
+MyApp.controller('OrderResumenOldDocCtrl',['$scope','$timeout','DateParse', 'Order', function ($scope, $timeout,DateParse, Order) {
+
+    $scope.$parent.OrderResumenOldDocCtrl = function (data) {
+        $scope.model = {};
+        Order.get({type:"Document", id:data.id,tipo: data.tipo}, {},function(response) {
+            response.emision= DateParse.toDate(response.emision);
+            $scope.model = response;
+        });
+        $scope.LayersAction({open:{name:"OrderResumenOldDoc"}});
+    }
+}]);
+MyApp.controller('OrderOldDocsCtrl',['$scope','$timeout', 'DateParse','Order','setGetOrder','form' ,function ($scope,$timeout, DateParse, Order,setGetOrder, formSrv) {
+
+    $scope.tbl = {
+        data:[],
+        order:'id'
+    };
+    $scope.load = function () {
+        Order.queryMod({type:$scope.formMode.mod,mod:"Versions", id:$scope.document.id},{}, function(response){
+            angular.forEach(response, function(v){
+                v.emision= DateParse.toDate(v.emision);
+                $scope.tbl.data.push(v);
+            });
+        });
+    };
+    $scope.$parent.OrderOldDocsCtrl = function () {
+        $scope.tbl.data.splice(0, $scope.tbl.data.length);
+
+        $scope.LayersAction({open:{name:"OrderOldDocs",
+            before: function(){
+                $timeout(function () {
+                    $scope.load();
+                }, 400);
+            }}});
+    };
+    $scope.openVersions  = function (){
+        $scope.LayersAction({open:{name:"OrderOldDocs",
+            before: function(){
+                Order.queryMod({type:$scope.formMode.mod,mod:"Versions", id:$scope.document.id},{}, function(response){
+                    if(!$scope.oldDocs){
+                        $scope.oldDocs =[];
+                    }
+                    $scope.oldDocs.splice(0, $scope.oldDocs.length);
+                    angular.forEach(response, function(v){
+                        v.emision= DateParse.toDate(v.emision);
+                        $scope.oldDocs.push(v);
+                    });
+                });
+            }, after: function(){
+            }
+        }});
+    };
+
+    $scope.open= function (item) {
+        $scope.$parent.OrderResumenOldDocCtrl(item);
+    };
+
+    $scope.back = function (data) {
+        Order.postMod({type:$scope.formMode.mod, mod:"Restore"},{princ_id:$scope.document.id,reemplace_id:data.id},function(response){
+            setGetOrder.reload({id:response.id,tipo: $scope.formMode.value});
+            $scope.LayersAction({search:{name:"detalleDoc", search:true}});
+        })
+    };
+    $scope.restore = function (item) {
+        $scope.NotifAction("alert", "¡Perderas los cambios que hallas hecho!, ¿esta seguro de volver a esta version ?",[
+
+                {name:"Cancelar", default:10, action: function () {
+
+                }},
+                {name:"Si, Deshacer cambios", action: function () {
+                    $scope.back(item);
+                }}
+
+
+            ],
+            {block:true, save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}})
+    }
+
+
+}]);
 /***lista de documentos  de un proveedor*/
 MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse','clickCommitSrv','Order', function ($scope,$timeout,$filter,DateParse,commitSrv, Order) {
 
@@ -2535,9 +2543,6 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
 
     $scope.$parent.OrderDetalleCtrl = function (data, fn) {
         $scope.FormHeadDocument.$setUntouched();
-        /*        $scope.FormEstatusDoc.$setUntouched();
-         $scope.FormAprobCompras.$setUntouched();
-         $scope.FormCancelDoc.$setUntouched();*/
         $scope.isTasaFija=true;
 
 
@@ -2558,11 +2563,13 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             if($scope.$parent.provSelec.id){
                 $scope.$parent.document.prov_id=$scope.provSelec.id;
             }
+
             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.$parent.document, function(response){
                 setGetOrder.setOrder({id:response.id,tipo:$scope.formMode.value});
                 setGetOrder.setState('select');
             });
         }
+
         if(fn){
             fn($scope);
         }
@@ -2595,6 +2602,74 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
         return true;
     }
+
+    $scope.changeProvMoneda = function(newVal ){
+
+
+        if(newVal == null){
+            $scope.document.prov_moneda_id= null;
+            if( angular.equals(angular.element("#detalleDoc #prov_moneda_id input[type=search]"),angular.element(":focus"))){
+                setGetOrder.change("document","prov_moneda_id",undefined);
+            }
+
+
+        }else{
+            if(angular.equals(angular.element("#detalleDoc #prov_moneda_id input[type=search]"),angular.element(":focus") )){
+                setGetOrder.change("document","prov_moneda_id",newVal.id);
+            }
+            var tasa = parseFloat(newVal.precio_usd);
+            $scope.$parent.document.prov_moneda_id= newVal.id;
+            if(!$scope.document.tasa || $scope.isTasaFija){
+                $scope.document.tasa = tasa;
+            }else {
+                if($scope.document.tasa !=  tasa && !$scope.isTasaFija ){
+                    $scope.NotifAction("alert","La tasa del "+newVal.nombre+" es diferente de la fijada ¿Que desea hacer? ",
+                        [
+                            {name:"Mantener la tasa actual ", default:2000,action:
+                                function(){
+
+                                }
+                            },{name:"Asignar la tasa del "+newVal.nombre+" a la "+ $scope.formMode.name, action:
+                            function(){
+                                $scope.document.tasa = tasa;
+                                $scope.isTasaFija=true;
+                            }}
+                        ]
+                        ,{block:true});
+                }
+            }
+
+        }
+    };
+
+
+    $scope.toEditHead= function(form, id,val){
+        console.log("por to edit");
+        setGetOrder.change(form,id,val);
+    };
+    $scope.editTasa= function(){
+        if( $scope.isTasaFija && $scope.document.permit.update){
+            $scope.NotifAction("alert","Desea asignar una tasa unica para esta "+$scope.formMode.name,[
+                {
+                    name:"No",
+                    action: function(){
+
+                    }
+                },
+                {
+                    name:"Si",
+                    action: function(){
+                        $scope.isTasaFija=false;
+                        var mo= jQuery("#tasa");
+                        mo[0].focus();
+                    }
+                }
+
+            ],{block:true});
+
+        }
+    };
+
     $scope.$watch('clikBind.state', function (newVal) {
         if(newVal){
 
@@ -2671,9 +2746,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         if(newVal ){
 
             $scope.$parent.document.direccion_facturacion_id = newVal.id;
-            if( $scope.$parent.Docsession.global != 'new'){
-                setGetOrder.change("document","direccion_facturacion_id",newVal.id);
-            }
+
         }
 
     });
@@ -2689,16 +2762,11 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             Order.query({type:"AdrressPorts", direccion_id: newVal.id},{}, function(response){
                 $scope.formData.puertos = response;
             });
-            if( angular.equals(angular.element("#detalleDoc #direccion_almacen_id input[type=search]"),angular.element(":focus"))){
-                setGetOrder.change("document","direccion_almacen_id",newVal.id);
-            }
+
         }else{
             if( angular.equals(angular.element("#detalleDoc #direccion_almacen_id input[type=search]"),angular.element(":focus"))){
                 $scope.$parent.document.direccion_almacen_id= null;
                 $scope.$parent.ctrl.puerto_id= null;
-                setGetOrder.change("document","direccion_almacen_id",undefined);
-                setGetOrder.change("document","puerto_id",undefined);
-
             }
 
 
@@ -2717,7 +2785,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                 $scope.formData.direcciones = response;
             });
             if( $scope.Docsession.global!= 'new'){
-                setGetOrder.change("document","pais_id",newVal.id);
+
             }
         }else{
             if(!$scope.Docsession.block){
@@ -2731,44 +2799,6 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
 
     });
 
-    $scope.changeProvMoneda = function(newVal ){
-
-
-        if(newVal == null){
-            $scope.document.prov_moneda_id= null;
-            if( angular.equals(angular.element("#detalleDoc #prov_moneda_id input[type=search]"),angular.element(":focus"))){
-                setGetOrder.change("document","prov_moneda_id",undefined);
-            }
-
-
-        }else{
-            if(angular.equals(angular.element("#detalleDoc #prov_moneda_id input[type=search]"),angular.element(":focus") )){
-                setGetOrder.change("document","prov_moneda_id",newVal.id);
-            }
-            var tasa = parseFloat(newVal.precio_usd);
-            $scope.$parent.document.prov_moneda_id= newVal.id;
-            if(!$scope.document.tasa || $scope.isTasaFija){
-                $scope.document.tasa = tasa;
-            }else {
-                if($scope.document.tasa !=  tasa && !$scope.isTasaFija ){
-                    $scope.NotifAction("alert","La tasa del "+newVal.nombre+" es diferente de la fijada ¿Que desea hacer? ",
-                        [
-                            {name:"Mantener la tasa actual ", default:2000,action:
-                                function(){
-
-                                }
-                            },{name:"Asignar la tasa del "+newVal.nombre+" a la "+ $scope.formMode.name, action:
-                            function(){
-                                $scope.document.tasa = tasa;
-                                $scope.isTasaFija=true;
-                            }}
-                        ]
-                        ,{block:true});
-                }
-            }
-
-        }
-    };
 
     $scope.$watch('$parent.document.objs.condicion_pago_id', function (newVal) {
 
@@ -2778,10 +2808,10 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             if(newVal ){
                 if(newVal != 0){
                     $scope.$parent.document.condicion_pago_id = newVal.id;
-                    setGetOrder.change("document","condicion_pago_id", newVal.id);
+                   // setGetOrder.change("document","condicion_pago_id", newVal.id);
                 }
             }else{
-                setGetOrder.change("document","condicion_pago_id",undefined);
+              //  setGetOrder.change("document","condicion_pago_id",undefined);
             }
         }
 
@@ -2793,12 +2823,12 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             if(newVal ){
                 if(newVal != 0){
                     $scope.$parent.document.puerto_id = newVal.id;
-                    setGetOrder.change("document","puerto_id", newVal.id);
+                  //  setGetOrder.change("document","puerto_id", newVal.id);
                 }
             }else{
                 if(!$scope.Docsession.block){
                     $scope.$parent.document.puerto_id= null;
-                    setGetOrder.change("document","puerto_id",undefined);
+                    //setGetOrder.change("document","puerto_id",undefined);
                 }
             }
         }
@@ -2865,15 +2895,11 @@ MyApp.controller('OrderUnclosetDocCtrl',['$scope','DateParse','Order','masters',
             }
         }});
     };
-
     $scope.open = function (item) {
         $scope.$parent.OrderDetalleCtrl(item, function () {
             $scope.$parent.Docsession.block= false;
         });
     };
-
-
-
 }]);
 
 MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','form', function ($scope,Order,masters,formSrv) {
@@ -2899,6 +2925,11 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','form', f
             after: function(){
             }
         }});
+    };
+
+    $scope.$parent.OrderlistCreatedProducProvCtrl = function () {
+        formSrv.name= 'OrderCreateProdCtrl';
+        $scope.$parent.OrderCreateProdCtrl({prov_id: $scope.$parent.document.prov_id});
     };
 
     $scope.openItem= function (data) {
@@ -3065,17 +3096,30 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','form', f
     });
 
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-        if(newVal && formSrv.name == 'OrderlistProducProvCtrl'){
-            var data = formSrv.getData();
-            $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
-            $scope.select.reng_id = data.response.reng_id;
-            $scope.select.cantidad = data.response.cantidad;
-            $scope.select.saldo = data.response.saldo;
-            if(data.response.accion  == 'new'){
-                $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
-            }if(data.response.accion  == 'upd'){
-                $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
+        if(newVal  ){
+            if(formSrv.name == 'OrderlistProducProvCtrl'){
+                var data = formSrv.getData();
+                $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
+                $scope.select.reng_id = data.response.reng_id;
+                $scope.select.cantidad = data.response.cantidad;
+                $scope.select.saldo = data.response.saldo;
+                if(data.response.accion  == 'new'){
+                    $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
+                }if(data.response.accion  == 'upd'){
+                    $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
+                }
             }
+            if(formSrv.name == 'OrderCreateProdCtrl'){
+                var data = formSrv.getData();
+                var prod = angular.copy(data.response);
+                prod.cantidad = 0;
+                prod.saldo = 0;
+                $scope.providerProds.push(prod);
+                $scope.openItem(prod);
+                console.log("hola data", data);
+
+            }
+
 
         }
     });
@@ -3087,9 +3131,27 @@ MyApp.controller('OrderCreateProdCtrl',['$scope','$mdSidenav','$timeout', 'Order
 
     $scope.isOpen = false;
     $scope.inProcess = false;
-    $scope.$parent.OrderCreateProdCtrl= function () {
+
+    $scope.$parent.OrderCreateProdCtrl= function (data) {
+
+        $scope.almacnAdd = [];
+        $scope.model = {};
+        $scope.form.$setPristine();
+        $scope.form.$setUntouched();
+        if(data){
+            angular.forEach(data, function (v, k) {
+                $scope.model[k]=v;
+            });
+        }
         $scope.open();
     };
+    masters.query({type:"prodLines"},{}, function (response) {
+        $scope.lineas= response;
+    });
+    masters.query({type:"DirStores"},{}, function (response) {
+        $scope.almacn= response;
+    });
+
     $scope.createProduct = function(item){
 
         /*if(item && item.saldo  && item.descripcion){
@@ -3151,12 +3213,46 @@ MyApp.controller('OrderCreateProdCtrl',['$scope','$mdSidenav','$timeout', 'Order
     $scope.close = function(e){
         if($scope.isOpen && !$scope.inProcess
 
-        ){
-            $scope.inProcess= true;
-            $scope.inClose();
+        ){ $scope.inProcess= true;
+            if(!$scope.form.$pristine){
+                if(!$scope.form.$valid ){
+                    $scope.NotifAction("alert", "Disculpe no has colocado suficiente informacion como para guardar el producto",
+                        [
+                            {name:"Dejarme corregirlo", default: 5,action:function () {
+
+                            }},
+                            {name:"Cancelar",action:function () {
+
+                            }}
+                        ]
+                        , {block:true})
+                }else{
+                    $scope.save(function () {
+                        $scope.inClose();
+                    });
+
+
+                }
+            }else{
+                $scope.inClose();
+            }
+
         }
     };
 
+    $scope.save = function (fn ) {
+        Order.post({type:"CreateTemp"},$scope.model,function(response){
+            formSrv.setData({model:angular.copy($scope.model), response:response});
+            formSrv.setBind(true);
+            $timeout(function () {
+                formSrv.setBind(false);
+            },5);
+            $scope.NotifAction("ok", "Articulo creado",[] ,{autohidden: 1500})
+            if(fn){
+                fn();
+            }
+        });
+    };
     $scope.isAddAlmacen = function(val){
         return $scope.almacnAdd.indexOf(val.id) === -1
     };
@@ -3196,7 +3292,7 @@ MyApp.controller('OrderAccCopyDoc',['$scope','Order','setGetOrder', function ($s
             $scope.$parent.OrderDetalleCtrl({id:response.id,tipo: $scope.$parent.formMode.value }, function () {
                 $scope.NotifAction("ok","Nueva version creada",[],{autohidden:2000});
                 $scope.Docsession.block= false;
-                setGetOrder.change("document", 'id', response.id);
+              //  setGetOrder.change("document", 'id', response.id);
             });
 
 
@@ -3280,11 +3376,15 @@ MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder',
                 $scope.NotifAction("ok","Se ha realizado la aprobacion por parte de gerencia",[],{autohidden: 1500});
                 $scope.$parent.document.fecha_aprob_gerencia = angular.copy($scope.model.fecha);
                 $scope.$parent.document.isAprobado= true;
+                setGetOrder.change('fecha_aprob_gerencia', 'fecha', $scope.model.fecha );
+                setGetOrder.change('fecha_aprob_gerencia', 'nro_doc', $scope.model.nro_doc );
             }
             if(response.accion == 'ap_compras'){
                 $scope.NotifAction("ok","Se ha realizado la aprobacion por parte de compras",[],{autohidden: 1500});
                 $scope.$parent.document.fecha_aprob_compras = angular.copy($scope.model.fecha);
                 $scope.$parent.document.isAprobado= true;
+                setGetOrder.change('fecha_aprob_compra', 'fecha', $scope.model.fecha );
+                setGetOrder.change('fecha_aprob_compra', 'nro_doc', $scope.model.nro_doc );
 
             }
             if(fn){
@@ -3426,7 +3526,23 @@ MyApp.controller('OrderAgrPedCtrl',['$scope','Order','masters','clickCommitSrv',
         return true;
     };
     $scope.next = function () {
-        $scope.$parent.OrderfinalDocCtrl();
+        if($scope.document.productos.contraPedido.length == 0
+            && $scope.document.productos.kitchenBox.length == 0
+        ){
+
+            $scope.NotifAction("alert", "¡No agregaste ni un contra pedido, ni un kitchenBox, es raro no cargar al menos un contra pedido, ¿igual quieres continuar?",
+                [{name:"Si, continuar", action: function () {
+                    $scope.$parent.OrderfinalDocCtrl();
+                }},{name:"Cancelar", action: function () {
+
+                }}]
+                , {block:true})
+        }else{
+            $scope.$parent.OrderfinalDocCtrl();
+        }
+
+
+
     };
     $scope.openCp = function () {
         $scope.$parent.OrderAgrContPed()
@@ -3439,6 +3555,8 @@ MyApp.controller('OrderAgrPedCtrl',['$scope','Order','masters','clickCommitSrv',
     };
 
 
+
+
 }]);
 
 MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function ($scope,Order,setGetOrder) {
@@ -3447,18 +3565,18 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
         data:[],
         order:'id'
     };
-  /*  $scope.selecPedidoSust =function (item) {
-        $scope.pedidoSusPedSelec ={};
-        $scope.LayersAction({open:{name:"resumenPedidoSus",
-            after: function(){
-                Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.formMode.value,doc_id: $scope.document.id}, {},function(response){
-                    $scope.pedidoSusPedSelec = response;
-                    $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
-                });
+    /*  $scope.selecPedidoSust =function (item) {
+     $scope.pedidoSusPedSelec ={};
+     $scope.LayersAction({open:{name:"resumenPedidoSus",
+     after: function(){
+     Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.formMode.value,doc_id: $scope.document.id}, {},function(response){
+     $scope.pedidoSusPedSelec = response;
+     $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
+     });
 
-            }}});
+     }}});
 
-    };*/
+     };*/
     $scope.load = function () {
         $scope.tbl.data.splice(0,$scope.tbl.data.length);
         Order.query({type:$scope.formMode.mod,mod:"Substitutes",tipo: $scope.$parent.formMode.value, prov_id: $scope.$parent.provSelec.id, doc_id: $scope.$parent.document.id},{}, function (response) {
@@ -3506,43 +3624,43 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
         if(!item.asignado){
             $scope.add(item);
         }else {
-        $scope.NotifAction("alert","¿Esta seguro de quitarlo ?",
-            [
-                {name:"Si", action: function () {
-                    $scope.remove(item);
-                }},
-                {name:"Cancelar", action: function () {
+            $scope.NotifAction("alert","¿Esta seguro de quitarlo ?",
+                [
+                    {name:"Si", action: function () {
+                        $scope.remove(item);
+                    }},
+                    {name:"Cancelar", action: function () {
 
-                }}
-            ],{block:true})
+                    }}
+                ],{block:true})
         }
 
     };
 
-/*
- $scope.changePedidoSustituto = function (item) {
+    /*
+     $scope.changePedidoSustituto = function (item) {
 
- if (item.asignado) {
- Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
- $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
- $scope.document.id = response.id;
- setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
+     if (item.asignado) {
+     Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+     $scope.document.id = response.id;
+     setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
 
- });
- } else {
- Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
- $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
- $scope.document.id = response.id;
- setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
- setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
+     });
+     } else {
+     Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
+     $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+     $scope.document.id = response.id;
+     setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
+     setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
 
 
- });
- }
+     });
+     }
 
- };
+     };
 
-*/
+     */
 
 }]);
 
@@ -3997,47 +4115,47 @@ MyApp.controller('OrderResumenPedidoSusCtrl',['$scope', '$timeout','Order','form
     };
 
     $scope.addRemoveDocSusItem = function(item){
-    /*    var aux = {
-            asignado:item.asignado,
-            tipo_origen_id: $scope.formMode.value,
-            doc_origen_id: item.doc_id,
-            doc_id: $scope.document.id,
-            cantidad:  item.saldo,
-            saldo:  item.saldo,
-            producto_id:  item.producto_id,
-            descripcion:  item.descripcion,
-            id:item.id
+        /*    var aux = {
+         asignado:item.asignado,
+         tipo_origen_id: $scope.formMode.value,
+         doc_origen_id: item.doc_id,
+         doc_id: $scope.document.id,
+         cantidad:  item.saldo,
+         saldo:  item.saldo,
+         producto_id:  item.producto_id,
+         descripcion:  item.descripcion,
+         id:item.id
 
-        };
-        if(item.asignado){
-            Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-                if(response.accion == "new"){
-                    $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-                    item.renglon_id= response.renglon_id;
-                }
+         };
+         if(item.asignado){
+         Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+         if(response.accion == "new"){
+         $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
+         item.renglon_id= response.renglon_id;
+         }
 
-            });
+         });
 
-        }else if(!item.asignado && item.renglon_id){
-            $scope.NotifAction("alert","Se Removera el articulo",[
-                {name:'Cancelar',
-                    action: function(){
+         }else if(!item.asignado && item.renglon_id){
+         $scope.NotifAction("alert","Se Removera el articulo",[
+         {name:'Cancelar',
+         action: function(){
 
-                    }
-                },
-                {name:'Continuar',default:4,
-                    action: function(){
-                        Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-                            if(response.accion == "new"){
-                                $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-                                item.renglon_id= response.renglon_id;
-                            }
-                        });
+         }
+         },
+         {name:'Continuar',default:4,
+         action: function(){
+         Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
+         if(response.accion == "new"){
+         $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
+         item.renglon_id= response.renglon_id;
+         }
+         });
 
-                    }
-                }
-            ]);
-        }*/
+         }
+         }
+         ]);
+         }*/
 
 
 
@@ -4245,7 +4363,7 @@ MyApp.controller('OrderminiAddKitchenBoxCtrl',['$scope','$timeout','$mdSidenav',
     };
 }]);
 
-MyApp.controller('OrderfinalDocCtrl',['$scope','Order','masters','setGetOrder', function ($scope,Order,masters, setGetOrder) {
+MyApp.controller('OrderfinalDocCtrl',['$scope','Order','clickerTime', 'masters','setGetOrder', function ($scope,Order,clickerTime, masters, setGetOrder, clickerTime) {
 
     $scope.switchBack=  {
         head:{model:true,change:false},
@@ -4312,7 +4430,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','masters','setGetOrder', 
     };
 
     $scope.buildfinalDoc = function(){
-        var final={contra:[],kitchen:[],pedidoSusti:[], todos:[], document:[], aprob_gerencia:[], aprob_compras:[]};
+        var final={contra:[],kitchen:[],pedidoSusti:[], todos:[], document:{}, aprob_gerencia:[], aprob_compras:[]};
         console.log("$scope.switchBack",$scope.switchBack);
         console.log("form",setGetOrder.getForm());
         angular.forEach(setGetOrder.getForm(), function(v,k){
@@ -4333,7 +4451,10 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','masters','setGetOrder', 
             }
         );
         angular.forEach(setGetOrder.getForm('document'), function(v,k){
-
+                if(v.estado  && v.estado  != 'new'){
+                    final.document[k]= v;
+                    final.document.estado = 'upd';
+                }
             }
 
         );
@@ -5317,6 +5438,8 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
             }
         },
         change:function(form,fiel, value){
+            console.log("change ", form);
+            console.log("change ", fiel);
             externo='upd';
             change(form,fiel, value);
 
@@ -5369,7 +5492,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                     angular.forEach(response,function(v,k){
                         if(!order[k]){
                             order[k]= v;
-                            if(v !=null && typeof (v) != 'object' && typeof (v) != 'array' && !isNaN(k)){
+                            if(v !=null && typeof (v) != 'object' && typeof (v) != 'array' && isNaN(k)){
                                 forms['document'][k]={original:v, v:v, estado:'new',trace:[]};
                             }
 
