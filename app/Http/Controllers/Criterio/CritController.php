@@ -115,6 +115,27 @@ class CritController extends BaseController
 
     }
 
+    public function saveField(Request $rq){
+        //dd($rq);
+        $ret = array("action"=>"new","id"=>false,"ready"=>false);
+        if($rq->id){
+            $crit = Campos::find($rq->id);
+            $ret["action"]="upd";
+
+        }else{
+            $crit = new Campos();
+        }
+
+        $crit->descripcion = $rq->descripcion;
+        $crit->tipo_id = $rq->default;
+
+        $crit->save();
+        $ret["id"] = $crit->id;
+        //$ret["ready"] = ($crit->linea_id && $crit->campo_id && $crit->tipo_id);
+        return $ret;
+
+    }
+
     public function saveCritField(Request $rq){
         $ret = array("action"=>"new","id"=>false,"ready"=>false);
         if($rq->id){

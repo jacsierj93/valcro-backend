@@ -40,7 +40,7 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
     $scope.listLines = mastersCrit.getLines();
 
     $scope.openCrit = function(line){
-        //critForm.setLine(line);
+        critForm.setLine(line);
 
         $scope.$parent.LayersAction({open:{name:"critLayer1"}});
         /*$mdSidenav("layer1").open();*/
@@ -121,6 +121,50 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         $scope.layer = nvo[0];
     });
 
+    var activesPopUp = [];
+    $scope.closePopUp = function(sideNav,fn){
+        idx = activesPopUp.indexOf(sideNav);
+        if(idx != -1){
+            if(fn.before){
+                pre = fn.before();
+            }else{
+                pre = true;
+            }
+
+            if(!pre){
+                return false;
+            }
+            $mdSidenav(sideNav).close().then(function(){
+
+                activesPopUp.splice(idx,1);
+                if(fn.after){
+                    fn.after();
+                }
+            });
+        };
+    };
+
+    $scope.openPopUp = function(sideNav,fn){
+        if(activesPopUp.indexOf(sideNav)==-1){
+            if(fn && fn.before){
+                pre = fn.before();
+            }else{
+                pre = true;
+            }
+
+            if(!pre){
+                return false;
+            }
+            $mdSidenav(sideNav).open().then(function(){
+                activesPopUp.push(sideNav);
+                if(fn.after){
+                    fn.after();
+                }
+            })
+        }
+
+    };
+
     $scope.showNext = function(status,to){
         if(status){
             $scope.nxtAction = to;
@@ -145,6 +189,9 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
+    $scope.$watch("line.id",function(){
+        $scope.criteria = critForm.get();
+    });
 
     $scope.listOptions = critForm.getOptions();
 
@@ -334,7 +381,10 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.addField= function(type){
         critForm.add(type);
     };
-    
+
+    $scope.callNew = function(){
+        $mdSidenav("newField").open()
+    };
     $scope.createNewIten = function(nuevo){
         criterios.put({type:"saveNewItemList"},{name:nuevo},function(data){
             setNotif.addNotif("ok", "item creado", [
@@ -363,6 +413,38 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         }
 
     };
+
+    $scope.used = function(field){
+        return $filter("customFind")($scope.criteria,field,function(c,v){
+            return c.campo_id == v.id;
+        }).length > 0
+    }
+
+}]);
+
+MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
+    $scope.types = mastersCrit.getTypes();
+    $scope.fields = mastersCrit.getFields();
+    $scope.newField = {
+        id:false,
+        descripcion:"",
+        default:null
+    }
+    $scope.$watchGroup(['fieldForm.$valid','fieldForm.$pristine'], function(nuevo) {
+        if(nuevo[0] && !nuevo[1]) {
+            criterios.put({type:"saveNewField"},$scope.newField,function(data){
+                $scope.newField.id = data.id;
+                $scope.fieldForm.$setPristine();
+                if(data.action=="new"){
+                    
+                    $scope.fields.push(angular.copy($scope.newField));
+                    setNotif.addNotif("ok", "item creado", [
+                    ],{autohidden:3000});
+                };
+            });
+
+        }
+    });
 
 }]);
 

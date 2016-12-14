@@ -26,3 +26,7 @@
 #critConstruct md-sidenav{
     z-index:70;
 }
+
+.assign {
+    background: rgba(0, 255, 0, 0.5);
+}

@@ -31,7 +31,7 @@ MyApp.service("productsServices",function(criterios,mastersCrit,$filter){
     }
 })
 
-MyApp.controller('listController',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
+MyApp.controller('listProdController',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
     $scope.listProvs = productos.query({type:'provsProds'});
     
     $scope.getByProv = function(prov,e){
@@ -204,9 +204,6 @@ MyApp.service("nxtService",function(){
     };
 
     return {
-      /*  setFn :function(fn){
-            cfg.fn = fn;
-        },*/
         getCfg : function(){
             return cfg;
         }

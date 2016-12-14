@@ -201,7 +201,7 @@
         </md-sidenav>
 
 
-        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer1" id="critLayer1">
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="critLayer1" id="critLayer1">
             <!-- 11) ########################################## LAYER PREVIEW DEL FORMULARIO ########################################## -->
 
             <input type="hidden" md-autofocus>
@@ -235,74 +235,7 @@
 
 
                     <div flex></div>
-                    <!--<div flex="15" layout="column" class="md-whiteframe-2dp" >
-                        <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="field in fields" class="row" ng-class="{'rowSel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
-                            </div>
-                        </md-content>
-                    </div>
-                    <div flex="15" layout="column" class="md-whiteframe-2dp">
-                        <md-content style="margin: 0 8px 0 8px !important;">
-                            <div ng-repeat="type in tipos" ng-class="{'rowSel':type.id == critField.type}"  class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                <div ng-click="createField(type,'type')" >{{type.descripcion}}</div>
-                            </div>
-                        </md-content>
-                    </div>
-                    <div flex layout="column" class="md-whiteframe-2dp" style="padding:8px;">
-                        <div flex>
-                            <div class="titulo_formulario" layout="column" layout-align="start start">
-                                <div ng-click="show()">
-                                    Opciones
-                                </div>
-                            </div>
-                            <div flex>
-                                <form name="optionsForm" layout="column">
-                                    <div ng-repeat="opcion in options" ng-init="inicialize(opcion)" style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
-                                        <div layout="column" class="optHolder" ng-show="opcion.descripcion == 'Requerido'" flex tabindex="0" id="{{opcion.descripcion}}">
-                                            <md-input-container class="md-block" flex>
 
-                                                <md-switch ng-model="opcValue[opcion.descripcion].valor"
-                                                           ng-blur="checkSave($event)"
-                                                >
-                                                    {{opcion.descripcion}}
-                                                </md-switch>
-                                            </md-input-container>
-                                            <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
-                                                <label>{{opcion.descripcion}} mensaje</label>
-                                                <input skip-tab
-                                                       ng-model="opcValue[opcion.descripcion].msg"
-                                                       ng-blur="checkSave($event)"
-                                                      >
-                                            </md-input-container>
-                                        </div>
-
-                                        <div layout="column" class="optHolder" ng-show="opcion.descripcion != 'Requerido'" tabindex="0" id="{{opcion.descripcion}}">
-                                            <md-input-container class="md-block" flex>
-                                                <label>{{opcion.descripcion}}</label>
-                                                <input skip-tab
-                                                       ng-model="opcValue[opcion.descripcion].valor"
-                                                       ng-blur="checkSave($event)"
-                                                       >
-                                            </md-input-container>
-                                            <md-input-container class="md-block" flex ng-show="opcValue[opcion.descripcion].valor != ''">
-                                                <label>{{opcion.descripcion}} mensaje</label>
-                                                <input skip-tab
-                                                       ng-model="opcValue[opcion.descripcion].msg"
-                                                       ng-blur="checkSave($event)"
-                                                       >
-                                            </md-input-container>
-                                        </div>
-
-
-                                    </div>
-                                </form>
-
-                            </div>
-
-                        </div>
-
-                    </div>-->
                 </md-content>
             </div>
         </md-sidenav>
@@ -320,12 +253,12 @@
                                 <div>
                                     Nombre del Campo
                                 </div>
-                                <!--<div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>-->
+                                <div style="width: 24px; font-size:24px;" ng-click="openPopUp('newField')">+</div>
                             </div>
 
                             <md-content flex>
-                                <div ng-repeat="field in fields" class="row" ng-class="{'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                    <div ng-click="createField(field,'field')">{{field.descripcion}}</div>
+                                <div ng-repeat="field in fields" class="row" ng-class="{'assign':used(field),'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                    <div ng-click="(!used(field))?createField(field,'field'):true">{{field.descripcion}}</div>
                                 </div>
                             </md-content>
                         </div>
@@ -345,7 +278,7 @@
                                 <div>
                                     Tipo de Campo
                                 </div>
-                                <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
+                              <!--  <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>-->
                             </div>
                             <lmb-collection
                                 lmb-type="list"
@@ -589,6 +522,59 @@
             </md-sidenav>
 
         </div>
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" style="width:calc(100% - 928px);" md-disable-backdrop="true" md-component-id="newField" id="newField" click-out="closePopUp('newField',$event)">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <input type="hidden" >
+                <form name="fieldForm" layout="row" class="focused" ng-controller="createFieldController">
+                    <div style="width:24px; height: 100%;"></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
+                            <div>
+                                Nuevo Campo
+                            </div>
+                        </div>
+                        <div layout="row" class="column">
+                            <md-input-container class="md-block" flex>
+                                <label>Nombre del campo</label>
+                                <input md-autofocus skip-tab minlength="2" required duplicate="fields" field="descripcion"  info="escribe el nombre del nuevo campo ej. \"acabado\"" alpha autocomplete="off" ng-disabled="$parent.enabled" ng-model="newField.descripcion">
+                            </md-input-container>
+                            <md-input-container class="md-block" flex>
+                                <label>Tipo de Campo</label>
+                                <md-autocomplete md-selected-item="ctrl.field"
+                                                 flex
+                                                 
+                                                 md-selected-item-change="newField.default = ctrl.field.id"
+                                                 info="este sera el tipo por defecto para este campo"
+                                                 skip-tab
+                                                 required
+                                                 md-require-match="true"
+                                                 md-search-text="ctrl.searchType"
+                                                 md-items="item in types | stringKey : ctrl.searchType: 'descripcion'"
+                                                 md-item-text="item.descripcion"
+
+                                                 md-no-asterisk
+                                                 
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.descripcion}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                                <!--  <label>Moneda</label>
+                                  <md-select id="convCoin" skip-tab ng-disabled="$parent.enabled || coins.length < 1" ng-model="conv.coin" name="state" required md-no-ink>
+                                      <md-option ng-repeat="coin in coins" value="{{coin.id}}">
+                                          {{coin.nombre}}
+                                      </md-option>
+                                  </md-select>-->
+                            </md-input-container>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </md-content>
+        </md-sidenav>
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 952px); z-index:80;" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" click-out="closeDepend()" md-component-id="lyrConfig" id="lyrConfig" >
             <!-- 11) ########################################## MINI LAYER SELECTOR TIPO DE CAMPO ########################################## -->
 
