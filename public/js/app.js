@@ -706,7 +706,7 @@ MyApp.directive('lmbMaxImp', function($filter,$q,$timeout,setNotif) {
             //var targ = attrs.integer;
             ctrl.$validators.maxImp = function(modelValue, viewValue) {
                 if (ctrl.$isEmpty(modelValue) || ctrl.$pristine || modelValue===true) {
-                    console.log("entrooooo",modelValue)
+                    //console.log("entrooooo",modelValue)
                     return true;
                 }
                 if(parseInt(modelValue) > parseInt(attrs.lmbMaxImp)){

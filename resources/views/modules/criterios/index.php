@@ -257,8 +257,8 @@
                             </div>
 
                             <md-content flex>
-                                <div ng-repeat="field in fields" class="row" ng-class="{'assign':used(field),'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                    <div ng-click="(!used(field))?createField(field,'field'):true">{{field.descripcion}}</div>
+                                <div ng-repeat="field in fields" class="row" ng-class="{'assign':(used(field) && field.id != critField.field),'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                    <div ng-click="(!used(field))?createField(field,'field'):isUsed()">{{field.descripcion}}</div>
                                 </div>
                             </md-content>
                         </div>
@@ -299,7 +299,6 @@
                 </div>
             </md-sidenav>
             <md-sidenav  style="margin-top:96px; margin-bottom:48px; width:calc(100% - 1120px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst3" id="lyrConst3" >
-                <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->
 
                 <input type="hidden" md-autofocus>
                 <div layout="row" flex style="width:304px;">

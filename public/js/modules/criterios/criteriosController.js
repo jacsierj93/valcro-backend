@@ -119,8 +119,26 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
         $scope.layer = nvo[0];
+        $timeout(function(){
+            if(old[0] == 'critLayer1'){
+                if(!$mdSidenav(old[0]).isOpen()){
+                    $scope.closeConstruct()
+                }
+            }
+
+        })
+        console.log(old[0])
     });
 
+    $scope.closeConstruct = function(){
+        $mdSidenav("lyrConst1").close();
+        $timeout(function(){
+            $mdSidenav("lyrConst2").close()
+        },250);
+        $timeout(function(){
+            $mdSidenav("lyrConst3").close()
+        },500);
+    };
     var activesPopUp = [];
     $scope.closePopUp = function(sideNav,fn){
         idx = activesPopUp.indexOf(sideNav);
@@ -334,6 +352,17 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.$watch("critField.type",function(val){
         $scope.options = (val)?$filter("filterSearch")($scope.tipos ,[val])[0].cfg:[];
     });
+
+    $scope.$watchCollection("critField",function(n,o){
+        if(n.id == o.id && n.line != null && n.type != null && n.field != null){
+            criterios.put({type:"save"},$scope.critField,function(data){
+                $scope.critField.id = data.id;
+                $scope.critField.ready = data.ready;
+                critForm.add($scope.critField);
+            });
+        }
+
+    });
     $scope.$watch("line.id",function(val){
         $scope.criteria = critForm.get();
     });
@@ -368,11 +397,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     $scope.createField = function(data,campo){
         $scope.critField[campo]=data.id;
-        criterios.put({type:"save"},$scope.critField,function(data){
-            $scope.critField.id = data.id;
-            $scope.critField.ready = data.ready;
-            critForm.add($scope.critField);
-        });
+
     };
     $scope.opennext = function(){
         $scope.LayersAction({open:{name:"layer1"}});
@@ -418,6 +443,11 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         return $filter("customFind")($scope.criteria,field,function(c,v){
             return c.campo_id == v.id;
         }).length > 0
+    }
+
+    $scope.isUsed = function(){
+        setNotif.addNotif("error", "no se puede usar este campo dos veces", [
+        ],{autohidden:3000});
     }
 
 }]);
@@ -507,7 +537,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             elem.field = $filter("filterSearch")(fields,[datos.field])[0];
             elem.tipo_id=datos.type;
             elem.type = $filter("filterSearch")(tipos,[datos.type])[0];
-            elem.opcs = elem.type.cfg;
+            //elem.opcs = elem.type.cfg;
         },
         get:function(){
             return listado;
@@ -617,7 +647,11 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.formId = critForm.getEdit();
     
     $scope.get = function (filt,obj) {
-        if(obj.options.length>0){
+        console.log(obj)
+        if(!("options" in  obj)){
+            return false;
+        }
+        if(obj,options && (filt in obj.options) && obj.options.length>0){
             if(obj.tipo != "Opcion"){
                 return $filter("customFind")(obj.options,[obj.tipo],function(c,v){
                     return c.descripcion == v[0];
@@ -627,6 +661,8 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
                     return c.descripcion == obj.tipo && c.pivot.value == v[0];
                 }).length > 0;
             }
+        }else{
+            return "";
         }
 
 
@@ -739,6 +775,41 @@ MyApp.directive('treeBranch', function() {
             }
         };
 });
+
+MyApp.directive("setAttr",function(){
+    return {
+
+        link:function(scope,elem,attr){
+            scope.ats = scope.$eval(attr.setAttr);
+
+
+            scope.$watchCollection("ats",function(ats){
+
+                angular.forEach(ats.options,function(v,k){
+
+                    scope[v.especificacion+"_live"] = v.pivot;
+                    scope.$watchCollection(v.especificacion+"_live",function(){
+                        if(v.especificacion == "label"){
+                            elem.parent().find("label").html(scope[v.especificacion+"_live"].value);
+                        }else if(v.especificacion != ""){
+                            attr[v.especificacion] = scope[v.especificacion+"_live"].value;
+                        }
+
+                    });
+                    if(v.especificacion == "label"){
+                        elem.parent().find("label").html(v.pivot.value);
+                    }else if(v.especificacion != ""){
+                        attr.$observe(v.especificacion,function(){});
+                        attr[v.especificacion] = v.pivot.value;
+                        console.log(attr);
+                    }
+                })
+            });
+
+
+        }
+    };
+})
 
 MyApp.directive('lmbCollection', function() {
 

@@ -160,6 +160,9 @@ class CritController extends BaseController
         $ret = array();
         foreach ($reqs->request as $k=>$rq){
             if($k != "opts"){
+                if(!$rq['id'] && $rq['valor']==""){
+                    continue;
+                }
                 if($rq['id']){
                     $opt = Options::find($rq['id']);
 
