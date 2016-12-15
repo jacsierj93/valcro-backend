@@ -1327,99 +1327,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
 
-    /**@deprecated*/
-    $scope.saveWithContactMail= function(){
-        $scope.OpenContactMail(function(issend){
-            if(issend){
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                    if (response.success) {
-                        $timeout(function(){
-                            var layer=angular.element("#"+$scope.layer);
-                            layer[0].click();
-                        },0);
-
-                        $scope.updateProv(function(){
-                            $scope.NotifAction("ok","Realizado",[
-                                {name:"Ok", action: function(){
-                                    $scope.LayersAction({close:{first:true, search:true}});
-                                }}
-                            ],{block:true});
-
-                        });
-
-                    }});
-            }
-
-        });
-    };
-    /**@deprecated*/
-
-    $scope.saveWithSenMail= function (){
-        $scope.openSendMail(function(isSend){
-            if(isSend){
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                    if (response.success) {
-                        $timeout(function(){
-                            var layer=angular.element("#"+$scope.layer);
-                            layer[0].click();
-
-                        },0);
-
-                        $scope.updateProv(function(){
-                            $scope.NotifAction("ok","Realizado",[
-                                {name:"Ok", action: function(){
-                                    $scope.LayersAction({close:{first:true, search:true}});
-
-                                }}
-                            ],{block:true});
-
-                        });
-
-                    }});
-            }
-        });
-    };
-
-    $scope.saveWithPreview= function (){
-        $scope.openMailPreview(
-            function(isSend){
-                if(isSend){
-                    console.log("llamado a calback");
-                    Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                        if (response.success) {
-                            $timeout(function(){
-                                var layer=angular.element("#"+$scope.layer);
-                                layer[0].click();
-
-                            },0);
-
-                            $scope.updateProv(function(){
-                                $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
-                                $timeout(function(){
-                                    $scope.LayersAction({close:{first:true, search:true}});
-                                },1500);
-
-                            });
-
-                        }});
-                }
-            }
-        );
-    };
-
-    $scope.saveDoc = function(){
-        $scope.inProcess = true;
-        App.setBlock({block:true,level:89});
-        Order.postMod({type:$scope.formMode.mod, mod:"Close"},{id:$scope.document.id}, function(response){
-            $scope.inProcess = false;
-            App.setBlock({block:false});
-            $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
-            $scope.updateProv();
-            $timeout(function(){
-                $scope.LayersAction({close:{first:true, search:true}});
-            },1400);
-        });
-    };
 
 
 
@@ -2644,8 +2551,10 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
 
 
     $scope.toEditHead= function(form, id,val){
-        console.log("por to edit");
-        setGetOrder.change(form,id,val);
+        if(!$scope.FormHeadDocument.$pristine){
+            setGetOrder.change(form,id,val);
+        }
+
     };
     $scope.editTasa= function(){
         if( $scope.isTasaFija && $scope.document.permit.update){
@@ -4363,7 +4272,7 @@ MyApp.controller('OrderminiAddKitchenBoxCtrl',['$scope','$timeout','$mdSidenav',
     };
 }]);
 
-MyApp.controller('OrderfinalDocCtrl',['$scope','Order','clickerTime', 'masters','setGetOrder', function ($scope,Order,clickerTime, masters, setGetOrder, clickerTime) {
+MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clickerTime', 'masters','setGetOrder', function ($scope,$timeout,App,Order,clickerTime, masters, setGetOrder) {
 
     $scope.switchBack=  {
         head:{model:true,change:false},
@@ -4374,6 +4283,24 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','clickerTime', 'masters',
 
     };
 
+    $scope.$parent.OrderfinalDocCtrl = function () {
+        $scope.switchBack=  {
+            head:{model:true,change:false},
+            contraPedido:{model:true,change:false},
+            kichenBox:{model:true,change:true},
+            changeItems:{model:true,change:true},
+            pedidoSusti:{model:true,change:false}
+
+        };
+        $scope.finalDoc = $scope.buildfinalDoc();
+        $scope.gridViewFinalDoc = 1;
+        $scope.action = undefined;
+        Order.get({type:$scope.$parent.formMode.mod, mod:"Summary",tipo: $scope.$parent.formMode.value,id: $scope.$parent.document.id},{}, function (response) {
+            $scope.finalDoc.productos = response.productos;
+        });
+
+        $scope.LayersAction({search:{name:"finalDoc",before: function(){}}});
+    };
     $scope.toSideNave = function(elem ,msm, data){
 
         $scope.NotifAction("alert", msm,[
@@ -4403,34 +4330,78 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','clickerTime', 'masters',
 
     };
 
-    $scope.saveFinal = function(){
+    $scope.getAction = function(){
         var accions = {};
 
-        angular.forEach($scope.switchBack, function(v,k){
-            accions[k] = v.change;
-        });
-        Order.postMod({type:$scope.formMode.mod, mod:"CloseAction"},{id:$scope.$parent.document.id,accion:accions, seccion:$scope.Docsession.global }, function(response){
+        Order.postMod({type:$scope.formMode.mod, mod:"CloseAction"},{id:$scope.$parent.document.id, seccion:$scope.Docsession.global }, function(response){
+            $scope.action = response.action;
             if(response.action){
                 if(response.action == 'question'){
                     $scope.NotifAction("alert", "¿Que desea hacer?",[
-                        {name:"Enviar", action:$scope.saveWithPreview},
-                        {name:"Solo Guardar",action:$scope.saveDoc}
+                        {name:"Enviar a proveedor ", action: function (){
+                        $scope.send({action:'sendPrv'})
+                    }},
+                        {name:"Informar a departamentos", action: function (){
+                            $scope.send({action:'sendIntern'})
+                        }},
+                        {name:"Solo Guardar",action:$scope.save}
                     ],{block:true});
-                }else if(response.action == 'save' ){
-                    $scope.saveDoc();
-                }else if(response.action == 'send'){
-                    $scope.saveWithPreview();
-                }else if(response.action == 'close'){
-                    $scope.LayersAction({close:{first:true, search:true}});
-                }else{
-
+                }else if(response.action == 'sendPrv' ){
+                    $scope.send({action:'sendPrv'});
+                }else if(response.action == 'sendIntern'){
+                    $scope.send({action:'sendIntern'});
                 }
             }
         });
     };
 
+    $scope.send = function (data) {
+        $scope.$parent.OrderSendMail(data);
+    };
+
+
+    /**@deprecated*/
+    $scope.saveWithContactMail= function(){
+        $scope.OpenContactMail(function(issend){
+            if(issend){
+                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
+                    if (response.success) {
+                        $timeout(function(){
+                            var layer=angular.element("#"+$scope.layer);
+                            layer[0].click();
+                        },0);
+
+                        $scope.updateProv(function(){
+                            $scope.NotifAction("ok","Realizado",[
+                                {name:"Ok", action: function(){
+                                    $scope.LayersAction({close:{first:true, search:true}});
+                                }}
+                            ],{block:true});
+
+                        });
+
+                    }});
+            }
+
+        });
+    };
+
+    $scope.save = function(){
+        $scope.inProcess = true;
+        App.setBlock({block:true,level:89});
+        Order.postMod({type:$scope.formMode.mod, mod:"Close"},{id:$scope.document.id, }, function(response){
+            $scope.inProcess = false;
+            App.setBlock({block:false});
+            $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
+            $scope.updateProv();
+            $timeout(function(){
+                //$scope.LayersAction({close:{first:true, search:true}});
+            },1400);
+        });
+    };
+
     $scope.buildfinalDoc = function(){
-        var final={contra:[],kitchen:[],pedidoSusti:[], todos:[], document:{}, aprob_gerencia:[], aprob_compras:[]};
+        var final={contra:[],kitchen:[],pedidoSusti:[], todos:[], document:{}, aprob_gerencia:{}, aprob_compras:{}};
         console.log("$scope.switchBack",$scope.switchBack);
         console.log("form",setGetOrder.getForm());
         angular.forEach(setGetOrder.getForm(), function(v,k){
@@ -4463,23 +4434,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','clickerTime', 'masters',
         return final;
     };
 
-    $scope.$parent.OrderfinalDocCtrl = function () {
-        $scope.switchBack=  {
-            head:{model:true,change:false},
-            contraPedido:{model:true,change:false},
-            kichenBox:{model:true,change:true},
-            changeItems:{model:true,change:true},
-            pedidoSusti:{model:true,change:false}
 
-        };
-        $scope.finalDoc = $scope.buildfinalDoc();
-        $scope.gridViewFinalDoc = 1;
-        Order.get({type:$scope.$parent.formMode.mod, mod:"Summary",tipo: $scope.$parent.formMode.value,id: $scope.$parent.document.id},{}, function (response) {
-            $scope.finalDoc.productos = response.productos;
-        });
-
-        $scope.LayersAction({search:{name:"finalDoc",before: function(){}}});
-    };
 
     $scope.canNext = function () {
 
@@ -4487,7 +4442,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','Order','clickerTime', 'masters',
     };
 
     $scope.next = function () {
-        $scope.saveFinal();
+        $scope.getAction();
     }
 
 }]);
@@ -4514,7 +4469,63 @@ MyApp.controller('OrderMenuAgrCtrl',['$scope','Order','masters','clickCommitSrv'
  * in lieu of de template
  * */
 MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','App','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav,$timeout,App, setGetOrder,Order, IsEmail, SYSTEM){
-    $scope.isOpen= false;
+
+    $scope.origenes = {};
+    $scope.correos = [];
+    $scope.to = [];
+    $scope.cc = [];
+    $scope.ccb = [];
+    $scope.destinos = [];
+    $scope.langs = {};
+    $scope.prfLang = '';
+    $scope.asunto = undefined;
+    $scope.lang = undefined;
+$scope.model = {to:[], cc: [], ccb:[], adjs:[],asunto:undefined};
+    $scope.adjsUp = [];
+    $scope.adjsLoaded = [];
+
+
+    $scope.$parent.OrderSendMail = function (data) {
+        $scope.data  = data;
+        $scope.LayersAction({search:{name:"OrderSendEmail",before: function(){}}});
+        $scope.correos.splice(0,  $scope.correos.length);
+        $scope.model.to = [];
+        $scope.model.cc = [];
+        $scope.model.ccb = [];
+        $scope.model.adjs = [];
+        $scope.asunto = undefined;
+
+        $scope.template= "<div></div>";
+        if(data.action == 'sendPrv'){
+
+            Order.getMod({type:$scope.formMode.mod, mod:"ProviderTemplates",id:$scope.document.id},{}, function(response){
+                $scope.correos = response.correos;
+                $scope.origenes = response.templates;
+            });
+        }
+        if(data.action == 'sendIntern'){
+            Order.getMod({type:$scope.formMode.mod, mod:"InternalTemplates",id:$scope.document.id},{}, function(response){});
+        }
+
+    };
+    $scope.upfileFinis = function (file) {
+        console.log("upfileFinis", file);
+    };
+
+    $scope.canNext = function () {
+
+        return true;
+    };
+
+    $scope.next = function () {
+        Order.postMod({type:$scope.formMode.mod, mod:"Send"},$scope.model, function(response){
+
+        });
+    };
+    $scope.upFiles = function (newVal,olv, data) {
+        console.log("data", data);
+    };
+    /* $scope.isOpen= false;
     $scope.destinos =[];
     $scope.emailToText='';
     $scope.inProgress=false;
@@ -4609,7 +4620,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','App','setGet
 
             });
         }
-    }
+    }*/
 
 }]);
 
@@ -4618,6 +4629,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','App','setGet
  * destination mail, the mail is filter for provider select
  *
  * */
+/*
 MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav,$timeout,App,setGetOrder,Order, IsEmail, SYSTEM){
 
     // $scope.bind =setGetOrder.bind();
@@ -4725,6 +4737,7 @@ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','set
 
     }
 }]);
+*/
 
 MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form',  function($scope, $timeout,$mdSidenav,Order, formSrv){
 
@@ -5438,8 +5451,6 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
             }
         },
         change:function(form,fiel, value){
-            console.log("change ", form);
-            console.log("change ", fiel);
             externo='upd';
             change(form,fiel, value);
 

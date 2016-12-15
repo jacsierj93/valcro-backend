@@ -9,7 +9,6 @@ use App\Libs\Api\RestApi;
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\Masters\FileModel;
-use App\Models\Sistema\Notifications\NotificationModule;
 use App\Models\Sistema\Order\OrderAnswer;
 use App\Models\Sistema\Order\OrderAnswerAttachment;
 use App\Models\Sistema\Order\OrderAttachment;
@@ -18,6 +17,8 @@ use App\Models\Sistema\CustomOrders\CustomOrderPriority;
 use App\Models\Sistema\CustomOrders\CustomOrderReason;
 use App\Models\Sistema\KitchenBoxs\KitchenBox;
 use App\Models\Sistema\Masters\Monedas;
+use App\Models\Sistema\MailModels\MailModule;
+use App\Models\Sistema\MailModels\MailPart;
 use App\Models\Sistema\Order\Order;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderItem;
@@ -291,26 +292,6 @@ class OrderController extends BaseController
     }
 
 
-    public function closeActionSolicitude(Request $req)
-    {
-        $model = Solicitude::findOrFail($req->id);
-
-        if ($this->user->cargo_id == $this->profile['gerente']) {
-            return ['action' => 'question'];
-
-        } else if ($this->user->cargo_id == $this->profile['jefe']) {
-
-            $userCreate = User::findOrFail($model->usuario_id);
-            if ($userCreate->cargo_id == $this->profile['trabajador']) {
-
-                if ($model->fecha_aprob_compra != null && $model->fecha_envio == null) {
-                    return ['action' => 'send'];
-                }
-            }
-
-        }
-        return ['action' => 'save'];
-    }
 
     public function closeActionOrder(Request $req)
     {
@@ -559,10 +540,6 @@ class OrderController extends BaseController
         return $prov;
     }
 
-    public function getProviderEmails(Request $req)
-    {
-        return ContactField::where('prov_id', $req->prov_id)->where('campo', 'email')->get();
-    }
 
     public function getAddressrPort(Request $req)
     {
@@ -1701,6 +1678,172 @@ class OrderController extends BaseController
 
     }
 
+
+    public function closeActionSolicitude(Request $req)
+    {
+        $model = Solicitude::findOrFail($req->id);
+
+        $result =[];
+        $result['action'] = 'save';
+        $senders =MailModule::where('tipo_origen_id','21')
+            ->where('doc_id',$model->id)
+            ->get();
+        $result['send']= sizeof($senders);
+        if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) && sizeof($senders) == 0){
+            $result['action'] = 'sendPrv';
+             return $result;
+        }
+        if ($this->user->cargo_id == $this->profile['gerente']) {
+            $result['action'] = 'question';
+
+        } else if ($this->user->cargo_id == $this->profile['jefe'] || $this->user->cargo_id == $this->profile['trabajador']) {
+            $result['action'] = 'sendIntern';
+
+        }
+        return $result;
+    }
+    /**cierra la solicitud*/
+    public function CloseSolicitude(Request $req)
+    {
+      $result['success'] = "Registro guardado con éxito!";
+        $result['action'][] = "close";
+        $model = Solicitude::findOrFail($req->id);
+        /*$notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
+        $model->final_id=
+            "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
+            ."-a".sizeof($model->attachments()->get());*/
+        $model->ult_revision = Carbon::now();
+        $model->save();
+/*
+        $sender  =[
+            'subject'=>'Notificacion de creacion de Solicitud',
+            'to' =>$this->getEmailDepartment($this->departamentos['compras']),
+            'cc' =>[],
+            'ccb' =>[]
+        ];
+
+        if(sizeof($notif->where('clave', 'created')->get()) == 0){
+            $noti = new NotificationModule();
+            $noti->doc_id = $model->id;
+            $noti->doc_tipo_id = 21;
+            $noti->usuario_id = $this->user->id;
+            $data =$this->parseDocToSummaryEmail($model);
+            $data['accion'] ="Creacion de solicitud ";
+            $noti->send($data,$sender,$noti,"created");
+            $result['action'][]="send";
+        }else{
+            if($model->fecha_aprob_compra != null){
+                if(sizeof(NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21)->where('clave', 'aprob_compras')->get()) == 0){
+                    $noti = new NotificationModule();
+                    $noti->doc_id = $model->id;
+                    $noti->doc_tipo_id = 21;
+                    $noti->usuario_id = $this->user->id;
+                    $data =$this->parseDocToSummaryEmail($model);
+                    $data['accion'] ="Aprobacion de solicitud";
+                    $noti->send($data,$sender,$noti,"aprob_compras");
+                    $result['action'][]="aprob_compras";
+                }else if(sizeof($notif->where('clave', 'aprob_compras')->where('usuario_id', $this->user->id)->get()) > 0){
+                    $noti = new NotificationModule();
+                    $noti->doc_id = $model->id;
+                    $noti->doc_tipo_id = 21;
+                    $noti->usuario_id = $this->user->id;
+                    $data =$this->parseDocToSummaryEmail($model);
+                    $data['accion'] ="Desaprobacion de solicitud";
+                    $noti->send($data,$sender,$noti,"cancel_aprob_compras");
+                    $result['action'][]="cancel_aprob_compras";
+                }
+            }else{
+                $sender['subject']= "Notificacion de modificacion de solicitud";
+                $noti = new NotificationModule();
+                $noti->doc_id = $model->id;
+                $noti->doc_tipo_id = 21;
+                $noti->usuario_id = $this->user->id;
+                $data =$this->parseDocToSummaryEmail($model);
+                $data['accion'] ="Modificacion de solicitud ";
+                $noti->send($data,$sender,$noti,"update");
+                $result['action'][]="update";
+            }
+        }*/
+
+        return ['id'=>$req->id];
+    }
+
+    public static function buildMailTemplates ($module, $reason, $calback){
+        $files =emails_templates_lang($module,$reason) ;
+        $templates =MailPart::where('modulo',$module)->where('proposito',$reason)->first();
+        $good = [];
+        $bad = [];
+
+        foreach ($files as $aux){
+            $lang = new Language();
+            $lang = $lang->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->first();
+            $subjet = $templates->subjets()->where(function($query) use ($aux)  {
+                $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
+
+            })->first();
+            if($lang != null && $subjet !=null){
+                $content = [
+                    'lang'=>$lang->lang,
+                    'iso_lang'=>$lang->iso_lang,
+                    'subjet'=>$subjet->texto,
+                    'subjets'=>$templates->subjets()->where(function($query) use ($aux)  {
+                        $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
+
+                    })->orderByRaw('rand()')->lists('texto')
+                ];
+                $content['body'] = $calback($content, 'emails/'.$module.'/'.$reason.'/'.$aux['iso_lang']);
+                $good[$aux['iso_lang']] = $content;
+            }else{
+                $bad[$aux['iso_lang']] = ['lang'=>$lang ,'$subjet'=>$subjet];
+            }
+
+        }
+        $data['bad'] =$bad ;
+        $data['good'] =$good ;
+        return $data;
+    }
+    public function getProviderSolicitudeTemplate(Request $req)
+    {
+        $model = Solicitude::findOrFail($req->id);
+        $prov = Provider::findOrFail($model->prov_id);
+       $user =   $this->user;
+        $fn =  function ($content, $file) use ($model,$user)  {
+            $template = View::make($file,[
+            'subjet'=>$content['subjet'],
+            'model'=>$model,
+            'articulos'=>$model->items()->with('producto')->get(),
+            'user'=>$user
+            ])->render();
+
+           return $template;
+        };
+        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Solicitude', 'toProviders', $fn)['good']];
+
+        $correos = [];
+
+        foreach ($prov->contacts()->get() as  $aux){
+            foreach ($aux->campos()->where('campo', 'email')->get() as $aux2){
+                $e =  ['nombre'=>$aux->nombre, 'correo'=>$aux2->valor];
+                $e['langs'] = array_map('strtolower', $aux->idiomas()->lists('iso_lang')->toarray());
+                $correos[] =$e ;
+            }
+
+        }
+        $data['correos'] = $correos;
+        return $data;
+
+
+    }
+
+    public static function tester ($data){
+        return $data['lang'];
+    }
+    /**
+     *
+    */
+    public function getInternalSolicitudeTemplate (Request $req){
+
+    }
     /**
      * contrulle el resumen preliminar de la solicitud
      */
@@ -5126,71 +5269,6 @@ class OrderController extends BaseController
 
     /*************************************** CLOSE *****************************************/
 
-    /***/
-    public function CloseSolicitude(Request $req)
-    {
-        $result['success'] = "Registro guardado con éxito!";
-        $result['action'][] = "close";
-        $model = Solicitude::findOrFail($req->id);
-        $notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
-        $model->final_id=
-            "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
-            ."-a".sizeof($model->attachments()->get());
-        $model->ult_revision = Carbon::now();
-        $model->save();
-
-        $sender  =[
-            'subject'=>'Notificacion de creacion de Solicitud',
-            'to' =>$this->getEmailDepartment($this->departamentos['compras']),
-            'cc' =>[],
-            'ccb' =>[]
-        ];
-
-        if(sizeof($notif->where('clave', 'created')->get()) == 0){
-            $noti = new NotificationModule();
-            $noti->doc_id = $model->id;
-            $noti->doc_tipo_id = 21;
-            $noti->usuario_id = $this->user->id;
-            $data =$this->parseDocToSummaryEmail($model);
-            $data['accion'] ="Creacion de solicitud ";
-            $noti->send($data,$sender,$noti,"created");
-            $result['action'][]="send";
-        }else{
-            if($model->fecha_aprob_compra != null){
-                if(sizeof(NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21)->where('clave', 'aprob_compras')->get()) == 0){
-                    $noti = new NotificationModule();
-                    $noti->doc_id = $model->id;
-                    $noti->doc_tipo_id = 21;
-                    $noti->usuario_id = $this->user->id;
-                    $data =$this->parseDocToSummaryEmail($model);
-                    $data['accion'] ="Aprobacion de solicitud";
-                    $noti->send($data,$sender,$noti,"aprob_compras");
-                    $result['action'][]="aprob_compras";
-                }else if(sizeof($notif->where('clave', 'aprob_compras')->where('usuario_id', $this->user->id)->get()) > 0){
-                    $noti = new NotificationModule();
-                    $noti->doc_id = $model->id;
-                    $noti->doc_tipo_id = 21;
-                    $noti->usuario_id = $this->user->id;
-                    $data =$this->parseDocToSummaryEmail($model);
-                    $data['accion'] ="Desaprobacion de solicitud";
-                    $noti->send($data,$sender,$noti,"cancel_aprob_compras");
-                    $result['action'][]="cancel_aprob_compras";
-                }
-            }else{
-                $sender['subject']= "Notificacion de modificacion de solicitud";
-                $noti = new NotificationModule();
-                $noti->doc_id = $model->id;
-                $noti->doc_tipo_id = 21;
-                $noti->usuario_id = $this->user->id;
-                $data =$this->parseDocToSummaryEmail($model);
-                $data['accion'] ="Modificacion de solicitud ";
-                $noti->send($data,$sender,$noti,"update");
-                $result['action'][]="update";
-            }
-        }
-
-        return $result;
-    }
 
     /***/
     public function ClosePurchase(Request $req)

@@ -32,10 +32,10 @@ class MailPart extends Model
     protected $dates = ['deleted_at'];
 
     public function subjets (){
-        return $this->hasMAny('App\Models\Sistema\MailModels\MailPartSubject','mail_part_id');
+        return $this->hasMany('App\Models\Sistema\MailModels\MailPartSubject','mail_part_id');
     }
     public function contents (){
-        return $this->hasMAny('App\Models\Sistema\MailModels\MailPartContent','mail_part_id');
+        return $this->hasMany('App\Models\Sistema\MailModels\MailPartContent','mail_part_id');
     }
 
 }

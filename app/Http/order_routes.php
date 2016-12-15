@@ -28,7 +28,6 @@ $app->get("Order/MailLenguaje",'Orders\OrderController@getPrefeLangXcontacts'); 
 $app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
 $app->get("Order/Pdf",'Orders\OrderController@testPdf'); ///obtiene las direcciones de almacen
 
-$app->get("Order/ProviderEmails",'Orders\OrderController@getProviderEmails'); ///obtiene los correo de un proveedor @depreccated
 
 $app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el correo
 
@@ -142,6 +141,9 @@ $app->get("Order/Purchase/EmailSummary",'Orders\OrderController@EmailSummaryDocP
 
 $app->get("Order/Solicitude/Substitutes",'Orders\OrderController@getSolicitudeSubstitutes'); ///lista de todos las solicitudes que son sustituibles
 $app->get("Order/Solicitude/Versions",'Orders\OrderController@getOldSolicitude'); /// trae todas las versiones que a generado el documento
+$app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
+$app->get("Order/Solicitude/ProviderTemplates",'Orders\OrderController@getProviderSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Solicitude/InternalTemplates",'Orders\OrderController@getInternalSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
 
@@ -159,6 +161,7 @@ $app->post("Order/Solicitude/Cancel",'Orders\OrderController@cancelSolicitude');
 $app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteSolicitude'); // agrega un aolicitud vieja a una nueva
 $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
+$app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 
 
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
@@ -173,10 +176,8 @@ $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicit
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
-$app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 
 
-$app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
 $app->get("Order/Solicitude/EmailEstimate",'Orders\OrderController@EmailEstimateSolicitude'); ///trau preview del  presupuesto a enviar al provedor
 $app->get("Order/Solicitude/EmailSummary",'Orders\OrderController@EmailSummaryDocSolicitude'); ///trau preview del  presupuesto a enviar al provedor
 

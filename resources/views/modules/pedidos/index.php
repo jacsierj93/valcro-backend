@@ -4215,10 +4215,15 @@
         <!-- ########################################## LAYER send correo ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
-                    md-disable-backdrop="true" md-component-id="sendEmail" id="sendEmail"
+                    md-disable-backdrop="true" md-component-id="OrderSendEmail" id="OrderSendEmail"
         >
             <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderSendMail"    >
-                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                <vld-mail-with-adj
+                    load="origenes" text="centerText" template="template"
+                    correos="correos" to="model.to" cc="model.cc" ccb="model.ccb" langs="langs"  lang="lang" asunto="model.subject" up-model="adjsUp"
+                    key="OrderSendEmail" storage="orders" fn-file-up="upfileFinis" fn-up-watch="upFiles" titulo="Correo"
+                ></vld-mail-with-adj>
+                <!--<div  layout="column" flex class="layerColumn"   click-out="close($event)">
                     <form name="FormSendMail" flex layout="row" class="focused">
                         <div class="activeleft"></div>
                         <div layout="column" flex>
@@ -4345,13 +4350,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>-->
                 <loader ng-show="inProgress"></loader>
+                <div style="width: 16px;"  ng-mouseenter="(canNext()) ? $parent.showNext(true) :0 ; $parent.nextLayer = next" > </div>
+
             </md-content>
         </md-sidenav>
 
         <!-- ########################################## LAYER add contactos para correo ########################################## -->
-        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+  <!--      <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
                     md-disable-backdrop="true" md-component-id="addEMail" id="addEMail"
         >
@@ -4468,7 +4475,7 @@
                 <loader ng-show="inProgress"></loader>
 
             </md-content>
-        </md-sidenav>
+        </md-sidenav>-->
 
         <!-- ########################################## LAYER crear nuevo producto ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
@@ -4592,61 +4599,7 @@
 
             </md-content>
         </md-sidenav>
-        <!-- ########################################## LAYER crear nuevo producto ########################################## -->
 
-        <!--        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
-                            class="md-sidenav-right md-whiteframe-2dp popUp"
-                            md-disable-backdrop="true" md-component-id="OrderCreateProd" id="OrderCreateProd"
-                >
-                    <md-content   layout="row" flex  ng-controller="OrderCreateProdCtrl" >
-                        <div  layout="column" flex="" class="layerColumn"   click-out="CloseCreateProduct($event)" >
-                            <form layout="row" class="focused" name="createdProd" >
-                                <div layout="column" flex>
-                                    <div layout="row" class="form-row-head form-row-head-select" >
-
-                                        <div class="titulo_formulario">
-                                            <div>
-                                              Crear producto
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <md-input-container class="md-block"  >
-                                        <label>Descripcion</label>
-                                        <input ng-model="createProd.descripcion"
-                                               info="Descripción del producto "
-                                               required
-                                               skip-tab
-
-                                        />
-                                    </md-input-container>
-                                    <md-input-container class="md-block"  >
-                                        <label>Cantidad</label>
-                                        <input ng-model="createProd.saldo"
-                                               decimal info="Cantidad del producto a solicitar "
-                                               required
-                                               skip-tab
-                                               decimal
-
-                                        />
-                                    </md-input-container>
-                                    <md-input-container class="md-block"  >
-                                        <label>Cod. Fabrica</label>
-                                        <input ng-model="createProd.codigo_fabrica"
-                                               info=" Codigo  de fabrica del producto "
-                                               skip-tab
-                                               ng-keypress="($event.which === 13)? doClick('#createProd :first '): 0 "
-
-                                        />
-                                    </md-input-container>
-
-                                </div>
-                            </form>
-
-                        </div>
-
-                    </md-content>
-                </md-sidenav>
-        -->
         <!------------------------------------------- Flecha de siguiente------------------------------------------------------------------------->
         <md-sidenav
             style="margin-top:96px;

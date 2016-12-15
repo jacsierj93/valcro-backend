@@ -1618,13 +1618,19 @@ class EmbarquesController extends BaseController
         foreach ($files as $aux){
             $lang = new Language();
             $lang = $lang->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->first();
-            $subjet = $templates->subjets()->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->orderByRaw('rand()')->first();
+            $subjet = $templates->subjets()->where(function($query) use ($aux)  {
+                $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
+
+            })->first();
             if($lang != null && $subjet !=null){
                 $content = [
                     'lang'=>$lang->lang,
                     'iso_lang'=>$lang->iso_lang,
                     'subjet'=>$subjet->texto,
-                    'subjets'=>$templates->subjets()->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->orderByRaw('rand()')->lists('texto'),
+                    'subjets'=>$templates->subjets()->where(function($query) use ($aux)  {
+                        $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
+
+                    })->orderByRaw('rand()')->lists('texto'),
                     'body'=>
                         View::make('emails/Embarques/sumary/'.$aux['iso_lang'],[
                             'subjet'=>$subjet,

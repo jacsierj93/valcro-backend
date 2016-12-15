@@ -1,9 +1,9 @@
 <div layout="column" class="mail-contacts"  >
     <div flex layout="row"  layout-align="end start" class="mail-option">
-        <div layout="row" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
+        <div  ng-show="cc" layout="row" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
             Cc
         </div>
-        <div layout="row"  ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
+        <div layout="row"   ng-show="ccb" ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
             Cco
         </div>
     </div>
@@ -16,6 +16,7 @@
                   md-on-remove ="removeEmail($chip) "
                   skitp-tab
                   flex
+                  ng-show="to"
 
         >
             <md-autocomplete
@@ -37,7 +38,7 @@
                   md-on-add =" addEmail($chip,'cc') "
                   md-on-remove ="removeEmail($chip) "
                   skitp-tab
-                  ng-show="showCc"
+                  ng-show="cc"
 
         >
             <md-autocomplete
@@ -58,7 +59,7 @@
                   md-on-add =" addEmail($chip,'ccb') "
                   md-on-remove ="removeEmail($chip) "
                   skitp-tab
-                  ng-show="showCco"
+                  ng-show="ccb"
 
         >
             <md-autocomplete

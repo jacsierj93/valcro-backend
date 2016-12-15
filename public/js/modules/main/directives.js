@@ -44,8 +44,7 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
     };
 
     $scope.selectLang = function (id) {
-        console.log("index",$scope.changes );
-        console.log("out ",$scope.contacts );
+
         if(id != $scope.select){
             if($scope.contacts && $scope.contacts.length > 0){
                 if( !$scope.reviewContact(id)){
@@ -120,13 +119,14 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
         $scope.template= $sce.trustAsHtml(angular.copy($scope.origenes[id].body));
         $scope.state = 'load';
         $scope.changes= {trace:[], index:0};
-        if($scope.asuntos && $scope.asuntos.length > 0 && $scope.origenes[id].subjets && $scope.origenes[id].subjets.length > 0){
+        if($scope.asuntos && $scope.origenes[id].subjets && $scope.origenes[id].subjets.length > 0){
             $scope.asuntos.splice(0, $scope.asuntos.length);
             angular.forEach($scope.origenes[id].subjets, function (v, k) {
                 $scope.asuntos.push(v);
             });
-            setNotif.addNotif("info", "Se ha actualizado la lista de asuntos disponibles, por favor revisala y recuerda siempre se debe escribir el asunto en el idioma selecionado",[], {autohidden:2500})
+            setNotif.addNotif("info", "Se ha actualizado la lista de asuntos disponibles, por favor revisala y recuerda siempre se debe escribir el asunto en el idioma selecionado",[], {autohidden:5000})
         }
+
     };
 
     $scope.change = function (e) {
@@ -222,8 +222,11 @@ MyApp.directive('vldhMailContacts', function() {
         controller:'vldCMailContacts',
         replace: true,
         scope:{
-            'out' : "=contacts",
+            'to' : "=?to",
+            'cc' : "=?cc",
+            'ccb' : "=?ccb",
             'correos' : "=?correos",
+            'out' : "=?senders",
             'asuntos' : "=?asuntos",
             'asunto' : "=?asunto",
             'addlangs' : "=?langs",
@@ -241,9 +244,7 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
 
     $scope.destinos = [];
     $scope.addlangs = {};
-    $scope.to = [];
-    $scope.cc = [];
-    $scope.ccb = [];
+
 
     $scope.all  = function () {
         if(!$scope.correos){
@@ -331,7 +332,6 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
             if( newVall > 0 && newVall > oldVall  && $scope.addlangs){
 
                 angular.forEach($scope.to[newVall - 1].langs, function (v, k) {
-                    console.log("to", newVall);
                     if( $scope.addlangs[v]){
                         $scope.addlangs[v] ++;
                     }else{
@@ -387,8 +387,11 @@ MyApp.directive('vldMailWithAdj', function() {
             'template' : "=?template",
             'langs' : "=?langs",
             'lang' : "=?lang",
-            'contacts': "=?contacts",
+            'to': "=?to",
+            'cc': "=?cc",
+            'ccb': "=?ccb",
             'asuntos': "=?asuntos",
+            'asunto': "=?asunto",
             'correos': "=?correos",
             'state' : "=?state",
             //adjuntos
@@ -405,7 +408,6 @@ MyApp.directive('vldMailWithAdj', function() {
 
         },
         template: function(elem, attr){
-            console.log("attr", attr);
             return '<div layout ="column" flex>' +
                     '<div  layout="row"  layout-align="start center" style="    height: 32px;color: rgb(92,183,235);border-bottom: solid 1.5px;  margin-left: 4px;   padding-left: 4px;">' +
                 '<div flex style="margin-top : 8px;">{{title}} </div>' +
@@ -413,8 +415,8 @@ MyApp.directive('vldMailWithAdj', function() {
                     ' <img ng-src="{{(mode == \'list\') ? \'images/adjunto.png\' : \'images/listado.png\'}}"> </div> ' +
                 '</div>'+
                 '<div    layout ="column" flex >' +
-                ' <vldh-mail-contacts correos="correos" contacts="contacts" langs="langs"  lang="lang"  > </vldh-mail-contacts>' +
-                ' <vldhtml-preview load="origenes" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  ></vldhtml-preview>' +
+                ' <vldh-mail-contacts correos="correos" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs"  lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
+                ' <vldhtml-preview load="origenes" template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
                 ' <vld-file-up-img  ng-show="mode != \'list\'" up-model="adjs"  key="'+attr.key+'"  storage="'+attr.storage+'" fn-file-up="fileUp" fn-up-watch="finish" ></vld-file-up-img>' +
             ' </div>' +
                 '</div>';
@@ -422,9 +424,16 @@ MyApp.directive('vldMailWithAdj', function() {
     };
 });
 
-MyApp.controller('vldCMailWithAdj',['$scope',function($scope){
+MyApp.controller('vldCMailWithAdj',['$scope','$timeout',function($scope, $timeout){
     $scope.mode ='list';
-
+    $timeout(function () {
+        if(!$scope.contacts){
+            $scope.contacts=  [];
+        }
+        if(!$scope.asuntos){
+            $scope.asuntos=  [];
+        }
+    },100);
     }
     ]
 );

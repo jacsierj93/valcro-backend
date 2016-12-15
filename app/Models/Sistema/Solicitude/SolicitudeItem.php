@@ -18,4 +18,7 @@ class SolicitudeItem extends Model
     protected $table = "tbl_solicitud_item";
     protected $dates = ['deleted_at'];
 
+    public function producto(){
+        return $this->belongsTo('App\Models\Sistema\Product\Product', 'producto_id');
+    }
 }
