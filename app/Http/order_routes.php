@@ -144,6 +144,7 @@ $app->get("Order/Solicitude/Versions",'Orders\OrderController@getOldSolicitude')
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
 $app->get("Order/Solicitude/ProviderTemplates",'Orders\OrderController@getProviderSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Solicitude/InternalTemplates",'Orders\OrderController@getInternalSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Solicitude/Answerds",'Orders\OrderController@getAnswerdsSolicitude'); ///agrega una respuesta a la solicutd
 
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
 
@@ -162,6 +163,7 @@ $app->post("Order/Solicitude/AddSustitute",'Orders\OrderController@addSustituteS
 $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSustiteSolicitude'); // quita la solicitud anterior
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
 $app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
+$app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
 
 
 $app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
@@ -172,7 +174,6 @@ $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicit
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
 $app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
-$app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
@@ -198,6 +199,8 @@ $app->get("Order/KitchenBoxReview",'Orders\OrderController@getKitchenBoxReview')
 // pedido a  sustituir
 $app->get("Order/Susstitute",'Orders\OrderController@getOrderSustitute'); // detalle del documento a sustituir
 
+// email
+$app->post("Order/mail/resend",'Orders\OrderController@resendEmail'); ///elimina el pedido
 
 $app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina todo el pedido sustituto @deprecated
 $app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega todo el pedido sustituto @deprecated
@@ -213,7 +216,6 @@ $app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///
 $app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
 $app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
 $app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
-$app->get("Order/mail",'Orders\OrderController@getMail'); ///elimina el pedido
 
 
 

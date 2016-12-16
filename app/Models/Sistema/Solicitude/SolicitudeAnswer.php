@@ -17,7 +17,12 @@ class SolicitudeAnswer extends Model
     use SoftDeletes;
     protected $table = "tbl_solicitud_contestacion";
     protected $dates = ['deleted_at'];
-
+    /**
+     * adjuntos del documento
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAnswerAttachment', 'doc_id');
+    }
 
 }
 

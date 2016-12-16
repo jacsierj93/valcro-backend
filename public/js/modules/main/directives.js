@@ -21,6 +21,7 @@ MyApp.directive('vldhtmlPreview', function() {
             'lang' : "=?lang",
             'contacts': "=?contacts",
             'asuntos': "=?asuntos",
+            'funciones' : "=?funciones",
             'state' : "=?state"
         },
         transclude: true,
@@ -34,9 +35,14 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
 
     $scope.changes= {trace:[], index:0};
     $scope.state = 'wait';
-    $scope.template = '<div></div>';
     $scope.prf= undefined;
+    $scope.funciones = {
+        clear: function () {
+            $scope.changes.trace.splice(0, $scope.changes.trace.length);$scope.changes.index=0;
+            $scope.state = 'wait';
 
+        }
+    };
 
     $scope.load = function (key) {
         $scope.state = 'loading';
@@ -230,7 +236,9 @@ MyApp.directive('vldhMailContacts', function() {
             'asuntos' : "=?asuntos",
             'asunto' : "=?asunto",
             'addlangs' : "=?langs",
+            'funciones' : "=?funciones",
             'lang' : "=?lang"
+
         },
         transclude: true,
         link: function(scope, elem, attr, ctrl){},
@@ -244,6 +252,26 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
 
     $scope.destinos = [];
     $scope.addlangs = {};
+    $scope.funciones = {
+
+        clear: function () {
+            $scope.subject = undefined;
+            $scope.asunto = undefined;
+            if($scope.to){
+                $scope.to.splice(0,$scope.to.length);
+            }
+            if($scope.cc){
+                $scope.cc.splice(0,$scope.cc.length);
+            }
+            if($scope.ccb){
+                $scope.ccb.splice(0,$scope.ccb.length);
+            }
+        }
+    };
+
+
+
+
 
 
     $scope.all  = function () {
@@ -272,7 +300,9 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
     };
     $scope.addEmail = function(chip, tipo){
         chip.tipo= tipo;
+/*
         $scope.destinos.push(chip.correo);
+*/
         $scope.out.push(chip);
         if($scope.lang){
             $scope.reviewContact(chip, tipo);
@@ -316,10 +346,10 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
                 ,{block:true})
         }
     };
-
-
     $scope.removeEmail = function(chip){
+/*
         $scope.destinos.splice($scope.destinos.indexOf(chip.correo),1);
+*/
         $scope.out.splice($scope.out.indexOf(chip.correo),1);
         angular.forEach(chip.langs, function (v, k) {
             $scope.addlangs[v] -- ;
@@ -341,6 +371,9 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
                 });
             }
         }
+
+
+
     });
     $scope.$watch('cc.length', function (newVall, oldVall) {
         if(newVall){
@@ -368,6 +401,25 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
             }
         }
     });
+
+    $scope.$watchGroup(['to.length', 'cc.length', 'ccb.length'], function (newVal, oldVal) {
+        $scope.destinos.splice(0, $scope.destinos.length);
+        if($scope.to){
+            angular.forEach($scope.to, function (v, k) {
+                $scope.destinos.push(v.correo);
+            });
+        }
+        if($scope.cc){
+            angular.forEach($scope.cc, function (v, k) {
+                $scope.destinos.push(v.correo);
+            });
+        }
+        if($scope.ccb){
+            angular.forEach($scope.ccb, function (v, k) {
+                $scope.destinos.push(v.correo);
+            });
+        }
+    })
 }]);
 
 /**
@@ -393,6 +445,7 @@ MyApp.directive('vldMailWithAdj', function() {
             'asuntos': "=?asuntos",
             'asunto': "=?asunto",
             'correos': "=?correos",
+            'funciones': "=?funciones",
             'state' : "=?state",
             //adjuntos
             'adjs' : "=upModel",
@@ -415,8 +468,8 @@ MyApp.directive('vldMailWithAdj', function() {
                     ' <img ng-src="{{(mode == \'list\') ? \'images/adjunto.png\' : \'images/listado.png\'}}"> </div> ' +
                 '</div>'+
                 '<div    layout ="column" flex >' +
-                ' <vldh-mail-contacts correos="correos" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs"  lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
-                ' <vldhtml-preview load="origenes" template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
+                ' <vldh-mail-contacts correos="correos" funciones="fnContacts" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs"  lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
+                ' <vldhtml-preview load="origenes" funciones="fnPreview"  template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
                 ' <vld-file-up-img  ng-show="mode != \'list\'" up-model="adjs"  key="'+attr.key+'"  storage="'+attr.storage+'" fn-file-up="fileUp" fn-up-watch="finish" ></vld-file-up-img>' +
             ' </div>' +
                 '</div>';
@@ -426,6 +479,14 @@ MyApp.directive('vldMailWithAdj', function() {
 
 MyApp.controller('vldCMailWithAdj',['$scope','$timeout',function($scope, $timeout){
     $scope.mode ='list';
+
+    $scope.funciones = {
+
+        clear: function () {
+            $scope.fnContacts.clear();
+            $scope.fnPreview.clear();
+        }
+    };
     $timeout(function () {
         if(!$scope.contacts){
             $scope.contacts=  [];

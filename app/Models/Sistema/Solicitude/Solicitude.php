@@ -41,6 +41,10 @@ class Solicitude extends Model
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
     }
 
+    public function answerds(){
+        return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAnswer', 'doc_id');
+    }
+
     /**
      * adjuntos del documento
      */

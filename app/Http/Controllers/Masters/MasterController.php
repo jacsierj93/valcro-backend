@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Masters;
 
 use App\Models\Sistema\Alerts\Alert;
 use App\Models\Sistema\Alerts\AlertItem;
+use App\Models\Sistema\MailModels\MailModule;
 use App\Models\Sistema\Masters\StoreValcro;
 use App\Models\Sistema\Product\SubLine;
 use App\Models\Sistema\Order\OrderCondition;
@@ -183,6 +184,14 @@ class MasterController extends BaseController
         $return['model'] =$model;
         $return['items'] =$model->items()->get();
          return $return;
+    }
+
+    /**
+     * reenvia un correo del modulo que alla fallado
+    **/
+    public function resendMailModulo ($id){
+        $model = MailModule::findOrFail($id);
+        return $model->resend();
     }
 
 }

@@ -722,7 +722,7 @@
                                     <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)">{{item.comentario}}</div>
                                     <div style="width: 80px; text-align: -webkit-center;"  class="cellEmpty "
                                          layout-align="center center" layout="row"
-                                         ng-click="sideaddAnswer(this, item)"
+                                         ng-click="addAnswer(item)"
                                     >
                                         <div class="dot-empty dot-attachment "  layout-align="center center" >
                                             <div style=" margin-top: 2.5px;">M</div>
@@ -3841,7 +3841,7 @@
             </md-content>
         </md-sidenav>
 
-        <!------------------------------------------- mini layer aprobar documento ------------------------------------------------------------------------->
+        <!------------------------------------------- mini layer cancelacion documento ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderCancel" id="OrderCancel"
         >
@@ -4165,38 +4165,63 @@
         <!-- ########################################## LAYER exception  respuesta ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
                     class="md-sidenav-right md-whiteframe-2dp popUp"
-                    md-disable-backdrop="true" md-component-id="addAnswer" id="addAnswer"
+                    md-disable-backdrop="true" md-component-id="OrderAddAnswer" id="OrderAddAnswer"
         >
-            <md-content   layout="row" flex class="sideNavContent" class="cntLayerHolder" layout-padding >
-                <div  layout="column" flex="" class="layerColumn"   click-out="closeAddAnswer($event)">
+            <md-content   layout="row" flex class="sideNavContent" class="cntLayerHolder" ng-controller="OrderAddAnswer" >
+                <div  layout="column" flex="" class="layerColumn"   click-out="close($event)" style="padding-left: 12px" >
 
-
-                    <div layout="row" style="min-height: 36px;" ng-init="addAnswerMode == 1">
-                        <div class="titulo_formulario" layout="column" flex layout-align="start start">
+                    <div layout="row" class="form-row-head form-row-head-select" >
+                        <div class="titulo_formulario" flex>
                             <div>
-                                Respuesta del proveedor
+                                Respuestas del proveedor
                             </div>
                         </div>
 
+                        <div layout="row" layout-align="center end" class="form-row-head-option">
+                            <!--<div flex layout="column" layout-align="center center" ng-click="mode = 'add'">
+                                <span class="icon-Agregar" style="font-size: 12px"></span>
+
+                                <md-tooltip >
+                                   Agregar
+                                </md-tooltip>
+                            </div>-->
+                            <div flex layout="column" layout-align="center center" ng-click="mode = (mode == 'add') ? 'list': 'add' " style="color: #ccc;">
+                                <img ng-src="images/listado.png" ng-show=" mode == 'add'">
+                                <span class="icon-Agregar" style="font-size: 12px" ng-show=" mode == 'list'"></span>
+                                <md-tooltip >
+                                    {{(mode == 'adj')  ? 'Redactar' : 'Agregar' }}
+                                </md-tooltip>
+                            </div>
+                        </div>
                     </div>
-                    <div flex style="overflow: auto;">
-                        <form flex layout="column" name="formAnswerDoc">
-                            <div  >
-                                <md-input-container class="md-block" flex >
-                                <textarea ng-model="addAnswer.descripcion"
+                    <div flex layout="column" class="gridContent" ng-show="mode == 'add'" >
+                        <vld-file-up-img up-model="upModel" fn-file-up="fnfile" key="OrderAddAnswer" storage="orders"></vld-file-up-img>
+                        <form flex="50"  layout="column " name="form" >
+                                <textarea ng-model="model.descripcion"
                                           info="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
+                                          placeholder="Por favor ingrese un texto que describa la conclusion que se llego con el proveedor "
                                           required
                                           id="textarea"
                                           skip-tab
+                                          style="width: inherit;"
                                 ></textarea>
 
-                                </md-input-container>
-
-                            </div>
 
                         </form>
+
                     </div>
-                    <div style="height: : '{{ !(addAnswer.adjs) ? 0 : (20 * addAnswer.adjs.length) }}px'">
+                    <div flex class="gridContent form-style" ng-show="mode == 'list'" >
+                        <div ng-repeat="item in tbl.data" >
+                            <div layout="row" class="cellGridHolder" >
+                                <div flex class="cellGrid" >{{item.descripcion}} </div>
+                            </div>
+                        </div>
+                        <div flex layout="column" layout-align="center center" ng-show="tbl.data.length == 0  " style="height: 100%;">
+                            No hay datos para mostrar
+                        </div>
+                    </div>
+
+                    <!--<div flex ng-show="mode != 'list'" >
                         <div layout="row" layout-align="center space-between" style="border: 1px solid rgb(84, 180, 234);"
                              ngf-drop ngf-select  ng-model="answerfiles"
                              ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="AnswerfileInput"
@@ -4206,7 +4231,7 @@
                             <div flex layout-align=" center start " layout="column">Adjuntos</div>
                             <div style="width: 16px"  layout-align=" center left " layout="column"></div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
 
             </md-content>
@@ -4219,7 +4244,7 @@
         >
             <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderSendMail"    >
                 <vld-mail-with-adj
-                    load="origenes" text="centerText" template="template"
+                    load="origenes" text="centerText" template="template" funciones = "mailFn"
                     correos="correos" to="model.to" cc="model.cc" ccb="model.ccb" langs="langs"  lang="lang" asunto="model.subject" up-model="adjsUp"
                     key="OrderSendEmail" storage="orders" fn-file-up="upfileFinis" fn-up-watch="upFiles" titulo="Correo"
                 ></vld-mail-with-adj>

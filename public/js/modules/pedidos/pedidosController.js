@@ -1430,83 +1430,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 
 
-    /****** ************************** agregar respuesta ***************************************/
-    $scope.addAnswer={};
-    $scope.addAnswer.adjs =[];
-    $scope.isOpenaddAnswer= false;
-
-    $scope.closeAddAnswer= function(e){
-
-        if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
-            /*
-             jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
-             */
-            $scope.isOpenaddAnswer &&
-            !angular.element(e.target).is("#ngf-AnswerfileInput")) {
-
-            if ($mdSidenav("addAnswer").isOpen()) {
-
-                if($scope.formAnswerDoc.$valid){
-                    Order.postMod(
-                        {type:$scope.formMode.mod, mod:"AddAnswer"},{  descripcion:$scope.addAnswer.descripcion,doc_id: $scope.addAnswer.doc_id, adjs :( $scope.addAnswer.adjs.length > 0)  ? $scope.addAnswer.adjs : []},function(response){
-                            $scope.priorityDocs.docs.splice($scope.addAnswer.index,1);
-                            $scope.addAnswer={};
-                            $scope.addAnswer.adjs =[];
-                            $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:autohidden});
-                        });
-
-
-
-                }
-                angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"0"},400);
-                $mdSidenav("addAnswer").close().then(function () {
-                    $scope.isOpenaddAnswer = false;
-                });
-
-            }
-
-
-        }
-    };
-    $scope.sideaddAnswer = function(data, item){
-
-        if(!$scope.isOpenaddAnswer){
-            angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"336px"},400);
-            $scope.formAnswerDoc.$setUntouched();
-            $mdSidenav("addAnswer").open().then(function(){
-                $scope.isOpenaddAnswer = true;
-                $scope.addAnswer.doc_id=angular.copy(item.id);
-                $scope.addAnswer.index=data.$index;
-                $scope.formMode= $scope.forModeAvilable.getXname(item.documento);
-                angular.element(document).find("#addAnswer").find("#textarea").focus();
-
-
-            });
-
-        }
-
-    };
-
 
     /***  Crear producto ***/
 
 
 
-    $scope.$watch('answerfiles.length', function(newValue){
-        if(newValue > 0){
-            filesService.setFolder("orders");
-            angular.forEach($scope.answerfiles, function(v){
 
-                filesService.Upload({file:v,
-                    success: function(data){
-                        $scope.addAnswer.adjs.push(data);
-                    },
-                    error:function(){
-                    }})
-            });
-            $scope.answerfiles =[]
-        }
-    });
 
 
 
@@ -2381,32 +2310,12 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
 
     $scope.DtPedido = function (doc) {
         $scope.OrderDetalleCtrl(doc);
-        // setGetOrder.clear();
-        /*   $scope.gridView= 1;
-         var  paso=  true;
-         if ($mdSidenav("addAnswer").isOpen()){
-         paso=false;
-
-         }
-
-         var aux= angular.copy(doc);
-         if(doc && $scope.module.index <2 && paso){
-         if (segurity('editPedido')) {
-         //$scope.document = aux;;
-         setGetOrder.setOrder(aux);
-         setGetOrder.setState("select");
-         $scope.formMode= $scope.forModeAvilable.getXname(doc.documento);
-         $scope.Docsession.global='upd';
-         $scope.preview=false;
-         $scope.navCtrl.value="detalleDoc";
-         $scope.navCtrl.estado=true;
-         $scope.Docsession.isCopyableable = true;
-         $scope.Docsession.block = true;
-
-         }
-
-         }*/
     };
+
+    $scope.addAnswer = function (item) {
+        $scope.$parent.OrderAddAnswer({id:item.id, documento:item.documento});
+    }
+
 }]);
 
 MyApp.controller('OrderlistEmailsImportCtrl',['$scope','$timeout','DateParse','Order','providers','setGetOrder','clickCommitSrv',  function ($scope,$timeout,DateParse, Order,providers, setGetOrder,commitSrv) {
@@ -2717,10 +2626,10 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             if(newVal ){
                 if(newVal != 0){
                     $scope.$parent.document.condicion_pago_id = newVal.id;
-                   // setGetOrder.change("document","condicion_pago_id", newVal.id);
+                    // setGetOrder.change("document","condicion_pago_id", newVal.id);
                 }
             }else{
-              //  setGetOrder.change("document","condicion_pago_id",undefined);
+                //  setGetOrder.change("document","condicion_pago_id",undefined);
             }
         }
 
@@ -2732,7 +2641,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             if(newVal ){
                 if(newVal != 0){
                     $scope.$parent.document.puerto_id = newVal.id;
-                  //  setGetOrder.change("document","puerto_id", newVal.id);
+                    //  setGetOrder.change("document","puerto_id", newVal.id);
                 }
             }else{
                 if(!$scope.Docsession.block){
@@ -3201,7 +3110,7 @@ MyApp.controller('OrderAccCopyDoc',['$scope','Order','setGetOrder', function ($s
             $scope.$parent.OrderDetalleCtrl({id:response.id,tipo: $scope.$parent.formMode.value }, function () {
                 $scope.NotifAction("ok","Nueva version creada",[],{autohidden:2000});
                 $scope.Docsession.block= false;
-              //  setGetOrder.change("document", 'id', response.id);
+                //  setGetOrder.change("document", 'id', response.id);
             });
 
 
@@ -4339,8 +4248,8 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
                 if(response.action == 'question'){
                     $scope.NotifAction("alert", "¿Que desea hacer?",[
                         {name:"Enviar a proveedor ", action: function (){
-                        $scope.send({action:'sendPrv'})
-                    }},
+                            $scope.send({action:'sendPrv'})
+                        }},
                         {name:"Informar a departamentos", action: function (){
                             $scope.send({action:'sendIntern'})
                         }},
@@ -4466,9 +4375,8 @@ MyApp.controller('OrderMenuAgrCtrl',['$scope','Order','masters','clickCommitSrv'
 
 /**
  * controller for mdsidenav mail type popUp, this controller is responsable de send correo option, this is used for send text,
- * in lieu of de template
  * */
-MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','App','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav,$timeout,App, setGetOrder,Order, IsEmail, SYSTEM){
+MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App','setGetOrder','Order','masters','SYSTEM', function($scope,$mdSidenav,$timeout,$sce, App, setGetOrder,Order,masters , SYSTEM){
 
     $scope.origenes = {};
     $scope.correos = [];
@@ -4480,7 +4388,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','App','setGet
     $scope.prfLang = '';
     $scope.asunto = undefined;
     $scope.lang = undefined;
-$scope.model = {to:[], cc: [], ccb:[], adjs:[],asunto:undefined};
+    $scope.model = {to:[], cc: [], ccb:[], adjs:[],asunto:undefined, content:''};
     $scope.adjsUp = [];
     $scope.adjsLoaded = [];
 
@@ -4494,8 +4402,11 @@ $scope.model = {to:[], cc: [], ccb:[], adjs:[],asunto:undefined};
         $scope.model.ccb = [];
         $scope.model.adjs = [];
         $scope.asunto = undefined;
+        $scope.template = '';
+        $scope.mailFn.clear();
 
-        $scope.template= "<div></div>";
+
+
         if(data.action == 'sendPrv'){
 
             Order.getMod({type:$scope.formMode.mod, mod:"ProviderTemplates",id:$scope.document.id},{}, function(response){
@@ -4518,109 +4429,162 @@ $scope.model = {to:[], cc: [], ccb:[], adjs:[],asunto:undefined};
     };
 
     $scope.next = function () {
+        $scope.model.content =$sce.getTrustedHtml($scope.template);
+        $scope.model.id = angular.copy($scope.$parent.document.id);
+        $scope.inProgress=true;
+        App.setBlock({block:true,level:89});
         Order.postMod({type:$scope.formMode.mod, mod:"Send"},$scope.model, function(response){
+            if(response.email.is){
+                $scope.$parent.NotifAction("ok","Correo enviado",[], {autohidden:2000});
+                $timeout(function () {
+                    if($scope.$parent.module.historia[1] == 'detalleDoc'){
+                        $scope.LayersAction({close:{all:true}});
+                    }else{
+                        $scope.LayersAction({close:{first:true, search:true}});
+                    }
+                    $scope.inProgress=false;
+                    App.setBlock({block:false,level:0});
+                },2200);
+            }else{
+                $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrados, ¿Desea intentar enviar el correo nuevamente? ",
+                    [
+                        {name:"Reintentar", default:15, action: function () {
+                            $scope.resend(response.email.id);
+                        }},
+                        {name:"Cancelar, lo hare mas tarde", action: function () {
 
+                        }}
+                    ]
+                    ,{block:true});
+            }
+        });
+    };
+    $scope.resend = function (id) {
+        Order.post({type:"mail", mod:"resend"},{id:id}, function (response) {
+            if(response.is){
+                $scope.$parent.NotifAction("ok","Correo enviado",[], {autohidden:2000});
+                $timeout(function () {
+                    if($scope.$parent.module.historia[1] == 'detalleDoc'){
+                        $scope.LayersAction({close:{all:true}});
+                    }else{
+                        $scope.LayersAction({close:{first:true, search:true}});
+                    }
+                    $scope.inProgress=false;
+                    App.setBlock({block:false,level:0});
+                },2200);
+            }else{
+                $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrados, ¿Desea intentar enviar el correo nuevamente? ",
+                    [
+                        {name:"Reintentar", default:15, action: function () {
+                            $scope.resend(response.id);
+                        }},
+                        {name:"Cancelar, lo hare mas tarde", action: function () {
+
+                        }}
+                    ]
+                    ,{block:true});
+            }
         });
     };
     $scope.upFiles = function (newVal,olv, data) {
         console.log("data", data);
     };
     /* $scope.isOpen= false;
-    $scope.destinos =[];
-    $scope.emailToText='';
-    $scope.inProgress=false;
-    $scope.transformChip = function(chip) {
-        if (angular.isObject(chip)) {
-            return chip;
-        }
-        if(IsEmail(chip)!= null){
-            return {valor:chip,razon_social:''};
-        }
-        return null;
-    };
-    $scope.$parent.openSendMail = function(calback){
-        if (calback){
-            $scope.calback=calback;
-        }else{
-            delete $scope.calback;
-        }
-        $mdSidenav("sendEmail").open().then(function(){
-            $scope.isOpen= true;
-            $scope.showHead= true;
-            $scope.showCc= false;
-            $scope.showCco= false;
-            $scope.usePersonal= true;
-            $scope.to = [];
-            $scope.cc = [];
-            $scope.cco = [];
-            $scope.asunto='';
-            $scope.text='';
-            $scope.FormSendMail.$setPristine();
-            $scope.FormSendMail.$setUntouched();
+     $scope.destinos =[];
+     $scope.emailToText='';
+     $scope.inProgress=false;
+     $scope.transformChip = function(chip) {
+     if (angular.isObject(chip)) {
+     return chip;
+     }
+     if(IsEmail(chip)!= null){
+     return {valor:chip,razon_social:''};
+     }
+     return null;
+     };
+     $scope.$parent.openSendMail = function(calback){
+     if (calback){
+     $scope.calback=calback;
+     }else{
+     delete $scope.calback;
+     }
+     $mdSidenav("sendEmail").open().then(function(){
+     $scope.isOpen= true;
+     $scope.showHead= true;
+     $scope.showCc= false;
+     $scope.showCco= false;
+     $scope.usePersonal= true;
+     $scope.to = [];
+     $scope.cc = [];
+     $scope.cco = [];
+     $scope.asunto='';
+     $scope.text='';
+     $scope.FormSendMail.$setPristine();
+     $scope.FormSendMail.$setUntouched();
 
 
-            Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
-                $scope.correosProvider= response;
-            });
-        });
-    };
+     Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
+     $scope.correosProvider= response;
+     });
+     });
+     };
 
-    $scope.close = function(e){
-        if(jQuery(e.target).parents("#lyrAlert").length == 0
-            && jQuery(e.target).parents("#sendEmail").length == 0
-            && jQuery(e.target).parents("#noti-button").length == 0
-            && jQuery(e.target).parents(".md-chip-remove").length == 0
-            && jQuery(e.target).parents("#blockXLevel").length == 0
+     $scope.close = function(e){
+     if(jQuery(e.target).parents("#lyrAlert").length == 0
+     && jQuery(e.target).parents("#sendEmail").length == 0
+     && jQuery(e.target).parents("#noti-button").length == 0
+     && jQuery(e.target).parents(".md-chip-remove").length == 0
+     && jQuery(e.target).parents("#blockXLevel").length == 0
 
-            && $scope.isOpen
+     && $scope.isOpen
 
-        ){
-            $mdSidenav("sendEmail").close().then(function(){
-                $scope.isOpen = false;
-                $scope.emailToText='';
-                $scope.useMailSyte= false;
-            });
-        }
+     ){
+     $mdSidenav("sendEmail").close().then(function(){
+     $scope.isOpen = false;
+     $scope.emailToText='';
+     $scope.useMailSyte= false;
+     });
+     }
 
-    };
-
-
-    $scope.addEmail = function(chip){
-        $scope.destinos.push(chip.valor+chip.razon_social);
-    };
-
-    $scope.removeEmail = function(chip){
-        var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
-        $scope.destinos.splice(index,1);
-    };
-    $scope.isAddMail = function(val){
-        return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
-    };
-
-    $scope.send = function(){
-        if($scope.to.length == 0){
-            $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
-        }
-        else if(!$scope.FormSendMail.$valid){
-            $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
-
-        }else{
-            $scope.inProgress=true;
-            App.setBlock({block:true,level:89});
-            Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
-                if(response.accion){
-                    if( $scope.calback){
-                        $scope.calback(response.accion);
-                    }
-                    $scope.inProgress=false;
-                    App.setBlock({block:false});
-                }
+     };
 
 
+     $scope.addEmail = function(chip){
+     $scope.destinos.push(chip.valor+chip.razon_social);
+     };
 
-            });
-        }
-    }*/
+     $scope.removeEmail = function(chip){
+     var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
+     $scope.destinos.splice(index,1);
+     };
+     $scope.isAddMail = function(val){
+     return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
+     };
+
+     $scope.send = function(){
+     if($scope.to.length == 0){
+     $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
+     }
+     else if(!$scope.FormSendMail.$valid){
+     $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
+
+     }else{
+     $scope.inProgress=true;
+     App.setBlock({block:true,level:89});
+     Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
+     if(response.accion){
+     if( $scope.calback){
+     $scope.calback(response.accion);
+     }
+     $scope.inProgress=false;
+     App.setBlock({block:false});
+     }
+
+
+
+     });
+     }
+     }*/
 
 }]);
 
@@ -4630,114 +4594,115 @@ $scope.model = {to:[], cc: [], ccb:[], adjs:[],asunto:undefined};
  *
  * */
 /*
-MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav,$timeout,App,setGetOrder,Order, IsEmail, SYSTEM){
+ MyApp.controller('OrderContactMail',['$scope','$mdSidenav','$timeout','App','setGetOrder','Order','IsEmail','SYSTEM', function($scope,$mdSidenav,$timeout,App,setGetOrder,Order, IsEmail, SYSTEM){
 
-    // $scope.bind =setGetOrder.bind();
-    $scope.isOpen= false;
-    $scope.destinos =[];
-    $scope.emailToText='';
-    $scope.useMailSyte= false;
-    $scope.correosProvider =[];
-    $scope.inProgress= false;
-    $scope.transformChip = function(chip) {
-        if (angular.isObject(chip)) {
-            return chip;
-        }
-        if(IsEmail(chip)!= null){
-            return {valor:chip};
-        }
+ // $scope.bind =setGetOrder.bind();
+ $scope.isOpen= false;
+ $scope.destinos =[];
+ $scope.emailToText='';
+ $scope.useMailSyte= false;
 
-        return null;
-    };
+ $scope.correosProvider =[];
+ $scope.inProgress= false;
+ $scope.transformChip = function(chip) {
+ if (angular.isObject(chip)) {
+ return chip;
+ }
+ if(IsEmail(chip)!= null){
+ return {valor:chip};
+ }
 
-    $scope.$parent.OpenContactMail = function(calback){
+ return null;
+ };
 
-        if(calback){
-            $scope.calback=calback;
-        }else{
-            delete  $scope.$scope.calback;
-        }
-        $mdSidenav("addEMail").open().then(function(){
-            $scope.isOpen= true;
-            $scope.to =[];
-            $scope.cc =[];
-            $scope.cco =[];
-            $scope.correos = [];
-            $scope.usePersonal= true;
-            $scope.FormaddEMail.$setPristine();
-            $scope.FormaddEMail.$setUntouched();
+ $scope.$parent.OpenContactMail = function(calback){
 
-            $scope.asunto='';
-            $scope.text='';
-            Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
-                $scope.correos= response;
+ if(calback){
+ $scope.calback=calback;
+ }else{
+ delete  $scope.$scope.calback;
+ }
+ $mdSidenav("addEMail").open().then(function(){
+ $scope.isOpen= true;
+ $scope.to =[];
+ $scope.cc =[];
+ $scope.cco =[];
+ $scope.correos = [];
+ $scope.usePersonal= true;
+ $scope.FormaddEMail.$setPristine();
+ $scope.FormaddEMail.$setUntouched();
 
-            });
-        });
-    };
+ $scope.asunto='';
+ $scope.text='';
+ Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
+ $scope.correos= response;
 
-    $scope.close = function(e){
-        if(jQuery(e.target).parents("#lyrAlert").length == 0
-            && jQuery(e.target).parents("#addEMail").length == 0
-            && jQuery(e.target).parents("#noti-button").length == 0
-            && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
-            && jQuery(e.target).parents(".md-chip-remove").length == 0
-            &&  jQuery(e.target).attr("id") != "blockXLevel"
-            && $scope.isOpen
-        ){
-            $mdSidenav("addEMail").close().then(function(){
-                $scope.isOpen = false;
-                $scope.destinos.splice(0,  $scope.destinos.length);
-                $scope.emailToText='';
-                $scope.useMailSyte= false;
-            });
-        }
+ });
+ });
+ };
 
-    };
+ $scope.close = function(e){
+ if(jQuery(e.target).parents("#lyrAlert").length == 0
+ && jQuery(e.target).parents("#addEMail").length == 0
+ && jQuery(e.target).parents("#noti-button").length == 0
+ && jQuery(e.target).parents(".md-autocomplete-suggestions").length == 0
+ && jQuery(e.target).parents(".md-chip-remove").length == 0
+ &&  jQuery(e.target).attr("id") != "blockXLevel"
+ && $scope.isOpen
+ ){
+ $mdSidenav("addEMail").close().then(function(){
+ $scope.isOpen = false;
+ $scope.destinos.splice(0,  $scope.destinos.length);
+ $scope.emailToText='';
+ $scope.useMailSyte= false;
+ });
+ }
 
-    $scope.addEmail = function(chip){
-        $scope.destinos.push(chip.valor+chip.razon_social);
+ };
 
-    };
+ $scope.addEmail = function(chip){
+ $scope.destinos.push(chip.valor+chip.razon_social);
 
-    $scope.removeEmail = function(chip){
-        var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
-        $scope.destinos.splice(index,1);
-    };
-    $scope.isAddMail = function(val){
-        return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
-    };
+ };
 
-    $scope.send = function(){
-        if($scope.destinos.length == 0){
-            $scope.NotifAction("error","Por favor selecione al menos un destinatario",[],{autohidden:SYSTEM.noti_autohidden});
+ $scope.removeEmail = function(chip){
+ var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
+ $scope.destinos.splice(index,1);
+ };
+ $scope.isAddMail = function(val){
+ return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
+ };
 
-        }else{
-            $scope.inProgress= true;
-            App.setBlock({block:true, level:89});
+ $scope.send = function(){
+ if($scope.destinos.length == 0){
+ $scope.NotifAction("error","Por favor selecione al menos un destinatario",[],{autohidden:SYSTEM.noti_autohidden});
 
-            Order.postMod({type:$scope.formMode.mod, mod:"Send"},
-                {id:$scope.document.id, to:$scope.to, cc:$scope.cc, cco:$scope.cco,local:$scope.usePersonal, asunto:$scope.asunto},
-                function(response){
-                    $scope.inProgress= false;
-                    App.setBlock({block:false,level:0});
+ }else{
+ $scope.inProgress= true;
+ App.setBlock({block:true, level:89});
 
-                    $mdSidenav("addEMail").close().then(function(){
-                        $scope.isOpen = false;
-                        if( $scope.calback){
-                            $scope.calback(response.accion);
-                            delete $scope.calback;
-                        }
+ Order.postMod({type:$scope.formMode.mod, mod:"Send"},
+ {id:$scope.document.id, to:$scope.to, cc:$scope.cc, cco:$scope.cco,local:$scope.usePersonal, asunto:$scope.asunto},
+ function(response){
+ $scope.inProgress= false;
+ App.setBlock({block:false,level:0});
 
-                    });
+ $mdSidenav("addEMail").close().then(function(){
+ $scope.isOpen = false;
+ if( $scope.calback){
+ $scope.calback(response.accion);
+ delete $scope.calback;
+ }
+
+ });
 
 
-                });
-        }
+ });
+ }
 
-    }
-}]);
-*/
+ }
+ }]);
+ */
 
 MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form',  function($scope, $timeout,$mdSidenav,Order, formSrv){
 
@@ -4956,6 +4921,166 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
 
 }]);
 
+MyApp.controller('OrderAddAnswer',['$scope','$timeout','$mdSidenav','Order','form',  function($scope, $timeout,$mdSidenav,Order, formSrv) {
+
+    $scope.isOpen = false;
+    $scope.isProcess = false;
+    $scope.model = {};
+
+    $scope.tbl = {data:[]}
+    $scope.adjs = [];
+    $scope.$parent.OrderAddAnswer = function (data) {
+        $scope.formMode= $scope.$parent.forModeAvilable.getXname(data.documento);
+        $scope.model = {};
+        $scope.mode= 'list';
+        $scope.isUpFile= false;
+        angular.forEach(data, function (v, k) {
+            $scope.model[k]=v;
+        });
+        $scope.tbl.data.splice(0, $scope.tbl.data.length);
+        Order.query({type:$scope.formMode.mod, mod:"Answerds", id:data.id},{}, function (response) {
+            angular.forEach(response, function (v, k) {
+                $scope.tbl.data.push(v);
+            });
+        });
+        $scope.open();
+    };
+
+    $scope.open = function () {
+        $mdSidenav("OrderAddAnswer").open().then(function(){
+            $scope.isOpen = true;
+            angular.element(document).find("#OrderAddAnswer").find("#textarea").focus();
+        });
+    };
+
+    $scope.save= function (fn ) {
+        Order.postMod(
+            {type:$scope.formMode.mod, mod:"AddAnswer"},$scope.model,function(response){
+                $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:2500});
+                if(fn){
+                    fn();
+                }
+            });
+    };
+    $scope.close= function () {
+        if($scope.isOpen &&  !$scope.isProcess){
+            $scope.isProcess = true;
+            if(!$scope.form.$pristine || $scope.isUpFile){
+                if(!$scope.form.$valid){
+                    $scope.NotifAction("alert","No has colocado una descripcion! por favor dimos a que conclusion has lleagod con el proveedor ",
+                        [
+                            {name:"Dejame agregarla", action: function () {
+
+                            }},
+
+                            {name:"Cancelar", action: function () {
+                                $scope.inclose();
+                            }}
+                        ]
+                        , {block:true})
+                }else{
+                    $scope.save(function () {
+                        $scope.inclose();
+                    });
+                }
+            }else{
+                $scope.inclose();
+            }
+
+        }
+    };
+    $scope.inclose = function () {
+        $mdSidenav("OrderAddAnswer").close().then(function () {
+            $scope.isOpen = false;
+            $timeout(function () {
+                $scope.mode= 'list';
+                $scope.isProcess= false;
+            },500);
+        });
+    };
+
+    $scope.fnfile = function (item) {
+        $scope.isUpFile= true;
+        $scope.model.adjs.push(item);
+    };
+    /*
+
+     $scope.sideaddAnswer = function(data, item){
+
+     if(!$scope.isOpenaddAnswer){
+     angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"336px"},400);
+     $scope.formAnswerDoc.$setUntouched();
+     $mdSidenav("addAnswer").open().then(function(){
+     $scope.isOpenaddAnswer = true;
+     $scope.addAnswer.doc_id=angular.copy(item.id);
+     $scope.addAnswer.index=data.$index;
+     $scope.formMode= $scope.forModeAvilable.getXname(item.documento);
+     angular.element(document).find("#addAnswer").find("#textarea").focus();
+
+
+     });
+
+     }
+
+     };
+     $scope.$watch('answerfiles.length', function(newValue){
+     if(newValue > 0){
+     filesService.setFolder("orders");
+     angular.forEach($scope.answerfiles, function(v){
+
+     filesService.Upload({file:v,
+     success: function(data){
+     $scope.addAnswer.adjs.push(data);
+     },
+     error:function(){
+     }})
+     });
+     $scope.answerfiles =[]
+     }
+     });
+
+
+
+
+     /!****** ************************** agregar respuesta ***************************************!/
+     $scope.addAnswer={};
+     $scope.addAnswer.adjs =[];
+     $scope.isOpenaddAnswer= false;
+
+     $scope.closeAddAnswer= function(e){
+
+     if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
+     /!*
+     jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
+     *!/
+     $scope.isOpenaddAnswer &&
+     !angular.element(e.target).is("#ngf-AnswerfileInput")) {
+
+     if ($mdSidenav("addAnswer").isOpen()) {
+
+     if($scope.formAnswerDoc.$valid){
+     Order.postMod(
+     {type:$scope.formMode.mod, mod:"AddAnswer"},{  descripcion:$scope.addAnswer.descripcion,doc_id: $scope.addAnswer.doc_id, adjs :( $scope.addAnswer.adjs.length > 0)  ? $scope.addAnswer.adjs : []},function(response){
+     $scope.priorityDocs.docs.splice($scope.addAnswer.index,1);
+     $scope.addAnswer={};
+     $scope.addAnswer.adjs =[];
+     $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:autohidden});
+     });
+
+
+
+     }
+     angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"0"},400);
+     $mdSidenav("addAnswer").close().then(function () {
+     $scope.isOpenaddAnswer = false;
+     });
+
+     }
+
+
+     }
+     };*/
+}]);
 
 MyApp.controller('OrderModuleMsmCtrl',['$scope','$mdSidenav','Order','masters','clickCommitSrv','setGetOrder', function ($scope,$mdSidenav,Order,masters,clickCommitSrv,setGetOrder) {
 

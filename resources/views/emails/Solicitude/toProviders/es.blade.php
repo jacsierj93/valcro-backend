@@ -23,7 +23,7 @@
                                             <img width="150px"  style="margin: 0;padding: 0" src='http://valcro.com.ve/images/logo-head.png' ></td>
                                         <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">Emision:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px">
-                                                {{$model->emision}}
+                                                {{vl_db_out_put_date($model->emision)}}
                                             </p></td>
                                         <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro.
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
@@ -37,7 +37,7 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
-                                            <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
+                                            <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
                                                 {{--{{$texto}}--}}
                                             </p>
                                         </td>
@@ -49,7 +49,7 @@
                                     <tbody>
                                     <tr>
                                         <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo:
-                                            <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;">
+                                            <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" contenteditable="true" >
                                                 {{$subjet}}
                                             </p>
                                         </td>
@@ -62,7 +62,7 @@
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Responsable:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0; font-weight: normal;">
-                                               {{-- {{$responsable}}--}}
+                                                {{$user->nombre}}
                                             </p>
                                         </td>
 
@@ -75,7 +75,7 @@
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Correo:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
-                                               {{-- {{$correo}}--}}
+                                                {{$user->email}}
                                             </p>										</td>
                                     </tr>
                                     </tbody>

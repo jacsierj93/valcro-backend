@@ -29,3 +29,5 @@ $app->post("master/files/upload",'Masters\FilesController@uploadFile'); ///sube 
 $app->get("master/files/getFile",'Masters\FilesController@getFileId'); /// obtiene el archivo
 $app->get("master/files/getFiles",'Masters\FilesController@getFiles'); ///obtiene todos los archivo
 
+$app->get("master/mailModule/resend",'Masters\FilesController@resendMailModulo'); ///obtiene todos los archivo
+

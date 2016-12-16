@@ -19,6 +19,7 @@ use App\Models\Sistema\KitchenBoxs\KitchenBox;
 use App\Models\Sistema\Masters\Monedas;
 use App\Models\Sistema\MailModels\MailModule;
 use App\Models\Sistema\MailModels\MailPart;
+use App\Models\Sistema\MailModels\MailModuleDestinations;
 use App\Models\Sistema\Order\Order;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderItem;
@@ -85,7 +86,7 @@ class OrderController extends BaseController
         $this->middleware('auth');
         $this->request = $req;
         if ($this->user == null) {
-            $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
+            $this->user = User::selectRaw('tbl_usuario.id,tbl_usuario.nombre, tbl_usuario.email,tbl_usuario.apellido, tbl_usuario.cargo_id , tbl_cargo.departamento_id')
                 ->join('tbl_cargo', 'tbl_usuario.cargo_id', '=', 'tbl_cargo.id')->where('tbl_usuario.id', $req->session()->get('DATAUSER')['id'])->first();
         }
     }
@@ -291,8 +292,6 @@ class OrderController extends BaseController
 
     }
 
-
-
     public function closeActionOrder(Request $req)
     {
         $model = Order::findOrFail($req->id);
@@ -333,6 +332,11 @@ class OrderController extends BaseController
 
         }
         return ['action' => 'save'];
+    }
+
+    public function resendEmail(Request $req){
+        $model = MailModule::findOrFail($req->id);
+        return $model->resend();
     }
     /*********************** PROVIDER ************************/
 
@@ -556,9 +560,9 @@ class OrderController extends BaseController
         $prov = Provider::findOrFail($req->id);
 
         $docs = Collection::make(array());
-        $solic = $prov->solicitude()->whereNotNull('final_id')->where('fecha_sustitucion', null)->where('comentario_cancelacion', null)->whereNull('uid');
-        $odc = $prov->purchase()->whereNotNull('final_id')->where('fecha_sustitucion', null)->where('comentario_cancelacion', null)->whereNull('uid');
-        $order = $prov->Order()->whereNotNull('final_id')->where('fecha_sustitucion', null)->where('comentario_cancelacion', null)->whereNull('uid');
+        $solic = $prov->solicitude()->where('disponible', 1);
+        $odc = $prov->purchase()->where('disponible', 1);
+        $order = $prov->Order()->where('disponible', 1);
         if ($this->user->cargo_id == $this->profile['trabajador']) {
             $solic = $solic->where('usuario_id', $req->session()->get('DATAUSER')['id']);
             $odc = $odc->where('usuario_id', $req->session()->get('DATAUSER')['id']);
@@ -1691,7 +1695,7 @@ class OrderController extends BaseController
         $result['send']= sizeof($senders);
         if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) && sizeof($senders) == 0){
             $result['action'] = 'sendPrv';
-             return $result;
+            return $result;
         }
         if ($this->user->cargo_id == $this->profile['gerente']) {
             $result['action'] = 'question';
@@ -1705,117 +1709,104 @@ class OrderController extends BaseController
     /**cierra la solicitud*/
     public function CloseSolicitude(Request $req)
     {
-      $result['success'] = "Registro guardado con éxito!";
+        $result['success'] = "Registro guardado con éxito!";
         $result['action'][] = "close";
         $model = Solicitude::findOrFail($req->id);
-        /*$notif= NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21);
-        $model->final_id=
-            "tk".$model->id."-v".$model->version."-i".sizeof($model->items()->get())
-            ."-a".sizeof($model->attachments()->get());*/
         $model->ult_revision = Carbon::now();
+        $model->final_id = $this->getFinalId($model);
+
         $model->save();
-/*
-        $sender  =[
-            'subject'=>'Notificacion de creacion de Solicitud',
-            'to' =>$this->getEmailDepartment($this->departamentos['compras']),
-            'cc' =>[],
-            'ccb' =>[]
-        ];
-
-        if(sizeof($notif->where('clave', 'created')->get()) == 0){
-            $noti = new NotificationModule();
-            $noti->doc_id = $model->id;
-            $noti->doc_tipo_id = 21;
-            $noti->usuario_id = $this->user->id;
-            $data =$this->parseDocToSummaryEmail($model);
-            $data['accion'] ="Creacion de solicitud ";
-            $noti->send($data,$sender,$noti,"created");
-            $result['action'][]="send";
-        }else{
-            if($model->fecha_aprob_compra != null){
-                if(sizeof(NotificationModule::where('doc_id',$req->id)->where('doc_tipo_id', 21)->where('clave', 'aprob_compras')->get()) == 0){
-                    $noti = new NotificationModule();
-                    $noti->doc_id = $model->id;
-                    $noti->doc_tipo_id = 21;
-                    $noti->usuario_id = $this->user->id;
-                    $data =$this->parseDocToSummaryEmail($model);
-                    $data['accion'] ="Aprobacion de solicitud";
-                    $noti->send($data,$sender,$noti,"aprob_compras");
-                    $result['action'][]="aprob_compras";
-                }else if(sizeof($notif->where('clave', 'aprob_compras')->where('usuario_id', $this->user->id)->get()) > 0){
-                    $noti = new NotificationModule();
-                    $noti->doc_id = $model->id;
-                    $noti->doc_tipo_id = 21;
-                    $noti->usuario_id = $this->user->id;
-                    $data =$this->parseDocToSummaryEmail($model);
-                    $data['accion'] ="Desaprobacion de solicitud";
-                    $noti->send($data,$sender,$noti,"cancel_aprob_compras");
-                    $result['action'][]="cancel_aprob_compras";
-                }
-            }else{
-                $sender['subject']= "Notificacion de modificacion de solicitud";
-                $noti = new NotificationModule();
-                $noti->doc_id = $model->id;
-                $noti->doc_tipo_id = 21;
-                $noti->usuario_id = $this->user->id;
-                $data =$this->parseDocToSummaryEmail($model);
-                $data['accion'] ="Modificacion de solicitud ";
-                $noti->send($data,$sender,$noti,"update");
-                $result['action'][]="update";
-            }
-        }*/
-
         return ['id'=>$req->id];
     }
 
-    public static function buildMailTemplates ($module, $reason, $calback){
-        $files =emails_templates_lang($module,$reason) ;
-        $templates =MailPart::where('modulo',$module)->where('proposito',$reason)->first();
-        $good = [];
-        $bad = [];
 
-        foreach ($files as $aux){
-            $lang = new Language();
-            $lang = $lang->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang'])->first();
-            $subjet = $templates->subjets()->where(function($query) use ($aux)  {
-                $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
-
-            })->first();
-            if($lang != null && $subjet !=null){
-                $content = [
-                    'lang'=>$lang->lang,
-                    'iso_lang'=>$lang->iso_lang,
-                    'subjet'=>$subjet->texto,
-                    'subjets'=>$templates->subjets()->where(function($query) use ($aux)  {
-                        $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
-
-                    })->orderByRaw('rand()')->lists('texto')
-                ];
-                $content['body'] = $calback($content, 'emails/'.$module.'/'.$reason.'/'.$aux['iso_lang']);
-                $good[$aux['iso_lang']] = $content;
-            }else{
-                $bad[$aux['iso_lang']] = ['lang'=>$lang ,'$subjet'=>$subjet];
-            }
-
+    public function sendSolicitude(Request $req){
+        $resul = ['action'=>'send'];
+        $model = Solicitude::findOrFail($req->id);
+        $sends =MailModule::where('tipo_origen_id','21')
+            ->where('doc_id',$model->id)
+            ->whereNotNull('send')
+            ->get();
+        $mail = new MailModule();
+        $mail->doc_id = $model->id;
+        $mail->tipo_origen_id = 21;
+        $mail->asunto =$req->has('subject') ? $req->subject : '' ;
+        $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+        $mail->tipo = 'user';
+        $mail->modulo = 'solicitude';
+        $adjs = [];
+        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[], 'subject'=>$mail->asunto];
+        if(sizeof($sends) == 0){
+            $mail->clave= 'created';
         }
-        $data['bad'] =$bad ;
-        $data['good'] =$good ;
-        return $data;
+        if($req->has('to')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'to' ;
+                $destinations['to'][] =$dest;
+            }
+        }
+        if($req->has('cc')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'cc' ;
+                $destinations['cc'][] =$dest;
+
+            }
+        }
+        if($req->has('ccb')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'ccb' ;
+                $destinations['ccb'][] =$dest;
+            }
+        }
+        $mail->save();
+        $mail->senders()->saveMany($destinations['to']);
+        $mail->senders()->saveMany($destinations['cc']);
+        $mail->senders()->saveMany($destinations['ccb']);
+//        if($req->has('adjs')){
+//            foreach ($req->adjs as $file){
+//                $adjs[] = []
+//            }
+//
+//        }
+        //$destinations['subject'] = $req->subject;
+
+        $resul['email'] = $mail->sendMail($req->content, $destinations);
+        if(!$resul['email']['is']){
+            $model->final_id= null;
+
+        }else{
+            $model->ult_revision = Carbon::now();
+            $model->final_id = $this->getFinalId($model);
+        }
+        $model->save();
+        return $resul;
     }
+    /**
+     * obitene las plantillas par el envio del correo al proveedor
+     */
     public function getProviderSolicitudeTemplate(Request $req)
     {
         $model = Solicitude::findOrFail($req->id);
         $prov = Provider::findOrFail($model->prov_id);
-       $user =   $this->user;
+        $user =   $this->user;
         $fn =  function ($content, $file) use ($model,$user)  {
             $template = View::make($file,[
-            'subjet'=>$content['subjet'],
-            'model'=>$model,
-            'articulos'=>$model->items()->with('producto')->get(),
-            'user'=>$user
+                'subjet'=>$content['subjet'],
+                'model'=>$model,
+                'articulos'=>$model->items()->with('producto')->get(),
+                'user'=>$user
             ])->render();
 
-           return $template;
+            return $template;
         };
         $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Solicitude', 'toProviders', $fn)['good']];
 
@@ -1840,7 +1831,7 @@ class OrderController extends BaseController
     }
     /**
      *
-    */
+     */
     public function getInternalSolicitudeTemplate (Request $req){
 
     }
@@ -1888,7 +1879,7 @@ class OrderController extends BaseController
     }
     /**
      * regrese a la solicud anterior
-    **/
+     **/
     public function restoreSolicitude(Request $req){
         $resul = array();
         $princi = Solicitude::findOrFail($req->princ_id);
@@ -1942,6 +1933,53 @@ class OrderController extends BaseController
         return $resul;
     }
 
+    public function AddAnswerSolicitude(Request $req){
+        $response =[];
+        $att =[];
+        $doc= Solicitude::findOrFail($req->id);
+        $model = new SolicitudeAnswer();
+
+
+        $model->descripcion = $req->descripcion;
+        $model->doc_id= $req->id;
+        $model->save();
+
+        $doc->ult_revision  = Carbon::now();
+        $doc->save();
+        $response['accion']= "new";
+        if($req->has("adjs")){
+            $response['accion']= "edit";
+
+            foreach($req->adjs as $aux){
+                $adj= new SolicitudeAnswerAttachment();
+                $adj->contestacion_id = $doc->id;
+                $adj->archivo_id = $aux['id'];
+                $adj->save();
+                $att[] = $adj;
+
+            }
+        }
+        $response['id']=$model->id;
+        $response['doc_id']=$model->doc_id;
+        $response['data']=$model;
+        $response['items']=$att;
+        return $response;
+
+    }
+
+    public function getAnswerdsSolicitude(Request $req){
+        $model = Solicitude::findOrFail($req->id);
+        $resul = [];
+
+        foreach ($model->answerds()->get() as $aux){
+            $aux->adjs = $aux->attachments()->lists('archivo_id');
+            $resul[] = $aux;
+        }
+
+
+        return  $resul;
+
+    }
     /**
      *aprueba la solicutud dependiendo del usuario logeado
      */
@@ -2917,39 +2955,6 @@ class OrderController extends BaseController
 
     /*********************************** AGREGAR RESPUESTA ***********************************/
 
-    public function AddAnswerSolicitude(Request $req){
-        $response =[];
-        $att =[];
-        $doc= Solicitude::findOrFail($req->doc_id);
-        $model = new SolicitudeAnswer();
-        if($req->has("id")){
-            $model = SolicitudeAnswer::findOrFail($req->id);
-        }
-
-        $model->descripcion = $req->descripcion;
-        $model->doc_id= $req->doc_id;
-        $model->save();
-
-        $doc->ult_revision  = Carbon::now();
-        $doc->save();
-        $response['accion']= "new";
-        if($req->has("adjs")){
-            $response['accion']= "edit";
-
-            foreach($req->adjs as $aux){
-                $adj= new SolicitudeAnswerAttachment();
-                $adj->contestacion_id = $doc->id;
-                $adj->archivo_id = $aux['id'];
-                $adj->save();
-                $att[] = $adj;
-
-            }
-        }
-        $response['id']=$model->id;
-        $response['data']=$model;
-        $response['items']=$att;
-
-    }
     public function AddAnswerOrder(Request $req){
         $doc= Order::findOrFail($req->doc_id);
         $model = new OrderAnswer();
@@ -4016,49 +4021,7 @@ class OrderController extends BaseController
         return  ['body'=>View::make("emails.modules.Order.External.ProviderEstimate", $data)->render()];
     }
 
-    public function sendSolicitude(Request $req){
 
-        $model= Solicitude::findOrFail($req->id);
-
-        Mail::send('emails.modules.Order.External.Simple',['texto'=>$req->texto], function ($m) use($req, $model){
-
-            $m->subject(($req->has('asunto')) ? $req->asunto :'');
-            if(!$req->has('local')){
-                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
-            }
-            foreach($req->to as $aux){
-                $m->to($aux['valor'],$aux['nombre']);
-            }
-            foreach($req->cc as $aux){
-                $m->cc($aux['valor'],$aux['nombre']);
-            }
-            foreach($req->cco as $aux){
-                $m->bcc($aux['valor'],$aux['nombre']);
-            }
-            $model->fecha_envio= Carbon::now();
-            $model->save();
-            $sender  =[
-                'subject'=>'Notificacion de creacion de Solicitud',
-                'to' =>$this->getEmailDepartment($this->departamentos['compras']),
-                'cc' =>[],
-                'ccb' =>[]
-            ];
-            $noti = new NotificationModule();
-            $noti->doc_id = $model->id;
-            $noti->doc_tipo_id = 21;
-            $noti->usuario_id = $this->user->id;
-            $data =$this->parseDocToSummaryEmail($model);
-            $data['accion'] ="Envio al proveedor";
-            $noti->send($data,$sender,$noti,"send_provider");
-
-
-
-
-        });
-        $resul =[];
-        $resul['accion']= 'send';
-        return $resul;
-    }
 
     public function sendOrder(Request $req){
 

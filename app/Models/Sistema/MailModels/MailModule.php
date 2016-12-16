@@ -61,13 +61,13 @@ class MailModule extends Model
      *sennder
      */
     public function senders(){
-        return $this->hasMany('App\Models\Sistema\MailModels\MailModuleSenders', 'doc_id');
+        return $this->hasMany('App\Models\Sistema\MailModels\MailModuleDestinations', 'doc_id');
     }
 
-    public function sendMail ($template,$sender){
+    public function sendMail ($template,$sender =  []){
 
         $model = $this;
-        try {
+      try {
             $snappy = App::make('snappy.pdf');
             $pdf = response()->make($snappy->getOutputFromHtml($template), 200, [
                 'Content-Type' => 'application/pdf',
@@ -93,6 +93,7 @@ class MailModule extends Model
             $model->send = null;
             $model->save();
             $model->failSend($template);
+
             return ['is'=>false, 'id'=>$model->id,$e];
         }
     }
@@ -106,7 +107,7 @@ class MailModule extends Model
     public function resend (){
         $store = Storage::disk('mail_fail');
         $template = $store->get(''.$this->id);
-        $senders = ['subject' =>$this->asunto , 'to'=>[new MailModuleDestinations(['tipo'=>'to','doc_id'=>'78','email'=>'meqh1992@gmail.com','nombre'=>'miguel'])], 'cc'=>[], 'ccb'=>[]];
+        $senders = ['subject' =>$this->asunto , 'to'=>[], 'cc'=>[], 'ccb'=>[]];
         $send = $this->senders()->get();
 
         if(!array_key_exists('atts',$senders )){
@@ -124,7 +125,7 @@ class MailModule extends Model
             $senders['ccb'][] = $aux;
         }
         try {   $this->sending($template,$senders);
-            return ['is'=>true, 'id'=>$this->id];
+            return ['is'=>true, 'id'=>$this->id ,'senders'=>$senders];
         }
         catch (\Exception $e) {
 
@@ -149,10 +150,12 @@ class MailModule extends Model
                 }
             }
             if(array_key_exists('ccb',$sender )){
-                foreach($sender['ccb'] as $aux)
-                {
-                    $m->ccb($aux->email, $aux->nombre);
-                    $aux->send = 1;
+                if(array_key_exists('ccb',$sender )){
+                    foreach($sender['ccb'] as $aux)
+                    {
+                        $m->cc($aux->email, $aux->nombre);
+                        $aux->send = 1;
+                    }
                 }
             }
             if(array_key_exists('attsData',$sender )){

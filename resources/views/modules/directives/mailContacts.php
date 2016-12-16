@@ -78,7 +78,6 @@
             <label style="width: calc(100% - 4px );">Asunto</label>
             <md-autocomplete md-selected-item="subject"
                              info="Asunto del correo"
-                             required
                              skip-tab
                              md-search-text="asunto"
                              md-items="item in asuntos"
