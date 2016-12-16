@@ -40,10 +40,10 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
     $scope.listLines = mastersCrit.getLines();
 
     $scope.openCrit = function(line){
-        critForm.setLine(line);
+        if(critForm.setLine(line)){
+            $scope.$parent.LayersAction({open:{name:"critLayer1"}});
+        }
 
-        $scope.$parent.LayersAction({open:{name:"critLayer1"}});
-        /*$mdSidenav("layer1").open();*/
     };
     $scope.curLine = critForm.getLine();
     $scope.filtAvaiable = function(c,v){
@@ -127,7 +127,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             }
 
         })
-        console.log(old[0])
     });
 
     $scope.closeConstruct = function(){
@@ -192,9 +191,13 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         }
     };
     $scope.newCrit = function(){
-        $scope.LayersAction({open:{name:"layer0"}});
+        if(critForm.setLine(false)){
+            $scope.LayersAction({open:{name:"critlayer0"}});
+        }
+
     };
     $scope.newLine = function(){
+
         $scope.LayersAction({open:{name:"layer2"}});
     };
 
@@ -207,8 +210,8 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
-    $scope.$watch("line.id",function(){
-        $scope.criteria = critForm.get();
+    $scope.$watchCollection("line.listado",function(n,o){
+        $scope.criteria = n
     });
 
     $scope.listOptions = critForm.getOptions();
@@ -270,6 +273,24 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             valor: [],
             msg: ''
         }
+    };
+
+    var chngLine = function(n,o){
+        critForm.setEdit(n);
+        clearOpts();
+        if(n===false){
+            $scope.closeConstruct();
+        }
+
+    };
+
+    var clearOpts = function(){
+
+       angular.forEach($scope.opcValue,function(v,k){
+           v.id = false;
+           v.valor = (k=="opts")?[]:"";
+           v.msg = "";
+       })
     };
 
 
@@ -335,7 +356,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
     var saveOptions = function(datos){
-
         criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
             angular.forEach(data, function(value, key){
                 if(key.match(/^[^\$]/g) && ("id" in value)) {
@@ -363,12 +383,8 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         }
 
     });
-    $scope.$watch("line.id",function(val){
-        $scope.criteria = critForm.get();
-    });
+    $scope.$watch("line.id",chngLine);
     $scope.$watch("critField.id",function(val){
-
-
         $timeout(function(){
             $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
             angular.forEach($scope.opcValue, function(value, key){
@@ -483,10 +499,10 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var lines = mastersCrit.getLines();
     var fields = mastersCrit.getFields();
     var tipos = mastersCrit.getTypes();
-    var listado = [];
+    var listadobkup = [];
     var masterOptions = criterios.query({ type:"masterOptions"});
     var ListOptions = criterios.query({ type:"optionLists"});
-    var curLine = {id:false};
+    var curLine = {id:false,listado:[]};
     var factory = {
         linea_id: "1",
         campo_id: "1",
@@ -504,6 +520,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         field:null,
         opcs:[]
     };
+    var accept = false;
 
     var dependency = {
         id:false,
@@ -516,18 +533,36 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 
     return {
         setLine:function(elem){
+            if(!angular.equals(curLine.listado,listadobkup) && !accept){
+                console.log("error");
+                return false;
+            }
+
+            if(!elem){
+                curLine.id = false;
+                listadobkup = [];
+                curLine.listado = [];
+                return true;
+            }
             curLine.id = elem.id;
-            listado = criterios.query({ type:"getCriteria",id:curLine.id});
+            criterios.query({ type:"getCriteria",id:elem.id},function(data){
+                    listadobkup = angular.copy(data) || [];
+                    curLine.listado = data || [];
+                console.log(listadobkup);
+            });
+
+
+            return true;
         },
         getLine:function(){
             return curLine;
         },
         add:function(datos){
             var elem = {};
-            elem = $filter("filterSearch")(listado,[datos.id])[0]
+            elem = $filter("filterSearch")(curLine.listado,[datos.id])[0]
             if(!elem){
                 elem = angular.copy(factory);
-                listado.push(elem);
+                curLine.listado.push(elem);
             }
             elem.id=datos.id;
             elem.ready = datos.ready;
@@ -554,7 +589,8 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             return edit;
         },
         updOptions:function (opt) {
-            var aux = $filter("filterSearch")(listado,[opt.field_id])[0];
+            var aux = $filter("filterSearch")(curLine.listado,[opt.field_id])[0];
+            if(!("options" in aux)) aux.options = [];
             if(opt.opc_id == 4){
                 var valAux = angular.copy(opt.valor);
                 angular.forEach(aux.options, function(value, key){
@@ -568,10 +604,12 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                     }
                 });
                 angular.forEach(valAux, function(value, key) {
+
                     aux.options.push({
                         camp_tipo: "array",
                         descripcion: "Opcion",
                         id: opt.opc_id,
+                        elem:$filter("filterSearch")(ListOptions,[value])[0],
                         pivot: {
                             id: opt.id,
                             lct_id: opt.field_id,
@@ -582,7 +620,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                     })
                 });
 
-            }else{
+            }else{console.log(aux)
                 var upd =  $filter("filterSearch")(aux.options,[opt.opc_id])[0];
                 if(upd){
                     upd.pivot.value =  opt.valor;
@@ -636,8 +674,10 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
-    $scope.$watch("line.id",function(){
-        $scope.criteria = critForm.get();
+    //$scope.criteria =$scope.line.listado;
+    
+    $scope.$watchCollection("line.listado",function(n,o){
+        $scope.criteria = n
     });
     $scope.setEdit = function(campo){
         $scope.openConstruct(function () {
@@ -647,24 +687,11 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.formId = critForm.getEdit();
     
     $scope.get = function (filt,obj) {
-        console.log(obj)
-        if(!("options" in  obj)){
-            return false;
-        }
-        if(obj,options && (filt in obj.options) && obj.options.length>0){
-            if(obj.tipo != "Opcion"){
-                return $filter("customFind")(obj.options,[obj.tipo],function(c,v){
-                    return c.descripcion == v[0];
-                })[0] || {pivot:{value:false}};
-            }else{
-                return $filter("customFind")(obj.options,[filt.id],function(c,v){
-                    return c.descripcion == obj.tipo && c.pivot.value == v[0];
-                }).length > 0;
-            }
+        if(filt!==true){
+            return filt.descripcion == 'Opcion' && (filt.elem.nombre.indexOf(obj)!=-1);
         }else{
-            return "";
+            return filt.descripcion == 'Opcion';
         }
-
 
     };
 
@@ -692,13 +719,16 @@ MyApp.controller('treeViewController',['$scope', 'setNotif','masters','critForm'
 MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter','criterios',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter,criterios) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
-    $scope.$watch("line.id",function(){
-        $scope.criteria = critForm.get();
+    $scope.$watchCollection("line.listado",function(n,o){
+        $scope.criteria = n;
     });
     $scope.currentLct = critForm.getEdit();
     $scope.configDep = critForm.getDepend();
     $scope.$watch("currentLct.id",function(nvo){
-        $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
+        if(nvo){
+            $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
+        }
+
 
     });
 
@@ -753,7 +783,10 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
 
     $scope.$watch("configDep.parent_id",function(nvo){
-        $scope.currentParent = $filter("filterSearch")($scope.criteria,[nvo])[0];
+        if(nvo){
+            $scope.currentParent = $filter("filterSearch")($scope.criteria,[nvo])[0];
+        }
+
     })
 
 }]);
@@ -801,7 +834,7 @@ MyApp.directive("setAttr",function(){
                     }else if(v.especificacion != ""){
                         attr.$observe(v.especificacion,function(){});
                         attr[v.especificacion] = v.pivot.value;
-                        console.log(attr);
+                        //console.log(attr);
                     }
                 })
             });
@@ -848,11 +881,18 @@ MyApp.directive('lmbCollection', function() {
             scope.multi = ('multiple' in attr);
         },
         template: function(elem,attr){
+            var show = "descripcion"
+            if("lmbDisplay" in attr){
+                show = attr.lmbDisplay;
+            }
+            var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
             if(attr.lmbType=="items"){
-                return '<div><div ng-repeat="item in itens" ng-click="setIten(item)" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.nombre}}</div></div>';
+
+                return '<div><div ng-repeat="item in itens'+filt+' track by $index" ng-click="setIten(item)" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.'+show+'}}</div></div>';
             }else{
                 return '<md-content flex layout="column">'+
-                    '<div ng-repeat="item in itens" class="row" ng-click="setIten(item)" ng-class="{\'field-sel\':item.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.descripcion}} </div>'
+                    '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="setIten(item)" ng-class="{\'field-sel\':item.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'
+
                 +'</md-content>';
             }
 

@@ -74,6 +74,12 @@ class CritController extends BaseController
             $field->field;
             $field->type;
             $field['options'] = $field->options()->get();
+            foreach ($field['options'] as $opt){
+                if($opt->descripcion=="Opcion"){
+                    $opt["elem"] = Lista::find($opt->pivot->value);
+                }
+
+            }
             $field['deps'] = $field->dependency()->get();
             foreach ($field['deps'] as $dep){
                 $dep['parent'] = $dep->parent()->first();

@@ -26,29 +26,30 @@
 </md-input-container>
 
 
-<md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')">
-    <label>{{get(true,{'tipo':'placeholder','options':field}).pivot.value || ''}}</label>
+<md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')" layout="row">
+    <label>default</label>
     <md-autocomplete md-selected-item="ctrl.lang"
                      ng-model="crit[field.id]"
                      flex
                      skip-tab
+                     set-attr="field"
                      id="langCont"
-                     ng-required="(cnt.languaje.length==0)"
-                     info="{{get(true,{'tipo':'Info','options':field}).pivot.value || ''}}"
+                     ng-required=""
+                     info=""
                      md-search-text="ctrl.searchLang"
-                     md-items="item in listOptions | stringKey : ctrl.searchLang: 'nombre' | customFind : {'tipo':'Opcion','options':field.options} : get"
-                     md-item-text="item.nombre"
+                     md-items="item in field.options | customFind : ctrl.searchLang : get"
+                     md-item-text="item.elem.nombre"
                      md-no-asterisk
                      md-min-length="0"
                      id="{{field.id}}">
-        <input >
+
         <md-item-template>
-            <span>{{item.nombre}}</span>
+            <span>{{item.elem.nombre}}</span>
         </md-item-template>
     </md-autocomplete>
 
 </md-input-container>
 
-<!--<lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-itens="listOptions | customFind : {tipo:'Opcion',options:field.options} : get" ng-show="(field.type.directive == 'prevRadio')">
+<lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-display="elem.nombre" lmb-itens="field.options" filter-by="customFind : true : get" ng-if="(field.type.directive == 'prevRadio')">
 
-</lmb-collection>-->
+</lmb-collection>

@@ -163,6 +163,8 @@ MyApp.filter('filterSearch', function() {
 MyApp.filter('customFind', function() {
 
     return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
+        if(!arr1) return false;
+
         return arr1.filter(function(val) {
             return  (func) ? func(val,arr2) : true;
         });
@@ -748,7 +750,10 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
 
                angular.forEach(o,function(k,v){
                    if(!(v in n)){
-                       setNotif.hideByContent(scope[v].t,scope[v].m);
+                       if(v in scope){
+                           setNotif.hideByContent(scope[v].t,scope[v].m);
+                       }
+
                    }
                });
                 angular.forEach(n,function(k,v){
