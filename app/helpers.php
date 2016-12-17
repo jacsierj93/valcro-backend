@@ -91,3 +91,18 @@ if ( ! function_exists('attachments_file'))
 
     }
 }
+if ( ! function_exists('storage_disk_path'))
+{
+    /**
+     * Get the  email lang  paths
+     *
+     * @param  string $mod the module
+     * @param  string $accion the accion or function
+     * @return string
+     */
+    function storage_disk_path($disk, $file = '')
+    {
+        return Storage::disk($disk)->getDriver()->getAdapter()->getPathPrefix().$file;
+
+    }
+}

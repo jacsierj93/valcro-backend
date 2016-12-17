@@ -6,6 +6,7 @@ use App\Http\Controllers\Masters\MasterProductController;
 
 use App\Libs\Api\RestApi;
 
+use App\Libs\Utils\Files;
 use App\Models\Sistema\Masters\Country;
 use App\Models\Sistema\CustomOrders\CustomOrder;
 use App\Models\Sistema\Masters\FileModel;
@@ -55,6 +56,8 @@ use Carbon\Carbon;
 use DB;
 use Log;
 use PDF;
+use Storage;
+
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -1735,7 +1738,7 @@ class OrderController extends BaseController
         $mail->tipo = 'user';
         $mail->modulo = 'solicitude';
         $adjs = [];
-        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[], 'subject'=>$mail->asunto];
+        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto];
         if(sizeof($sends) == 0){
             $mail->clave= 'created';
         }
@@ -1771,12 +1774,15 @@ class OrderController extends BaseController
         $mail->senders()->saveMany($destinations['to']);
         $mail->senders()->saveMany($destinations['cc']);
         $mail->senders()->saveMany($destinations['ccb']);
-//        if($req->has('adjs')){
-//            foreach ($req->adjs as $file){
-//                $adjs[] = []
-//            }
-//
-//        }
+       if($req->has('adjs')){
+
+
+            foreach ($req->adjs as $f){
+               $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+            }
+
+        }
+
         //$destinations['subject'] = $req->subject;
 
         $resul['email'] = $mail->sendMail($req->content, $destinations);
@@ -1802,6 +1808,7 @@ class OrderController extends BaseController
             $template = View::make($file,[
                 'subjet'=>$content['subjet'],
                 'model'=>$model,
+                'texto'=>$content['contents']->first(),
                 'articulos'=>$model->items()->with('producto')->get(),
                 'user'=>$user
             ])->render();
@@ -1825,15 +1832,35 @@ class OrderController extends BaseController
 
 
     }
-
-    public static function tester ($data){
-        return $data['lang'];
-    }
-    /**
-     *
+   /**
+     * obtiens las plantillas para envio interno de informacion
      */
     public function getInternalSolicitudeTemplate (Request $req){
+        $model = Solicitude::findOrFail($req->id);
+        $prov = Provider::findOrFail($model->prov_id);
+        $user =   $this->user;
+        $fn =  function ($content, $file) use ($model,$user)  {
+            $template = View::make($file,[
+                'subjet'=>$content['subjet'],
+                'model'=>$model,
+                'texto'=>$content['contents']->first(),
+                'articulos'=>$model->items()->with('producto')->get(),
+                'user'=>$user
+            ])->render();
 
+            return $template;
+        };
+        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Solicitude', 'created', $fn)['good']];
+
+        $correos = [];
+
+
+
+        foreach (User::get() as  $aux){
+            $correos[] = ['nombre'=>$aux->nombre,'correo'=>$aux->email, 'langs'=>['es']];
+        }
+        $data['correos'] = $correos;
+        return $data;
     }
     /**
      * contrulle el resumen preliminar de la solicitud
@@ -1948,19 +1975,21 @@ class OrderController extends BaseController
         $doc->save();
         $response['accion']= "new";
         if($req->has("adjs")){
-            $response['accion']= "edit";
 
             foreach($req->adjs as $aux){
                 $adj= new SolicitudeAnswerAttachment();
-                $adj->contestacion_id = $doc->id;
+                $adj->doc_id = $doc->id;
                 $adj->archivo_id = $aux['id'];
                 $adj->save();
                 $att[] = $adj;
 
             }
         }
+        $model = SolicitudeAnswer::findOrFail($model->id);
+        $model->adjs =  $model->attachments()->lists('archivo_id');
         $response['id']=$model->id;
         $response['doc_id']=$model->doc_id;
+        $response['model']=$model;
         $response['data']=$model;
         $response['items']=$att;
         return $response;
@@ -2875,13 +2904,7 @@ class OrderController extends BaseController
         return $data;
     }
 
-    /**
-     * prueba para metodos
-     * @deprecated
-     */
-    function test(Request $req){
-        dd($req->session()->get('DATAUSER')['id']);
-    }
+
     /**
      * Remuevo todos lo item de un pedido segun el documento de origen
      * @parm id el id de cabezera de documento

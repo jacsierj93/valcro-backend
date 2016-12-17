@@ -451,8 +451,7 @@ MyApp.directive('vldMailWithAdj', function() {
             'adjs' : "=upModel",
             'fileUp' : "=fnFileUp",
             'finish' : "=fnUpWatch",
-            'upAdjs' : "=?loaded"
-
+            'loadeds' : "=?loaded",
         },
         transclude: true,
         link: function(scope, elem, attr, ctrl){
@@ -470,7 +469,7 @@ MyApp.directive('vldMailWithAdj', function() {
                 '<div    layout ="column" flex >' +
                 ' <vldh-mail-contacts correos="correos" funciones="fnContacts" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs"  lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
                 ' <vldhtml-preview load="origenes" funciones="fnPreview"  template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
-                ' <vld-file-up-img  ng-show="mode != \'list\'" up-model="adjs"  key="'+attr.key+'"  storage="'+attr.storage+'" fn-file-up="fileUp" fn-up-watch="finish" ></vld-file-up-img>' +
+                ' <vld-file-up-img  loaded="loadeds" ng-show="mode != \'list\'" up-model="adjs"  key="'+attr.key+'"  storage="'+attr.storage+'" fn-file-up="fileUp" fn-up-watch="finish" ></vld-file-up-img>' +
             ' </div>' +
                 '</div>';
         }
@@ -485,6 +484,7 @@ MyApp.controller('vldCMailWithAdj',['$scope','$timeout',function($scope, $timeou
         clear: function () {
             $scope.fnContacts.clear();
             $scope.fnPreview.clear();
+            $scope.loadeds.splice(0, $scope.loadeds.length);
         }
     };
     $timeout(function () {
@@ -513,7 +513,8 @@ MyApp.directive('vldFileUpImg', function() {
             'key' : "=key",
             'fileUp' : "=fnFileUp",
             'finish' : "=fnUpWatch",
-            'loadeds' : "=?loaded"
+            'loadeds' : "=?loaded",
+            'funciones': "=?funciones",
         },
         transclude: true,
         link: function(scope, elem, attr, ctrl){
@@ -533,6 +534,7 @@ MyApp.controller('vldCFileUpImg',['$scope','$timeout', 'fileSrv',function($scope
         }
     },1000);
 
+    $scope.funciones = {};
     $scope.$watch('adjs.length', function(newValue){
         if(newValue > 0){
             fileSrv.storage($scope.storage);

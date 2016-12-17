@@ -208,7 +208,7 @@ $app->post("Order/AddOrderSubstituteItem",'Orders\OrderController@OrderSubstitut
 
 // sin uso
 $app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido @deprecated
-$app->get("Order/test",'Orders\OrderController@test'); ///elimina el pedido @deprecated
+$app->get("Order/test",'Orders\OrderController@tester'); ///elimina el pedido @deprecated
 
 
 //deprecated

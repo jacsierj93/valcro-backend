@@ -21,11 +21,11 @@
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td align="center" width="20%" style="color: rgb(140,140,140);margin: 0;padding: 10px 10px 10px 0; text-align: left;">
                                             <img width="150px"  style="margin: 0;padding: 0" src='http://valcro.com.ve/images/logo-head.png' ></td>
-                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">Emision:
+                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">emission:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px">
                                                 {{vl_db_out_put_date($model->emision)}}
                                             </p></td>
-                                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro.
+                                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Number.
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                                 {{$model->id}}
                                             </p></td>
@@ -36,7 +36,7 @@
 
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
+                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Description:
                                             <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
                                                 {{$texto}}
                                             </p>
@@ -48,7 +48,7 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
                                     <tr>
-                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo:
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Title:
                                             <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" contenteditable="true" >
                                                 {{$subjet}}
                                             </p>
@@ -84,7 +84,7 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
                                     <tr style="margin: 0;padding: 0px">
-                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Art&iacuteculos:</td>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Article</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -92,9 +92,9 @@
                                     <tbody>
                                     <tr style="color: rgb(140,140,140); height: 32px;font-weight: bold;">
                                         <td style="text-align: left;"> </td>
-                                        <td style="text-align: left;">Codigo </td>
+                                        <td style="text-align: left;">Code </td>
                                         <td style="text-align: left;">Descripcion</td>
-                                        <td style="text-align: left;">Cantidad</td>
+                                        <td style="text-align: left;">Quantity</td>
                                     </tr>
 
                                     @for ($i = 0; $i < sizeof($articulos); $i++)

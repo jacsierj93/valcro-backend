@@ -82,7 +82,6 @@
                              md-search-text="asunto"
                              md-items="item in asuntos"
                              md-item-text="item"
-                             md-no-asterisk
                              md-min-length="0"
                              md-no-cache="true"
                              vl-no-clear

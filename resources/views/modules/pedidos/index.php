@@ -227,7 +227,7 @@
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
-                        ng-show="document.id"  ng-click="OrderCancelDocCtrl();" >
+                         ng-show="document.id"  ng-click="OrderCancelDocCtrl();" >
                         <img src="images/CancelarDocumento.png">
                         <md-tooltip>
                             Cancelar
@@ -1384,8 +1384,8 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <div class="adj-box">
-                                    <div ng-click="openAdj('Factura')"  class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">
+                                <div class="adj-box" ng-click="$parent.OrderNrFacturaCtrl()">
+                                    <div   class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">
                                         {{ (document.adjuntos | stringKey :'factura': 'documento' ).length || 0 }}
                                     </div>
                                 </div>
@@ -1401,8 +1401,8 @@
 
                                     >
                                 </md-input-container>
-                                <div  class="adj-box">
-                                    <div ng-click="openAdj('Proforma')" class="vlc-buttom" ng-class="{'ng-disable':Docsession.block}"  style="float:left">
+                                <div  class="adj-box" ng-click="$parent.OrderNrProformaCtrl()" >
+                                    <div  class="vlc-buttom" ng-class="{'ng-disable':Docsession.block}"  style="float:left">
                                         {{ ($parent.document.adjuntos | stringKey :'proforma' : 'documento' ).length || 0 }}
                                     </div>
                                 </div>
@@ -1456,7 +1456,6 @@
                                 <span style="color: #1f1f1f" ng-show="($parent.document.productos.todos.length > 0 )">
                                         ({{$parent.document.productos.todos.length}})</span>
                             </div>
-
                         </div>
 
                     </div>
@@ -3840,6 +3839,47 @@
 
             </md-content>
         </md-sidenav>
+        <!------------------------------------------- mini nro_factura------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderNrProforma" id="OrderNrProforma"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderNrProformaCtrl" style="padding-left: 12px"  click-out="close($event)" >
+                <div layout="column" flex>
+                    <div layout="row" class="form-row-head form-row-head-select" >
+
+                        <div class="titulo_formulario">
+                            <div>
+                                Proforma
+                            </div>
+                        </div>
+                    </div>
+                    <vld-file-up-img up-model="upModel" fn-file-up="fnfile" key="OrderNrProformaCtrl" storage="orders"></vld-file-up-img>
+
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
+        <!------------------------------------------- mini nro_factura------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderNrFactura" id="OrderNrFactura"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderNrFacturaCtrl" style="padding-left: 12px"  click-out="close($event)" >
+                <div layout="column" flex>
+                    <div layout="row" class="form-row-head form-row-head-select" >
+
+                        <div class="titulo_formulario">
+                            <div>
+                                Factura
+                            </div>
+                        </div>
+                    </div>
+                    <vld-file-up-img up-model="upModel" fn-file-up="fnfile" key="OrderNrFactura" storage="orders"></vld-file-up-img>
+
+                </div>
+
+            </md-content>
+        </md-sidenav>
 
         <!------------------------------------------- mini layer cancelacion documento ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
@@ -3859,7 +3899,7 @@
                                 <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
 
                                 <md-tooltip >
-                                   {{(mode == 'adj')  ? 'Redactar' : 'Adjuntar' }}
+                                    {{(mode == 'adj')  ? 'Redactar' : 'Adjuntar' }}
                                 </md-tooltip>
                             </div>
                         </div>
@@ -3873,7 +3913,7 @@
                                  flex
                        ></textarea
 
-                      <!--  -->
+                           <!--  -->
                     </form>
                     <vld-file-up-img ng-show="mode == 'adj' " up-model="upModel" fn-file-up="fnfile" key="OrderCancelDocCtrl" up-adjs="loades" storage="orders"></vld-file-up-img>
                 </div>
@@ -4220,18 +4260,6 @@
                             No hay datos para mostrar
                         </div>
                     </div>
-
-                    <!--<div flex ng-show="mode != 'list'" >
-                        <div layout="row" layout-align="center space-between" style="border: 1px solid rgb(84, 180, 234);"
-                             ngf-drop ngf-select  ng-model="answerfiles"
-                             ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="AnswerfileInput"
-
-                        >
-                            <div  class="vlc-buttom" style="margin-top: 0; background-color: rgb(84, 180, 234); ">{{addAnswer.adjs.length}}</div>
-                            <div flex layout-align=" center start " layout="column">Adjuntos</div>
-                            <div style="width: 16px"  layout-align=" center left " layout="column"></div>
-                        </div>
-                    </div>-->
                 </div>
 
             </md-content>
@@ -4383,124 +4411,124 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER add contactos para correo ########################################## -->
-  <!--      <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
-                    class="md-sidenav-right md-whiteframe-2dp popUp"
-                    md-disable-backdrop="true" md-component-id="addEMail" id="addEMail"
-        >
-            <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderContactMail"    >
-                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
-                    <form name="FormaddEMail" flex layout="row" class="focused">
-                        <div class="activeleft"></div>
-                        <div layout="column" flex>
-                            <div layout="row" >
-                                <div class="titulo_formulario">
-                                    <div>
-                                        Envio de Correo
-                                    </div>
-                                </div>
-                                <div flex layout="row"  layout-align="end start" class="mail-option">
-                                    <div layout="row" style="width: 20px" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
-                                        Cc
-                                    </div>
-                                    <div layout="row" style="width: 28px" ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
-                                        Cco
-                                    </div>
-                                </div>
-                            </div>
-                            <div layout="row" class="row">
-                                <md-switch class="md-primary"
-                                           ng-model="usePersonal">
-                                </md-switch>
-                                <div flex style="padding-top: 12px;">
-                                    <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
-                                </div>
-                            </div>
-                            <md-chips ng-model="to"
-                                      id="toaddEMail"
-                                      required
-                                      md-transform-chip="transformChip($chip)"
-                                      style="height: inherit;"
-                                      md-on-add =" addEmail($chip) "
-                                      md-on-remove =" removeEmail($chip) "
-                                      ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                      skip-tab
-                            >
-                                <md-autocomplete
-                                    md-search-text="searchDestinos"
-                                    md-items="item in correos  | stringKey : searchDestinos : 'valor' | customFind : destinos : isAddMail "
-                                    md-item-text="item.valor"
-                                    placeholder="Para:">
-                                    <span >{{item.valor}} </span>
+        <!--      <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
+                          class="md-sidenav-right md-whiteframe-2dp popUp"
+                          md-disable-backdrop="true" md-component-id="addEMail" id="addEMail"
+              >
+                  <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderContactMail"    >
+                      <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                          <form name="FormaddEMail" flex layout="row" class="focused">
+                              <div class="activeleft"></div>
+                              <div layout="column" flex>
+                                  <div layout="row" >
+                                      <div class="titulo_formulario">
+                                          <div>
+                                              Envio de Correo
+                                          </div>
+                                      </div>
+                                      <div flex layout="row"  layout-align="end start" class="mail-option">
+                                          <div layout="row" style="width: 20px" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
+                                              Cc
+                                          </div>
+                                          <div layout="row" style="width: 28px" ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
+                                              Cco
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div layout="row" class="row">
+                                      <md-switch class="md-primary"
+                                                 ng-model="usePersonal">
+                                      </md-switch>
+                                      <div flex style="padding-top: 12px;">
+                                          <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
+                                      </div>
+                                  </div>
+                                  <md-chips ng-model="to"
+                                            id="toaddEMail"
+                                            required
+                                            md-transform-chip="transformChip($chip)"
+                                            style="height: inherit;"
+                                            md-on-add =" addEmail($chip) "
+                                            md-on-remove =" removeEmail($chip) "
+                                            ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                            skip-tab
+                                  >
+                                      <md-autocomplete
+                                          md-search-text="searchDestinos"
+                                          md-items="item in correos  | stringKey : searchDestinos : 'valor' | customFind : destinos : isAddMail "
+                                          md-item-text="item.valor"
+                                          placeholder="Para:">
+                                          <span >{{item.valor}} </span>
 
 
 
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                </md-chip-template>
-                            </md-chips>
-                            <md-chips ng-model="cc"
-                                      md-transform-chip="transformChip($chip)"
-                                      style="height: inherit;"
-                                      ng-show="(showCc)"
-                                      md-on-add =" addEmail($chip) "
-                                      md-on-remove =" removeEmail($chip) "
-                                      ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                      skip-tab
-                            >
-                                <md-autocomplete
-                                    md-search-text="searchCc"
-                                    md-items="item in correos | stringKey : searchCc : 'valor' | customFind : destinos : isAddMail  "
-                                    md-item-text="item.valor"
-                                    placeholder="Cc:">
-                                    <span >{{item.valor}} </span>
+                                      </md-autocomplete>
+                                      <md-chip-template>
+                                          <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                      </md-chip-template>
+                                  </md-chips>
+                                  <md-chips ng-model="cc"
+                                            md-transform-chip="transformChip($chip)"
+                                            style="height: inherit;"
+                                            ng-show="(showCc)"
+                                            md-on-add =" addEmail($chip) "
+                                            md-on-remove =" removeEmail($chip) "
+                                            ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                            skip-tab
+                                  >
+                                      <md-autocomplete
+                                          md-search-text="searchCc"
+                                          md-items="item in correos | stringKey : searchCc : 'valor' | customFind : destinos : isAddMail  "
+                                          md-item-text="item.valor"
+                                          placeholder="Cc:">
+                                          <span >{{item.valor}} </span>
 
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                </md-chip-template>
-                            </md-chips>
-                            <md-chips ng-model="cco"
-                                      md-transform-chip="transformChip($chip)"
-                                      md-item-text="item.valor"
-                                      style="height: inherit;"
-                                      ng-show="(showCco)"
-                                      md-on-add =" addEmail($chip) "
-                                      md-on-remove =" removeEmail($chip) "
-                                      ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                      skip-tab
-                            >
-                                <md-autocomplete
-                                    md-search-text="searchCco"
-                                    md-items="item in correos | stringKey : searchCco : 'valor' | customFind : destinos : isAddMail "
-                                    md-item-text="item.valor"
-                                    placeholder="Cco:">
-                                    <span >{{item.valor}} </span>
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                </md-chip-template>
-                            </md-chips>
-                            <div layout="row" class="row-min" style="padding-right: 4px;" >
-                                <md-input-container flex>
-                                    <label>Asunto:</label>
-                                    <input  ng-model="asunto" required skip-tab >
-                                </md-input-container>
-                            </div>
-                        </div>
-                    </form>
-                    <div   skip-tab class="blue-btn " ng-click="send()" >
-                        <div layout="row" class="layout-row " aria-hidden="true">
-                            <div >
-                                Enviar
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <loader ng-show="inProgress"></loader>
+                                      </md-autocomplete>
+                                      <md-chip-template>
+                                          <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                      </md-chip-template>
+                                  </md-chips>
+                                  <md-chips ng-model="cco"
+                                            md-transform-chip="transformChip($chip)"
+                                            md-item-text="item.valor"
+                                            style="height: inherit;"
+                                            ng-show="(showCco)"
+                                            md-on-add =" addEmail($chip) "
+                                            md-on-remove =" removeEmail($chip) "
+                                            ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
+                                            skip-tab
+                                  >
+                                      <md-autocomplete
+                                          md-search-text="searchCco"
+                                          md-items="item in correos | stringKey : searchCco : 'valor' | customFind : destinos : isAddMail "
+                                          md-item-text="item.valor"
+                                          placeholder="Cco:">
+                                          <span >{{item.valor}} </span>
+                                      </md-autocomplete>
+                                      <md-chip-template>
+                                          <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
+                                      </md-chip-template>
+                                  </md-chips>
+                                  <div layout="row" class="row-min" style="padding-right: 4px;" >
+                                      <md-input-container flex>
+                                          <label>Asunto:</label>
+                                          <input  ng-model="asunto" required skip-tab >
+                                      </md-input-container>
+                                  </div>
+                              </div>
+                          </form>
+                          <div   skip-tab class="blue-btn " ng-click="send()" >
+                              <div layout="row" class="layout-row " aria-hidden="true">
+                                  <div >
+                                      Enviar
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <loader ng-show="inProgress"></loader>
 
-            </md-content>
-        </md-sidenav>-->
+                  </md-content>
+              </md-sidenav>-->
 
         <!-- ########################################## LAYER crear nuevo producto ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"

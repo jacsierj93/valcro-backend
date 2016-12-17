@@ -822,30 +822,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     };
 
 
-    $scope.openAdj = function(folder){
-        if($scope.document.id){
-            filesService.open();
-            var items = [];
-            $scope.folder = folder;
-            filesService.setTitle(folder);
-            var data= $filter("customFind")($scope.document.adjuntos,folder.toUpperCase(),function(current,compare){return current.documento==compare});
 
-            if($scope.document.adjuntos.length >0 ){
-                angular.forEach(data,function(v,k){
-                    items.push(v.file);
-                });
-
-            }
-            filesService.setFiles(items);
-        }else {
-            filesService.open();
-            $scope.folder = folder;
-            filesService.setTitle(folder);
-        }
-
-
-
-    };
 
 
 
@@ -1982,14 +1959,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     });
-
-
-
-    $scope.$watch("Docsession.block",function(newVal){
-    });
-
-
-
     /**layers
      working
      * */
@@ -2088,60 +2057,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     /******************************** GUARDADOS ***************************************/
 
-
-
-
-    $scope.$watchGroup(['FormEstatusDoc.$valid', 'FormEstatusDoc.$pristine'], function (nuevo) {
-
-        if (nuevo[0] && !nuevo[1]) {
-
-            Order.postMod({type:$scope.formMode.mod, mod:"SetStatus"},{id:$scope.document.id, estado_id:$scope.document.estado_id}, function(response){
-                if (response.success) {
-                    setGetOrder.change("document","estado",response.item.estado);
-                    $scope.NotifAction("ok","Estado cambiado a "+response.item.estado,[],{autohidden:autohidden});
-                    $scope.FormEstatusDoc.$setPristine();
-
-                }
-
-            });
-        }
-    });
-
-
-    /* $scope.$watchGroup(['FormCancelDoc.$valid', 'FormCancelDoc.$pristine'], function (nuevo) {
-
-     /!* if (nuevo[0] && !nuevo[1]) {
-
-     $scope.document.prov_id = $scope.provSelec.id;
-     Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
-     $scope.FormCancelDoc.$setPristine();
-
-     if (response.success && response.accion == 'new') {
-     $scope.NotifAction("ok","Cancelado",[],{autohidden:autohidden});
-     }
-
-     });
-     }*!/
-
-
-     });*/
-
-    $scope.$watchGroup(['FormAprobCompras.$valid', 'FormAprobCompras.$pristine'],function(newVal){
-        if(!newVal[1]){
-
-        }
-    });
-    $scope.Docsession.msmAprobComTrue= false;
-    $scope.Docsession.msmAprobComfalse= false;
-
-
-
-
-
-
-
-
-    /*********************************  peticiones  carga $http ********************* ************/
 
     $scope.removeList= function(item){
 
@@ -2459,6 +2374,32 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
     };
 
 
+    $scope.openAdj = function(folder){
+
+
+      /*  if($scope.document.id){
+            filesService.open();
+            var items = [];
+            $scope.folder = folder;
+            filesService.setTitle(folder);
+            var data= $filter("customFind")($scope.document.adjuntos,folder.toUpperCase(),function(current,compare){return current.documento==compare});
+
+            if($scope.document.adjuntos.length >0 ){
+                angular.forEach(data,function(v,k){
+                    items.push(v.file);
+                });
+
+            }
+            filesService.setFiles(items);
+        }else {
+            filesService.open();
+            $scope.folder = folder;
+            filesService.setTitle(folder);
+        }*/
+
+
+
+    };
     $scope.toEditHead= function(form, id,val){
         if(!$scope.FormHeadDocument.$pristine){
             setGetOrder.change(form,id,val);
@@ -3213,6 +3154,96 @@ MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder',
 
 
 }]);
+
+
+MyApp.controller('OrderNrFacturaCtrl',['$scope','$mdSidenav', 'Order','setGetOrder', function ($scope,$mdSidenav,Order,setGetOrder) {
+    $scope.upModel = [];
+    $scope.loades = [];
+    $scope.model = {};
+    $scope.fnfile = function (item) {
+        $scope.model.adjs.push(item);
+    };
+    $scope.$parent.OrderNrFacturaCtrl = function () {
+        console.log("nro factura");
+        $scope.model = {adjs:[]};
+        $scope.open();
+    };
+    $scope.open = function (fn) {
+        $mdSidenav("OrderNrFactura").open().then(function(){
+            $scope.isOpen = true;
+
+            if(fn){
+                fn($scope);
+            }
+        });
+    };
+    $scope.inClose = function (fn) {
+
+        $mdSidenav("OrderNrFactura").close().then(function(){
+            $scope.isOpen = false;
+            $scope.isProcess= false;
+            if(fn){
+                fn();
+            }
+        });
+
+    };
+    $scope.close= function (e) {
+        if($scope.isOpen && !$scope.isProcess){
+            $scope.inClose();
+        }
+    }
+    $scope.save = function (fn) {
+
+    };
+
+
+}]);
+
+MyApp.controller('OrderNrProformaCtrl',['$scope','$mdSidenav', 'Order','setGetOrder', function ($scope,$mdSidenav,Order,setGetOrder) {
+    $scope.upModel = [];
+    $scope.loades = [];
+    $scope.model = {};
+    $scope.fnfile = function (item) {
+        $scope.model.adjs.push(item);
+    };
+    $scope.$parent.OrderNrProformaCtrl = function () {
+        console.log("nro factura");
+        $scope.model = {adjs:[]};
+        $scope.open();
+    };
+    $scope.open = function (fn) {
+        $mdSidenav("OrderNrProforma").open().then(function(){
+            $scope.isOpen = true;
+
+            if(fn){
+                fn($scope);
+            }
+        });
+    };
+    $scope.inClose = function (fn) {
+
+        $mdSidenav("OrderNrProforma").close().then(function(){
+            $scope.isOpen = false;
+            $scope.isProcess= false;
+            if(fn){
+                fn();
+            }
+        });
+
+    };
+    $scope.close= function (e) {
+        if($scope.isOpen && !$scope.isProcess){
+            $scope.inClose();
+        }
+    }
+    $scope.save = function (fn) {
+
+    };
+
+
+}]);
+
 MyApp.controller('OrderCancelDocCtrl',['$scope','$mdSidenav','$timeout',  'Order','setGetOrder', function ($scope,$mdSidenav, $timeout, Order,setGetOrder) {
     $scope.upModel = [];
     $scope.loades = [];
@@ -4420,6 +4451,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
 
     };
     $scope.upfileFinis = function (file) {
+        $scope.model.adjs.push(file);
         console.log("upfileFinis", file);
     };
 
@@ -4927,11 +4959,11 @@ MyApp.controller('OrderAddAnswer',['$scope','$timeout','$mdSidenav','Order','for
     $scope.isProcess = false;
     $scope.model = {};
 
-    $scope.tbl = {data:[]}
+    $scope.tbl = {data:[]};
     $scope.adjs = [];
     $scope.$parent.OrderAddAnswer = function (data) {
         $scope.formMode= $scope.$parent.forModeAvilable.getXname(data.documento);
-        $scope.model = {};
+        $scope.model = {adjs:[]};
         $scope.mode= 'list';
         $scope.isUpFile= false;
         angular.forEach(data, function (v, k) {
@@ -4957,6 +4989,7 @@ MyApp.controller('OrderAddAnswer',['$scope','$timeout','$mdSidenav','Order','for
         Order.postMod(
             {type:$scope.formMode.mod, mod:"AddAnswer"},$scope.model,function(response){
                 $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:2500});
+                $scope.tbl.data.push(response.model);
                 if(fn){
                     fn();
                 }
@@ -4967,7 +5000,7 @@ MyApp.controller('OrderAddAnswer',['$scope','$timeout','$mdSidenav','Order','for
             $scope.isProcess = true;
             if(!$scope.form.$pristine || $scope.isUpFile){
                 if(!$scope.form.$valid){
-                    $scope.NotifAction("alert","No has colocado una descripcion! por favor dimos a que conclusion has lleagod con el proveedor ",
+                    $scope.NotifAction("alert","No has colocado una descripcion! por favor dinos a que conclusion has llegado con el proveedor ",
                         [
                             {name:"Dejame agregarla", action: function () {
 

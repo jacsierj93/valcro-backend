@@ -194,6 +194,34 @@ class Files
 
 
     }
+    /**busca y muestra un archivo, dada su ruta
+     * @param $name
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getAttach($name)
+
+    {
+
+        try {
+
+            Log::info("buscando archivo");
+
+            $archivo = response()->make($this->fileSystem->get($name), 200, [
+                'Content-Type' => $this->fileSystem->mimeType($name),
+                'Content-Disposition' => 'inline; ' . $name,
+            ]);
+
+        } catch (\Exception $e) {
+
+            Log::error("no se  encontro el archivo $name");
+            $archivo = null;
+
+        }
+
+        return $archivo;
+
+
+    }
 
     /**
      * @return mixed

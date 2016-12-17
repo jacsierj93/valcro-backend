@@ -78,9 +78,13 @@ class EmailController extends BaseController
                     'subjets'=>$templates->subjets()->where(function($query) use ($aux)  {
                         $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
 
+                    })->orderByRaw('rand()')->lists('texto'),
+                    'contents'=>$templates->contents()->where(function($query) use ($aux)  {
+                        $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
+
                     })->orderByRaw('rand()')->lists('texto')
                 ];
-                $content['body'] = $calback($content, 'emails/'.$module.'/'.$reason.'/'.$aux['iso_lang']);
+                $content['body'] = $calback($content, 'emails/'.$module.'/'.$reason.'/'.$aux['iso_lang'],$templates);
                 $good[$aux['iso_lang']] = $content;
             }else{
                 $bad[$aux['iso_lang']] = ['lang'=>$lang ,'$subjet'=>$subjet];
