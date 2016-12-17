@@ -73,7 +73,7 @@ class CritController extends BaseController
             $field->line;
             $field->field;
             $field->type;
-            $field['options'] = $field->options()->get();
+            $field['options'] = $field->options()->get();/*->groupBy("descripcion");*/
             foreach ($field['options'] as $opt){
                 if($opt->descripcion=="Opcion"){
                     $opt["elem"] = Lista::find($opt->pivot->value);
@@ -133,7 +133,7 @@ class CritController extends BaseController
         }
 
         $crit->descripcion = $rq->descripcion;
-        $crit->tipo_id = $rq->default;
+        $crit->tipo_id = $rq->tipo_id;
 
         $crit->save();
         $ret["id"] = $crit->id;

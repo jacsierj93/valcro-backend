@@ -284,6 +284,7 @@
                                 lmb-type="list"
                                 lmb-model="critField.type"
                                 lmb-itens="tipos"
+                                valid = "{f:checkType,c:callback}"
                                 flex
                             >
 
@@ -456,14 +457,14 @@
                                                                              flex
                                                                              skip-tab
                                                                              ng-required="(cnt.languaje.length==0)"
-                                                                             md-selected-item-change="setOptSel(ctrl.selOption.id)"
+                                                                             md-selected-item-change="setOptSel(ctrl)"
                                                                              info="opcion a agregar"
                                                                              md-search-text="ctrl.searchOptions"
                                                                              md-items="item in listOptions | stringKey : ctrl.searchOpctions: 'nombre' | filterSelect: opcValue.opts.valor"
                                                                              md-item-text="item.nombre"
                                                                              md-no-asterisk
                                                                              md-min-length="0"
-                                                                             vl-no-clear
+
                                                                              class="Frm-value"
                                                             >
                                                                 <input >
@@ -542,8 +543,7 @@
                                 <label>Tipo de Campo</label>
                                 <md-autocomplete md-selected-item="ctrl.field"
                                                  flex
-                                                 
-                                                 md-selected-item-change="newField.default = ctrl.field.id"
+                                                 md-selected-item-change="newField.tipo_id = ctrl.field.id"
                                                  info="este sera el tipo por defecto para este campo"
                                                  skip-tab
                                                  required

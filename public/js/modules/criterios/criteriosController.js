@@ -120,6 +120,9 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         $scope.layerIndex = nvo[0];
         $scope.layer = nvo[0];
         $timeout(function(){
+            if($scope.index == 0){
+                critForm.setLine(false);
+            }
             if(old[0] == 'critLayer1'){
                 if(!$mdSidenav(old[0]).isOpen()){
                     $scope.closeConstruct()
@@ -345,11 +348,12 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         return $filter("filterSearch")($scope.listOptions ,[id])[0];
     };
 
-    $scope.setOptSel = function(id){
+    $scope.setOptSel = function(elem){
         
-        if(id){
-            $scope.opcValue.opts.valor.unshift(id);
-            $timeout(function(){$scope.ctrl.searchOptions = null},0);
+        if(elem.selOption.id){
+            $scope.opcValue.opts.valor.unshift(elem.selOption.id);
+            //console.log(elem)
+            $timeout(function(){elem.searchOptions = null},0);
             saveOptions($scope.opcValue)
         }
 
@@ -369,8 +373,10 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         });
     };
 
-    $scope.$watch("critField.type",function(val){
-        $scope.options = (val)?$filter("filterSearch")($scope.tipos ,[val])[0].cfg:[];
+    $scope.$watch("critField.type",function(val,old){
+            $scope.options = (val)?$filter("filterSearch")($scope.tipos ,[val])[0].cfg:[];
+
+
     });
 
     $scope.$watchCollection("critField",function(n,o){
@@ -383,6 +389,31 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         }
 
     });
+
+    $scope.checkType = function (dat) {
+        if(!$scope.critField.field){
+            return true;
+        }
+        var def = $filter("filterSearch")($scope.fields ,[$scope.critField.field])[0].tipo_id || false;
+        return dat.id == def || def===false;
+    };
+
+    $scope.callback = function(ok){
+        setNotif.addNotif("alert","este campo usualmente no es de este tipo, estas seguro del cambio",[
+            {
+                name: "SI",
+                action: function () {
+                    ok()
+                }
+            },
+            {
+                name:"NO",
+                action: function(){
+
+                }
+            }
+        ])
+    };
     $scope.$watch("line.id",chngLine);
     $scope.$watch("critField.id",function(val){
         $timeout(function(){
@@ -413,6 +444,10 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     $scope.createField = function(data,campo){
         $scope.critField[campo]=data.id;
+        if(campo == "field"){
+            //console.log(data)
+            $scope.critField.type = data.tipo_id;
+        }
 
     };
     $scope.opennext = function(){
@@ -474,7 +509,7 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
     $scope.newField = {
         id:false,
         descripcion:"",
-        default:null
+        tipo_id:null
     }
     $scope.$watchGroup(['fieldForm.$valid','fieldForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
@@ -534,7 +569,6 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     return {
         setLine:function(elem){
             if(!angular.equals(curLine.listado,listadobkup) && !accept){
-                console.log("error");
                 return false;
             }
 
@@ -687,9 +721,11 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.formId = critForm.getEdit();
     
     $scope.get = function (filt,obj) {
-        if(filt!==true){
+        console.log("entro",obj)
+        if(obj!==true){
             return filt.descripcion == 'Opcion' && (filt.elem.nombre.indexOf(obj)!=-1);
         }else{
+            console.log("entro")
             return filt.descripcion == 'Opcion';
         }
 
@@ -851,11 +887,28 @@ MyApp.directive('lmbCollection', function() {
         transclude: true,
         scope: {
             itens: '=lmbItens',
-            model: '=lmbModel'
+            model: '=lmbModel',
+            valid: '=?valid'
         },
         controller:function($scope){
+            $scope.curVal = {};
+            if(!("valid" in $scope)){
+                $scope.valid = {
+                    f:function(){return true},
+                    c:function(){return true},
+                }
+            }
             $scope.setIten=function(dat){
+                $scope.curVal = dat;
+                if($scope.valid.f(dat)){
+                    done()
+                }else{
+                    $scope.valid.c(done)
+                }
+            };
 
+            var done = function(){
+                var dat = $scope.curVal;
                 if($scope.multi){
                     if($scope.model.indexOf(dat.id) != -1){
                         $scope.model.splice($scope.model.indexOf(dat.id),1);
@@ -865,7 +918,6 @@ MyApp.directive('lmbCollection', function() {
                 }else{
                     $scope.model = dat.id;
                 }
-
             };
 
             $scope.exist = function(dat){
@@ -888,7 +940,7 @@ MyApp.directive('lmbCollection', function() {
             var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
             if(attr.lmbType=="items"){
 
-                return '<div><div ng-repeat="item in itens'+filt+' track by $index" ng-click="setIten(item)" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.'+show+'}}</div></div>';
+                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="setIten(item)" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.'+show+'}}</div></div>';
             }else{
                 return '<md-content flex layout="column">'+
                     '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="setIten(item)" ng-class="{\'field-sel\':item.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'

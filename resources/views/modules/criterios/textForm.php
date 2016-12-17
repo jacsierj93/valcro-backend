@@ -50,6 +50,6 @@
 
 </md-input-container>
 
-<lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-display="elem.nombre" lmb-itens="field.options" filter-by="customFind : true : get" ng-if="(field.type.directive == 'prevRadio')">
+<lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-display="elem.nombre" lmb-itens="field.options" filter-by="customFind : true : $parent.get" ng-if="(field.type.directive == 'prevRadio')">
 
 </lmb-collection>
