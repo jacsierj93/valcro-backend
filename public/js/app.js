@@ -760,9 +760,7 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
                     if((v in scope)){
                         btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
                             ctrl.$setValidity(v, true);
-                            console.log(ctrl.$error)
                         }}]:[];
-
                         setNotif.addNotif(scope[v].t,scope[v].m,btn);
                     }
 

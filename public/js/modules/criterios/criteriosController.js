@@ -418,26 +418,47 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.$watch("critField.id",function(val){
         $timeout(function(){
             $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
-            angular.forEach($scope.opcValue, function(value, key){
-                value.field_id = val;
-                if(key!="opts"){
-                    var v =  $filter("customFind")($scope.critField.opcs,[value.opc_id],function(c,v){
-                        return c.pivot.opc_id == v[0];
-                    })[0];
+            console.log($scope.critField)
+            $scope.opcValue.info.field_id= val;
+            $scope.opcValue.info.id= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.id : false;
+            $scope.opcValue.info.valor= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.value : false;
+            $scope.opcValue.info.msg= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.message : false;
 
-                    if(v){
-                        value.id=v.pivot.id || false;
-                        value.valor=v.pivot.value || "";
-                        value.msg=v.pivot.message || "";
-                    }
-                }else{
-                    value.valor = [];
-                    angular.forEach($filter("filterSearch")($scope.critField.opcs,[value.opc_id]), function(valor, key){
-                        value.valor.push(valor.pivot.value);
-                    });
-                }
+            $scope.opcValue.place.field_id= val;
+            $scope.opcValue.place.id= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.id : false;
+            $scope.opcValue.place.valor= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.value : false;
+            $scope.opcValue.place.msg= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.message : false;
 
+            $scope.opcValue.req.field_id= val;
+            $scope.opcValue.req.id= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.id : false;
+            $scope.opcValue.req.valor= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.value : false;
+            $scope.opcValue.req.msg= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.message : false;
+
+            $scope.opcValue.min.field_id= val;
+            $scope.opcValue.min.id= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.id : false;
+            $scope.opcValue.min.valor= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.value : false;
+            $scope.opcValue.min.msg= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.message : false;
+
+            $scope.opcValue.max.field_id= val;
+            $scope.opcValue.max.id =  ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.id : false;
+            $scope.opcValue.max.valor= ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.value : false;
+            $scope.opcValue.max.msg= ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.message : false;
+
+            $scope.opcValue.maxI.field_id= val;
+            $scope.opcValue.maxI.id = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.id : false;
+            $scope.opcValue.maxI.valor = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.value : false;
+            $scope.opcValue.maxI.msg = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.message : false;
+
+            $scope.opcValue.minI.field_id= val;
+            $scope.opcValue.minI.id = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.id : false;
+            $scope.opcValue.minI.valor = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.value : false;
+            $scope.opcValue.minI.msg = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.message : false;
+
+            $scope.opcValue.opts.field_id = $scope.critField.id;
+            angular.forEach($scope.critField.opcs.Opcion, function(valor, key){
+                $scope.opcValue.opts.valor.push(valor.pivot.value);
             });
+
         },0)
 
     });
@@ -510,7 +531,7 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
         id:false,
         descripcion:"",
         tipo_id:null
-    }
+    };
     $scope.$watchGroup(['fieldForm.$valid','fieldForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
             criterios.put({type:"saveNewField"},$scope.newField,function(data){
@@ -582,7 +603,6 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             criterios.query({ type:"getCriteria",id:elem.id},function(data){
                     listadobkup = angular.copy(data) || [];
                     curLine.listado = data || [];
-                console.log(listadobkup);
             });
 
 
@@ -627,7 +647,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             if(!("options" in aux)) aux.options = [];
             if(opt.opc_id == 4){
                 var valAux = angular.copy(opt.valor);
-                angular.forEach(aux.options, function(value, key){
+                angular.forEach(aux.options.Opcion, function(value, key){
                     if(value.id==opt.opc_id){
                         var idx = valAux.indexOf(parseInt(value.id))
                         if(idx==-1){
@@ -639,7 +659,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                 });
                 angular.forEach(valAux, function(value, key) {
 
-                    aux.options.push({
+                    aux.options.Opcion.push({
                         camp_tipo: "array",
                         descripcion: "Opcion",
                         id: opt.opc_id,
@@ -654,13 +674,14 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                     })
                 });
 
-            }else{console.log(aux)
-                var upd =  $filter("filterSearch")(aux.options,[opt.opc_id])[0];
+            }else{
+                var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
+                var upd =  aux.options[define.descripcion][0];
                 if(upd){
                     upd.pivot.value =  opt.valor;
                     upd.pivot.message =  opt.msg;
                 }else{
-                    var temp = angular.copy($filter("filterSearch")(masterOptions,[opt.opc_id])[0]);
+                    var temp = angular.copy(define);
                     temp.pivot= {
                         id: opt.id,
                         lct_id: opt.field_id,
@@ -668,7 +689,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                         value: opt.valor,
                         message: opt.msg
                     };
-                    aux.options.push(temp);
+                    aux.options[define.descripcion][0].push(temp);
                 }
             }
         },
@@ -702,9 +723,6 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     }
 });
 
-
-
-
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
@@ -720,15 +738,10 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     };
     $scope.formId = critForm.getEdit();
     
-    $scope.get = function (filt,obj) {
-        console.log("entro",obj)
-        if(obj!==true){
-            return filt.descripcion == 'Opcion' && (filt.elem.nombre.indexOf(obj)!=-1);
-        }else{
-            console.log("entro")
-            return filt.descripcion == 'Opcion';
-        }
-
+    $scope.isShow = function(field){
+        field.deps.forEach(function (){
+            
+        })
     };
 
     $scope.openConstruct = function(callback){
