@@ -76,18 +76,39 @@ if ( ! function_exists('attachments_file'))
      */
     function attachments_file($keys)
     {
+        $data = [];
         foreach($keys as $aux){
             $att = [];
             $file= \App\Models\Sistema\Masters\FileModel::findOrFail($aux);
-            $att['id'] = $aux->id;
-            $att['archivo_id'] = $aux->archivo_id;
-            $att['documento'] = $aux->documento;
-            $att['comentario'] = $aux->comentario;
+            $att['archivo_id'] = $aux;
             $att['thumb']=$file->getThumbName();
             $att['tipo']=$file->tipo;
-            $att['file'] = $file->archivo;
+            $att['archivo'] = $file->archivo;
             $data[]= $att;
         }
+        return $data;
+
+    }
+}
+if ( ! function_exists('attachment_file'))
+{
+    /**
+     * Get the  email lang  paths
+     *
+     * @param  string $mod the module
+     * @param  string $accion the accion or function
+     * @return string
+     */
+    function attachment_file($id)
+    {
+            $file= \App\Models\Sistema\Masters\FileModel::findOrFail($id);
+            $att['archivo_id'] = $id;
+            $att['thumb']=$file->getThumbName();
+            $att['tipo']=$file->tipo;
+            $att['archivo'] = $file->archivo;
+            $data[]= $att;
+
+        return $data;
 
     }
 }

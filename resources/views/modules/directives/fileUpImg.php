@@ -1,7 +1,7 @@
 <div layout="column" flex >
     <div style="padding: 2px;; min-height: 56px;" layout="row" >
         <div ngf-drop ngf-select  ng-model="adjs" class="drop-box" ngf-drag-over-class="dragover"
-             ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" >
+             ngf-multiple="true" ngf-allow-dir="true"  accept="image/*,application/pdf" id="fileInput" ng-disabled="noUp">
             Insertar archivo
         </div>
     </div>
