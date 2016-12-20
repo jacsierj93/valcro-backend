@@ -9,18 +9,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.formMode ={};
     $scope.layer= undefined;
     $scope.index= 0;
-    /*
-     $scope.formData ={direccionesFact:[],monedas:[], paises :[], condicionPago:[] , direcciones:[], puertos:[]};
-     */
-    /*
-     $scope.formDataContraP ={};
-     */
-    /*
-     $scope.clickerTime = clickerTime;
-     */
-
-    // filesService.setFolder('orders');
-    // $scope.filesProcess = filesService.getProcess();
 
     $scope.forModeAvilable={
         Correo: {
@@ -818,40 +806,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     }
 
 
-    /*
-     $scope.selecContraP = function (item) {
-     $scope.contraPedSelec ={};
-     $scope.LayersAction({open:{name:"resumenContraPedido", before: function(){
-
-     Order.get({type:"CustomOrder", id: item.id, doc_id: $scope.document.id, tipo: $scope.formMode.value}, {},
-     function(response){
-
-     $scope.contraPedSelec= response;
-     if(response.fecha_aprox_entrega != null){
-     $scope.contraPedSelec.fecha_aprox_entrega = new Date(Date.parse(response.fecha_aprox_entrega));
-     }
-     if(response.fecha != null){
-     $scope.contraPedSelec.fecha = new Date(Date.parse(response.fecha));
-
-     }
-
-     });
-
-     if(!$scope.formDataContraP.contraPedidoMotivo){
-     $scope.formDataContraP.contraPedidoMotivo = Order.query({type: 'CustomOrderReason'});
-     }
-     if(!$scope.formDataContraP.contraPedidoPrioridad){
-     $scope.formDataContraP.contraPedidoPrioridad = Order.query({type: 'CustomOrderPriority'});
-     }
-
-     if(!$scope.formDataContraP.tipoEnvio){
-     $scope.formDataContraP.tipoEnvio = masters.query({type: 'getProviderTypeSend'});
-     }
-     }}});
-
-     }
-     */
-
 
 
 
@@ -957,107 +911,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     };
     /*********************************************** EVENTOS CHANGE ***********************************************/
 
-
-    /*$scope.changeContraP = function (item) {
-     if(item.import){
-     $scope.NotifAction("error",
-     "Este Contra pedido fue agregado a partir de otra solicitud "
-     ,[],{autohidden:autohidden});
-     item.asignado=true;
-
-     }else
-     if($scope.provSelec.contrapedido != '1' && item.asignado){
-     $scope.NotifAction("alert","El proveedor "+ $scope.provSelec.razon_social +
-     " no admite contra pedidos ¿Esta seguro de asignarlo ?",
-     [
-     {name:"No", action : function(){item.asignado = false;}},
-     {name:"Si", action:
-     function(){
-     $scope.addRemoveContraPe(item);
-     }
-     }
-
-
-     ]
-     ,{});
-     }else {
-     $scope.addRemoveContraPe(item);
-     }
-
-
-     };*/
-
-    /*
-     $scope.addRemoveContraPe = function(item){
-     if(item.asignado){
-     Order.query({type:"CustomOrderReview", id: item.id, tipo: $scope.formMode.value, doc_id:$scope.document.id},{},function(response){
-     item.doc_id=$scope.document.id;
-     if(response.length > 0){
-     $scope.NotifAction("alert",
-     "Ya se encuentra asignado a otro documento ¿Desea agregarlo de igual manera?"
-     ,[
-     {name: 'Si',
-     action:function(){
-     Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
-     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-     setGetOrder.change('contraPedido'+item.id,'id',item);
-     setGetOrder.setState("change");
-     });
-     }
-     },{name: 'No',
-     action:function(){item.asignado=false;}
-     }
-     ]);
-     }else{
-     Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
-     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-     setGetOrder.change('contraPedido'+item.id,'id',item);
-
-
-     });
-     }
-
-
-
-     });
-     }else {
-     $scope.NotifAction("alert",
-     "Se eliminara el contra pedido ¿Desea continuar?"
-     ,[
-     {name: 'Ok',
-     action:function(){
-     Order.postMod({type:$scope.formMode.mod,mod:"RemoveCustomOrder"},item,function(response){
-     $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-     setGetOrder.change('contraPedido'+item.id,'id',undefined);
-
-     });
-     }
-     },{name: 'Cancel',
-     action:function(){item.asignado=true;}
-     }
-     ]);
-     }
-     /!*
-
-     if(item.asignado){
-     if(item.asignadoOtro.length >0){
-
-     }else {
-     Order.postMod({type:$scope.formMode.mod,mod:"AddCustomOrder"},item,function(response){
-     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-     setGetOrder.change('contraPedido'+item.id,'id',item);
-
-
-     });
-     }
-
-     }
-     else{
-
-     }
-     *!/
-     };
-     */
 
 
     $scope.clearSelec = function(obj){
@@ -2748,63 +2601,6 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','form', f
         return true;
     };
 
-    /*
-     $scope.changeProducto = function (item){
-     var paso = true;
-     if(item.asignado && item.saldo > 0){
-     item.prov_id =$scope.provSelec.id;
-     item.doc_id =$scope.document.id;
-     Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
-     if(!item.reng_id){
-     $scope.NotifAction("ok",
-     "agregado"
-     ,[],{autohidden:autohidden});
-     var prod= angular.copy(response);
-     prod.cantidad = parseFloat(prod.cantidad);
-     }
-     item.reng_id=response.reng_id;
-     setGetOrder.change('producto'+item.id,'id',item);
-     });
-     }
-
-
-     };
-
-     $scope.addRemoveProd = function (item){
-     if(item.asignado){
-     $timeout(function(){
-     var mo= jQuery("#p"+item.id);
-     mo[0].focus();
-     item.saldo=1;
-     $scope.changeProducto(item);
-
-     },100);
-
-     }else if(!item.asignado && item.reng_id){
-     $scope.NotifAction("alert",
-     "Se eliminara el producto ¿Deseas continuar?"
-     ,[
-     {name: 'Ok',
-     action:function(){
-     Order.postMod({type:$scope.formMode.mod,mod:"ProductChange"},item,function(response){
-     $scope.NotifAction("info",
-     "Removido"
-     ,[],{autohidden:autohidden});
-     setGetOrder.change('producto'+item.id,'id',undefined);
-     delete item.reng_id;
-     item.saldo = 0;
-     item.cantidad = 0;
-     });
-     }
-     },{name: 'Cancel',
-     action:function(){item.asignado=true;}
-     }
-     ],{block:true});
-     }
-
-     };
-
-     */
     $scope.$watch('lineaSelec', function (newVal, oldVal) {
         if(newVal ){
             masters.query({type:"prodSubLines", linea_id: newVal.id},{}, function (response) {
@@ -3871,7 +3667,7 @@ MyApp.controller('OrderResumenContraPedidoCtrl',['$scope', '$timeout','Order','f
                     [
                         {name:"Si, añadirlo ", action: function () {
                             formSrv.name= 'OrderResumenContraPedidoCtrl';
-                            $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrder"});
+                            $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrderItem"});
                         }},
                         {name:"Cancelar", action: function () {
 
@@ -3944,53 +3740,7 @@ MyApp.controller('OrderResumenPedidoSusCtrl',['$scope', '$timeout','Order','form
 
     };
 
-    $scope.addRemoveDocSusItem = function(item){
-        /*    var aux = {
-         asignado:item.asignado,
-         tipo_origen_id: $scope.formMode.value,
-         doc_origen_id: item.doc_id,
-         doc_id: $scope.document.id,
-         cantidad:  item.saldo,
-         saldo:  item.saldo,
-         producto_id:  item.producto_id,
-         descripcion:  item.descripcion,
-         id:item.id
-
-         };
-         if(item.asignado){
-         Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-         if(response.accion == "new"){
-         $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-         item.renglon_id= response.renglon_id;
-         }
-
-         });
-
-         }else if(!item.asignado && item.renglon_id){
-         $scope.NotifAction("alert","Se Removera el articulo",[
-         {name:'Cancelar',
-         action: function(){
-
-         }
-         },
-         {name:'Continuar',default:4,
-         action: function(){
-         Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-         if(response.accion == "new"){
-         $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-         item.renglon_id= response.renglon_id;
-         }
-         });
-
-         }
-         }
-         ]);
-         }*/
-
-
-
-    };
-    $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+/*   $scope.$watch("bindForm.estado", function (newVal, oldVall) {
         if(newVal && formSrv.name == 'OrderResumenContraPedidoCtrl'){
             var data = formSrv.getData();
             $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
@@ -4005,7 +3755,7 @@ MyApp.controller('OrderResumenPedidoSusCtrl',['$scope', '$timeout','Order','form
             }
 
         }
-    });
+    });*/
 
 }]);
 
@@ -4605,7 +4355,6 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
 
 }]);
 
-
 MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form',  function($scope, $timeout,$mdSidenav,Order, formSrv){
 
     $scope.defaultUrl =  {type:$scope.$parent.formMode.mod, mod:"SaveProductItem"};
@@ -4822,7 +4571,6 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
      */
 
 }]);
-
 
 MyApp.controller('OrderminiChangeItemCtrl',['$scope','$timeout','$mdSidenav','Order','form',  function($scope, $timeout,$mdSidenav,Order, formSrv){
 
@@ -5997,21 +5745,7 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
     }
 }]);
 
-/**
- * filtra para buscar dentro de array de json
- * @param data el array de objetos
- * @param compare el valor a evaluar
- * @param key clave que corresponde al json
- *@return un array de resultados
- * **/
-MyApp.filter('stringKey', function() {
 
-    return function(data,compare, key) {
-        return (!data) ? [] :data.filter(function(val) {
-            return (!val[key] || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
-        });
-    }
-});
 
 /**
  * valida campos del formulario, solo admite numeros y puntos

@@ -54,6 +54,10 @@ class Order extends Model
         return $this->hasMany('App\Models\Sistema\Order\OrderAttachment', 'doc_id');
     }
 
+    public function answerds(){
+        return $this->hasMany('App\Models\Sistema\Order\OrderAnswer', 'doc_id');
+    }
+
     /**
      * @return el numero de contra pedido asignados a este pedido
      */

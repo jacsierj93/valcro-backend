@@ -2785,8 +2785,7 @@
                                     <div class="rowRsmTitle" flex="40"> Creado: </div>
                                     <div class="rms" flex  layout="row" layout-align="space-between center">
                                         <div>{{document.emision | date:'dd/MM/yyyy' }}</div>
-                                        <div style="width: 16px; height: 16px; border-radius: 50% ; float: left;margin-left: 2px;margin-right: 2px;"
-                                             class="emit{{document.diasEmit}}"></div>
+                                        <div style="border:none;" class="circle emit{{document.diasEmit}}"></div>
                                     </div>
                                 </div>
                                 <div layout="row" flex  class="rowRsm" ng-show="gridViewFinalDoc == 1" >
@@ -2887,7 +2886,7 @@
                                     </div>
                                     <div class="rms" flex> {{document.puerto_id}} </div>
                                 </div>
-                                <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && (document.nro_proforma ||finalDoc.adjProforma.length > 0 ))" >
+                                <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && (document.nro_proforma.doc ||document.nro_proforma.adjs.length > 0 ))" >
                                     <div layout="row" flex="40"  >
                                         <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'new' && finalDoc.nro_proforma.trace.length > 0 "
                                              layout-align="center center" >
@@ -2900,10 +2899,10 @@
                                     </div>
                                     <div class="rms" flex  layout="row" layout-align="space-between center">
                                         <div>{{document.nro_proforma.doc}}</div>
-                                        <div class="circle" ng-click="openAdj('proforma')" ng-show="finalDoc.adjProforma.length > 0">{{finalDoc.adjProforma.length}}</div>
+                                        <div class="circle" ng-show="document.nro_proforma.adjs.length > 0 ">{{document.nro_proforma.adjs.length}}</div>
                                     </div>
                                 </div>
-                                <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura || finalDoc.adjFactura.length > 0) )">
+                                <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura.doc || document.nro_factura.adjs.length > 0) )">
                                     <div layout="row" flex="40" >
                                         <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'created'"
                                              layout-align="center center" >
@@ -2916,7 +2915,7 @@
                                     </div>
                                     <div class="rms" flex  layout="row" layout-align="space-between center">
                                         <div>{{document.nro_factura.doc}}</div>
-                                        <div class="circle"  ng-click="openAdj('factura')" ng-show="finalDoc.adjFactura.length > 0" >{{finalDoc.adjFactura.length}}</div>
+                                        <div class="circle" ng-show="document.nro_factura.adjs.length > 0 ">{{document.nro_factura.adjs.length}}</div>
 
                                     </div>
                                 </div>

@@ -17,8 +17,12 @@ class PurchaseItem extends Model
     use SoftDeletes;
     protected $table = "tbl_compra_orden_item";
     protected $dates = ['deleted_at'];
-    public function product (){
+    public function producto (){
         return $this->belongsTo('App\Models\Sistema\Product\Product', 'producto_id');
+    }
+
+    public function document(){
+        return $this->belongsTo('App\Models\Sistema\Purchase\Purchase', 'doc_id');
     }
 /*
     public  function getAdvancePaymentProvider(){

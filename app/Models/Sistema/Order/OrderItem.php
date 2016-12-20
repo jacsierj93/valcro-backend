@@ -19,13 +19,11 @@ class OrderItem extends Model
     protected $table = "tbl_pedido_item";
     protected $dates = ['deleted_at'];
 
-    public function product (){
+    public function producto (){
         return $this->belongsTo('App\Models\Sistema\Product\Product', 'producto_id');
     }
-/*
-    public function items()
-    {
-        return $this->morphTo();
+
+    public function document(){
+        return $this->belongsTo('App\Models\Sistema\Order\Order', 'doc_id');
     }
-*/
 }

@@ -299,7 +299,7 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
             if( !$scope.noNew){
                 return {nombre:chip,correo:chip,lang:[]};
             }else{
-                setNotif.addNotif("error","No se admite la agregacion de nuvos destinatario",[], {autohidden:2000})
+                setNotif.addNotif("error","No se admite la agregacion de nuevos destinatario",[], {autohidden:2000})
             }
 
         }
@@ -307,9 +307,6 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
     };
     $scope.addEmail = function(chip, tipo){
         chip.tipo= tipo;
-/*
-        $scope.destinos.push(chip.correo);
-*/
         $scope.out.push(chip);
         if($scope.lang){
             $scope.reviewContact(chip, tipo);

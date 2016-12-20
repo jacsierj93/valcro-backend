@@ -18,7 +18,12 @@ class OrderAnswer extends Model
     protected $table = "tbl_pedido_contestacion";
     protected $dates = ['deleted_at'];
 
-
+    /**
+     * adjuntos del documento
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Order\OrderAnswerAttachment', 'doc_id');
+    }
 }
 
 

@@ -18,6 +18,12 @@ class PurchaseAnswer extends Model
     protected $table = "tbl_compra_orden_contestacion";
     protected $dates = ['deleted_at'];
 
+    /**
+     * adjuntos del documento
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseAnswerAttachment', 'doc_id');
+    }
 }
 
 

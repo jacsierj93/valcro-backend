@@ -34,19 +34,13 @@ class Purchase extends Model
     public function type_origen(){
         return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id');
     }
-    /*   public function getTypeAttribute()
-      {
-
-      }
-     public function getTypevalueAttribute()
-      {
-          return 23;
-      }
-  */
     public function items(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseItem', 'doc_id');
     }
 
+    public function answerds(){
+        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseAnswer', 'doc_id');
+    }
     public function newItem(){
         return new PurchaseItem();
     }

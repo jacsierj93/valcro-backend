@@ -67,75 +67,6 @@ $app->post("Order/CreateTemp",'Orders\OrderController@createTemp'); ///crea un p
 $app->get("Order/Document",'Orders\OrderController@getDocument'); ///obtiene el documento
 
 
-//pedidos
-$app->post("Order/Order/Save",'Orders\OrderController@saveOrder'); ///guarda la solicitud
-$app->post("Order/Order/AdddRemoveItem",'Orders\OrderController@addRemoveOrderItem'); ///asigna y remove item a l solicitud
-$app->post("Order/Order/ChangeItem",'Orders\OrderController@changeItemOrder'); ///actuliza el item de solicitud
-$app->post("Order/Order/AddCustomOrder",'Orders\OrderController@addCustomOrderOrder'); ///agrega el contra pedido
-$app->post("Order/Order/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderOrder'); ///remueve un contra pedido de un pedido
-$app->post("Order/Order/AddkitchenBox",'Orders\OrderController@addkitchenBoxOrder'); ///agrega un kitchen box
-$app->post("Order/Order/RemovekitchenBox",'Orders\OrderController@removekitchenBoxOrder'); ///quita  kitchen box
-$app->post("Order/Order/SetStatus",'Orders\OrderController@setStatusOrder'); // cambia el estado del documento
-$app->post("Order/Order/AdddRemoveItems",'Orders\OrderController@addRemoveOrderItems'); // agrega y quita items a la solicud por lotes
-$app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
-$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
-$app->post("Order/Order/AddSustitute",'Orders\OrderController@addSustituteOrder'); // add un solicitud vieja a un anueva
-$app->post("Order/Order/RemoveSustitute",'Orders\OrderController@removeSustiteOrder'); // quita la solicitud anterio
-$app->post("Order/Order/AddAdjuntos",'Orders\OrderController@addAttachmentsOrder'); ///agrega adjuntos al pedido
-$app->post("Order/Order/Update",'Orders\OrderController@UpdateOrder'); ///retira el final id y notifica que se actualizara el documento
-$app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); /// crea una copia sin adjuntos
-$app->post("Order/Order/AddAnswer",'Orders\OrderController@AddAnswerOrder'); /// agrega una respuesta tipo snoze a al a proforma
-$app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesOrder'); /// realiza la aprobacion por comprass
-$app->post("Order/Order/Cancel",'Orders\OrderController@cancelOrder'); /// cancela el pedido
-$app->post("Order/Order/ProductChange",'Orders\OrderController@changeProductoOrden'); /// cambia un producto item
-$app->post("Order/Order/Restore",'Orders\OrderController@restoreOrden'); /// restaura a una version anterior
-$app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
-$app->post("Order/Order/CloseAction",'Orders\OrderController@closeActionOrder'); /// define que acion se debe realizar para cerrar la accion
-
-
-$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
-$app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// trae el resumen final de un pedido
-$app->get("Order/Order/Versions",'Orders\OrderController@getOldOrden'); /// trae todas las versiones que a generado el documento
-$app->get("Order/Order/EmailEstimate",'Orders\OrderController@EmailEstimateOrder'); ///trau preview del  presupuesto a enviar al provedor
-$app->get("Order/Order/EmailSummary",'Orders\OrderController@EmailSummaryDocDocOrder'); ///trau preview de el resumen del documento
-
-
-//Orden de compra
-$app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda  la orden de compra
-$app->post("Order/Purchase/AdddRemoveItem",'Orders\OrderController@addRemovePurchaseItem'); ///asigna y remove item a l solicitud
-$app->post("Order/Purchase/ChangeItem",'Orders\OrderController@changeItemPurchase'); ///actuliza el item de solicitud
-$app->post("Order/Purchase/AddCustomOrder",'Orders\OrderController@addCustomOrderPurchase'); //  agrega un contra pedido a la orden de compra
-$app->post("Order/Purchase/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderPurchase'); // remove el contra pedido
-$app->post("Order/Purchase/AddkitchenBox",'Orders\OrderController@addkitchenBoxPurchase'); /// agrga un kitchen box
-$app->post("Order/Purchase/RemovekitchenBox",'Orders\OrderController@removekitchenBoxPurchase'); ///quita  kitchen box
-$app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
-$app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
-$app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
-$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // asigna el paren a la orden de compra
-$app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addPurchaseOrder'); // agrega un sustito
-$app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removePurchaseOrder'); // quita la orden de compra
-$app->post("Order/Purchase/AddAdjuntos",'Orders\OrderController@addAttachmentsPurchase'); ///agrega adjuntos a la orden de compra
-$app->post("Order/Purchase/Update",'Orders\OrderController@PurchaseUpdate'); /// marca la orden de compra como temporar
-$app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); /// crea una copia de la orden de compra sina adjutos
-$app->post("Order/Purchase/AddProdConditionPay",'Orders\OrderController@addProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
-$app->post("Order/Purchase/RemoveProdConditionPay",'Orders\OrderController@removeProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
-$app->post("Order/Purchase/AddAnswer",'Orders\OrderController@AddAnswerPurchase'); ///agrega una respuesta tipo snoze a la orden de compra
-$app->post("Order/Purchase/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesPurchase'); // agreaga la aprobacion por compras
-$app->post("Order/Purchase/Cancel",'Orders\OrderController@cancelPurchase'); /// Cancela el documento
-$app->post("Order/Purchase/ProductChange",'Orders\OrderController@changeProductoPurchase'); // cambia el producto
-$app->post("Order/Purchase/Restore",'Orders\OrderController@restorePurchase'); /// restaura a una version anterior
-$app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// envia la solicitud al proveedor
-$app->post("Order/Purchase/Create",'Orders\OrderController@CreatePurchase'); /// envia la solicitud al proveedor
-$app->post("Order/Purchase/CloseAction",'Orders\OrderController@closeActionPurchase'); /// define que acion se debe realizar para cerrar la accion
-
-
-$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
-$app->get("Order/Purchase/Versions",'Orders\OrderController@getOldPurchase'); /// trae todas las versiones que a generado el documento
-$app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///resumen final de la orden de compra
-$app->get("Order/Purchase/EmailEstimate",'Orders\OrderController@EmailEstimatePurchase'); ///trau preview del  presupuesto a enviar al provedor
-$app->get("Order/Purchase/EmailSummary",'Orders\OrderController@EmailSummaryDocPurchase'); ///trau preview del  presupuesto a enviar al provedor
-
-
 
 // solicitudes
 
@@ -147,16 +78,14 @@ $app->get("Order/Solicitude/InternalTemplates",'Orders\OrderController@getIntern
 $app->get("Order/Solicitude/Answerds",'Orders\OrderController@getAnswerdsSolicitude'); ///agrega una respuesta a la solicutd
 
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
-
 $app->post("Order/Solicitude/SaveProductItem",'Orders\OrderController@saveSolicitudItemProduc'); ///guarda y asinga el dproducto a la solicutud
 $app->post("Order/Solicitude/DeleteProductItem",'Orders\OrderController@DeleteSolicitudItemProduc'); ///guarda y asinga el dproducto a la solicutud
 $app->post("Order/Solicitude/SaveCustomOrderItem",'Orders\OrderController@saveSolicitudItemCustomOrder'); ///asigna un iten de contra pedido
 $app->post("Order/Solicitude/DeleteCustomOrderItem",'Orders\OrderController@DeleteSolicitudItemCustomOrder'); ///elimna
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
-$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@ChangeItemSolicitude'); /// guarda el item de la solicitud
+$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@ChangeItemSolicitude'); /// GUARDA EL ITEM DE LA SOLICTUD
 $app->post("Order/Solicitude/DeleteItem",'Orders\OrderController@DeleteItemSolicitude'); /// guarda el item de la solicitud
-$app->post("Order/Solicitude/RestoreItem",'Orders\OrderController@RestoreItemSolicitude'); /// guarda el item de la solicitud
-
+$app->post("Order/Solicitude/RestoreItem",'Orders\OrderController@RestoreItemSolicitude'); /// elimina el item de la solicut
 $app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido entero
 $app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido entero
 $app->post("Order/Solicitude/SavekitchenBox",'Orders\OrderController@addkitchenBoxSolicitude'); ///agrega u kitchen box
@@ -169,27 +98,113 @@ $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'
 $app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
 $app->post("Order/Solicitude/AddAttachments",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
+$app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
+$app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
+$app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 
-
+/*** sin uso aparente**********************/
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
-$app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // asigna un nuevo paren al docuemnto
-$app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
-$app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
-$app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
+/*** sin uso aparente********* */
 
 
-$app->get("Order/Solicitude/EmailEstimate",'Orders\OrderController@EmailEstimateSolicitude'); ///trau preview del  presupuesto a enviar al provedor
-$app->get("Order/Solicitude/EmailSummary",'Orders\OrderController@EmailSummaryDocSolicitude'); ///trau preview del  presupuesto a enviar al provedor
+//pedidos
 
+
+$app->get("Order/Order/Substitutes",'Orders\OrderController@getOrderSubstitutes'); ///lista de todos los pedidos que se peden sustituir
+$app->get("Order/Order/Versions",'Orders\OrderController@getOldOrden'); /// trae todas las versiones que a generado el documento
+$app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// trae el resumen final de un pedido
+$app->get("Order/Order/ProviderTemplates",'Orders\OrderController@getProviderOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Order/InternalTemplates",'Orders\OrderController@getInternalOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Order/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
+
+$app->post("Order/Order/Save",'Orders\OrderController@saveOrder'); ///guarda la solicitud
+$app->post("Order/Order/SaveProductItem",'Orders\OrderController@saveOrderItemProduc'); ///guarda y asinga el dproducto a la solicutud
+$app->post("Order/Order/DeleteProductItem",'Orders\OrderController@DeleteOrderItemProduc'); ///guarda y asinga el dproducto a la solicutud
+$app->post("Order/Order/SaveCustomOrderItem",'Orders\OrderController@saveOrderItemCustomOrder'); ///asigna un iten de contra pedido
+$app->post("Order/Order/DeleteCustomOrderItem",'Orders\OrderController@DeleteOrderItemCustomOrder'); ///elimna
+$app->post("Order/Order/Update",'Orders\OrderController@UpdateOrder'); ///retira el final id y notifica que se actualizara el documento
+$app->post("Order/Order/ChangeItem",'Orders\OrderController@changeItemOrder'); ///actuliza el item de solicitud
+$app->post("Order/Order/DeleteItem",'Orders\OrderController@DeleteItemOrder'); /// guarda el item de la solicitud
+$app->post("Order/Order/RestoreItem",'Orders\OrderController@RestoreItemOrder'); /// elimina el item de la solicut
+$app->post("Order/Order/AddCustomOrder",'Orders\OrderController@addCustomOrderOrder'); ///agrega el contra pedido
+$app->post("Order/Order/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderOrder'); ///remueve un contra pedido de un pedido
+$app->post("Order/Order/SavekitchenBox",'Orders\OrderController@SavekitchenBoxOrder'); ///agrega un kitchen box
+$app->post("Order/Order/RemovekitchenBox",'Orders\OrderController@RemovekitchenBoxOrder'); ///quita  kitchen box
+$app->post("Order/Order/Approved",'Orders\OrderController@ApprovedOrder'); ///agrega la aprobacion de compras
+$app->post("Order/Order/Cancel",'Orders\OrderController@cancelOrder'); /// cancela el pedido
+$app->post("Order/Order/AddSustitute",'Orders\OrderController@addSustituteOrder'); // add un solicitud vieja a un anueva
+$app->post("Order/Order/RemoveSustitute",'Orders\OrderController@removeSustituteOrder'); // quita la solicitud anterio
+$app->post("Order/Order/Restore",'Orders\OrderController@restoreOrden'); /// restaura a una version anterior
+$app->post("Order/Order/CloseAction",'Orders\OrderController@closeActionOrder'); /// define que acion se debe realizar para cerrar la accion
+$app->post("Order/Order/AddAnswer",'Orders\OrderController@AddAnswerOrder'); /// agrega una respuesta tipo snoze a al a proforma
+$app->post("Order/Order/AddAttachments",'Orders\OrderController@addAttachmentsOrder'); ///agrega adjuntos al pedido
+$app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
+$app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); /// crea una copia sin adjuntos
+$app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
+
+
+/*** sin uso aparente**********************/
+$app->post("Order/Order/AdddRemoveItem",'Orders\OrderController@addRemoveOrderItem'); ///asigna y remove item a l solicitud
+$app->post("Order/Order/SetStatus",'Orders\OrderController@setStatusOrder'); // cambia el estado del documento
+$app->post("Order/Order/AdddRemoveItems",'Orders\OrderController@addRemoveOrderItems'); // agrega y quita items a la solicud por lotes
+$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
+$app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesOrder'); /// realiza la aprobacion por comprass
+/*** sin uso aparente**********************/
+
+//Orden de compra
+
+$app->get("Order/Purchase/Substitutes",'Orders\OrderController@getPurchaseSubstitutes'); ///lista de todos las ordenes de compra que se púeden sustituir
+$app->get("Order/Purchase/Versions",'Orders\OrderController@getOldPurchase'); /// trae todas las versiones que a generado el documento
+$app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary'); ///resumen final de la orden de compra
+$app->get("Order/Purchase/ProviderTemplates",'Orders\OrderController@getProviderPurchaseTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Purchase/InternalTemplates",'Orders\OrderController@getInternalPurchaseTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Purchase/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
+
+$app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda  la orden de compra
+$app->post("Order/Purchase/SaveProductItem",'Orders\OrderController@changeProductoPurchase'); // cambia el producto
+$app->post("Order/Purchase/DeleteProductItem",'Orders\OrderController@DeletPurchaseItemProduc'); ///guarda y asinga el dproducto a la solicutud
+$app->post("Order/Purchase/SaveCustomOrderItem",'Orders\OrderController@savePurchaseItemCustomOrder'); ///asigna un iten de contra pedido
+$app->post("Order/Purchase/DeleteCustomOrderItem",'Orders\OrderController@DeleteOrderItemCustomOrder'); ///elimna
+$app->post("Order/Purchase/Update",'Orders\OrderController@PurchaseUpdate'); /// marca la orden de compra como temporar
+$app->post("Order/Purchase/ChangeItem",'Orders\OrderController@changeItemPurchase'); ///actuliza el item de solicitud
+$app->post("Order/Purchase/DeleteItem",'Orders\OrderController@DeleteItemPurchase'); /// guarda el item de la solicitud
+$app->post("Order/Purchase/RestoreItem",'Orders\OrderController@RestoreItemPurchase'); /// elimina el item de la solicut
+$app->post("Order/Purchase/AddCustomOrder",'Orders\OrderController@addCustomOrderPurchase'); //  agrega un contra pedido a la orden de compra
+$app->post("Order/Purchase/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderPurchase'); // remove el contra pedido
+$app->post("Order/Purchase/SavekitchenBox",'Orders\OrderController@addkitchenBoxPurchase'); /// agrga un kitchen box
+$app->post("Order/Purchase/RemovekitchenBox",'Orders\OrderController@removekitchenBoxPurchase'); ///quita  kitchen box
+$app->post("Order/Purchase/Approved",'Orders\OrderController@ApprovedPurchase'); ///agrega la aprobacion de compras
+$app->post("Order/Purchase/Cancel",'Orders\OrderController@cancelPurchase'); /// Cancela el documento
+$app->post("Order/Purchase/AddSustitute",'Orders\OrderController@addSustitutePurchase'); // agrega un sustito
+$app->post("Order/Purchase/RemoveSustitute",'Orders\OrderController@removeSustitutePurchase'); // quita la orden de compra
+$app->post("Order/Purchase/Restore",'Orders\OrderController@restorePurchase'); /// restaura a una version anterior
+$app->post("Order/Purchase/CloseAction",'Orders\OrderController@closeActionPurchase'); /// define que acion se debe realizar para cerrar la accion
+$app->post("Order/Purchase/AddAnswer",'Orders\OrderController@AddAnswerOrder'); /// agrega una respuesta tipo snoze a al a proforma
+$app->post("Order/Purchase/AddAttachments",'Orders\OrderController@addAttachmentsPurchase'); ///agrega adjuntos a la orden de compra
+$app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
+$app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); /// crea una copia de la orden de compra sina adjutos
+$app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// envia la solicitud al proveedor
+
+
+
+/*** sin uso aparente**********************/
+
+$app->post("Order/Purchase/AdddRemoveItem",'Orders\OrderController@addRemovePurchaseItem'); ///asigna y remove item a l solicitud
+$app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
+$app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
+$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // asigna el paren a la orden de compra
+$app->post("Order/Purchase/AddProdConditionPay",'Orders\OrderController@addProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
+$app->post("Order/Purchase/RemoveProdConditionPay",'Orders\OrderController@removeProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
+$app->post("Order/Purchase/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesPurchase'); // agreaga la aprobacion por compras
+$app->post("Order/Purchase/Create",'Orders\OrderController@CreatePurchase'); /// envia la solicitud al proveedor
+/*** sin uso aparente**********************/
 
 
 // contra pedidos
 $app->get("Order/CustomOrderReview",'Orders\OrderController@getCustomOrderReview'); ///trae tod el detalle de contraPedido
-$app->get("Order/CustomOrderReason",'Orders\OrderController@getCustomOrderResons'); ///trae los motivos de contrapedido
-$app->get("Order/CustomOrderPriority",'Orders\OrderController@getCustomOrderPriority'); ///trae tod el detalle de contraPedido
 
 $app->post("Order/RemoveCustomOrder",'Orders\OrderController@removeCustomOrder'); ///elimina el contra pedido @deprecated
 $app->post("Order/AddCustomOrderItem",'Orders\OrderController@addCustomOrderItem'); ///agrega un item de contra pedido @deprecated
@@ -202,22 +217,8 @@ $app->get("Order/KitchenBoxReview",'Orders\OrderController@getKitchenBoxReview')
 $app->get("Order/Susstitute",'Orders\OrderController@getOrderSustitute'); // detalle del documento a sustituir
 
 // email
-$app->post("Order/mail/resend",'Orders\OrderController@resendEmail'); ///elimina el pedido
+$app->post("Order/mail/resend",'Orders\OrderController@resendEmail'); /// reenvia el email
 
-$app->post("Order/RemoveOrderSubstitute",'Orders\OrderController@removeOrderSubstitute'); ///elimina todo el pedido sustituto @deprecated
-$app->post("Order/AddOrderSubstitute",'Orders\OrderController@addOrderSubstitute'); ///agrega todo el pedido sustituto @deprecated
-$app->post("Order/AddOrderSubstituteItem",'Orders\OrderController@OrderSubstituteItem'); ///agrega todo el pedido sustituto@deprecated
-
-// sin uso
-$app->post("Order/Del",'Orders\OrderController@delete'); ///elimina el pedido @deprecated
-$app->get("Order/test",'Orders\OrderController@tester'); ///elimina el pedido @deprecated
-
-
-//deprecated
-$app->post("Order/ProviderOrder",'Orders\OrderController@getProviderOrder'); ///Obtiene todas las ordenes de compra de un proveedor segun su id
-$app->post("Order/PurchaseOrder",'Orders\OrderController@getPurchaseOrder'); ///obtiene una orden de compra segun su id
-$app->post("Order/RemovePurchaseOrder",'Orders\OrderController@removePurchaseOrder'); ///elimina el pedido
-$app->post("Order/AddPurchaseOrder",'Orders\OrderController@addPurchaseOrder'); ///elimina el pedido
 
 
 

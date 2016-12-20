@@ -160,6 +160,21 @@ MyApp.filter('filterSearch', function() {
     }
 });
 
+/**
+ * filtra para buscar dentro de array de json
+ * @param data el array de objetos
+ * @param compare el valor a evaluar
+ * @param key clave que corresponde al json
+ *@return un array de resultados
+ * **/
+MyApp.filter('stringKey', function() {
+
+    return function(data,compare, key) {
+        return (!data) ? [] :data.filter(function(val) {
+            return (!val[key] || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
+        });
+    }
+});
 MyApp.filter('customFind', function() {
 
     return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
