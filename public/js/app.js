@@ -147,7 +147,8 @@ MyApp.filter('filterSelect', function() {
             return [];
         }
         return arr1.filter(function(val) {
-            return arr2.indexOf(val.id) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
+            //console.log(arr2.indexOf(val.id.toString()),arr2.indexOf(parseInt(val.id)),arr2)
+            return (arr2.indexOf(val.id.toString()) === -1 && arr2.indexOf(parseInt(val.id)) === -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
     }
 });
@@ -160,6 +161,23 @@ MyApp.filter('filterSearch', function() {
     }
 });
 
+/**
+ * filtra para buscar dentro de array de json
+ * @param data el array de objetos
+ * @param compare el valor a evaluar
+ * @param key clave que corresponde al json
+ *@return un array de resultados
+ * **/
+MyApp.filter('stringKey', function() {
+
+    return function(data,compare, key) {
+        var aux;
+        return (!data) ? [] :data.filter(function(val) {
+            aux = eval("val."+key);
+            return (!aux || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  aux.toLowerCase().indexOf(compare.toLowerCase())!==-1;
+        });
+    }
+});
 MyApp.filter('customFind', function() {
 
     return function(arr1,arr2, func) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -760,7 +778,9 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
                     if((v in scope)){
                         btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
                             ctrl.$setValidity(v, true);
+                            console.log(ctrl.$error)
                         }}]:[];
+
                         setNotif.addNotif(scope[v].t,scope[v].m,btn);
                     }
 

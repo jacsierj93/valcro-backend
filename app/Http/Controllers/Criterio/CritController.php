@@ -84,10 +84,7 @@ class CritController extends BaseController
             }
 
             foreach ($field['options']['Opcion'] as $opt){
-
                 $opt["elem"] = Lista::find($opt->pivot->value);
-                
-
             }
 
 
@@ -180,6 +177,12 @@ class CritController extends BaseController
                     $opt = Options::find($rq['id']);
 
                     if($opt->value == $rq['valor'] && $opt->message == $rq['msg']){
+                        continue;
+                    }
+
+                    if($rq['valor']==""){
+                        $opt->delete();
+                        $ret[$k]["action"]="del";
                         continue;
                     }
                     $ret[$k]["action"]="upd";
