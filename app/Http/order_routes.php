@@ -153,6 +153,9 @@ $app->post("Order/Solicitude/DeleteProductItem",'Orders\OrderController@DeleteSo
 $app->post("Order/Solicitude/SaveCustomOrderItem",'Orders\OrderController@saveSolicitudItemCustomOrder'); ///asigna un iten de contra pedido
 $app->post("Order/Solicitude/DeleteCustomOrderItem",'Orders\OrderController@DeleteSolicitudItemCustomOrder'); ///elimna
 $app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
+$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@ChangeItemSolicitude'); /// guarda el item de la solicitud
+$app->post("Order/Solicitude/DeleteItem",'Orders\OrderController@DeleteItemSolicitude'); /// guarda el item de la solicitud
+$app->post("Order/Solicitude/RestoreItem",'Orders\OrderController@RestoreItemSolicitude'); /// guarda el item de la solicitud
 
 $app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido entero
 $app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido entero
@@ -166,7 +169,6 @@ $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'
 $app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
 $app->post("Order/Solicitude/AddAttachments",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
-$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
 
 
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes

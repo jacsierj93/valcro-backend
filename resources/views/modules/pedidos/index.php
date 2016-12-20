@@ -1498,6 +1498,14 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl_dtDoc" key="saldo"></grid-order-by>
                             </div>
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block" flex >
+                                    <label>Costo</label>
+                                    <input  ng-model="tbl_dtDoc.filter.costo_unitario"
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl_dtDoc" key="costo_unitario"></grid-order-by>
+                            </div>
                         </div>
 
                     </div>
@@ -1515,6 +1523,7 @@
                                         <div flex class="cellGrid" ng-click="openProd(item)">  {{item.descripcion}}</div>
                                         <div flex class="cellGrid" ng-click="openProd(item)" > {{item.documento}}</div>
                                         <div flex="10" class="cellGrid"  ng-click="openProd(item)" > {{item.saldo}}</div>
+                                        <div flex="10" class="cellGrid"  ng-click="openProd(item)" > {{item.costo_unitario}}</div>
 
                                     </div>
                                 </div>
@@ -3969,6 +3978,7 @@
                 </div>
             </md-content>
         </md-sidenav>
+
         <!------------------------------------------- mini layer cambiar item  ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderminiChangeItem" id="OrderminiChangeItem"
@@ -3979,7 +3989,7 @@
 
                         <div class="titulo_formulario">
                             <div>
-                               Cambiar Articulo
+                               Cambiar {{(select.documento) ? select.documento : 'articulo'}}
                             </div>
                         </div>
                     </div>
@@ -3990,7 +4000,7 @@
                                 <div layout="column" layout-align="center center">Asignado </div>
                             </div>
 
-                            <md-input-container class="md-block rms" flex >
+                            <md-input-container class="md-block rms" flex  ng-dblclick="forceAsign()" >
                                 <input  skip-tab required id="input" type="text" ng-model="select.saldo" range minVal="0.1" maxVal="{{select.cantidad}}"
                                         ng-readonly="noEdit" ng-disabled="noEditAsign"  >
                             </md-input-container>
@@ -4002,8 +4012,11 @@
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
                                 <div layout="column" layout-align="center center">Costo unitario </div>
                             </div>
-                            <md-input-container class="md-block rms" flex >
-                                <input skip-tab ng-required="$parent.document.nro_proforma" id="input" type="text" ng-model="select.costo_unitario" decimal  ng-readonly="noEdit"   >
+                            <md-input-container class="md-block rms" flex ng-dblclick="forceCosto()" >
+                                <input skip-tab ng-required="$parent.document.nro_proforma" id="input" type="text"
+                                       ng-model="select.costo_unitario" decimal  ng-readonly="noEdit"
+
+                                >
                             </md-input-container>
 
                             <md-tooltip >Monto a pagar por unidad</md-tooltip>
@@ -4061,6 +4074,7 @@
                 </div>
             </md-content>
         </md-sidenav>
+
         <!------------------------------------------- mini layer agregar  kitchen box ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderminiAddKitchenBox" id="OrderminiAddKitchenBox"

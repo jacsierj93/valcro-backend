@@ -1612,9 +1612,11 @@ class OrderController extends BaseController
         return $prodTemp;
     }
 
-    /*********************** SOLICITUD ************************/
+    /**************************************************************SOLICITUD**************************************************************/
 
-    // guarda la solicitud
+    /**
+     * gurada la solicitud
+     */
     public function saveSolicitude(Request $req)
     {
 
@@ -1690,6 +1692,61 @@ class OrderController extends BaseController
         return ['id'=>$req->id];
     }
 
+    /**
+     * guarda el item de la solcicitud
+     */
+    public function ChangeItemSolicitude(Request $req){
+        $resul['accion']= "upd";
+        $model = SolicitudeItem::findOrFail($req->id);
+
+        $model->tipo_origen_id = ($req->has('tipo_origen_id')) ? $req->tipo_origen_id : null;
+        $model->doc_id = ($req->has('doc_id')) ? $req->doc_id : null;
+        $model->origen_item_id = ($req->has('origen_item_id')) ? $req->origen_item_id : null;
+        $model->doc_origen_id = ($req->has('doc_origen_id')) ? $req->doc_origen_id : null;
+        $model->producto_id = ($req->has('producto_id')) ? $req->producto_id : null;
+        $model->descripcion = ($req->has('descripcion')) ? $req->descripcion : null;
+        $model->costo_unitario = ($req->has('costo_unitario')) ? $req->costo_unitario : null;
+        if( $model->tipo_origen_id == '21' ){
+            $prevI= SolicitudeItem::find($model->origen_item_id);
+            if($prevI != null){
+                $prevI->saldo = floatval($prevI->saldo ) + floatval($model->cantidad);
+                $prevI->saldo = floatval($prevI->saldo ) - floatval( $req->saldo );
+                $model->saldo = $req->saldo ;
+                $model->cantidad = $req->saldo ;
+                $prevI->save();
+                $doc =  $prevI->document;
+                $doc->disponible=1;
+                $doc->save();
+            }
+        }else{
+            $model->cantidad = ($req->has('cantidad')) ? $req->cantidad : null;
+            $model->saldo = ($req->has('saldo')) ? $req->saldo : null;
+            $model->uid = ($req->has('uid')) ? $req->uid : uid('', true);
+        }
+
+
+
+        $resul['response']=$model->save();
+        $resul['id']=$model->id;
+        $resul['model']=$model;
+        return $resul;
+    }
+
+    public function DeleteItemSolicitude(Request $req){
+        $resul= ['accion'=>'del'];
+        $model = SolicitudeItem::find($req->id);
+        $resul['response']= $model->destroy($model->id);
+        return $resul;
+
+    }
+    public function restoreItemSolicitude(Request $req){
+        $resul= ['accion'=>'restore'];
+        $model = SolicitudeItem::withTrashed()->where('id',$req->id )->first();
+       // $model->id= $req->id;
+        //  dd($model);
+        $resul['response']= $model->restore();
+        return $resul;
+    }
     /***
      * agrega
      **/
@@ -1770,11 +1827,11 @@ class OrderController extends BaseController
         $mail->senders()->saveMany($destinations['to']);
         $mail->senders()->saveMany($destinations['cc']);
         $mail->senders()->saveMany($destinations['ccb']);
-       if($req->has('adjs')){
+        if($req->has('adjs')){
 
 
             foreach ($req->adjs as $f){
-               $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+                $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
             }
 
         }
@@ -1828,7 +1885,7 @@ class OrderController extends BaseController
 
 
     }
-   /**
+    /**
      * obtiens las plantillas para envio interno de informacion
      */
     public function getInternalSolicitudeTemplate (Request $req){
@@ -2831,24 +2888,7 @@ class OrderController extends BaseController
         return $resul;
     }
 
-    public function changeItemSolicitude(Request $req){
-        $resul['accion']= "upd";
-        $model = SolicitudeItem::findOrFail($req->id);
-        $model->tipo_origen_id = $req->tipo_origen_id;
-        $model->doc_id = $req->doc_id;
-        $model->origen_item_id= $req->origen_item_id;
-        $model->doc_origen_id= $req->doc_origen_id;
-        $model->cantidad= $req->cantidad;
-        $model->saldo= $req->saldo;
-        $model->producto_id= $req->producto_id;
-        $model->descripcion= $req->descripcion;
-        if($req->has("final_id")){
-            $model->final_id= $req->final_id;
-        }
-        $resul['response']=$model->save();
-        $resul['id']=$model->id;
-        return $resul;
-    }
+
 
     public function changeItemPurchase(Request $req){
         $resul['accion']= "upd";
@@ -4593,13 +4633,13 @@ class OrderController extends BaseController
         $atts = array();
         //                                var data ={id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
 
-/*        foreach($model->attachments()->get() as $aux){
-            $att = attachment_file($aux->archivo_id);
-            foreach ($att as $key => $value){
-                $att[$key]= $value;
-            }
-            $atts[]= $att;
-        }*/
+        /*        foreach($model->attachments()->get() as $aux){
+                    $att = attachment_file($aux->archivo_id);
+                    foreach ($att as $key => $value){
+                        $att[$key]= $value;
+                    }
+                    $atts[]= $att;
+                }*/
         foreach($model->attachments()->where('documento','PROFORMA')->get() as $aux){
             $att = attachment_file($aux->archivo_id);
             foreach ($att as $key => $value){
@@ -5439,7 +5479,7 @@ class OrderController extends BaseController
             $aux['first']= $this->getFirstProducto($aux);
             $aux->producto;
             if($aux->producto != null){
-                $aux->codi_fabrica=  $aux->producto->codigo_fabrica;
+                $aux->codigo_fabrica=  $aux->producto->codigo_fabrica;
                 $aux->codigo=  $aux->producto->codigo_fabrica;
                 $aux->cod_profit=  $aux->producto->cod_profit;
                 $aux->cod_barra=  $aux->producto->cod_barra;
