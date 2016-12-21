@@ -231,6 +231,7 @@ MyApp.directive('vldhMailContacts', function() {
             'to' : "=?to",
             'cc' : "=?cc",
             'ccb' : "=?ccb",
+            'noNew': "=?noNew",
             'correos' : "=?correos",
             'out' : "=?senders",
             'asuntos' : "=?asuntos",
@@ -290,11 +291,17 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
         $scope.asuntos = [];
     }
     $scope.transformChip = function(chip) {
+
         if (angular.isObject(chip) && $scope.destinos.indexOf(chip.correo) === -1) {
             return chip;
         }
-        if(IsEmail(chip)!= null &&  $scope.isAddMail({correo:chip}) ){
-            return {nombre:chip,correo:chip,lang:[]};
+        if(IsEmail(chip)!= null &&  $scope.isAddMail({correo:chip})){
+            if( !$scope.noNew){
+                return {nombre:chip,correo:chip,lang:[]};
+            }else{
+                setNotif.addNotif("error","No se admite la agregacion de nuvos destinatario",[], {autohidden:2000})
+            }
+
         }
         return null;
     };
@@ -442,6 +449,7 @@ MyApp.directive('vldMailWithAdj', function() {
             'to': "=?to",
             'cc': "=?cc",
             'ccb': "=?ccb",
+            'noNew': "=?noNew",
             'asuntos': "=?asuntos",
             'asunto': "=?asunto",
             'correos': "=?correos",
@@ -467,7 +475,7 @@ MyApp.directive('vldMailWithAdj', function() {
                     ' <img ng-src="{{(mode == \'list\') ? \'images/adjunto.png\' : \'images/listado.png\'}}"> </div> ' +
                 '</div>'+
                 '<div    layout ="column" flex >' +
-                ' <vldh-mail-contacts correos="correos" funciones="fnContacts" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs"  lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
+                ' <vldh-mail-contacts correos="correos" funciones="fnContacts" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs" no-new="noNew" lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
                 ' <vldhtml-preview load="origenes" funciones="fnPreview"  template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
                 ' <vld-file-up-img  loaded="loadeds" ng-show="mode != \'list\'" up-model="adjs"  key="'+attr.key+'"  storage="'+attr.storage+'" fn-file-up="fileUp" fn-up-watch="finish" ></vld-file-up-img>' +
             ' </div>' +
@@ -478,9 +486,7 @@ MyApp.directive('vldMailWithAdj', function() {
 
 MyApp.controller('vldCMailWithAdj',['$scope','$timeout',function($scope, $timeout){
     $scope.mode ='list';
-
     $scope.funciones = {
-
         clear: function () {
             $scope.fnContacts.clear();
             $scope.fnPreview.clear();
@@ -514,6 +520,7 @@ MyApp.directive('vldFileUpImg', function() {
             'fileUp' : "=fnFileUp",
             'finish' : "=fnUpWatch",
             'loadeds' : "=?loaded",
+            'noUp' : "=?noUp",
             'funciones': "=?funciones",
         },
         transclude: true,
@@ -526,31 +533,81 @@ MyApp.directive('vldFileUpImg', function() {
         }
     };
 });
-MyApp.controller('vldCFileUpImg',['$scope','$timeout', 'fileSrv',function($scope,$timeout, fileSrv){
+MyApp.controller('vldCFileUpImg',['$scope','$timeout', 'setNotif', 'fileSrv',function($scope,$timeout, setNotif, fileSrv ){
     $scope.bindFiles = fileSrv.bin();
     $timeout(function () {
         if(!$scope.loadeds){
             $scope.loadeds = [];
+        }if(!$scope.adjs){
+            $scope.adjs = [];
         }
+
     },1000);
 
     $scope.funciones = {};
     $scope.$watch('adjs.length', function(newValue){
-        if(newValue > 0){
-            fileSrv.storage($scope.storage);
-            fileSrv.setKey($scope.key);
-            angular.forEach(fileSrv.upload($scope.adjs), function (v, k) {
-                $scope.loadeds.push(v);
-            });
+        if(newValue > 0 ){
+            if(!$scope.noUp){
+                fileSrv.storage($scope.storage);
+                fileSrv.setKey($scope.key);
+                angular.forEach(fileSrv.upload($scope.adjs), function (v, k) {
+                    $scope.loadeds.push(v);
+                });
+            }else{
+                setNotif.addNotif("error", "Disculpe pero no se permite agregar nuevos archivos ",[], {autohidden:3000})
+            }
+
         }
     });
     $scope.$watch('bindFiles.estado', function (newVal,oldVal) {
         if(fileSrv.getKey() == $scope.key && $scope.finish){
-
             $scope.finish(newVal,oldVal, fileSrv.get());
         }
     });
 }]);
+
+/**
+ * Dibuja la minatura de subida de archivos*/
+MyApp.directive('vlThumb', function( fileSrv) {
+    return {
+        replace: true,
+        transclude: true,
+        scope:{
+            'model' : "=ngModel",
+            'up' : "=vlUp",
+            /*'fail' : "=vlFail",
+             'progress' : "=vlLoad"*/
+        },
+        link: function(scope, elem, attr, ctrl){
+            scope.$watch('model.state', function (newVal,oldVal) {
+                if(newVal == 'up'){
+                    delete scope.model.up;
+                    if( scope.up){
+                        scope.up(scope.model);
+                    }
+                }
+                if(newVal == 'fail'){
+                    scope.model.fail = true;
+                    /*if(scope.fail){
+                     scope.model
+                     //scope.fail(scope.model);
+                     }*/
+                }
+            });
+            scope.reinten = function (item) {
+                fileSrv.upFile(item);
+            }
+        },
+        template: function () {
+
+            return '<div layout="column"  layout-align="center center" style="background-color: rgba(88, 181, 234,{{( model.up)/100}}); height: 100%">'  +
+                '<img ng-src="images/thumbs/{{model.thumb}}"/>' +
+                ' <div style="position: absolute; vertical-align: middle;" ng-show="model.up && !model.fail">{{model.up}}%</div> ' +
+                ' <div style="position: absolute; vertical-align: bottom; background-color: #0a6ebd;" ng-show="model.fail" ng-click="reinten(model)">fail</div> ' +
+                '</div>'
+        }
+    };
+});
 
 /**
  * difunde el click en un evento
@@ -603,4 +660,5 @@ MyApp.service('clickCommitSrv', function() {
 
     }
 });
+
 

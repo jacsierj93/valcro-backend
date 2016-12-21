@@ -1120,39 +1120,7 @@ class OrderController extends BaseController
 
     /*********************** Attachments ************************/
 
-    /***
-     * adjuntos para la solicitud
-     **/
-    public function addAttachmentsSolicitude(Request $req)
-    {
-        $resul = array();
-        $attacs = array();
-        $id = null;
-        if (!$req->has('id')) {
-            if ($req->has('tempId')) {
-                $id = $req->tempId;
-            } else {
-                $id = uniqid('', true);
-            }
-        }
-        foreach ($req->adjuntos as $aux) {
-            $attac = new SolicitudeAttachment();
-            $attac->archivo_id = $aux['id'];
-            $attac->uid = $id;
-            if ($req->has('id')) {
-                $attac->doc_id = $req->id;
-            }
-            $attac->documento = strtoupper($aux['documento']);
-            $attac->save();
-            $attacs[] = $attac;
 
-        }
-
-        $resul['accion'] = "new";
-        $resul['items'] = $attacs;
-        $resul['id'] = $id;
-        return $resul;
-    }
 
     /**
      * adjuntos para el pedido
@@ -1644,9 +1612,11 @@ class OrderController extends BaseController
         return $prodTemp;
     }
 
-    /*********************** SOLICITUD ************************/
+    /**************************************************************SOLICITUD**************************************************************/
 
-    // guarda la solicitud
+    /**
+     * gurada la solicitud
+     */
     public function saveSolicitude(Request $req)
     {
 
@@ -1685,7 +1655,7 @@ class OrderController extends BaseController
 
     }
 
-
+// dtermina la accion a realizar segun los permiso de usuario y el estado de la solicutd
     public function closeActionSolicitude(Request $req)
     {
         $model = Solicitude::findOrFail($req->id);
@@ -1709,7 +1679,7 @@ class OrderController extends BaseController
         }
         return $result;
     }
-    /**cierra la solicitud*/
+    //cierra la solicitud
     public function CloseSolicitude(Request $req)
     {
         $result['success'] = "Registro guardado con éxito!";
@@ -1720,6 +1690,89 @@ class OrderController extends BaseController
 
         $model->save();
         return ['id'=>$req->id];
+    }
+
+    /**
+     * guarda el item de la solcicitud
+     */
+    public function ChangeItemSolicitude(Request $req){
+        $resul['accion']= "upd";
+        $model = SolicitudeItem::findOrFail($req->id);
+
+        $model->tipo_origen_id = ($req->has('tipo_origen_id')) ? $req->tipo_origen_id : null;
+        $model->doc_id = ($req->has('doc_id')) ? $req->doc_id : null;
+        $model->origen_item_id = ($req->has('origen_item_id')) ? $req->origen_item_id : null;
+        $model->doc_origen_id = ($req->has('doc_origen_id')) ? $req->doc_origen_id : null;
+        $model->producto_id = ($req->has('producto_id')) ? $req->producto_id : null;
+        $model->descripcion = ($req->has('descripcion')) ? $req->descripcion : null;
+        $model->costo_unitario = ($req->has('costo_unitario')) ? $req->costo_unitario : null;
+        if( $model->tipo_origen_id == '21' ){
+            $prevI= SolicitudeItem::find($model->origen_item_id);
+            if($prevI != null){
+                $prevI->saldo = floatval($prevI->saldo ) + floatval($model->cantidad);
+                $prevI->saldo = floatval($prevI->saldo ) - floatval( $req->saldo );
+                $model->saldo = $req->saldo ;
+                $model->cantidad = $req->saldo ;
+                $prevI->save();
+                $doc =  $prevI->document;
+                $doc->disponible=1;
+                $doc->save();
+            }
+        }else{
+            $model->cantidad = ($req->has('cantidad')) ? $req->cantidad : null;
+            $model->saldo = ($req->has('saldo')) ? $req->saldo : null;
+            $model->uid = ($req->has('uid')) ? $req->uid : uid('', true);
+        }
+
+
+
+        $resul['response']=$model->save();
+        $resul['id']=$model->id;
+        $resul['model']=$model;
+        return $resul;
+    }
+
+    public function DeleteItemSolicitude(Request $req){
+        $resul= ['accion'=>'del'];
+        $model = SolicitudeItem::find($req->id);
+        $resul['response']= $model->destroy($model->id);
+        return $resul;
+
+    }
+    public function restoreItemSolicitude(Request $req){
+        $resul= ['accion'=>'restore'];
+        $model = SolicitudeItem::withTrashed()->where('id',$req->id )->first();
+       // $model->id= $req->id;
+        //  dd($model);
+        $resul['response']= $model->restore();
+        return $resul;
+    }
+    /***
+     * agrega
+     **/
+    public function addAttachmentsSolicitude(Request $req)
+    {
+        $model = Solicitude::findOrFail($req->id);
+        $resul = [ 'size' => sizeof($req->adjs) ,'files'=>[]];
+        $attacs = [];
+        foreach ($req->adjs as $aux) {
+            if(!array_key_exists('id',$aux )){
+                $attac = new SolicitudeAttachment();
+                $attac->archivo_id = $aux['archivo_id'];
+                $attac->doc_id = $model->id;
+                $attac->documento = strtoupper($aux['documento']);
+                $attac->save();
+
+                $file= attachment_file($aux['archivo_id']);
+                foreach ($file as $key => $value){
+                    $attac[$key]= $value;
+                }
+                $resul['files'][]=$attac;
+            }
+        }
+
+
+        return $resul;
     }
 
 
@@ -1774,11 +1827,11 @@ class OrderController extends BaseController
         $mail->senders()->saveMany($destinations['to']);
         $mail->senders()->saveMany($destinations['cc']);
         $mail->senders()->saveMany($destinations['ccb']);
-       if($req->has('adjs')){
+        if($req->has('adjs')){
 
 
             foreach ($req->adjs as $f){
-               $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+                $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
             }
 
         }
@@ -1832,7 +1885,7 @@ class OrderController extends BaseController
 
 
     }
-   /**
+    /**
      * obtiens las plantillas para envio interno de informacion
      */
     public function getInternalSolicitudeTemplate (Request $req){
@@ -2478,7 +2531,7 @@ class OrderController extends BaseController
      * @deprecated
      * asigna el producto a la solicitud
      */
-    public  function  changeProductoSolicitud (Request $req){
+    /*public  function  changeProductoSolicitud (Request $req){
         $res= array();
         $item= new SolicitudeItem();
         $res['accion']= "new";
@@ -2509,7 +2562,7 @@ class OrderController extends BaseController
         return $res;
 
 
-    }
+    }*/
 
 
 
@@ -2835,24 +2888,7 @@ class OrderController extends BaseController
         return $resul;
     }
 
-    public function changeItemSolicitude(Request $req){
-        $resul['accion']= "upd";
-        $model = SolicitudeItem::findOrFail($req->id);
-        $model->tipo_origen_id = $req->tipo_origen_id;
-        $model->doc_id = $req->doc_id;
-        $model->origen_item_id= $req->origen_item_id;
-        $model->doc_origen_id= $req->doc_origen_id;
-        $model->cantidad= $req->cantidad;
-        $model->saldo= $req->saldo;
-        $model->producto_id= $req->producto_id;
-        $model->descripcion= $req->descripcion;
-        if($req->has("final_id")){
-            $model->final_id= $req->final_id;
-        }
-        $resul['response']=$model->save();
-        $resul['id']=$model->id;
-        return $resul;
-    }
+
 
     public function changeItemPurchase(Request $req){
         $resul['accion']= "upd";
@@ -4565,8 +4601,8 @@ class OrderController extends BaseController
             $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
         }
 
-        $tem['nro_proforma']=$model->nro_proforma;
-        $tem['nro_factura']=$model->nro_factura;
+        $tem['nro_proforma']= ['doc'=>$model->nro_proforma, 'adjs'=>[]];
+        $tem['nro_factura']= ['doc'=>$model->nro_factura, 'adjs'=>[]];
         $tem['nro_doc']=$model->nro_doc;
         $tem['img_proforma']=$model->img_proforma;
         $tem['img_factura']=$model->img_factura;
@@ -4597,25 +4633,26 @@ class OrderController extends BaseController
         $atts = array();
         //                                var data ={id:data.file.id,thumb:data.file.thumb,tipo:data.file.tipo,name:data.file.file, documento:$scope.folder};
 
-        foreach($model->attachments()->get() as $aux){
-            $auxFile= array();
-            $file= FileModel::findOrFail($aux->archivo_id);
-            $att['id'] = $aux->id;
-            $att['final_id'] = $aux->final_id;
-            $att['archivo_id'] = $aux->archivo_id;
-            $att['doc_id'] = $aux->doc_id;
-            $att['documento'] = $aux->documento;
-            $att['comentario'] = $aux->comentario;
-
-            $auxFile['id']=$file->id;
-            $auxFile['thumb']=$file->getThumbName();
-            $auxFile['tipo']=$file->tipo;
-            $auxFile['file'] = $file->archivo;
-            $att['file'] = $auxFile;
-            $atts[]= $att;
-
-
-
+        /*        foreach($model->attachments()->get() as $aux){
+                    $att = attachment_file($aux->archivo_id);
+                    foreach ($att as $key => $value){
+                        $att[$key]= $value;
+                    }
+                    $atts[]= $att;
+                }*/
+        foreach($model->attachments()->where('documento','PROFORMA')->get() as $aux){
+            $att = attachment_file($aux->archivo_id);
+            foreach ($att as $key => $value){
+                $att[$key]= $value;
+            }
+            $tem['nro_proforma']['adjs'] = $att;
+        }
+        foreach($model->attachments()->where('documento','FACTURA')->get() as $aux){
+            $att = attachment_file($aux->archivo_id);
+            foreach ($att as $key => $value){
+                $att[$key]= $value;
+            }
+            $tem['nro_factura']['adjs'] = $att;
         }
         $tem['adjuntos'] = $atts;
 
@@ -5436,23 +5473,18 @@ class OrderController extends BaseController
 
         /** todos */
         foreach($items as $aux){
-            $tem = array();
-            $tem['id']= $aux->id;
-            $tem['cantidad']= $aux->cantidad;
-            $tem['saldo']= $aux->saldo;
-            $tem['descripcion']= $aux->descripcion;
-            $tem['tipo_origen_id']= $aux->tipo_origen_id;
-            $tem['origen_item_id']= $aux->origen_item_id;
-            $tem['doc_origen_id']= $aux->doc_origen_id;
-            $tem['doc_id']= $aux->doc_id;
-            $tem['producto_id']= $aux->producto_id;
-            $tem['cod_producto']= $aux->id;
-            //$tem['codigo_fabrica']=$prod_prov->where('id',''.$aux->producto_id)->first()->codigo_fabrica;
-            $tem['documento']=  $origen->where('id', $aux->tipo_origen_id)->first()->descripcion;
-
-            $tem['asignado']= true;
-            //$tem['origen']= MasterOrderController::getTypeProduct($aux)['descripcion'];
-            $all->push($tem);
+            $aux['asignado']= true;
+            $doc = $origen->where('id', $aux->tipo_origen_id)->first();
+            $aux['documento']=  $doc->descripcion;
+            $aux['first']= $this->getFirstProducto($aux);
+            $aux->producto;
+            if($aux->producto != null){
+                $aux->codigo_fabrica=  $aux->producto->codigo_fabrica;
+                $aux->codigo=  $aux->producto->codigo_fabrica;
+                $aux->cod_profit=  $aux->producto->cod_profit;
+                $aux->cod_barra=  $aux->producto->cod_barra;
+            }
+            $all->push($aux);
         }
 
         $data['contraPedido'] = $contra;
@@ -5539,11 +5571,11 @@ class OrderController extends BaseController
         if($req->has('prov_moneda_id')){
             $model->prov_moneda_id = ($req->prov_moneda_id."" == "-1") ? null: $req->prov_moneda_id ;
         }
-        if($req->has('nro_proforma')){
-            $model->nro_proforma = $req->nro_proforma;
+        if($req->has('nro_proforma')  && array_key_exists('doc', $req->nro_proforma)){
+            $model->nro_proforma = array_key_exists('doc', $req->nro_proforma) ? $req->nro_proforma['doc'] : null;
         }
         if($req->has('nro_factura')){
-            $model->nro_factura = $req->nro_factura;
+            $model->nro_factura =  array_key_exists('doc', $req->nro_factura) ? $req->nro_factura['doc'] : null;
         }
         if($req->has('comentario')){
             $model->comentario = $req->comentario;

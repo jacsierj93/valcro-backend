@@ -106,7 +106,7 @@
                                                 {{$articulos[$i]->producto['codigo_fabrica']}}
                                             </td>
                                             <td  width="30%" style="text-align: left;"  >
-                                                {{$articulos[$i]->producto['descripcion']}}
+                                                {{$articulos[$i]->descripcion}}
 
                                             </td>
                                             <td width="30%"  style=" text-align: left;">

@@ -1208,6 +1208,9 @@ area para subir los archivos
     background-color: transparent;
     text-align: center;
 }
+.drop-box[disabled="disabled"] {
+    color: #ccc;
+}
 
 .dragover {
     border: 2px dashed rgb(84, 180, 234);

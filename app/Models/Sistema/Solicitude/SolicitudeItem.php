@@ -21,4 +21,7 @@ class SolicitudeItem extends Model
     public function producto(){
         return $this->belongsTo('App\Models\Sistema\Product\Product', 'producto_id');
     }
+    public function document(){
+        return $this->belongsTo('App\Models\Sistema\Solicitude\Solicitude', 'doc_id');
+    }
 }

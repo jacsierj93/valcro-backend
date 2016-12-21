@@ -5458,46 +5458,6 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
 }]);
 
 
-MyApp.directive('vlThumb', function( fileSrv) {
-    return {
-        replace: true,
-        transclude: true,
-        scope:{
-            'model' : "=ngModel",
-            'up' : "=vlUp",
-            /*'fail' : "=vlFail",
-             'progress' : "=vlLoad"*/
-        },
-        link: function(scope, elem, attr, ctrl){
-            scope.$watch('model.state', function (newVal,oldVal) {
-                if(newVal == 'up'){
-                    delete scope.model.up;
-                    if( scope.up){
-                        scope.up(scope.model);
-                    }
-                }
-                if(newVal == 'fail'){
-                    scope.model.fail = true;
-                    /*if(scope.fail){
-                     scope.model
-                     //scope.fail(scope.model);
-                     }*/
-                }
-            });
-            scope.reinten = function (item) {
-                fileSrv.upFile(item);
-            }
-        },
-        template: function () {
-
-            return '<div layout="column"  layout-align="center center" style="background-color: rgba(88, 181, 234,{{( model.up)/100}}); height: 100%">'  +
-                '<img ng-src="images/thumbs/{{model.thumb}}"/>' +
-                ' <div style="position: absolute; vertical-align: middle;" ng-show="model.up && !model.fail">{{model.up}}%</div> ' +
-                ' <div style="position: absolute; vertical-align: bottom; background-color: #0a6ebd;" ng-show="model.fail" ng-click="reinten(model)">fail</div> ' +
-                '</div>'
-        }
-    };
-});
 
 
 

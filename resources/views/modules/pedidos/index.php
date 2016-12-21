@@ -1378,7 +1378,7 @@
 
                                 <md-input-container class="md-block" flex  >
                                     <label>N° Factura:</label>
-                                    <input ng-model="$parent.document.nro_factura"  ng-disabled="( Docsession.block)"
+                                    <input ng-model="$parent.document.nro_factura.doc"  ng-disabled="( Docsession.block)"
                                            ng-change="toEditHead('document', 'nro_factura', $parent.document.nro_factura)"
                                            info="Introducir Nro de factura en caso de tenerla"
                                            skip-tab
@@ -1386,14 +1386,14 @@
                                 </md-input-container>
                                 <div class="adj-box" ng-click="$parent.OrderNrFacturaCtrl()">
                                     <div   class="vlc-buttom"  ng-class="{'ng-disable':(Docsession.block)}"  style="float:left">
-                                        {{ (document.adjuntos | stringKey :'factura': 'documento' ).length || 0 }}
+                                        {{ $parent.document.nro_factura.adjs.length || 0 }}
                                     </div>
                                 </div>
 
 
                                 <md-input-container class="md-block" flex >
                                     <label>N° Proforma:</label>
-                                    <input ng-model="$parent.document.nro_proforma"  ng-disabled="( Docsession.block)"
+                                    <input ng-model="$parent.document.nro_proforma.doc"  ng-disabled="( Docsession.block)"
                                            ng-required ="(formMode.value == 22 || formMode.value == 23 )"
                                            ng-change="toEditHead('document', 'nro_proforma', $parent.document.nro_proforma)"
                                            info="Introducir Nro de proforma en caso de tenerla"
@@ -1403,7 +1403,7 @@
                                 </md-input-container>
                                 <div  class="adj-box" ng-click="$parent.OrderNrProformaCtrl()" >
                                     <div  class="vlc-buttom" ng-class="{'ng-disable':Docsession.block}"  style="float:left">
-                                        {{ ($parent.document.adjuntos | stringKey :'proforma' : 'documento' ).length || 0 }}
+                                        {{ $parent.document.nro_proforma.adjs.length || 0 }}
                                     </div>
                                 </div>
 
@@ -1459,7 +1459,7 @@
                         </div>
 
                     </div>
-                    <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5) }" ng-show="(gridView == 5) ">
+                    <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5) }">
                         <div active-left></div>
                         <div layout="row" flex ng-init="tbl_dtDoc.order = 'id' " class="row">
                             <div flex="5"></div>
@@ -1498,6 +1498,14 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl_dtDoc" key="saldo"></grid-order-by>
                             </div>
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block" flex >
+                                    <label>Costo</label>
+                                    <input  ng-model="tbl_dtDoc.filter.costo_unitario"
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl_dtDoc" key="costo_unitario"></grid-order-by>
+                            </div>
                         </div>
 
                     </div>
@@ -1506,25 +1514,17 @@
                         <div layout="column" flex>
                             <div >
                                 <div ng-repeat="item in filterProdDoc(document.productos.todos,tbl_dtDoc.filter) | orderBy : tbl_dtDoc.order as docProdFilter " id="prodDt{{$index}}" row-select>
-                                    <div layout="row" class="cellGridHolder" >
-                                        <div flex="5" class="cellEmpty">
-                                            <md-switch class="md-primary" ng-change="addRemoveItem(item)"
-                                                       ng-disabled="( Docsession.block || !document.permit.update)" ng-model="item.asignado"> </md-switch>
+                                    <div layout="row" class="cellGridHolder" OrderminiChangeItemCtrl>
+                                        <div flex="5" class="cellEmpty" ng-click="changeProd(item)" >
+                                            <md-switch class="md-primary"
+                                                       ng-disabled="true" ng-model="item.asignado"> </md-switch>
                                         </div>
-                                        <div flex="10" class="cellSelect"> {{item.cod_producto}}</div>
-                                        <div flex class="cellGrid">  {{item.descripcion}}</div>
-                                        <div flex class="cellGrid"> {{item.documento}}</div>
-                                        <div flex class="cellGrid"> {{item.item.saldo}}</div>
-                                        <!--<md-input-container class="md-block" flex="10" >
-                                            <input  ng-model="item.saldo"
-                                                    ng-change="changeItem(item)"
-                                                    decimal
-                                                    ng-disabled="(Docsession.block || !item.asignado || !document.permit.update)"
-                                                    ng-readonly = "!item.edit"
-                                                    ng-click="isEditItem(item)"
-                                                    id="prodDtInp{{item.id}}"
-                                            />
-                                        </md-input-container>-->
+                                        <div flex="10" class="cellSelect" ng-click="openProd(item)" > {{item.codigo}}</div>
+                                        <div flex class="cellGrid" ng-click="openProd(item)">  {{item.descripcion}}</div>
+                                        <div flex class="cellGrid" ng-click="openProd(item)" > {{item.documento}}</div>
+                                        <div flex="10" class="cellGrid"  ng-click="openProd(item)" > {{item.saldo}}</div>
+                                        <div flex="10" class="cellGrid"  ng-click="openProd(item)" > {{item.costo_unitario}}</div>
+
                                     </div>
                                 </div>
                             </div>
@@ -1532,14 +1532,12 @@
                                 No hay datos para mostrar
                             </div>
                         </div>
-
-
-                    </div>
+                   </div><!--
                     <div layout="column"  class="row" ng-click=" tbl_dtDoc.extend = ( tbl_dtDoc.extend == 0) ? 1: 0 " ng-show="docProdFilter.length > 0 && (gridView == 5) ">
                         <div flex style="border: dashed 1px #f1f1f1; text-align: center" layout="column" layout-align="end none">
                             <span class="{{ ( tbl_dtDoc.extend == 0) ? 'icon-Up' : 'icon-Above' }}"></span>
                         </div>
-                    </div>
+                    </div>-->
 
                 </div>
                 <div   id="expand"></div>
@@ -2901,7 +2899,7 @@
                                         <div class="rowRsmTitle" flex> Proforma </div>
                                     </div>
                                     <div class="rms" flex  layout="row" layout-align="space-between center">
-                                        <div>{{document.nro_proforma}}</div>
+                                        <div>{{document.nro_proforma.doc}}</div>
                                         <div class="circle" ng-click="openAdj('proforma')" ng-show="finalDoc.adjProforma.length > 0">{{finalDoc.adjProforma.length}}</div>
                                     </div>
                                 </div>
@@ -2917,7 +2915,7 @@
                                         <div class="rowRsmTitle"> Factura </div>
                                     </div>
                                     <div class="rms" flex  layout="row" layout-align="space-between center">
-                                        <div>{{document.nro_factura}}</div>
+                                        <div>{{document.nro_factura.doc}}</div>
                                         <div class="circle"  ng-click="openAdj('factura')" ng-show="finalDoc.adjFactura.length > 0" >{{finalDoc.adjFactura.length}}</div>
 
                                     </div>
@@ -3167,74 +3165,45 @@
                         </div>
 
                     </div>
-                    <form layout="row" ng-init="tbl_finalDoc.order = 'codigo'">
+                    <div class="row" layout="row" ng-init="tbl_finalDoc.order = 'codigo'">
                         <div layout="row" flex>
-                            <div flex="20" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'codigo' " ><img ng-src="{{(tbl_finalDoc.order == 'codigo')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-codigo' " ><img ng-src="{{(tbl_finalDoc.order == '-codigo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="20" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Codigo</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_finalDoc.filter.codigo"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.codigo"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl_finalDoc" key="codigo"></grid-order-by>
                             </div>
-                            <div flex="20" layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'codigo_fabrica' " ><img ng-src="{{(tbl_finalDoc.order == 'codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-codigo_fabrica' "><img ng-src="{{(tbl_finalDoc.order == '-codigo_fabrica')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="20" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Cod. Fabrica</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_finalDoc.filter.codigo_fabrica"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.codigo_fabrica"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl_finalDoc" key="codigo_fabrica"></grid-order-by>
                             </div>
-
-                            <div flex layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'descripcion' " ><img ng-src="{{(tbl_finalDoc.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-descripcion' " ><img ng-src="{{(tbl_finalDoc.order == '-descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex>
+                            <div flex="" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Descripion</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_finalDoc.filter.descripcion"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.descripcion"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl_finalDoc" key="descripcion"></grid-order-by>
                             </div>
-
-                            <div flex layout="row"  >
-                                <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                    <div  layout-align="end center" ng-click="tbl_finalDoc.order = 'cantidad' " ><img ng-src="{{(tbl_finalDoc.order == 'cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                    <div layout-align="star center" ng-click="tbl_finalDoc.order = '-cantidad' "><img ng-src="{{(tbl_finalDoc.order == '-cantidad')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                                </div>
-
-                                <md-input-container class="md-block"  flex="15">
+                            <div flex="15" layout="row">
+                                <md-input-container class="md-block" flex >
                                     <label>Cantidad</label>
-                                    <input type="text" class="inputFilter"  ng-minlength="1"
-                                           ng-model="tbl_finalDoc.filter.cantidad"
-                                           skip-tab
+                                    <input  ng-model="tbl.filter.saldo"
                                     >
                                 </md-input-container>
-
+                                <grid-order-by ng-model="tbl_finalDoc" key="saldo"></grid-order-by>
                             </div>
-                            <div  style="width: 80px;" ng-show="formMode.value == 23" ></div>
+
+                           <!-- <div  style="width: 80px;" ng-show="formMode.value == 23" ></div>-->
 
                         </div>
-                    </form>
+                    </div>
                     <div layout="row"  class="gridContent">
                         <div  layout="column" flex>
                             <div flex >
@@ -3245,17 +3214,16 @@
                                         </div>
                                         <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
                                         <div flex class="cellGrid" > {{item.descripcion}}</div>
-                                        <div flex="15" class="cellGrid">{{item.cantidad | number:2}}</div>
-                                        <div style="width: 80px;"  class="cellEmpty " ng-show="formMode.value == 23"
+                                        <div flex="15" class="cellGrid">{{item.saldo | number:2}}</div>
+                                  <!--      <div style="width: 80px;"  class="cellEmpty " ng-show="formMode.value == 23"
                                              layout-align="center center" layout="column" ng-click="excepProdFinal(item)">
                                             <div class="dot-empty dot-attachment "  layout-align="center center" >
                                                 <div style=" margin-top: 2.5px;">   {{item.condicion_pago.length}}</div>
                                             </div>
-                                        </div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -3839,7 +3807,7 @@
 
             </md-content>
         </md-sidenav>
-        <!------------------------------------------- mini nro_factura------------------------------------------------------------------------->
+        <!------------------------------------------- mini nro_proforma------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderNrProforma" id="OrderNrProforma"
         >
@@ -3853,7 +3821,7 @@
                             </div>
                         </div>
                     </div>
-                    <vld-file-up-img up-model="upModel" fn-file-up="fnfile" key="OrderNrProformaCtrl" storage="orders"></vld-file-up-img>
+                    <vld-file-up-img up-model="upModel"  fn-file-up="fnfile" fn-up-watch="uploTe" key="OrderNrProformaCtrl" storage="orders" loaded="adjs" no-up="(Docsession.block)" ></vld-file-up-img>
 
                 </div>
 
@@ -3867,17 +3835,15 @@
             <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderNrFacturaCtrl" style="padding-left: 12px"  click-out="close($event)" >
                 <div layout="column" flex>
                     <div layout="row" class="form-row-head form-row-head-select" >
-
                         <div class="titulo_formulario">
                             <div>
                                 Factura
                             </div>
                         </div>
                     </div>
-                    <vld-file-up-img up-model="upModel" fn-file-up="fnfile" key="OrderNrFactura" storage="orders"></vld-file-up-img>
+                    <vld-file-up-img up-model="upModel" fn-file-up="fnfile" fn-up-watch="uploTe" key="OrderNrFactura" storage="orders" loaded="adjs" no-up="(Docsession.block)" ></vld-file-up-img>
 
                 </div>
-
             </md-content>
         </md-sidenav>
 
@@ -4012,6 +3978,103 @@
                 </div>
             </md-content>
         </md-sidenav>
+
+        <!------------------------------------------- mini layer cambiar item  ------------------------------------------------------------------------->
+        <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
+                    md-disable-backdrop="true" md-component-id="OrderminiChangeItem" id="OrderminiChangeItem"
+        >
+            <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderminiChangeItemCtrl" style="padding-left: 12px"  click-out="close($event)" >
+                <div  layout="column" flex class="layerColumn"   click-out="close($event)">
+                    <div layout="row" class="form-row-head form-row-head-select" >
+
+                        <div class="titulo_formulario">
+                            <div>
+                               Cambiar {{(select.documento) ? select.documento : 'articulo'}}
+                            </div>
+                        </div>
+                    </div>
+                    <form name="form" flex class="gridContent focused" layout="column" style="padding-right:4px">
+
+                        <div layout="row" class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Asignado </div>
+                            </div>
+
+                            <md-input-container class="md-block rms" flex  ng-dblclick="forceAsign()" >
+                                <input  skip-tab required id="input" type="text" ng-model="select.saldo" range minVal="0.1" maxVal="{{select.cantidad}}"
+                                        ng-readonly="noEdit" ng-disabled="noEditAsign"  >
+                            </md-input-container>
+
+                            <md-tooltip >Cantidad a agregar</md-tooltip>
+                        </div>
+
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Costo unitario </div>
+                            </div>
+                            <md-input-container class="md-block rms" flex ng-dblclick="forceCosto()" >
+                                <input skip-tab ng-required="$parent.document.nro_proforma" id="input" type="text"
+                                       ng-model="select.costo_unitario" decimal  ng-readonly="noEdit"
+
+                                >
+                            </md-input-container>
+
+                            <md-tooltip >Monto a pagar por unidad</md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Maximo</div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;"> {{(select.disponible) ? select.disponible :'N/A'}}</div>
+
+                            <md-tooltip >
+                                Disponible para asignacion
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Cod. Fabrica</div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;"> {{(select.codigo_fabrica) ? select.codigo_fabrica :'No existe'}} </div>
+
+                            <md-tooltip >
+                                Codigo en fabrica
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Codigo</div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;"> {{(select.codigo) ? select.codigo :'No existe'}} </div>
+
+                            <md-tooltip >
+                                Codigo
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Cod. Barra </div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;">{{(select.codigo_barra) ? select.codigo_barra : 'No existe'}} </div>
+                            <md-tooltip >
+                                Codigo de barra
+                            </md-tooltip>
+                        </div>
+                        <div layout="row"  class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Descripcion </div>
+                            </div>
+                            <div layout="column" layout-align="center start" flex style="padding-left: 2px;">{{select.descripcion}} </div>
+                            <md-tooltip >
+                                Descripcion del producto
+                            </md-tooltip>
+                        </div>
+
+                    </form>
+                </div>
+            </md-content>
+        </md-sidenav>
+
         <!------------------------------------------- mini layer agregar  kitchen box ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"
                     md-disable-backdrop="true" md-component-id="OrderminiAddKitchenBox" id="OrderminiAddKitchenBox"
@@ -4273,262 +4336,15 @@
             <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderSendMail"    >
                 <vld-mail-with-adj
                     load="origenes" text="centerText" template="template" funciones = "mailFn"
-                    correos="correos" to="model.to" cc="model.cc" ccb="model.ccb" langs="langs"  lang="lang" asunto="model.subject" up-model="adjsUp"
+                    correos="correos" no-new="noNew" to="model.to" cc="model.cc" ccb="model.ccb" langs="langs"  lang="lang" asunto="model.subject" up-model="adjsUp"
                     key="OrderSendEmail" storage="orders" fn-file-up="upfileFinis" fn-up-watch="upFiles" titulo="Correo"
                 ></vld-mail-with-adj>
-                <!--<div  layout="column" flex class="layerColumn"   click-out="close($event)">
-                    <form name="FormSendMail" flex layout="row" class="focused">
-                        <div class="activeleft"></div>
-                        <div layout="column" flex>
-                            <div layout="row" >
-                                <div class="titulo_formulario">
-                                    <div>
-                                        Envio de Correo
-                                    </div>
-                                </div>
-                                <div flex layout="row"  layout-align="end start" class="mail-option">
-                                    <div layout="row" style="width: 28px" ng-click=" showHead = !showHead " >
-                                        <span>{{(showHead) ? '/' : '()'}}</span>
-                                    </div>
-                                    <div layout="row" style="width: 20px" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
-                                        Cc
-                                    </div>
-                                    <div layout="row" style="width: 28px" ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
-                                        Cco
-                                    </div>
-                                </div>
-                            </div>
-                            <div layout="row" class="row" ng-show="showHead">
-                                <md-switch class="md-primary"
-                                           ng-model="usePersonal">
-                                </md-switch>
-                                <div flex style="padding-top: 12px;">
-                                    <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
-                                </div>
-                            </div>
-                            <md-chips ng-model="to"
-                                      required
-                                      md-transform-chip="transformChip($chip)"
-                                      style="height: inherit;"
-                                      md-on-add =" addEmail($chip) "
-                                      md-on-remove =" removeEmail($chip) "
-                                      ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                      ng-show="showHead"
-                                      skip-tab
-                            >
-                                <md-autocomplete
-                                    md-search-text="searchDestinos"
-                                    md-items="item in correos  | stringKey : searchDestinos : 'valor' | customFind : destinos : isAddMail "
-                                    md-item-text="item.valor"
-                                    placeholder="Para:">
-                                    <span >{{item.valor}} </span>
-
-
-
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                </md-chip-template>
-                            </md-chips>
-                            <md-chips ng-model="cc"
-                                      md-transform-chip="transformChip($chip)"
-                                      style="height: inherit;"
-                                      ng-show="(  showHead && showCc)"
-                                      md-on-add =" addEmail($chip) "
-                                      md-on-remove =" removeEmail($chip) "
-                                      ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                      skip-tab
-                            >
-                                <md-autocomplete
-                                    md-search-text="searchCc"
-                                    md-items="item in correos | stringKey : searchCc : 'valor' | customFind : destinos : isAddMail  "
-                                    md-item-text="item.valor"
-                                    placeholder="Cc:">
-                                    <span >{{item.valor}} </span>
-
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                </md-chip-template>
-                            </md-chips>
-                            <md-chips ng-model="cco"
-                                      md-transform-chip="transformChip($chip)"
-                                      md-item-text="item.valor"
-                                      style="height: inherit;"
-                                      ng-show="(showHead && showCco)"
-                                      md-on-add =" addEmail($chip) "
-                                      md-on-remove =" removeEmail($chip) "
-                                      ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                      skip-tab
-                            >
-                                <md-autocomplete
-                                    md-search-text="searchCco"
-                                    md-items="item in correos | stringKey : searchCco : 'valor' | customFind : destinos : isAddMail "
-                                    md-item-text="item.valor"
-                                    placeholder="Cco:">
-                                    <span >{{item.valor}} </span>
-                                </md-autocomplete>
-                                <md-chip-template>
-                                    <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                </md-chip-template>
-                            </md-chips>
-                            <div layout="row" class="row-min" style="padding-right: 4px;" ng-show="showHead" >
-                                <md-input-container flex>
-                                    <label>Asunto:</label>
-                                    <input  ng-model="asunto" required  skip-tab  >
-                                </md-input-container>
-                            </div>
-                            <div layout="row" flex class="text-box" >
-
-                                <div style="" layout="column" >
-                                        <textarea ng-model="texto"  skip-tab
-                                                  id="textarea"
-                                                  required
-                                                  flex
-                                                  placeholder="Texto"
-
-                                        ></textarea>
-                                    <div >
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </form>
-                    <div  class="blue-btn " ng-click="send()"  skip-tab >
-                        <div layout="row" class="layout-row " aria-hidden="true">
-                            <div >
-                                Enviar
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
                 <loader ng-show="inProgress"></loader>
                 <div style="width: 16px;"  ng-mouseenter="(canNext()) ? $parent.showNext(true) :0 ; $parent.nextLayer = next" > </div>
 
             </md-content>
         </md-sidenav>
 
-        <!-- ########################################## LAYER add contactos para correo ########################################## -->
-        <!--      <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"
-                          class="md-sidenav-right md-whiteframe-2dp popUp"
-                          md-disable-backdrop="true" md-component-id="addEMail" id="addEMail"
-              >
-                  <md-content   layout="row" flex class="sideNavContent" ng-controller="OrderContactMail"    >
-                      <div  layout="column" flex class="layerColumn"   click-out="close($event)">
-                          <form name="FormaddEMail" flex layout="row" class="focused">
-                              <div class="activeleft"></div>
-                              <div layout="column" flex>
-                                  <div layout="row" >
-                                      <div class="titulo_formulario">
-                                          <div>
-                                              Envio de Correo
-                                          </div>
-                                      </div>
-                                      <div flex layout="row"  layout-align="end start" class="mail-option">
-                                          <div layout="row" style="width: 20px" ng-click="showCc = !showCc ; showHead = true ;"   ng-class="{'mail-option-select': (showCc) }">
-                                              Cc
-                                          </div>
-                                          <div layout="row" style="width: 28px" ng-click="showCco = !showCco ;showHead = true ; "  ng-class="{'mail-option-select': (showCco) }">
-                                              Cco
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div layout="row" class="row">
-                                      <md-switch class="md-primary"
-                                                 ng-model="usePersonal">
-                                      </md-switch>
-                                      <div flex style="padding-top: 12px;">
-                                          <span style="margin-left: 8px;">¿Recibir respuesta a mi correo?</span>
-                                      </div>
-                                  </div>
-                                  <md-chips ng-model="to"
-                                            id="toaddEMail"
-                                            required
-                                            md-transform-chip="transformChip($chip)"
-                                            style="height: inherit;"
-                                            md-on-add =" addEmail($chip) "
-                                            md-on-remove =" removeEmail($chip) "
-                                            ng-style="(selectTo == 1 && destinos.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                            skip-tab
-                                  >
-                                      <md-autocomplete
-                                          md-search-text="searchDestinos"
-                                          md-items="item in correos  | stringKey : searchDestinos : 'valor' | customFind : destinos : isAddMail "
-                                          md-item-text="item.valor"
-                                          placeholder="Para:">
-                                          <span >{{item.valor}} </span>
-
-
-
-                                      </md-autocomplete>
-                                      <md-chip-template>
-                                          <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                      </md-chip-template>
-                                  </md-chips>
-                                  <md-chips ng-model="cc"
-                                            md-transform-chip="transformChip($chip)"
-                                            style="height: inherit;"
-                                            ng-show="(showCc)"
-                                            md-on-add =" addEmail($chip) "
-                                            md-on-remove =" removeEmail($chip) "
-                                            ng-style="(selectTo == 1 && cc.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                            skip-tab
-                                  >
-                                      <md-autocomplete
-                                          md-search-text="searchCc"
-                                          md-items="item in correos | stringKey : searchCc : 'valor' | customFind : destinos : isAddMail  "
-                                          md-item-text="item.valor"
-                                          placeholder="Cc:">
-                                          <span >{{item.valor}} </span>
-
-                                      </md-autocomplete>
-                                      <md-chip-template>
-                                          <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                      </md-chip-template>
-                                  </md-chips>
-                                  <md-chips ng-model="cco"
-                                            md-transform-chip="transformChip($chip)"
-                                            md-item-text="item.valor"
-                                            style="height: inherit;"
-                                            ng-show="(showCco)"
-                                            md-on-add =" addEmail($chip) "
-                                            md-on-remove =" removeEmail($chip) "
-                                            ng-style="(selectTo == 1 && cco.length == 0 ) ? {'heigth': '30px'} : {'heigth': 'inherit'}"
-                                            skip-tab
-                                  >
-                                      <md-autocomplete
-                                          md-search-text="searchCco"
-                                          md-items="item in correos | stringKey : searchCco : 'valor' | customFind : destinos : isAddMail "
-                                          md-item-text="item.valor"
-                                          placeholder="Cco:">
-                                          <span >{{item.valor}} </span>
-                                      </md-autocomplete>
-                                      <md-chip-template>
-                                          <strong>{{$chip.valor}}/{{$chip.razon_social}} </strong>
-                                      </md-chip-template>
-                                  </md-chips>
-                                  <div layout="row" class="row-min" style="padding-right: 4px;" >
-                                      <md-input-container flex>
-                                          <label>Asunto:</label>
-                                          <input  ng-model="asunto" required skip-tab >
-                                      </md-input-container>
-                                  </div>
-                              </div>
-                          </form>
-                          <div   skip-tab class="blue-btn " ng-click="send()" >
-                              <div layout="row" class="layout-row " aria-hidden="true">
-                                  <div >
-                                      Enviar
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <loader ng-show="inProgress"></loader>
-
-                  </md-content>
-              </md-sidenav>-->
 
         <!-- ########################################## LAYER crear nuevo producto ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px;"

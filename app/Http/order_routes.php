@@ -152,6 +152,10 @@ $app->post("Order/Solicitude/SaveProductItem",'Orders\OrderController@saveSolici
 $app->post("Order/Solicitude/DeleteProductItem",'Orders\OrderController@DeleteSolicitudItemProduc'); ///guarda y asinga el dproducto a la solicutud
 $app->post("Order/Solicitude/SaveCustomOrderItem",'Orders\OrderController@saveSolicitudItemCustomOrder'); ///asigna un iten de contra pedido
 $app->post("Order/Solicitude/DeleteCustomOrderItem",'Orders\OrderController@DeleteSolicitudItemCustomOrder'); ///elimna
+$app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
+$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@ChangeItemSolicitude'); /// guarda el item de la solicitud
+$app->post("Order/Solicitude/DeleteItem",'Orders\OrderController@DeleteItemSolicitude'); /// guarda el item de la solicitud
+$app->post("Order/Solicitude/RestoreItem",'Orders\OrderController@RestoreItemSolicitude'); /// guarda el item de la solicitud
 
 $app->post("Order/Solicitude/AddCustomOrder",'Orders\OrderController@addCustomOrderSolicitud'); ///agrega aun contra pedido entero
 $app->post("Order/Solicitude/RemoveCustomOrder",'Orders\OrderController@RemoveCustomOrderSolicitud'); // remove un contra pedido entero
@@ -164,16 +168,14 @@ $app->post("Order/Solicitude/RemoveSustitute",'Orders\OrderController@removeSust
 $app->post("Order/Solicitude/Restore",'Orders\OrderController@restoreSolicitude'); /// restaura a una version anterior
 $app->post("Order/Solicitude/CloseAction",'Orders\OrderController@closeActionSolicitude'); /// define que acion se debe realizar para cerrar la accion
 $app->post("Order/Solicitude/AddAnswer",'Orders\OrderController@AddAnswerSolicitude'); ///agrega una respuesta a la solicutd
+$app->post("Order/Solicitude/AddAttachments",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
 
 
-$app->post("Order/Solicitude/ChangeItem",'Orders\OrderController@changeItemSolicitude'); /// camia el item de la solicitud
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // asigna un nuevo paren al docuemnto
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
-$app->post("Order/Solicitude/AddAdjuntos",'Orders\OrderController@addAttachmentsSolicitude'); /// agrega adjuntos a la solicitud
-$app->post("Order/Solicitude/Update",'Orders\OrderController@SolicitudeUpdate'); //// coloca la solicitud en un estado de edicio
 $app->post("Order/Solicitude/ProductChange",'Orders\OrderController@changeProductoSolicitud'); /// actualiza un producto de solicitude
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
 $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
