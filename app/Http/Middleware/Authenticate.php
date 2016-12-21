@@ -34,6 +34,7 @@ class Authenticate
      */
     public function handle($request, Closure $next)
     {
+        $request->session()->put('script',$request->url());
         if (!$request->session()->has('DATAUSER')) {
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);

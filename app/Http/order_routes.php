@@ -55,11 +55,9 @@ $app->get("Order/KitchenBox",'Orders\OrderController@getKitchenBox'); ///trae to
 $app->get("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
 
 // import
-$app->get("Order/SolicitudeToImport",'Orders\OrderController@getSolicitudeToImport'); /// obtiens las solicitudes aptas para importar
 $app->get("Order/OrderToImport",'Orders\OrderController@getOrderToImport'); /// obtien los pedidos(Proforma) q son aptas para importar
 
 // compare
-$app->get("Order/BetweenOrderToSolicitud",'Orders\OrderController@getDiffbetweenSolicitudToOrder'); /// campara y trae las diferencias entre un pedido(Proforma y una solicitud)
 $app->get("Order/BetweenOrderToPurchase",'Orders\OrderController@getDiffbetweenOrderToPurchase'); /// compara y trae las diferncias entre un Pedido(Proforma) y una orden de copra
 
 
@@ -119,6 +117,8 @@ $app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// t
 $app->get("Order/Order/ProviderTemplates",'Orders\OrderController@getProviderOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Order/InternalTemplates",'Orders\OrderController@getInternalOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Order/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
+$app->get("Order/Order/Imports",'Orders\OrderController@getDocOrderImport'); /// obtiene los documentos que se pueden importar a un pedido
+
 
 $app->post("Order/Order/Save",'Orders\OrderController@saveOrder'); ///guarda la solicitud
 $app->post("Order/Order/SaveProductItem",'Orders\OrderController@saveOrderItemProduc'); ///guarda y asinga el dproducto a la solicutud
@@ -144,13 +144,14 @@ $app->post("Order/Order/AddAttachments",'Orders\OrderController@addAttachmentsOr
 $app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
 $app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); /// crea una copia sin adjuntos
 $app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
+$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
+$app->get("Order/Order/Compare",'Orders\OrderController@getOrderCompareSolicitud'); /// campara y trae las diferencias entre un pedido(Proforma y una solicitud)
 
 
 /*** sin uso aparente**********************/
 $app->post("Order/Order/AdddRemoveItem",'Orders\OrderController@addRemoveOrderItem'); ///asigna y remove item a l solicitud
 $app->post("Order/Order/SetStatus",'Orders\OrderController@setStatusOrder'); // cambia el estado del documento
 $app->post("Order/Order/AdddRemoveItems",'Orders\OrderController@addRemoveOrderItems'); // agrega y quita items a la solicud por lotes
-$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
 $app->post("Order/Order/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesOrder'); /// realiza la aprobacion por comprass
 /*** sin uso aparente**********************/
 

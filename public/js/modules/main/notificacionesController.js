@@ -159,7 +159,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     };
 
     $scope.saveAnswer = function (call, data) {
-        if(data.noti.param && data.noti.param.save){
+        if( data && data.noti && data.noti.param && data.noti.param.save){
 
 
             $timeout(function () {

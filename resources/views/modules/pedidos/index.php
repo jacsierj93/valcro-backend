@@ -297,21 +297,21 @@
 
 
 
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="listImport" id="listImport">
+        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="OrderlistImportDoc" id="OrderlistImportDoc">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
-            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistImportCtrl">
+            <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistDocImportCtrl">
                 <div layout="column" flex>
                     <div layout="row" class="focused">
                         <div active-left ></div>
                         <div layout="row" flex class="form-row-head form-row-head-select">
                             <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                 <div>
-                                    <span >  Correos</span>
+                                    <span > Documentos</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div layout="row" class="table-filter">
+                    <div layout="row"  class="table-filter">
                         <div active-left ></div>
                         <div layout="row" class="row" flex tyle="padding-right: 4px;">
                             <div flex layout="row">
@@ -334,8 +334,7 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="nro_proforma"></grid-order-by>
                             </div>
-
-                            <div layout="row" style="width: 8px;">
+                            <div flex layout="row" >
                                 <md-input-container class="md-block"  flex>
                                     <label>Emision</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -345,65 +344,61 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="emision"></grid-order-by>
                             </div>
-                            <div layout="row" style="width: 8px;">
-                                <md-input-container class="md-block"  flex>
-                                    <label></label>
-                                    <md-select ng-model="tbl.filter.diasEmit"  ng-init="tbl_listImport.filter.diasEmit = '-1'">
-                                        <md-option value="-1">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item" style="border: 1px solid #bbb9b9;color: #bbb9b9;">
-                                                    All
-                                                </div>
+                            <div style="width: 80px; color: white;" layout="row">
+                                <md-select ng-model="tbl.filter.diasEmit"  ng-init="tbl.filter.diasEmit = '-1'">
+                                    <md-option value="-1">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item" style="border: 1px solid #bbb9b9;color: #bbb9b9;">
+                                                All
                                             </div>
-                                        </md-option>
-                                        <md-option value="100">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit100 " >
-                                                    +
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="100">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit100 " >
+                                                +
                                             </div>
-                                        </md-option>
-                                        <md-option value="90">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit90 " >
-                                                    90
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="90">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit90 " >
+                                                90
                                             </div>
-                                        </md-option>
-                                        <md-option value="60">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit60 " >
-                                                    60
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="60">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit60 " >
+                                                60
                                             </div>
-                                        </md-option>
-                                        <md-option value="30">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit30 " >
-                                                    30
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="30">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit30 " >
+                                                30
                                             </div>
-                                        </md-option>
-                                        <md-option value="7">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit7 " >
-                                                    7
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="7">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit7 " >
+                                                7
                                             </div>
-                                        </md-option>
-                                        <md-option value="0">
-                                            <div flex layout layout-align="center center">
-                                                <div layout layout-align="center center" class="dot-item emit0" >
-                                                    Hoy
-                                                </div>
+                                        </div>
+                                    </md-option>
+                                    <md-option value="0">
+                                        <div flex layout layout-align="center center">
+                                            <div layout layout-align="center center" class="dot-item emit0" >
+                                                Hoy
                                             </div>
-                                        </md-option>
-                                    </md-select>
-                                </md-input-container>
+                                        </div>
+                                    </md-option>
+                                </md-select>
                                 <grid-order-by ng-model="tbl" key="diasEmit"></grid-order-by>
                             </div>
-
-                            <div layout="row" style="width: 8px;">
+                            <div flex layout="row" >
                                 <md-input-container class="md-block"  flex>
                                     <label>Factura</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -413,7 +408,7 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="nro_factura"></grid-order-by>
                             </div>
-                            <div layout="row" style="width: 8px;">
+                            <div flex layout="row" >
                                 <md-input-container class="md-block"  flex>
                                     <label>Monto</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -423,7 +418,7 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="monto"></grid-order-by>
                             </div>
-                            <div layout="row" style="width: 8px;">
+                            <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Comentario</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -438,17 +433,17 @@
                     <form  flex layout="row"  class="gridContent">
                         <div active-left before="verificExit" ></div>
                         <div layout="column" flex>
-                            <div   ng-repeat="item in filterDocuments(tbl.data, tbl_listImport.filter) | orderBy : tbl.data.order as filter" >
+                            <div   ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : tbl.order as filter" >
                                 <div layout="row" class="cellGridHolder" >
-                                    <div flex class="cellGrid" ng-click="docImport(item)"> {{item.titulo}}</div>
-                                    <div flex class="cellGrid" ng-click="docImport(item)"> {{item.nro_proforma}}</div>
-                                    <div flex class="cellGrid" ng-click="docImport(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
-                                    <div class="cellGrid" ng-click="docImport(item)">
+                                    <div flex class="cellGrid" ng-click="open(item)"> {{item.titulo}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)"> {{item.nro_proforma}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                    <div style="width: 80px;" class="cellGrid" ng-click="open(item)"   >
                                         <div style="width: 16px; height: 16px; border-radius: 50%"
                                              class="emit{{item.diasEmit}}"></div>                                    </div>
-                                    <div  class="cellGrid" ng-click="docImport(item)" > {{item.nro_factura}}</div>
-                                    <div flex class="cellGrid" ng-click="docImport(item)" > {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
-                                    <div flex class="cellGrid" ng-click="docImport(item)" >{{item.comentario}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" > {{item.nro_factura}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" > {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
+                                    <div flex class="cellGrid" ng-click="open(item)" >{{item.comentario}}</div>
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" ng-show="filter.length == 0 " flex>
@@ -1361,7 +1356,7 @@
                                                      md-input-minlength="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change=" toEditHead('document','condicion_pago_id',($parent.document.objs.condicion_pago_id)  ?  $parent.document.objs.condicion_pago_id: undefined );"
+                                                     md-selected-item-change=" toEditHead('document','condicion_pago_id',($parent.document.objs.condicion_pago_id)  ?  $parent.document.objs.condicion_pago_id: undefined );$parent.document.condicion_pago_id = $parent.document.objs.condicion_pago_id.id;"
                                     >
                                         <md-item-template>
                                             <span>{{item.titulo}}</span>
@@ -1767,10 +1762,10 @@
                                     <div flex="5" class="cellEmpty cellSelect">
                                         <md-switch class="md-primary"  ng-click="change(item, $event)"  ng-disabled="(true)" ng-model="item.asignado"></md-switch>
                                     </div>
-                                    <div flex="20" class="cellGrid" ng-click="openItem(item)"> {{item.codigo}}</div>
-                                    <div flex="20" class="cellGrid" ng-click="openItem(item)"> {{item.codigo_fabrica}}</div>
-                                    <div flex class="cellGrid" ng-click="openItem(item)"> {{item.descripcion}}</div>
-                                    <div flex="15" class="cellGrid" ng-click="openItem(item)"> {{item.cantidad}}</div><!--cantidad total asignada -->
+                                    <div flex="20" class="cellGrid" ng-click="openItem(item, $index)"> {{item.codigo}}</div>
+                                    <div flex="20" class="cellGrid" ng-click="openItem(item,index)"> {{item.codigo_fabrica}}</div>
+                                    <div flex class="cellGrid" ng-click="openItem(item,index)"> {{item.descripcion}}</div>
+                                    <div flex="15" class="cellGrid" ng-click="openItem(item,index)"> {{item.cantidad}}</div><!--cantidad total asignada -->
                                 </div>
                             </div>
                             <div layout="column" layout-align="center center" ng-show="filterProductProv.length == 0 " flex>
@@ -2948,7 +2943,7 @@
                             </div>
                         </div>
                     </div>
-                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 } "  ng-show="document.fecha_aprob_compra">
+                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 } "  ng-show="$parent.document.fecha_aprob_compra">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 2 }" ng-click="gridViewFinalDoc = 2" >
@@ -2981,7 +2976,7 @@
                             </div>
                         </div>
                     </div>
-                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" ng-show="document.fecha_aprob_gerencia">
+                    <div  layout="row"  class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" ng-show="$parent.document.fecha_aprob_gerencia">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 3 }" ng-click="gridViewFinalDoc = 3" >
@@ -3014,7 +3009,7 @@
                             </div>
                         </div>
                     </div>
-                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" layout="row" ng-show="document.contraPedido && document.contraPedido.length > 0">
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" layout="row" ng-show="$parent.document.productos.contraPedido && $parent.document.productos.contraPedido.length > 0">
                         <div active-left> </div>
                         <div layout="column" flex >
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 4 }" ng-click="gridViewFinalDoc = 4" >
@@ -3033,9 +3028,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div flex ng-show="gridViewFinalDoc == 2" >
+                            <div flex ng-show="gridViewFinalDoc == 4" >
                                 <md-content style="margin: 4px;">
-                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in document.contraPedido  track by $index " layout-align="space-between center" >
+                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contra  track by $index " layout-align="space-between center" >
                                         <div layout="row"  flex>
                                             <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
@@ -3056,7 +3051,7 @@
                         </div>
 
                     </div>
-                    <div    class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" layout="row"  ng-show="document.kitchenBox && document.kitchenBox.length > 0"  >
+                    <div    class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" layout="row"  ng-show="$parent.document.productos.kitchenBox && $parent.document.productos.kitchenBox.length > 0"  >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 5 }" ng-click="gridViewFinalDoc = 5" >
@@ -3078,16 +3073,16 @@
 
                             <div flex ng-show="gridViewFinalDoc == 5">
                                 <md-content style="margin: 4px;">
-                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.kitchenBox  track by $index " layout-align="space-between center" >
+                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.kitchen  track by $index " layout-align="space-between center" >
                                         <div layout="row" >
-                                            <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
+                                            <div  layout="column" ng-show="(item.estado == 'new' && item.trace.length > 0) || item.estado == 'created'"
                                                   layout-align="center center">
                                                 <span class="icon-Agregar" style="font-size: 16px"></span>
                                             </div>
-                                            <div  layout="column" ng-show="item.id.estado == 'upd'" layout-align="center center" >
+                                            <div  layout="column" ng-show="item.estado == 'upd'" layout-align="center center" >
                                                 <span class="icon-Actualizar" style="font-size: 16px"></span>
                                             </div>
-                                            <div  layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
+                                            <div  layout="column" ng-show="item.estado == 'del'" layout-align="center center" >
                                                 <span class="icon-Eliminar" style="font-size: 16px"></span>
                                             </div>
                                             <div class="rowRsm " >{{item.titulo.v}}</div>
@@ -3099,7 +3094,7 @@
 
                         </div>
                     </div>
-                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row"  ng-show="document.pedidoSusti && document.pedidoSusti.length > 0"  >
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row"  ng-show="$parent.document.productos.productos.pedidoSusti && $parent.document.productos.pedidoSusti.length > 0"  >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" ng-click="gridViewFinalDoc = 6" >
