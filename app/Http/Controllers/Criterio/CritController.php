@@ -73,17 +73,21 @@ class CritController extends BaseController
             $field->line;
             $field->field;
             $field->type;
-            $field['options'] = $field->options()->get();/*->groupBy("descripcion");*/
-            foreach ($field['options'] as $opt){
-                if($opt->descripcion=="Opcion"){
-                    $opt["elem"] = Lista::find($opt->pivot->value);
-                }
-
-            }
             $field['deps'] = $field->dependency()->get();
             foreach ($field['deps'] as $dep){
                 $dep['parent'] = $dep->parent()->first();
             }
+            $field['options'] = $field->options()->get()->groupBy("descripcion");
+
+            if(!$field['options']->has("Opcion")){
+                continue;
+            }
+
+            foreach ($field['options']['Opcion'] as $opt){
+                $opt["elem"] = Lista::find($opt->pivot->value);
+            }
+
+
         }
         return  json_encode($crit);
     }
@@ -173,6 +177,12 @@ class CritController extends BaseController
                     $opt = Options::find($rq['id']);
 
                     if($opt->value == $rq['valor'] && $opt->message == $rq['msg']){
+                        continue;
+                    }
+
+                    if($rq['valor']==""){
+                        $opt->delete();
+                        $ret[$k]["action"]="del";
                         continue;
                     }
                     $ret[$k]["action"]="upd";

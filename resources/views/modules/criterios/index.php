@@ -224,7 +224,9 @@
                                             <div ng-repeat="field in criteria" class="row"
                                                  ng-class="{'field-sel':field.id==formId.id}"
                                                  test="{{formId.id}}"
+                                                 ng-init="createModel(field)"
                                                  ng-dblclick="setEdit(field)"
+                                                 ng-show="isShow[field.id]"
                                                  form-preview="{{ field.type.directive }}">
 
                                             </div>
@@ -460,7 +462,7 @@
                                                                              md-selected-item-change="setOptSel(ctrl)"
                                                                              info="opcion a agregar"
                                                                              md-search-text="ctrl.searchOptions"
-                                                                             md-items="item in listOptions | stringKey : ctrl.searchOpctions: 'nombre' | filterSelect: opcValue.opts.valor"
+                                                                             md-items="item in listOptions | stringKey : ctrl.searchOptions: 'nombre' | filterSelect: opcValue.opts.valor"
                                                                              md-item-text="item.nombre"
                                                                              md-no-asterisk
                                                                              md-min-length="0"
