@@ -50,6 +50,7 @@ use App\Models\Sistema\Solicitude\SolicitudeAnswerAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeAttachment;
 use App\Models\Sistema\Solicitude\SolicitudeItem;
 use App\Models\Sistema\User;
+use App\Models\Sistema\Views\ItemsInMdlOrders;
 use Carbon\Carbon;
 use DB;
 use Log;
@@ -1027,7 +1028,7 @@ class OrderController extends BaseController
      **/
     public function getSolicitudeSubstitutes(Request $req)
     {
-        $data = array();
+        $data =Collection::make(array());
         $model = Solicitude::findOrFail($req->doc_id);
         $items = Solicitude::where('id','<>', $req->doc_id)
             ->where('prov_id', $req->prov_id)
@@ -1042,12 +1043,16 @@ class OrderController extends BaseController
 
         foreach($items as $aux){
             $aux->asignado =false;
-            $data[]= $aux;
+            $data->push($aux);
+
         }
         foreach ($model->items()->where('tipo_origen_id','22')->get() as $aux){
-            $doc = Order::findOrFail($aux->doc_origen_id);
-            $doc->asignado =true;
-            $data[]= $doc;
+            if(!$data->contains($aux->doc_origen_id)){
+                $doc = Solicitude::findOrFail($aux->doc_origen_id);
+                $doc->asignado =true;
+                $data->push($doc);
+            }
+
         }
         foreach($data as $aux){
             $aux['documento'] = $aux->getTipo();
@@ -2045,7 +2050,7 @@ class OrderController extends BaseController
     /**** PEDIDO GET *********/
 
     public function getOrderSubstitutes(Request $req){
-        $data = array();
+        $data = Collection::make(Array());
 
         $model = Order::findOrFail($req->doc_id);
         $items = Order::where('id','<>', $req->doc_id)
@@ -2061,12 +2066,16 @@ class OrderController extends BaseController
         $paises= Country::get();
         foreach($items as $aux){
             $aux->asignado =false;
-            $data[]= $aux;
+            $data->push($aux);
         }
         foreach ($model->items()->where('tipo_origen_id','22')->get() as $aux){
-            $doc = Order::findOrFail($aux->doc_origen_id);
-            $doc->asignado =true;
-            $data[]= $doc;
+            if(!$data->contains($aux->doc_origen_id)){
+                $doc = Order::findOrFail($aux->doc_origen_id);
+                $doc->asignado =true;
+                $data->push($doc);
+
+            }
+
         }
         foreach($data as $aux){
             $aux['documento'] = $aux->getTipo();
@@ -2641,8 +2650,6 @@ class OrderController extends BaseController
     public function SavekitchenBoxOrder(Request $req){
 
         $resul['action']="new";
-        $resul= array();
-        $doc = Order::findOrFail($req->doc_id);
         $k = KitchenBox::findOrFail($req->id);
         $item = new OrderItem();
         if ($req->has('reng_id')) {
@@ -2658,7 +2665,7 @@ class OrderController extends BaseController
         $item->producto_id = $k->producto_id;
         $item->uid = $req->uid;
         $item->costo_unitario = $req->costo_unitario;
-        $item->doc_origen_id = $k->id;/// reemplazr cuando se sepa la logica
+        $item->doc_origen_id = $k->id;/// reemplazar cuando se sepa la logica
         $resul['response'] = $item->save();
         $resul['item'] = $item;
         return $resul;
@@ -2726,7 +2733,9 @@ class OrderController extends BaseController
      */
     public  function  addSustituteOrder(Request $req){
 
-        $resul = array();
+        $resul =[];
+        $resul['kitchen'] = [];
+        $resul['cp'] = [];
         $princi = Order::findOrFail($req->princ_id);
         $reemplaze = Order::findOrFail($req->reemplace_id);
         $model = new Order();
@@ -3146,7 +3155,7 @@ class OrderController extends BaseController
      * Asigna el parent a un pedido(proforma)
      */
     public function setParentOrder(Request $req){
-        $resul = ['accion'=>'upd', 'changes' => [],'new'=>[], 'old'=>[]];
+        $resul = ['accion'=>'upd', 'changes' => [],'new'=>[], 'old'=>[],'co'=>[]];
         $model = Order::findOrFail($req->id);
         $so = Solicitude::findOrFail($req->doc_parent_id);
         $model->doc_parent_id= $req->doc_parent_id;
@@ -3222,6 +3231,12 @@ class OrderController extends BaseController
                 $aux->saldo = 0;
                 $aux->save();
                 $item->save();
+                $co= $aux->customOrder;
+                if($co !=  null){
+                    $co->saldo =  0;
+                    $co->save();
+                    $resul['co']= $co;
+                }
 
                 $resul['new'][]= $item;
                 $resul['old'][]= $aux;
@@ -3348,7 +3363,7 @@ class OrderController extends BaseController
      * obtiene todos las ordenes de compras que son sustituibles
      **/
     public function getPurchaseSubstitutes(Request $req){
-        $data = array();
+        $data =  Collection::make(Array());
         $model = Purchase::findOrFail($req->doc_id);
         $items = Purchase::where('id','<>', $req->doc_id)
             ->where('prov_id', $req->prov_id)
@@ -3363,12 +3378,15 @@ class OrderController extends BaseController
 
         foreach($items as $aux){
             $aux->asignado =false;
-            $data[]= $aux;
+            $data->push($aux);
         }
         foreach ($model->items()->where('tipo_origen_id','22')->get() as $aux){
-            $doc = Order::findOrFail($aux->doc_origen_id);
-            $doc->asignado =true;
-            $data[]= $doc;
+            if(!$data->contains($aux->doc_origen_id)){
+                $doc = Purchase::findOrFail($aux->doc_origen_id);
+                $aux->asignado =false;
+                $data->push($doc);
+            }
+
         }
         foreach($data as $aux){
             $aux['documento'] = $aux->getTipo();
@@ -3478,8 +3496,8 @@ class OrderController extends BaseController
      */
     public function getInternalPurchaseTemplate (Request $req){
         $model = Purchase::findOrFail($req->id);
-        $prov = Provider::findOrFail($model->prov_id);
         $user =   $this->user;
+        $tipo = 'created';
         $fn =  function ($content, $file) use ($model,$user)  {
             $template = View::make($file,[
                 'subjet'=>$content['subjet'],
@@ -3491,11 +3509,12 @@ class OrderController extends BaseController
 
             return $template;
         };
-        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Purchase', 'created', $fn)['good']];
+        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Purchase', $tipo, $fn)['good']];
         $correos = [];
         foreach (User::get() as  $aux){
             $correos[] = ['nombre'=>$aux->nombre,'correo'=>$aux->email, 'langs'=>['es']];
         }
+        $data['tipo']=$tipo;
         $data['correos'] = $correos;
         return $data;
     }
@@ -3516,6 +3535,29 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * obtiene las sodocumentos actos para importacion
+     */
+    public function getDocPurchaseImport(Request $req)
+    {
+        $data = array();
+        $items = Order::where('disponible', 1)->get();
+        $type = OrderType::get();
+        $prov = Provider::findOrFail($req->prov_id);
+        $coin = Monedas::get();
+        $motivo = OrderReason::get();
+        $prioridad = OrderPriority::get();
+        $estados = OrderStatus::get();
+        $paises = Country::get();
+        foreach ($items as $aux) {
+            $aux->diasEmit = $aux->daysCreate();
+            $data[] = $aux;
+        }
+
+
+        return $data;
+
+    }
     /**** ORDEN DE COMPRA POST *********/
     public function savePurchaseOrder(Request $req){
 
@@ -3847,10 +3889,9 @@ class OrderController extends BaseController
     public function addkitchenBoxPurchase(Request $req){
 
         $resul['action']="new";
-        $resul= array();
         $doc = Purchase::findOrFail($req->doc_id);
         $k = KitchenBox::findOrFail($req->id);
-        $item = new OrderItem();
+        $item = new PurchaseItem();
         if ($req->has('reng_id')) {
             $resul['action'] = 'upd';
             $item = PurchaseItem::findOrFail($req->reng_id);
@@ -4334,6 +4375,210 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * Asigna el parent a un pedido(proforma)
+     */
+    public function setParentPurchase(Request $req){
+        $resul = ['accion'=>'upd', 'changes' => [],'new'=>[], 'old'=>[],'co'=>[]];
+        $model = Purchase::findOrFail($req->id);
+        $so = Order::findOrFail($req->doc_parent_id);
+        $model->doc_parent_id= $req->doc_parent_id;
+        $model->doc_parent_origen_id= $req->doc_parent_origen_id;
+
+        if($req->has('monto')){
+            $model->monto = $req->monto;
+            $resul['changes']['monto']=$model->monto;
+        }
+        if($req->has('titulo')){
+            $model->titulo = $req->titulo;
+            $resul['changes']['titulo']=$model->titulo;
+        }
+        if($req->has('pais_id')){
+            $model->pais_id = $req->pais_id;
+            $resul['changes']['pais_id']=$model->pais_id;
+        }
+
+        if($req->has('motivo_id')){
+            $model->motivo_id = $req->motivo_id;
+            $resul['changes']['motivo_id'] =$model->motivo_id;
+        }
+        if($req->has('prov_moneda_id')){
+            $model->prov_moneda_id = $req->prov_moneda_id;
+            $resul['changes']['prov_moneda_id']= $model->prov_moneda_id;
+        }
+
+        if($req->has('mt3')){
+            $model->mt3 = $req->mt3;
+            $resul['changes']['mt3'] = $model->mt3;
+        }
+        if($req->has('peso')){
+            $model->peso = $req->peso;
+            $resul['changes']['peso']= $model->peso;
+        }
+        if($req->has('direccion_almacen_id')){
+            $model->direccion_almacen_id = $req->direccion_almacen_id;
+            $resul['changes']['direccion_almacen_id']= $model->direccion_almacen_id;
+        }
+        if($req->has('direccion_facturacion_id')){
+            $model->direccion_facturacion_id = $req->direccion_facturacion_id;
+            $resul['changes']['direccion_facturacion_id']= $model->direccion_facturacion_id;
+        }
+        if($req->has('puerto_id')){
+            $model->puerto_id = $req->puerto_id;
+            $resul['changes']['puerto_id']= $model->puerto_id;
+        }
+        if($req->has('condicion_id')){
+            $model->condicion_id = $req->condicion_id;
+            $resul['changes']['condicion_id'] = $model->condicion_id;
+        }
+        if($req->has('tasa')){
+            $model->tasa = $req->tasa;
+            $resul['changes']['tasa']= $model->tasa;
+        }
+        if($req->has('comentario')){
+            $model->comentario = $req->comentario;
+            $resul['changes']['comentario'] = $model->comentario;
+        }
+        if($req->has('items')){
+            foreach ($req->items as $id){
+                $aux = OrderItem::findOrFail($id);
+                $item= new PurchaseItem();
+                $item->tipo_origen_id = $req->doc_parent_origen_id;
+                $item->doc_id = $model->id;
+                $item->origen_item_id =$aux->id;
+                $item->doc_origen_id =$aux->doc_id;
+                $item->cantidad = $aux->saldo;
+                $item->saldo = $aux->saldo;
+                $item->producto_id = $aux->producto_id;
+                $item->descripcion = $aux->descripcion;
+                $item->costo_unitario = $aux->costo_unitario;
+                $aux->saldo = 0;
+                $aux->save();
+                $item->save();
+                $co= $aux->customOrder;
+                if($co !=  null){
+                    $co->saldo =  0;
+                    $co->save();
+                    $resul['co']= $co;
+                }
+
+                $resul['new'][]= $item;
+                $resul['old'][]= $aux;
+
+            }
+        }
+        $so->disponible= 0;
+        $so->save();
+        $model->save();
+        return $resul;
+    }
+
+
+    /**
+     *  compara una proforma  y una orden de compra y muestra las diferencias por campos entre ellos
+     */
+    public function getOrderCompareOrder(Request $req)
+    {
+        $data = array();
+        $error = array();
+        $asigna = [];
+        $compare = array('titulo', 'pais_id', 'motivo_id', 'prov_moneda_id', 'mt3', 'peso',
+            'direccion_almacen_id', 'direccion_facturacion_id', 'puerto_id', 'condicion_id', 'tasa', 'comentario'
+        );
+        $princi = Purchase::findOrFail($req->id);// id de la proforma
+        $import = Order::findOrFail($req->compare);// id de la solicitud
+        $asigna['monto'] = $princi->monto + $import->monto;
+        $asigna['mt3'] = $princi->mt3 + $import->mt3;
+
+
+        foreach ($compare as $aux) {
+            $ordval = $princi->getAttributeValue($aux);
+            $solval = $import->getAttributeValue($aux);
+            $data['comp'][] = array('ord' => $ordval, 'solv' => $solval, 'key' => $aux);
+            if ($solval == null && $ordval != null) {
+                $asigna[$aux] = $ordval;
+            } else if ($solval != null && $ordval == null) {
+                $asigna[$aux] = $solval;
+            } else
+                if ($solval != null && $ordval != null) {
+
+                    if ($solval != $ordval) {
+                        $temp0 = array();
+                        $temp1 = array();
+                        $temp0['key'] = $solval;
+                        $temp1['key'] = $ordval;
+
+                        switch ($aux) {
+
+                            case "prov_moneda_id":
+                                $mon = Monedas::findOrFail($solval);
+                                $mon2 = Monedas::findOrFail($ordval);
+                                $temp0['text'] = $mon->nombre;
+                                $temp1['text'] = $mon2->nombre;
+                                break;
+                            case "pais_id":
+                                $mon = Country::find($solval);
+                                $mon2 = Country::find($ordval);
+                                if ($mon != null) {
+                                    $temp0['text'] = $mon->short_name;
+                                }
+                                if ($mon2 != null) {
+                                    $temp1['text'] = $mon2->short_name;
+                                }
+                                break;
+                            case "motivo_id":
+                                $mon = OrderReason::findOrFail($solval);
+                                $mon2 = OrderReason::findOrFail($ordval);
+                                $temp0['text'] = $mon->motivo;
+                                $temp1['text'] = $mon2->motivo;
+                                break;
+                            case "direccion_almacen_id" || "direccion_facturacion_id":
+                                $mon = ProviderAddress::find($solval);
+                                $mon2 = ProviderAddress::find($ordval);
+                                if ($mon != null) {
+                                    $temp0['text'] = $mon->short_name;
+                                }
+                                if ($mon2 != null) {
+                                    $temp1['text'] = $mon2->short_name;
+                                }
+
+                                break;
+                            /*       case "direccion_facturacion_id":
+                                       $mon=ProviderAddress::findOrFail($solval);
+                                       $mon2=ProviderAddress::findOrFail($ordval);
+                                       $temp0['text'] =$mon->direccion;
+                                       $temp1['text'] =$mon2->direccion;
+                                       break;*/
+                            case "puerto_id" :
+                                $mon = Ports::findOrFail($solval);
+                                $mon2 = Ports::findOrFail($ordval);
+                                $temp0['text'] = $mon->Main_port_name;
+                                $temp1['text'] = $mon2->Main_port_name;
+                                break;
+                            case "condicion_id" :
+                                $mon = OrderCondition::findOrFail($solval);
+                                $mon2 = OrderCondition::findOrFail($ordval);
+                                $temp0['text'] = $mon->Main_port_name;
+                                $temp1['text'] = $mon2->Main_port_name;
+                                break;
+
+
+                        }
+                        $error[$aux][] = $temp0;
+                        $error[$aux][] = $temp1;
+
+                    }
+                }
+        }
+        $data['error'] = $error;
+        $data['asignado'] = $asigna;
+        $solItms = $import->items()->where('saldo','>', 0)->get();
+        $data['items'] = $solItms;
+
+
+        return $data;
+    }
+
     /************************************************************** FIn orden de compra *************************************************************/
 
 
@@ -4479,21 +4724,6 @@ class OrderController extends BaseController
         return $resul;
     }
 
-
-
-    /**
-     * Asigna el parent a un pedido(proforma)
-     */
-    public function setParentPurchase(Request $req){
-        $resul = array();
-        $princ = Purchase::findOrFail($req->princ_id);
-        $princ->doc_parent_id = $req->doc_parent_id;
-        $princ->doc_parent_origen_id = 21;
-        $princ->save();
-        $resul['accion']='upd';
-
-        return $resul;
-    }
 
     /**
      * Asigna el parent a un pedido(proforma)
@@ -4837,82 +5067,22 @@ class OrderController extends BaseController
      *
      **/
     public function  getCustomOrderReview (Request $req){
+
+        $items = CustomOrderItem::where('doc_id', $req->id)->get();
+        $model = $this->getDocumentIntance($req->tipo);
+        $model  = $model->findOrFail($req->doc_id);
         $data = [];
-        switch ($req->tipo){
-            case  21:
-                $solIt = SolicitudeItem::where('tipo_origen_id', 2)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Solicitud" ,$solIt );
-                }
-                $proIt = OrderItem::where('tipo_origen_id', 2)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Proforma" ,$proIt );
-                }
-                $odcIt = PurchaseItem::where('tipo_origen_id', 2)
-                    ->where('saldo','>',0)
-                    ->where('doc_origen_id', $req->id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Orden de compra" ,$odcIt );
-                }
-                break;
-            case  22:
-                $solIt = SolicitudeItem::where('tipo_origen_id', 2)
-                    ->where('saldo','>',0)
-                    ->where('doc_origen_id', $req->id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Solicitud" ,$solIt );
-                }
-                $proIt = OrderItem::where('tipo_origen_id', 2)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Proforma" ,$proIt );
-                }
-                $odcIt = PurchaseItem::where('tipo_origen_id', 2)
-                    ->where('saldo','>',0)
-                    ->where('doc_origen_id', $req->id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Orden de compra" ,$odcIt );
-                }
-                ;break;
-            case  23:
-                $solIt = SolicitudeItem::where('tipo_origen_id', 2)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Solicitud" ,$solIt );
-                }
-                $proIt = OrderItem::where('tipo_origen_id', 2)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Proforma" ,$proIt );
-                }
-                $odcIt = PurchaseItem::where('tipo_origen_id', 2)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Orden de compra" ,$odcIt );
-                }
-                ;break;
+        foreach ($items as $aux){
+            $hh = ItemsInMdlOrders::where('uid', $aux->uid)
+                ->where('tbl_disponible','1')
+                ->where('tbl_uid','<>',$model->uid)
+                ->where('saldo','>','0')
+                ->get();
+            if(sizeof($hh)  > 0) {
+                $data = array_merge($data,$hh->toarray() );
+            }
         }
+
 
         return $data;
 
@@ -5293,82 +5463,13 @@ class OrderController extends BaseController
      *
      **/
     public function  getKitchenBoxReview (Request $req){
-        $data = [];
-        switch ($req->tipo){
-            case  21:
-                $solIt = SolicitudeItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Solicitud" ,$solIt );
-                }
-                $proIt = OrderItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Proforma" ,$proIt );
-                }
-                $odcIt = PurchaseItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Orden de compra" ,$odcIt );
-                }
-                break;
-            case  22:
-                $solIt = SolicitudeItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Solicitud" ,$solIt );
-                }
-                $proIt = OrderItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Proforma" ,$proIt );
-                }
-                $odcIt = PurchaseItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Orden de compra" ,$odcIt );
-                }
-                ;break;
-            case  23:
-                $solIt = SolicitudeItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Solicitud" ,$solIt );
-                }
-                $proIt = OrderItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Proforma" ,$proIt );
-                }
-                $odcIt = PurchaseItem::where('tipo_origen_id', 3)
-                    ->where('doc_origen_id', $req->id)
-                    ->where('saldo','>',0)
-                    ->where('doc_id','<>',$req->doc_id)
-                    ->get();
-                if(sizeof($solIt) > 0){
-                    $data[]=  array("Orden de compra" ,$odcIt );
-                }
-                ;break;
-        }
+        $model = $this->getDocumentIntance($req->tipo);
+        $model  = $model->findOrFail($req->doc_id);
+        $data = ItemsInMdlOrders::where('doc_origen_id',  $req->id)
+            ->where('tbl_disponible','1')
+            ->where('saldo','>','0')
+            ->where('tbl_uid','<>',$model->uid)
+            ->get();
 
         return $data;
 
@@ -5615,6 +5716,7 @@ class OrderController extends BaseController
         $contra=Collection::make(Array());
         $kitchen= Collection::make(Array());
         $pediSus= Collection::make(Array());
+        $import= Collection::make(Array());
         $all= Collection::make(Array());
         $prod_prov = Product::where('prov_id', $order->prov_id)->get();
 
@@ -5627,7 +5729,9 @@ class OrderController extends BaseController
         }
         /** kitceh box*/
         foreach($items->where('tipo_origen_id', '3') as $aux){
-            $kitchen->push(KitchenBox::find($aux->origen_item_id));
+            $k = KitchenBox::find($aux->origen_item_id);
+            $k->titulo = $aux->descripcion;
+            $kitchen->push($k);
         }
 
         /** importados */
@@ -5667,9 +5771,28 @@ class OrderController extends BaseController
             $all->push($aux);
         }
 
+        if($order->getTipoId() == '22'){
+            foreach($items->where('tipo_origen_id','21') as $aux){
+                if(!$import->contains($aux->doc_origen_id)){
+                    $tem = Solicitude::find($aux->doc_origen_id);
+                    $tem->sustituto = $aux->id;
+                    $import->push($tem);
+                }
+            }
+        }
+        if($order->getTipoId() == '23'){
+            foreach($items->where('tipo_origen_id','22') as $aux){
+                if(!$import->contains($aux->doc_origen_id)){
+                    $tem = Order::find($aux->doc_origen_id);
+                    $tem->sustituto = $aux->id;
+                    $import->push($tem);
+                }
+            }
+        }
         $data['contraPedido'] = $contra;
         $data['kitchenBox'] = $kitchen;
         $data['pedidoSusti'] = $pediSus;
+        $data['import'] = $import;
         $data['todos'] = $all;
         return $data;
     }

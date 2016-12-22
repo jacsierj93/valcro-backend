@@ -163,6 +163,8 @@ $app->get("Order/Purchase/Summary",'Orders\OrderController@getPurchaseSummary');
 $app->get("Order/Purchase/ProviderTemplates",'Orders\OrderController@getProviderPurchaseTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Purchase/InternalTemplates",'Orders\OrderController@getInternalPurchaseTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Purchase/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
+$app->get("Order/Purchase/Imports",'Orders\OrderController@getDocPurchaseImport'); /// obtiene los documentos que se pueden importar a un pedido
+
 
 $app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda  la orden de compra
 $app->post("Order/Purchase/SaveProductItem",'Orders\OrderController@changeProductoPurchase'); // cambia el producto
@@ -188,6 +190,8 @@ $app->post("Order/Purchase/AddAttachments",'Orders\OrderController@addAttachment
 $app->post("Order/Purchase/Close",'Orders\OrderController@ClosePurchase'); // cierra el documento y notifica por correo
 $app->post("Order/Purchase/Copy",'Orders\OrderController@copyPurchase'); /// crea una copia de la orden de compra sina adjutos
 $app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// envia la solicitud al proveedor
+$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // cierra el documento y notifica por correo
+$app->get("Order/Purchase/Compare",'Orders\OrderController@getOrderCompareOrder'); /// campara y trae las diferencias entre un pedido(Proforma y una solicitud)
 
 
 
@@ -196,7 +200,6 @@ $app->post("Order/Purchase/Send",'Orders\OrderController@sendPurchase'); /// env
 $app->post("Order/Purchase/AdddRemoveItem",'Orders\OrderController@addRemovePurchaseItem'); ///asigna y remove item a l solicitud
 $app->post("Order/Purchase/SetStatus",'Orders\OrderController@setStatusPurchase'); // cambia el estado del documento
 $app->post("Order/Purchase/AdddRemoveItems",'Orders\OrderController@addRemovePurchaseItems'); // agrega y quita items a la solicud por lotes
-$app->post("Order/Purchase/SetParent",'Orders\OrderController@setParentPurchase'); // asigna el paren a la orden de compra
 $app->post("Order/Purchase/AddProdConditionPay",'Orders\OrderController@addProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
 $app->post("Order/Purchase/RemoveProdConditionPay",'Orders\OrderController@removeProdConditionPurchase'); //@exception//agrega una cndicion de pago a un producto
 $app->post("Order/Purchase/ApprovedPurchases",'Orders\OrderController@ApprovedPurchasesPurchase'); // agreaga la aprobacion por compras

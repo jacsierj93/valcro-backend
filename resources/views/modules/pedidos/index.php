@@ -179,7 +179,7 @@
         <div layout="column" flex class="md-whiteframe-1dp">
 
             <div class="botonera" layout="row" layout-align="space-between center">
-                <div style="width: 240px;" layout="row">
+                <div style="width: 336px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.created)" layout-align="center center" ng-click="menuAgregar()">
@@ -3030,7 +3030,7 @@
                             </div>
                             <div flex ng-show="gridViewFinalDoc == 4" >
                                 <md-content style="margin: 4px;">
-                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.contra  track by $index " layout-align="space-between center" >
+                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in $parent.document.productos.contraPedido  track by $index " layout-align="space-between center" >
                                         <div layout="row"  flex>
                                             <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
@@ -3073,7 +3073,7 @@
 
                             <div flex ng-show="gridViewFinalDoc == 5">
                                 <md-content style="margin: 4px;">
-                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in finalDoc.kitchen  track by $index " layout-align="space-between center" >
+                                    <div layout="row" class="cellGridHolder"  ng-repeat=" item in $parent.document.productos.kitchenBox  track by $index " layout-align="space-between center" >
                                         <div layout="row" >
                                             <div  layout="column" ng-show="(item.estado == 'new' && item.trace.length > 0) || item.estado == 'created'"
                                                   layout-align="center center">
@@ -3085,7 +3085,7 @@
                                             <div  layout="column" ng-show="item.estado == 'del'" layout-align="center center" >
                                                 <span class="icon-Eliminar" style="font-size: 16px"></span>
                                             </div>
-                                            <div class="rowRsm " >{{item.titulo.v}}</div>
+                                            <div class="rowRsm " >{{item.descripcion}}</div>
                                         </div>
                                     </div>
                                 </md-content>
@@ -3094,7 +3094,7 @@
 
                         </div>
                     </div>
-                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row"  ng-show="$parent.document.productos.productos.pedidoSusti && $parent.document.productos.pedidoSusti.length > 0"  >
+                    <div   class="form-style" ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" layout="row"  ng-show="$parent.document.productos.pedidoSusti && $parent.document.productos.pedidoSusti.length > 0"  >
                         <div active-left> </div>
                         <div layout="column" flex>
                             <div layout="row" class="form-row-head " ng-class="{'form-row-head-select' : gridViewFinalDoc == 6 }" ng-click="gridViewFinalDoc = 6" >
@@ -3117,7 +3117,7 @@
                             <div flex ng-show="gridViewFinalDoc == 6">
                                 <md-content style="margin: 4px;">
 
-                                    <div layout="row" class="cellGridHolder "  ng-repeat=" item in finalDoc.pedidoSusti  track by $index " layout-align="space-between center" >
+                                    <div layout="row" class="cellGridHolder "  ng-repeat=" item in $parent.document.productos.pedidoSusti  track by $index " layout-align="space-between center" >
                                         <div layout="row"  flex >
                                             <div  layout="column" ng-show="(item.id.estado == 'new' && item.id.trace.length > 0) || item.id.estado == 'created'"
                                                   layout-align="center center">
@@ -3129,7 +3129,7 @@
                                             <div  layout="column" ng-show="item.id.estado == 'del'" layout-align="center center" >
                                                 <span class="icon-Eliminar" style="font-size: 16px"></span>
                                             </div>
-                                            <div class="rowRsm">{{item.titulo.v}}</div>
+                                            <div class="rowRsm">{{item.titulo}}</div>
                                         </div>
 
                                     </div>
@@ -3201,7 +3201,7 @@
                     <div layout="row"  class="gridContent">
                         <div  layout="column" flex>
                             <div flex >
-                                <div  ng-repeat="item in finalDoc.productos | filter:tbl_finalDoc.filter:strict |orderBy : tbl_finalDoc  "  >
+                                <div  ng-repeat="item in $parent.document.productos.todos | filter:filter.filter:strict |orderBy : tbl_finalDoc.order  "  >
                                     <div layout="row" class="cellGridHolder" >
                                         <div flex="20" class="cellSelect" ng-class="{'cellSelect':( finalProdSelec.id  != item.id) ,'cellSelect-select':(finalProdSelec.id  == item.id )}" >
                                             {{item.codigo}}
@@ -3618,7 +3618,7 @@
         </md-sidenav>
 
         <!-- ########################################## LAYER LISTA DE PREVIEW HYML ########################################## -->
-        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="previewEmail" id="previewEmail">
+<!--        <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="previewEmail" id="previewEmail">
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderMailPreview" >
                 <div layout="column" flex>
                     <form layout="row"  class="focused" >
@@ -3757,7 +3757,7 @@
                 <loader ng-show="inProgress"></loader>
                 <div  style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
             </md-content>
-        </md-sidenav>
+        </md-sidenav>-->
 
         <!------------------------------------------- mini layer aprobar documento ------------------------------------------------------------------------->
         <md-sidenav layout="row" class="md-sidenav-right md-whiteframe-2dp popUp md-sidenav-layer"

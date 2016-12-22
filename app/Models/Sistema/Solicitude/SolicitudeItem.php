@@ -24,4 +24,7 @@ class SolicitudeItem extends Model
     public function document(){
         return $this->belongsTo('App\Models\Sistema\Solicitude\Solicitude', 'doc_id');
     }
+    public function customOrder(){
+        return $this->belongsTo('App\Models\Sistema\CustomOrders\CustomOrder', 'uid');
+    }
 }

@@ -1324,6 +1324,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
              $scope.ctrl.condicion_pago_id= null;
              $scope.ctrl.searchcondPagoSelec= undefined;*/
             $scope.clearForHead();
+            setGetOrder.clear();
 
         }
 
@@ -1581,7 +1582,7 @@ MyApp.controller('OrderlistDocImportCtrl',['$scope','$timeout','DateParse','Orde
         Order.get({mod:"Compare",type:$scope.$parent.formMode.mod, id:$scope.$parent.document.id, compare:doc.id}, {},function(response){
             var errors = response.error;
             var globalData = response;
-            var send = {doc_parent_id:doc.id,doc_parent_origen_id:21, id : $scope.document.id, items:[], prov_id:$scope.$parent.provSelec.id};
+            var send = {doc_parent_id:doc.id,doc_parent_origen_id:$scope.$parent.formMode.value - 1 , id : $scope.document.id, items:[], prov_id:$scope.$parent.provSelec.id};
             angular.forEach(response.items ,function (v,k){
                 send.items.push(v.id);
             });
@@ -1678,7 +1679,7 @@ MyApp.controller('OrderlistDocImportCtrl',['$scope','$timeout','DateParse','Orde
                                             });
                                             $scope.save(send);
 
-                                            }
+                                        }
                                     }
                                     ,{name:"Usar proforma",
                                         action:function(){
@@ -1827,7 +1828,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
 
 
         if($scope.Docsession.block ){
-            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:200});
+            $scope.NotifAction("error","Debe  Actualizar o Copiar antes de poder importar el documento",[],{autohidden:2000});
         }else{
 
             if($scope.formMode.value == 21){
@@ -2019,10 +2020,10 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                 var data = formSrv.getData();
                 angular.forEach($scope.$parent.document.productos.todos, function (v) {
                     if(data.response.model.id == v.id){
-                       v.saldo= data.response.model.saldo;
-                       v.id= data.response.model.id;
-                       v.cantidad= data.response.model.cantidad;
-                       v.costo_unitario= data.response.model.costo_unitario;
+                        v.saldo= data.response.model.saldo;
+                        v.id= data.response.model.id;
+                        v.cantidad= data.response.model.cantidad;
+                        v.costo_unitario= data.response.model.costo_unitario;
                         setGetOrder.change('todos'+ data.response.id,'id', data.response.id);
                         setGetOrder.change('todos'+ data.response.id,'cantidad', data.response.cantidad);
                         setGetOrder.change('todos'+ data.response.id,'costo_unitario', data.response.costo_unitario);
@@ -2259,7 +2260,7 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','setGetOr
     $scope.$parent.OrderlistProducProvCtrl = function () {
         $scope.LayersAction({search:{name:"listProducProv",
             before:function(){
-               },
+            },
             after: function(){
                 $scope.providerProds = [];
                 Order.query({type:"ProviderProds", id:$scope.$parent.ctrl.provSelec.id,tipo:$scope.$parent.formMode.value, doc_id:$scope.document.id},{}, function(response){
@@ -2393,12 +2394,12 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','setGetOr
             if(formSrv.name == 'OrderlistProducProvCtrl'){
                 var data = formSrv.getData();
                 var model = {};
-               angular.forEach($scope.providerProds, function (v,k) {
+                angular.forEach($scope.providerProds, function (v,k) {
                     if(data.model.producto_id == v.id){
                         model= v;
                         return 0;
                     }
-               });
+                });
                 model.asignado= (data.response.accion  == 'new' || data.response.accion  == 'upd')  ;
                 model.reng_id = data.response.reng_id;
                 model.cantidad = data.response.cantidad;
@@ -2608,14 +2609,14 @@ MyApp.controller('OrderAccCopyDoc',['$scope','Order','setGetOrder', function ($s
     }
 
     $scope.$parent.copyDoc = function() {
-            $scope.$parent.NotifAction("alert","Esta seguro de crear una copia del documento actual",
-                [
-                    {name:"Duplicar", action:$scope.copy} ,
-                    {name:"Cancelar", action:function () {
+        $scope.$parent.NotifAction("alert","Esta seguro de crear una copia del documento actual",
+            [
+                {name:"Duplicar", action:$scope.copy} ,
+                {name:"Cancelar", action:function () {
 
-                    }}
-                ]
-                ,{block:true});
+                }}
+            ]
+            ,{block:true});
 
     };
 }]);
@@ -2996,18 +2997,6 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
         data:[],
         order:'id'
     };
-    /*  $scope.selecPedidoSust =function (item) {
-     $scope.pedidoSusPedSelec ={};
-     $scope.LayersAction({open:{name:"resumenPedidoSus",
-     after: function(){
-     Order.get({type:"OrderSubstitute", id:item.id,tipo:$scope.formMode.value,doc_id: $scope.document.id}, {},function(response){
-     $scope.pedidoSusPedSelec = response;
-     $scope.pedidoSusPedSelec.emision = DateParse.toDate(response.emision);
-     });
-
-     }}});
-
-     };*/
     $scope.load = function () {
         $scope.tbl.data.splice(0,$scope.tbl.data.length);
         Order.query({type:$scope.formMode.mod,mod:"Substitutes",tipo: $scope.$parent.formMode.value, prov_id: $scope.$parent.provSelec.id, doc_id: $scope.$parent.document.id},{}, function (response) {
@@ -3046,11 +3035,6 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
             setGetOrder.reload({id:response.id, tipo:$scope.$parent.formMode.value});
         });
     };
-
-    $scope.question = function (item) {
-
-    };
-
     $scope.change = function (item) {
         if(!item.asignado){
             $scope.add(item);
@@ -3068,30 +3052,6 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
 
     };
 
-    /*
-     $scope.changePedidoSustituto = function (item) {
-
-     if (item.asignado) {
-     Order.postMod({type:$scope.formMode.mod,mod:"AddSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
-     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-     $scope.document.id = response.id;
-     setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
-
-     });
-     } else {
-     Order.postMod({type:$scope.formMode.mod,mod:"RemoveSustitute"},{princ_id:$scope.document.id,reemplace_id:item.id},function(response){
-     $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-     $scope.document.id = response.id;
-     setGetOrder.change('pedidoSusti'+item.id,'id',undefined);
-     setGetOrder.reload({id:response.id, tipo:$scope.formMode.value});
-
-
-     });
-     }
-
-     };
-
-     */
 
 }]);
 
@@ -3221,7 +3181,7 @@ MyApp.controller('OrderAgrContPed',['$scope','Order','setGetOrder' ,function ($s
 }]);
 
 
-MyApp.controller('OrderAgrKitBoxsCtrl',['$scope','Order','setGetOrder','form' ,function ($scope,Order,setGetOrder, formSrv) {
+MyApp.controller('OrderAgrKitBoxsCtrl',['$scope','$timeout','Order','setGetOrder','form' ,function ($scope,$timeout,Order,setGetOrder, formSrv) {
     $scope.bindForm = formSrv.bind();
     $scope.tbl = {
         data:[],
@@ -3350,15 +3310,18 @@ MyApp.controller('OrderAgrKitBoxsCtrl',['$scope','Order','setGetOrder','form' ,f
             model.reng_id= data.response.item.id;
             model.costo_unitario= data.response.item.costo_unitario;
 
-            if(data.response.action  == 'new'){
-                setGetOrder.change('kitchenBox'+model.id,undefined,data.response.item);
-                $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
-            }if(data.response.action  == 'upd'){
-                setGetOrder.change('kitchenBox'+model.id,'asignado', model.asignado);
-                setGetOrder.change('kitchenBox'+model.id,'reng_id', model.reng_id);
-                setGetOrder.change('kitchenBox'+model.id,'costo_unitario', model.costo_unitario);
-                $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
-            }
+            $timeout(function () {
+                if(data.response.action  == 'new'){
+                    setGetOrder.change('kitchenBox'+model.id,undefined,data.response.item);
+                    $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
+                }if(data.response.action  == 'upd'){
+                    setGetOrder.change('kitchenBox'+model.id,'asignado', model.asignado);
+                    setGetOrder.change('kitchenBox'+model.id,'reng_id', model.reng_id);
+                    setGetOrder.change('kitchenBox'+model.id,'costo_unitario', model.costo_unitario);
+                    $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
+                }
+            },200);
+
 
             setGetOrder.setState("upd");
 
@@ -3499,22 +3462,22 @@ MyApp.controller('OrderResumenPedidoSusCtrl',['$scope', '$timeout','Order','form
 
     };
 
-/*   $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-        if(newVal && formSrv.name == 'OrderResumenContraPedidoCtrl'){
-            var data = formSrv.getData();
-            $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
-            $scope.select.reng_id = data.response.reng_id;
-            $scope.select.disponible = data.response.disponible;
-            $scope.select.inDoc = data.response.inDoc;
-            $scope.select.inDocBlock = data.response.inDocBlock;
-            if(data.response.accion  == 'new'){
-                $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
-            }if(data.response.accion  == 'upd'){
-                $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
-            }
+    /*   $scope.$watch("bindForm.estado", function (newVal, oldVall) {
+     if(newVal && formSrv.name == 'OrderResumenContraPedidoCtrl'){
+     var data = formSrv.getData();
+     $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
+     $scope.select.reng_id = data.response.reng_id;
+     $scope.select.disponible = data.response.disponible;
+     $scope.select.inDoc = data.response.inDoc;
+     $scope.select.inDocBlock = data.response.inDocBlock;
+     if(data.response.accion  == 'new'){
+     $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
+     }if(data.response.accion  == 'upd'){
+     $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
+     }
 
-        }
-    });*/
+     }
+     });*/
 
 }]);
 
@@ -3712,7 +3675,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
         pedidoSusti:{model:true,change:false}
 
     };
-    $scope.finalDoc = {contra:[],kitchen:[],pedidoSusti:[], todos:[], document:{}, aprob_gerencia:{}, aprob_compras:{}};
+    $scope.finalDoc = {contra:{},kitchen:{},pedidoSusti:{}, todos:[], document:{}, aprob_gerencia:{}, aprob_compras:{}};
     $scope.$parent.OrderfinalDocCtrl = function () {
         $scope.switchBack=  {
             head:{model:true,change:false},
@@ -3825,35 +3788,28 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
             $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
             $scope.updateProv();
             $timeout(function(){
-                //$scope.LayersAction({close:{first:true, search:true}});
+                $scope.LayersAction({close:{all:true, search:true}});
             },1400);
         });
     };
 
     $scope.buildfinalDoc = function(){
-        $scope.finalDoc.contra.splice(0,$scope.finalDoc.contra.length);
-        $scope.finalDoc.kitchen.splice(0,$scope.finalDoc.kitchen.length);
-        $scope.finalDoc.pedidoSusti.splice(0,$scope.finalDoc.pedidoSusti.length);
-        $scope.finalDoc.todos.splice(0,$scope.finalDoc.todos.length);
-        console.log("$scope.switchBack",$scope.switchBack);
-        console.log("form",setGetOrder.getForm());
-        console.log("paretn",$scope.$parent.document);
+        $scope.finalDoc = {contra:{},kitchen:{},pedidoSusti:{},import:{}, todos:{}, document:{}, aprob_gerencia:{}, aprob_compras:{}};
         angular.forEach(setGetOrder.getForm(), function(v,k){
-                if(k.startsWith('contra')){
-                    $scope.finalDoc.contra.push(v);
+                /*if(k.startsWith('contra')){
+                    $scope.finalDoc.contra[v.id] = 'upd';
                 }
 
                 if(k.startsWith('kitchen')){
-                    $scope.finalDoc.kitchen.push(v);
+                    $scope.finalDoc.kitchen[v.id] = 'upd';
                 }
 
                 if(k.startsWith('pedidoSusti')){
-                    $scope.finalDoc.pedidoSusti.push(v);
-
+                    $scope.finalDoc.pedidoSusti[v.id] = 'upd';
                 }
                 if(k.startsWith('todos')){
-                    $scope.finalDoc.todos.push(v);
-                }
+                    $scope.finalDoc.todos[v.id] = 'upd';
+                }*/
             }
         );
         angular.forEach(setGetOrder.getForm('document'), function(v,k){
@@ -3937,6 +3893,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
             Order.getMod({type:$scope.formMode.mod, mod:"ProviderTemplates",id:$scope.document.id},{}, function(response){
                 $scope.correos = response.correos;
                 $scope.origenes = response.templates;
+                $scope.model.tipo = response.tipo;
             });
         }
         if(data.action == 'sendIntern'){
@@ -3944,6 +3901,8 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
             Order.getMod({type:$scope.formMode.mod, mod:"InternalTemplates",id:$scope.document.id},{}, function(response){
                 $scope.correos = response.correos;
                 $scope.origenes = response.templates;
+                $scope.model.tipo = response.tipo;
+
             });
         }
 
@@ -4344,7 +4303,7 @@ MyApp.controller('OrderminiChangeItemCtrl',['$scope','$timeout','$mdSidenav','Or
     $scope.event =undefined;
     $scope.noEdit=  false;
     $scope.$parent.OrderminiChangeItemCtrl= function (data, url) {
-    $scope.noEdit=  false;
+        $scope.noEdit=  false;
         $scope.noEditAsign= false;
         $scope.url = url;
         $scope.copyTem = angular.copy(data);
@@ -4369,44 +4328,44 @@ MyApp.controller('OrderminiChangeItemCtrl',['$scope','$timeout','$mdSidenav','Or
             $scope.isProcess = true;
             var parent = angular.element(event.target).parents("*[OrderminiChangeItemCtrl]");
             if(!$scope.form.$pristine ){
-                    if(!$scope.form.$valid){
-                        $scope.$parent.NotifAction("alert", "No colocaste suficiente informacion para guardar el articulo. ¿Que deseas hacer?",
-                            [
-                                {name:"Corregir", default:10, action: function () {
+                if(!$scope.form.$valid){
+                    $scope.$parent.NotifAction("alert", "No colocaste suficiente informacion para guardar el articulo. ¿Que deseas hacer?",
+                        [
+                            {name:"Corregir", default:10, action: function () {
 
-                                }},
-                                {name:"Cancelar", action: function () {
-                                    if(parent.length > 0){
-                                        $scope.inClose(function () {
-                                            $scope.open(function () {
-                                                $timeout(function () {
-                                                    $scope.select=  angular.copy($scope.copyTem); ;
-                                                    $scope.copy = angular.copy($scope.copyTem);
-                                                },2);
-                                            }) ;
-                                        });
-                                    }else{
-                                        $scope.inClose();
-                                    }
-                                }}
-                            ]
-                            , {block:true});
-                    }else{
-                        $scope.save(function () {
-                            if(parent.length > 0){
-                                $scope.inClose(function () {
-                                    $scope.open(function () {
-                                        $timeout(function () {
-                                            $scope.select=  angular.copy($scope.copyTem); ;
-                                            $scope.copy = angular.copy($scope.copyTem);
-                                        },2);
-                                    }) ;
-                                });
-                            }else{
-                                $scope.inClose();
-                            }
-                        });
-                    }
+                            }},
+                            {name:"Cancelar", action: function () {
+                                if(parent.length > 0){
+                                    $scope.inClose(function () {
+                                        $scope.open(function () {
+                                            $timeout(function () {
+                                                $scope.select=  angular.copy($scope.copyTem); ;
+                                                $scope.copy = angular.copy($scope.copyTem);
+                                            },2);
+                                        }) ;
+                                    });
+                                }else{
+                                    $scope.inClose();
+                                }
+                            }}
+                        ]
+                        , {block:true});
+                }else{
+                    $scope.save(function () {
+                        if(parent.length > 0){
+                            $scope.inClose(function () {
+                                $scope.open(function () {
+                                    $timeout(function () {
+                                        $scope.select=  angular.copy($scope.copyTem); ;
+                                        $scope.copy = angular.copy($scope.copyTem);
+                                    },2);
+                                }) ;
+                            });
+                        }else{
+                            $scope.inClose();
+                        }
+                    });
+                }
 
             }else {
                 if(parent.length > 0){
@@ -5120,22 +5079,6 @@ MyApp.controller("LayersCtrl",function($mdSidenav,$timeout, Layers, $scope){
 
 
 /*
- MyApp.service('vlMiniSideNav',function () {
- var obj = function (key ) {
- var bind  = {estado:false, key:key}
- return {}
- }
-
- return function ( key, data) {
- var model =  new obj(key);
- angular.forEach(data, function (v, k) {
- model[k] = v;
- })
- };
- });*/
-
-
-/*
  Servicio que almacena la informacion del docuemnto y monitoriza cambios
  */
 MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
@@ -5399,7 +5342,9 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
             forms ={};
             interno= 'new';
             externo= 'new';
-            order={};
+            angular.forEach(order, function (v, k) {
+                delete order[k];
+            });
             data = {};
             bindin.estado=false;
         }
