@@ -13,6 +13,7 @@ use App\Models\Sistema\Order\OrderStatus;
 use App\Models\Sistema\Payments\PaymentType;
 use App\Models\Sistema\Masters\Ports;
 use App\Models\Sistema\ProviderAddress;
+use App\Models\Sistema\User;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Validator;
@@ -46,11 +47,13 @@ class MasterController extends BaseController
 		return json_encode($paises);
 	}
 
-	/*public function commonConuntries(){
-	basandose en los paises de proveedores registrado, busca los que ya se han creado mas de 2 veces
-
-	}*/
-
+	public function getUserData(Request $req){
+	    $model =User::selectRaw('nombre, email')->where('id',$req->session()->get('DATAUSER')['id'])->first();
+            return $model;
+    }
+    public function getSystemMail(){
+	   return 'sistamaValcro@valcro.co';
+    }
 	public function getCountriesHaveProvider()
 	{
 		$data = Collection::make(array());

@@ -4741,169 +4741,42 @@ MyApp.controller('OrderModuleMsmCtrl',['$scope','$mdSidenav','Order','masters','
 
 }]);
 
-MyApp.controller('OrderMailPreview',['$scope',"$sce",'setGetOrder','Order','IsEmail','SYSTEM','App', function($scope,$sce, setGetOrder,Order,IsEmail,SYSTEM, App){
-
-    $scope.isLoad= false;
-    $scope.template ={};
-    $scope.idiomas =[];
-    $scope.idioma= null;
-    $scope.contactos =[];
-    $scope.correos =[];
-    $scope.to =[];
-    $scope.cc =[];
-    $scope.cco =[];
-    $scope.destinos = [];
-
-    $scope.$parent.openMailPreview = function(data){
-        if(data){
-            console.log("tienen calbacl");
-            $scope.calback = data;
-        }else{
-            delete  $scope.calback;
-        }
-        $scope.$parent.LayersAction({open:{name:'previewEmail' ,before: function(){
-
-            console.log("parent", $scope.$parent);
-            Order.get({type:"ProviderContacts", prov_id: $scope.$parent.document.prov_id},{}, function(response){
-                console.log("response contact",  response);
-                $scope.idiomas= response.idiomas;
-                $scope.idioma=response.default;
-                $scope.contactos = response.contactos;
-                $scope.correos.splice(0,$scope.correos.length);
-                angular.forEach(response.contactos, function(cv){
-                    angular.forEach(cv.email, function(ev){
-                        $scope.correos.push({nombre:cv.nombre,valor:ev.valor,id:cv.id})
-                    });
-                });
-
-                $scope.loadPreview();
-            });
-        }}});
-
-    };
-
-    $scope.transformChip = function (chip){
-        if (angular.isObject(chip)) {
-            console.log("es chipc", chip);
-            return chip;
-        }
-        if(IsEmail(chip)!= null){
-            return {nombre:'new',valor:chip};
-        }
-        return null;
-
-    };
-
-    $scope.addEmail = function(chip){
-        $scope.destinos.push(chip.valor+chip.nombre);
-    };
-    $scope.removeEmail = function(chip){
-        var index = $scope.destinos.indexOf(chip.valor+chip.nombre);
-        $scope.destinos.splice(index,1);
-    };
-    $scope.isAddMail = function(val){
-        return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
-    };
-    $scope.loadPreview = function(){
-        Order.htmlMod({type:$scope.$parent.formMode.mod, mod:'EmailEstimate',id:$scope.$parent.document.id, lang:$scope.idioma.iso_lang},{},function(response){
-            $scope.template= $sce.trustAsHtml(response.body);
-        });
-    };
-    $scope.exitValidate = function(){
-        return true;
-    }
-    $scope.$parent.sendPreviewEmail = function(){
-        if($scope.to.length == 0){
-            $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
-        }else{
-            $scope.inProgress=true;
-            App.setBlock({block:true, level:99});
-            var html = angular.element("#templateContent");
-            Order.postMod({type:$scope.$parent.formMode.mod,mod:"Send"} ,{id:$scope.$parent.document.id,asunto:$scope.asunto, texto:html.html(), to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
-                $scope.inProgress=false;
-                App.setBlock({block:false, level:0});
-                if($scope.calback){
-                    console.log("calback",response );
-                    $scope.calback(response);
-                }
-            });
-        }
-    }
-
-}]);
 
 /**
  * controller for mdsidenav mail, this controller is responsable de send correo option
  * */
-MyApp.controller('MailCtrl',['$scope','SYSTEM','IsEmail','Order', function($scope,SYSTEM,IsEmail, Order){
-    $scope.destinos =[];
-    $scope.cc =[];
-    $scope.cco =[];
-    $scope.correos = [];
+MyApp.controller('MailCtrl',['$scope','masters', function($scope, masters){
+    $scope.model = {to:[], cc:[], ccb:[], asunto:undefined};
     $scope.inProgress=false;
-    $scope.transformChip = function(chip) {
-        if (angular.isObject(chip)) {
-            return chip;
-        }
-        if(IsEmail(chip)!= null){
-            return {valor:chip,razon_social:'new'};
-        }
-
-        return null;
-    };
+    $scope.mailSystem =  masters.get({type:"SystemMail"});
+    $scope.user =  masters.get({type:"User"});
     $scope.$parent.openEmail= function(){
-        $scope.to =[];
-        $scope.cc =[];
-        $scope.cco =[];
-        $scope.correos = [];
-        $scope.usePersonal= true;
-        $scope.showHead =true;
-        $scope.mail.$setPristine();
-
-        $scope.$parent.LayersAction({open:{name:"email", after: function(){
-            Order.query({type:'Emails'},{},function(response){
-                $scope.correos = response;
-                $scope.usePersonal= true;
-                $scope.mail.$setPristine();
-                $scope.mail.$setUntouched();
-                $scope.to =[];
-                $scope.cc =[];
-                $scope.cco =[];
-                $scope.asunto="";
-                $scope.texto="";
-            });
-        }}});
-
+        $scope.mode= 'list';
+        $scope.model.inMyMail = true;
+        $scope.model.from = angular.copy($scope.user.email);
+        $scope.$parent.LayersAction({open:{name:"email"}});
     };
 
-    $scope.addEmail = function(chip){
-        $scope.destinos.push(chip.valor+chip.razon_social);
+    $scope.change= function (data) {
+     if(data){
+         $scope.model.from = angular.copy($scope.user.email);
+     }  else{
+         $scope.model.from = angular.copy(mailSystem);
+     }
     };
-
-    $scope.removeEmail = function(chip){
-        var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
-        $scope.destinos.splice(index,1);
-    };
-    $scope.isAddMail = function(val){
-        return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
-    };
-
-    $scope.send = function(){
-        if($scope.to.length == 0){
-            $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
-        }
-        else if(!$scope.mail.$valid){
-            $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
-
-        }else{
-            $scope.inProgress=true;
-            Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
-                $scope.inProgress=false;
-                $scope.$parent.LayersAction({close:true});
-            });
-        }
+    $scope.load= function () {
+        Order.query({type:'Emails'},{},function(response){
+         /*   $scope.correos = response;
+            $scope.usePersonal= true;
+            $scope.mail.$setPristine();
+            $scope.mail.$setUntouched();
+            $scope.to =[];
+            $scope.cc =[];
+            $scope.cco =[];
+            $scope.asunto="";
+            $scope.texto="";*/
+        });
     }
-
 
 }]);
 
