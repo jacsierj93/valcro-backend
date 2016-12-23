@@ -182,7 +182,7 @@
                 <div style="width: 336px;" layout="row">
                     <div layout="column" layout-align="center center"></div>
 
-                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.created)" layout-align="center center" ng-click="menuAgregar()">
+                    <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.created)" layout-align="center center" ng-click="OrderMenuAgrCtrl()">
                         <span class="icon-Agregar" style="font-size: 24px"></span>
                         <md-tooltip >
                             Crear un nuevo documento
@@ -220,7 +220,7 @@
                         </md-tooltip>
                     </div>
 
-                    <div layout="column" layout-align="center center"  ng-click="OrderAprobCtrl();" ng-class="{'blue':document.isAprobado}"  ng-show="document.id" >
+                    <div layout="column" layout-align="center center"  ng-click="OrderAprobCtrl();" ng-class="{'blue':document.isAprobado}"  ng-show="document.isAprobable" >
                         <span class="icon-checkMark" style="font-size: 24px"></span>
                         <md-tooltip >
                             Aprobar
@@ -3559,7 +3559,7 @@
                     <form name="formData">
                         <div layout="row" class="date-row vlc-date row"  ng-class="{'vlc-date-no-edit':$parent.Docsession.block}"
                         >
-                            <div layout="column" class="md-block" layout-align="center center" ng-click="($parent.shipment.fechas.fecha_carga.confirm) ? desblockFecha_carga() : 0" >
+                            <div layout="column" class="md-block" layout-align="center center" >
                                 <div>Fecha Aprobación</div>
                             </div>
                             <md-datepicker ng-model="model.fecha"

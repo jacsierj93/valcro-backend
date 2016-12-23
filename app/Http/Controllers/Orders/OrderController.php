@@ -751,7 +751,7 @@ class OrderController extends BaseController
 
 
     /*********************** Approved Purchases ************************/
-
+/*
 
     public function ApprovedPurchasesOrder(Request $req)
     {
@@ -786,7 +786,7 @@ class OrderController extends BaseController
         $response['accion'] = $model->fecha_aprob_compra == null ? 'new' : 'upd';
         return $response;
 
-    }
+    }*/
 
 
 
@@ -1698,6 +1698,18 @@ class OrderController extends BaseController
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_compras';
 
+        }
+        if($req->has("adjs")){
+
+            foreach($req->adjs as $aux){
+                $adj= new SolicitudeAttachment();
+                $adj->doc_id = $model->id;
+                $adj->archivo_id = $aux['id'];
+                $adj->documento = $result['accion'];
+                $adj->save();
+                $att[] = $adj;
+
+            }
         }
         $model->save();
         $result['fecha'] = $model->fecha_aprob_gerencia;
@@ -2766,6 +2778,18 @@ class OrderController extends BaseController
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_compras';
 
+        }
+        if($req->has("adjs")){
+
+            foreach($req->adjs as $aux){
+                $adj= new OrderAttachment();
+                $adj->doc_id = $model->id;
+                $adj->archivo_id = $aux['id'];
+                $adj->documento = $result['accion'];
+                $adj->save();
+                $att[] = $adj;
+
+            }
         }
         $model->save();
         $result['fecha'] = $model->fecha_aprob_gerencia;
@@ -4004,6 +4028,18 @@ class OrderController extends BaseController
             $result['accion']='ap_compras';
 
         }
+        if($req->has("adjs")){
+
+            foreach($req->adjs as $aux){
+                $adj= new PurchaseAttachment();
+                $adj->doc_id = $model->id;
+                $adj->archivo_id = $aux['id'];
+                $adj->documento = $result['accion'];
+                $adj->save();
+                $att[] = $adj;
+
+            }
+        }
         $model->save();
         $result['fecha'] = $model->fecha_aprob_gerencia;
         $result['nro_doc'] = $model->nro_doc;
@@ -4298,7 +4334,7 @@ class OrderController extends BaseController
         $resul = [ 'size' => sizeof($req->adjs) ,'files'=>[]];
         foreach ($req->adjs as $aux) {
             if(!array_key_exists('id',$aux )){
-                $attac = new PurchaseAnswerAttaments();
+                $attac = new PurchaseAttachment();
                 $attac->archivo_id = $aux['archivo_id'];
                 $attac->doc_id = $model->id;
                 $attac->documento = strtoupper($aux['documento']);
@@ -5307,6 +5343,7 @@ class OrderController extends BaseController
         $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_gerencia ;
         $tem['img_aprob'] =$model->fecha_aprob_compra ;
         $tem['isAprobado'] = ($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null);
+        $tem['aprobado'] = ['nro_doc'=>$model->nro_doc,'adjs'=>[]];
 
         $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
 
@@ -5358,6 +5395,7 @@ class OrderController extends BaseController
         $tem['maritimo']=1;
         $atts = array();
 
+
         foreach($model->attachments()->where('documento','PROFORMA')->get() as $aux){
             $att = attachment_file($aux->archivo_id);
             foreach ($att as $key => $value){
@@ -5371,6 +5409,13 @@ class OrderController extends BaseController
                 $att[$key]= $value;
             }
             $tem['nro_factura']['adjs'] = $att;
+        }
+        foreach($model->attachments()->whereRaw('documento like \'ap_%\'')->get() as $aux){
+            $att = attachment_file($aux->archivo_id);
+            foreach ($att as $key => $value){
+                $att[$key]= $value;
+            }
+            $tem['Aprobado']['adjs'] = $att;
         }
         $tem['adjuntos'] = $atts;
 

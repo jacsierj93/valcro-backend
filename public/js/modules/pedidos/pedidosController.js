@@ -1,8 +1,7 @@
 
 MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     ,$filter,$location,App, Order,masters,providers,
-                                           Upload,Layers,setGetOrder, DateParse, Accion,clickerTime) {
-
+                                           Upload,Layers,setGetOrder, DateParse ) {
     $scope.permit= Order.get({type:"Permision"});
     // controlers
     $scope.Docsession = {isCopyable:false,global:"new", block:true};
@@ -62,11 +61,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.document  = setGetOrder.getOrder();
     $scope.docBind= setGetOrder.bind();
     $scope.todos =[];
-
-
-
-    /*    $scope.docOrder ={};
-     $scope.docOrder.order ='id';*/
     Order.query({type:"OrderProvList"},{},function(response){
         $scope.todos = response;
     });
@@ -190,8 +184,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     };
 
     $scope.reloadDoc = function () {
-        console.log("internal ",setGetOrder.getInternalState() );
-        console.log("getState ",setGetOrder.getState() );
         if(setGetOrder.getInternalState() != 'new' && setGetOrder.getState() != 'reload'){
             setGetOrder.reload();
             setGetOrder.setState('reload');
@@ -221,8 +213,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.oldReviewDoc = function (){
 
     };
-
-
 
     $scope.redirect = function(data){
         alert("redirect " +data.field);
@@ -286,11 +276,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         $scope.isOpen = ($scope.isOpen) ? false : true;
     };
 
-
-    /******************************************** ROLLBACK SETTER **/
-
-
-
     $scope.verificExit = function(){
         var paso = true;
         if(!$scope.Docsession.block && $scope.document.id){
@@ -342,9 +327,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     };
 
     /********************************************EVENTOS ********************************************/
-
-
-
     $scope.allowEdit = function(){
 
 
@@ -417,12 +399,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         setGetOrder.setState('upd');
         $scope.Docsession.global='upd';
     };
-    /***@deprecated **/
 
-    $scope.closeTo = function(layer){
-        $scope.LayersAction({close:layer});
-
-    };
 
     $scope.delete = function(doc){
         $scope.NotifAction("alert", "¿Esta seguro  de eliminar "+doc.documento+"?",
@@ -438,27 +415,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
             ],{block:true});
 
     };
-
-
-
-
-
-    /********************************************DEBUGGIN ********************************************/
-
-
-    $scope.test = function (test) {
-        $scope.OrderCreatProduct();
-    };
-
-    $scope.demo = function(){
-        $scope.openMailPreview(function(){alert("dsf");});
-
-
-
-    };
-    /********************************************DEBUGGIN ********************************************/
-
-
 
     /******************************************** filtros ********************************************/
 
@@ -482,10 +438,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
             }
         }
         return false;
-    };
-
-    $scope.searchCountry = function(item,texto){
-        return item.short_name.indexOf(texto) > -1;
     };
 
     //proveedores
@@ -597,12 +549,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         return  data;
         //  return data;
     };
-
-    $scope.searchXText = function(data, text, key){
-
-    };
-
-
 
     // productos del documentos
     $scope.filterProdDoc = function(data, obj){
@@ -765,39 +711,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         return data;
     };
 
-    $scope.searchEmails= function(){
-        return $scope.email.contactos;
-    };
-
-
-    /******************************************** APERTURA DE LAYERS ********************************************/
-
-    $scope.openSide = function(name){
-
-        $scope.navCtrl.value = name;
-        $scope.navCtrl.estado=true;
-
-    };
-
-
-
-
-
-
-
-    $scope.menuAgregar= function(){
-        $scope.LayersAction({close:{all:true}});
-        $scope.LayersAction({open:{name:"menuAgr", before: function(){
-
-            setGetOrder.clear();
-        }}});
-        $scope.gridView= 1;
-        $scope.preview =false;
-
-    };
-
-    /*************** conversores **********/
-
     $scope.transforDocToImg = function(doc){
         var mode = $scope.forModeAvilable.getXname(doc);
         if(mode){
@@ -809,97 +722,13 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
             }
         }
     }
-
-
-
-
-
-
     /** al pulsar la flecha siguiente
      *  working
      * **/
     $scope.next = function (data) {
-        if(data){
-            data();
-        }else{
-
-
-            switch($scope.module.layer){
-                case "resumenPedido":
-                    setGetOrder.setOrder(angular.copy($scope.resumen));
-                    $scope.Docsession.isCopyableable = true;
-
-                    $scope.formMode= $scope.forModeAvilable.getXname($scope.resumen.documento);
-                    $scope.navCtrl.value = "detalleDoc" ;
-                    $scope.navCtrl.estado= true;
-                    return;
-                    break;
-                case "detalleDoc":
-                    break;
-                case "listProducProv":
-                    break;
-                case "agrPed":
-
-                    if($scope.document.productos.todos.length == 0
-                        && $scope.document.productos.contraPedido.length == 0
-                        && $scope.document.productos.kitchenBox.length  == 0
-                        && $scope.document.productos.pedidoSusti.length  == 0
-                        && !$scope.Docsession.block
-                    )
-                    {
-                        $scope.NotifAction("alert",
-                            "No se a selecionado ningun documento para la "+$scope.formMode.name+ " ¿desea continuar de todas formas? "
-                            ,[
-                                {name:"Cancelar", action: function(){}}
-                                ,{name:"Continuar",action: function(){
-                                    $scope.navCtrl.value = "finalDoc" ;
-                                    $scope.navCtrl.estado= true;
-
-                                }}
-                            ],{block:true});
-                    }
-
-                    else{
-                        $scope.navCtrl.value = "finalDoc" ;
-                        $scope.navCtrl.estado= true;
-                    }
-
-                    break;
-                case "finalDoc":
-
-                    if($scope.finalDoc.productos.length == 0 && !$scope.Docsession.block)
-                    {
-                        $scope.NotifAction("alert",
-                            "No se ha cargado ningun articulo para la "+$scope.formMode.name+ " ¿desea continuar? "
-                            ,[
-                                {name:"Cancelar", action: function(){}}
-                                ,{name:"Continuar",action: function(){
-
-                                    $scope.navCtrl.value = "close" ;
-                                    $scope.navCtrl.estado= true;
-
-                                }}
-                            ],{block:true});
-                    }else{
-                        $scope.navCtrl.value = "close";
-                        $scope.navCtrl.estado= true;
-                    }
-                    break;
-                case "previewEmail":
-                    $scope.sendPreviewEmail();
-
-
-            }
-        }
-
-
+        data();
         $scope.showNext();
-
     };
-
-    $scope.testShow = function () {
-        return $scope.docProdFilter.length > 0
-    }
 
 
     $scope.showNext = function (status) {
@@ -910,175 +739,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     };
-
-    $scope.reloadSide = function(){
-
-    };
-    /*********************************************** EVENTOS CHANGE ***********************************************/
-
-
-
-    $scope.clearSelec = function(obj){
-        if(!obj){
-            delete obj;
-        };
-    }
-
-
-    /**
-     * @review
-     * */
-    $scope.changeItem = function(item){
-        if($scope.dtdocProductos.$valid){
-            Order.postMod({type:$scope.formMode.mod, mod:"ChangeItem"},item, function(response){
-                setGetOrder.change('producto'+item.id,'id',item);
-                setGetOrder.setState('upd');
-            });
-        }
-
-    };
-
-    $scope.isEditItem = function(item) {
-        if (!$scope.Docsession.block) {
-            if (item.tipo_origen_id == 1 || !item.tipo_origen_id){
-                item.edit = true;
-                var mo= jQuery("#prodDtInp"+item.id);
-                mo[0].focus();
-            }else if ($scope.formMode.value == 21) {
-                if(! item.edit){
-                    $scope.NotifAction("alert","No suele ser usual modificar la cantidad de este tipo de articulos" +
-                        " ¿Esta seguro de editar esta cantidad?",
-                        [
-                            {name:"No", action: function(){}},
-                            {name: "Si", action: function(){
-                                item.edit = true;
-                                var mo= jQuery("#prodDtInp"+item.id);
-                                mo[0].focus();
-
-                            }}
-
-                        ],{block:true});
-                }
-
-            }else if ($scope.formMode.value == 22 || $scope.formMode.value == 23) {
-                if(!item.edit){
-                    if(item.tipo_origen_id == 2 || item.tipo_origen_id == 3){
-                        $scope.NotifAction("alert","No suele ser usual modificar la cantidad de este tipo de articulos" +
-                            " ¿Esta seguro de editar esta cantidad?",
-                            [
-                                {name:"No", action: function(){}},
-                                {name: "Si", action: function(){
-                                    item.edit = true;
-                                    var mo= jQuery("#prodDtInp"+item.id);
-                                    mo[0].focus();
-                                }}
-
-                            ],{block:true});
-                    }else{
-                        $scope.NotifAction("alert","Este articulo fue importado de otro documento" +
-                            " ¿Esta seguro de editar esta cantidad?",
-                            [
-                                {name:"No", action: function(){}},
-                                {name: "Si", action: function(){
-                                    alert("moificar cantidad por excepcion");
-                                    // item.edit = true;
-                                }}
-
-                            ],{block:true}
-                        );
-                    }
-                }
-
-            }
-
-        }
-
-
-    };
-
-    /**
-     * @review
-     * */
-    /*    $scope.addRemoveCpItem = function(item){
-     var aux = {
-     asignado:item.asignado,
-     tipo_origen_id: 2,
-     doc_origen_id: item.contra_pedido_id,
-     doc_id: $scope.document.id,
-     cantidad:  item.saldo,
-     saldo:  item.saldo,
-     producto_id:  item.producto_id,
-     descripcion:  item.descripcion,
-     id:item.id
-
-     };
-     if(item.asignado){
-     if(item.asignadoOtro.length == 0){
-     Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-     if(response.accion == "new"){
-     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-     item.renglon_id= response.renglon_id;
-     }
-
-     });
-     }else{
-     var text="Este item se encuentra agregado a ";
-     angular.forEach(item.asignadoOtro, function(v,k){
-     text += v[0] +" " + v[1].length +" veces ";
-     });
-     $scope.NotifAction("alert",text,[
-     {name:'Cancelar',default: 2,
-     action: function(){
-
-     }
-     },
-     {name:'Continuar de todas formas',
-     action: function(){
-     Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-     if(response.accion == "new"){
-     $scope.NotifAction("ok","Asignado",[],{autohidden:autohidden});
-     item.renglon_id= response.renglon_id;
-     }
-
-     });
-     }
-     }
-     ]);
-     }
-     }else if(!item.asignado && item.renglon_id){
-     $scope.NotifAction("alert","Se Removera el articulo",[
-     {name:'Cancelar',default:2,
-     action: function(){
-
-     }
-     },
-     {name:'Continuar',
-     action: function(){
-     Order.postMod({type:$scope.formMode.mod,mod:"AdddRemoveItem"},aux,function(response){
-     if(response.accion == "new"){
-     $scope.NotifAction("ok","Removido",[],{autohidden:autohidden});
-     item.renglon_id= response.renglon_id;
-     }
-     });
-
-     }
-     }
-     ]);
-     }
-
-
-
-     };*/
-
-
-
-
-
-
-    /*********************************************** EVENTOS FOCUS LOST ***********************************************/
-
-
-
 
     $scope.closeSide = function(){
 
@@ -1100,122 +760,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     };
 
-
-
-
-
-
-
-
-
-    /******************     excepciones       **********/
-
-    $scope.isOpenexcepAddCP = false;
-
-    $scope.closeExcep= function(e){
-
-        if(jQuery(e.target).parents("#lyrAlert").length == 0 && jQuery(e.target).parents("#gridProdFinalDoc").length == 0 && $scope.isOpenexcepAddCP) {
-            if ($mdSidenav("excepAddCP").open()) {
-                angular.element(document).find("#finalDoc").find("#expand").animate({width:"0"},400);
-                $mdSidenav("excepAddCP").close().then(function () {
-                    $scope.isOpenexcepAddCP = false;
-                });
-
-                $scope.finalProdSelec = {};
-                $scope.formExcepAddCP.$setUntouched();
-            }
-        }
-    };
-
-
-    $scope.addexcepProdFinal = function(){
-
-        if(!$scope.formExcepAddCP.$valid){
-            $scope.NotifAction('error', "Todos los campos son obligatorios, por favor verirfiquelos",[], {autohidden:autohidden});
-            return false;
-        }
-        if(parseFloat($scope.excepAddCP.cantidad) > parseFloat($scope.finalProdSelec.cantidad)){
-            $scope.NotifAction('error', "La cantidad introducidad,  excede el total de los productos a solicitar, " +
-                "por favor introdusca una cantidad menor "
-                ,[], {autohidden:autohidden});
-            return false;
-
-        }
-
-        if(parseFloat($scope.excepAddCP.monto) > parseFloat($scope.document.monto)){
-            $scope.NotifAction('error', "El monto introducido,  excede el monto de la Orden de compra" +
-                "por favor introdusca un monto menor "
-                ,[], {autohidden:autohidden });
-            return false;
-
-        }
-
-        var cant=0;
-        var mont = 0.0;
-        angular.forEach($scope.finalProdSelec.condicion_pago, function(v){
-            cant+= parseFloat(v.cantidad);
-            mont+= parseFloat(v.monto);
-        });
-
-        if((parseFloat($scope.excepAddCP.cantidad) + cant)> parseFloat($scope.finalProdSelec.cantidad)){
-            $scope.NotifAction('error', "Si introduce "+$scope.excepAddCP.cantidad+ " excedera la cantidad total de articulos a solicitar" +
-                "por favor introdusca una cantidad menor "
-
-                ,[], {autohidden:autohidden});
-            return false;
-        }
-
-        if((parseFloat($scope.excepAddCP.monto) + mont) > parseFloat($scope.document.monto)){
-            $scope.NotifAction('error', "Si introduce "+$scope.excepAddCP.monto+ " excedera el monto del documento" +
-                "por favor introdusca una cantidad menor ó modifique el monto del documento "
-
-                ,[], {autohidden:autohidden});
-            return false;
-        }
-        $scope.submitAddExcepProdFinal();
-        return true;
-    };
-
-    $scope.submitAddExcepProdFinal = function(){
-        Order.postMod({type:$scope.formMode.mod, mod:"AddProdConditionPay"},
-            {id:$scope.finalProdSelec.id,
-                doc_id:$scope.document.id,
-                cantidad:$scope.excepAddCP.cantidad,
-                dias:$scope.excepAddCP.dias,
-                monto:$scope.excepAddCP.monto
-
-            }, function(response){
-                $scope.finalProdSelec.condicion_pago.push(response.item);
-                $scope.excepAddCP ={};
-                $scope.formExcepAddCP.$setUntouched();
-
-
-            });
-    };
-
-    $scope.removeExcepProdFinal = function(item){
-
-        $scope.NotifAction("alert","¿Esta seguro de eliminar la condicion?",[
-            {name:"No", action: function(){}},
-            {name:"Si, estoy seguro", action: function(){
-                $scope.finalProdSelec.condicion_pago.splice(item.$index,1);
-            }}
-        ],{block:true});
-    };
-
-
-
-
-
-
-    /***  Crear producto ***/
-
-
-
-
-
-
-
     $scope.updateProv= function(calback){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
 
@@ -1228,23 +772,11 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         });
     };
 
-    /****** **************************import  ***************************************/
-
-
-
-    /****** ************************** autocomplete ***************************************/
-
-
-
-
-
-
     /****** **************************listener ***************************************/
 
     $scope.$watch('docBind.estado', function(newVal){
         if(newVal){
             $scope.document=setGetOrder.getOrder();
-            $scope.docBind.estado= false;
             if( $scope.document.prov_id ){
                 Order.get({type:"Provider",  id: $scope.document.prov_id},{}, function(response){
                     $scope.ctrl.provSelec=response;
@@ -1254,9 +786,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     });
-    /**layers
-     working
-     * */
     $scope.$watchGroup(['module.index','module.layer'], function(newVal, oldVal){
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
@@ -2059,6 +1588,9 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                 $scope.$parent.document.uid= response.uid;
             });
         }
+        if(newVal[0] && $scope.$parent.document.id){
+            $scope.$parent.document.isAprobable=true;
+        }
     });
     $scope.$watch('$parent.ctrl.provSelec', function (newVal, oldVal) {
         if(newVal ){
@@ -2442,17 +1974,19 @@ MyApp.controller('OrderCreateProdCtrl',['$scope','$mdSidenav','$timeout', 'Order
     $scope.inProcess = false;
 
     $scope.$parent.OrderCreateProdCtrl= function (data) {
-
-        $scope.almacnAdd = [];
-        $scope.model = {};
-        $scope.form.$setPristine();
-        $scope.form.$setUntouched();
-        if(data){
-            angular.forEach(data, function (v, k) {
-                $scope.model[k]=v;
-            });
+        if($scope.allowEdit()){
+            $scope.almacnAdd = [];
+            $scope.model = {};
+            $scope.form.$setPristine();
+            $scope.form.$setUntouched();
+            if(data){
+                angular.forEach(data, function (v, k) {
+                    $scope.model[k]=v;
+                });
+            }
+            $scope.open();
         }
-        $scope.open();
+
     };
     masters.query({type:"prodLines"},{}, function (response) {
         $scope.lineas= response;
@@ -2620,6 +2154,7 @@ MyApp.controller('OrderAccCopyDoc',['$scope','Order','setGetOrder', function ($s
 
     };
 }]);
+
 MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder', function ($scope,$mdSidenav,Order,setGetOrder) {
     $scope.upModel = [];
     $scope.loades = [];
@@ -2628,8 +2163,19 @@ MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder',
         $scope.model.adjs.push(item);
     };
     $scope.$parent.OrderAprobCtrl = function () {
-        $scope.model = {adjs:[]};
-        $scope.open();
+        $scope.formData.$setPristine();
+        $scope.formData.$setUntouched();
+        if($scope.allowEdit() && !$scope.$parent.document.isAprobado){
+            $scope.model = {adjs:[]};
+            $scope.open();
+            if($scope.$parent.document.isAprobado){
+                $scope.model.nro_doc= angular.copy($scope.$parent.document.aprobado.nro_doc);
+                angular.forEach($scope.$parent.document.aprobado.adjs, function (v, k) {
+                    $scope.model.adjs.push(v);
+                });
+            }
+        }
+
     };
     $scope.open = function (fn) {
         $mdSidenav("OrderAprob").open().then(function(){
@@ -2665,10 +2211,10 @@ MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder',
                                 $scope.inClose();
                             }}
                         ], {block: true});
-                }else if($scope.loades.length == 0){
+                }else if($scope.model.adjs.length == 0){
                     $scope.NotifAction("alert","¡No has cargado adjuntos! es preferible que adjuntes algun documento que soporte la aprobacion.  Confirmanos que no posees ese soporte",
                         [
-                            {name:"No tengo soporte",default:5, action:function () {
+                            {name:"No tengo soporte",default:15, action:function () {
                                 $scope.save(function () {
                                     $scope.inClose();
                                 });
@@ -2691,7 +2237,6 @@ MyApp.controller('OrderAprobCtrl',['$scope','$mdSidenav', 'Order','setGetOrder',
     }
     $scope.save = function (fn) {
         $scope.model.id= $scope.$parent.document.id;
-        $scope.model.adjs=angular.copy( $scope.loades);
         Order.postMod({type:$scope.formMode.mod, mod:"Approved"},$scope.model,function(response){
             if(response.accion == 'ap_gerencia'){
                 $scope.NotifAction("ok","Se ha realizado la aprobacion por parte de gerencia",[],{autohidden: 1500});
@@ -3036,19 +2581,22 @@ MyApp.controller('OrderAgrPedPendCtrl',['$scope','Order','setGetOrder' ,function
         });
     };
     $scope.change = function (item) {
-        if(!item.asignado){
-            $scope.add(item);
-        }else {
-            $scope.NotifAction("alert","¿Esta seguro de quitarlo ?",
-                [
-                    {name:"Si", action: function () {
-                        $scope.remove(item);
-                    }},
-                    {name:"Cancelar", action: function () {
+        if($scope.allowEdit()){
+            if(!item.asignado){
+                $scope.add(item);
+            }else {
+                $scope.NotifAction("alert","¿Esta seguro de quitarlo ?",
+                    [
+                        {name:"Si", action: function () {
+                            $scope.remove(item);
+                        }},
+                        {name:"Cancelar", action: function () {
 
-                    }}
-                ],{block:true})
+                        }}
+                    ],{block:true})
+            }
         }
+
 
     };
 
@@ -3152,27 +2700,30 @@ MyApp.controller('OrderAgrContPed',['$scope','Order','setGetOrder' ,function ($s
     };
 
     $scope.change = function (item) {
-        if(!item.asignado){
-            if($scope.provSelec.contrapedido != '1'){
-                $scope.NotifAction("alert","El proveedor "+ $scope.provSelec.razon_social +
-                    " no admite contra pedidos ¿Esta seguro de asignarlo ?",
-                    [
-                        {name:"No", action : function(){
-                        }},
-                        {name:"Si", action:
-                            function(){
-                                $scope.reviewCp(item);
+        if($scope.allowEdit()){
+            if(!item.asignado){
+                if($scope.provSelec.contrapedido != '1'){
+                    $scope.NotifAction("alert","El proveedor "+ $scope.provSelec.razon_social +
+                        " no admite contra pedidos ¿Esta seguro de asignarlo ?",
+                        [
+                            {name:"No", action : function(){
+                            }},
+                            {name:"Si", action:
+                                function(){
+                                    $scope.reviewCp(item);
+                                }
                             }
-                        }
-                    ]
-                    ,{block: true, save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}});
-            }else {
-                $scope.reviewCp(item);
-            }
+                        ]
+                        ,{block: true, save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}});
+                }else {
+                    $scope.reviewCp(item);
+                }
 
-        }else{
-            $scope.questionCp(item);
+            }else{
+                $scope.questionCp(item);
+            }
         }
+
 
     };
 
@@ -3288,11 +2839,14 @@ MyApp.controller('OrderAgrKitBoxsCtrl',['$scope','$timeout','Order','setGetOrder
     };
 
     $scope.change = function (item) {
-        if(!item.asignado){
-            $scope.review(item);
-        }else{
-            $scope.question(item);
+        if($scope.allowEdit()){
+            if(!item.asignado){
+                $scope.review(item);
+            }else{
+                $scope.question(item);
+            }
         }
+
 
     };
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
@@ -3365,56 +2919,54 @@ MyApp.controller('OrderResumenContraPedidoCtrl',['$scope', '$timeout','Order','f
 
     };
     $scope.change = function (data) {
-        $scope.select= data;
-        var send = {
-            reng_id: data.reng_id,
-            origen_item_id:data.id,
-            costo_unitario:data.costo_unitario,
-            descripcion: data.descripcion,
-            codigo: data.codigo,
-            codigo_fabrica: data.codigo_fabrica,
-            codigo_profit: data.codigo_fabrica,
-            doc_id: $scope.$parent.document.id,
-            disponible: data.disponible,
-            producto_id: data.producto_id,
-            uid: data.uid
+        if($scope.allowEdit()){
+            $scope.select= data;
+            var send = {
+                reng_id: data.reng_id,
+                origen_item_id:data.id,
+                costo_unitario:data.costo_unitario,
+                descripcion: data.descripcion,
+                codigo: data.codigo,
+                codigo_fabrica: data.codigo_fabrica,
+                codigo_profit: data.codigo_fabrica,
+                doc_id: $scope.$parent.document.id,
+                disponible: data.disponible,
+                producto_id: data.producto_id,
+                uid: data.uid
 
-        };
-        if(!data.asignado){
-            if(data.asignadoOtro.length == 0){
-                formSrv.name= 'OrderResumenContraPedidoCtrl';
-                $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrderItem"});
-            }else {
-                $scope.NotifAction("alert","Este articulo ya sido agregado a otro documento,  por favor confirmanos que desea agregarlo",
+            };
+            if(!data.asignado){
+                if(data.asignadoOtro.length == 0){
+                    formSrv.name= 'OrderResumenContraPedidoCtrl';
+                    $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrderItem"});
+                }else {
+                    $scope.NotifAction("alert","Este articulo ya sido agregado a otro documento,  por favor confirmanos que desea agregarlo",
+                        [
+                            {name:"Si, añadirlo ", action: function () {
+                                formSrv.name= 'OrderResumenContraPedidoCtrl';
+                                $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrderItem"});
+                            }},
+                            {name:"Cancelar", action: function () {
+
+                            }}
+                        ]
+                        , {block: true,  save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}} );
+                }
+            }else{
+                $scope.NotifAction("alert", "Esta seguro de remover el articulo selecionado",
                     [
-                        {name:"Si, añadirlo ", action: function () {
-                            formSrv.name= 'OrderResumenContraPedidoCtrl';
-                            $scope.$parent.OrderminiAddProductCtrl(send, {type:$scope.$parent.formMode.mod, mod:"SaveCustomOrderItem"});
-                        }},
+                        {name:"Si, remover el articulo", action: function () {
+                            $scope.remove(data);
+                        }}
+                        ,
                         {name:"Cancelar", action: function () {
-
+                            $scope.remove(data);
                         }}
                     ]
-                    , {block: true,  save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}} );
+                    ,{block:true})
+
             }
-        }else{
-            $scope.NotifAction("alert", "Esta seguro de remover el articulo selecionado",
-                [
-                    {name:"Si, remover el articulo", action: function () {
-                        $scope.remove(data);
-                    }}
-                    ,
-                    {name:"Cancelar", action: function () {
-                        $scope.remove(data);
-                    }}
-                ]
-                ,{block:true})
-
         }
-    };
-    $scope.addRemoveCpItem = function(item){
-
-
     };
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
         if(newVal && formSrv.name == 'OrderResumenContraPedidoCtrl'){
@@ -3454,30 +3006,6 @@ MyApp.controller('OrderResumenPedidoSusCtrl',['$scope', '$timeout','Order','form
         },500);
         $scope.LayersAction({search:{name:"resumenPedidoSus" }});
     };
-    $scope.remove = function (item) {
-
-
-    };
-    $scope.change = function (data) {
-
-    };
-
-    /*   $scope.$watch("bindForm.estado", function (newVal, oldVall) {
-     if(newVal && formSrv.name == 'OrderResumenContraPedidoCtrl'){
-     var data = formSrv.getData();
-     $scope.select.asignado = (data.response.accion  == 'new' || data.response.accion  == 'upd') ;
-     $scope.select.reng_id = data.response.reng_id;
-     $scope.select.disponible = data.response.disponible;
-     $scope.select.inDoc = data.response.inDoc;
-     $scope.select.inDocBlock = data.response.inDocBlock;
-     if(data.response.accion  == 'new'){
-     $scope.$parent.NotifAction("ok", "Agregado",[], {autohidden:1500});
-     }if(data.response.accion  == 'upd'){
-     $scope.$parent.NotifAction("ok", "Actualizado",[], {autohidden:1500});
-     }
-
-     }
-     });*/
 
 }]);
 
@@ -3500,17 +3028,6 @@ MyApp.controller('OrderResumenKitchenboxCtrl',['$scope', '$timeout','Order','for
         $scope.LayersAction({search:{name:"resumenKitchenbox" }});
     };
 
-    $scope.remove = function (item) {
-
-
-    };
-    $scope.change = function (data) {
-
-    };
-    $scope.addRemoveCpItem = function(item){
-
-
-    };
     $scope.$watch("bindForm.estado", function (newVal, oldVall) {
         if(newVal && formSrv.name == 'OrderResumenKitchenboxCtrl'){
             var data = formSrv.getData();
@@ -3795,21 +3312,20 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
 
     $scope.buildfinalDoc = function(){
         $scope.finalDoc = {contra:{},kitchen:{},pedidoSusti:{},import:{}, todos:{}, document:{}, aprob_gerencia:{}, aprob_compras:{}};
+        console.log("setGetOrder.getForm() ", setGetOrder.getForm());
         angular.forEach(setGetOrder.getForm(), function(v,k){
-                /*if(k.startsWith('contra')){
+                if(k.startsWith('contra')){
                     $scope.finalDoc.contra[v.id] = 'upd';
                 }
-
                 if(k.startsWith('kitchen')){
                     $scope.finalDoc.kitchen[v.id] = 'upd';
                 }
-
                 if(k.startsWith('pedidoSusti')){
                     $scope.finalDoc.pedidoSusti[v.id] = 'upd';
                 }
                 if(k.startsWith('todos')){
                     $scope.finalDoc.todos[v.id] = 'upd';
-                }*/
+                }
             }
         );
         angular.forEach(setGetOrder.getForm('document'), function(v,k){
@@ -3827,7 +3343,15 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
 
 
     $scope.canNext = function () {
-
+        if(Object.keys($scope.finalDoc.document).length == 0 &&
+            Object.keys($scope.finalDoc.contra).length == 0 &&
+            Object.keys($scope.finalDoc.pedidoSusti).length == 0 &&
+            Object.keys($scope.finalDoc.import).length == 0 &&
+            Object.keys($scope.finalDoc.todos).length == 0
+        ){
+            $scope.NotifAction("ok","Sin cambios no se realizara ninguna accion",[],{autohidden:2000});
+            return false;
+        }
         return true;
     };
 
@@ -3839,11 +3363,13 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
 
 MyApp.controller('OrderMenuAgrCtrl',['$scope','Order','masters','clickCommitSrv','setGetOrder', function ($scope,Order,masters,clickCommitSrv,setGetOrder) {
 
-
-
     $scope.$parent.OrderMenuAgrCtrl = function () {
-        $scope.LayersAction({search:{name:"finalDoc",before: function(){}}});
-    };
+        $scope.LayersAction({close:{all:true}});
+        setGetOrder.clear();
+        $scope.LayersAction({open:{name:"menuAgr", before: function(){
+
+        }}
+        })};
 
     $scope.newDoc= function(formMode){
         $scope.$parent.formMode=formMode;
@@ -4086,16 +3612,19 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
     $scope.select ={};
     $scope.event =undefined;
     $scope.$parent.OrderminiAddProductCtrl= function (data, url) {
-        $scope.url = url;
-        $scope.copyTem = angular.copy(data);
-        if(!$scope.isOpen){
-            $scope.open(function () {
+        if($scope.allowEdit()){
+            $scope.url = url;
+            $scope.copyTem = angular.copy(data);
+            if(!$scope.isOpen){
+                $scope.open(function () {
 
-                $scope.select= data;
-                $scope.copy = angular.copy(data);
-                $scope.copyTem= undefined;
-            });
+                    $scope.select= data;
+                    $scope.copy = angular.copy(data);
+                    $scope.copyTem= undefined;
+                });
+            }
         }
+
 
     };
     $scope.close = function (event) {
@@ -4303,24 +3832,27 @@ MyApp.controller('OrderminiChangeItemCtrl',['$scope','$timeout','$mdSidenav','Or
     $scope.event =undefined;
     $scope.noEdit=  false;
     $scope.$parent.OrderminiChangeItemCtrl= function (data, url) {
-        $scope.noEdit=  false;
-        $scope.noEditAsign= false;
-        $scope.url = url;
-        $scope.copyTem = angular.copy(data);
+        if($scope.allowEdit()){
+            $scope.noEdit=  false;
+            $scope.noEditAsign= false;
+            $scope.url = url;
+            $scope.copyTem = angular.copy(data);
 
-        if(!$scope.isOpen){
-            $scope.open(function () {
-                if(!(data.tipo_origen_id == '1' || data.tipo_origen_id == '2' || data.tipo_origen_id == '3') && data.costo_unitario){
-                    $scope.noEdit= true;
-                }
-                if(data.first.tipo_origen_id == '3' || data.tipo_origen_id == '3'){
-                    $scope.noEditAsign= true;
-                }
-                $scope.select= data;
-                $scope.copy = angular.copy(data);
-                $scope.copyTem= undefined;
-            });
+            if(!$scope.isOpen){
+                $scope.open(function () {
+                    if(!(data.tipo_origen_id == '1' || data.tipo_origen_id == '2' || data.tipo_origen_id == '3') && data.costo_unitario){
+                        $scope.noEdit= true;
+                    }
+                    if(data.first.tipo_origen_id == '3' || data.tipo_origen_id == '3'){
+                        $scope.noEditAsign= true;
+                    }
+                    $scope.select= data;
+                    $scope.copy = angular.copy(data);
+                    $scope.copyTem= undefined;
+                });
+            }
         }
+
     };
 
     $scope.close = function (event) {
@@ -4770,16 +4302,16 @@ MyApp.controller('MailCtrl',['$scope','masters','Order', function($scope, master
     };
 
     $scope.change= function (data) {
-     if(data){
-         $scope.model.from = angular.copy($scope.user);
-     }  else{
-         console.log($scope.mailSystem);
-         $scope.model.from = angular.copy($scope.mailSystem);
-     }
-     if($scope.mode == 'list'){
-         console.log("$scope.model.from.email",$scope.model.from.email);
-         $scope.btnText = 'Correo de respuesta : '+ angular.copy( $scope.model.from.email);
-     }
+        if(data){
+            $scope.model.from = angular.copy($scope.user);
+        }  else{
+            console.log($scope.mailSystem);
+            $scope.model.from = angular.copy($scope.mailSystem);
+        }
+        if($scope.mode == 'list'){
+            console.log("$scope.model.from.email",$scope.model.from.email);
+            $scope.btnText = 'Correo de respuesta : '+ angular.copy( $scope.model.from.email);
+        }
     };
     $scope.fnfile = function (item) {
         $scope.model.adjs.push(item);
@@ -4788,34 +4320,34 @@ MyApp.controller('MailCtrl',['$scope','masters','Order', function($scope, master
     $scope.send = function () {
         $scope.inProgress=true;
         Order.post({type:"Mail", mod:"send"},$scope.model, function (response) {
-           if(response.email.is){
-               $scope.NotifAction("ok","Correo enviado, ¿desea enviar otro?",
-                   [
-                       {name:"Si, quitar destinararios y adjuntos",action:function () {
-                           $scope.mainFn.clear();
-                           $scope.AdjFn.clear();
-                       }},
-                       {name:"Si, Mantener destinararios y adjuntos",action:function () {
+            if(response.email.is){
+                $scope.NotifAction("ok","Correo enviado, ¿desea enviar otro?",
+                    [
+                        {name:"Si, quitar destinararios y adjuntos",action:function () {
+                            $scope.mainFn.clear();
+                            $scope.AdjFn.clear();
+                        }},
+                        {name:"Si, Mantener destinararios y adjuntos",action:function () {
 
-                       }},
-                       {name:"No",action:function () {
-                           $scope.LayersAction({close:{all:true}});
-                       }}
-                   ]
-                   , {block:true});
-               $scope.inProgress=false;
-           }else{
-               $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrador, ¿Desea intentar enviar el correo nuevamente? ",
-                   [
-                       {name:"Reintentar", default:15, action: function () {
-                           $scope.resend(response.email.id);
-                       }},
-                       {name:"Cancelar, lo hare mas tarde", action: function () {
+                        }},
+                        {name:"No",action:function () {
+                            $scope.LayersAction({close:{all:true}});
+                        }}
+                    ]
+                    , {block:true});
+                $scope.inProgress=false;
+            }else{
+                $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrador, ¿Desea intentar enviar el correo nuevamente? ",
+                    [
+                        {name:"Reintentar", default:15, action: function () {
+                            $scope.resend(response.email.id);
+                        }},
+                        {name:"Cancelar, lo hare mas tarde", action: function () {
 
-                       }}
-                   ]
-                   ,{block:true});
-           }
+                        }}
+                    ]
+                    ,{block:true});
+            }
         });
 
     };
