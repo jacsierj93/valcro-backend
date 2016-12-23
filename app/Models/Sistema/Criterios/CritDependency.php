@@ -21,4 +21,12 @@ class CritDependency extends Model
         return $this->hasOne('App\Models\Sistema\Criterios\CritLinCamTip','id','lct_id')
             ->join('tbl_crit_campos','campo_id',"=",'tbl_crit_campos.id');
     }
+
+    public function children(){
+        return $this->hasMany('App\Models\Sistema\Criterios\CritLinCamTip','id','sub_lct_id')
+            ->with(array('field'=>function($query){
+                $query->select('id','descripcion');
+            }))
+            ->with('children');
+    }
 }

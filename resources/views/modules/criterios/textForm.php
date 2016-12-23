@@ -8,11 +8,10 @@
                     >
     <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
     <input skip-tab
-           ng-model="crit[field.id]"
+           ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
            autocomplete="off"
            name="razon_social"
-           type="number"
            ng-required="{{field.options.Requerido[0].pivot.value || false}}"
            number
            min="{{field.options.Minimo[0].pivot.value || 0}}"
@@ -33,7 +32,7 @@
 <md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')" layout="row">
     <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
     <md-autocomplete md-selected-item="ctrl.lang"
-                     ng-model="crit[field.id]"
+                     ng-model="crit[field.id].value"
                      flex
                      skip-tab
                      id="langCont"
@@ -56,9 +55,10 @@
 <lmb-collection class="rad-contain"
                 layout="row"
                 lmb-type="items"
-                lmb-model="item"
+                lmb-model="crit[field.id].value"
                 lmb-display="elem.nombre"
                 lmb-itens="field.options.Opcion"
+                lmb-key="elem.id"
                 ng-if="(field.type.directive == 'prevRadio')"
                >
 

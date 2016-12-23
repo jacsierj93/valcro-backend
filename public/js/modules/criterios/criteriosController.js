@@ -42,6 +42,21 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
     $scope.openCrit = function(line){
         if(critForm.setLine(line)){
             $scope.$parent.LayersAction({open:{name:"critLayer1"}});
+        }else{
+            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiarlo, los cambios se guardaron automaticamente",[{
+                name:"deacuerdo",
+                action:function () {
+                    critForm.setLine(line,true)
+                    $scope.$parent.LayersAction({open:{name:"critLayer1"}});
+                }
+            },
+                {
+                    name:"cancelar",
+                    action:function(){
+
+                    }
+                }
+            ])
         }
 
     };
@@ -196,6 +211,21 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.newCrit = function(){
         if(critForm.setLine(false)){
             $scope.LayersAction({open:{name:"critlayer0"}});
+        }else{
+            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiar, los cambios se guardaron automaticamente",[{
+                name:"deacuerdo",
+                action:function () {
+                    critForm.setLine(false,true)
+                    $scope.LayersAction({open:{name:"critlayer0"}});
+                }
+            },
+                {
+                    name:"cancelar",
+                    action:function(){
+
+                    }
+                }
+            ])
         }
 
     };
@@ -530,9 +560,9 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.opendDep = false;
     $scope.addDepend = function(deps){
         deps = deps || false;
-        if(deps){
-            critForm.setDepend(deps)
-        }
+
+        critForm.setDepend(deps)
+
 
         $mdSidenav("lyrConfig").open().then(function(){
             $scope.opendDep = true;
@@ -629,8 +659,9 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     };
 
     return {
-        setLine:function(elem){
-            if(!angular.equals(curLine.listado,listadobkup) && !accept){
+        setLine:function(elem,force){
+            //console.log(angular.equals(curLine.listado,listadobkup))
+            if(!angular.equals(curLine.listado,listadobkup) && !force){
                 return false;
             }
 
@@ -644,6 +675,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             criterios.query({ type:"getCriteria",id:elem.id},function(data){
                     listadobkup = angular.copy(data) || [];
                     curLine.listado = data || [];
+
             });
 
 
@@ -721,7 +753,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
 
             }else{
                 var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
-                var upd =  (aux.options[define.descripcion].length>0)?aux.options[define.descripcion][0]:false;
+                var upd =  ((define.descripcion in aux.options) && aux.options[define.descripcion].length>0)?aux.options[define.descripcion][0]:false;
                 if(upd){
                     upd.pivot.value =  opt.valor;
                     upd.pivot.message =  opt.msg;
@@ -734,7 +766,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                         value: opt.valor,
                         message: opt.msg
                     };
-                    aux.options[define.descripcion][0].push(temp);
+                    aux.options[define.descripcion]= [temp];
                 }
             }
         },
@@ -746,30 +778,17 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         getOptions:function () {
             return ListOptions;
         },
-
         setDepend : function(depend){
-            if(depend){
-                dependency.id = depend.id || false;
-                dependency.parent_id = depend.lct_id || false;
-                dependency.lct_id = depend.sub_lct_id || false;
-                dependency.operator = depend.operador || "";
-                dependency.condition = depend.valor || "";
-                dependency.action = depend.accion || null;
-            }else{
-                dependency.id = false;
-                dependency.parent_id = false;
-                dependency.lct_id = false;
-                dependency.operator = "";
-                dependency.condition = "";
-                dependency.action = null;
-            }
-
+            dependency.id = depend.id || false;
+            dependency.parent_id = depend.lct_id || false;
+            dependency.lct_id = depend.sub_lct_id || edit.id;
+            dependency.operator = depend.operador || "";
+            dependency.condition = depend.valor || "";
+            dependency.action = depend.accion || null;
         },
-
         getDepend : function(){
             return dependency;
         }
-
     }
 });
 
@@ -789,44 +808,45 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.formId = critForm.getEdit();
     $scope.crit = [];
     $scope.isShow = [];
+    var validators = {};
     $scope.createModel = function(field){
-        $scope.crit[''+field.id] = "";
+        $scope.crit[''+field.id] = {value : "",childs:[]};
         $scope.isShow[field.id] = true;
+        console.log($scope.crit[''+field.id])
         for(i=0;i<field.deps.length;i++){
-            $scope.$watch("crit["+field.deps[0].lct_id+"]",function(n,o){
-                $scope.isShow[field.id] = isShow(field.deps[0],n);
-                console.log("en el campo "+field.id+" la visibilidad es "+$scope.isShow[field.id]);
-            });
+            var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");+
+            key.childs.push(field.deps[i]);
+            if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
+                $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
+                    console.log(n)
+                    isShow(n);
+                });
+            }
+
 
         }
     };
-    var isShow = function(dep,curVal){
-        var show = true;
+    var isShow = function(val){
 
-        switch (dep.operador){
-            case "=":
+        angular.forEach(val.childs,function(dep,k){
+            var ret = eval(dep.accion);
+            switch (dep.operador){
+                case "=":
+                    $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
+                    break;
+                case ">":
+                    $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
+                    break;
+                case "<":
+                    $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
+                    break;
+                case "!=":
+                    $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
+                    break;
+            }
 
-                show = curVal == dep.valor
-                break;
-            case ">":
-
-                show = curVal > parseFloat(dep.valor)
-
-                break;
-            case "<":
-
-                show = curVal < parseFloat(dep.valor)
-                break;
-            case "!=":
-
-                show = curVal != dep.valor
-                break;
-            /*case "=":
-
-                show = crit[field.deps[0].lct_id] == field.deps[0].valor
-                break;*/
-        }
-        return show;
+        });
+        //return show;
     };
 
     $scope.openConstruct = function(callback){
@@ -862,17 +882,29 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         if(nvo){
             $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
         }
-
-
     });
 
     $scope.saveDependency = function(){
         criterios.put({type:"saveDep"},$scope.configDep,function(data){
             $scope.configDep.id = data.id;
+            updateDependency($scope.configDep,data.action);
             setNotif.addNotif("ok", "GUARDADO!!", [
             ],{autohidden:1000});
             $scope.$parent.closeDepend();
         });
+    };
+
+    var updateDependency = function(dat,act){
+        depend = (act=="upd")?$filter("filterSearch")($scope.currentCrit.deps,[dat.id])[0]:{};
+        depend.id = dat.id
+        depend.lct_id = dat.parent_id
+        depend.sub_lct_id = dat.lct_id
+        depend.operador = dat.operator;
+        depend.valor = dat.condition;
+        depend.accion =  dat.action;
+        if(act=="new"){
+            $scope.currentCrit.deps.push(depend);
+        }
     };
 
 
@@ -885,6 +917,7 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
     
     $scope.showAlert = function(){
+        console.log($scope.configDep)
         setNotif.addNotif("error", "datos incomṕletos", [
         ],{autohidden:1000});
     };
@@ -1008,27 +1041,28 @@ MyApp.directive('lmbCollection', function() {
             var done = function(){
                 var dat = $scope.curVal;
                 if($scope.multi){
-                    if($scope.model.indexOf(dat.id) != -1){
-                        $scope.model.splice($scope.model.indexOf(dat.id),1);
+                    if($scope.model.indexOf(eval("dat."+$scope.key)) != -1){
+                        $scope.model.splice($scope.model.indexOf(eval("dat."+$scope.key)),1);
                     }else{
-                        $scope.model.push(dat.id);
+                        $scope.model.push(eval("dat."+$scope.key));
                     }
                 }else{
-                    $scope.model = dat.id;
+                    $scope.model = eval("dat."+$scope.key);
                 }
             };
 
             $scope.exist = function(dat){
                 if($scope.multi){
-                    return $scope.model.indexOf(dat.id) !== -1;
+                    return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
                 }else{
-                    return $scope.model == dat.id;
+                    return $scope.model == eval("dat."+$scope.key);
                 }
 
             };
         },
         link:function(scope,elem,attr,model){
             scope.multi = ('multiple' in attr);
+            scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
         },
         template: function(elem,attr){
             var show = "descripcion"

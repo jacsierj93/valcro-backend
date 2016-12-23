@@ -25,6 +25,7 @@ trait Journal
                 break;
         }
         $usr = Session::get("DATAUSER");
+        $script = Session::get("script");
         $key = $model->attributes[$model->primaryKey];
 
         $master = ($act=="del")?$model->original:$model->attributes;
@@ -33,6 +34,7 @@ trait Journal
             if($k!="updated_at" && $k!="created_at" && $k!="deleted_at" && (!is_int($k))){
                 $toAudit[]=array(
                             "datetime"=>$date,
+                            "script"=>$script,
                             "user" => $usr['id'],
                             "action" => $act,
                             "table" => $model->table,

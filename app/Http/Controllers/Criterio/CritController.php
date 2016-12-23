@@ -30,11 +30,11 @@ use App\Models\Sistema\Criterios\CritDependencyAction;
 
 class CritController extends BaseController
 {
-   /* public function __construct()
+    public function __construct()
     {
 
         $this->middleware('auth');
-    }*/
+    }
 
     public function getCampos(){
         $fields  = Campos::all();
@@ -91,6 +91,29 @@ class CritController extends BaseController
         }
         return  json_encode($crit);
     }
+    public function treeMap($line){
+        $tree = Criterio::where("linea_id",$line)
+            ->doesntHave("dependency")
+            /*->has("children")*/
+            ->with(array('field'=>function($query){
+                $query->selectRaw('id,descripcion');
+            }))
+            ->with("children")
+            ->get();
+        foreach ($tree as $branch){
+            self::recursive($branch);
+        }
+        return $tree;
+
+
+    }
+
+    private static function recursive ($child){
+        foreach ($child->children as $cur){
+            $cur['children'] = $cur->children;
+            self::recursive($cur['children'][0]);
+        }
+    }
 
     public function createLine(Request $rq){
         $ret = array("action"=>"new","id"=>false);
@@ -126,7 +149,6 @@ class CritController extends BaseController
     }
 
     public function saveField(Request $rq){
-        //dd($rq);
         $ret = array("action"=>"new","id"=>false,"ready"=>false);
         if($rq->id){
             $crit = Campos::find($rq->id);
@@ -239,7 +261,7 @@ class CritController extends BaseController
             }
         }
 
-        if($ret["action"]=="new"){
+        //if($ret["action"]=="new"){
             $dep->lct_id = $rq->parent_id;
             $dep->operador = $rq->operator;
             $dep->valor = $rq->condition;
@@ -247,7 +269,7 @@ class CritController extends BaseController
             $dep->sub_lct_id = $rq->lct_id;
             $dep->save();
             $ret['id'] = $dep->id;
-        }
+        //}
         return $ret;
     }
 }

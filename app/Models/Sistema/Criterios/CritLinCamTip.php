@@ -37,4 +37,7 @@ class CritLinCamTip extends Model
     public function dependency(){
         return $this->hasMany('App\Models\Sistema\Criterios\CritDependency','sub_lct_id','id');
     }
+    public function children(){
+        return $this->hasMany('App\Models\Sistema\Criterios\CritDependency','lct_id','id');
+    }
 }

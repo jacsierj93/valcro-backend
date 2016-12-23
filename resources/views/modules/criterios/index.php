@@ -209,18 +209,18 @@
                 <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
 
 
-                        <div  style="width:440px;padding:8px" >
-                                <form name="LineProd" layout="row" class="focused" ng-controller="formPreview">
+                        <div  style="width:440px;padding:8px" layout="column">
+                                <form flex name="LineProd" layout="row" class="focused" ng-controller="formPreview">
                                     <div active-left></div>
                                     <div flex layout="column">
-                                        <div class="titulo_formulario" layout="row" layout-align="start start" flex>
+                                        <div class="titulo_formulario row" layout="row" layout-align="start start">
                                             <div>
                                                 Linea
                                             </div>
                                             <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
                                         </div>
 
-                                        <md-content layout="column" style="margin: 0px 4px 0px 4px">
+                                        <md-content layout="column" flex style="margin: 0px 4px 0px 4px">
                                             <div ng-repeat="field in criteria" class="row"
                                                  ng-class="{'field-sel':field.id==formId.id}"
                                                  test="{{formId.id}}"
@@ -595,13 +595,13 @@
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px">
 
                                 </div>
-                                <div flex layout="column">
-                                    <md-content v>
+
+                                    <md-content flex layout="column">
                                         <div ng-repeat="field in criteria | filterSelect: configDep.lct_id" id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center center">
                                             {{field.field.descripcion}}
                                         </div>
                                     </md-content>
-                                </div>
+
 
                             </div>
                             <div layout="row" flex="25">
@@ -627,11 +627,11 @@
                                             </div>
                                             <md-content flex  ng-if="currentParent.type.descripcion == 'selector' || currentParent.type.descripcion == 'opciones'">
                                                 <div
-                                                    ng-repeat="opt in currentCrit.options track by $index"
-                                                    ng-if="opt.camp_tipo == 'array'"
-                                                    ng-click="setCfg('condition',opt.pivot.id)"
+                                                    ng-repeat="opt in currentParent.options.Opcion track by $index"
+
+                                                    ng-click="setCfg('condition',opt.pivot.value)"
                                                     class="row"
-                                                    ng-class="{'field-sel':configDep.condition == opt.pivot.id}"
+                                                    ng-class="{'field-sel':configDep.condition == opt.pivot.value}"
                                                     layout="column"
                                                     layout-align="center center"
                                                     style="border-bottom: 1px solid #ccc">
@@ -639,7 +639,7 @@
                                                 </div>
                                             </md-content>
                                             <md-input-container id="text" class="md-block" flex prevText ng-if="currentParent.type.descripcion == 'texto'" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
-                                                <label>????</label>
+                                                <label>valor</label>
                                                 <input skip-tab
                                                        info="ingrese el valor contra el que se comparara"
                                                        autocomplete="off"
@@ -657,7 +657,7 @@
                                             </div>
                                         </div>
                                         <md-input-container class="md-block" class="row">
-                                            <md-switch ng-model="configDep.action">
+                                            <md-switch ng-model="configDep.action" ng-true-value="'true'" ng-false-value="'false'">
                                                 &nbsp;Visibilidad
                                             </md-switch>
                                         </md-input-container>
@@ -685,7 +685,7 @@
 
                     </div>
                 </md-content>
-                <div class="showNext" style="width: 16px;" ng-mouseover="$parent.showNext(true,true)">
+                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()" ng-mouseleave="over = false;">
                 </div>
             </div>
 
