@@ -52,7 +52,7 @@ class MasterController extends BaseController
             return $model;
     }
     public function getSystemMail(){
-	   return 'sistamaValcro@valcro.co';
+	   return ['nombre'=>'sistema','email'=>'sistemaValcro@valcro.co'];
     }
 	public function getCountriesHaveProvider()
 	{

@@ -3949,7 +3949,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
         });
     };
     $scope.resend = function (id) {
-        Order.post({type:"mail", mod:"resend"},{id:id}, function (response) {
+        Order.post({type:"Mail", mod:"resend"},{id:id}, function (response) {
             if(response.is){
                 $scope.$parent.NotifAction("ok","Correo enviado",[], {autohidden:2000});
                 $timeout(function () {
@@ -4745,36 +4745,115 @@ MyApp.controller('OrderModuleMsmCtrl',['$scope','$mdSidenav','Order','masters','
 /**
  * controller for mdsidenav mail, this controller is responsable de send correo option
  * */
-MyApp.controller('MailCtrl',['$scope','masters', function($scope, masters){
-    $scope.model = {to:[], cc:[], ccb:[], asunto:undefined};
+MyApp.controller('MailCtrl',['$scope','masters','Order', function($scope, masters,Order){
+    $scope.model = {to:[], cc:[], ccb:[],adjs:[], asunto:undefined};
     $scope.inProgress=false;
     $scope.mailSystem =  masters.get({type:"SystemMail"});
     $scope.user =  masters.get({type:"User"});
+    $scope.upModel= [];
+    $scope.loades = [];
+    $scope.correos = [];
+
     $scope.$parent.openEmail= function(){
+        $scope.inProgress=false;
+        $scope.load();
         $scope.mode= 'list';
         $scope.model.inMyMail = true;
-        $scope.model.from = angular.copy($scope.user.email);
+        $scope.model.to.splice(0, $scope.model.to.length);
+        $scope.model.cc.splice(0, $scope.model.cc.length);
+        $scope.model.ccb.splice(0, $scope.model.ccb.length);
+        $scope.model.adjs.splice(0, $scope.model.adjs.length);
+        $scope.model.from = angular.copy($scope.user);
+        $scope.btnText = 'Correo de respuesta : '+ angular.copy( $scope.model.from.email);
+        $scope.loades.splice(0, $scope.loades.length);
         $scope.$parent.LayersAction({open:{name:"email"}});
     };
 
     $scope.change= function (data) {
      if(data){
-         $scope.model.from = angular.copy($scope.user.email);
+         $scope.model.from = angular.copy($scope.user);
      }  else{
-         $scope.model.from = angular.copy(mailSystem);
+         console.log($scope.mailSystem);
+         $scope.model.from = angular.copy($scope.mailSystem);
+     }
+     if($scope.mode == 'list'){
+         console.log("$scope.model.from.email",$scope.model.from.email);
+         $scope.btnText = 'Correo de respuesta : '+ angular.copy( $scope.model.from.email);
      }
     };
-    $scope.load= function () {
-        Order.query({type:'Emails'},{},function(response){
-         /*   $scope.correos = response;
-            $scope.usePersonal= true;
-            $scope.mail.$setPristine();
-            $scope.mail.$setUntouched();
-            $scope.to =[];
-            $scope.cc =[];
-            $scope.cco =[];
-            $scope.asunto="";
-            $scope.texto="";*/
+    $scope.fnfile = function (item) {
+        $scope.model.adjs.push(item);
+    };
+
+    $scope.send = function () {
+        $scope.inProgress=true;
+        Order.post({type:"Mail", mod:"send"},$scope.model, function (response) {
+           if(response.email.is){
+               $scope.NotifAction("ok","Correo enviado, ¿desea enviar otro?",
+                   [
+                       {name:"Si, quitar destinararios y adjuntos",action:function () {
+                           $scope.mainFn.clear();
+                           $scope.AdjFn.clear();
+                       }},
+                       {name:"Si, Mantener destinararios y adjuntos",action:function () {
+
+                       }},
+                       {name:"No",action:function () {
+                           $scope.LayersAction({close:{all:true}});
+                       }}
+                   ]
+                   , {block:true});
+               $scope.inProgress=false;
+           }else{
+               $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrador, ¿Desea intentar enviar el correo nuevamente? ",
+                   [
+                       {name:"Reintentar", default:15, action: function () {
+                           $scope.resend(response.email.id);
+                       }},
+                       {name:"Cancelar, lo hare mas tarde", action: function () {
+
+                       }}
+                   ]
+                   ,{block:true});
+           }
+        });
+
+    };
+    $scope.resend = function (id) {
+        Order.post({type:"Mail", mod:"resend"},{id:id}, function (response) {
+            if(response.is){
+                $scope.NotifAction("ok","Correo enviado, ¿desea enviar otro?",
+                    [
+                        {name:"Si, quitar destinararios y adjuntos",action:function () {
+                            $scope.mainFn.clear();
+                            $scope.AdjFn.clear();
+                        }},
+                        {name:"Si, Mantener destinararios y adjuntos",action:function () {
+
+                        }},
+                        {name:"No",action:function () {
+                            $scope.LayersAction({close:{all:true}});
+                        }}
+                    ]
+                    , {block:true});
+                $scope.inProgress=false;
+            }else{
+                $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrados, ¿Desea intentar enviar el correo nuevamente? ",
+                    [
+                        {name:"Reintentar", default:15, action: function () {
+                            $scope.resend(response.id);
+                        }},
+                        {name:"Cancelar, lo hare mas tarde", action: function () {
+
+                        }}
+                    ]
+                    ,{block:true});
+            }
+        });
+    };
+    $scope.load=  function () {
+        Order.query({type:"Mail", mod:"Providers"},{}, function (response) {
+            $scope.correos = response;
         });
     }
 

@@ -67,7 +67,7 @@ class MailModule extends Model
     public function sendMail ($template,$sender =  []){
 
         $model = $this;
-      try {
+    /*  try {*/
             $snappy = App::make('snappy.pdf');
             $pdf = response()->make($snappy->getOutputFromHtml($template), 200, [
                 'Content-Type' => 'application/pdf',
@@ -88,14 +88,14 @@ class MailModule extends Model
             $model->send = Carbon::now();
             $model->save();
             return ['is'=>true, 'id'=>$model->id];
-        }
+       /* }
         catch (\Exception $e) {
             $model->send = null;
             $model->save();
             $model->failSend($template);
 
             return ['is'=>false, 'id'=>$model->id,$e];
-        }
+        }*/
     }
 
 
@@ -137,6 +137,9 @@ class MailModule extends Model
         Mail::send('emails.render', ['data'=>$template],function ($m) use($sender , $model){
             $m->subject($sender['subject']);
 
+            if(array_key_exists('from' , $sender)){
+                $m->from($sender['from']['email'],$sender['from']['nombre']);
+            }
             foreach($sender['to'] as $aux)
             {
                 $m->to($aux->email, $aux->nombre);

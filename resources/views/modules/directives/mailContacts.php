@@ -12,7 +12,7 @@
                   required
                   md-transform-chip="transformChip($chip)"
                   style="height: inherit;"
-                  md-on-add =" addEmail($chip,'to') "
+                  md-on-add =" addEmail($chip,'to'); searchTo = '';"
                   md-on-remove ="removeEmail($chip) "
                   skitp-tab
                   flex
@@ -38,7 +38,7 @@
                   md-on-add =" addEmail($chip,'cc') "
                   md-on-remove ="removeEmail($chip) "
                   skitp-tab
-                  ng-show="cc"
+                  ng-show="cc && showCc"
 
         >
             <md-autocomplete
@@ -59,7 +59,7 @@
                   md-on-add =" addEmail($chip,'ccb') "
                   md-on-remove ="removeEmail($chip) "
                   skitp-tab
-                  ng-show="ccb"
+                  ng-show="ccb && showCco"
 
         >
             <md-autocomplete

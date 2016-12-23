@@ -93,18 +93,6 @@ class OrderController extends BaseController
         }
     }
 
-    public function testPdf(Request $req)
-    {
-        $data = $this->parseDocToSummaryEmail(Solicitude::findOrFail($req->id));
-        $data['accion'] = ($req->has('accion')) ? $req->accion : 'demo';
-        $view = View::make("emails/modules/Order/Internal/Simple", $data)->render();
-        $pdf = App::make('dompdf.wrapper');
-        $pdf->loadHTML($view);
-
-        return View::make("emails/modules/Order/Internal/Simple", $data);
-
-    }
-
     /*********************** SYSTEM ************************/
 
     public function getPermision()
@@ -299,7 +287,85 @@ class OrderController extends BaseController
         $model = MailModule::findOrFail($req->id);
         return $model->resend();
     }
+
+
+    public function sendMail(Request $req){
+
+        $mail = new MailModule();
+        $mail->tipo_origen_id = 20;
+        $mail->asunto =$req->has('asunto') ? $req->asunto : '' ;
+        $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+        $mail->tipo = 'user';
+        $mail->modulo = 'solicitude';
+        $adjs = [];
+        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto,'from'=>$req->from];
+
+        if($req->has('to')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'to' ;
+                $destinations['to'][] =$dest;
+            }
+        }
+        if($req->has('cc')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'cc' ;
+                $destinations['cc'][] =$dest;
+
+            }
+        }
+        if($req->has('ccb')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'ccb' ;
+                $destinations['ccb'][] =$dest;
+            }
+        }
+        $mail->save();
+        $mail->senders()->saveMany($destinations['to']);
+        $mail->senders()->saveMany($destinations['cc']);
+        $mail->senders()->saveMany($destinations['ccb']);
+        if($req->has('adjs')){
+
+
+            foreach ($req->adjs as $f){
+                $att = new App\Models\Sistema\MailModels\MailModuleAttachment();
+                $att->doc_id= $mail->id;
+                $att->archivo_id= $f['id'];
+                $att->nombre= $f['file'];
+                $att->save();
+                $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+            }
+
+        }
+        $resul['email'] = $mail->sendMail($req->content, $destinations);
+        return $resul;
+    }
     /*********************** PROVIDER ************************/
+
+    public function getProvidersEmails (Request $req){
+
+        $correos = [];
+        $data = App\Models\Sistema\Providers\Contactos::selectRaw('tbl_contacto.id, nombre')->
+        join('tbl_prov_cont','tbl_contacto.id','=','tbl_prov_cont.cont_id')->get();
+        foreach ($data as $contact){
+            foreach ($contact->campos()->where('campo', 'email')->get() as $aux2){
+                foreach ($contact->contacto_proveedor()->get() as $prov){
+                    $e =  ['nombre'=>$contact->nombre, 'correo'=>$aux2->valor, 'prov'=> ['prov_id'=>$prov->id,'razon_social'=>$prov->razon_social] ];
+                    $e['langs'] = array_map('strtolower', $contact->idiomas()->lists('iso_lang')->toarray());
+                    $correos[] =$e ;
+                }
+            }
+        }
+        return $correos;
+    }
 
     /**
      * obtiene la lista de proveedores
@@ -659,6 +725,7 @@ class OrderController extends BaseController
     }
 
 
+
     /*********************** Create  ************************/
     public function CreateSolicitude(Request $req)
     {
@@ -720,8 +787,6 @@ class OrderController extends BaseController
         return $response;
 
     }
-
-
 
 
 
@@ -4785,57 +4850,6 @@ class OrderController extends BaseController
 
 
     /**
-     * Remuevo todos lo item de un pedido segun el documento de origen
-     * @parm id el id de cabezera de documento
-     * @parm pedido_id el pedido donde se desea borrar
-     **/
-    public function removeToOrden(Request $req){
-        $items = OrderItem::where('doc_origen_id', $req->id)
-            ->where('pedido_id', $req->pedido_id)
-            ->get();
-        $ids=Array();
-        $resul= Array();
-        foreach($items as $aux){
-            $ids[]=$aux->id;
-        }
-        $resul['response']=OrderItem::destroy($ids);
-        $resul['accion']="elimnar";
-        $resul['items']=$ids;
-        return $resul;
-    }
-
-    /**
-     * remueve el item del pedido
-     * @param id
-     **/
-    public  function removeOrderItem(Request $req){
-        $resul['accion']= "eliminar";
-        $item = OrderItem:: findOrFail($req->id);
-        $resul['response']= $item->destroy($item->id);
-
-        return $resul;
-    }
-
-
-    /**
-     * edita el item de pedido y ajusta los valores del anterior
-     */
-
-    public function EditPedido(Request $req){
-
-        $model= OrderItem::findOrfail($req->id);
-        $model->cantidad = $req->cantidad;
-        $model->saldo = $req->saldo;
-        $model->save();
-
-        $resul['accion']= "edicion ". $req->tipo_origen_id;
-        $resul['item']= $model;
-        return $resul;
-
-    }
-
-
-    /**
      * obtine el pedido con sus item sin separar
      */
     public function getOrderSustitute(Request $req){
@@ -5013,19 +5027,6 @@ class OrderController extends BaseController
     }
 
 
-    /*********************************** Email ***********************************/
-
-    public function getEmails (Request $req){
-        $query = ContactField::selectRaw('valor,tbl_proveedor.id, razon_social')->leftJoin('tbl_proveedor','tbl_contacto_campo.prov_id','=','tbl_proveedor.id')->where('campo', 'email');
-        return $query->get();
-    }
-
-    public function EmailSummaryDocOrder(Request $req){
-        $data =$this->parseDocToSummaryEmail(Order::findOrFail($req->id));
-        $data['accion'] =($req->has('accion')) ? $req->accion  : 'demo';
-
-        return view("emails/modules/Order/Internal/ResumenDoc",$data);
-    }
 
 
 
@@ -5034,30 +5035,8 @@ class OrderController extends BaseController
 
 
 
-    public function sendMail(Request $req){
-        $adjuntos = [];
-        Mail::raw($req->texto, function ($m) use($req, $adjuntos){
-            $m->subject($req->asunto);
-            if(!$req->has('local')){
-                $m->from($req->session()->get('DATAUSER')['email'],$req->session()->get('DATAUSER')['nombre']);
-            }
 
-            foreach($req->to  as $aux){
-                $m->to($aux['valor'],($aux['razon_social'] == 'new') ? '': $aux['razon_social']);
-            }
-            foreach($req->cc  as $aux){
-                $m->cc($aux['valor'],($aux['razon_social'] == 'new') ? '': $aux['razon_social']);
 
-            }
-            foreach($req->cco  as $aux){
-                $m->bcc($aux['valor'],($aux['razon_social'] == 'new') ? '': $aux['razon_social']);
-
-            }
-        });
-
-        $response =['accion'=>'send', 'destinos'=>$req->to[0]['valor']];
-        return $response;
-    }
 
     /*********************************** CONTRAPEDIDOS ***********************************/
 
@@ -5205,48 +5184,6 @@ class OrderController extends BaseController
 
         return $model;
     }
-
-    /**
-     * @deprecated
-     * agrega un contra pedido al documento
-     *
-     */
-    /* public  function addCustomOrderItem(Request $req){
-
-         $resul= array();
-
-
- //        $cpIt= CustomOrderItem::findOrFail($req->id);
- //        $item = new OrderItem();
- //        if($req->has('renglon_id')){
- //            $item = OrderItem:: findOrFail($req->renglon_id);
- //
- //        }else{
- //            $item->cantidad = $req->saldo;
- //        }
- //        $item->tipo_origen_id = 2;
- //        $item->pedido_id =  $req->pedido_id;
- //        $item->doc_origen_id =  $req->doc_origen_id;
- //        $item->origen_item_id = $req->id;
- //        $item->descripcion = $req->descripcion;
- //        $item->saldo = $req->saldo;
- //
- //        if($req->saldo >= $req->cantidad){
- //            $cpIt->saldo=0;
- //        }else{
- //            $cpIt->saldo = $req->cantidad - $req->saldo;
- //        }
- //        $cpIt->save();
- //        $item->save();
-
-         //   return $item;
-
-     }*/
-    /*
-        public  function removeCustomOrderItem(Request $req){
-            $item = OrderItem:: findOrFail($req->id);
-            $item->destroy($item->id);
-        }*/
 
 
     /**
@@ -5404,7 +5341,7 @@ class OrderController extends BaseController
         $tem['emision']=$model->emision;
         $tem['usuario_id']=$model->usuario_id;
         $tem['monto']=$model->monto;
-       $tem['productos'] =$this->getProductoItem($model);
+        $tem['productos'] =$this->getProductoItem($model);
         $objs['prov_id']=$prov;
         $objs['prov_moneda_id'] = Monedas::find($model->prov_moneda_id);
         $objs['direccion_facturacion_id'] = ProviderAddress::find($model->direccion_facturacion_id);
@@ -5446,14 +5383,6 @@ class OrderController extends BaseController
         return $tem;
 
     }
-
-
-
-
-
-
-
-
 
     /*********************************** kitchen box (cocinas)*********************************************/
 
@@ -5997,7 +5926,7 @@ class OrderController extends BaseController
             }
             if($aux->tipo_origen_id  == 21){
 
-               $aux = SolicitudeItem::findOrFail($aux->origen_item_id);
+                $aux = SolicitudeItem::findOrFail($aux->origen_item_id);
             }else  if($aux->tipo_origen_id  == 22){
                 $aux = OrderItem::findOrFail($aux->origen_item_id);
             }else{

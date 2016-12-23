@@ -15,21 +15,10 @@ $app->get("Order/OldReviewDocs",'Orders\OrderController@getOldReviewDoc'); ///tr
 $app->get("Order/Notifications",'Orders\OrderController@getNotifications'); ///trae los mensajes del sistema
 $app->get("Order/Permision",'Orders\OrderController@getPermision'); ///trae los mensajes del sistema
 
-//Genericos
-$app->post("Order/RemoveToOrden",'Orders\OrderController@removeToOrden'); /// @deprecated
-$app->post("Order/RemoveOrdenItem",'Orders\OrderController@removeOrderItem'); ///
-$app->post("Order/EditOrdenItem",'Orders\OrderController@EditPedido'); //
 
 //otros modulos
 $app->get("Order/InvoiceAddress",'Orders\OrderController@getInvoiceAddressCountry'); ///obtiene las direcciones de facturacion
 $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry'); ///obtiene las direcciones de almacen
-$app->get("Order/ProviderContacts",'Orders\OrderController@getProviderContacts'); ///obtiene los contactos de un proveedor
-$app->get("Order/MailLenguaje",'Orders\OrderController@getPrefeLangXcontacts'); ///el lenguaje prof segun contactos proveedor
-$app->get("Order/Emails",'Orders\OrderController@getEmails'); ///obtiene las direcciones de almacen
-$app->get("Order/Pdf",'Orders\OrderController@testPdf'); ///obtiene las direcciones de almacen
-
-
-$app->post("Order/Mailsend",'Orders\OrderController@sendMail'); ///envia el correo
 
 //***productos */
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtiene los produtos de un proveedor
@@ -221,7 +210,10 @@ $app->get("Order/KitchenBoxReview",'Orders\OrderController@getKitchenBoxReview')
 $app->get("Order/Susstitute",'Orders\OrderController@getOrderSustitute'); // detalle del documento a sustituir
 
 // email
-$app->post("Order/mail/resend",'Orders\OrderController@resendEmail'); /// reenvia el email
+$app->get("Order/Mail/Providers",'Orders\OrderController@getProvidersEmails'); ///obtiene las direcciones de almacen
+
+$app->post("Order/Mail/resend",'Orders\OrderController@resendEmail'); /// reenvia el email
+$app->post("Order/Mail/send",'Orders\OrderController@sendMail'); ///envia el correo
 
 
 

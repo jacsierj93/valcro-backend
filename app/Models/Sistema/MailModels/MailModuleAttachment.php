@@ -29,13 +29,7 @@ class MailModuleAttachment extends Model
     // constructores
     function __construct()
     {
-        $a = func_get_args();
-        if(sizeof($a > 0)){
-            foreach ($a[0] as $key => $value){
-              $this[$key]= $value;
-            }
-        }
-        $this->save();
+
 
     }
 

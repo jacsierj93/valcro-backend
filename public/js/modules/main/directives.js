@@ -307,7 +307,6 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
     };
     $scope.addEmail = function(chip, tipo){
         chip.tipo= tipo;
-        $scope.out.push(chip);
         if($scope.lang){
             $scope.reviewContact(chip, tipo);
         }
@@ -354,7 +353,6 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
 /*
         $scope.destinos.splice($scope.destinos.indexOf(chip.correo),1);
 */
-        $scope.out.splice($scope.out.indexOf(chip.correo),1);
         angular.forEach(chip.langs, function (v, k) {
             $scope.addlangs[v] -- ;
         });

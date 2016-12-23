@@ -963,7 +963,7 @@
                                     Correo
                                 </div>
                             </div>
-
+<!--
                             <div layout="row" layout-align="center end" class="form-row-head-option">
                                 <div flex layout="column" layout-align="center center" ng-click="mode = (mode == 'adj') ? 'list': 'adj' ">
                                     <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
@@ -972,32 +972,31 @@
                                         {{(mode == 'adj')  ? 'Redactar' : 'Adjuntar' }}
                                     </md-tooltip>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                     <div  layout="row" flex >
                         <div active-left ></div>
                         <form name="mail"  class="focused" layout="column" flex  >
-
-
-
-                            <vldh-mail-contacts to="model.to" cc="model.cc" ccb="model.ccb" asunto="model.asunto" funciones="mainFn"></vldh-mail-contacts>
-                            <div layout="row" layout-align="start center">
+                            <vldh-mail-contacts correos="correos" to="model.to" cc="model.cc" ccb="model.ccb" asunto="model.asunto" funciones="mainFn"></vldh-mail-contacts>
+                            <div layout="row" layout-align="start center"  ng-show="mode != 'adj'" >
                                 <div>
                                     <md-switch class="md-primary" ng-model="model.inMyMail" ng-change="change(model.inMyMail)"> </md-switch>
                                 </div>
                                 <span>¿Recibir respuesta a mi correo?</span>
                             </div>
                             <textarea ng-model="model.content"
+                                      ng-show="mode != 'adj'"
                                       info="Texto a enviar"
                                       required
-                                      skip-tab
                                       placeholder="Texto a enviar"
                                       flex
-                            ></textarea>
+                                      style="border-top: solid 0.1px #ccc; border-bottom: solid 0.1px #ccc;"  ></textarea>
+                            <vld-file-up-img style="border-bottom: solid 0.1px #ccc;" ng-show="mode == 'adj'" funciones="AdjFn" up-model="upModel" fn-file-up="fnfile" key="MailCtrl" up-adjs="loades" storage="orders"></vld-file-up-img>
                         </form>
                     </div>
-                    <div layout="row" layout-align="start center" style="margin: 4px 0 4px 4px;">
+                    <div layout="row" layout-align="start center" style="margin: 4px 0 4px 0;">
+                        <div active-left ></div>
                         <div  class="blue-btn " ng-click="send()" style="width: 80px;  ">
                             <div layout="row" class="layout-row " aria-hidden="true" style="padding: 3px;">
                                 <div >
@@ -1005,14 +1004,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div layout="row" flex class="mail-attaments" layout-align="end center">
-                            <div layout layout-align="center center"  >
-                                A
-                            </div>
-                            <div layout layout-align="center center"  >
-                                A
-                            </div>
+                        <div layout="row" layout-align="center end" style="color: #999999;" flex>{{btnText}}</div>
+                        <div layout="row" layout-align="center end" class="form-row-head-option">
+                            <div flex layout="column" layout-align="center center" ng-click="mode = (mode == 'adj') ? 'list': 'adj' ">
+                                <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
 
+                                <md-tooltip >
+                                    {{(mode == 'adj')  ? 'Redactar' : 'Adjuntar' }}
+                                </md-tooltip>
+                            </div>
                         </div>
                     </div>
                 </div>
