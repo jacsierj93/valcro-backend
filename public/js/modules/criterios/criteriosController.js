@@ -812,7 +812,6 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.createModel = function(field){
         $scope.crit[''+field.id] = {value : "",childs:[]};
         $scope.isShow[field.id] = true;
-        console.log($scope.crit[''+field.id])
         for(i=0;i<field.deps.length;i++){
             var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");+
             key.childs.push(field.deps[i]);
@@ -862,11 +861,16 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
 }]);
 
 
-MyApp.controller('treeViewController',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
+MyApp.controller('treeController',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter','criterios',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter,criterios) {
     $scope.line = critForm.getLine();
-    $scope.$watch("line.id",function(){
-        $scope.criteria = critForm.get();
+
+    $scope.$watch("line.id",function(n){
+        $scope.treedata = criterios.query({type:"getTree",id:n});
+        console.log($scope.treedata)
     });
+    $scope.opts = {
+        templateUrl: 'testtpl.html'
+    };
   
 }]);
 

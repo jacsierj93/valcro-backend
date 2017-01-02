@@ -16,6 +16,8 @@
     <?= HTML::style("css/criterios.css") ?>
     <?= HTML::style("css/correos.css") ?>
     <?= HTML::style("components/font-awesome/css/font-awesome.min.css") ?>
+    <?= HTML::style("components/angular-tree-control/css/tree-control.css") ?>
+
 
     <?= HTML::script("components/jquery/dist/jquery.min.js") ?>
     <?= HTML::script("components/angular/angular.js") ?>
@@ -34,6 +36,9 @@
 
     <!--    demo file upload-->
     <?= HTML::script("components/ng-file-upload/ng-file-upload.min.js") ?>
+
+    <!--    angular tree controller (criterios)-->
+    <?= HTML::script("components/angular-tree-control/angular-tree-control.js") ?>
 
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>

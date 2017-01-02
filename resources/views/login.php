@@ -30,6 +30,8 @@
     <?= HTML::script('js/modules/main/vlcClickOut.js') ?>
     <!--    demo file upload-->
     <?= HTML::script("components/ng-file-upload/ng-file-upload.min.js") ?>
+    <!--    angular tree controller (criterios)-->
+    <?= HTML::script("components/angular-tree-control/angular-tree-control.js") ?>
 
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>

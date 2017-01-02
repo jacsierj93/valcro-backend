@@ -73,7 +73,7 @@
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center">
-                    <span class="icon-Actualizar" style="font-size: 23px"></span>
+                    <span class="icon-Actualizar" style="font-size: 23px" ng-click="openPopUp('treeLayer')"></span>
                     <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center" >
@@ -575,6 +575,7 @@
 
             </md-content>
         </md-sidenav>
+
         <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 952px); z-index:80;" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" click-out="closeDepend()" md-component-id="lyrConfig" id="lyrConfig" >
             <!-- 11) ########################################## MINI LAYER SELECTOR TIPO DE CAMPO ########################################## -->
 
@@ -689,6 +690,38 @@
                 </div>
             </div>
 
+        </md-sidenav>
+
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" style="width:calc(100% - 928px);" md-disable-backdrop="true" md-component-id="treeLayer" id="treeLayer" click-out="closePopUp('treeLayer',$event)">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <input type="hidden" >
+                <form name="fieldForm" layout="row" class="focused" ng-controller="treeController">
+                    <div style="width:24px; height: 100%;"></div>
+                    <div flex>
+                        <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
+                            <div>
+                                Tree
+                            </div>
+                        </div>
+                        <div layout="row" class="column">
+                            
+                            <treecontrol class="tree-classic" tree-model="treedata">
+
+                                <span ng-if="node.field" >
+                                    {{node.field.descripcion}}
+                                </span>
+                                <span ng-if="node.operador" >
+                                    {{node.operador}} {{node.valor}}
+                                </span>
+
+                            </treecontrol>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </md-content>
         </md-sidenav>
     </div>
     <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
