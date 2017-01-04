@@ -466,7 +466,7 @@
                                                                              md-item-text="item.nombre"
                                                                              md-no-asterisk
                                                                              md-min-length="0"
-
+                                                                             vl-no-clear
                                                                              class="Frm-value"
                                                             >
                                                                 <input >
@@ -474,7 +474,7 @@
                                                                     <span>{{item.nombre}}</span>
                                                                 </md-item-template>
                                                                 <md-not-found>
-                                                                    <a ng-click="createNewIten(ctrl.searchOpctions)">la opcion {{ctrl.searchOpctions}}, no existe
+                                                                    <a ng-click="createNewIten(ctrl)">la opcion <b>{{ctrl.searchOptions}}</b>, no existe
                                                                         crearla?</a>
                                                                 </md-not-found>
                                                             </md-autocomplete>

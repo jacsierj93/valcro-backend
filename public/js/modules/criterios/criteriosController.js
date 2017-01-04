@@ -380,7 +380,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
     $scope.setOptSel = function(elem){
-
+        console.log(elem)
         if(elem.selOption) {
             $scope.opcValue.opts.valor.push(elem.selOption.id);
 
@@ -550,20 +550,21 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.callNew = function(){
         $mdSidenav("newField").open()
     };
-    $scope.createNewIten = function(nuevo){
+    $scope.createNewIten = function(ctrl){
+        var nuevo = ctrl.searchOptions;
         criterios.put({type:"saveNewItemList"},{name:nuevo},function(data){
             setNotif.addNotif("ok", "item creado", [
-            ],{autohidden:3000});
+            ],{autohidden:1500});
+            $scope.listOptions.push({id:data.id,nombre:nuevo})
+            ctrl.selOption = {id:data.id,nombre:nuevo}
+
         });
     };
 
     $scope.opendDep = false;
     $scope.addDepend = function(deps){
         deps = deps || false;
-
         critForm.setDepend(deps)
-
-
         $mdSidenav("lyrConfig").open().then(function(){
             $scope.opendDep = true;
         });
@@ -817,7 +818,7 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
             key.childs.push(field.deps[i]);
             if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
                 $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
-                    console.log(n)
+                    //console.log(n)
                     isShow(n);
                 });
             }
@@ -866,7 +867,6 @@ MyApp.controller('treeController',['$scope', 'setNotif','masters','critForm','$m
 
     $scope.$watch("line.id",function(n){
         $scope.treedata = criterios.query({type:"getTree",id:n});
-        console.log($scope.treedata)
     });
     $scope.opts = {
         templateUrl: 'testtpl.html'
