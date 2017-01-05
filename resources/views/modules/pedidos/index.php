@@ -190,17 +190,15 @@
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-controller="OrderUpdateDoc"
-                         ng-show="(document.id && !Docsession.block )" ng-click="updateForm()">
+                         ng-show="(document.id && Docsession.block )" ng-click="updateForm()">
                         <span class="icon-Actualizar" style="font-size: 24px"></span>
                         <md-tooltip >
                             Actualizar la  {{formMode.name}}
                         </md-tooltip>
                     </div>
-                    <div style="width: 48px; height: 100%;" ng-click="allowEdit()" layout-align="center center" ng-show="( module.layer == 'listProducProv' && !Docsession.block  &&  !$parent.document.isAprobado)" >
-                        <div ng-click="OrderlistCreatedProducProvCtrl()" style="width: 24px; margin-top:8px;" >
-                            <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
-                        </div skip-tab >
-                        <md-tooltip >
+                    <div layout="column" ng-click="allowEdit();OrderlistCreatedProducProvCtrl(); " layout-align="center center" ng-show="( module.layer == 'listProducProv' && !Docsession.block  && !$parent.document.isAprobado)" >
+                        <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                                               <md-tooltip >
                             Crear Producto
                         </md-tooltip>
                     </div>
@@ -696,7 +694,7 @@
                     <form layout="row"  class="gridContent" flex>
                         <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
                         <div layout="column" flex="" ng-mouseleave="hoverLeave(false)"  >
-                            <div   ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : docOrder.order as filter"   id="doc{{$index}}"  >
+                            <div   ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : tbl.order as filter"   id="doc{{$index}}"  >
                                 <div layout="row" class="cellGridHolder" >
                                     <div  class=" cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)"  ng-click="DtPedido(item)"> </div>
                                     <div style="width: 120px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
@@ -1347,11 +1345,8 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex ng-click="allowEdit()" ng-show="$parent.formMode.value == '23' ">
                                     <label>Condicion de compra</label>
-                                    <md-autocomplete md-selected-item="condicion_cp"
-                                                     info="Establesca la condicion de compra, 'EXW' ex works ( en fábrica) quiere decir que nosotros recogemos la mercancía en la fábrica del proveedor; 'FOB', free on board (libre abordo) quere decir que el proveedor nos
-pone la mercancía en el barco, en el puerto de origen; 
-'CIF' cost insurance and Freight (costo seguro y flete) quiere decir
-que el proveedor nos pone la mercancía en Venezuela con seguro y todo incluido "
+                                    <md-autocomplete md-selected-item="$parent.document.condicion_cp"
+                                                     info="Establesca la condicion de compra"
                                                      ng-required="$parent.formMode.value == '23'"
                                                      ng-disabled="( $parent.document.uid == null || $parent.Docsession.block || $parent.document.isAprobado )"
                                                      ng-click="toEditHead('prov_id', provSelect.id)"
@@ -1366,12 +1361,12 @@ que el proveedor nos pone la mercancía en Venezuela con seguro y todo incluido 
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-item-change="toEditHead('document','condicion_cp',ctrl.condicion_cp );$scope.$parent.document.condicion_cp = ctrl.condicion_cp;"
+                                                     md-item-change="toEditHead('document','condicion_cp',$parent.document.condicion_cp  );"
 
 
                                     >
                                         <md-item-template>
-                                            <span>{{item.razon_social}}</span>
+                                            <span>{{item}}</span>
                                         </md-item-template>
                                         <md-not-found  >
                                             No se encontro la condicion de compra
@@ -2906,7 +2901,7 @@ que el proveedor nos pone la mercancía en Venezuela con seguro y todo incluido 
                                     </div>
                                 </div>
                                 <div layout=""  layout-align="center center"  >
-                                    <div  layout="row"  layout-align="end start" ng-show="finalDoc.fecha_aprob_compra">
+                                    <div  layout="row"  layout-align="end start" ng-show="finalDoc.fecha_aprob_compra.estado == 'upd'">
                                         <md-switch class="md-primary"
                                                    ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
                                                    ng-show="switchBack.head.change"
@@ -2925,7 +2920,7 @@ que el proveedor nos pone la mercancía en Venezuela con seguro y todo incluido 
                                     </div>
                                     <div class="rowRsmTitle"> Fecha </div>
                                 </div>
-                                <div class="rms" flex> {{document.estado }}</div>
+                                <div class="rms" flex> {{document.fecha_aprob_compra  | date :'dd/MM/yyyy'}}</div>
                             </div>
                         </div>
                     </div>
@@ -2939,7 +2934,7 @@ que el proveedor nos pone la mercancía en Venezuela con seguro y todo incluido 
                                     </div>
                                 </div>
                                 <div layout=""  layout-align="center center"  >
-                                    <div  layout="row"  layout-align="end start">
+                                    <div  layout="row"  layout-align="end start" ng-show="finalDoc.fecha_aprob_compra.estado == 'upd'" >
                                         <md-switch class="md-primary"
                                                    ng-model="switchBack.head.model" ng-change ="(switchBack.head.model)? 0:toSideNave(switchBack.head,'¿Desea revisar los cambio realizados en la {{formMode.name}} ? ',['#detalleDoc div.activeleft '])"
                                                    ng-show="switchBack.head.change"
@@ -2958,7 +2953,7 @@ que el proveedor nos pone la mercancía en Venezuela con seguro y todo incluido 
                                     </div>
                                     <div class="rowRsmTitle"> Fecha </div>
                                 </div>
-                                <div class="rms" flex> {{document.estado }}</div>
+                                <div class="rms" flex> {{document.fecha_aprob_gerencia | date :'dd/MM/yyyy' }}</div>
                             </div>
                         </div>
                     </div>

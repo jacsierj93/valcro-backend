@@ -2183,8 +2183,8 @@ MyApp.controller('OrderUpdateDoc',['$scope','Order','setGetOrder', function ($sc
                 $model.reload({id:response.id, tipo:$scope.$parent.formMode.value});
             }
         });
-        setGetOrder.change("document","final_id", undefined);
-        setGetOrder.setState('upd');
+        $model.change("document","final_id", undefined);
+        $model.setState('upd');
         $scope.Docsession.global='upd';
     };
 
@@ -2540,6 +2540,7 @@ MyApp.controller('OrderAgrPedCtrl',['$scope','Order','masters','clickCommitSrv',
     $scope.next = function () {
         if($scope.document.productos.contraPedido.length == 0
             && $scope.document.productos.kitchenBox.length == 0
+            && !$scope.document.isAprobado
         ){
 
             $scope.NotifAction("alert", "¡No agregaste ni un contra pedido, ni un kitchenBox, es raro no cargar al menos un contra pedido, ¿igual quieres continuar?",
@@ -3283,10 +3284,10 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
             if(response.actions){
                 accions.push( {name:"Solo Guardar",action:$scope.save});
                 if(response.actions.indexOf('sendPrv') != -1){
-                    accions.push( {name:"Informar a departamentos",action:function () { $scope.send({action:'sendPrv'})}});
+                    accions.push( {name:"Enviar al proveedor ",action:function () { $scope.send({action:'sendPrv'})}});
                 }
                 if(response.actions.indexOf('sendIntern') != -1){
-                    accions.push( {name:"Enviar a proveedor",action:function () { $scope.send({action:'sendIntern'})}});
+                    accions.push( {name:"Informar a departamentos",action:function () { $scope.send({action:'sendIntern'})}});
                 }
                 $scope.NotifAction("alert", "¿Que desea hacer?",accions,{block:true});
 
@@ -3341,7 +3342,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
     };
 
     $scope.buildfinalDoc = function(){
-        $scope.finalDoc = {contra:{},kitchen:{},pedidoSusti:{},import:{}, todos:{}, document:{}, aprob_gerencia:{}, aprob_compras:{}};
+        $scope.finalDoc = {contra:{},kitchen:{},pedidoSusti:{},import:{}, todos:{}, document:{}, fecha_aprob_gerencia:{}, fecha_aprob_compr:{}};
         console.log("setGetOrder.getForm() ", setGetOrder.getForm());
         angular.forEach(setGetOrder.getForm(), function(v,k){
                 if(k.startsWith('contra')){
@@ -3356,12 +3357,30 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
                 if(k.startsWith('todos')){
                     $scope.finalDoc.todos[v.id] = 'upd';
                 }
+
+
             }
         );
         angular.forEach(setGetOrder.getForm('document'), function(v,k){
                 if(v.estado  && v.estado  != 'new'){
                     $scope.finalDoc.document[k]= v;
                     $scope.finalDoc.document.estado = 'upd';
+                }
+            }
+
+        );
+        angular.forEach(setGetOrder.getForm('fecha_aprob_compra'), function(v,k){
+                if(v.estado  && v.estado  != 'new'){
+                    $scope.finalDoc.fecha_aprob_compra[k]= v;
+                    $scope.finalDoc.fecha_aprob_compra.estado = 'upd';
+                }
+            }
+
+        );
+        angular.forEach(setGetOrder.getForm('fecha_aprob_gerencia'), function(v,k){
+                if(v.estado  && v.estado  != 'new'){
+                    $scope.finalDoc.fecha_aprob_gerencia[k]= v;
+                    $scope.finalDoc.fecha_aprob_gerencia.estado = 'upd';
                 }
             }
 
@@ -3535,106 +3554,9 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
     $scope.upFiles = function (newVal,olv, data) {
         console.log("data", data);
     };
-    /* $scope.isOpen= false;
-     $scope.destinos =[];
-     $scope.emailToText='';
-     $scope.inProgress=false;
-     $scope.transformChip = function(chip) {
-     if (angular.isObject(chip)) {
-     return chip;
-     }
-     if(IsEmail(chip)!= null){
-     return {valor:chip,razon_social:''};
-     }
-     return null;
-     };
-     $scope.$parent.openSendMail = function(calback){
-     if (calback){
-     $scope.calback=calback;
-     }else{
-     delete $scope.calback;
-     }
-     $mdSidenav("sendEmail").open().then(function(){
-     $scope.isOpen= true;
-     $scope.showHead= true;
-     $scope.showCc= false;
-     $scope.showCco= false;
-     $scope.usePersonal= true;
-     $scope.to = [];
-     $scope.cc = [];
-     $scope.cco = [];
-     $scope.asunto='';
-     $scope.text='';
-     $scope.FormSendMail.$setPristine();
-     $scope.FormSendMail.$setUntouched();
-
-
-     Order.query({type:'ProviderEmails',prov_id:$scope.$parent.provSelec.id},{},function(response){
-     $scope.correosProvider= response;
-     });
-     });
-     };
-
-     $scope.close = function(e){
-     if(jQuery(e.target).parents("#lyrAlert").length == 0
-     && jQuery(e.target).parents("#sendEmail").length == 0
-     && jQuery(e.target).parents("#noti-button").length == 0
-     && jQuery(e.target).parents(".md-chip-remove").length == 0
-     && jQuery(e.target).parents("#blockXLevel").length == 0
-
-     && $scope.isOpen
-
-     ){
-     $mdSidenav("sendEmail").close().then(function(){
-     $scope.isOpen = false;
-     $scope.emailToText='';
-     $scope.useMailSyte= false;
-     });
-     }
-
-     };
-
-
-     $scope.addEmail = function(chip){
-     $scope.destinos.push(chip.valor+chip.razon_social);
-     };
-
-     $scope.removeEmail = function(chip){
-     var index = $scope.destinos.indexOf(chip.valor+chip.razon_social);
-     $scope.destinos.splice(index,1);
-     };
-     $scope.isAddMail = function(val){
-     return  $scope.destinos.indexOf(val.valor+val.razon_social) === -1;
-     };
-
-     $scope.send = function(){
-     if($scope.to.length == 0){
-     $scope.$parent.NotifAction('error','Debe asignar al menos un destinatario',[],{autohidden:SYSTEM.noti_autohidden});
-     }
-     else if(!$scope.FormSendMail.$valid){
-     $scope.$parent.NotifAction('error','Por favor asigne un texto',[],{autohidden:SYSTEM.noti_autohidden});
-
-     }else{
-     $scope.inProgress=true;
-     App.setBlock({block:true,level:89});
-     Order.post({type:"Mailsend"} ,{asunto:$scope.asunto, texto:$scope.texto, to:$scope.to,cc:$scope.cc, cco:$scope.cco ,local:!$scope.usePersonal}, function(response){
-     if(response.accion){
-     if( $scope.calback){
-     $scope.calback(response.accion);
-     }
-     $scope.inProgress=false;
-     App.setBlock({block:false});
-     }
-
-
-
-     });
-     }
-     }*/
-
 }]);
 
-MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form',  function($scope, $timeout,$mdSidenav,Order, formSrv){
+MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form', 'setGetOrder', function($scope, $timeout,$mdSidenav,Order, formSrv,$model){
 
     $scope.defaultUrl =  {type:$scope.$parent.formMode.mod, mod:"SaveProductItem"};
     $scope.block= false;
@@ -3755,6 +3677,15 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
             $scope.isProcess= false;
             formSrv.setData({model:send, response:response});
             formSrv.setBind(true);
+
+            send.reng_id = response.reng_id;
+           if(response.accion == 'new'){
+               $model.change("productos"+response.reng_id,undefined,send);
+           }else{
+               $model.change("productos"+response.reng_id,'cantidad',response.cantidad);
+               $model.change("productos"+response.reng_id,'saldo',response.saldo);
+               $model.change("productos"+response.reng_id,'reng_id',response.reng_id);
+           }
             $timeout(function () {
                 formSrv.setBind(false);
             },5);
@@ -3764,9 +3695,6 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
         if(fn){
             fn();
         }
-    };
-    $scope.delete = function (fn) {
-        $scope.NotifAction("alert","Eliminado",[],{autohidden:1500});
     };
     $scope.inClose = function (fn) {
 
