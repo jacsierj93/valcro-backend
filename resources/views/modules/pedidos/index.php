@@ -293,9 +293,6 @@
             </div>
         </div>
 
-
-
-
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="OrderlistImportDoc" id="OrderlistImportDoc">
             <!-- 11) ########################################## CONTENDOR LISTA DE PEDIDOS ########################################## -->
             <md-content  layout="row" flex class="sideNavContent" ng-controller="OrderlistDocImportCtrl">
@@ -696,24 +693,24 @@
                         <div layout="column" flex="" ng-mouseleave="hoverLeave(false)"  >
                             <div   ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : tbl.order as filter"   id="doc{{$index}}"  >
                                 <div layout="row" class="cellGridHolder" >
-                                    <div  class=" cellEmpty" ng-mouseover="hoverpedido(item)"  ng-mouseenter="hoverEnter()" ng-mouseleave="hoverLeave(false)"  ng-click="DtPedido(item)"> </div>
-                                    <div style="width: 120px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
+                                    <div  class=" cellEmpty" ng-mouseenter="hoverpedido(item)" ng-mouseleave="hoverpedido()" ng-mouseover="notCloseSumary()" ng-click="DtPedido(item)"> </div>
+                                    <div style="width: 120px;" class="cellEmpty cellSelect"  tabindex="{{$index + 1}}">
 
                                         <div layout-align="center center"  style="text-align: center; width: 100%; ">
                                             <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
                                         </div>
 
                                     </div>
-                                    <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.titulo}}</div>
-                                    <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.nro_proforma}}</div>
-                                    <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
-                                    <div style="width: 80px;text-align: -webkit-center; " class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)">
+                                    <div flex class="cellGrid"  ng-click="DtPedido(item)"> {{item.titulo}}</div>
+                                    <div flex="10" class="cellGrid"  ng-click="DtPedido(item)"> {{item.nro_proforma}}</div>
+                                    <div flex="10" class="cellGrid"  ng-click="DtPedido(item)"> {{item.emision| date:'dd/MM/yyyy' }}</div>
+                                    <div style="width: 80px;text-align: -webkit-center; " class="cellGrid"  ng-click="DtPedido(item)">
                                         <div style="width: 16px; height: 16px; border-radius: 50%"
                                              class="emit{{item.diasEmit}}"></div>
                                     </div>
-                                    <div flex="10" class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.nro_factura}}</div>
-                                    <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
-                                    <div flex class="cellGrid" ng-mouseover="hoverPreview(true)" ng-click="DtPedido(item)">{{item.comentario}}</div>
+                                    <div flex="10" class="cellGrid"  ng-click="DtPedido(item)"> {{item.nro_factura}}</div>
+                                    <div flex class="cellGrid"  ng-click="DtPedido(item)"> {{item.monto | currency :(item.symbol)?item.symbol:'' :2}}</div>
+                                    <div flex class="cellGrid"  ng-click="DtPedido(item)">{{item.comentario}}</div>
                                     <div style="width: 80px; text-align: -webkit-center;"  class="cellEmpty "
                                          layout-align="center center" layout="row"
                                          ng-click="addAnswer(item)"
@@ -740,10 +737,10 @@
         <md-sidenav style="margin-top:96px; margin-bottom:48px; " class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="resumenPedido" id="resumenPedido">
             <!--  ########################################## CONTENDOR  RESUMEN PEDIDO ########################################## -->
             <md-content  layout="row" flex class="sideNavContent"
-                         ng-class="{preview: preview }"
-                         flex ng-mouseover="hoverPreview(false)"
+                         ng-class="{preview: opaque }"
+                         flex ng-mouseover="opaque = false;"
+                         ng-controller="resumenPedidoCtrl"
             >
-                <!--  ##########################################  DIV BUT ########################################## -->
 
                 <div active-left before="verificExit"></div>
                 <!----PRIMERA COLUMNA DETALLE DE PEDIDO---->
@@ -829,70 +826,48 @@
                             </div>
                         </div>
                     </form>
-                    <form layout="row" ng-init="tblResumenPe.order = 'cod_producto' ">
-                        <div flex="15" layout="row"  >
-                            <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                <div  layout-align="end center" ng-click="tblResumenPe.order = 'cod_producto' " ><img ng-src="{{(tblResumenPe.order == 'cod_producto') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                <div layout-align="star center" ng-click="tblResumenPe.order = '-cod_producto' " ><img ng-src="{{(tblResumenPe.order == 'cod_producto') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                            </div>
+                    <div layout="row" ng-init="tblResumenPe.order = 'cod_producto' ">
+                        <div flex="15" layout="row">
                             <md-input-container class="md-block"  flex>
                                 <label>Codigo</label>
-                                <input type="text" class="inputFilter"  ng-minlength="1"
-                                       ng-model="tblResumenPe.filter.cod_producto"
+                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                       ng-model="tbl.filter.cod_producto"
                                        skip-tab
                                 >
                             </md-input-container>
-
+                            <grid-order-by ng-model="tbl" key="cod_producto"></grid-order-by>
                         </div>
-                        <div flex layout="row"  >
-                            <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                <div  layout-align="end center" ng-click="tblResumenPe.order = 'descripcion' " ><img ng-src="{{(tblResumenPe.order == 'descripcion')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                <div layout-align="star center" ng-click="tblResumenPe.order = '-descripcion' "><img ng-src="{{(tblResumenPe.order == '-descripcion') ?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                            </div>
-
+                        <div flex layout="row">
                             <md-input-container class="md-block"  flex>
                                 <label>Descripicion</label>
-                                <input type="text" class="inputFilter"  ng-minlength="1"
-                                       ng-model="tblResumenPe.filter.descripcion"
+                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                       ng-model="tbl.filter.descripcion"
                                        skip-tab
                                 >
                             </md-input-container>
-
+                            <grid-order-by ng-model="tbl" key="descripcion"></grid-order-by>
                         </div>
-
-                        <div flex layout="row"  >
-                            <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                <div  layout-align="end center" ng-click="tblResumenPe.order = 'documento' " ><img ng-src="{{(tblResumenPe.order == 'documento')?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                <div layout-align="star center" ng-click="tblResumenPe.order = '-documento' " ><img ng-src="{{(tblResumenPe.order == '-documento')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                            </div>
-
+                        <div flex layout="row">
                             <md-input-container class="md-block"  flex>
                                 <label>Origen</label>
-                                <input type="text" class="inputFilter"  ng-minlength="1"
-                                       ng-model="tblResumenPe.filter.documento"
+                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                       ng-model="tbl.filter.documento"
                                        skip-tab
                                 >
                             </md-input-container>
-
+                            <grid-order-by ng-model="tbl" key="documento"></grid-order-by>
                         </div>
-
-                        <div flex="10" layout="row"  >
-                            <div class="cell-filter-order" layout-align="center center" layout="column" >
-                                <div  layout-align="end center" ng-click="tblResumenPe.order = 'saldo' " ><img ng-src="{{(tblResumenPe.order == 'saldo') ?'images/TrianguloUp.png' : 'images/Triangulo_2_claro-01.png'}}"></div>
-                                <div layout-align="star center" ng-click="tblResumenPe.order = '-saldo' " ><img ng-src="{{(tblResumenPe.order == '-saldo')?'images/TrianguloUp.png' : 'images/Triangulo_1_claro.png'}}"/></div>
-                            </div>
-
+                        <div flex layout="row">
                             <md-input-container class="md-block"  flex>
                                 <label>Cantidad</label>
-                                <input type="text" class="inputFilter"  ng-minlength="1"
-                                       ng-model="tblResumenPe.filter.saldo"
+                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                       ng-model="tbl.filter.saldo"
                                        skip-tab
                                 >
                             </md-input-container>
-
+                            <grid-order-by ng-model="tbl" key="saldo"></grid-order-by>
                         </div>
-
-                    </form>
+                    </div>
                     <form layout="row"  class="gridContent">
                         <div  layout="column" flex="">
                             <div flex>
@@ -910,7 +885,7 @@
                     </form>
                 </div>
 
-                <div style="width: 16px;" ng-mouseover="showNext(true)"  > </div>
+                <div style="width: 16px;"  ng-mouseenter="$parent.nextLayer = next " > </div>
             </md-content>
         </md-sidenav>
 
