@@ -23,6 +23,9 @@ $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry');
 //***productos */
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtiene los produtos de un proveedor
 
+ /**debuggin*/
+$app->get("Order/Test",'Orders\OrderController@ test()'); ///@deprecated
+
 
 //form
 $app->get("Order/Order",'Orders\OrderController@getOrden'); ///@deprecated
@@ -42,12 +45,6 @@ $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae 
 
 $app->get("Order/KitchenBox",'Orders\OrderController@getKitchenBox'); ///trae tod el detalle de kitchenbox
 $app->get("Order/KitchenBoxs",'Orders\OrderController@getKitchenBoxs'); /// obtiene las kitchen box de proveedor
-
-// import
-$app->get("Order/OrderToImport",'Orders\OrderController@getOrderToImport'); /// obtien los pedidos(Proforma) q son aptas para importar
-
-// compare
-$app->get("Order/BetweenOrderToPurchase",'Orders\OrderController@getDiffbetweenOrderToPurchase'); /// compara y trae las diferncias entre un Pedido(Proforma) y una orden de copra
 
 
 $app->post("Order/CreateTemp",'Orders\OrderController@createTemp'); ///crea un producto temporal

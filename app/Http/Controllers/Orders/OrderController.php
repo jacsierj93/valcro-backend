@@ -77,8 +77,8 @@ class OrderController extends BaseController
         'en' => 'emails.modules.Order.External.en.ProviderEstimate'
     ]];
 
-    private $profile = ['gerente' => '6', 'trabajador' => '10', 'jefe' => '9'];
-    private $departamentos = ['compras' => '17', 'propetario' => '18', 'auditoria' => '22','gerente_dp' => '21','gerente_dp' => '19'];
+    private $profile = ['gerente' => '6', 'trabajador' => '10', 'jefe' => '9','gerente_adm'=>'8'];
+    private $departamentos = ['compras' => '17', 'propetario' => '18', 'auditoria' => '22','gerente_dp' => '21','gerente_adm' => '21'];
     private $user = null;
 
 
@@ -397,7 +397,9 @@ class OrderController extends BaseController
         $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 61 and  90 ") . ") as review90 ";
         $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " > 90 ") . ") as review100 ";
 
-        $provs = Provider::selectRaw($rawn)->whereRaw("(select count(id) from tbl_prov_moneda where prov_id = tbl_proveedor.id) > 0 ")->get();
+        $provs = Provider::selectRaw($rawn)
+            ->with('getProviderCoin','getPaymentCondition')
+            ->get();
         /*     foreach($provs as $aux){
                  $paises= [];
                  foreach( $aux->getCountry() as $p){
@@ -724,295 +726,129 @@ class OrderController extends BaseController
         return ['contactos' => $resut, 'idiomas' => $lang->unique()->values(), 'default' => $default, 'eval' => $eval, 'all' => $lang];
     }
 
+    /*********************** GENERICOS ************************/
+    public function getDocument(Request $req){
+        $model = $this->getDocumentIntance($req->tipo);
+        $model = $model->findOrFail($req->id);
+        $prov= Provider::find($model->prov_id);
+        $objs =[];
+        //para maquinas
+        $tem = array();
+        $tem['id']=$model->id;
+        $tem['tipo']=$model->getTipoId();
+        $tem['pais_id']=$model->pais_id;
+        $tem['fecha_envio']=$model->fecha_envio;
+        $tem['puerto_id']=$model->puerto_id;
+        $tem['final_id']=$model->final_id;
+        $tem['direccion_almacen_id']=$model->direccion_almacen_id;
+        $tem['direccion_facturacion_id']=$model->direccion_facturacion_id;
+        $tem['prov_id']=$model->prov_id;
+        $tem['condicion_pago_id']=$model->condicion_pago_id;
+        $tem['motivo_pedido_id']=$model->motivo_pedido_id;
+        $tem['prioridad_id']=$model->prioridad_id;
+        $tem['condicion_pedido_id']=$model->condicion_pedido_id;
+        $tem['prov_moneda_id']=$model->prov_moneda_id;
+        $tem['estado_id']=$model->estado_id;
+        $tem['doc_parent_id']=$model->doc_parent_id;
+        $tem['doc_parent_origen_id']=$model->doc_parent_origen_id;
+        $tem['uid']=$model->uid;
+        // pra humanos
+        $tem['comentario']=$model->comentario;
+        $tem['tasa']=$model->tasa;
+        $tem['proveedor']=($prov != null)? $prov->razon_social: '';
+        $tem['documento']= $model->type;
+        $tem['titulo']= $model->titulo;
+        $tem['diasEmit']=$model->daysCreate();
+        $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
+        $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_gerencia ;
+        $tem['img_aprob'] =$model->fecha_aprob_compra ;
+        $tem['isAprobado'] = ($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null);
+        $tem['aprobado'] = ['nro_doc'=>$model->nro_doc,'adjs'=>[]];
+        $tem['condicion_cp'] =$model->condicion_cp ;
 
+        $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
 
-    /*********************** Create  ************************/
-    public function CreateSolicitude(Request $req)
-    {
-        $model = Solicitude::findOrFail($req->id);
-        $response = [];
-        $sender = ['to' => [['email' => 'meqh1992@gmail.com', 'name' => 'Miguel Eduadro'], ['email' => 'mquevedo.sistemas@valcro.co', 'name' => 'Miguel Eduadro']]
-            , 'cc' => [], 'ccb' => []
-            , 'asunto' => 'Notificacion de creacion de solicitud'];
-
-        $data = $this->parseDocToSummaryEmail($model);
-        $data['accion'] = $sender['asunto'];
-        $this->sendNotificacion($data, $sender);
-
-        $response['success'] = 'enviado';
-        $response['to'] = $sender['to'];
-        $response['cc'] = $sender['cc'];
-        $response['ccb'] = $sender['ccb'];
-        $response['noti'] = $req->session()->get('DATAUSER')['email'];
-        return $response;
-
-
-    }
-
-
-    /*********************** Approved Purchases ************************/
-/*
-
-    public function ApprovedPurchasesOrder(Request $req)
-    {
-
-        $response = [];
-        $model = Order::findOrFail($req->id);
-
-        $model->fecha_aprob_compra = $req->fecha_aprob_compra;
-        $model->nro_doc = $req->nro_doc;
-
-        $response['response'] = $model->save();
-
-        $response['success'] = 'Pedido aprobado';
-        $response['accion'] = 'upd';
-
-        return $response;
-
-    }
-
-    public function ApprovedPurchasesPurchase(Request $req)
-    {
-
-        $response = [];
-        $model = Purchase::findOrFail($req->id);
-
-        $model->fecha_aprob_compra = $req->fecha_aprob_compra;
-        $model->nro_doc = $req->nro_doc;
-        $response['response'] = $model->save();
-
-        $response['success'] = 'ODC aprobada';
-
-        $response['accion'] = $model->fecha_aprob_compra == null ? 'new' : 'upd';
-        return $response;
-
-    }*/
-
-
-
-    /*********************** IMPORT ************************/
-
-    /**
-     * obtiene los pedidos que se pueden inportar
-     */
-    public function getOrderToImport(Request $req)
-    {
-        $data = array();
-        $items = Order::where('id', "<>", $req->id)->whereNotNull('final_id')->whereNull('fecha_sustitucion')
-            //  ->where('aprob_compras' ,1)
-            //  ->where("aprob_gerencia", 1)
-            ->whereNull("comentario_cancelacion");
-
-        $type = OrderType::get();
-        $items = $items->get();
-        $prov = Provider::findOrFail($req->prov_id);
-        $coin = Monedas::get();
-        $motivo = OrderReason::get();
-        $prioridad = OrderPriority::get();
-        $estados = OrderStatus::get();
-        $paises = Country::get();
-        $purchase = Purchase::get();
-        foreach ($items as $aux) {
-            $paso = true;
-            if (sizeof($purchase->where('doc_parent_id', $aux->id)->where('doc_parent_origen_id', '21')) > 0) {
-                $paso = false;
-            }
-            if ($paso) {
-                //para maquinas
-                $tem = array();
-                $tem['id'] = $aux->id;
-                //$tem['tipo_id']=$aux->tipo_pedido_id;
-                $tem['pais_id'] = $aux->pais_id;
-                $tem['direccion_almacen_id'] = $aux->direccion_almacen_id;
-                $tem['condicion_pago_id'] = $aux->condicion_pago_id;
-                $tem['motivo_pedido_id'] = $aux->motivo_pedido_id;
-                $tem['prioridad_id'] = $aux->prioridad_id;
-                $tem['condicion_pedido_id'] = $aux->condicion_pedido_id;
-                $tem['prov_moneda_id'] = $aux->prov_moneda_id;
-                $tem['estado_id'] = $aux->estado_id;
-                // $tem['tipo_value']=$aux->typevalue;
-                // pra humanos
-                $tem['comentario'] = $aux->comentario;
-                $tem['titulo'] = $aux->titulo;
-                $tem['tasa'] = $aux->tasa;
-                $tem['proveedor'] = $prov->razon_social;
-                $tem['documento'] = $aux->getTipo();
-                $tem['diasEmit'] = $aux->daysCreate();
-                $tem['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
-                $tem['fecha_aprob_compra'] = $aux->fecha_aprob_compra;
-                $tem['fecha_aprob_gerencia'] = $aux->fecha_aprob_compra;
-                $tem['img_aprob'] = $aux->fecha_aprob_compra;
-
-
-                if ($aux->motivo_id) {
-                    $tem['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
-                }
-                if ($aux->pais_id) {
-                    //$tem['pais']=$paises->where('id',$aux->pais_id)->first()->short_name;
-                }
-                if ($aux->prioridad_id) {
-                    $tem['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
-                }
-                if ($aux->prov_moneda_id) {
-                    $tem['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
-                }
-                if ($aux->prov_moneda_id) {
-                    $tem['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
-                }
-                if ($aux->tipo_id != null) {
-                    $tem['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
-                }
-
-
-                $tem['nro_proforma'] = $aux->nro_proforma;
-                $tem['nro_factura'] = $aux->nro_factura;
-                $tem['img_proforma'] = $aux->img_proforma;
-                $tem['img_factura'] = $aux->img_factura;
-                $tem['mt3'] = $aux->mt3;
-                $tem['peso'] = $aux->peso;
-                $tem['emision'] = $aux->emision;
-                $tem['monto'] = $aux->monto;
-
-                /**actualizar cuando este el final**/
-                $tem['almacen'] = "Desconocido";
-
-                // modificar cuando se sepa la logica
-                $tem['aero'] = 1;
-                $tem['version'] = $aux->version;
-                $tem['maritimo'] = 1;
-                $data[] = $tem;
-            }
+        if($model->motivo_id){
+            $tem['motivo']=OrderReason::findOrFail($model->motivo_id)->motivo;
+        }
+        if($model->pais_id){
+            $tem['pais']=Country::findOrFail($model->pais_id)->short_name;
+        }
+        if($model->prioridad_id){
+            $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
         }
 
+        if($model->prov_moneda_id){
+            $mone=Monedas::findOrFail($model->prov_moneda_id);
+            $tem['moneda']=$mone->nombre;
+            $tem['symbol']=$mone->simbolo;
 
-        return $data;
-    }
-
-
-
-
-
-
-    /*********************** COMPARE ************************/
-
-
-    /**
-     * moetod que compara un pedido  y una orden de compra y muestra las diferencias por campos entre ellos
-     */
-    public function getDiffbetweenOrderToPurchase(Request $req)
-    {
-        $data = array();
-        $error = array();
-        $asigna = array();
-        $compare = array('titulo', 'pais_id', 'motivo_id', 'prov_moneda_id', 'mt3', 'peso',
-            'direccion_almacen_id', 'direccion_facturacion_id', 'puerto_id', 'condicion_id', 'tasa', 'comentario'
-        );
-        $prin = Purchase::findOrFail($req->princ_id);// id de la proforma
-        $import = Order::findOrFail($req->impor_id);// id de la solicitud princ_id
-        $asigna['monto'] = $prin->monto + $import->monto;
-        $asigna['mt3'] = $prin->mt3 + $import->mt3;
-        foreach ($compare as $aux) {
-            $ordval = $prin->getAttributeValue($aux);
-            $solval = $import->getAttributeValue($aux);
-            $data['comp'][] = array('ord' => $ordval, 'solv' => $solval, 'key' => $aux);
-            if ($solval == null && $ordval != null) {
-                $asigna[$aux] = $ordval;
-            } else if ($solval != null && $ordval == null) {
-                $asigna[$aux] = $solval;
-            }
-            if ($solval != null && $ordval != null) {
-
-
-                if ($solval != $ordval) {
-                    $temp0 = array();
-                    $temp1 = array();
-
-                    $temp0['key'] = $solval;
-                    $temp1['key'] = $ordval;
-
-                    switch ($aux) {
-                        case "prov_moneda_id":
-                            $mon = Monedas::findOrFail($solval);
-                            $mon2 = Monedas::findOrFail($ordval);
-                            $temp0['text'] = $mon->nombre;
-                            $temp1['text'] = $mon2->nombre;
-                            break;
-                        case "pais_id":
-                            $mon = Country::find($solval);
-                            $mon2 = Country::find($ordval);
-                            if ($mon != null) {
-                                $temp0['text'] = $mon->short_name;
-                                $temp1['text'] = $mon2->short_name;
-                            }
-                            if ($mon2 != null) {
-                                $temp1['text'] = $mon2->short_name;
-                            }
-
-
-                            break;
-                        case "motivo_id":
-                            $mon = OrderReason::findOrFail($solval);
-                            $mon2 = OrderReason::findOrFail($ordval);
-                            $temp0['text'] = $mon->motivo;
-                            $temp1['text'] = $mon2->motivo;
-                            break;
-                        case "direccion_almacen_id" || "direccion_facturacion_id":
-                            if ($solval != 0 && $ordval != 0) {
-                                $mon = ProviderAddress::findOrFail($solval);
-                                $mon2 = ProviderAddress::findOrFail($ordval);
-                                $temp0['text'] = $mon->direccion;
-                                $temp1['text'] = $mon2->direccion;
-                            }
-
-                            break;
-                        /*       case "direccion_facturacion_id":
-                                   $mon=ProviderAddress::findOrFail($solval);
-                                   $mon2=ProviderAddress::findOrFail($ordval);
-                                   $temp0['text'] =$mon->direccion;
-                                   $temp1['text'] =$mon2->direccion;
-                                   break;*/
-                        case "puerto_id" :
-                            $mon = Ports::findOrFail($solval);
-                            $mon2 = Ports::findOrFail($ordval);
-                            $temp0['text'] = $mon->Main_port_name;
-                            $temp1['text'] = $mon2->Main_port_name;
-                            break;
-                        case "condicion_id" :
-                            $mon = OrderCondition::findOrFail($solval);
-                            $mon2 = OrderCondition::findOrFail($ordval);
-                            $temp0['text'] = $mon->Main_port_name;
-                            $temp1['text'] = $mon2->Main_port_name;
-                            break;
-
-
-                    }
-                    $error[$aux][] = $temp0;
-                    $error[$aux][] = $temp1;
-
-                }
-            }
         }
 
-
-        $solItms = $import->items()->get();
-        if (sizeof($solItms) > 0) {
-            $prods = array();
+        if($model->tipo_id != null){
+            $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
         }
 
-        $data['error'] = $error;
-        $data['asignado'] = $asigna;
-        $data['items'] = $solItms;
-        return $data;
+        $tem['nro_proforma']= ['doc'=>$model->nro_proforma, 'adjs'=>[]];
+        $tem['nro_factura']= ['doc'=>$model->nro_factura, 'adjs'=>[]];
+        $tem['nro_doc']=$model->nro_doc;
+        $tem['img_proforma']=$model->img_proforma;
+        $tem['img_factura']=$model->img_factura;
+        $tem['mt3']=$model->mt3;
+        $tem['peso']=$model->peso;
+        $tem['emision']=$model->emision;
+        $tem['usuario_id']=$model->usuario_id;
+        $tem['monto']=$model->monto;
+        $tem['productos'] =$this->getProductoItem($model);
+        $objs['prov_id']=$prov;
+        $objs['prov_moneda_id'] = Monedas::find($model->prov_moneda_id);
+        $objs['direccion_facturacion_id'] = ProviderAddress::find($model->direccion_facturacion_id);
+        $objs['direccion_almacen_id'] = ProviderAddress::find($model->direccion_almacen_id);
+        $objs['pais_id'] = Country::find($model->pais_id);
+        $objs['condicion_pago_id'] =  ProviderCondPay::find($model->condicion_pago_id);
+        $objs['puerto_id'] = Ports::find($model->puerto_id);
+        /**actualizar cuando este el final**/
+        $tem['almacen']="Desconocido";
+
+        // modificar cuando se sepa la logica
+        $tem['aero']=1;
+        $tem['version']=$model->version;
+        $tem['maritimo']=1;
+        $atts = array();
+
+
+        foreach($model->attachments()->where('documento','PROFORMA')->get() as $aux){
+            $att = attachment_file($aux->archivo_id);
+            foreach ($att as $key => $value){
+                $att[$key]= $value;
+            }
+            $tem['nro_proforma']['adjs'] = $att;
+        }
+        foreach($model->attachments()->where('documento','FACTURA')->get() as $aux){
+            $att = attachment_file($aux->archivo_id);
+            foreach ($att as $key => $value){
+                $att[$key]= $value;
+            }
+            $tem['nro_factura']['adjs'] = $att;
+        }
+        foreach($model->attachments()->whereRaw('documento like \'ap_%\'')->get() as $aux){
+            $att = attachment_file($aux->archivo_id);
+            foreach ($att as $key => $value){
+                $att[$key]= $value;
+            }
+            $tem['Aprobado']['adjs'] = $att;
+        }
+        $tem['adjuntos'] = $atts;
+
+        $tem['objs']=$objs;
+
+        $tem['permit'] = $this->getPermisionDoc($model);
+
+
+
+        return $tem;
+
     }
-
-
-
-
-
-
-
-
-
     /*********************** PRODUCTOS ************************/
     public function getProviderProducts(Request $req)
     {
@@ -1425,10 +1261,53 @@ class OrderController extends BaseController
     {
         $resul['action'] = "upd";
         $model = Solicitude::findOrFail($req->id);
-        $model->edit_usuario_id = $this->user->id;
+        $validator = Validator::make($req->all(), [
+            'prov_id' => 'required',
+            'titulo' => 'required',
+            'tasa' => 'required',
+            'prov_moneda_id' => 'required'
 
-        $model->final_id = null;
-        $model->save();
+        ]);
+        if ($validator->fails()) {
+            $model->edit_usuario_id = $this->user->id;
+            $model->final_id = null;
+            $model->save();
+        }else{
+            $resul["action"] = "copy";
+            $newItems = array();
+            $newModel = new Solicitude();
+
+            $newModel = $this->transferDataDoc($model, $newModel);
+            $newModel->parent_id = $model->id;
+            $newModel->version = $model->version + 1;
+            $newModel->uid = $model->uid;
+            $newModel->save();
+            $model->cancelacion = Carbon::now();
+            $model->comentario_cancelacion = "#sistema: copiado por new id#" . $newModel->id;
+            $model->save();
+
+            foreach ($model->items()->get() as $aux) {
+                $it = new  SolicitudeItem();
+                $it->tipo_origen_id = $aux->tipo_origen_id;
+                $it->doc_id = $newModel->id;
+                $it->origen_item_id = $aux->origen_item_id;
+                $it->doc_origen_id = $aux->doc_origen_id;
+                $it->cantidad = $aux->cantidad;
+                $it->saldo = $aux->saldo;
+                $it->producto_id = $aux->producto_id;
+                $it->descripcion = $aux->descripcion;
+                $it->costo_unitario = $aux->costo_unitario;
+                $it->save();
+                $newItems[] = $it;
+
+            }
+
+            $resul['id'] = $newModel->id;
+            $resul['doc'] = $newModel;
+            $resul['oldItems'] = $newItems;
+        }
+
+
         return $resul;
     }
 
@@ -1689,12 +1568,14 @@ class OrderController extends BaseController
         $result = [];
         $model = Solicitude::findOrFail($req->id);
 
-        if($this->user->departamento_id == '21' || $this->user->departamento_id == '19'){
+        if($this->user->cargo_id == '6' || $this->user->cargo_id == '8'){
             $model->fecha_aprob_gerencia= $req->fecha;
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_gerencia';
+            $result['fecha'] = $model->fecha_aprob_gerencia;
         }else{
             $model->fecha_aprob_compra = $req->fecha;
+            $result['fecha'] = $model->fecha_aprob_compra;
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_compras';
 
@@ -1712,7 +1593,7 @@ class OrderController extends BaseController
             }
         }
         $model->save();
-        $result['fecha'] = $model->fecha_aprob_gerencia;
+
         $result['nro_doc'] = $model->nro_doc;
         $result['response'] = $model->save();
         return $result;
@@ -1749,22 +1630,12 @@ class OrderController extends BaseController
         $model = Solicitude::findOrFail($req->id);
 
         $result =[];
-        $result['action'] = 'save';
+        $result['actions'] = ['sendPrv','save'];
         $senders =MailModule::where('tipo_origen_id','21')
             ->where('doc_id',$model->id)
+            ->where('tipo','user')
             ->get();
         $result['send']= sizeof($senders);
-        if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) && sizeof($senders) == 0){
-            $result['action'] = 'sendPrv';
-            return $result;
-        }
-        if ($this->user->cargo_id == $this->profile['gerente']) {
-            $result['action'] = 'question';
-
-        } else if ($this->user->cargo_id == $this->profile['jefe'] || $this->user->cargo_id == $this->profile['trabajador']) {
-            $result['action'] = 'sendIntern';
-
-        }
         return $result;
     }
 
@@ -1819,6 +1690,7 @@ class OrderController extends BaseController
         $model = Solicitude::findOrFail($req->id);
         $sends =MailModule::where('tipo_origen_id','21')
             ->where('doc_id',$model->id)
+            ->where('tipo','user')
             ->whereNotNull('send')
             ->get();
         $mail = new MailModule();
@@ -1828,7 +1700,6 @@ class OrderController extends BaseController
         $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
         $mail->tipo = 'user';
         $mail->modulo = 'solicitude';
-        $adjs = [];
         $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto];
         if(sizeof($sends) == 0){
             $mail->clave= 'created';
@@ -1866,12 +1737,9 @@ class OrderController extends BaseController
         $mail->senders()->saveMany($destinations['cc']);
         $mail->senders()->saveMany($destinations['ccb']);
         if($req->has('adjs')){
-
-
             foreach ($req->adjs as $f){
                 $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
             }
-
         }
 
         $resul['email'] = $mail->sendMail($req->content, $destinations);
@@ -1881,6 +1749,24 @@ class OrderController extends BaseController
         }else{
             $model->ult_revision = Carbon::now();
             $model->final_id = $this->getFinalId($model);
+
+            /** envio de notificaciones **/
+            $options = $this->templateNotif($model, 'emails.Solicitude.genericNoti.es','solicitude','sendPrv');
+
+            $options['atts'][]= ['data'=>$resul['email']['attOff']['data'],'nombre'=>$model->id.'_A_Proveedor.pdf'];
+            $dest = $this->geUsersEMail('tbl_cargo.id = '.$this->profile['gerente_adm']);
+            $resul['email']['attOff'] ='';
+            $options['to'] = $dest;
+            $mail = new MailModule();
+            $mail->doc_id = $model->id;
+            $mail->tipo_origen_id = 21;
+            $mail->asunto =$options['subject'];
+            $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $mail->tipo = 'sis';
+            $mail->modulo = 'solicitude';
+            $mail->save();
+            $resul['nofs']=  $mail->sendMail($options['template'], $options);
+
         }
         $model->save();
         return $resul;
@@ -2081,7 +1967,6 @@ class OrderController extends BaseController
     {
         $resul["action"] = "copy";
         $newItems = array();
-        $newAtt = array();
         $newModel = new Solicitude();
         $oldModel = Solicitude::findOrFail($req->id);
 
@@ -2110,10 +1995,8 @@ class OrderController extends BaseController
 
         }
 
-        // $newModel->items()->saveMany($newItems);
         $resul['id'] = $newModel->id;
         $resul['doc'] = $newModel;
-        $resul['adjs'] = $newAtt;
         $resul['oldItems'] = $newItems;
         return $resul;
 
@@ -2769,16 +2652,19 @@ class OrderController extends BaseController
     {
         $result = [];
         $model = Order::findOrFail($req->id);
-        if($this->user->departamento_id == '21' || $this->user->departamento_id == '19'){
+        if($this->user->cargo_id == '6' || $this->user->cargo_id == '8'){
             $model->fecha_aprob_gerencia= $req->fecha;
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_gerencia';
+            $result['fecha'] = $model->fecha_aprob_gerencia;
         }else{
             $model->fecha_aprob_compra = $req->fecha;
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_compras';
+            $result['fecha'] = $model->fecha_aprob_compra;
 
         }
+
         if($req->has("adjs")){
 
             foreach($req->adjs as $aux){
@@ -2792,7 +2678,7 @@ class OrderController extends BaseController
             }
         }
         $model->save();
-        $result['fecha'] = $model->fecha_aprob_gerencia;
+
         $result['nro_doc'] = $model->nro_doc;
         $result['response'] = $model->save();
         return $result;
@@ -3027,22 +2913,18 @@ class OrderController extends BaseController
     {
         $model = Order::findOrFail($req->id);
 
-        $result =[];
-        $result['action'] = 'save';
+        $result['actions'] = ['save'];
         $senders =MailModule::where('tipo_origen_id','22')
             ->where('doc_id',$model->id)
+            ->where('tipo','user')
             ->get();
         $result['send']= sizeof($senders);
-        if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) && sizeof($senders) == 0){
-            $result['action'] = 'sendPrv';
+
+        if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) ){
+            $result['actions'][] = 'sendPrv';
             return $result;
-        }
-        if ($this->user->cargo_id == $this->profile['gerente']) {
-            $result['action'] = 'question';
-
-        } else if ($this->user->cargo_id == $this->profile['jefe'] || $this->user->cargo_id == $this->profile['trabajador']) {
-            $result['action'] = 'sendIntern';
-
+        }else{
+            $result['actions'][] = 'sendIntern';
         }
         return $result;
 
@@ -3176,6 +3058,7 @@ class OrderController extends BaseController
         $sends =MailModule::where('tipo_origen_id','21')
             ->where('doc_id',$model->id)
             ->whereNotNull('send')
+            ->where('tipo','user')
             ->get();
         $mail = new MailModule();
         $mail->doc_id = $model->id;
@@ -3233,6 +3116,26 @@ class OrderController extends BaseController
         }else{
             $model->ult_revision = Carbon::now();
             $model->final_id = $this->getFinalId($model);
+
+            /** envio de notificaciones **/
+            $options = $this->templateNotif($model, 'emails.Order.genericNoti.es','order',$req->action);
+            $options['atts'][]= ['data'=>$resul['email']['attOff']['data'],'nombre'=>$model->id.'_A_Proveedor.pdf'];
+            $resul['email']['attOff'] ='';
+            if($req->action == 'sendPrv'){
+                $dest = $this->geUsersEMail('tbl_departamento.id = '.$this->departamentos['compras']);
+            }else{
+                $dest = $this->geUsersEMail('tbl_cargo.id = '.$this->profile['gerente_adm']);
+            }
+            $options['to'] = $dest;
+            $mail = new MailModule();
+            $mail->doc_id = $model->id;
+            $mail->tipo_origen_id = 22;
+            $mail->asunto =$options['subject'];
+            $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $mail->tipo = 'sis';
+            $mail->modulo = 'solicitude';
+            $mail->save();
+            $resul['nofs']=  $mail->sendMail($options['template'], $options);
         }
         $model->save();
         return $resul;
@@ -3659,6 +3562,11 @@ class OrderController extends BaseController
             $model = $model->findOrFail($req->id);
             $result["action"]="edit";
         }
+        $model= $this->setDocItem($model, $req);
+        if($req->has('condicion_cp')){
+            $model->condicion_cp = $req->condicion_cp;
+
+        }
         $validator = Validator::make($req->all(), [
             'prov_id' => 'required',
             'titulo' => 'required',
@@ -3676,7 +3584,7 @@ class OrderController extends BaseController
         }else{
             $result['success']= "Registro guardado con éxito";
         }
-        $model= $this->setDocItem($model, $req);
+
         $model->save();
         $result['id']= $model->id;
         $result['user']= $model->usuario_id;
@@ -4018,7 +3926,7 @@ class OrderController extends BaseController
     {
         $result = [];
         $model = Purchase::findOrFail($req->id);
-        if($this->user->departamento_id == '21' || $this->user->departamento_id == '19'){
+        if($this->user->cargo_id == '6' || $this->user->cargo_id == '8'){
             $model->fecha_aprob_gerencia= $req->fecha;
             $model->nro_doc = $req->nro_doc;
             $result['accion']='ap_gerencia';
@@ -4267,22 +4175,19 @@ class OrderController extends BaseController
     {
         $model = Purchase::findOrFail($req->id);
 
-        $result =[];
-        $result['action'] = 'save';
-        $senders =MailModule::where('tipo_origen_id','23')
+
+        $result['actions'] = ['save'];
+        $senders =MailModule::where('tipo_origen_id','22')
             ->where('doc_id',$model->id)
+            ->where('tipo','user')
             ->get();
         $result['send']= sizeof($senders);
-        if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) && sizeof($senders) == 0){
-            $result['action'] = 'sendPrv';
+
+        if(($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null) ){
+            $result['actions'][] = 'sendPrv';
             return $result;
-        }
-        if ($this->user->cargo_id == $this->profile['gerente']) {
-            $result['action'] = 'question';
-
-        } else if ($this->user->cargo_id == $this->profile['jefe'] || $this->user->cargo_id == $this->profile['trabajador']) {
-            $result['action'] = 'sendIntern';
-
+        }else{
+            $result['actions'][] = 'sendIntern';
         }
         return $result;
     }
@@ -4412,6 +4317,7 @@ class OrderController extends BaseController
         $model = Purchase::findOrFail($req->id);
         $sends =MailModule::where('tipo_origen_id','21')
             ->where('doc_id',$model->id)
+            ->where('tipo','user')
             ->whereNotNull('send')
             ->get();
         $mail = new MailModule();
@@ -4470,6 +4376,24 @@ class OrderController extends BaseController
         }else{
             $model->ult_revision = Carbon::now();
             $model->final_id = $this->getFinalId($model);
+            $model->ult_revision = Carbon::now();
+            $model->final_id = $this->getFinalId($model);
+
+            /** envio de notificaciones **/
+            $options = $this->templateNotif($model, 'emails.Purchase.genericNoti.es','order',$req->action);
+            $options['atts'][]= ['data'=>$resul['email']['attOff']['data'],'nombre'=>$model->id.'_A_Proveedor.pdf'];
+            $resul['email']['attOff'] ='';
+            $dest= array_merge($this->geUsersEMail('tbl_departamento.id = '.$this->departamentos['compras']), $this->geUsersEMail('tbl_cargo.id = '.$this->profile['gerente_adm']));
+            $options['to'] = $dest;
+            $mail = new MailModule();
+            $mail->doc_id = $model->id;
+            $mail->tipo_origen_id = 23;
+            $mail->asunto =$options['subject'];
+            $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $mail->tipo = 'sis';
+            $mail->modulo = 'solicitude';
+            $mail->save();
+            $resul['nofs']=  $mail->sendMail($options['template'], $options);
         }
         $model->save();
         return $resul;
@@ -4923,6 +4847,7 @@ class OrderController extends BaseController
         $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
         $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_compra ;
         $tem['img_aprob'] =$model->fecha_aprob_compra ;
+        $tem['condicion_cp'] =$model->condicion_cp ;
 
         $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
 
@@ -5064,16 +4989,6 @@ class OrderController extends BaseController
 
 
 
-
-
-
-
-
-
-
-
-
-
     /*********************************** CONTRAPEDIDOS ***********************************/
 
     /**
@@ -5103,7 +5018,6 @@ class OrderController extends BaseController
 
 
     }
-
 
 
     /**
@@ -5222,11 +5136,6 @@ class OrderController extends BaseController
     }
 
 
-    /**
-     *
-     * revisar por intergar al maestro de Order
-     * obtiene los contra pedidos de un proveedor
-     */
     public function getCustomOrders(Request $req){
 
         $data = Array();
@@ -5307,127 +5216,7 @@ class OrderController extends BaseController
         return $data;
     }
 
-    public function getDocument(Request $req){
-        $model = $this->getDocumentIntance($req->tipo);
-        $model = $model->findOrFail($req->id);
-        $prov= Provider::find($model->prov_id);
-        $objs =[];
-        //para maquinas
-        $tem = array();
-        $tem['id']=$model->id;
-        $tem['tipo']=$model->getTipoId();
-        $tem['pais_id']=$model->pais_id;
-        $tem['fecha_envio']=$model->fecha_envio;
-        $tem['puerto_id']=$model->puerto_id;
-        $tem['final_id']=$model->final_id;
-        $tem['direccion_almacen_id']=$model->direccion_almacen_id;
-        $tem['direccion_facturacion_id']=$model->direccion_facturacion_id;
-        $tem['prov_id']=$model->prov_id;
-        $tem['condicion_pago_id']=$model->condicion_pago_id;
-        $tem['motivo_pedido_id']=$model->motivo_pedido_id;
-        $tem['prioridad_id']=$model->prioridad_id;
-        $tem['condicion_pedido_id']=$model->condicion_pedido_id;
-        $tem['prov_moneda_id']=$model->prov_moneda_id;
-        $tem['estado_id']=$model->estado_id;
-        $tem['doc_parent_id']=$model->doc_parent_id;
-        $tem['doc_parent_origen_id']=$model->doc_parent_origen_id;
-        $tem['uid']=$model->uid;
-        // pra humanos
-        $tem['comentario']=$model->comentario;
-        $tem['tasa']=$model->tasa;
-        $tem['proveedor']=($prov != null)? $prov->razon_social: '';
-        $tem['documento']= $model->type;
-        $tem['titulo']= $model->titulo;
-        $tem['diasEmit']=$model->daysCreate();
-        $tem['fecha_aprob_compra'] =$model->fecha_aprob_compra ;
-        $tem['fecha_aprob_gerencia'] =$model->fecha_aprob_gerencia ;
-        $tem['img_aprob'] =$model->fecha_aprob_compra ;
-        $tem['isAprobado'] = ($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null);
-        $tem['aprobado'] = ['nro_doc'=>$model->nro_doc,'adjs'=>[]];
 
-        $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
-
-        if($model->motivo_id){
-            $tem['motivo']=OrderReason::findOrFail($model->motivo_id)->motivo;
-        }
-        if($model->pais_id){
-            $tem['pais']=Country::findOrFail($model->pais_id)->short_name;
-        }
-        if($model->prioridad_id){
-            $tem['prioridad']=OrderPriority::findOrFail($model->prioridad_id)->descripcion;
-        }
-
-        if($model->prov_moneda_id){
-            $mone=Monedas::findOrFail($model->prov_moneda_id);
-            $tem['moneda']=$mone->nombre;
-            $tem['symbol']=$mone->simbolo;
-
-        }
-
-        if($model->tipo_id != null){
-            $tem['tipo']= OrderType::findOrFail($model->tipo_id)->tipo;
-        }
-
-        $tem['nro_proforma']= ['doc'=>$model->nro_proforma, 'adjs'=>[]];
-        $tem['nro_factura']= ['doc'=>$model->nro_factura, 'adjs'=>[]];
-        $tem['nro_doc']=$model->nro_doc;
-        $tem['img_proforma']=$model->img_proforma;
-        $tem['img_factura']=$model->img_factura;
-        $tem['mt3']=$model->mt3;
-        $tem['peso']=$model->peso;
-        $tem['emision']=$model->emision;
-        $tem['usuario_id']=$model->usuario_id;
-        $tem['monto']=$model->monto;
-        $tem['productos'] =$this->getProductoItem($model);
-        $objs['prov_id']=$prov;
-        $objs['prov_moneda_id'] = Monedas::find($model->prov_moneda_id);
-        $objs['direccion_facturacion_id'] = ProviderAddress::find($model->direccion_facturacion_id);
-        $objs['direccion_almacen_id'] = ProviderAddress::find($model->direccion_almacen_id);
-        $objs['pais_id'] = Country::find($model->pais_id);
-        $objs['condicion_pago_id'] =  ProviderCondPay::find($model->condicion_pago_id);
-        $objs['puerto_id'] = Ports::find($model->puerto_id);
-        /**actualizar cuando este el final**/
-        $tem['almacen']="Desconocido";
-
-        // modificar cuando se sepa la logica
-        $tem['aero']=1;
-        $tem['version']=$model->version;
-        $tem['maritimo']=1;
-        $atts = array();
-
-
-        foreach($model->attachments()->where('documento','PROFORMA')->get() as $aux){
-            $att = attachment_file($aux->archivo_id);
-            foreach ($att as $key => $value){
-                $att[$key]= $value;
-            }
-            $tem['nro_proforma']['adjs'] = $att;
-        }
-        foreach($model->attachments()->where('documento','FACTURA')->get() as $aux){
-            $att = attachment_file($aux->archivo_id);
-            foreach ($att as $key => $value){
-                $att[$key]= $value;
-            }
-            $tem['nro_factura']['adjs'] = $att;
-        }
-        foreach($model->attachments()->whereRaw('documento like \'ap_%\'')->get() as $aux){
-            $att = attachment_file($aux->archivo_id);
-            foreach ($att as $key => $value){
-                $att[$key]= $value;
-            }
-            $tem['Aprobado']['adjs'] = $att;
-        }
-        $tem['adjuntos'] = $atts;
-
-        $tem['objs']=$objs;
-
-        $tem['permit'] = $this->getPermisionDoc($model);
-
-
-
-        return $tem;
-
-    }
 
     /*********************************** kitchen box (cocinas)*********************************************/
 
@@ -5493,13 +5282,6 @@ class OrderController extends BaseController
 
         return $data;
     }
-
-
-
-
-
-
-
 
 
     /*************************************** ORDEDENES DE COMPRA *****************************************
@@ -5942,6 +5724,47 @@ class OrderController extends BaseController
         return $newModel;
     }
 
+    /**obtiene los correos segun el departamento*/
+    private function  geUsersEMail($condicion = null , $tipo = 'to'){
+        $resul = [];
+        $emails =  User::selectRaw(' distinct tbl_usuario.email as email,concat(tbl_usuario.nombre, \' \' ,tbl_departamento.nombre) as nombre')
+            ->join('tbl_cargo','tbl_cargo.id','=','tbl_usuario.cargo_id')
+            ->join('tbl_departamento','tbl_departamento.id','=','tbl_cargo.departamento_id');
+          if($condicion != null){
+              $emails = $emails->whereRaw($condicion);
+          }
+        $emails= $emails->get();
+        foreach ($emails as $aux){
+            $dest = new MailModuleDestinations();
+            $dest->email = $aux->email;
+            $dest->nombre = $aux->nombre;
+            $dest->tipo = $tipo ;
+            $dest->save();
+            $resul[]= $dest;
+
+        }
+        return $resul;
+    }
+    public function templateNotif( $model,$file, $modulo, $proposito ){
+        $lang = 'es';
+
+        $result  = ['subject'=>'','to'=>[],'cc'=>[], 'ccb'=>[],'atts'=>[],'attsData'=>[]];
+        $mailPart= App\Models\Sistema\MailModels\MailPart::where('modulo',$modulo)->where('proposito',$proposito)->first();
+        $texto = $mailPart->subjets()->where('iso_lang',$lang)->orderByRaw('rand()')->first()->texto;
+        $user =   $this->user;
+        $result['subject'] = $texto;
+        $template = View::make($file,[
+            'subjet'=>'',
+            'model'=>$model,
+            'texto'=>$texto,
+            'articulos'=>$model->items()->with('producto')->get(),
+            'user'=>$user
+        ])->render();
+        $result['template']= $template;
+
+        return $result;
+    }
+
 
     /**@deprecated*/
     private  function  transferItem($oldItem, $newItem){
@@ -6110,40 +5933,7 @@ class OrderController extends BaseController
 
     }
 
-    private function sendNotificacion($data,$sender, $type = null){
-        $noti = new NotificationModule();
-        $noti->doc_id= $data['id'];
-        $noti->doc_tipo_id_id = $data['tipo'];
-        $noti->clave = $type;
-        $noti->usuario_id = $this->user->id;
 
-        return $noti->send($data,$sender,$type);
-        /*Mail::send("emails.modules.Order.Internal.ResumenDoc",$data, function ($m) use( $data, $sender, $type){
-            $m->subject($sender['asunto']);
-            foreach($sender['to'] as $aux)
-            {
-                $m->to($aux['email'], $aux['name']);
-            }
-            foreach($sender['cc'] as $aux)
-            {
-                $m->cc($aux['email'], $aux['name']);
-            }
-            foreach($sender['ccb'] as $aux)
-            {
-                $m->ccb($aux['email'], $aux['name']);
-            }
-            if($type != null){
-                $noti = new NotificationOrder();
-                $noti->doc_id= $data['id'];
-                $noti->doc_tipo_id = $data['tipo'];
-                switch($type){
-                    case "created";  break;
-                }
-            }
-
-
-        });*/
-    }
 
     private function gettemplate($name, $leng, $default = true){
 
@@ -6164,13 +5954,7 @@ class OrderController extends BaseController
         return ['template'=>$template['default'], 'metodo'=>'default'];
     }
 
-    /**obtiene los correos segun el departamento*/
-    private function  getEmailDepartment($deparmet){
-        return  User::selectRaw('concat(tbl_usuario.nombre, \' \' ,tbl_usuario.apellido) as nombre, tbl_usuario.email as email')
-            ->join('tbl_cargo','tbl_cargo.id','=','tbl_usuario.cargo_id')
-            ->join('tbl_departamento','tbl_departamento.id','=','tbl_cargo.departamento_id')
-            ->where('tbl_cargo.departamento_id',$deparmet)->get();
-    }
+
 
     /*
      * determian los permiso del docuemnto segun las carcateristicas del mismo

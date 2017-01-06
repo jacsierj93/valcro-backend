@@ -67,7 +67,7 @@ class MailModule extends Model
     public function sendMail ($template,$sender =  []){
 
         $model = $this;
-    /*  try {*/
+        try {
             $snappy = App::make('snappy.pdf');
             $pdf = response()->make($snappy->getOutputFromHtml($template), 200, [
                 'Content-Type' => 'application/pdf',
@@ -81,21 +81,21 @@ class MailModule extends Model
                 $sender['atts']= [];
             }
 
-
-          $sender['atts'][] =['data'=>storage_path() . '/app/mail/backut/'.$fileModel->archivo, 'nombre'=>'offline.pdf'];
+            $ofline= ['data'=>storage_path() . '/app/mail/backut/'.$fileModel->archivo, 'nombre'=>'offline.pdf'];
+            $sender['atts'][] =$ofline ;
             $this->backut = $fileModel->archivo;
-           $this->sending($template, $sender);
+            $this->sending($template, $sender);
             $model->send = Carbon::now();
             $model->save();
-            return ['is'=>true, 'id'=>$model->id];
-       /* }
+            return ['is'=>true, 'id'=>$model->id,'attOff'=>$ofline];
+        }
         catch (\Exception $e) {
             $model->send = null;
             $model->save();
             $model->failSend($template);
 
             return ['is'=>false, 'id'=>$model->id,$e];
-        }*/
+        }
     }
 
 
