@@ -3466,21 +3466,18 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
 
         if(data.action == 'sendPrv'){
             $scope.noNew= false;
-            Order.getMod({type:$scope.formMode.mod, mod:"ProviderTemplates",id:$scope.document.id},{}, function(response){
+            Order.getMod({type:$scope.formMode.mod, mod:(data.action == 'sendPrv') ? "ProviderTemplates":'InternalTemplates',id:$scope.document.id},{}, function(response){
                 $scope.correos = response.correos;
                 $scope.origenes = response.templates;
                 $scope.model.tipo = response.tipo;
+                if(response.to){
+                    angular.forEach(respnse.to, function (v) {
+                        $scope.model.to.push(v);
+                    });
+                }
             });
         }
-        if(data.action == 'sendIntern'){
-            $scope.noNew= true;
-            Order.getMod({type:$scope.formMode.mod, mod:"InternalTemplates",id:$scope.document.id},{}, function(response){
-                $scope.correos = response.correos;
-                $scope.origenes = response.templates;
-                $scope.model.tipo = response.tipo;
 
-            });
-        }
 
     };
     $scope.upfileFinis = function (file) {
@@ -3489,8 +3486,16 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
     };
 
     $scope.canNext = function () {
+        console.log("satet", $scope.state);
+        if($scope.state == 'load' && $scope.model.to.length > 0){
+            return true;
+        }else if($scope.state != 'load'){
+            $scope.NotifAction("error","Disculpe debes selecionar un idioma para poder enviar el correo ",[],{autohidden:3000});
 
-        return true;
+        }else if($scope.model.to.length  == 0){
+            $scope.NotifAction("error","No se han cargado destinatarios",[],{autohidden:3000});
+        }
+
     };
 
     $scope.next = function () {
@@ -3679,13 +3684,13 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
             formSrv.setBind(true);
 
             send.reng_id = response.reng_id;
-           if(response.accion == 'new'){
-               $model.change("productos"+response.reng_id,undefined,send);
-           }else{
-               $model.change("productos"+response.reng_id,'cantidad',response.cantidad);
-               $model.change("productos"+response.reng_id,'saldo',response.saldo);
-               $model.change("productos"+response.reng_id,'reng_id',response.reng_id);
-           }
+            if(response.accion == 'new'){
+                $model.change("productos"+response.reng_id,undefined,send);
+            }else{
+                $model.change("productos"+response.reng_id,'cantidad',response.cantidad);
+                $model.change("productos"+response.reng_id,'saldo',response.saldo);
+                $model.change("productos"+response.reng_id,'reng_id',response.reng_id);
+            }
             $timeout(function () {
                 formSrv.setBind(false);
             },5);

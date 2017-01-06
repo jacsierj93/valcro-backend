@@ -131,6 +131,7 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
                 $scope.asuntos.push(v);
             });
             setNotif.addNotif("info", "Se ha actualizado la lista de asuntos disponibles, por favor revisala y recuerda siempre se debe escribir el asunto en el idioma selecionado",[], {autohidden:5000})
+            $scope.select= id;
         }
 
     };
@@ -471,7 +472,7 @@ MyApp.directive('vldMailWithAdj', function() {
                 '</div>'+
                 '<div    layout ="column" flex >' +
                 ' <vldh-mail-contacts correos="correos" funciones="fnContacts" senders="contacts" to="to" cc="cc" ccb="ccb"  langs="langs" no-new="noNew" lang="lang"  asuntos="asuntos" asunto="asunto"> </vldh-mail-contacts>' +
-                ' <vldhtml-preview load="origenes" funciones="fnPreview"  template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
+                ' <vldhtml-preview load="origenes" funciones="fnPreview" state="state"  template="template" contacts="contacts" langs="langs" text="centerText" lang="lang"  ng-show="mode == \'list\'"  asuntos="asuntos"  asunto="asunto"  ></vldhtml-preview>' +
                 ' <vld-file-up-img  loaded="loadeds" ng-show="mode != \'list\'" up-model="adjs"  key="'+attr.key+'"  storage="'+attr.storage+'" fn-file-up="fileUp" fn-up-watch="finish" ></vld-file-up-img>' +
             ' </div>' +
                 '</div>';

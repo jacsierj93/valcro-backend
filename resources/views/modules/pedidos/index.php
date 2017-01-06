@@ -1347,18 +1347,16 @@
                                     <label>Condicion de compra</label>
                                     <md-autocomplete md-selected-item="$parent.document.condicion_cp"
                                                      info="Establesca la condicion de compra"
-                                                     ng-required="$parent.formMode.value == '23'"
+                                                     ng-required ="(formMode.value == 23 )"
                                                      ng-disabled="( $parent.document.uid == null || $parent.Docsession.block || $parent.document.isAprobado )"
                                                      ng-click="toEditHead('prov_id', provSelect.id)"
                                                      skip-tab
                                                      md-search-text="ctrl.condicion_cp"
-                                                     md-auto-select="true"
                                                      md-items="item in ['EXW','FOB','CIF'] | filter : ctrl.condicion_cp "
                                                      md-item-text="item"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
                                                      md-min-length="0"
-                                                     md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
                                                      md-item-change="toEditHead('document','condicion_cp',$parent.document.condicion_cp  );"
@@ -4139,6 +4137,7 @@
                 <vld-mail-with-adj
                     load="origenes" text="centerText" template="template" funciones = "mailFn"
                     correos="correos" no-new="noNew" to="model.to" cc="model.cc" ccb="model.ccb" langs="langs"  lang="lang" asunto="model.subject" up-model="adjsUp"
+                    state="state"
                     key="OrderSendEmail" storage="orders" fn-file-up="upfileFinis" fn-up-watch="upFiles" titulo="Correo"
                 ></vld-mail-with-adj>
                 <loader ng-show="inProgress"></loader>
