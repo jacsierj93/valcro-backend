@@ -192,7 +192,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             }
             $mdSidenav(sideNav).open().then(function(){
                 activesPopUp.push(sideNav);
-                if(fn.after){
+                if(fn && fn.after){
                     fn.after();
                 }
             })
@@ -380,7 +380,6 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
     $scope.setOptSel = function(elem){
-        console.log(elem)
         if(elem.selOption) {
             $scope.opcValue.opts.valor.push(elem.selOption.id);
 
@@ -866,12 +865,11 @@ MyApp.controller('treeController',['$scope', 'setNotif','masters','critForm','$m
     $scope.line = critForm.getLine();
 
     $scope.$watch("line.id",function(n){
-        $scope.treedata = criterios.query({type:"getTree",id:n});
+        criterios.query({type:"getTree",id:n},function(data){
+            $scope.treedata =data || [];
+        });
     });
-    $scope.opts = {
-        templateUrl: 'testtpl.html'
-    };
-  
+
 }]);
 
 MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter','criterios',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter,criterios) {
@@ -1089,3 +1087,6 @@ MyApp.directive('lmbCollection', function() {
 
     };
 });
+
+
+lo

@@ -704,10 +704,10 @@
                             </div>
                         </div>
                         <div layout="row" class="column">
-                            
+
                             <treecontrol class="tree-classic" tree-model="treedata">
 
-                                <span ng-if="node.field" >
+                               <span ng-if="node.field" >
                                     {{node.field.descripcion}}
                                 </span>
                                 <span ng-if="node.operador" >
