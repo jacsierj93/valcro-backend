@@ -47,7 +47,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
     };
 
-    var timePreview;
 
 
     $scope.showFilterPed=false;
@@ -345,48 +344,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         return true;
     };
 
-    $scope.hoverpedido= function(document){
-        document.isNew=false;
 
-        $timeout(function(){
-            if(document &&  $scope.mouseProview){
-                $scope.formMode=$scope.forModeAvilable.getXValue(document.tipo);
-                //setGetOrder.setOrder(document);
-                $scope.resumen=document;
-
-                if($scope.module.layer !='resumenPedido' ){
-                    $scope.LayersAction({open:{name:"resumenPedido"}});
-                }
-            }
-        }, 1000);
-    };
-
-    $scope.hoverLeave= function( val){
-
-        $scope.mouseProview= val;
-        if(timePreview){
-            $timeout.cancel(timePreview);
-        }
-
-        timePreview= $timeout(function(){
-            if($scope.preview && $scope.module.layer== 'resumenPedido' && !$scope.mouseProview){
-                $scope.LayersAction({close:true});
-                $scope.hoverPreview(true);
-            }
-        }, 1000);
-
-
-    };
-
-    $scope.hoverEnter=  function(){
-        $scope.mouseProview= true;
-    };
-    $scope.hoverPreview= function(val){
-        $scope.preview=val;
-        if(val== false){
-            // delete $scope.resumen;
-        }
-    };
 
 
     $scope.delete = function(doc){
@@ -900,7 +858,46 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
 });
 
-//}
+
+MyApp.controller('resumenPedidoCtrl',['$scope','$timeout','DateParse', 'Order', function ($scope, $timeout,DateParse, Order) {
+
+
+
+    $scope.$parent.resumenPedidoCtrl = function (document) {
+        $scope.$parent.formMode=$scope.$parent.forModeAvilable.getXValue(document.tipo);
+        $scope.resumen= document;
+
+        $scope.$parent.notCloseSumary();
+        if($scope.$parent.module.layer != 'resumenPedido'){
+            $scope.opaque = true;
+            $scope.LayersAction({open:{name:"resumenPedido"}});
+
+        }
+        return  $scope.opaque;
+
+    };
+    $scope.$parent.notCloseSumary = function () {
+        if($scope.timeClose){
+            $timeout.cancel($scope.timeClose);
+            console.log("no closet");
+        }
+        $scope.timeClose =$timeout(function () {
+            if( $scope.opaque && $scope.$parent.module.layer == 'resumenPedido'){
+                $scope.close();
+            }
+        }, 3000);
+    }
+    $scope.close = function () {
+        $scope.LayersAction({close:true});
+    };
+    $scope.next = function () {
+
+    };
+    $scope.canNext = function () {
+
+        return true;
+    };
+}]);
 
 MyApp.controller('OrderResumenOldDocCtrl',['$scope','$timeout','DateParse', 'Order', function ($scope, $timeout,DateParse, Order) {
 
@@ -991,8 +988,9 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
         data: [],
         order:'id'
     };
-
-    $scope.$parent.OrderlistPedidoCtrl = function (prov) {
+    $scope.resumen  ={};
+    $scope.$parent.OrderlistPedidoCtrl = function () {
+        $scope.isHover = false;
         $scope.LayersAction({open:{name:"listPedido", after:function(){
             $scope.load( $scope.$parent.ctrl.provSelec.id);
         }}});
@@ -1044,6 +1042,54 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
     $scope.addAnswer = function (item) {
         $scope.$parent.OrderAddAnswer({id:item.id, documento:item.documento});
     }
+
+    /// hover     var timePreview;
+
+
+    $scope.hoverpedido= function(document){
+        if(document){
+            if($scope.timePreview){
+                $timeout.cancel($scope.timePreview);
+            }
+            $scope.timePreview= $timeout(function(){
+               $scope.preview =  $scope.$parent.resumenPedidoCtrl(document);
+            }, 1000);
+
+        }else{
+            if($scope.timePreview){
+                $timeout.cancel($scope.timePreview);
+            }
+        }
+    };
+
+    $scope.notCloseSumary = function () {
+        console.log("no closeeeeee");
+        $scope.$parent.notCloseSumary();
+    }
+
+/*    $scope.hoverLeave= function( val){
+
+        $scope.$parent.mouseProview= val;
+        if($scope.timePreview){
+
+        }
+
+        $scope.timePreview= $timeout(function(){
+            if($scope.preview && $scope.module.layer== 'resumenPedido' && !$scope.$parent.mouseProview){
+                $scope.LayersAction({close:true});
+                $scope.hoverPreview(true);
+            }
+        }, 1000);
+
+
+    };
+
+    $scope.hoverEnter=  function(){
+        $scope.$parent.mouseProview= true;
+    };
+    $scope.hoverPreview= function(val){
+        $scope.$parent.preview=val;
+    };*/
 
 }]);
 
@@ -3466,21 +3512,18 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
 
         if(data.action == 'sendPrv'){
             $scope.noNew= false;
-            Order.getMod({type:$scope.formMode.mod, mod:"ProviderTemplates",id:$scope.document.id},{}, function(response){
+            Order.getMod({type:$scope.formMode.mod, mod:(data.action == 'sendPrv') ? "ProviderTemplates":'InternalTemplates',id:$scope.document.id},{}, function(response){
                 $scope.correos = response.correos;
                 $scope.origenes = response.templates;
                 $scope.model.tipo = response.tipo;
+                if(response.to){
+                    angular.forEach(respnse.to, function (v) {
+                        $scope.model.to.push(v);
+                    });
+                }
             });
         }
-        if(data.action == 'sendIntern'){
-            $scope.noNew= true;
-            Order.getMod({type:$scope.formMode.mod, mod:"InternalTemplates",id:$scope.document.id},{}, function(response){
-                $scope.correos = response.correos;
-                $scope.origenes = response.templates;
-                $scope.model.tipo = response.tipo;
 
-            });
-        }
 
     };
     $scope.upfileFinis = function (file) {
@@ -3489,8 +3532,16 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
     };
 
     $scope.canNext = function () {
+        console.log("satet", $scope.state);
+        if($scope.state == 'load' && $scope.model.to.length > 0){
+            return true;
+        }else if($scope.state != 'load'){
+            $scope.NotifAction("error","Disculpe debes selecionar un idioma para poder enviar el correo ",[],{autohidden:3000});
 
-        return true;
+        }else if($scope.model.to.length  == 0){
+            $scope.NotifAction("error","No se han cargado destinatarios",[],{autohidden:3000});
+        }
+
     };
 
     $scope.next = function () {
@@ -3679,13 +3730,13 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
             formSrv.setBind(true);
 
             send.reng_id = response.reng_id;
-           if(response.accion == 'new'){
-               $model.change("productos"+response.reng_id,undefined,send);
-           }else{
-               $model.change("productos"+response.reng_id,'cantidad',response.cantidad);
-               $model.change("productos"+response.reng_id,'saldo',response.saldo);
-               $model.change("productos"+response.reng_id,'reng_id',response.reng_id);
-           }
+            if(response.accion == 'new'){
+                $model.change("productos"+response.reng_id,undefined,send);
+            }else{
+                $model.change("productos"+response.reng_id,'cantidad',response.cantidad);
+                $model.change("productos"+response.reng_id,'saldo',response.saldo);
+                $model.change("productos"+response.reng_id,'reng_id',response.reng_id);
+            }
             $timeout(function () {
                 formSrv.setBind(false);
             },5);
@@ -4895,7 +4946,6 @@ MyApp.filter("sanitize", ['$sce', function($sce) {
         return $sce.trustAsHtml(htmlCode);
     }
 }]);
-
 
 
 /**
