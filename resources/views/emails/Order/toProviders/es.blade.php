@@ -1,7 +1,6 @@
 
 <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto") ?>
 <div style="min-height: 100%;margin: 0;padding: 0px; text-align: center; font-family: Roboto;">
-
     <table style="border-spacing: 0px;margin: auto;padding: 0;width: 600px;">
         <tbody>
         <tr style="margin: 0;padding: 0px">
@@ -51,6 +50,18 @@
                                         <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo:
                                             <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" contenteditable="true" >
                                                 {{$subjet}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Proveedor:
+                                            <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;"  >
+                                               $model->provider()->razon_social
                                             </p>
                                         </td>
                                     </tr>
@@ -119,7 +130,6 @@
                                 </table>
                             </div>
                         </td>
-
                     </tr></tbody>
                 </table></td>
             <td width="5" style="color: rgb(140,140,140);background: repeat-y;margin: 0;padding: 0px; background-image: url('http://valcro.com.ve/mailer/images/sdw_right_center.jpg')" ></td>

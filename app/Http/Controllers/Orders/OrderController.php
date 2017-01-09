@@ -81,6 +81,17 @@ class OrderController extends BaseController
     private $departamentos = ['compras' => '17', 'propetario' => '18', 'auditoria' => '22','gerente_dp' => '21','gerente_adm' => '21'];
     private $user = null;
 
+    public function test(Request $req){
+        $model= Solicitude::findOrFail(665);
+        $user = $this->user;
+       $data =  [
+            'subjet'=>'daee',
+            'model'=>$model,
+            'texto'=>'sadfsadf',
+            'articulos'=>$model->items()->with('producto')->get(),
+            'user'=>$user];
+        return View('emails.Solicitude.toProviders.es',$data);
+    }
 
     public function __construct(Request $req)
     {

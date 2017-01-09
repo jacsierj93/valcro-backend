@@ -9,10 +9,10 @@
 namespace App\Models\Sistema\Solicitude;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\ProdTime;
-use App\Models\Sistema\Solicitude\SolicitudeItem;
 use App\Models\Sistema\TiemAproTran;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 use DB;
 use Carbon\Carbon;
 
@@ -36,6 +36,11 @@ class Solicitude extends Model
     public function provider(){
         return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
     }
+    public function CondPay(){
+        return $this->belongsTo('App\Models\Sistema\Providers\ProviderCondPay', 'condicion_pago_id');
+    }
+
+
 
     public function items(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeItem', 'doc_id');
@@ -43,6 +48,10 @@ class Solicitude extends Model
 
     public function answerds(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAnswer', 'doc_id');
+    }
+
+    public function payCondition(){
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
     }
 
     /**

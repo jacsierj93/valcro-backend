@@ -1,7 +1,6 @@
 
 <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto") ?>
 <div style="min-height: 100%;margin: 0;padding: 0px; text-align: center; font-family: Roboto;">
-
     <table style="border-spacing: 0px;margin: auto;padding: 0;width: 600px;">
         <tbody>
         <tr style="margin: 0;padding: 0px">

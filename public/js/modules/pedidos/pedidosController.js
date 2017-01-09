@@ -1065,7 +1065,7 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
     $scope.notCloseSumary = function () {
         console.log("no closeeeeee");
         $scope.$parent.notCloseSumary();
-    }
+    };
 
 /*    $scope.hoverLeave= function( val){
 

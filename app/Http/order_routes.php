@@ -24,7 +24,7 @@ $app->get("Order/StoreAddress",'Orders\OrderController@getStoreAddressCountry');
 $app->get("Order/ProviderProds",'Orders\OrderController@getProviderProducts'); ///obtiene los produtos de un proveedor
 
  /**debuggin*/
-$app->get("Order/Test",'Orders\OrderController@ test()'); ///@deprecated
+$app->get("Order/Test",'Orders\OrderController@test'); ///@deprecated
 
 
 //form

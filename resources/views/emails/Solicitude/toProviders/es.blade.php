@@ -1,7 +1,6 @@
 
 <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto") ?>
 <div style="min-height: 100%;margin: 0;padding: 0px; text-align: center; font-family: Roboto;">
-
     <table style="border-spacing: 0px;margin: auto;padding: 0;width: 600px;">
         <tbody>
         <tr style="margin: 0;padding: 0px">
@@ -33,7 +32,60 @@
                                     </tbody>
                                 </table>
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Proveedor:
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                {{$model->provider->razon_social}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
 
+                            @if($model->CondPay != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Codicion de pago:
+                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                    {{$model->CondPay->getText()}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                @endif
+                                @if($model->nro_factura != null || $model->nro_proforma != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            @if($model->nro_factura != null)
+                                            <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Factura:
+                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                    {{$model->nro_factura}}
+                                                </p>
+                                            </td>
+                                            @endif
+                                                @if($model->nro_proforma != null)
+                                                    <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Proforma:
+                                                        <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                            {{$model->nro_proforma}}
+                                                        </p>
+                                                    </td>
+                                                @endif
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                @endif
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
@@ -44,6 +96,8 @@
                                     </tr>
                                     </tbody>
                                 </table>
+
+
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -106,7 +160,7 @@
                                                 {{$articulos[$i]->producto['codigo_fabrica']}}
                                             </td>
                                             <td  width="30%" style="text-align: left;"  >
-                                                {{$articulos[$i]->producto['descripcion']}}
+                                                {{$articulos[$i]->descripcion}}
 
                                             </td>
                                             <td width="30%"  style=" text-align: left;">
