@@ -12,6 +12,7 @@ use App\Models\Sistema\ProdTime;
 use App\Models\Sistema\TiemAproTran;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Collection;
 
 use DB;
 use Carbon\Carbon;
@@ -39,7 +40,20 @@ class Solicitude extends Model
     public function CondPay(){
         return $this->belongsTo('App\Models\Sistema\Providers\ProviderCondPay', 'condicion_pago_id');
     }
+    public function country(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Country', 'pais_id');
+    }
+    public function store(){
+        return $this->belongsTo('App\Models\Sistema\Providers\ProviderAddress', 'direccion_almacen_id');
+    }
+    public function port(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Ports', 'puerto_id');
 
+    }
+    public function coin(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'prov_moneda_id');
+
+    }
 
 
     public function items(){
@@ -50,8 +64,27 @@ class Solicitude extends Model
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAnswer', 'doc_id');
     }
 
-    public function payCondition(){
-        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
+
+    public function customOrders(){
+
+        $items = $this->items()
+            ->join('tbl_contra_pedido_item', 'tbl_contra_pedido_item.uid', '=', 'tbl_solicitud_item.uid')
+            ->join('tbl_contra_pedido', 'tbl_contra_pedido_item.doc_id', '=', 'tbl_contra_pedido.id');
+        return $items;
+    }
+    public function kitchenBoxs(){
+
+        $items = $this->items()
+            ->join('tbl_kitchen_box', 'tbl_kitchen_box.uid', '=', 'tbl_solicitud_item.uid');
+        return $items;
+    }
+    public function sustitutes(){
+
+        $items = $this->items()
+            ->join('tbl_solicitud', 'tbl_solicitud.id', '=', 'tbl_solicitud_item.doc_id')
+            ->where('tipo_origen_id',21)
+        ;
+        return $items;
     }
 
     /**
@@ -60,6 +93,7 @@ class Solicitude extends Model
     public function attachments(){
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAttachment', 'doc_id');
     }
+
     public function newItem(){
         return new SolicitudeItem();
     }
@@ -70,7 +104,6 @@ class Solicitude extends Model
     /**
      * @return el numero de contra pedido asignados a este pedido
      */
-
     public function getNumItem($tipo){
         $i=0;
         $items = $this->items()->get();

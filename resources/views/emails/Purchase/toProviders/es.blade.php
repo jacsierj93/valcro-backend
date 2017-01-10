@@ -1,7 +1,6 @@
 
 <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto") ?>
 <div style="min-height: 100%;margin: 0;padding: 0px; text-align: center; font-family: Roboto;">
-
     <table style="border-spacing: 0px;margin: auto;padding: 0;width: 600px;">
         <tbody>
         <tr style="margin: 0;padding: 0px">
@@ -19,13 +18,19 @@
                             <div style="width: 100%;margin: 0;padding: 0">
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
+
                                         <td align="center" width="20%" style="color: rgb(140,140,140);margin: 0;padding: 10px 10px 10px 0; text-align: left;">
                                             <img width="150px"  style="margin: 0;padding: 0" src='http://valcro.com.ve/images/logo-head.png' ></td>
-                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">Emision:
+                                        <td  align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;">Responsable:
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0; font-weight: normal;">
+                                                {{$user->nombre}}
+                                            </p>
+                                        </td>
+                                        <td width="" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px">Emision:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px">
                                                 {{vl_db_out_put_date($model->emision)}}
                                             </p></td>
-                                        <td width="30%" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro.
+                                        <td width="" align="right" style="color: rgb(140,140,140);margin: 0;padding: 10px;">Nro.
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                                 {{$model->id}}
                                             </p></td>
@@ -33,7 +38,60 @@
                                     </tbody>
                                 </table>
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Proveedor:
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                {{$model->provider->razon_social}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
 
+                                @if($model->CondPay != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Codicion de pago:
+                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                    {{$model->CondPay->getText()}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                @endif
+                                @if($model->nro_factura != null || $model->nro_proforma != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            @if($model->nro_factura != null)
+                                                <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Factura:
+                                                    <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                        {{$model->nro_factura}}
+                                                    </p>
+                                                </td>
+                                            @endif
+                                            @if($model->nro_proforma != null)
+                                                <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Proforma:
+                                                    <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                        {{$model->nro_proforma}}
+                                                    </p>
+                                                </td>
+                                            @endif
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                @endif
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
@@ -44,6 +102,34 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody><tr style="margin: 0;padding: 0px">
+                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Documentos Referidos:
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
+                                                @foreach($model->customOrders()->get() as $aux)
+                                                    <span> CP-{{$aux->id}}</span>,
+                                                @endforeach
+                                                @if($model->kitchenBoxs()->count() > 0)
+                                                    /
+                                                @endif
+
+                                                @foreach($model->kitchenBoxs()->get() as $aux)
+                                                    <span> K-{{$aux->id}}</span>,
+                                                @endforeach
+                                                @if($model->sustitutes()->count() > 0)
+                                                    /
+                                                @endif
+                                                @foreach($model->sustitutes()->get() as $aux)
+                                                    <span> SOL-{{$aux->id}}</span>,
+                                                @endforeach
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -60,19 +146,6 @@
 
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Responsable:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0; font-weight: normal;">
-                                                {{$user->nombre}}
-                                            </p>
-                                        </td>
-
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Correo:
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
                                                 {{$user->email}}
@@ -80,7 +153,7 @@
                                     </tr>
                                     </tbody>
                                 </table>
-
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
                                     <tr style="margin: 0;padding: 0px">
@@ -106,7 +179,7 @@
                                                 {{$articulos[$i]->producto['codigo_fabrica']}}
                                             </td>
                                             <td  width="30%" style="text-align: left;"  >
-                                                {{$articulos[$i]->producto['descripcion']}}
+                                                {{$articulos[$i]->descripcion}}
 
                                             </td>
                                             <td width="30%"  style=" text-align: left;">
@@ -117,6 +190,7 @@
 
                                     </tbody>
                                 </table>
+
                             </div>
                         </td>
 

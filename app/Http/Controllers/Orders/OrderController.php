@@ -82,7 +82,7 @@ class OrderController extends BaseController
     private $user = null;
 
     public function test(Request $req){
-        $model= Solicitude::findOrFail(665);
+        $model= Solicitude::findOrFail(668);
         $user = $this->user;
        $data =  [
             'subjet'=>'daee',
@@ -1762,7 +1762,7 @@ class OrderController extends BaseController
             $model->final_id = $this->getFinalId($model);
 
             /** envio de notificaciones **/
-            $options = $this->templateNotif($model, 'emails.Solicitude.genericNoti.es','solicitude','sendPrv');
+            $options = $this->templateNotif($model, 'emails.Solicitude.internalManager.es','solicitude','sendPrv');
 
             $options['atts'][]= ['data'=>$resul['email']['attOff']['data'],'nombre'=>$model->id.'_A_Proveedor.pdf'];
             $dest = $this->geUsersEMail('tbl_cargo.id = '.$this->profile['gerente_adm']);

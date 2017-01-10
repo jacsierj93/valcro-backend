@@ -83,7 +83,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                         }
                     }
 
-                    if(compare.titulo){
+                    if(compare.titulo && current.titulo){
                         if( current.titulo.toLowerCase().indexOf(compare.titulo)== -1){
                             return false;
                         }
@@ -1727,24 +1727,6 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                 }
             }else{
                 //  setGetOrder.change("document","condicion_pago_id",undefined);
-            }
-        }
-
-    });
-    $scope.$watch('$parent.document.objs.puerto_id', function (newVal) {
-
-        if( angular.equals(angular.element("#detalleDoc #puerto_id input[type=search]"),angular.element(":focus"))){
-
-            if(newVal ){
-                if(newVal != 0){
-                    $scope.$parent.document.puerto_id = newVal.id;
-                    //  setGetOrder.change("document","puerto_id", newVal.id);
-                }
-            }else{
-                if(!$scope.Docsession.block){
-                    $scope.$parent.document.puerto_id= null;
-                    //setGetOrder.change("document","puerto_id",undefined);
-                }
             }
         }
 

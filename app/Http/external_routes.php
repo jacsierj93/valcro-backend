@@ -10,13 +10,13 @@ $app->get("External/Email",function (Request $req){
     $req->session()->put('services.email', $req->all());
     $req->session()->put('services.email', $req->all());
     $req->session()->put('services.email', $req->all());
+    redirect()->route('login');
     if (!$req->session()->has('DATAUSER')) {
         redirect()->route('login');
     }else{
         return view("home");
     }
 
-    dd($req);
 });
 
 

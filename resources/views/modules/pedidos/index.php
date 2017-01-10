@@ -1170,6 +1170,8 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
+                                                     md-selected-item-change="$parent.document.puerto_id = $parent.document.objs.puerto_id.id; toEditHead('document','puerto_id',($parent.document.objs.puerto_id)  ?  $parent.document.objs.puerto_id: undefined );"
+
                                     >
                                         <md-item-template>
                                             <span>{{item.Main_port_name}}</span>
@@ -1310,7 +1312,7 @@
                                     >
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20" >
-                                    <label>Peso</label>
+                                    <label>Peso (Kg)</label>
                                     <input ng-model="$parent.document.peso" name="peso" decimal
                                            ng-disabled="( $parent.Docsession.block || $parent.document.isAprobado )"
                                            ng-change="toEditHead('document','peso', $parent.document.peso)"
