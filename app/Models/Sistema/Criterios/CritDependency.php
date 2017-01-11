@@ -24,9 +24,11 @@ class CritDependency extends Model
 
     public function children(){
         return $this->hasMany('App\Models\Sistema\Criterios\CritLinCamTip','id','sub_lct_id')
+            ->selectRaw('id,linea_id, tipo_id,campo_id')
             ->with(array('field'=>function($query){
-                $query->select('id','descripcion');
+                $query->selectRaw('id,descripcion');
             }))
-            ->with('children');
+            ->with('childCfg');
+            
     }
 }

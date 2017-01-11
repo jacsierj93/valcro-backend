@@ -37,7 +37,15 @@ class CritLinCamTip extends Model
     public function dependency(){
         return $this->hasMany('App\Models\Sistema\Criterios\CritDependency','sub_lct_id','id');
     }
-    public function children(){
+    public function childCfg(){
         return $this->hasMany('App\Models\Sistema\Criterios\CritDependency','lct_id','id');
+    }
+    public function children(){
+        return $this->belongsToMany('App\Models\Sistema\Criterios\CritLinCamTip','tbl_crit_dependencia','lct_id','sub_lct_id')
+            ->selectRaw('tbl_crit_lin_cam_tip.id as id,linea_id, tipo_id,campo_id,RAND() as random')
+            ->with(array('field'=>function($query){
+                $query->selectRaw('id,descripcion,RAND() as random');
+            }))
+            ->with('children');
     }
 }

@@ -30,3 +30,45 @@
 .assign {
     background: rgba(0, 255, 0, 0.5);
 }
+
+treecontrol li{
+    background-color: #eef7fe;
+}
+treecontrol li li{
+    background-color: #d4ebfd;
+}
+treecontrol li li li{
+    background-color: #b8ddfa;
+}
+treecontrol  li  li  li  li{
+    background-color: #a3d4fc;
+}
+treecontrol  li  li  li  li  li{
+    background-color: #84c7fb;
+}
+treecontrol  li  li  li  li  li  li{
+    background-color: #6ebefd;
+}
+treecontrol  li  li  li  li  li  li  li{
+    background-color: #4fb1fc;
+}
+treecontrol  li  li  li  li  li  li  li li{
+    background-color: #2fa2fb;
+}
+treecontrol  li  li  li  li  li  li  li  li  li{
+    background-color: #118ae7;
+    color:#f1f1f1;
+}
+treecontrol  li  li  li  li  li  li  li  li  li  li{
+    background-color: #0774c7;
+}
+treecontrol  li  li  li  li  li  li  li  li  li  li{
+    background-color: #1161a0;
+}
+treecontrol  li  li  li  li  li  li  li  li  li  li  li{
+    background-color: #1b507c;
+    color:#fdfdfd;
+}
+treecontrol  li  li  li  li  li  li  li  li  li  li  li  li{
+    background-color: #223e54;
+}

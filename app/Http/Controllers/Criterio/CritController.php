@@ -92,25 +92,28 @@ class CritController extends BaseController
         return  json_encode($crit);
     }
     public function treeMap($line){
-        $tree = Criterio::where("linea_id",$line)
+        $tree = Criterio::selectRaw('id ,linea_id, tipo_id,campo_id,RAND() as randon')->where("linea_id",$line)
             ->doesntHave("dependency")
             /*->has("children")*/
             ->with(array('field'=>function($query){
-                $query->selectRaw('id,descripcion');
+                $query->selectRaw('id,descripcion,RAND() as random');
             }))
             ->with("children")
             ->get();
-        foreach ($tree as $branch){
+        /*foreach ($tree as $branch){
             self::recursive($branch);
-        }
+        }*/
         return $tree;
 
 
     }
 
     private static function recursive ($child){
-        foreach ($child->children as $cur){
-            $cur['children'] = $cur->children;
+        //$child->field['cod']=$child->field['id'];
+
+        foreach ($child->childCfg as $cur){
+
+            $child['children'] = $cur->children;
             self::recursive($cur['children'][0]);
         }
     }
