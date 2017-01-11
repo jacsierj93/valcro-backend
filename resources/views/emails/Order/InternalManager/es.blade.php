@@ -80,48 +80,6 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                                @if($model->nro_factura != null || $model->nro_proforma != null )
-                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                        <tbody>
-                                        <tr>
-                                            @if($model->nro_factura != null)
-                                                <td  width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Factura:
-                                                    <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
-                                                        {{$model->nro_factura}}
-                                                    </p>
-                                                </td>
-                                            @endif
-                                            @if($model->nro_proforma != null)
-                                                <td  width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Proforma:
-                                                    <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
-                                                        {{$model->nro_proforma}}
-                                                    </p>
-                                                </td>
-                                            @endif
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                @endif
-
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody>
-                                    <tr>
-                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Cubicaje Mt3
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
-                                                {{($model->mt3 != null) ? $model->mt3 : 'No asignado' }}
-                                            </p>
-                                        </td>
-                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Peso (Kg)
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
-                                                {{($model->peso != null) ? $model->peso : 'No asignado' }}
-                                            </p>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -172,12 +130,54 @@
                                     </tr>
                                     </tbody>
                                 </table>
+
+                                @if($model->nro_factura != null || $model->nro_proforma != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            @if($model->nro_factura != null)
+                                                <td  width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Factura:
+                                                    <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                        {{$model->nro_factura}}
+                                                    </p>
+                                                </td>
+                                            @endif
+                                            @if($model->nro_proforma != null)
+                                                <td  width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Proforma:
+                                                    <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                        {{$model->nro_proforma}}
+                                                    </p>
+                                                </td>
+                                            @endif
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                @endif
+
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Cubicaje Mt3
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->mt3 != null) ? $model->mt3 : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                        <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Peso (Kg)
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->peso != null) ? $model->peso : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Comentario:
-                                            <p id="comentario" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
-                                                {{$model->comentario}}
+                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
+                                            <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
+                                                {{$texto}}
                                             </p>
                                         </td>
                                     </tr>
@@ -187,7 +187,7 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Documentos Referidos:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;"  >
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
                                                 @foreach($model->customOrders()->get() as $key=> $aux)
                                                     <span>   CP-{{$aux->id}}</span> @if($key > $model->customOrders()->count() -1), @endif
                                                 @endforeach
@@ -261,17 +261,6 @@
                                             <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background:@if($model->fecha_aprob_compra != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Aprobado por<br>Compras</div></td>
                                         <td align="center" width="30%">
                                             <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: @if($model->comentario_cancelacion != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Cancelado<br>&nbsp;</div></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody>
-                                    <tr style="margin: 0;padding:0">
-                                        <td  width="90%" align="center" style="color: rgb(140,140,140);margin: 0;padding: 10px 0 0 0 ;">
-                                            <div style="text-align: center;font-size: 22px;border-radius: 10px;background: rgb(238,141,0);margin: 0 5px 0 0;padding: 14px 10px;" align="center">
-                                                <a href="http://10.15.2.76/dev/External/Email?module=order&id={{$model->id}}&tipo={{$model->getTipoId()}}"  style="color: #ffffff;text-decoration: none;margin: 0;padding:0" target="_blank" tabindex="-1" rel="external nofollow">Click aqu&iacute para ver el Documento</a>
-                                            </div>
-                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>

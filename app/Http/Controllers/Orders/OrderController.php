@@ -3130,7 +3130,7 @@ class OrderController extends BaseController
             $model->final_id = $this->getFinalId($model);
 
             /** envio de notificaciones **/
-            $options = $this->templateNotif($model, 'emails.Order.genericNoti.es','order',$req->action);
+            $options = $this->templateNotif($model, 'emails.Order.InternalManager.es','order',$req->action);
             $options['atts'][]= ['data'=>$resul['email']['attOff']['data'],'nombre'=>$model->id.'_A_Proveedor.pdf'];
             $resul['email']['attOff'] ='';
             if($req->action == 'sendPrv'){
@@ -4282,8 +4282,26 @@ class OrderController extends BaseController
         $model->ult_revision = Carbon::now();
         $model->final_id = $this->getFinalId($model);
         $model->save();
+        $result['id'] = $model->id;
+        //$model->attachments()->where('documento','FACTURA')->count();
+        if($model->nro_factura != null && $model->attachments()->where('documento','FACTURA')->count() > 0){
+            /** envio de notificaciones **/
+            $model->makedebt();
+            $options = $this->templateNotif($model, 'emails.Purchase.InternalManager.es','purchase','update');
 
-        return ['id'=>$req->id];
+            $dest= array_merge($this->geUsersEMail('tbl_departamento.id = '.$this->departamentos['compras']), $this->geUsersEMail('tbl_cargo.id = '.$this->profile['gerente_adm']));
+            $options['to'] = $dest;
+            $mail = new MailModule();
+            $mail->doc_id = $model->id;
+            $mail->tipo_origen_id = 23;
+            $mail->asunto =$options['subject'];
+            $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+            $mail->tipo = 'sis';
+            $mail->modulo = 'solicitude';
+            $mail->save();
+            $result['nofs']=  $mail->sendMail($options['template'], $options);
+       }
+        return $result;
     }
 
     /**
@@ -4397,7 +4415,7 @@ class OrderController extends BaseController
             $model->final_id = $this->getFinalId($model);
 
             /** envio de notificaciones **/
-            $options = $this->templateNotif($model, 'emails.Purchase.genericNoti.es','order',$req->action);
+            $options = $this->templateNotif($model, 'emails.Purchase.InternalManager.es','order',$req->action);
             $options['atts'][]= ['data'=>$resul['email']['attOff']['data'],'nombre'=>$model->id.'_A_Proveedor.pdf'];
             $resul['email']['attOff'] ='';
             $dest= array_merge($this->geUsersEMail('tbl_departamento.id = '.$this->departamentos['compras']), $this->geUsersEMail('tbl_cargo.id = '.$this->profile['gerente_adm']));

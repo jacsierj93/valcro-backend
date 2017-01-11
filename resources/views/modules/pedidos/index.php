@@ -2776,7 +2776,7 @@
                                         </div>
                                         <div class="rowRsmTitle"> Pais </div>
                                     </div>
-                                    <div class="rms" flex> {{document.pais}} </div>
+                                    <div class="rms" flex> {{document.objs.pais.short_name}} </div>
                                 </div>
                                 <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
                                     <div layout="row" flex="40" >
