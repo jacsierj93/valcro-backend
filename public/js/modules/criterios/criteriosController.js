@@ -34,6 +34,178 @@ MyApp.service("mastersCrit",function(criterios,masters){
     }
 });
 
+MyApp.service("critForm",function(criterios,mastersCrit,$filter){
+
+    var lines = mastersCrit.getLines();
+    var fields = mastersCrit.getFields();
+    var tipos = mastersCrit.getTypes();
+    var listadobkup = [];
+    var masterOptions = criterios.query({ type:"masterOptions"});
+    var ListOptions = criterios.query({ type:"optionLists"});
+    var curLine = {id:false,listado:[]};
+    var factory = {
+        linea_id: "1",
+        campo_id: "1",
+        tipo_id: "2",
+        line:{},
+        field:$filter("filterSearch")(fields,[1])[0],
+        type:$filter("filterSearch")(tipos,[2])[0],
+        id:false,
+        options:{},
+        deps:[],
+        ready:false
+    };
+    var edit = {
+        id:false,
+        line:null,
+        type:null,
+        field:null,
+        opcs:[]
+    };
+    var accept = false;
+
+    var dependency = {
+        id:false,
+        lct_id:edit.id,
+        parent_id:false,
+        operator:'',
+        condition:"",
+        action:null
+    };
+
+    return {
+        setLine:function(elem,force){
+            //console.log(angular.equals(curLine.listado,listadobkup))
+            if(!angular.equals(curLine.listado,listadobkup) && !force){
+                return false;
+            }
+
+            if(!elem){
+                curLine.id = false;
+                listadobkup = [];
+                curLine.listado = [];
+                return true;
+            }
+            curLine.id = elem.id;
+            criterios.query({ type:"getCriteria",id:elem.id},function(data){
+                listadobkup = angular.copy(data) || [];
+                curLine.listado = data || [];
+
+            });
+
+
+            return true;
+        },
+        getLine:function(){
+            return curLine;
+        },
+        add:function(datos){
+            var elem = {};
+            elem = $filter("filterSearch")(curLine.listado,[datos.id])[0]
+            if(!elem){
+                elem = angular.copy(factory);
+                curLine.listado.push(elem);
+            }
+            elem.id=datos.id;
+            elem.ready = datos.ready;
+            elem.linea_id=datos.line;
+            elem.line = $filter("filterSearch")(lines,[datos.line])[0];
+            elem.campo_id=datos.field;
+            elem.field = $filter("filterSearch")(fields,[datos.field])[0];
+            elem.tipo_id=datos.type;
+            elem.type = $filter("filterSearch")(tipos,[datos.type])[0];
+            //elem.opcs = elem.type.cfg;
+        },
+        get:function(){
+            return listado;
+        },
+        setEdit:function(campo){
+            edit.id = campo.id || false;
+            edit.line = campo.linea_id || curLine.id;
+            edit.field = campo.campo_id || null;
+            edit.type = campo.tipo_id || null;
+            edit.opcs = campo.options || [];
+
+        },
+        getEdit:function(){
+            return edit;
+        },
+        updOptions:function (opt) {
+            var aux = $filter("filterSearch")(curLine.listado,[opt.field_id])[0];
+            if(!("options" in aux)) aux.options = [];
+            if(opt.opc_id == 4){
+                if(!("Opcion" in aux.options)){
+                    aux.options.Opcion = [];
+                }
+                var valAux = angular.copy(opt.valor);
+                angular.forEach(aux.options.Opcion, function(value, key){
+                    if(value.id==opt.opc_id){
+                        var idx = valAux.indexOf(parseInt(value.id))
+                        if(idx==-1){
+                            aux.options.Opcion.splice(key,1);
+                        }else{
+                            valAux.splice(idx,1);
+                        }
+                    }
+                });
+
+                angular.forEach(valAux, function(value, key) {
+
+                    aux.options.Opcion.push({
+                        camp_tipo: "array",
+                        descripcion: "Opcion",
+                        id: opt.opc_id,
+                        elem:$filter("filterSearch")(ListOptions,[value])[0],
+                        pivot: {
+                            id: opt.id,
+                            lct_id: opt.field_id,
+                            opc_id: opt.opc_id,
+                            value: value,
+                            message: ""
+                        }
+                    })
+                });
+
+            }else{
+                var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
+                var upd =  ((define.descripcion in aux.options) && aux.options[define.descripcion].length>0)?aux.options[define.descripcion][0]:false;
+                if(upd){
+                    upd.pivot.value =  opt.valor;
+                    upd.pivot.message =  opt.msg;
+                }else{
+                    var temp = angular.copy(define);
+                    temp.pivot= {
+                        id: opt.id,
+                        lct_id: opt.field_id,
+                        opc_id: opt.opc_id,
+                        value: opt.valor,
+                        message: opt.msg
+                    };
+                    aux.options[define.descripcion]= [temp];
+                }
+            }
+        },
+        delOption :function(opt){
+            var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
+            var aux = $filter("filterSearch")(curLine.listado,[opt.field_id])[0].options[define.descripcion]
+            aux.splice(0,1);
+        },
+        getOptions:function () {
+            return ListOptions;
+        },
+        setDepend : function(depend){
+            dependency.id = depend.id || false;
+            dependency.parent_id = depend.lct_id || false;
+            dependency.lct_id = depend.sub_lct_id || edit.id;
+            dependency.operator = depend.operador || "";
+            dependency.condition = depend.valor || "";
+            dependency.action = depend.accion || undefined;
+        },
+        getDepend : function(){
+            return dependency;
+        }
+    }
+});
 
 
 MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
@@ -619,179 +791,6 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
 
 }]);
 
-MyApp.service("critForm",function(criterios,mastersCrit,$filter){
-
-    var lines = mastersCrit.getLines();
-    var fields = mastersCrit.getFields();
-    var tipos = mastersCrit.getTypes();
-    var listadobkup = [];
-    var masterOptions = criterios.query({ type:"masterOptions"});
-    var ListOptions = criterios.query({ type:"optionLists"});
-    var curLine = {id:false,listado:[]};
-    var factory = {
-        linea_id: "1",
-        campo_id: "1",
-        tipo_id: "2",
-        line:{},
-        field:$filter("filterSearch")(fields,[1])[0],
-        type:$filter("filterSearch")(tipos,[2])[0],
-        id:false,
-        options:{},
-        deps:[],
-        ready:false
-    };
-    var edit = {
-        id:false,
-        line:null,
-        type:null,
-        field:null,
-        opcs:[]
-    };
-    var accept = false;
-
-    var dependency = {
-        id:false,
-        lct_id:edit.id,
-        parent_id:false,
-        operator:'',
-        condition:"",
-        action:null
-    };
-
-    return {
-        setLine:function(elem,force){
-            //console.log(angular.equals(curLine.listado,listadobkup))
-            if(!angular.equals(curLine.listado,listadobkup) && !force){
-                return false;
-            }
-
-            if(!elem){
-                curLine.id = false;
-                listadobkup = [];
-                curLine.listado = [];
-                return true;
-            }
-            curLine.id = elem.id;
-            criterios.query({ type:"getCriteria",id:elem.id},function(data){
-                    listadobkup = angular.copy(data) || [];
-                    curLine.listado = data || [];
-
-            });
-
-
-            return true;
-        },
-        getLine:function(){
-            return curLine;
-        },
-        add:function(datos){
-            var elem = {};
-            elem = $filter("filterSearch")(curLine.listado,[datos.id])[0]
-            if(!elem){
-                elem = angular.copy(factory);
-                curLine.listado.push(elem);
-            }
-            elem.id=datos.id;
-            elem.ready = datos.ready;
-            elem.linea_id=datos.line;
-            elem.line = $filter("filterSearch")(lines,[datos.line])[0];
-            elem.campo_id=datos.field;
-            elem.field = $filter("filterSearch")(fields,[datos.field])[0];
-            elem.tipo_id=datos.type;
-            elem.type = $filter("filterSearch")(tipos,[datos.type])[0];
-            //elem.opcs = elem.type.cfg;
-        },
-        get:function(){
-            return listado;
-        },
-        setEdit:function(campo){
-            edit.id = campo.id || false;
-            edit.line = campo.linea_id || curLine.id;
-            edit.field = campo.campo_id || null;
-            edit.type = campo.tipo_id || null;
-            edit.opcs = campo.options || [];
-
-        },
-        getEdit:function(){
-            return edit;
-        },
-        updOptions:function (opt) {
-            var aux = $filter("filterSearch")(curLine.listado,[opt.field_id])[0];
-            if(!("options" in aux)) aux.options = [];
-            if(opt.opc_id == 4){
-                if(!("Opcion" in aux.options)){
-                    aux.options.Opcion = [];
-                }
-                var valAux = angular.copy(opt.valor);
-                angular.forEach(aux.options.Opcion, function(value, key){
-                    if(value.id==opt.opc_id){
-                        var idx = valAux.indexOf(parseInt(value.id))
-                        if(idx==-1){
-                            aux.options.Opcion.splice(key,1);
-                        }else{
-                            valAux.splice(idx,1);
-                        }
-                    }
-                });
-
-                angular.forEach(valAux, function(value, key) {
-
-                    aux.options.Opcion.push({
-                        camp_tipo: "array",
-                        descripcion: "Opcion",
-                        id: opt.opc_id,
-                        elem:$filter("filterSearch")(ListOptions,[value])[0],
-                        pivot: {
-                            id: opt.id,
-                            lct_id: opt.field_id,
-                            opc_id: opt.opc_id,
-                            value: value,
-                            message: ""
-                        }
-                    })
-                });
-
-            }else{
-                var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
-                var upd =  ((define.descripcion in aux.options) && aux.options[define.descripcion].length>0)?aux.options[define.descripcion][0]:false;
-                if(upd){
-                    upd.pivot.value =  opt.valor;
-                    upd.pivot.message =  opt.msg;
-                }else{
-                    var temp = angular.copy(define);
-                    temp.pivot= {
-                        id: opt.id,
-                        lct_id: opt.field_id,
-                        opc_id: opt.opc_id,
-                        value: opt.valor,
-                        message: opt.msg
-                    };
-                    aux.options[define.descripcion]= [temp];
-                }
-            }
-        },
-        delOption :function(opt){
-            var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
-            var aux = $filter("filterSearch")(curLine.listado,[opt.field_id])[0].options[define.descripcion]
-            aux.splice(0,1);
-        },
-        getOptions:function () {
-            return ListOptions;
-        },
-        setDepend : function(depend){
-            dependency.id = depend.id || false;
-            dependency.parent_id = depend.lct_id || false;
-            dependency.lct_id = depend.sub_lct_id || edit.id;
-            dependency.operator = depend.operador || "";
-            dependency.condition = depend.valor || "";
-            dependency.action = depend.accion || null;
-        },
-        getDepend : function(){
-            return dependency;
-        }
-    }
-});
-
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
@@ -860,7 +859,6 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.item = [];
 }]);
 
-
 MyApp.controller('treeController',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter','criterios',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter,criterios) {
     $scope.line = critForm.getLine();
 
@@ -869,6 +867,9 @@ MyApp.controller('treeController',['$scope', 'setNotif','masters','critForm','$m
             $scope.treedata =data || [];
         });
     });
+    $scope.check = function(path,i,parent){
+        console.log(path,i,parent);
+    }
 
 }]);
 
@@ -960,6 +961,7 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
 
 }]);
 
+
 MyApp.directive('formPreview', function() {
         return {
             templateUrl: function(elem, attr) {
@@ -1021,7 +1023,8 @@ MyApp.directive('lmbCollection', function() {
         scope: {
             itens: '=lmbItens',
             model: '=lmbModel',
-            valid: '=?valid'
+            valid: '=?valid',
+            dis: '=?lmbDisabled'
         },
         controller:function($scope){
             $scope.curVal = {};
@@ -1061,10 +1064,18 @@ MyApp.directive('lmbCollection', function() {
                 }
 
             };
+
         },
         link:function(scope,elem,attr,model){
             scope.multi = ('multiple' in attr);
             scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
+            attr.$observe('lmbDisabled', function (newValue) {
+                if(newValue){
+                    elem.css("color","#f1f1f1");
+                }else{
+                    elem.css("color","#000");
+                }
+            });
         },
         template: function(elem,attr){
             var show = "descripcion"
@@ -1074,10 +1085,10 @@ MyApp.directive('lmbCollection', function() {
             var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
             if(attr.lmbType=="items"){
 
-                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="setIten(item)" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.'+show+'}}</div></div>';
+                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.'+show+'}}</div></div>';
             }else{
                 return '<md-content flex layout="column">'+
-                    '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="setIten(item)" ng-class="{\'field-sel\':item.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'
+                    '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':item.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'
 
                 +'</md-content>';
             }
@@ -1087,6 +1098,3 @@ MyApp.directive('lmbCollection', function() {
 
     };
 });
-
-
-lo

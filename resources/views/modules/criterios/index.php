@@ -306,16 +306,17 @@
                 <input type="hidden" md-autofocus>
                 <div layout="row" flex style="width:304px;">
                     <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important; ">
-                        <div flex layout="column" style="padding:8px;">
-                            <div flex="70">
-                                <div class="titulo_formulario row" layout="column" layout-align="start start">
-                                    <div ng-click="show()">
-                                        Opciones
-                                    </div>
-                                </div>
-                                <md-content flex layout="row">
-                                    <form name="optionsForm" layout="column" flex>
 
+                        <div flex layout="column" style="padding:8px;">
+                            <form name="optionsForm" layout="column" flex="70">
+                                <!--<div >-->
+                                    <div class="titulo_formulario row" layout="column" layout-align="start start">
+                                        <div ng-click="show()">
+                                            Opciones
+                                        </div>
+                                    </div>
+
+                                    <md-content flex layout="column">
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px" class="row">
                                                 <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">
                                                     <md-input-container class="md-block" flex >
@@ -496,13 +497,10 @@
                                                     </div>
                                                 </md-content>
                                             </div>
+                                        </md-content>
 
-                                    </form>
-                                </md-content>
-
-
-                            </div>
-
+                                <!--</div>-->
+                            </form>
                             <div flex>
                                 <div class="titulo_formulario row" layout="column" layout-align="start start">
                                     <div ng-click="addDepend(false)">
@@ -671,11 +669,26 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <md-content flex>
-                                                <div ng-repeat="opt in currentCrit.options track by $index" ng-if="opt.camp_tipo == 'array'" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                                    {{getoptSet(opt.pivot.value).nombre}}
+
+                                            <lmb-collection class="rad-contain"
+                                                            layout="column"
+                                                            lmb-type="list"
+                                                            multiple
+                                                            lmb-disabled="configDep.action === true || configDep.action === false"
+                                                            lmb-model="configDep.action"
+                                                            lmb-display="elem.nombre"
+                                                            lmb-itens="selCrit.options.Opcion"
+                                                            lmb-key="elem.id"
+
+                                            >
+
+                                            </lmb-collection>
+                                            <!--<md-content flex>
+                                                <div ng-repeat="opt in opcValue.opts.valor track by $index" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                                    {{getoptSet(opt).nombre}}
                                                 </div>
                                             </md-content>
+-->
                                         </div>
                                     </div>
 
@@ -705,14 +718,13 @@
                         </div>
                         <div layout="row" class="column">
 
-                            <treecontrol class="tree-classic" tree-model="treedata">
+                            <treecontrol class="tree-light" tree-model="treedata">
+
 
                                <span ng-if="node.field" >
-                                    {{node.field.descripcion}}
+                                   {{node.field.descripcion}}
                                 </span>
-                                <span ng-if="node.operador" >
-                                    {{node.operador}} {{node.valor}}
-                                </span>
+
 
                             </treecontrol>
                         </div>
