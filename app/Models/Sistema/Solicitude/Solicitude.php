@@ -23,33 +23,56 @@ class Solicitude extends Model
     protected $table = "tbl_solicitud";
     protected $dates = ['deleted_at'];
 
+    /****************************** NO MODIFICABLES *****************************/
     public function  getTipo(){
         return 'Solicitud';
     }
     public function  getTipoId(){
         return 21;
     }
+    /****************************** FIN NO MODIFICABLES *****************************/
+
+    /****************************** RELACIONALES *****************************/
 
     public function type_origen(){
         return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id');
     }
 
+    /**
+     * get provider
+    */
     public function provider(){
         return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
     }
+
+    /**
+     * get payment conditions the provider
+     */
     public function CondPay(){
         return $this->belongsTo('App\Models\Sistema\Providers\ProviderCondPay', 'condicion_pago_id');
     }
+    /**
+     * get country arrivalsolicitude
+     */
     public function country(){
         return $this->belongsTo('App\Models\Sistema\Masters\Country', 'pais_id');
     }
+    /**
+     * get address store from arrival the products
+     */
     public function store(){
         return $this->belongsTo('App\Models\Sistema\Providers\ProviderAddress', 'direccion_almacen_id');
     }
+    /**
+     * get port going the productos
+     */
     public function port(){
         return $this->belongsTo('App\Models\Sistema\Masters\Ports', 'puerto_id');
-
     }
+
+    /**
+     * get the coin
+     */
     public function coin(){
         return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'prov_moneda_id');
 
@@ -64,6 +87,20 @@ class Solicitude extends Model
         return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAnswer', 'doc_id');
     }
 
+    /**
+     * adjuntos del documento
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAttachment', 'doc_id');
+    }
+    /**
+     */
+    public function getTypeOrder(){
+        return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
+    }
+    /****************************** FIN RELACIONALES *****************************/
+
+    /******************************  RELACIONAL FOR QUERYS *****************************/
 
     public function customOrders(){
 
@@ -87,37 +124,9 @@ class Solicitude extends Model
         return $items;
     }
 
-    /**
-     * adjuntos del documento
-     */
-    public function attachments(){
-        return $this->hasMany('App\Models\Sistema\Solicitude\SolicitudeAttachment', 'doc_id');
-    }
+    /******************************  END RELACIONAL  FOR QUERYS *****************************/
 
-    public function newItem(){
-        return new SolicitudeItem();
-    }
-    public function newAttachment(){
-        return new SolicitudeAttachment();
-    }
-
-    /**
-     * @return el numero de contra pedido asignados a este pedido
-     */
-    public function getNumItem($tipo){
-        $i=0;
-        $items = $this->items()->get();
-        foreach($items as $aux){
-            $tip=$this->getTypeProduct($aux);
-            if($tip == $tipo){
-                $i++;
-            }
-
-        }
-
-        return $i;
-    }
-
+    /******************************   CALCULATED *****************************/
     /**
      * Metodo que calcula la categoria de llegada del pedido
      * @return categoria de llegada
@@ -157,6 +166,23 @@ class Solicitude extends Model
         }
 
         return $estatus;//->format("d");
+    }
+
+    /**
+     * @return el numero de contra pedido asignados a este pedido
+     */
+    public function getNumItem($tipo){
+        $i=0;
+        $items = $this->items()->get();
+        foreach($items as $aux){
+            $tip=$this->getTypeProduct($aux);
+            if($tip == $tipo){
+                $i++;
+            }
+
+        }
+
+        return $i;
     }
 
 
@@ -211,15 +237,6 @@ class Solicitude extends Model
         }
         return $estatus;//->format("d");
     }
-    /**
-     * @deprecated */
-    private function dateDiff($dateIni, $dateEnd)
-    {
-        $from = date_create($dateIni);
-        $to = date_create($dateEnd);
-        $diff = date_diff($to, $from);
-        return (int)$diff->format('%R%d');
-    }
 
     /**
      * @return el tipo de producto original
@@ -241,17 +258,15 @@ class Solicitude extends Model
         return SourceType::findOrFail($idType)->id;
 
     }
-    /**************************** descontinuado**********************
-
-    /*     */
-    public function getOrders(){
-        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrder', 'pedido_id');
+    /******************************  END CALCULATED *****************************/
+    /******************************  TRAP *****************************/
+    public function newItem(){
+        return new SolicitudeItem();
+    }
+    public function newAttachment(){
+        return new SolicitudeAttachment();
     }
 
-    /**
-     */
-    public function getTypeOrder(){
-        return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
-    }
+
 
 }

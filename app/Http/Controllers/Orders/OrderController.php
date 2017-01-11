@@ -82,15 +82,16 @@ class OrderController extends BaseController
     private $user = null;
 
     public function test(Request $req){
-        $model= Solicitude::findOrFail(668);
+        $model= Purchase::findOrFail(23);
         $user = $this->user;
+        $model->makedebt();
        $data =  [
             'subjet'=>'daee',
             'model'=>$model,
             'texto'=>'sadfsadf',
             'articulos'=>$model->items()->with('producto')->get(),
             'user'=>$user];
-        return View('emails.Solicitude.toProviders.es',$data);
+        return View('emails.Purchase.InternalManager.es',$data);
     }
 
     public function __construct(Request $req)
@@ -1235,7 +1236,7 @@ class OrderController extends BaseController
         $model->producto_id = $co->producto_id;
         $model->doc_origen_id = $co->doc_id;
         $model->uid = $co->uid;
-        $model->doc_origen_id = $req->has('costo_unitario') ? $req->costo_unitario : null;
+        $model->costo_unitario = $req->has('costo_unitario') ? $req->costo_unitario : null;
 
         if ($resul['accion'] == 'new' || $model->cantidad == $model->saldo) {
             $model->cantidad = $req->saldo;
@@ -3512,6 +3513,10 @@ class OrderController extends BaseController
 
             return $template;
         };
+
+        if($model->nro_factura != null && $model->attachments()->where('document','nro_factura')->count() > 0){
+            $tipo = 'update';
+        }
         $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Purchase', $tipo, $fn)['good']];
         $correos = [];
         foreach (User::get() as  $aux){
@@ -3664,7 +3669,7 @@ class OrderController extends BaseController
         $model->producto_id = $co->producto_id;
         $model->doc_origen_id = $co->doc_id;
         $model->uid = $co->uid;
-        $model->doc_origen_id = $req->has('costo_unitario') ? $req->costo_unitario : null;
+        $model->costo_unitario = $req->has('costo_unitario') ? $req->costo_unitario : null;
 
         if ($resul['accion'] == 'new' || $model->cantidad == $model->saldo) {
             $model->cantidad = $req->saldo;
@@ -4277,6 +4282,7 @@ class OrderController extends BaseController
         $model->ult_revision = Carbon::now();
         $model->final_id = $this->getFinalId($model);
         $model->save();
+
         return ['id'=>$req->id];
     }
 
@@ -4326,7 +4332,7 @@ class OrderController extends BaseController
     public function sendPurchase(Request $req){
         $resul = ['action'=>'send'];
         $model = Purchase::findOrFail($req->id);
-        $sends =MailModule::where('tipo_origen_id','21')
+        $sends =MailModule::where('tipo_origen_id','23')
             ->where('doc_id',$model->id)
             ->where('tipo','user')
             ->whereNotNull('send')

@@ -3315,7 +3315,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
                     accions.push( {name:"Enviar al proveedor ",action:function () { $scope.send({action:'sendPrv'})}});
                 }
                 if(response.actions.indexOf('sendIntern') != -1){
-                    accions.push( {name:"Informar a departamentos",action:function () { $scope.send({action:'sendIntern'})}});
+                    accions.push( {name:"Informar a departamentos",action:function () { $scope.send({action:'sendIntern', op:response.actions.sendIntern})}});
                 }
                 $scope.NotifAction("alert", "¿Que desea hacer?",accions,{block:true});
 
@@ -3486,24 +3486,26 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
         $scope.model.ccb = [];
         $scope.model.adjs = [];
         $scope.model.action = angular.copy(data.action);
+        $scope.model.op = angular.copy(data.op);
         $scope.asunto = undefined;
         $scope.template = '';
         $scope.mailFn.clear();
+        $scope.noNew= false;
+        Order.getMod({type:$scope.formMode.mod, mod:(data.action == 'sendPrv') ? "ProviderTemplates":'InternalTemplates',id:$scope.document.id},{}, function(response){
+            $scope.correos = response.correos;
+            $scope.origenes = response.templates;
+            $scope.model.tipo = response.tipo;
+            if(response.to){
+                angular.forEach(respnse.to, function (v) {
+                    $scope.model.to.push(v);
+                });
+            }
+        });
 
 
 
         if(data.action == 'sendPrv'){
-            $scope.noNew= false;
-            Order.getMod({type:$scope.formMode.mod, mod:(data.action == 'sendPrv') ? "ProviderTemplates":'InternalTemplates',id:$scope.document.id},{}, function(response){
-                $scope.correos = response.correos;
-                $scope.origenes = response.templates;
-                $scope.model.tipo = response.tipo;
-                if(response.to){
-                    angular.forEach(respnse.to, function (v) {
-                        $scope.model.to.push(v);
-                    });
-                }
-            });
+
         }
 
 

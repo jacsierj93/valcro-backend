@@ -1,5 +1,7 @@
 
 <?=HTML::style("http://fonts.googleapis.com/css?family=Roboto") ?>
+<style>
+</style>
 <div style="min-height: 100%;margin: 0;padding: 0px; text-align: center; font-family: Roboto;">
     <table style="border-spacing: 0px;margin: auto;padding: 0;width: 600px;">
         <tbody>
@@ -37,6 +39,7 @@
                                     </tr>
                                     </tbody>
                                 </table>
+
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -49,24 +52,48 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                {{$model->titulo}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
 
-
-                                @if($model->CondPay != null )
-                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                        <tbody>
-                                        <tr>
-                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Codicion de pago:
-                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
-                                                    {{$model->CondPay->getText()}}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                @endif
-
-
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td   align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Pais
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                {{($model->country->short_name != null) ? $model->country->short_name : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                        <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Puerto
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->port != null) ? $model->port->Main_port_name : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Almacen
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->store != null) ? $model->store->direccion : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -81,12 +108,51 @@
                                                 {{($model->coin != null) ? $model->coin->nombre : 'No asignado' }}
                                             </p>
                                         </td>
+                                        <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Tasa
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{$model->tasa }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Cubicaje Mt3
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->mt3 != null) ? $model->mt3 : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                        <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Peso (Kg)
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->peso != null) ? $model->peso : 'No asignado' }}
+                                            </p>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>
 
+                                @if($model->CondPay != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Codicion de pago:
+                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                    {{$model->CondPay->getText()}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                @endif
                                 @if($model->nro_factura != null || $model->nro_proforma != null )
                                     <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                         <tbody>
                                         <tr>
@@ -107,24 +173,27 @@
                                         </tr>
                                         </tbody>
                                     </table>
-                                @endif
 
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Comentario:
-                                            <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
-                                                {{$model->comentario}}
-                                            </p>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                @endif
+                                @if($model->deuda != null )
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr>
+                                            <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Por pagar:
+                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                    {{$model->deuda}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                @endif
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Documentos Referidos:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;"  >
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
                                                 @foreach($model->customOrders()->get() as $key=> $aux)
                                                     <span>   CP-{{$aux->id}}</span> @if($key > $model->customOrders()->count() -1), @endif
                                                 @endforeach
@@ -147,6 +216,21 @@
                                     </tbody>
                                 </table>
 
+
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Comentario
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
+                                                {{$model->comentario}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -184,22 +268,36 @@
 
                                     </tbody>
                                 </table>
-                                @if($model->comentario_cancelacion != null)
-                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
 
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 16px;">
-                                        <tbody>
-                                        <tr>
-                                            <td align="center">
-                                                <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: rgba(205, 0, 0, 0.69);margin: 0 5px 0 0;padding: 14px 10px;" align="center">Cancelado<br>&nbsp;</div></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                @endif
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 16px;">
+                                    <tbody>
+                                    <tr>
+                                        <td align="center" width="30%">
+                                            <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: @if($model->fecha_aprob_gerencia != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Aprobado por<br>Gerente</div></td>
+                                        <td align="center" width="30%">
+                                            <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background:@if($model->fecha_aprob_compra != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Aprobado por<br>Compras</div></td>
+                                        <td align="center" width="30%">
+                                            <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: @if($model->comentario_cancelacion != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Cancelado<br>&nbsp;</div></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr style="margin: 0;padding:0">
+                                        <td  width="90%" align="center" style="color: rgb(140,140,140);margin: 0;padding: 10px 0 0 0 ;">
+                                            <div style="text-align: center;font-size: 22px;border-radius: 10px;background: rgb(238,141,0);margin: 0 5px 0 0;padding: 14px 10px;" align="center">
+                                                <a href="http://10.15.2.76/dev/External/Email?module=order&id={{$model->id}}&tipo={{$model->getTipoId()}}"  style="color: #ffffff;text-decoration: none;margin: 0;padding:0" target="_blank" tabindex="-1" rel="external nofollow">Click aqu&iacute para ver el Documento</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </td>
 
-                    </tr></tbody>
+                    </tr>
+                    </tbody>
                 </table></td>
             <td width="5" style="color: rgb(140,140,140);background: repeat-y;margin: 0;padding: 0px; background-image: url('http://valcro.com.ve/mailer/images/sdw_right_center.jpg')" ></td>
         </tr>

@@ -21,6 +21,7 @@ class Order extends Model
     protected $table = "tbl_pedido";
     protected $dates = ['deleted_at'];
 
+    /****************************** NO MODIFICABLES *****************************/
 
     public function  getTipo(){
         return 'Proforma';
@@ -28,24 +29,19 @@ class Order extends Model
     public function  getTipoId(){
         return 22;
     }
+    /****************************** FIN NO MODIFICABLES *****************************/
+    /****************************** RELACIONALES *****************************/
 
     public function type_origen(){
         return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id','id');
     }
 
-    public function newItem(){
-        return new OrderItem();
-    }
-    public function newAttachment(){
-        return new OrderAttachment();
-    }
     /**
      * obtiene los item de pedidos
      */
     public function items(){
         return $this->hasMany('App\Models\Sistema\Order\OrderItem', 'doc_id');
     }
-
 
     /**
      * adjuntos del documento
@@ -54,14 +50,63 @@ class Order extends Model
         return $this->hasMany('App\Models\Sistema\Order\OrderAttachment', 'doc_id');
     }
 
+    public function provider(){
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
+    }
+    /**
+     */
+    public function getTypeOrder(){
+        return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
+    }
+    public function CondPay(){
+        return $this->belongsTo('App\Models\Sistema\Providers\ProviderCondPay', 'condicion_pago_id');
+    }
+    public function country(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Country', 'pais_id');
+    }
+    public function store(){
+        return $this->belongsTo('App\Models\Sistema\Providers\ProviderAddress', 'direccion_almacen_id');
+    }
+    public function port(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Ports', 'puerto_id');
+    }
+    public function coin(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'prov_moneda_id');
+
+    }
     public function answerds(){
         return $this->hasMany('App\Models\Sistema\Order\OrderAnswer', 'doc_id');
     }
+    /****************************** FIN RELACIONALES *****************************/
+    /******************************  RELACIONAL FOR QUERYS *****************************/
+
+    public function customOrders(){
+
+        $items = $this->items()
+            ->join('tbl_contra_pedido_item', 'tbl_contra_pedido_item.uid', '=', 'tbl_pedido_item.uid')
+            ->join('tbl_contra_pedido', 'tbl_contra_pedido_item.doc_id', '=', 'tbl_contra_pedido.id');
+        return $items;
+    }
+    public function kitchenBoxs(){
+
+        $items = $this->items()
+            ->join('tbl_kitchen_box', 'tbl_kitchen_box.uid', '=', 'tbl_pedido_item.uid');
+        return $items;
+    }
+    public function sustitutes(){
+
+        $items = $this->items()
+            ->join('tbl_pedido', 'tbl_pedido.id', '=', 'tbl_pedido_item.doc_id')
+            ->where('tipo_origen_id',22)
+        ;
+        return $items;
+    }
+    /******************************  END RELACIONAL  FOR QUERYS *****************************/
+    /******************************   CALCULATED *****************************/
 
     /**
      * @return el numero de contra pedido asignados a este pedido
      */
-
     public function getNumItem($tipo){
         $i=0;
         $items = $this->items()->get();
@@ -117,7 +162,6 @@ class Order extends Model
         return $estatus;//->format("d");
     }
 
-
     /**
      * Metodo que calcula la categoria de llegada del pedido
      * @return categoria de llegada
@@ -150,7 +194,7 @@ class Order extends Model
      */
     public function catLastReview(){
         if($this->ult_revision  == null ){
-          return   $this->daysCreate();
+            return   $this->daysCreate();
         }
         $estatus = 100;
         $auxDate= date_create($this->ult_revision);
@@ -168,15 +212,6 @@ class Order extends Model
             $estatus = 90;
         }
         return $estatus;//->format("d");
-    }
-    /**
-     * @deprecated */
-    private function dateDiff($dateIni, $dateEnd)
-    {
-        $from = date_create($dateIni);
-        $to = date_create($dateEnd);
-        $diff = date_diff($to, $from);
-        return (int)$diff->format('%R%d');
     }
 
     /**
@@ -199,17 +234,13 @@ class Order extends Model
         return SourceType::findOrFail($idType)->id;
 
     }
-    /**************************** descontinuado**********************
+    /******************************  END CALCULATED *****************************/
+    /******************************  TRAP *****************************/
 
-    /*     */
-    public function getOrders(){
-        return $this->hasMany('App\Models\Sistema\Purchase\PurchaseOrder', 'pedido_id');
+    public function newItem(){
+        return new OrderItem();
     }
-
-    /**
-     */
-    public function getTypeOrder(){
-        return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
+    public function newAttachment(){
+        return new OrderAttachment();
     }
-
 }

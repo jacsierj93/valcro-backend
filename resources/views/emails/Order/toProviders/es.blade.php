@@ -65,6 +65,26 @@
                                         </tbody>
                                     </table>
                                 @endif
+
+
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr>
+                                        <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Monto
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->monto != null) ? $model->monto : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                        <td align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Moneda
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;max-width: 600px; overflow: hidden;word-break: break-all;" >
+                                                {{($model->coin != null) ? $model->coin->nombre : 'No asignado' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
                                 @if($model->nro_factura != null || $model->nro_proforma != null )
                                     <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -91,9 +111,9 @@
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Descripcion:
+                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Comentario:
                                             <p id="descripcion" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
-                                                {{$texto}}
+                                                {{$model->comentario}}
                                             </p>
                                         </td>
                                     </tr>
@@ -103,22 +123,22 @@
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
                                         <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Documentos Referidos:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;" contenteditable="true" >
-                                                @foreach($model->customOrders()->get() as $aux)
-                                                    <span> CP-{{$aux->id}}</span>,
+                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;"  >
+                                                @foreach($model->customOrders()->get() as $key=> $aux)
+                                                    <span>   CP-{{$aux->id}}</span> @if($key > $model->customOrders()->count() -1), @endif
                                                 @endforeach
                                                 @if($model->kitchenBoxs()->count() > 0)
                                                     /
                                                 @endif
 
-                                                @foreach($model->kitchenBoxs()->get() as $aux)
-                                                    <span> K-{{$aux->id}}</span>,
+                                                @foreach($model->kitchenBoxs()->get() as $key=> $aux)
+                                                    <span>  K-{{$aux->id}}</span> @if($key > $model->kitchenBoxs()->count() -1), @endif
                                                 @endforeach
                                                 @if($model->sustitutes()->count() > 0)
                                                     /
                                                 @endif
-                                                @foreach($model->sustitutes()->get() as $aux)
-                                                    <span> SOL-{{$aux->id}}</span>,
+                                                @foreach($model->sustitutes()->get() as $key=> $aux)
+                                                    <span> SOL-{{$aux->id}}</span>@if($key > $model->sustitutes()->count() -1), @endif
                                                 @endforeach
                                             </p>
                                         </td>
@@ -126,30 +146,6 @@
                                     </tbody>
                                 </table>
 
-
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody>
-                                    <tr>
-                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Titulo:
-                                            <p id="titulo" style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" contenteditable="true" >
-                                                {{$subjet}}
-                                            </p>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Correo:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;">
-                                                {{$user->email}}
-                                            </p>										</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
@@ -187,6 +183,18 @@
 
                                     </tbody>
                                 </table>
+                                @if($model->comentario_cancelacion != null)
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 16px;">
+                                        <tbody>
+                                        <tr>
+                                            <td align="center">
+                                                <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: rgba(205, 0, 0, 0.69);margin: 0 5px 0 0;padding: 14px 10px;" align="center">Cancelado<br>&nbsp;</div></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                @endif
                             </div>
                         </td>
 

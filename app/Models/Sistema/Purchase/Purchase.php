@@ -9,8 +9,9 @@
 namespace App\Models\Sistema\Purchase;
 use App\Models\Sistema\Other\SourceType;
 use App\Models\Sistema\Payments\DocumentCP;
-use App\Models\Sistema\Provider;
+use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\ProviderCondPayItem;
+use App\Models\Sistema\Providers\ProviderCondPay;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
@@ -22,7 +23,9 @@ class Purchase extends Model
     use SoftDeletes;
     protected $table = "tbl_compra_orden";
     protected $dates = ['deleted_at'];
-    //protected $appends = array('tipo');
+    public  $deuda =  null;
+
+    /****************************** NO MODIFICABLES *****************************/
 
     public function  getTipo(){
         return 'Orden de Compra';
@@ -30,6 +33,8 @@ class Purchase extends Model
     public function  getTipoId(){
         return 23;
     }
+    /****************************** FIN NO MODIFICABLES *****************************/
+    /****************************** RELACIONALES *****************************/
 
     public function type_origen(){
         return $this->hasOne('App\Models\Sistema\Other\SourceType', 'tipo_origen_id');
@@ -41,13 +46,6 @@ class Purchase extends Model
     public function answerds(){
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseAnswer', 'doc_id');
     }
-    public function newItem(){
-        return new PurchaseItem();
-    }
-    public function newAttachment(){
-        return new PurchaseAttachment();
-    }
-
     /**
      * adjuntos del documento
      */
@@ -55,6 +53,57 @@ class Purchase extends Model
         return $this->hasMany('App\Models\Sistema\Purchase\PurchaseAttachment', 'doc_id');
     }
 
+    public function provider(){
+        return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');
+    }
+    /**
+     */
+    public function getTypeOrder(){
+        return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
+    }
+    public function CondPay(){
+        return $this->belongsTo('App\Models\Sistema\Providers\ProviderCondPay', 'condicion_pago_id');
+    }
+    public function country(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Country', 'pais_id');
+    }
+    public function store(){
+        return $this->belongsTo('App\Models\Sistema\Providers\ProviderAddress', 'direccion_almacen_id');
+    }
+    public function port(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Ports', 'puerto_id');
+    }
+    public function coin(){
+        return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'prov_moneda_id');
+
+    }
+    /****************************** FIN RELACIONALES *****************************/
+    /******************************  RELACIONAL FOR QUERYS *****************************/
+
+    public function customOrders(){
+
+        $items = $this->items()
+            ->join('tbl_contra_pedido_item', 'tbl_contra_pedido_item.uid', '=', 'tbl_compra_orden_item.uid')
+            ->join('tbl_contra_pedido', 'tbl_contra_pedido_item.doc_id', '=', 'tbl_contra_pedido.id');
+        return $items;
+    }
+    public function kitchenBoxs(){
+
+        $items = $this->items()
+            ->join('tbl_kitchen_box', 'tbl_kitchen_box.uid', '=', 'tbl_compra_orden_item.uid');
+        return $items;
+    }
+    public function sustitutes(){
+        $items = $this->items()
+            ->join('tbl_compra_orden', 'tbl_compra_orden.id', '=', 'tbl_compra_orden_item.doc_id')
+            ->where('tipo_origen_id',23)
+        ;
+        return $items;
+    }
+
+    /******************************  END RELACIONAL  FOR QUERYS *****************************/
+
+    /******************************   CALCULATED *****************************/
 
     /**
      * Metodo que calcula la categoria de llegada del pedido
@@ -127,12 +176,15 @@ class Purchase extends Model
     /**
      * genera los documentos de pago
      */
+    /******************************  END CALCULATED *****************************/
+
+    /******************************  TRAP *****************************/
 
     public function builtPaymentDocs(){
         //**generacion de cuotas de pago*/
         $resul=array();
         $resul['acction'] = "new";
-        $codItems = ProviderCondPayItem::where('id_condicion', $this->condicion_pago_id)->get();
+        $codItems = ProviderCondPay::where('id_condicion', $this->condicion_pago_id)->get();
         $cps= array();
         $hoy= Carbon::now();
         $prv= Provider::findOrFail($this->prov_id);
@@ -202,90 +254,15 @@ class Purchase extends Model
 
     }
 
-
-
-    /**
-     * @return el tipo de producto original
-     */
-    private function getTypeProduct($producto){
-
-        $idType=$producto->tipo_origen_id;
-
-        if($idType == 4){
-            $i=0;
-            $aux= $producto;
-            do {
-                $aux= PurchaseItem::findOrFail($aux->origen_item_id);
-                $idType=$aux->tipo_origen_id;
-                $i++;
-
-            } while ($idType == 4 && $i<3);
-        }
-        return SourceType::findOrFail($idType)->id;
-
+    public function makedebt(){
+        $this->deuda = 3000;
     }
-
-
-
-
-    /*
-
-    CREATE TABLE valcro_db2.tbl_compra_orden (
-  id int(11) NOT NULL,
-  final_id varchar(50) DEFAULT NULL,
-  parent_id int(11) DEFAULT NULL,
-  doc_parent_id int(11) DEFAULT NULL,
-  doc_parent_origen_id int(11) DEFAULT NULL,
-  fecha_sustitucion date DEFAULT NULL,
-  version int(11) DEFAULT 1,
-  emision datetime NOT NULL,
-  titulo varchar(100) NOT NULL,
-  ult_revision datetime DEFAULT NULL,
-  nro_proforma varchar(45) DEFAULT NULL,
-  nro_factura varchar(45) DEFAULT NULL,
-  img_proforma varchar(100) DEFAULT NULL,
-  img_factura varchar(100) DEFAULT NULL,
-  img_punto_compra varchar(100) DEFAULT NULL,
-  img_abono varchar(45) DEFAULT NULL,
-  monto decimal(10, 4) DEFAULT 0.0000,
-  comentario longtext DEFAULT NULL,
-  prov_id int(11) DEFAULT NULL,
-  pais_id int(11) DEFAULT NULL,
-  condicion_pago_id int(11) DEFAULT NULL,
-  motivo_id int(11) DEFAULT NULL,
-  estado_id int(11) NOT NULL DEFAULT 1,
-  prov_moneda_id int(11) DEFAULT NULL,
-  direccion_almacen_id int(11) DEFAULT NULL,
-  direccion_facturacion_id int(11) DEFAULT NULL,
-  puerto_id int(11) DEFAULT NULL,
-  comentario_cancelacion longtext DEFAULT NULL,
-  condicion_id int(11) DEFAULT NULL,
-  mt3 varchar(45) DEFAULT NULL,
-  peso varchar(45) DEFAULT NULL,
-  cancelacion date DEFAULT NULL,
-  fecha_aprob_compra date DEFAULT NULL,
-  fecha_aprob_gerencia date DEFAULT NULL,
-  aprob_compras tinyint(1) DEFAULT NULL,
-  aprob_gerencia tinyint(1) DEFAULT NULL,
-  culminacion date DEFAULT NULL,
-  nro_doc char(20) DEFAULT '',
-  tasa decimal(10, 4) DEFAULT NULL,
-  created_at datetime DEFAULT NULL,
-  deleted_at datetime DEFAULT NULL,
-  updated_at datetime DEFAULT NULL,
-  usuario_id int(11) NOT NULL,
-  uid varchar(100) DEFAULT NULL,
-  fecha_envio date DEFAULT NULL,
-  edit_usuario_id varchar(100) DEFAULT NULL,
-  fecha_prodcucion date DEFAULT NULL,
-  UNIQUE INDEX id (id)
-)
-ENGINE = INNODB
-AVG_ROW_LENGTH = 16384
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
-   */
-
+    public function newItem(){
+        return new PurchaseItem();
+    }
+    public function newAttachment(){
+        return new PurchaseAttachment();
+    }
 
 
 }
