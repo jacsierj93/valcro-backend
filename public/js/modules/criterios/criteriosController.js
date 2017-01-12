@@ -194,12 +194,14 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
             return ListOptions;
         },
         setDepend : function(depend){
+
             dependency.id = depend.id || false;
             dependency.parent_id = depend.lct_id || false;
             dependency.lct_id = depend.sub_lct_id || edit.id;
             dependency.operator = depend.operador || "";
             dependency.condition = depend.valor || "";
             dependency.action = depend.accion || undefined;
+
         },
         getDepend : function(){
             return dependency;
@@ -807,10 +809,12 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
     $scope.formId = critForm.getEdit();
     $scope.crit = [];
     $scope.isShow = [];
+    $scope.formFilters = [];
     var validators = {};
     $scope.createModel = function(field){
         $scope.crit[''+field.id] = {value : "",childs:[]};
         $scope.isShow[field.id] = true;
+        $scope.formFilters[field.id] = [];
         for(i=0;i<field.deps.length;i++){
             var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");+
             key.childs.push(field.deps[i]);
@@ -830,7 +834,19 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
             var ret = eval(dep.accion);
             switch (dep.operador){
                 case "=":
-                    $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
+                    if(typeof(ret) == "boolean"){
+
+                        $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
+                    }else{
+                        $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
+                        /*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
+                        if(val.value == dep.valor){
+                            ret.forEach(function(v,a){
+                                $scope.formFilters[dep.sub_lct_id].push(v)
+                            })
+                        }*/
+                    }
+
                     break;
                 case ">":
                     $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
@@ -842,6 +858,8 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
                     $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
                     break;
             }
+
+
 
         });
         //return show;
@@ -886,6 +904,17 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
             $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
         }
     });
+
+    $scope.visibility = [
+        {
+            id:'true',
+            icon:"icon-checkMark"
+        },
+        {
+            id:'false',
+            icon:"icon-Eliminar"
+        }
+    ]
 
     $scope.saveDependency = function(){
         criterios.put({type:"saveDep"},$scope.configDep,function(data){
@@ -1024,7 +1053,7 @@ MyApp.directive('lmbCollection', function() {
             itens: '=lmbItens',
             model: '=lmbModel',
             valid: '=?valid',
-            dis: '=?lmbDisabled'
+            dis: '=?ngDisabled'
         },
         controller:function($scope){
             $scope.curVal = {};
@@ -1046,11 +1075,15 @@ MyApp.directive('lmbCollection', function() {
             var done = function(){
                 var dat = $scope.curVal;
                 if($scope.multi){
+                    if(typeof($scope.model) !='object'){
+                        $scope.model = [];
+                    }
                     if($scope.model.indexOf(eval("dat."+$scope.key)) != -1){
                         $scope.model.splice($scope.model.indexOf(eval("dat."+$scope.key)),1);
                     }else{
                         $scope.model.push(eval("dat."+$scope.key));
                     }
+
                 }else{
                     $scope.model = eval("dat."+$scope.key);
                 }
@@ -1058,6 +1091,7 @@ MyApp.directive('lmbCollection', function() {
 
             $scope.exist = function(dat){
                 if($scope.multi){
+
                     return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
                 }else{
                     return $scope.model == eval("dat."+$scope.key);
@@ -1069,7 +1103,7 @@ MyApp.directive('lmbCollection', function() {
         link:function(scope,elem,attr,model){
             scope.multi = ('multiple' in attr);
             scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
-            attr.$observe('lmbDisabled', function (newValue) {
+            attr.$observe('disabled', function (newValue) {
                 if(newValue){
                     elem.css("color","#f1f1f1");
                 }else{
@@ -1084,11 +1118,10 @@ MyApp.directive('lmbCollection', function() {
             }
             var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
             if(attr.lmbType=="items"){
-
-                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center">{{item.'+show+'}}</div></div>';
+                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center"><span ng-if="item.icon" class="{{item.icon}}"></span>{{item.'+show+'}}</div></div>';
             }else{
                 return '<md-content flex layout="column">'+
-                    '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':item.id == model}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'
+                    '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'
 
                 +'</md-content>';
             }

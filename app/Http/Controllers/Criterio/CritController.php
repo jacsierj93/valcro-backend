@@ -76,6 +76,9 @@ class CritController extends BaseController
             $field['deps'] = $field->dependency()->get();
             foreach ($field['deps'] as $dep){
                 $dep['parent'] = $dep->parent()->first();
+                if(!($dep['accion']=="true" || $dep['accion']=="false")){
+                    $dep['accion'] = explode(",",$dep['accion']);
+                }
             }
             $field['options'] = $field->options()->get()->groupBy("descripcion");
 
@@ -264,11 +267,11 @@ class CritController extends BaseController
             }
         }
 
-        //if($ret["action"]=="new"){
+
             $dep->lct_id = $rq->parent_id;
             $dep->operador = $rq->operator;
             $dep->valor = $rq->condition;
-            $dep->accion = $rq->action;
+            $dep->accion = (gettype($rq->action) == "array")?implode(",",$rq->action):$rq->action;
             $dep->sub_lct_id = $rq->lct_id;
             $dep->save();
             $ret['id'] = $dep->id;

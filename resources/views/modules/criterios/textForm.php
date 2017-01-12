@@ -39,7 +39,9 @@
                      ng-required="{{field.options.Requerido[0].pivot.value || ''}}"
                      info="{{field.options.Info[0].pivot.value || ''}}"
                      md-search-text="ctrl.searchLang"
-                     md-items="item in field.options.Opcion || [] | stringKey : ctrl.searchLang: 'elem.nombre'"
+                     datos = "{{formFilters[field.id]}}"
+                     md-no-cache
+                         md-items="item in field.options.Opcion || [] | filterSelect: formFilters[field.id] : 'elem.id' | stringKey : ctrl.searchLang: 'elem.nombre' "
                      md-item-text="item.elem.nombre"
                      md-no-asterisk
                      md-min-length="0"
@@ -59,6 +61,7 @@
                 lmb-display="elem.nombre"
                 lmb-itens="field.options.Opcion"
                 lmb-key="elem.id"
+                filter-by="filterSelect: formFilters[field.id] : 'elem.id'"
                 ng-if="(field.type.directive == 'prevRadio')"
                >
 

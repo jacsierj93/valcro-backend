@@ -655,10 +655,18 @@
                                                 Acciones
                                             </div>
                                         </div>
-                                        <md-input-container class="md-block" class="row">
-                                            <md-switch ng-model="configDep.action" ng-true-value="'true'" ng-false-value="'false'">
-                                                &nbsp;Visibilidad
-                                            </md-switch>
+                                        <md-input-container class="md-block row">
+                                            <lmb-collection class="rad-contain"
+                                                            layout="row"
+                                                            style="width:100px;"
+                                                            lmb-type="items"
+                                                            lmb-model="configDep.action"
+                                                            lmb-display="elem.nombre"
+                                                            lmb-itens="visibility"
+                                                            lmb-key="id"
+
+                                            >
+
                                         </md-input-container>
                                         <div class="row"></div>
                                         <div flex ng-if="currentCrit.type.descripcion == 'selector' || currentCrit.type.descripcion == 'opciones'">
@@ -674,7 +682,7 @@
                                                             layout="column"
                                                             lmb-type="list"
                                                             multiple
-                                                            lmb-disabled="configDep.action === true || configDep.action === false"
+                                                            ng-disabled="configDep.action == 'true' || configDep.action == 'false'"
                                                             lmb-model="configDep.action"
                                                             lmb-display="elem.nombre"
                                                             lmb-itens="selCrit.options.Opcion"
