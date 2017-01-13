@@ -839,6 +839,9 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
                         $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
                     }else{
                         $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
+                        $timeout(function(){
+                          $scope.$apply();
+                        },0)
                         /*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
                         if(val.value == dep.valor){
                             ret.forEach(function(v,a){
@@ -1091,8 +1094,10 @@ MyApp.directive('lmbCollection', function() {
 
             $scope.exist = function(dat){
                 if($scope.multi){
+                    if($scope.model){
+                        return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
+                    }
 
-                    return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
                 }else{
                     return $scope.model == eval("dat."+$scope.key);
                 }
@@ -1117,6 +1122,7 @@ MyApp.directive('lmbCollection', function() {
                 show = attr.lmbDisplay;
             }
             var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
+            attr.filterBy = null;
             if(attr.lmbType=="items"){
                 return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center"><span ng-if="item.icon" class="{{item.icon}}"></span>{{item.'+show+'}}</div></div>';
             }else{

@@ -227,7 +227,7 @@
                                                  ng-init="createModel(field)"
                                                  ng-dblclick="setEdit(field)"
                                                  ng-show="isShow[field.id]"
-                                                 form-preview="{{ field.type.directive }}">
+                                                 form-preview="{{field.type.directive}}">
 
                                             </div>
                                         </md-content>
