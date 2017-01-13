@@ -70,20 +70,25 @@ class EmailController extends BaseController
                 $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
 
             })->first();
-            if($lang != null && $subjet !=null){
+            if($lang != null ){
                 $content = [
                     'lang'=>strtolower($lang->lang),
                     'iso_lang'=>strtolower ($lang->iso_lang),
-                    'subjet'=>$subjet->texto,
-                    'subjets'=>$templates->subjets()->where(function($query) use ($aux)  {
+                    'subjet'=>($subjet != null) ?  $subjet->texto: '',
+                    'subjets'=>($subjet == null)? [] : $templates->subjets()->where(function($query) use ($aux)  {
                         $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
 
                     })->orderByRaw('rand()')->lists('texto'),
-                    'contents'=>$templates->contents()->where(function($query) use ($aux)  {
-                        $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
-
-                    })->orderByRaw('rand()')->lists('texto')
+                    'contents'=>[]
                 ];
+                $contents = $templates->contents()->where(function($query) use ($aux)  {
+                    $query->where('iso_lang', $aux['iso_lang'])->orWhere('iso_lang','like','%'.$aux['iso_lang']);
+
+                })->orderByRaw('rand()');
+                if($contents->count() > 0){
+                    $content['contents']= $contents->list('texto');
+                }
+
                 $content['body'] = $calback($content, 'emails/'.$module.'/'.$reason.'/'.$aux['iso_lang'],$templates);
                 $good[$aux['iso_lang']] = $content;
             }else{

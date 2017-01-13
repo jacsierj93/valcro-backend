@@ -3630,6 +3630,15 @@
         >
             <md-content   layout="row" flex class="sideNavContent"   ng-controller="OrderCancelDocCtrl" style="padding-left: 12px"  click-out="close($event)" >
                 <div layout="column" flex>
+                    <vld-mail-with-adj
+                        load="origenes" text="centerText" template="template" funciones = "mailFn"
+                        correos="correos" no-new="noNew" to="model.to" cc="model.cc" ccb="model.ccb" langs="langs"  lang="lang" asunto="model.subject" up-model="adjsUp"
+                        state="state"
+                        key="OrderCancel" storage="orders" fn-file-up="upfileFinis" fn-up-watch="upFiles" titulo="Para el Proveedor"
+                    ></vld-mail-with-adj>
+                </div>
+                <div layout="column" style="width: 360px;    margin-left: 8px;">
+
                     <div layout="row" class="form-row-head form-row-head-select" >
 
                         <div class="titulo_formulario " flex>
@@ -3660,7 +3669,8 @@
                     </form>
                     <vld-file-up-img ng-show="mode == 'adj' " up-model="upModel" fn-file-up="fnfile" key="OrderCancelDocCtrl" up-adjs="loades" storage="orders"></vld-file-up-img>
                 </div>
-
+                <div style="width: 16px;"  ng-mouseenter="(canNext()) ? $parent.showNext(true) :0 ; $parent.nextLayer = next" > </div>
+                <loader ng-show="inProgress"></loader>
             </md-content>
         </md-sidenav>
 

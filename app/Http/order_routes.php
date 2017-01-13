@@ -59,6 +59,7 @@ $app->get("Order/Solicitude/Versions",'Orders\OrderController@getOldSolicitude')
 $app->get("Order/Solicitude/Summary",'Orders\OrderController@getSolicitudeSummary'); ///tre el resulme final de la solicutd
 $app->get("Order/Solicitude/ProviderTemplates",'Orders\OrderController@getProviderSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Solicitude/InternalTemplates",'Orders\OrderController@getInternalSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Solicitude/InternalCancel",'Orders\OrderController@getCancelSolicitudeTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Solicitude/Answerds",'Orders\OrderController@getAnswerdsSolicitude'); ///agrega una respuesta a la solicutd
 
 $app->post("Order/Solicitude/Save",'Orders\OrderController@saveSolicitude'); ///guarda la solicitud
@@ -102,6 +103,8 @@ $app->get("Order/Order/Versions",'Orders\OrderController@getOldOrden'); /// trae
 $app->get("Order/Order/Summary",'Orders\OrderController@getOrderSummary'); /// trae el resumen final de un pedido
 $app->get("Order/Order/ProviderTemplates",'Orders\OrderController@getProviderOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Order/InternalTemplates",'Orders\OrderController@getInternalOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
+$app->get("Order/Order/InternalCancel",'Orders\OrderController@getCancelOrderTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor para canelar
+
 $app->get("Order/Order/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
 $app->get("Order/Order/Imports",'Orders\OrderController@getDocOrderImport'); /// obtiene los documentos que se pueden importar a un pedido
 
@@ -150,6 +153,7 @@ $app->get("Order/Purchase/ProviderTemplates",'Orders\OrderController@getProvider
 $app->get("Order/Purchase/InternalTemplates",'Orders\OrderController@getInternalPurchaseTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor
 $app->get("Order/Purchase/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
 $app->get("Order/Purchase/Imports",'Orders\OrderController@getDocPurchaseImport'); /// obtiene los documentos que se pueden importar a un pedido
+$app->get("Order/Purchase/InternalCancel",'Orders\OrderController@getCancelPurchaseTemplate'); ///obtiene las plantillas para el envio de correo a un proveedor para canelar
 
 
 $app->post("Order/Purchase/Save",'Orders\OrderController@savePurchaseOrder'); ///guarda  la orden de compra

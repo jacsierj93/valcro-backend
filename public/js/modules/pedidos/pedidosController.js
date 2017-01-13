@@ -2436,121 +2436,107 @@ MyApp.controller('OrderNrProformaCtrl',['$scope','$mdSidenav', 'Order','setGetOr
 
 }]);
 
-MyApp.controller('OrderCancelDocCtrl',['$scope','$mdSidenav','$timeout',  'Order','setGetOrder', function ($scope,$mdSidenav, $timeout, Order,setGetOrder) {
+MyApp.controller('OrderCancelDocCtrl',['$scope','$sce','$timeout',  'App','Order', function ($scope,$sce, $timeout,App, Order) {
     $scope.upModel = [];
     $scope.loades = [];
-
+    $scope.model = {adjs:[],to:[],cc:[], ccb:[]};
+    $scope.inProgress = false;
 
     $scope.fnfile = function (item) {
         $scope.model.adjs.push(item);
     };
     $scope.$parent.OrderCancelDocCtrl = function () {
         $scope.mode = 'list';
-        $scope.model = {adjs:[]};
+        $scope.model.adjs.splice(0,$scope.model.adjs.length);
+        $scope.model.to.splice(0,$scope.model.to.length);
+        $scope.model.cc.splice(0,$scope.model.cc.length);
+        $scope.model.ccb.splice(0,$scope.model.ccb.length);
+        $scope.model.comentario = undefined;
+        $scope.model.content = undefined;
         $scope.open();
+        $scope.mailFn.clear();
     };
     $scope.open = function (fn) {
-        $mdSidenav("OrderCancel").open().then(function(){
-            $scope.isOpen = true;
-
-            if(fn){
-                fn($scope);
+        Order.getMod({type:$scope.formMode.mod, mod:'InternalCancel',id:$scope.document.id},{}, function(response){
+            $scope.correos = response.correos;
+            $scope.origenes = response.templates;
+            $scope.model.tipo = response.tipo;
+            if(response.to){
+                angular.forEach(response.to, function (v) {
+                    $scope.model.to.push(v);
+                });
             }
         });
+        $scope.$parent.LayersAction({open:{name:'OrderCancel'}});
+
     };
     $scope.inClose = function (fn) {
 
-        $mdSidenav("OrderCancel").close().then(function(){
-            $scope.isOpen = false;
-            $scope.isProcess= false;
-            if(fn){
-                fn();
-            }
-        });
 
     };
-    $scope.close= function (e) {
-        if($scope.isOpen && !$scope.isProcess){
-            if(!$scope.formData.$pristine){
-                if(!$scope.formData.$valid){
-                    $scope.NotifAction("alert","¡Muy pocos datos! No has colocado suficiente informacion para poder canclar el documento ",
-                        [
-                            {name:"Corregir",default:10, action:function () {
 
-                            }},
-
-                            {name:"Cancelar", action:function () {
-                                $scope.inClose();
-                            }}
-                        ], {block: true});
-                }else if($scope.upModel.length == 0){
-                    $scope.NotifAction("alert","¡No has cargado adjuntos! es preferible que adjuntes algun documento que soporte la cancelacion.  Confirmanos que no posees ese soporte",
-                        [
-                            {name:"No tengo soporte",default:10, action:function () {
-                                $scope.save(function () {
-                                    $scope.inClose();
-                                });
-                            }},
-
-                            {name:"Dejame colocarlo", action:function () {
-
-                            }}
-                        ], {block: true,save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}});
-                }else {
-                    $scope.save(function () {
-                        $scope.inClose();
-                    });
-                }
-            }else{
-                $scope.inClose();
-            }
-
+    $scope.canNext = function () {
+        if(!$scope.formData.$valid ){
+            $scope.NotifAction("error","¡Muy pocos datos! No has colocado suficiente informacion para poder cancelar el documento ",
+                [], {autohidden: 3000});
+            return false;
         }
-    }
-    $scope.save = function (fn) {
-        $scope.model.id= $scope.$parent.document.id;
-        Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.model,function(response){
-            $scope.$parent.NotifAction("ok", "Cancelado",[],{autohidden:1500});
-            if(fn){
-                fn()
-            }
-            $timeout(function () {
-                if($scope.$parent.module.historia[1] == 'detalleDoc'){
-                    $scope.LayersAction({close:{all:true}});
-                }else{
-                    $scope.LayersAction({close:{first:true, search:true}});
-                }
-            },500);
-        });
+        if($scope.state != 'load'){
+            $scope.NotifAction("error","Disculpe debes selecionar un idioma para poder enviar el correo ",[],{autohidden:3000});
+            return false;
+
+        }else if($scope.model.to.length  == 0){
+            $scope.NotifAction("error","No se han cargado destinatarios",[],{autohidden:3000});
+            return false;
+        }
+
+        return true;
     };
-
-    $scope.saveCancelDoc = function(){
-
-        if($scope.FormCancelDoc.$valid && !$scope.FormCancelDoc.$pristine){
-            $scope.NotifAction("ok","¿ Esta seguro de cancelar la "+$scope.formMode.name +" ? ",[
-                {name: "Si",
-                    action:function(){
-                        Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.document, function(response){
-                            if (response.success) {
-                                $scope.NotifAction("ok","La "+$scope.formMode.name +" a sido cancelada ",[
-                                    {name:"Ok",action:
-                                        function(){
-                                            $scope.LayersAction({close:{init:true, search:true}});
-                                        }
-                                    }
-                                ],{autohidden:autohidden});
-                            }
-                        });
+    
+    $scope.next = function () {
+        if($scope.model.adjs.length == 0){
+            $scope.NotifAction("alert","¡No has cargado adjuntos! es preferible que adjuntes algun documento que soporte la cancelacion.  Confirmanos que no posees ese soporte",
+                [
+                    {name:"No tengo soporte",default:10, action:function () {
+                        $scope.save();
                     }},
-                {name:"No", action:
-                    function(){
-                        $scope.mtvCancelacion=undefined;
+
+                    {name:"Dejame colocarlo", action:function () {
+
                     }}
-            ],{block:true});
-
+                ], {block: true,save:{doc_origen_id:$scope.document.id, tipo_origen_id: $scope.$parent.formMode.value}});
+        }else{
+            $scope.save();
         }
-
     };
+    $scope.save = function (fn) {
+
+        $scope.model.id= $scope.$parent.document.id;
+        $scope.model.content =$sce.getTrustedHtml($scope.template);
+        $scope.NotifAction("ok","¿ Esta seguro de cancelar la "+$scope.formMode.name +" ? ",[
+            {name: "Si",
+                action:function(){
+                    $scope.inProgress = true;
+                    App.setBlock({block:true,level:89});
+                    Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.model, function(response){
+
+                        App.setBlock({block:false});
+                        if (response.success) {
+                            $scope.NotifAction("ok","La "+$scope.formMode.name +" a sido cancelada ",[],{autohidden:2000});
+                            $timeout(function () {
+                                $scope.inProgress = false;
+                                $scope.LayersAction({close:{all:true}});
+                            },2500);
+                        }
+                    });
+                }},
+            {name:"No", action:
+                function(){
+                    $scope.mtvCancelacion=undefined;
+                }}
+        ],{block:true});
+    };
+
 }]);
 
 

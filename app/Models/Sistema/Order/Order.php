@@ -87,6 +87,12 @@ class Order extends Model
             ->join('tbl_contra_pedido', 'tbl_contra_pedido_item.doc_id', '=', 'tbl_contra_pedido.id');
         return $items;
     }
+    public function customOrderItems(){
+
+        $items = $this->items()
+            ->join('tbl_contra_pedido_item', 'tbl_contra_pedido_item.uid', '=', 'tbl_pedido_item.uid');
+        return $items;
+    }
     public function kitchenBoxs(){
 
         $items = $this->items()

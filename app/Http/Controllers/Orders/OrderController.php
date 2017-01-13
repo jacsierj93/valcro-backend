@@ -1058,17 +1058,22 @@ class OrderController extends BaseController
         };
         $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Solicitude', 'toProviders', $fn)['good']];
 
+        $model->comentario_cancelacion = 'ddd';
         $correos = [];
-
+        $to = [];
         foreach ($prov->contacts()->get() as  $aux){
             foreach ($aux->campos()->where('campo', 'email')->get() as $aux2){
                 $e =  ['nombre'=>$aux->nombre, 'correo'=>$aux2->valor];
                 $e['langs'] = array_map('strtolower', $aux->idiomas()->lists('iso_lang')->toarray());
                 $correos[] =$e ;
+                if($aux->pivot->default == 1){
+                    $to[] = $e;
+                }
             }
 
         }
         $data['correos'] = $correos;
+        $data['to'] = $to;
         return $data;
 
 
@@ -1102,6 +1107,45 @@ class OrderController extends BaseController
             $correos[] = ['nombre'=>$aux->nombre,'correo'=>$aux->email, 'langs'=>['es']];
         }
         $data['correos'] = $correos;
+        return $data;
+    }
+
+    /**
+     * obtiens las plantillas para envio interno de informacion
+     */
+    public function getCancelSolicitudeTemplate (Request $req){
+        $model = Solicitude::findOrFail($req->id);
+        $prov = Provider::findOrFail($model->prov_id);
+        $user =   $this->user;
+        $fn =  function ($content, $file) use ($model,$user)  {
+            $template = View::make($file,[
+                'subjet'=>$content['subjet'],
+                'model'=>$model,
+                'articulos'=>$model->items()->with('producto')->get(),
+                'user'=>$user
+            ])->render();
+
+            return $template;
+        };
+        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Solicitude', 'cancel', $fn)['good']];
+
+        $correos = [];
+        $to = [];
+
+        foreach ($prov->contacts()->get() as  $aux){
+            foreach ($aux->campos()->where('campo', 'email')->get() as $aux2){
+                $e =  ['nombre'=>$aux->nombre, 'correo'=>$aux2->valor];
+                $e['langs'] = array_map('strtolower', $aux->idiomas()->lists('iso_lang')->toarray());
+                $correos[] =$e ;
+                if($aux->pivot->default == 1){
+                   $to[] = $e;
+                }
+            }
+
+        }
+
+        $data['correos'] = $correos;
+        $data['to'] = $to;
         return $data;
     }
 
@@ -1628,6 +1672,56 @@ class OrderController extends BaseController
 
         $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
         $response['success'] = 'Solicitud Cancelada';
+
+        $mail = new MailModule();
+        $mail->doc_id = $model->id;
+        $mail->tipo_origen_id = 21;
+        $mail->asunto =$req->has('subject') ? $req->subject : '' ;
+        $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+        $mail->tipo = 'user';
+        $mail->modulo = 'solicitude';
+        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto];
+        $mail->clave= "cancel";
+        if($req->has('to')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'to' ;
+                $destinations['to'][] =$dest;
+            }
+        }
+        if($req->has('cc')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'cc' ;
+                $destinations['cc'][] =$dest;
+
+            }
+        }
+        if($req->has('ccb')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'ccb' ;
+                $destinations['ccb'][] =$dest;
+            }
+        }
+        $mail->save();
+        $mail->senders()->saveMany($destinations['to']);
+        $mail->senders()->saveMany($destinations['cc']);
+        $mail->senders()->saveMany($destinations['ccb']);
+        if($req->has('adjs')){
+            foreach ($req->adjs as $f){
+                $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+            }
+        }
+
+        $resul['email'] = $mail->sendMail($req->content, $destinations);
+
 
         return $response;
 
@@ -2181,6 +2275,42 @@ class OrderController extends BaseController
         return $data;
     }
 
+    /***/
+    public function getCancelOrderTemplate(Request $req){
+        $model = Order::findOrFail($req->id);
+        $prov = Provider::findOrFail($model->prov_id);
+        $user =   $this->user;
+        $fn =  function ($content, $file) use ($model,$user)  {
+            $template = View::make($file,[
+                'subjet'=>$content['subjet'],
+                'model'=>$model,
+                'articulos'=>$model->items()->with('producto')->get(),
+                'user'=>$user
+            ])->render();
+
+            return $template;
+        };
+        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Order', 'cancel', $fn)['good']];
+
+        $correos = [];
+        $to = [];
+
+        foreach ($prov->contacts()->get() as  $aux){
+            foreach ($aux->campos()->where('campo', 'email')->get() as $aux2){
+                $e =  ['nombre'=>$aux->nombre, 'correo'=>$aux2->valor];
+                $e['langs'] = array_map('strtolower', $aux->idiomas()->lists('iso_lang')->toarray());
+                $correos[] =$e ;
+                if($aux->pivot->default == 1){
+                    $to[] = $e;
+                }
+            }
+
+        }
+
+        $data['correos'] = $correos;
+        $data['to'] = $to;
+        return $data;
+    }
     /**
      * obtiene las respuesta a un provedor
      **/
@@ -2705,12 +2835,73 @@ class OrderController extends BaseController
         $response = [];
         $model = Order::findOrFail($req->id);
 
-        $model->comentario_cancelacion = $req->comentario_cancelacion;
+        $model->comentario_cancelacion = $req->comentario;
         $model->final_id = $this->getFinalId($model);
         $model->disponible = 0;
         $response['response'] = $model->save();
         $response['success'] = 'Pedido Cancelado';
         $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
+
+        foreach ($model->customOrderItems()->get() as $aux){
+            $co = CustomOrderItem::where('uid',$aux->uid)->first();
+            if($co != null){
+                $co->saldo = floatval($co->saldo) + floatval($aux->cantidad);
+                $co->save();
+            }
+        }
+        foreach ($model->kitchenBoxs()->get() as $aux){
+            $aux->saldo = 0;
+            $aux->save();
+        }
+        $mail = new MailModule();
+        $mail->doc_id = $model->id;
+        $mail->tipo_origen_id = 22;
+        $mail->asunto =$req->has('subject') ? $req->subject : '' ;
+        $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+        $mail->tipo = 'user';
+        $mail->modulo = 'order';
+        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto];
+        $mail->clave= "cancel";
+        if($req->has('to')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'to' ;
+                $destinations['to'][] =$dest;
+            }
+        }
+        if($req->has('cc')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'cc' ;
+                $destinations['cc'][] =$dest;
+
+            }
+        }
+        if($req->has('ccb')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'ccb' ;
+                $destinations['ccb'][] =$dest;
+            }
+        }
+        $mail->save();
+        $mail->senders()->saveMany($destinations['to']);
+        $mail->senders()->saveMany($destinations['cc']);
+        $mail->senders()->saveMany($destinations['ccb']);
+        if($req->has('adjs')){
+            foreach ($req->adjs as $f){
+                $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+            }
+        }
+
+        $response['email'] = $mail->sendMail($req->content, $destinations);
+
         return $response;
 
     }
@@ -3526,6 +3717,44 @@ class OrderController extends BaseController
         $data['correos'] = $correos;
         return $data;
     }
+
+
+    /***/
+    public function getCancelPurchaseTemplate(Request $req){
+        $model = Purchase::findOrFail($req->id);
+        $prov = Provider::findOrFail($model->prov_id);
+        $user =   $this->user;
+        $fn =  function ($content, $file) use ($model,$user)  {
+            $template = View::make($file,[
+                'subjet'=>$content['subjet'],
+                'model'=>$model,
+                'articulos'=>$model->items()->with('producto')->get(),
+                'user'=>$user
+            ])->render();
+
+            return $template;
+        };
+        $data = ['templates'=>App\Http\Controllers\Masters\EmailController::builtTemplates('Purchase', 'cancel', $fn)['good']];
+
+        $correos = [];
+        $to = [];
+
+        foreach ($prov->contacts()->get() as  $aux){
+            foreach ($aux->campos()->where('campo', 'email')->get() as $aux2){
+                $e =  ['nombre'=>$aux->nombre, 'correo'=>$aux2->valor];
+                $e['langs'] = array_map('strtolower', $aux->idiomas()->lists('iso_lang')->toarray());
+                $correos[] =$e ;
+                if($aux->pivot->default == 1){
+                    $to[] = $e;
+                }
+            }
+
+        }
+
+        $data['correos'] = $correos;
+        $data['to'] = $to;
+        return $data;
+    }
     /**
      * obtiene las respuesta a un provedor
      **/
@@ -3982,6 +4211,68 @@ class OrderController extends BaseController
         $response['response'] = $model->save();
         $response['success'] = 'Pedido Cancelado';
         $response['accion'] = $model->comentario_cancelacion == null ? 'new' : 'upd';
+
+        foreach ($model->customOrderItems()->get() as $aux){
+            $co = CustomOrderItem::where('uid',$aux->uid)->first();
+            if($co != null){
+                $co->saldo = floatval($co->saldo) + floatval($aux->cantidad);
+                $co->save();
+            }
+        }
+        foreach ($model->kitchenBoxs()->get() as $aux){
+            $aux->saldo = 0;
+            $aux->save();
+        }
+
+        $mail = new MailModule();
+        $mail->doc_id = $model->id;
+        $mail->tipo_origen_id = 22;
+        $mail->asunto =$req->has('subject') ? $req->subject : '' ;
+        $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
+        $mail->tipo = 'user';
+        $mail->modulo = 'order';
+        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto];
+        $mail->clave= "cancel";
+        if($req->has('to')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'to' ;
+                $destinations['to'][] =$dest;
+            }
+        }
+        if($req->has('cc')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'cc' ;
+                $destinations['cc'][] =$dest;
+
+            }
+        }
+        if($req->has('ccb')){
+            foreach ($req->to as $aux){
+                $dest = new MailModuleDestinations();
+                $dest->email = $aux['correo'];
+                $dest->nombre = $aux['nombre'];
+                $dest->tipo = 'ccb' ;
+                $destinations['ccb'][] =$dest;
+            }
+        }
+        $mail->save();
+        $mail->senders()->saveMany($destinations['to']);
+        $mail->senders()->saveMany($destinations['cc']);
+        $mail->senders()->saveMany($destinations['ccb']);
+        if($req->has('adjs')){
+            foreach ($req->adjs as $f){
+                $destinations['atts'][] = ['data'=>storage_disk_path('orders',$f['tipo'].$f['file']),'nombre'=>$f['file']];
+            }
+        }
+
+        $response['email'] = $mail->sendMail($req->content, $destinations);
+
         return $response;
 
     }
@@ -4326,6 +4617,20 @@ class OrderController extends BaseController
         $oldModel->comentario_cancelacion = "#sistema: copiado por new id#" . $newModel->id;
         $oldModel->save();
 
+        foreach ($oldModel->items()->get() as $aux) {
+            $it = new PurchaseItem();
+            $it->tipo_origen_id = $aux->tipo_origen_id;
+            $it->doc_id = $newModel->id;
+            $it->origen_item_id = $aux->origen_item_id;
+            $it->doc_origen_id = $aux->doc_origen_id;
+            $it->cantidad = $aux->cantidad;
+            $it->saldo = $aux->saldo;
+            $it->producto_id = $aux->producto_id;
+            $it->descripcion = $aux->descripcion;
+            $it->save();
+            $newItems[] = $it;
+
+        }
         foreach ($oldModel->items()->get() as $aux) {
             $it = new PurchaseItem();
             $it->tipo_origen_id = $aux->tipo_origen_id;

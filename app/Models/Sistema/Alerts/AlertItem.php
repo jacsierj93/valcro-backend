@@ -6,7 +6,7 @@
  * Time: 03:02 PM
  */
 
-namespace App\Models\Sistema;
+namespace App\Models\Sistema\Alerts;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
