@@ -913,14 +913,24 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 }]);
 
 
-MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGetProv, Layers,App,SYSTEM) {
+MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGetProv, Layers,App,ExtRedirect) {
 
-    if(location.pathname.indexOf('External') != -1){
-        location.assign(SYSTEM.PATHAPP+'#home');
-    }
 
     $scope.bindBlock=App.getBindBloc();
-
+    ExtRedirect.load(function (response) {
+        if(response && response.module){
+            var red = undefined;
+            angular.forEach($scope.secciones, function (v, k) {
+                if(response.module == v.key){
+                    red= v;
+                    return 0;
+                }
+            });
+            if(red){
+                $scope.seccLink(red);
+            }
+        }
+    });
 
     $scope.accion = App.getAccion();
     $scope.secciones = [
@@ -946,7 +956,7 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
             selct: 'btnDot'
         }, {
             secc: 'Pedidos',
-            key:'pedidos',
+            key:'order',
             url: 'modules/pedidos/index',
             selct: 'btnDot'
         }, {
@@ -1408,7 +1418,32 @@ MyApp.service('Layers' , function(){
     }
 });
 
+MyApp.service('ExtRedirect' , function($http){
+    var data  ;
 
+    return {
+        load: function (fn) {
+            $http.get("External/Get").success(function (response) {
+                data= response;
+                if(fn){
+                    fn(response);
+                }
+            });
+        },
+        del : function(fn){
+            $http.get("External/Del").success(function (response) {
+                data =null;
+                if(fn){
+                    fn(response);
+                }
+            });
+        }, get: function () {
+            return data;
+        }
+    }
+
+
+});
 /*
  MyApp.controller('ListPaises', function ($scope,$http) {
  $http({

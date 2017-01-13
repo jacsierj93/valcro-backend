@@ -1,7 +1,7 @@
 
 MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     ,$filter,$location,App, Order,masters,providers,
-                                           Upload,Layers,setGetOrder, DateParse ) {
+                                           Upload,Layers,setGetOrder, DateParse , ExtRedirect) {
     $scope.permit= Order.get({type:"Permision"});
     // controlers
     $scope.Docsession = {isCopyable:false,global:"new", block:true};
@@ -62,6 +62,27 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     $scope.todos =[];
     Order.query({type:"OrderProvList"},{},function(response){
         $scope.todos = response;
+
+        $timeout(function () {
+            var data =angular.copy( ExtRedirect.get());
+            if(data){
+                $scope.NotifAction("alert", "Se ha abierto el modulo desde un vinculo externo , ¿Desea ver el documento asociado?",
+                    [
+                        {name:"Ver Documento", action:function () {
+                            data.tipo = parseInt(data.tipo);
+                            ExtRedirect.del();
+                            $scope.OrderDetalleCtrl(data);
+                        }}, {name:"Cancelar", action:function () {
+
+                    }},
+                        {name:"Cancelar y no volver a preguntar", action:function () {
+                            ExtRedirect.del();
+                        }}
+                    ]
+                    ,{block:true});
+            }
+        }, 100);
+
     });
 
     /****filtros para todas las tablas de documentos*/
@@ -1418,7 +1439,12 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             $scope.gridView= 1;
             setGetOrder.setOrder({id:data.id, tipo:data.tipo});
             setGetOrder.setState("select");
-            $scope.$parent.formMode= $scope.$parent.forModeAvilable.getXname(data.documento);
+            if(data.documento){
+                $scope.$parent.formMode= $scope.$parent.forModeAvilable.getXname(data.documento);
+            }else{
+                $scope.$parent.formMode= $scope.$parent.forModeAvilable.getXValue(data.tipo);
+            }
+
             $scope.$parent.Docsession.global='upd';
             $scope.$parent.preview = false;
             $scope.$parent.Docsession.isCopyableable = true;

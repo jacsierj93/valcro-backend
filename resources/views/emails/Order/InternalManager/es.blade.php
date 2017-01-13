@@ -68,7 +68,7 @@
                                     <tr>
                                         <td  width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Pais
                                             <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
-                                                {{($model->country->short_name != null) ? $model->country->short_name : 'No asignado' }}
+                                                {{($model->country != null) ? $model->country->short_name : 'No asignado' }}
                                             </p>
                                         </td>
                                         <td width="30%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Puerto
@@ -261,6 +261,18 @@
                                             <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background:@if($model->fecha_aprob_compra != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Aprobado por<br>Compras</div></td>
                                         <td align="center" width="30%">
                                             <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: @if($model->comentario_cancelacion != null)#00CD00 @else #e3e3e3  @endif ;margin: 0 5px 0 0;padding: 14px 10px;" align="center">Cancelado<br>&nbsp;</div></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                    <tr style="margin: 0;padding:0">
+                                        <td  width="90%" align="center" style="color: rgb(140,140,140);margin: 0;padding: 10px 0 0 0 ;">
+                                            <div style="text-align: center;font-size: 22px;border-radius: 10px;background: rgb(238,141,0);margin: 0 5px 0 0;padding: 14px 10px;" align="center">
+                                                <a href="http://10.15.2.76/dev/External/Email?module=order&id={{$model->id}}&tipo={{$model->getTipoId()}}"  style="color: #ffffff;text-decoration: none;margin: 0;padding:0" target="_blank" tabindex="-1" rel="external nofollow">Click aqu&iacute para ver el Documento</a>
+                                            </div>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>

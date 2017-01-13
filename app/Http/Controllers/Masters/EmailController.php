@@ -86,7 +86,7 @@ class EmailController extends BaseController
 
                 })->orderByRaw('rand()');
                 if($contents->count() > 0){
-                    $content['contents']= $contents->list('texto');
+                    $content['contents']= $contents->lists('texto');
                 }
 
                 $content['body'] = $calback($content, 'emails/'.$module.'/'.$reason.'/'.$aux['iso_lang'],$templates);
