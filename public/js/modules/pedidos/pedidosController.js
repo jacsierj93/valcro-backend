@@ -1127,7 +1127,7 @@ MyApp.controller('OrderlistDocImportCtrl',['$scope','$timeout','DateParse','Orde
     $scope.tbl = {data:[], order:'id'};
     $scope.load = function(id){
         $scope.tbl.data.splice(0, $scope.tbl.data.length);
-        Order.query({mod:"Imports",type:$scope.$parent.formMode.mod, prov_id:$scope.$parent.ctrl.provSelec.id}, {},function(response){
+        Order.query({mod:"Imports",type:$scope.$parent.formMode.mod, prov_id:$scope.$parent.ctrl.provSelec.id, id:$scope.$parent.document.id}, {},function(response){
 
             angular.forEach(response, function (v, k) {
                 v.emision= DateParse.toDate(v.emision);
@@ -3340,37 +3340,33 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
         $scope.$parent.OrderSendMail(data);
     };
 
-
-    /**@deprecated*/
-    $scope.saveWithContactMail= function(){
-        $scope.OpenContactMail(function(issend){
-            if(issend){
-                Order.postMod({type:$scope.formMode.mod, mod:"Close"},$scope.document, function(response){
-                    if (response.success) {
-                        $timeout(function(){
-                            var layer=angular.element("#"+$scope.layer);
-                            layer[0].click();
-                        },0);
-
-                        $scope.updateProv(function(){
-                            $scope.NotifAction("ok","Realizado",[
-                                {name:"Ok", action: function(){
-                                    $scope.LayersAction({close:{first:true, search:true}});
-                                }}
-                            ],{block:true});
-
+    $scope.save = function(){
+       if($scope.$parent.formMode.value = 22 && $scope.$parent.document.isAprobado && $scope.$parent.document.condicion_pago_id && !$scope.$parent.document.pago_factura_id){
+            $scope.NotifAction("alert","Esta proforma ya tienes los datos suficiente para generar las ordenes de pago, ¿Quieres que creemos la ordenes de pago?",
+                [
+                    {name:"Si, puedes crearlas", action: function () {
+                        Order.postMod({type:$scope.formMode.mod, mod:"MakePayments"},{id:$scope.document.id }, function(response){
+                            
+                            $scope.OnlySave();
                         });
+                    }}
+                    ,
+                    {name:"No, solo guardar", action: function () {
+                        $scope.OnlySave();
+                    }}
 
-                    }});
-            }
+                ]
+                ,{block:true});
+       }else{
+           $scope.OnlySave();
+       }
 
-        });
     };
 
-    $scope.save = function(){
+    $scope.OnlySave= function (fn ) {
         $scope.inProcess = true;
         App.setBlock({block:true,level:89});
-        Order.postMod({type:$scope.formMode.mod, mod:"Close"},{id:$scope.document.id, }, function(response){
+        Order.postMod({type:$scope.formMode.mod, mod:"Close"},{id:$scope.document.id }, function(response){
             $scope.inProcess = false;
             App.setBlock({block:false});
             $scope.NotifAction("ok","Realizado",[],{autohidden:1500});

@@ -79,7 +79,10 @@ class Purchase extends Model
     }
     public function coin(){
         return $this->belongsTo('App\Models\Sistema\Masters\Monedas', 'prov_moneda_id');
+    }
 
+    public function docPayment(){
+        return $this->belongsTo('App\Models\Sistema\Payments', 'pago_factura_id');
     }
     /****************************** FIN RELACIONALES *****************************/
     /******************************  RELACIONAL FOR QUERYS *****************************/
@@ -188,7 +191,7 @@ class Purchase extends Model
         //**generacion de cuotas de pago*/
         $resul=array();
         $resul['acction'] = "new";
-        $codItems = ProviderCondPay::where('id_condicion', $this->condicion_pago_id)->get();
+        $codItems = \App\Models\Sistema\Providers\ProviderCondPayItem::where('id_condicion', $this->condicion_pago_id)->get();
         $cps= array();
         $hoy= Carbon::now();
         $prv= Provider::findOrFail($this->prov_id);
@@ -215,7 +218,8 @@ class Purchase extends Model
         }
         $cp->save();
         $id=$cp->id;
-
+        $this->pago_factura_id = $id;
+        $this->save();
         $cps[] = $cp;
         if(sizeof($codItems)>1){
             $fac= $cp->replicate();
@@ -259,6 +263,7 @@ class Purchase extends Model
     }
 
     public function makedebt(){
+
         $this->deuda = 3000;
     }
     public function newItem(){

@@ -777,6 +777,7 @@ class OrderController extends BaseController
         $tem['isAprobado'] = ($model->fecha_aprob_compra != null || $model->fecha_aprob_gerencia != null);
         $tem['aprobado'] = ['nro_doc'=>$model->nro_doc,'adjs'=>[]];
         $tem['condicion_cp'] =$model->condicion_cp ;
+        $tem['pago_factura_id'] =$model->pago_factura_id ;
 
         $tem['estado']=OrderStatus::findOrFail($model->estado_id)->estado;
 
@@ -2355,6 +2356,16 @@ class OrderController extends BaseController
     /**** PEDIDO POST *********/
 
     /**
+     * Make the payments doc the order
+    */
+    public function MakePaymentsOrder(Request $req){
+        $model = Order::findOrFail($req->id);
+        $result = [];
+        $result['accion']='make';
+        $result['response'] = $model->builtPaymentDocs();
+        return $result;
+    }
+    /**
      * Guarda un registro en la base de datos
      * @param $req la data del registro a guradar
      * @return json donde el primer valor representa 'error' en caso de q falle y
@@ -3778,14 +3789,21 @@ class OrderController extends BaseController
     public function getDocPurchaseImport(Request $req)
     {
         $data = array();
-        $items = Order::where('disponible', 1)->get();
-        $type = OrderType::get();
+
+        $model = Purchase::findOrfail($req->id);
+        $items = Order::where('disponible', 1);
+
+        if($model->pago_factura_id != null){
+            $items = $items->whereNull('pago_factura_id');
+        }
+        $items = $items->get();
+     /*   $type = OrderType::get();
         $prov = Provider::findOrFail($req->prov_id);
         $coin = Monedas::get();
         $motivo = OrderReason::get();
         $prioridad = OrderPriority::get();
         $estados = OrderStatus::get();
-        $paises = Country::get();
+        $paises = Country::get();*/
         foreach ($items as $aux) {
             $aux->diasEmit = $aux->daysCreate();
             $data[] = $aux;
@@ -4574,7 +4592,10 @@ class OrderController extends BaseController
         $model->final_id = $this->getFinalId($model);
         $model->save();
         $result['id'] = $model->id;
-        //$model->attachments()->where('documento','FACTURA')->count();
+
+        if($model->pago_factura_id == null){
+            $result['fac']= $model->builtPaymentDocs();
+        }
         if($model->nro_factura != null && $model->attachments()->where('documento','FACTURA')->count() > 0){
             /** envio de notificaciones **/
             $model->makedebt();
@@ -4591,6 +4612,8 @@ class OrderController extends BaseController
             $mail->modulo = 'solicitude';
             $mail->save();
             $result['nofs']=  $mail->sendMail($options['template'], $options);
+
+
        }
         return $result;
     }
@@ -4734,6 +4757,10 @@ class OrderController extends BaseController
             $mail->modulo = 'solicitude';
             $mail->save();
             $resul['nofs']=  $mail->sendMail($options['template'], $options);
+        }
+
+        if($model->pago_factura_id == null){
+            $result['fac']= $model->builtPaymentDocs();
         }
         $model->save();
         return $resul;

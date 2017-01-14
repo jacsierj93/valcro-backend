@@ -107,6 +107,7 @@ $app->get("Order/Order/InternalCancel",'Orders\OrderController@getCancelOrderTem
 
 $app->get("Order/Order/Answerds",'Orders\OrderController@getAnswerdsOrder'); ///agrega una respuesta a la solicutd
 $app->get("Order/Order/Imports",'Orders\OrderController@getDocOrderImport'); /// obtiene los documentos que se pueden importar a un pedido
+$app->get("Order/Order/Compare",'Orders\OrderController@getOrderCompareSolicitud'); /// campara y trae las diferencias entre un pedido(Proforma y una solicitud)
 
 
 $app->post("Order/Order/Save",'Orders\OrderController@saveOrder'); ///guarda la solicitud
@@ -134,7 +135,7 @@ $app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra e
 $app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); /// crea una copia sin adjuntos
 $app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
 $app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
-$app->get("Order/Order/Compare",'Orders\OrderController@getOrderCompareSolicitud'); /// campara y trae las diferencias entre un pedido(Proforma y una solicitud)
+$app->post("Order/Order/MakePayments",'Orders\OrderController@MakePaymentsOrder'); // cierra el documento y notifica por correo
 
 
 /*** sin uso aparente**********************/
