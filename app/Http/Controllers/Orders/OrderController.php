@@ -82,9 +82,8 @@ class OrderController extends BaseController
     private $user = null;
 
     public function test(Request $req){
-        $model= Purchase::findOrFail(23);
+        $model= Order::findOrFail(23);
         $user = $this->user;
-        $model->makedebt();
        $data =  [
             'subjet'=>'daee',
             'model'=>$model,

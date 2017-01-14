@@ -91,14 +91,14 @@
                                         <tbody>
                                         <tr>
                                             @if($model->nro_factura != null)
-                                                <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Invoice:
+                                                <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">No. Invoice:
                                                     <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
                                                         {{$model->nro_factura}}
                                                     </p>
                                                 </td>
                                             @endif
                                             @if($model->nro_proforma != null)
-                                                <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Nro Proforma:
+                                                <td  width="45%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">No Proforma:
                                                     <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
                                                         {{$model->nro_proforma}}
                                                     </p>
@@ -108,7 +108,6 @@
                                         </tbody>
                                     </table>
                                 @endif
-
                                 <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody><tr style="margin: 0;padding: 0px">
@@ -120,68 +119,81 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody><tr style="margin: 0;padding: 0px">
-                                        <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Referred Document:
-                                            <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;"  >
-                                                @foreach($model->customOrders()->get() as $key=> $aux)
-                                                    <span>   CP-{{$aux->id}}</span> @if($key > $model->customOrders()->count() -1), @endif
-                                                @endforeach
-                                                @if($model->kitchenBoxs()->count() > 0)
-                                                    /
-                                                @endif
+                                @if($model->customOrders()->count() > 0 || $model->kitchenBoxs()->count() || $model->sustitutes()->count())
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody><tr style="margin: 0;padding: 0px">
+                                            <td width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold; ">Referred documents:
+                                                <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0;font-weight: normal;"  >
+                                                    @foreach($model->customOrders()->get() as $key=> $aux)
+                                                        <span>   CP-{{$aux->id}}</span> @if($key > $model->customOrders()->count() -1), @endif
+                                                    @endforeach
+                                                    @if($model->kitchenBoxs()->count() > 0)
+                                                        /
+                                                    @endif
 
-                                                @foreach($model->kitchenBoxs()->get() as $key=> $aux)
-                                                    <span>  K-{{$aux->id}}</span> @if($key > $model->kitchenBoxs()->count() -1), @endif
-                                                @endforeach
-                                                @if($model->sustitutes()->count() > 0)
-                                                    /
-                                                @endif
-                                                @foreach($model->sustitutes()->get() as $key=> $aux)
-                                                    <span> SOL-{{$aux->id}}</span>@if($key > $model->sustitutes()->count() -1), @endif
-                                                @endforeach
-                                            </p>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-
-                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody>
-                                    <tr style="margin: 0;padding: 0px">
-                                        <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Articles</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding: 0 0 0 8px ;border-top: 1px solid #e8e8e8">
-                                    <tbody>
-                                    <tr style="color: rgb(140,140,140); height: 32px;font-weight: bold;">
-                                        <td style="text-align: left;"> </td>
-                                        <td style="text-align: left;">Code </td>
-                                        <td style="text-align: left;">Description</td>
-                                        <td style="text-align: left;">Quantity</td>
-                                    </tr>
-
-                                    @for ($i = 0; $i < sizeof($articulos); $i++)
-                                        <tr style="height: 32px;font-weight: normal; font-size: 13px; @if($i % 2 == 0)  color: #000000;background: rgb(241,241,241) @endif">
-                                            <td  width="5%" style="text-align: left; " >
-                                                {{$i + 1 }}
-                                            </td>
-                                            <td  width="30%" style="text-align: left; " >
-                                                {{$articulos[$i]->producto['codigo_fabrica']}}
-                                            </td>
-                                            <td  width="30%" style="text-align: left;"  >
-                                                {{$articulos[$i]->descripcion}}
-
-                                            </td>
-                                            <td width="30%"  style=" text-align: left;">
-                                                {{$articulos[$i]['cantidad']}}
+                                                    @foreach($model->kitchenBoxs()->get() as $key=> $aux)
+                                                        <span>  K-{{$aux->id}}</span> @if($key > $model->kitchenBoxs()->count() -1), @endif
+                                                    @endforeach
+                                                    @if($model->sustitutes()->count() > 0)
+                                                        /
+                                                    @endif
+                                                    @foreach($model->sustitutes()->get() as $key=> $aux)
+                                                        <span> SOL-{{$aux->id}}</span>@if($key > $model->sustitutes()->count() -1), @endif
+                                                    @endforeach
+                                                </p>
                                             </td>
                                         </tr>
-                                    @endfor
+                                        </tbody>
+                                    </table>
+                                @endif
+                                @if( sizeof($articulos) >  0)
+                                    <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                        <tr style="margin: 0;padding: 0px">
+                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Artocles</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding: 0 0 0 8px ;border-top: 1px solid #e8e8e8">
+                                        <tbody>
+                                        <tr style="color: rgb(140,140,140); height: 32px;font-weight: bold;">
+                                            <td style="text-align: left;"> </td>
+                                            <td style="text-align: left;">Code </td>
+                                            <td style="text-align: left;">Description</td>
+                                            <td style="text-align: left;">Quantity</td>
+                                        </tr>
 
+                                        @for ($i = 0; $i < sizeof($articulos); $i++)
+                                            <tr style="height: 32px;font-weight: normal; font-size: 13px; @if($i % 2 == 0)  color: #000000;background: rgb(241,241,241) @endif">
+                                                <td  width="5%" style="text-align: left; " >
+                                                    {{$i + 1 }}
+                                                </td>
+                                                <td  width="30%" style="text-align: left; " >
+                                                    {{$articulos[$i]->producto['codigo_fabrica']}}
+                                                </td>
+                                                <td  width="30%" style="text-align: left;"  >
+                                                    {{$articulos[$i]->descripcion}}
+
+                                                </td>
+                                                <td width="30%"  style=" text-align: left;">
+                                                    {{$articulos[$i]['cantidad']}}
+                                                </td>
+                                            </tr>
+                                        @endfor
+
+                                        </tbody>
+                                    </table>
+                                @endif
+                                <div style="border-top-width: 1px;border-top-color: #e8e8e8;border-top-style: solid;color: rgb(140,140,140);margin: 0;"></div>
+
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 16px;">
+                                    <tbody>
+                                    <tr>
+                                        <td align="center">
+                                            <div style="color: #ffffff;text-align: center;font-size: 16px;border-radius: 10px;background: rgba(205, 0, 0, 0.69);margin: 0 5px 0 0;padding: 14px 10px;" align="center">Canceled<br>&nbsp;</div></td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>

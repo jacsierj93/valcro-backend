@@ -56,7 +56,7 @@
                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                         <tbody>
                                         <tr>
-                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Codicion de pago:
+                                            <td  width="90%" align="left" style="color: rgb(140,140,140);margin: 0;padding: 10px;font-weight: bold;">Condicion de pago:
                                                 <p style="color: rgb(0,0,0)!important;font-size: 15px!important;margin: 0;padding: 0px;font-weight: normal;" >
                                                     {{$model->CondPay->getText()}}
                                                 </p>
