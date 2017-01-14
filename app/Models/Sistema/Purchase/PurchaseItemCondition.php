@@ -9,6 +9,8 @@
 namespace App\Models\Sistema\Purchase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
+
 
 
 /**@deprecate**/
@@ -16,6 +18,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PurchaseItemCondition extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_compra_orden_item_cond";
     protected $dates = ['deleted_at'];
 

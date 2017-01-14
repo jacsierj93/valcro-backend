@@ -14,10 +14,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
 use Carbon\Carbon;
+use App\Http\Traits\Journal;
+
 
 class Order extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_pedido";
     protected $dates = ['deleted_at'];
 

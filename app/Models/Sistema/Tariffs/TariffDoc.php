@@ -12,10 +12,13 @@ use App\Models\Sistema\Masters\Monedas;
 use App\Models\Sistema\Masters\Ports;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
 
 class TariffDoc extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_tarifa_doc";
     protected $dates = ['deleted_at'];
 

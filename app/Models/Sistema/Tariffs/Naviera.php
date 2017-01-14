@@ -9,10 +9,13 @@
 namespace App\Models\Sistema\Tariffs;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
 
 class Naviera extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_naviera";
     protected $dates = ['deleted_at'];
 

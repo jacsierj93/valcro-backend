@@ -10,12 +10,14 @@ namespace App\Models\Sistema\CustomOrders;
 use App\Models\Sistema\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
 
 
 
 class CustomOrder extends Model
 {
     use SoftDeletes;
+    use Journal;
     protected $table = "tbl_contra_pedido";
 
     /**

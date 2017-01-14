@@ -16,6 +16,8 @@ use App;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\File;
 use Storage;
+use App\Http\Traits\Journal;
+
 
 use Carbon\Carbon;
 /**
@@ -53,6 +55,8 @@ this model sen mail on registre in tbl_noti_modulo
 class MailModule extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_mail_modulo";
     protected $dates = ['deleted_at'];
 

@@ -10,12 +10,16 @@ namespace App\Models\Sistema\Order;
 use App\Models\Sistema\Purchase\PurchaseOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
+
 
 
 
 class OrderItem extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_pedido_item";
     protected $dates = ['deleted_at'];
 

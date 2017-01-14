@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\File;
 use Storage;
 
 use Carbon\Carbon;
+use App\Http\Traits\Journal;
+
 /**
 this model sen mail on registre in tbl_noti_modulo
 
@@ -28,6 +30,8 @@ this model sen mail on registre in tbl_noti_modulo
 class MailPartSubject extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_mail_part_asunto";
     protected $dates = ['deleted_at'];
 

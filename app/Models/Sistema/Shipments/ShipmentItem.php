@@ -9,10 +9,14 @@
 namespace App\Models\Sistema\Shipments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
+
 
 class ShipmentItem extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_embarque_item";
     protected $dates = ['deleted_at'];
 

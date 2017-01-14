@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
 use App;
 use Illuminate\Support\Facades\View;
+use App\Http\Traits\Journal;
+
 /**
 this model sen mail on registre in tbl_noti_modulo
 
@@ -23,6 +25,8 @@ this model sen mail on registre in tbl_noti_modulo
 class MailModuleDestinations extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_mail_modulo_destinos";
     protected $dates = ['deleted_at'];
 

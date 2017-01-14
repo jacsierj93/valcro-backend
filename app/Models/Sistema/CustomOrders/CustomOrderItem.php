@@ -9,12 +9,14 @@
 namespace App\Models\Sistema\CustomOrders;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
 
 
 
 class CustomOrderItem extends Model
 {
     use SoftDeletes;
+    use Journal;
     protected $table = "tbl_contra_pedido_item";
     protected $dates = ['deleted_at'];
 

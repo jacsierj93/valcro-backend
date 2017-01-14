@@ -15,12 +15,16 @@ use App\Models\Sistema\Providers\ProviderCondPay;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use App\Http\Traits\Journal;
+
 
 
 
 class Purchase extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_compra_orden";
     protected $dates = ['deleted_at'];
     public  $deuda =  null;

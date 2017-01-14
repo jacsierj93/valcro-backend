@@ -9,12 +9,16 @@
 namespace App\Models\Sistema\Solicitude;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
+
 
 
 
 class SolicitudeAttachment extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_solicitud_adj";
     protected $dates = ['deleted_at'];
 

@@ -16,10 +16,14 @@ use Illuminate\Database\Eloquent\Collection;
 
 use DB;
 use Carbon\Carbon;
+use App\Http\Traits\Journal;
+
 
 class Solicitude extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table = "tbl_solicitud";
     protected $dates = ['deleted_at'];
 

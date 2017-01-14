@@ -11,10 +11,14 @@ use App\Quotation;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
+
 
 class SourceType extends Model
 {
     use SoftDeletes;
+    use Journal;
+
     protected $table="tbl_tipo_origen";
 
     /**
