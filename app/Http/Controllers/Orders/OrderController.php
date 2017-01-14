@@ -84,6 +84,7 @@ class OrderController extends BaseController
     public function test(Request $req){
         $model= Order::findOrFail(23);
         $user = $this->user;
+        $model->makedebt();
        $data =  [
             'subjet'=>'daee',
             'model'=>$model,
@@ -409,7 +410,7 @@ class OrderController extends BaseController
         $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " > 90 ") . ") as review100 ";
 
         $provs = Provider::selectRaw($rawn)
-            ->with('getProviderCoin','getPaymentCondition')
+            ->with('getProviderCoin','getPaymentCondition','contacts')
             ->get();
         /*     foreach($provs as $aux){
                  $paises= [];

@@ -104,7 +104,7 @@
             </div>
 
             <div id="listado" flex  style="overflow-y:auto;">
-                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
+                <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' as filtreProv "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
@@ -1021,7 +1021,7 @@
                                                      skip-tab
                                                      md-search-text="ctrl.searchProveedor"
                                                      md-auto-select="true"
-                                                     md-items="item in todos | stringKey : ctrl.searchProveedor : 'razon_social' "
+                                                     md-items="item in $parent.filtreProv | stringKey : ctrl.searchProveedor : 'razon_social' "
                                                      md-item-text="item.razon_social"
                                                      md-autoselect = "true"
                                                      md-no-asterisk
@@ -1030,7 +1030,7 @@
                                                      md-no-cache="true"
                                                      md-select-on-match
                                                      md-item-change="toEditHead('document','prov_id',($parent.ctrl.provSelec)  ?  $parent.ctrl.provSelec.id : undefined );$scope.$parent.document.prov_id = $parent.ctrl.provSelec.id ;"
-
+                                                     lmb-required-child="{coin:'Lo sentimos este roveedor no tiene monedas no se puede asignar'}"
 
                                     >
                                         <md-item-template>
