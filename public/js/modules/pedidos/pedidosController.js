@@ -1,7 +1,5 @@
 
-MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
-    ,$filter,$location,App, Order,masters,providers,
-                                           Upload,Layers,setGetOrder, DateParse , ExtRedirect) {
+MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','$filter','Order','setGetOrder','DateParse','ExtRedirect',function ($scope,$mdSidenav,$timeout,$interval,$filter, Order, setGetOrder, DateParse , ExtRedirect) {
     $scope.permit= Order.get({type:"Permision"});
     // controlers
     $scope.Docsession = {isCopyable:false,global:"new", block:true};
@@ -47,15 +45,12 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
     };
 
-
-
     $scope.showFilterPed=false;
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
     $scope.imgLateralFilter="images/Down.png";
-    $scope.selecPed=false;
+
     $scope.preview=true;
-    $scope.mouseProview= false;
     $scope.provSelec ={};
     $scope.document  = setGetOrder.getOrder();
     $scope.docBind= setGetOrder.bind();
@@ -85,7 +80,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     });
 
-    /****filtros para todas las tablas de documentos*/
+    // filtros para las grillas de documentos
     $scope.filterDocuments = function (data, obj){
 
         if(data){
@@ -203,18 +198,15 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         return data;
     };
 
+    // recarga el documento
     $scope.reloadDoc = function () {
         if(setGetOrder.getInternalState() != 'new' && setGetOrder.getState() != 'reload'){
             setGetOrder.reload();
             setGetOrder.setState('reload');
         }
     };
-    /**final @deprecated*/
-    $scope.setProvedor =function(prov, all) {
 
-    };
-
-    /**Clear form head */
+    // limpiaa el modulo
     $scope.clearForHead = function (){
         $scope.provSelec ={};
         $scope.ctrl = {};
@@ -230,18 +222,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         $scope.ctrl.searchcondPagoSelec= undefined;
     };
 
-    $scope.oldReviewDoc = function (){
-
-    };
-
-    $scope.redirect = function(data){
-        alert("redirect " +data.field);
-        App.changeModule(data);
-    };
-
 
     /********************************************GUI ********************************************/
-
+// muestra los datos de los dot de lista de proveedores
     $scope.showDotData= function(item,emit,review, dias){
         if(emit && review){
             item.emit= angular.copy(emit);
@@ -258,18 +241,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     };
-
-    $scope.FilterListPed = function(){
-        $scope.showFilterPed = ($scope.showFilterPed) ? false : true;
-    };
-
+    // muestra el filtro de proveedores
     $scope.FilterLateral = function(){
         if(!$scope.showLateralFilter){
             jQuery("#menu").animate({height:"258px"},500);
             $scope.showLateralFilter=true;
         }
     };
-
+    // amplia  el filtro de proveedores
     $scope.FilterLateralMas = function(){
         if(!$scope.showLateralFilterCpl){
             var ele= jQuery("#barraLateral");
@@ -292,10 +271,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
     };
 
-    $scope.filtOpen= function(){
-        $scope.isOpen = ($scope.isOpen) ? false : true;
-    };
-
+    // verifiaca la salida del layers
     $scope.verificExit = function(){
         var paso = true;
         if(!$scope.Docsession.block && $scope.document.id){
@@ -319,33 +295,6 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         return paso;
     };
 
-    $scope.verificBackExit = function(){
-        var paso = true;
-        if(setGetOrder.getInternalState() != 'new'){
-
-            $scope.NotifAction("alert","Se han realizado cambio en la "+$scope.formMode.name+ " ¿esta seguro de salir sin culminar?",[
-                {
-                    name:"No",
-                    action: function(){
-
-                    }
-                },
-                {
-                    name:"Si",
-                    action: function(){
-                        $scope.LayersAction({close:{init:true}});
-                    }
-                }
-
-            ],{block:true});
-            return false;
-        }
-        if(!paso){
-
-        }
-        return paso;
-    };
-
     /********************************************EVENTOS ********************************************/
     $scope.allowEdit = function(){
 
@@ -365,47 +314,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         return true;
     };
 
-
-
-
-    $scope.delete = function(doc){
-        $scope.NotifAction("alert", "¿Esta seguro  de eliminar "+doc.documento+"?",
-            [
-                {name:"Cancelar",action: function(){
-
-                }
-                },{name:"Si, estoy seguro ", action:function(){
-                Order.postMod({type:$scope.formMode.mod, mod:"Delete"},$scope.document, function(response){
-
-                });
-            }}
-            ],{block:true});
-
-    };
-
     /******************************************** filtros ********************************************/
-
-    $scope.EqualsDate = function(current,compare){
-        var patern = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/;
-        if( patern.test(compare)){
-            var dc=new Date(Date.parse(current));
-            var m;
-            if ((m = patern.exec(compare)) !== null) {
-                var aux, dcp;
-                if(m[0].indexOf('-') != -1){
-                    aux = m[0].split('-');
-                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2])
-
-
-                }else if(m[0].indexOf('/') != -1){
-                    aux = m[0].split('/');
-                    dcp = new Date(aux[1]+"-"+aux[0]+"-"+aux[2]);
-                }
-                return dc.getDate() == dcp.getDate() &&  dc.getFullYear() == dcp.getFullYear() && dc.getMonth() == dcp.getMonth()
-            }
-        }
-        return false;
-    };
 
     //proveedores
     $scope.search = function(){
@@ -593,7 +502,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
         return data;
     };
-
+    // filtra la grilla dwe contrapedidos
     $scope.filterContraPed = function(data, obj){
         if(data){
             if(data.length > 0 && obj){
@@ -677,7 +586,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
         return data;
     };
-
+    //convierte el texto en images del select
     $scope.transforDocToImg = function(doc){
         var mode = $scope.forModeAvilable.getXname(doc);
         if(mode){
@@ -688,16 +597,14 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
                 default: return "";
             }
         }
-    }
-    /** al pulsar la flecha siguiente
-     *  working
-     * **/
+    };
+    //llama al siguiente layer
     $scope.next = function (data) {
         data();
         $scope.showNext();
     };
 
-
+    // muestra la flecha next
     $scope.showNext = function (status) {
         if (status) {
             $mdSidenav("NEXT").open();
@@ -706,7 +613,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     };
-
+    // funcion de cierre
     $scope.closeSide = function(){
 
         var paso= true;
@@ -726,7 +633,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     };
-
+    // actualiza el proveedor
     $scope.updateProv= function(calback){
         Order.get({type:"Provider", id: $scope.provSelec.id},{}, function(response){
 
@@ -740,7 +647,7 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
     };
 
     /****** **************************listener ***************************************/
-
+// actualiza el documento
     $scope.$watch('docBind.estado', function(newVal){
         if(newVal){
             $scope.document=setGetOrder.getOrder();
@@ -753,6 +660,8 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
         }
 
     });
+
+    // actuliza module index moduel layer
     $scope.$watchGroup(['module.index','module.layer'], function(newVal, oldVal){
         $scope.layer= newVal[1];
         $scope.index= newVal[0];
@@ -847,37 +756,9 @@ MyApp.controller('PedidosCtrll', function ($scope,$mdSidenav,$timeout,$interval
 
     });
 
-    /******************************** GUARDADOS ***************************************/
 
 
-    $scope.removeList= function(item){
-
-        $scope.NotifAction("alert",
-            "Se removera todos los productos asociados ¿Desea continuar?"
-            ,[
-                {name: 'Ok',
-                    action:function(){
-
-                    }
-                },{name: 'Cancel',action:function(){}}
-            ]);
-
-    };
-
-    $scope.doClick = function (name){
-        $timeout( function(){
-            var obj= angular.element(name);
-            obj.click();
-        }, 100);
-
-    };
-
-
-
-
-
-
-});
+}]);
 
 
 MyApp.controller('resumenPedidoCtrl',['$scope','$timeout','DateParse', 'Order', function ($scope, $timeout,DateParse, Order) {
@@ -1001,7 +882,7 @@ MyApp.controller('OrderOldDocsCtrl',['$scope','$timeout', 'DateParse','Order','s
 
 
 }]);
-/***lista de documentos  de un proveedor*/
+
 MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse','clickCommitSrv','Order', function ($scope,$timeout,$filter,DateParse,commitSrv, Order) {
 
     $scope.clikBind = commitSrv.bind();
@@ -1064,9 +945,6 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
         $scope.$parent.OrderAddAnswer({id:item.id, documento:item.documento});
     }
 
-    /// hover     var timePreview;
-
-
     $scope.hoverpedido= function(document){
         if(document){
             if($scope.timePreview){
@@ -1087,30 +965,6 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
         console.log("no closeeeeee");
         $scope.$parent.notCloseSumary();
     };
-
-/*    $scope.hoverLeave= function( val){
-
-        $scope.$parent.mouseProview= val;
-        if($scope.timePreview){
-
-        }
-
-        $scope.timePreview= $timeout(function(){
-            if($scope.preview && $scope.module.layer== 'resumenPedido' && !$scope.$parent.mouseProview){
-                $scope.LayersAction({close:true});
-                $scope.hoverPreview(true);
-            }
-        }, 1000);
-
-
-    };
-
-    $scope.hoverEnter=  function(){
-        $scope.$parent.mouseProview= true;
-    };
-    $scope.hoverPreview= function(val){
-        $scope.$parent.preview=val;
-    };*/
 
 }]);
 
@@ -4161,83 +4015,7 @@ MyApp.controller('OrderAddAnswer',['$scope','$timeout','$mdSidenav','Order','for
         $scope.isUpFile= true;
         $scope.model.adjs.push(item);
     };
-    /*
 
-     $scope.sideaddAnswer = function(data, item){
-
-     if(!$scope.isOpenaddAnswer){
-     angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"336px"},400);
-     $scope.formAnswerDoc.$setUntouched();
-     $mdSidenav("addAnswer").open().then(function(){
-     $scope.isOpenaddAnswer = true;
-     $scope.addAnswer.doc_id=angular.copy(item.id);
-     $scope.addAnswer.index=data.$index;
-     $scope.formMode= $scope.forModeAvilable.getXname(item.documento);
-     angular.element(document).find("#addAnswer").find("#textarea").focus();
-
-
-     });
-
-     }
-
-     };
-     $scope.$watch('answerfiles.length', function(newValue){
-     if(newValue > 0){
-     filesService.setFolder("orders");
-     angular.forEach($scope.answerfiles, function(v){
-
-     filesService.Upload({file:v,
-     success: function(data){
-     $scope.addAnswer.adjs.push(data);
-     },
-     error:function(){
-     }})
-     });
-     $scope.answerfiles =[]
-     }
-     });
-
-
-
-
-     /!****** ************************** agregar respuesta ***************************************!/
-     $scope.addAnswer={};
-     $scope.addAnswer.adjs =[];
-     $scope.isOpenaddAnswer= false;
-
-     $scope.closeAddAnswer= function(e){
-
-     if(jQuery(e.target).parents("#lyrAlert").length == 0 &&
-     /!*
-     jQuery(e.target).parents("#"+$scope.layer).length == 0 &&
-     *!/
-     $scope.isOpenaddAnswer &&
-     !angular.element(e.target).is("#ngf-AnswerfileInput")) {
-
-     if ($mdSidenav("addAnswer").isOpen()) {
-
-     if($scope.formAnswerDoc.$valid){
-     Order.postMod(
-     {type:$scope.formMode.mod, mod:"AddAnswer"},{  descripcion:$scope.addAnswer.descripcion,doc_id: $scope.addAnswer.doc_id, adjs :( $scope.addAnswer.adjs.length > 0)  ? $scope.addAnswer.adjs : []},function(response){
-     $scope.priorityDocs.docs.splice($scope.addAnswer.index,1);
-     $scope.addAnswer={};
-     $scope.addAnswer.adjs =[];
-     $scope.NotifAction("ok","Se agregado la respuesta del proveedor al documento ",[],{autohidden:autohidden});
-     });
-
-
-
-     }
-     angular.element(document).find("#"+$scope.layer).find("#expand").animate({width:"0"},400);
-     $mdSidenav("addAnswer").close().then(function () {
-     $scope.isOpenaddAnswer = false;
-     });
-
-     }
-
-
-     }
-     };*/
 }]);
 
 MyApp.controller('OrderModuleMsmCtrl',['$scope','$mdSidenav','Order','masters','clickCommitSrv','setGetOrder', function ($scope,$mdSidenav,Order,masters,clickCommitSrv,setGetOrder) {
