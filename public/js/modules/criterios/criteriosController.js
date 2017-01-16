@@ -739,7 +739,7 @@ MyApp.controller('prodMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         deps = deps || false;
         critForm.setDepend(deps)
         $mdSidenav("lyrConfig").open().then(function(){
-            $scope.opendDep = true;
+            $scope.opendDep = true; 
         });
         angular.element("#lyrConst3").animate({"width": (angular.element("#lyrConst3").width()+468)+"px"},500)
     };

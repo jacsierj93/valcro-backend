@@ -808,12 +808,13 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
                 week:"=?weekMsg",
                 month:"=?monthMsg",
                 minImp:"=?minImpMsg",
-                maxImp:"=?maxImpMsg"
+                maxImp:"=?maxImpMsg",
+                mdMinLength:"=?mdMinLength"
+                
         },
         link: function(scope, elm, attrs, ctrl) {
             scope.errors = ctrl.$error;
             scope.$watchCollection("errors",function(n,o){
-
                angular.forEach(o,function(k,v){
                    if(!(v in n)){
                        if(v in scope){
