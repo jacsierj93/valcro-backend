@@ -1046,27 +1046,6 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
         }
     });
 
-
-
-    //###########################################################################################3
-    //###########################################################################################3
-    //###########################################################################################3
-    //###########################################################################################3
-    //$scope.toggleLeft = buildToggler('left');
-
-    /* $scope.toggleRight = buildToggler('right');
-     $scope.toggleOtro = buildToggler('otro');
-     function buildToggler(navID) {
-     return function() {
-     // Component lookup should always be available since we are not using `ng-if`
-     $mdSidenav(navID).toggle();
-     }
-     }*/
-    //###########################################################################################3
-    //###########################################################################################3
-    //###########################################################################################3
-    //###########################################################################################3
-
 });
 
 MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){
