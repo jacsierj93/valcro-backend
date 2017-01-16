@@ -1454,7 +1454,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             $scope.$parent.Docsession.isCopyableable = false;
             $scope.$parent.Docsession.block=false;
             setGetOrder.clear();
-            if($scope.$parent.provSelec.id){
+            if($scope.$parent.provSelec && $scope.$parent.provSelec.id){
                 $scope.$parent.document.prov_id=$scope.provSelec.id;
             }
 
@@ -1472,6 +1472,16 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
 
     };
 
+    $scope.jsonValidator = function () {
+
+        if($scope.$parent.formMode.value == 23){
+             return {
+                 "get_provider_coin": "Este Provedor no tiene monedas, y no se puede asignar",
+                 "get_payment_condition": "Este Provedor no tiene condiciones de pago,y no se puede asignar"
+             };
+        }
+         return {"get_provider_coin": "Este Provedor no tiene monedas, y no se puede asignar "};
+    };
     $scope.canNext = function () {
         if (!$scope.FormHeadDocument.$valid) {
             $scope.NotifAction("error",
@@ -1642,7 +1652,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
     });
     $scope.$watchGroup(['FormHeadDocument.$valid', 'FormHeadDocument.$pristine'], function (newVal) {
-        if(!newVal[1] &&  $scope.formMode.mod){
+        if(!newVal[1] &&  $scope.formMode.mod && $scope.provSelec.id){
             $scope.document.prov_id = angular.copy($scope.provSelec.id);
             Order.postMod({type:$scope.$parent.formMode.mod, mod:"Save"},$scope.document, function(response){
                 $scope.FormHeadDocument.$setPristine();
@@ -1681,9 +1691,8 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                     angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
                 },0);
             }
-
-
-
+        }else{
+            $scope.$parent.provSelec= undefined;
         }
 
     });
