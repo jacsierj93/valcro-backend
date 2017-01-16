@@ -1030,7 +1030,8 @@
                                                      md-no-cache="true"
                                                      md-select-on-match
                                                      md-item-change="toEditHead('document','prov_id',($parent.ctrl.provSelec)  ?  $parent.ctrl.provSelec.id : undefined );$scope.$parent.document.prov_id = $parent.ctrl.provSelec.id ;"
-                                                     lmb-required-child="{coin:'Lo sentimos este roveedor no tiene monedas no se puede asignar'}"
+                                                     lmb-required='{"get_provider_coin":"Lo sentimos este proveedor no tiene monedas,s no se puede asignar"}'
+                                                     lmb-required-clear-on-fail
 
                                     >
                                         <md-item-template>

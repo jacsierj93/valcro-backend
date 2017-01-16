@@ -587,7 +587,7 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
     };
 });
 
-MyApp.directive('info', function($timeout,setNotif) {
+MyApp.directive('info', function($timeout,setNotif, $sce) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
 
@@ -595,6 +595,43 @@ MyApp.directive('info', function($timeout,setNotif) {
         restrict: 'A',
         require: '?mdAutocomplete',
         link: function(scope, element, attrs,model) {
+
+            if(attrs.lmbRequired){
+                model.scope.$watch("selectedItem", function (newVall, olVal) {
+                    if(newVall){
+                        var json = JSON.parse(attrs.lmbRequired);
+
+                        var error = [];
+
+                        angular.forEach(json, function (v, k) {
+
+                            if(!(k  in model.scope.selectedItem) ){
+
+                            }else{
+                               var e =  model.scope.selectedItem[k];
+                                if((typeof(e) == 'array' && e.length == 0)|| (typeof(e) == 'object' && Object.keys(e).length == 0)  ){
+                                    error.push(v);
+                                }
+                            }
+                        });
+                        if(error.length > 0){
+                            console.log("attr",attrs);
+                            angular.forEach(error, function (v, k) {
+                                setNotif.addNotif("error", v,[],{autohidden:7000});
+                            });
+                            if('lmbRequiredClearOnFail' in  attrs){
+                            $timeout(function () {
+                                    model.scope.searchText = undefined;
+                                console.log("limpiando", model.scope);
+                            }, 100);
+                            }
+
+                        }
+                    }
+                });
+
+            }
+
             element.bind("blur", function(e) {
                 $timeout(function() {
                     setNotif.hideByContent("info",attrs.info);
@@ -637,6 +674,7 @@ MyApp.directive('info', function($timeout,setNotif) {
                 element.on("focus","input", function(e) {
                     this.select();
                     showInfo();
+                    
                 });
 
                 element.on("blur","input", function(e) {
@@ -654,12 +692,14 @@ MyApp.directive('info', function($timeout,setNotif) {
 
 
 
+
                 });
             }else{
                 element.bind("focus", function(e){
                     showInfo();
                 })
             }
+
 
         }
     }
