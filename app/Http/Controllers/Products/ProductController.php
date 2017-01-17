@@ -29,9 +29,9 @@ class ProductController  extends BaseController
     }
     public function getProviders(Request $rq){
 
-        return Provider::has("proveedor_product")->get();
+        return Provider::has("proveedor_product")->lists("id");
     }
-    
+
     public function listByProv($prov){
 
         return Product::with("prov")

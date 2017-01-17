@@ -7,10 +7,19 @@ MyApp.factory('productos', ['$resource',function ($resource) {
     }
 ]);
 
-MyApp.service("productsServices",function(criterios,mastersCrit,$filter){
+MyApp.service("productsServices",function(masters,criterios,productos,mastersCrit,$filter){
+    var providers = masters.query({type:'allProviders'});
+    var listProv = productos.query({type:'provsProds'});
     var prov ={};
     var prod = {id:false,datos:{}};
+
     return{
+        getProvs:function(){
+            return providers;
+        },
+        getAssign:function(){
+            return listProv;
+        },
         setProvprod:function(item){
             prov.id = item.id;
             prov.razon_social = item.razon_social;
@@ -32,7 +41,11 @@ MyApp.service("productsServices",function(criterios,mastersCrit,$filter){
 })
 
 MyApp.controller('listProdController',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
-    $scope.listProvs = productos.query({type:'provsProds'});
+    $scope.listProvs = {
+        provs:productsServices.getProvs(),
+        withpProv:productsServices.getAssign()
+}
+
     
     $scope.getByProv = function(prov,e){
         productsServices.setProvprod(prov);

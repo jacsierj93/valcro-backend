@@ -40,7 +40,7 @@ trait Journal
                             "table" => $model->table,
                             "field" => $k,
                             "keyvalue" => $key,
-                            "oldvalue" => ($act!="new")?$model->original[$k]:"",
+                            "oldvalue" => ($act!="new" && array_key_exists($k, $model->original))?$model->original[$k]:"",
                             "newValue" => ($act!="del")?$att:""
                         );
             }
@@ -51,6 +51,7 @@ trait Journal
     public static function bootJournal(){
 
         static::created(function ($model) {
+
             self::audit($model,"new");
         });
 

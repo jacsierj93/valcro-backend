@@ -658,3 +658,85 @@ MyApp.service('clickCommitSrv', function() {
 });
 
 
+//directive with controller for draw Criterios FORM (productos and Criterios)
+MyApp.directive('formPreview', function() {
+
+    return {
+        scope:{
+            'model' : "=crit",
+            'up' : "=isShow",
+            /*'fail' : "=vlFail",
+             'progress' : "=vlLoad"*/
+        },
+        controller:function($scope,$filter,$timeout){
+            $scope.crit = [];
+            $scope.isShow = [];
+            $scope.formFilters = [];
+            var validators = {};
+            $scope.createModel = function(field){
+
+                $scope.$parent.crit[''+field.id] = {value : "",childs:[]};
+                console.log($scope.crit)
+                $scope.isShow[field.id] = true;
+                $scope.formFilters[field.id] = [];
+                for(i=0;i<field.deps.length;i++){
+                    var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");+
+                        key.childs.push(field.deps[i]);
+                    if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
+                        $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
+                            //console.log(n)
+                            isShow(n);
+                        });
+                    }
+
+
+                }
+            };
+            var isShow = function(val){
+
+                angular.forEach(val.childs,function(dep,k){
+                    var ret = eval(dep.accion);
+                    switch (dep.operador){
+                        case "=":
+                            if(typeof(ret) == "boolean"){
+
+                                $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
+                            }else{
+                                $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
+                                $timeout(function(){
+                                    $scope.$apply();
+                                },0)
+                                /*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
+                                 if(val.value == dep.valor){
+                                 ret.forEach(function(v,a){
+                                 $scope.formFilters[dep.sub_lct_id].push(v)
+                                 })
+                                 }*/
+                            }
+
+                            break;
+                        case ">":
+                            $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
+                            break;
+                        case "<":
+                            $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
+                            break;
+                        case "!=":
+                            $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
+                            break;
+                    }
+
+
+
+                });
+                //return show;
+            };
+        },
+        templateUrl: function(elem, attr) {
+            return 'modules/criterios/textForm';
+        }
+    };
+});
+
+
+

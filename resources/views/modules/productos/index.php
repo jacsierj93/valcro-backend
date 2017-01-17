@@ -4,7 +4,7 @@
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
 
-        <div class="barraLateral" layout="column" ng-controller="listController">
+        <div class="barraLateral" layout="column" ng-controller="listProdController">
             <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div class="menu" style="min-height: 48px; width: 100%;">
@@ -51,7 +51,7 @@
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
             <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="item in listProvs " ng-click="getByProv(item,$event)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created)), 'reserved':(item.reserved)}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="item in listProvs.provs | filterSearch : listProvs.withpProv" ng-click="getByProv(item,$event)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created)), 'reserved':(item.reserved)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                   
                     <div style="height:40px;">

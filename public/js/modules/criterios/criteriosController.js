@@ -807,7 +807,7 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         });
     };
     $scope.formId = critForm.getEdit();
-    $scope.crit = [];
+   /* $scope.crit = [];
     $scope.isShow = [];
     $scope.formFilters = [];
     var validators = {};
@@ -842,12 +842,12 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
                         $timeout(function(){
                           $scope.$apply();
                         },0)
-                        /*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
+                        /!*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
                         if(val.value == dep.valor){
                             ret.forEach(function(v,a){
                                 $scope.formFilters[dep.sub_lct_id].push(v)
                             })
-                        }*/
+                        }*!/
                     }
 
                     break;
@@ -866,7 +866,7 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
 
         });
         //return show;
-    };
+    };*/
 
     $scope.openConstruct = function(callback){
         $mdSidenav("lyrConst1").open();
@@ -994,13 +994,6 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
 }]);
 
 
-MyApp.directive('formPreview', function() {
-        return {
-            templateUrl: function(elem, attr) {
-                return 'modules/criterios/textForm';
-            }
-        };
-});
 
 MyApp.directive('treeBranch', function() {
 
