@@ -1,8 +1,13 @@
 <?php
 use Illuminate\Http\Request;
 
+$app->get("External/redirect",function (Request $req){
+
+    return redirect()->route('/',$req->all());
+
+});
 $app->get("External/Email",function (Request $req){
-    $req->session()->put('external', $req->all());
+    $req->session()->put('external');
     return redirect()->route('login');
 
 });

@@ -219,7 +219,7 @@
                         </md-tooltip>
                     </div>
 
-                    <div layout="column" layout-align="center center"  ng-click="OrderAprobCtrl();" ng-class="{'blue':document.isAprobado}"  ng-show="document.isAprobable && formMode.value !=  21 " >
+                    <div layout="column" layout-align="center center"  ng-click="OrderAprobCtrl();" ng-class="{'blue':document.isAprobado}"  ng-show="(document.isAprobable && formMode.value !=  21 ) || document.isAprobado " >
                         <span class="icon-checkMark" style="font-size: 24px"></span>
                         <md-tooltip >
                             Aprobar
@@ -1029,7 +1029,7 @@
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-item-change="toEditHead('document','prov_id',($parent.ctrl.provSelec)  ?  $parent.ctrl.provSelec.id : undefined );$scope.$parent.document.prov_id = $parent.ctrl.provSelec.id ;"
+                                                     md-selected-item-change="toEditHead('document','prov_id',($parent.ctrl.provSelec)  ?  $parent.ctrl.provSelec.id : undefined );$scope.$parent.document.prov_id = $parent.ctrl.provSelec.id ;"
                                                      lmb-required='{"get_provider_coin":"Lo sentimos este proveedor no tiene monedas,s no se puede asignar"}'
                                                      lmb-required-clear-on-fail
 
@@ -1083,7 +1083,7 @@
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-no-cache="true"
-                                                     md-item-change="toEditHead('document','pais_id',($parent.document.objs.pais_id)  ?  $parent.document.objs.pais_id : undefined );"
+                                                     md-selected-item-change="toEditHead('document','pais_id',($parent.document.objs.pais_id)  ?  $parent.document.objs.pais_id : undefined );"
 
 
 
@@ -1113,7 +1113,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-item-change="toEditHead('document','direccion_facturacion_id',($parent.document.objs.pais_id)  ?  $parent.document.objs.pais_id: undefined );"
+                                                     md-selected-item-change"toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_facturacion_id)  ? undefined );"
 
 
                                     >
@@ -1145,6 +1145,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
+                                                     md-selected-item-change"toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_almacen_id)  ? undefined );$parent.document.direccion_almacen_id = $parent.document.objs.direccion_almacen_id.id"
 
                                     >
                                         <md-item-template>
@@ -1272,7 +1273,7 @@
                                 <md-input-container class="md-block" flex  >
                                     <label>N° Factura:</label>
                                     <input ng-model="$parent.document.nro_factura.doc"  ng-disabled="( Docsession.block || $parent.document.isAprobado)"
-                                           ng-change="toEditHead('document', 'nro_factura', $parent.document.nro_factura)"
+                                           ng-change="toEditHead('document', 'nro_factura', $parent.document.nro_factura.doc)"
                                            info="Introducir Nro de factura en caso de tenerla"
                                            skip-tab
                                     >
@@ -1286,7 +1287,7 @@
                                     <label>N° Proforma:</label>
                                     <input ng-model="$parent.document.nro_proforma.doc"  ng-disabled="( Docsession.block || $parent.document.isAprobado)"
                                            ng-required ="(formMode.value == 22 || formMode.value == 23 )"
-                                           ng-change="toEditHead('document', 'nro_proforma', $parent.document.nro_proforma)"
+                                           ng-change="toEditHead('document', 'nro_proforma', $parent.document.nro_proforma.doc)"
                                            info="Introducir Nro de proforma en caso de tenerla"
                                            skip-tab
 
@@ -1337,7 +1338,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-item-change="toEditHead('document','condicion_cp',$parent.document.condicion_cp  );"
+                                                     md-selected-item-change=" toEditHead('document','condicion_cp',$parent.document.condicion_cp  );"
 
 
                                     >
@@ -3118,7 +3119,7 @@
                                 <grid-order-by ng-model="tbl_finalDoc" key="saldo"></grid-order-by>
                             </div>
 
-                            <!-- <div  style="width: 80px;" ng-show="formMode.value == 23" ></div>-->
+
 
                         </div>
                     </div>
@@ -3133,12 +3134,7 @@
                                         <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
                                         <div flex class="cellGrid" > {{item.descripcion}}</div>
                                         <div flex="15" class="cellGrid">{{item.saldo | number:2}}</div>
-                                        <!--      <div style="width: 80px;"  class="cellEmpty " ng-show="formMode.value == 23"
-                                                   layout-align="center center" layout="column" ng-click="excepProdFinal(item)">
-                                                  <div class="dot-empty dot-attachment "  layout-align="center center" >
-                                                      <div style=" margin-top: 2.5px;">   {{item.condicion_pago.length}}</div>
-                                                  </div>
-                                              </div>-->
+
                                     </div>
                                 </div>
                             </div>
