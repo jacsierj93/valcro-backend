@@ -3367,7 +3367,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
             $scope.origenes = response.templates;
             $scope.model.tipo = response.tipo;
             if(response.to){
-                angular.forEach(respnse.to, function (v) {
+                angular.forEach(response.to, function (v) {
                     $scope.model.to.push(v);
                 });
             }
