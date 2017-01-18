@@ -445,7 +445,7 @@
                 <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
                     <input type="hidden" md-autofocus>
                     <div style="height: 160px;">
-                        <form ng-class="{'focused':true}" >
+                        <form ng-controller="createProd" ng-class="{'focused':true}" >
                             <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
                                 <div>
                                     Producto
@@ -454,28 +454,28 @@
                             <div flex>
                                 <div layout="row" class="row">
                                     <md-input-container class="md-block" flex>
-                                        <label>Moneda</label>
+                                        <label>Proveedor</label>
                                         <md-autocomplete md-selected-item="ctrl.prov"
                                                          flex
-                                                         id="credCoin"
+                                                         id="prodProv"
                                                          info="busque el proveedor"
-
-                                                         md-selected-item-change="cred.coin = ctrl.coin.id;"
+                                                         md-selected-item-change="prod.prov = ctrl.prov.id"
                                                          skip-tab
-                                                         md-search-text="ctrl.searchCoin"
-                                                         md-items="item in ['prov1','prov2','prov3','prov4']"
-                                                         md-item-text="item"
+                                                         md-search-text="ctrl.searchProv"
+                                                         md-items="item in listProviders"
+                                                         md-item-text="item.razon_social"
                                                          require
                                                          require-match="true"
                                                          md-no-asterisk
                                                          md-min-length="0">
                                             <input >
                                             <md-item-template>
-                                                <span>{{item}}</span>
+                                                <span>{{item.razon_social}}</span>
                                             </md-item-template>
                                         </md-autocomplete>
 
                                     </md-input-container>
+                                    
                                 </div>
                                 <div class="row" layout="row" >
                                     <md-input-container class="md-block" flex="30">
@@ -484,7 +484,25 @@
                                     </md-input-container>
                                     <md-input-container class="md-block" flex="20">
                                         <label>Linea</label>
-                                        <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                        <md-autocomplete md-selected-item="ctrl.line"
+                                                         flex
+                                                         id="prodLine"
+                                                         info="busque la linea"
+                                                         md-selected-item-change="prod.line = ctrl.line.id"
+                                                         skip-tab
+                                                         md-search-text="ctrl.searchLine"
+                                                         md-items="item in lines"
+                                                         md-item-text="item.linea"
+                                                         require
+                                                         require-match="true"
+                                                         md-no-asterisk
+                                                         md-min-length="0">
+                                            <input >
+                                            <md-item-template>
+                                                <span>{{item.linea}}</span>
+                                            </md-item-template>
+                                        </md-autocomplete>
+
                                     </md-input-container>
                                     <md-input-container class="md-block" flex="20">
                                         <label>Sublinea</label>
@@ -505,14 +523,24 @@
                             </div>
                         </form>
                     </div>
-                    <div flex>
-                        <form ng-class="{'focused':true}" >
+                    <div flex layout="column">
+                        <form ng-class="{'focused':true}" ng-controller="datCritProds" flex>
                             <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
                                 <div>
                                     Detalles
                                 </div>
                             </div>
                             <md-content flex>
+                                <div ng-repeat="field in criteria" class="row"
+                                     ng-class="{'field-sel':field.id==formId.id}"
+                                     test="{{formId.id}}"
+                                     form-preview="{{field.type.directive}}"
+                                     ng-dblclick="setEdit(field)"
+                                     ng-show="isShow[field.id]"
+                                     style="width: 30%; float:left;"
+                                >
+
+                                </div>
                                 <!--<div class="row" style="float:left; width:32%;" ng-repeat="item in [1,2,3,4,5,6,7,8,9]">
 
                                     <lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-itens="[{id:1,descripcion:'prod1'},{id:2,descripcion:'prod2'},{id:3,descripcion:'prod3'},{id:4,descripcion:'prod4'}]">
@@ -520,10 +548,7 @@
                                     </lmb-collection>
                                 </div>
 -->
-                                <md-input-container class="md-block" ng-repeat="item in [1,2,3,4,5,6,7,8,9]" style="float:left; width:32%;">
-                                    <label>Titulo</label>
-                                    <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
-                                </md-input-container>
+                                
                             </md-content>
                         </form>
                     </div>

@@ -1,4 +1,4 @@
-
+<div style="display: none" ng-init="createModel(field)"></div>
 <md-input-container id="text"
                     class="md-block"
                     flex
@@ -44,7 +44,7 @@
                      md-items="item in field.options.Opcion || [] | filterSearch: formFilters[field.id] : 'elem.id' | stringKey : ctrl.searchLang: 'elem.nombre' "
                      md-item-text="item.elem.nombre"
                      md-no-asterisk
-                     md-min-length="2"
+                     md-min-length="0"
                 
                      id="{{field.id}}">
 

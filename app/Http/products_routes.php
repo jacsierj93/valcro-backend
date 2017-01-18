@@ -8,3 +8,4 @@
  */
 $app->get("productos/provsProds",'Products\ProductController@getProviders');
 $app->get("productos/prodsByProv/{id}",'Products\ProductController@listByProv');
+$app->get("productos/getCriterio/{line}",'Criterio\CritController@getCriterio');

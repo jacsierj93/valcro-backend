@@ -1,6 +1,6 @@
 <?php
 
-$app->get("master/allProviders",'Providers\ProvidersController@getList'); ///obtener listado de paises
+$app->get("master/allProviders",'Providers\ProvidersController@getList'); ///obtener listado de proveedores
 $app->get("master/getCountries",'Masters\MasterController@getCountries'); ///obtener listado de paises
 $app->get("master/getCountriesProvider",'Masters\MasterController@getCountriesHaveProvider'); ///obtener listado de paises donde tenemos provedores
 $app->get("master/getProviderType",'Masters\MasterController@getProviderType'); ///obtener listado de tipos de proveedores

@@ -657,26 +657,37 @@ MyApp.service('clickCommitSrv', function() {
     }
 });
 
+MyApp.service('formPreviewSrv',function(){
+    var commons = {
+        crit:[],
+        isShow:[],
+        formFilters:[]
+    };
+    return {
+        getCrits:function(){
+            return commons.crit;
+        },
+        getShows:function(){
+            return commons.isShow;
+        },
+        getFilters:function(){
+            return commons.formFilters;
+        }
+    }
+});
 
 //directive with controller for draw Criterios FORM (productos and Criterios)
 MyApp.directive('formPreview', function() {
 
     return {
-        scope:{
-            'model' : "=crit",
-            'up' : "=isShow",
-            /*'fail' : "=vlFail",
-             'progress' : "=vlLoad"*/
-        },
-        controller:function($scope,$filter,$timeout){
-            $scope.crit = [];
-            $scope.isShow = [];
-            $scope.formFilters = [];
+
+        controller:function($scope,$filter,$timeout,formPreviewSrv){
+            $scope.crit = formPreviewSrv.getCrits();
+            $scope.isShow = formPreviewSrv.getShows();
+            $scope.formFilters = formPreviewSrv.getFilters();
             var validators = {};
             $scope.createModel = function(field){
-
-                $scope.$parent.crit[''+field.id] = {value : "",childs:[]};
-                console.log($scope.crit)
+                $scope.crit[''+field.id] = {value : "",childs:[]};
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
                 for(i=0;i<field.deps.length;i++){
@@ -736,6 +747,23 @@ MyApp.directive('formPreview', function() {
             return 'modules/criterios/textForm';
         }
     };
+});
+
+
+MyApp.service('masterSrv',function(masters){
+    var providers = masters.query({type:'allProviders'});
+    var lines = masters.query({ type:"prodLines"});
+    return {
+        getProvs:function(){
+            return providers
+        },
+        getLines:function(){
+            return lines;
+        },
+        getFilters:function(){
+            return commons.formFilters;
+        }
+    }
 });
 
 

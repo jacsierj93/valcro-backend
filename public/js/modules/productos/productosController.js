@@ -7,12 +7,13 @@ MyApp.factory('productos', ['$resource',function ($resource) {
     }
 ]);
 
-MyApp.service("productsServices",function(masters,criterios,productos,mastersCrit,$filter){
-    var providers = masters.query({type:'allProviders'});
+MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,mastersCrit,$filter){
+    var providers = masterSrv.getProvs();
     var listProv = productos.query({type:'provsProds'});
     var prov ={};
     var prod = {id:false,datos:{}};
-
+    
+    
     return{
         getProvs:function(){
             return providers;
@@ -44,7 +45,7 @@ MyApp.controller('listProdController',['$scope', 'setNotif','productos','product
     $scope.listProvs = {
         provs:productsServices.getProvs(),
         withpProv:productsServices.getAssign()
-}
+    }
 
     
     $scope.getByProv = function(prov,e){
@@ -99,11 +100,10 @@ MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsService
     }
 }]);
 
-MyApp.controller('createProd',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
+MyApp.controller('createProd',['$scope', 'setNotif','productos','productsServices','masterSrv',function ($scope, setNotif,productos,productsServices,masterSrv) {
     $scope.prod = productsServices.getProd();
-    $scope.$watchCollection("prod",function(n,o){
-
-    });
+    $scope.listProviders = productsServices.getProvs();
+    $scope.lines = masterSrv.getLines();
 
     $scope.brcdOptions = {
         width: 3,
@@ -119,9 +119,14 @@ MyApp.controller('createProd',['$scope', 'setNotif','productos','productsService
 
 MyApp.controller('datCritProds',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
     $scope.prod = productsServices.getProd();
-    $scope.$watchCollection("prod",function(n,o){
-
-    });
+   /* $scope.$watchCollection("prod",function(n,o){
+        productos.query({ type:"getCriterio",id:n.datos.linea_id},function(data){
+            $scope.criteria = data;
+        });
+    });*/
+    /*productos.query({ type:"getCriterio",id:5},function(data){
+        $scope.criteria = data;
+    });*/
 
     $scope.brcdOptions = {
         width: 3,
