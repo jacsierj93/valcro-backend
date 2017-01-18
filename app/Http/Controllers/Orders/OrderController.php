@@ -4588,6 +4588,7 @@ class OrderController extends BaseController
         $result['success'] = "Registro guardado con éxito!";
         $result['action'][] = "close";
         $model = Purchase::findOrFail($req->id);
+
         $model->ult_revision = Carbon::now();
         $model->final_id = $this->getFinalId($model);
         $model->save();

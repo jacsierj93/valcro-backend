@@ -92,8 +92,11 @@ if (Request::is('master/*'))
 }
 
 
-$app->get('/', 'Account\AccountController@main'); ///pagina principal
-
+//$app->get('/', 'Account\AccountController@main'); ///pagina principal
+$app->get('/', [
+    'as' => '/',
+    'uses' => 'Account\AccountController@main'
+]); ///login
 
 $app->get('/angular', 'Account\AccountController@prueba'); ///pagina principal
 

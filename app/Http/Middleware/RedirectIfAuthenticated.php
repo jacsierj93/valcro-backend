@@ -35,7 +35,7 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next)
     {
         if ($request->session()->has('DATAUSER')) {
-            return redirect('/');
+            return  redirect()->route('/',$request->all());;
         }
 
         return $next($request);

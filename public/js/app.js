@@ -954,11 +954,24 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
 }]);
 
 
-MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGetProv, Layers,App,ExtRedirect) {
+MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect) {
+
+console.log('$routeParams', $routeParams);
+console.log('$location.search', $location.search());
 
 
     $scope.bindBlock=App.getBindBloc();
-    ExtRedirect.load(function (response) {
+    if(Object.keys($location.search()).length  > 0){
+        var params = $location.search();
+        ExtRedirect.set(params);
+        if(params.secc){
+            console.log("redirect ",params);
+            $location.replace('/modules/Pedidos');
+
+
+        }
+    }
+/*    ExtRedirect.load(function (response) {
         if(response && response.module){
             var red = undefined;
             angular.forEach($scope.secciones, function (v, k) {
@@ -971,7 +984,7 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
                 $scope.seccLink(red);
             }
         }
-    });
+    });*/
 
     $scope.accion = App.getAccion();
     $scope.secciones = [
@@ -1048,7 +1061,21 @@ MyApp.controller('AppMain', function ($scope,$mdSidenav,$location,$filter,setGet
     });
 
 });
+/*MyApp.config(['$routeProvider', '$locationProvider',
+    function($routeProvider, $locationProvider) {
+        $routeProvider
+            .when('/', {
+                templateUrl: 'modules/home/index'
+            }).when('/modules/Pedidos', {
+                    templateUrl: 'modules/pedidos/index',
+                    controller:'PedidosCtrll'
+                }).otherwise(function () {
+                    console.log("No se consige la ruta");
+                    })
+            ;
 
+        $locationProvider.html5Mode(true);
+    }]);*/
 MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){
 
     $scope.template = "modules/home/files";
@@ -1439,26 +1466,35 @@ MyApp.service('Layers' , function(){
 });
 
 MyApp.service('ExtRedirect' , function($http){
-    var data  ;
+    var model  ;
 
     return {
         load: function (fn) {
-            $http.get("External/Get").success(function (response) {
+            /*$http.get("External/Get").success(function (response) {
                 data= response;
                 if(fn){
                     fn(response);
                 }
-            });
+            });*/
+        },
+        set: function (redirect) {
+            model = redirect;
+            /*$http.get("External/Get").success(function (response) {
+             data= response;
+             if(fn){
+             fn(response);
+             }
+             });*/
         },
         del : function(fn){
-            $http.get("External/Del").success(function (response) {
+           /* $http.get("External/Del").success(function (response) {
                 data =null;
                 if(fn){
                     fn(response);
                 }
-            });
+            });*/
         }, get: function () {
-            return data;
+            return model;
         }
     }
 
