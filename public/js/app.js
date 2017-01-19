@@ -1,5 +1,42 @@
 var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload','io-barcode','treeControl'];
+var urls = [
+    {
+        secc: 'Inicio',
+        key:'inicio',
+        url: 'modules/home/index',
+        selct: 'btnDot'
+    }, {
+        secc: 'Proveedores',
+        key:'proveedores',
+        url: 'modules/proveedores/index',
+        selct: 'btnDot'
+    }, {
+        secc: 'Embarques',
+        key:'embarques',
+        url: 'modules/embarques/index',
+        selct: 'btnDot'
+    }, {
+        secc: 'Pagos',
+        key: 'pagos',
+        url: 'modules/pagos/index',
+        selct: 'btnDot'
+    }, {
+        secc: 'Pedidos',
+        key:'order',
+        url: 'modules/pedidos/index',
 
+        selct: 'btnDot'
+    }, {
+        secc: 'Criterios',
+        key:'criterios',
+        url: 'modules/criterios/index',
+        selct: 'btnDot'
+    }, {
+        secc: 'Productos',
+        key:'productos',
+        url: 'modules/productos/index',
+        selct: 'btnDot'
+    }];
 
 var MyApp = angular.module('MyApp', dependency, function() {
 
@@ -7,30 +44,6 @@ var MyApp = angular.module('MyApp', dependency, function() {
 
 /********************************************************/
 
-
-/*MyApp.config(['$routeProvider', '$locationProvider',
- function($routeProvider, $locationProvider){
- $routeProvider.
- when('/', {
- templateUrl : 'modules/home/index'
- }).when('/proveedores', {
- templateUrl : 'modules/proveedores/index'
- }).when('/logout', {
- redirectTo : 'logout'
- }).
- otherwise({
- redirectTo : '/'
- //templateUrl : 'modules/home/404'
- });
- $locationProvider.html5Mode(true);
- }
- ]);*/
-
-
-/*MyApp.config(['$routeProvider',function($routeProvider){
- $routeProvider
- .when('/home',  {templateUrl:"modules/home"})
- }]);*/
 window.addEventListener("keydown", function(e) {
     // space and arrow keys
 
@@ -149,9 +162,8 @@ MyApp.filter('filterSelect', function() {
         if(!id){
             id="id";
         }
-        console.log(arr1,arr2)
-        return arr1.filter(function(val) {
 
+        return arr1.filter(function(val) {
             return arr2.indexOf(eval("val."+id)) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
     }
@@ -327,7 +339,7 @@ MyApp.directive('decimal', function () {
                         || (key >= 112 && key <= 123)
                     )   ){
                     if(key != 13){
-                         e.preventDefault();
+                        e.preventDefault();
                     }
 
 
@@ -587,7 +599,7 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
     };
 });
 
-MyApp.directive('info', function($timeout,setNotif, $sce) {
+MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
 
@@ -595,6 +607,24 @@ MyApp.directive('info', function($timeout,setNotif, $sce) {
         restrict: 'A',
         require: '?mdAutocomplete',
         link: function(scope, element, attrs,model) {
+            /*if(("model" in  attrs)){
+                var mod = scope.$eval(attrs.model);
+                model.scope.itemChange = function(){
+                    mod = (model.scope.selectedItem)?model.scope.selectedItem.id : false;
+                }
+            }
+            if(("src" in  attrs)) {
+
+            }*/
+            if(element.is("md-autocomplete")){
+                var src = scope.$eval(attrs.mdItems.split(/ in /i)[1]);
+                var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
+                var text = attrs.mdItemText.split(".")[1];
+                scope.$watch(ngmodel, function (newVall, olVal) {
+                    model.scope.searchText = (newVall)?$filter("filterSearch")(src, [newVall])[0][text] : "";
+
+                });
+            }
 
             if(attrs.lmbRequired){
                 model.scope.$watch("selectedItem", function (newVall, olVal) {
@@ -608,7 +638,7 @@ MyApp.directive('info', function($timeout,setNotif, $sce) {
                             if(!(k  in model.scope.selectedItem) ){
 
                             }else{
-                               var e =  model.scope.selectedItem[k];
+                                var e =  model.scope.selectedItem[k];
                                 if((typeof(e) == 'array' && e.length == 0)|| (typeof(e) == 'object' && Object.keys(e).length == 0)  ){
                                     error.push(v);
                                 }
@@ -620,10 +650,10 @@ MyApp.directive('info', function($timeout,setNotif, $sce) {
                                 setNotif.addNotif("error", v,[],{autohidden:7000});
                             });
                             if('lmbRequiredClearOnFail' in  attrs){
-                            $timeout(function () {
+                                $timeout(function () {
                                     model.scope.searchText = undefined;
-                                console.log("limpiando", model.scope);
-                            }, 100);
+                                    console.log("limpiando", model.scope);
+                                }, 100);
                             }
 
                         }
@@ -674,7 +704,7 @@ MyApp.directive('info', function($timeout,setNotif, $sce) {
                 element.on("focus","input", function(e) {
                     this.select();
                     showInfo();
-                    
+
                 });
 
                 element.on("blur","input", function(e) {
@@ -793,36 +823,36 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
     return {
         require: '?ngModel',
         scope:{
-                email:"=?emailMsg",
-                max:"=?maxMsg",
-                maxlength:"=?maxlengthMsg",
-                min:"=?minMsg",
-                minlength:"=?minlengthMsg",
-                number:"=?numberMsg",
-                pattern:"=?patternMsg",
-                required:"=?requiredMsg",
-                url:"=?urlMsg",
-                date:"=?dateMsg",
-                datetimelocal:"=?datetimelocalMsg",
-                time:"=?timeMsg",
-                week:"=?weekMsg",
-                month:"=?monthMsg",
-                minImp:"=?minImpMsg",
-                maxImp:"=?maxImpMsg",
-                mdMinLength:"=?mdMinLength"
-                
+            email:"=?emailMsg",
+            max:"=?maxMsg",
+            maxlength:"=?maxlengthMsg",
+            min:"=?minMsg",
+            minlength:"=?minlengthMsg",
+            number:"=?numberMsg",
+            pattern:"=?patternMsg",
+            required:"=?requiredMsg",
+            url:"=?urlMsg",
+            date:"=?dateMsg",
+            datetimelocal:"=?datetimelocalMsg",
+            time:"=?timeMsg",
+            week:"=?weekMsg",
+            month:"=?monthMsg",
+            minImp:"=?minImpMsg",
+            maxImp:"=?maxImpMsg",
+            mdMinLength:"=?mdMinLength"
+
         },
         link: function(scope, elm, attrs, ctrl) {
             scope.errors = ctrl.$error;
             scope.$watchCollection("errors",function(n,o){
-               angular.forEach(o,function(k,v){
-                   if(!(v in n)){
-                       if(v in scope){
-                           setNotif.hideByContent(scope[v].t,scope[v].m);
-                       }
+                angular.forEach(o,function(k,v){
+                    if(!(v in n)){
+                        if(v in scope){
+                            setNotif.hideByContent(scope[v].t,scope[v].m);
+                        }
 
-                   }
-               });
+                    }
+                });
                 angular.forEach(n,function(k,v){
                     if((v in scope)){
                         btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
@@ -857,10 +887,10 @@ MyApp.directive('range', function () {
         restrict: 'A',
         require: 'ngModel',
         link: function (scope, elem, attrs, ctrl) {
-/*            console.log("atttr", attrs);
-            console.log("atttr", elem);
-            console.log("escope", scope);
-            console.log("ctrol", ctrl);*/
+            /*            console.log("atttr", attrs);
+             console.log("atttr", elem);
+             console.log("escope", scope);
+             console.log("ctrol", ctrl);*/
             elem.bind("keydown",function(e){
                 var key = window.Event ? e.which : e.keyCode;
                 if(!((key >= 48 && key <= 57) || (key==8)  || (key >= 96 && key <= 105
@@ -894,7 +924,7 @@ MyApp.directive('range', function () {
                 if(validate == true){
                     var paso= validateRange(viewValue,attrs.minval,attrs.maxval);
                     if(!paso){
-                      //  elem[0].focus();
+                        //  elem[0].focus();
                     }
                     return paso;
                 }
@@ -952,130 +982,97 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
     };
 
 }]);
-
-
-MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect) {
-
-console.log('$routeParams', $routeParams);
-console.log('$location.search', $location.search());
-
-
-    $scope.bindBlock=App.getBindBloc();
-    if(Object.keys($location.search()).length  > 0){
-        var params = $location.search();
-        ExtRedirect.set(params);
-        if(params.secc){
-            console.log("redirect ",params);
-            $location.replace('/modules/Pedidos');
-
-
-        }
-    }
-/*    ExtRedirect.load(function (response) {
-        if(response && response.module){
-            var red = undefined;
-            angular.forEach($scope.secciones, function (v, k) {
-                if(response.module == v.key){
-                    red= v;
-                    return 0;
-                }
-            });
-            if(red){
-                $scope.seccLink(red);
-            }
-        }
-    });*/
-
-    $scope.accion = App.getAccion();
-    $scope.secciones = [
-        {
-            secc: 'Inicio',
-            key:'inicio',
-            url: 'modules/home/index',
-            selct: 'btnDot'
-        }, {
-            secc: 'Proveedores',
-            key:'proveedores',
-            url: 'modules/proveedores/index',
-            selct: 'btnDot'
-        }, {
-            secc: 'Embarques',
-            key:'embarques',
-            url: 'modules/embarques/index',
-            selct: 'btnDot'
-        }, {
-            secc: 'Pagos',
-            key: 'pagos',
-            url: 'modules/pagos/index',
-            selct: 'btnDot'
-        }, {
-            secc: 'Pedidos',
-            key:'order',
-            url: 'modules/pedidos/index',
-            selct: 'btnDot'
-        }, {
-            secc: 'Criterios',
-            key:'criterios',
-            url: 'modules/criterios/index',
-            selct: 'btnDot'
-        }, {
-            secc: 'Productos',
-            key:'productos',
-            url: 'modules/productos/index',
-            selct: 'btnDot'
-        }];
-    $scope.seccion = $scope.secciones[0];
-    $scope.seccLink = function (item){
-        $scope.seccion = angular.copy(item);
-        Layers.setModule($scope.seccion.key);
-        App.setSeccion(item);
-        angular.forEach($scope.secciones, function(value, key) {
-            if( $scope.seccion.key == value.key){
-                value.selct = 'btnLine';
+MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($scope,$location,  App, Layers) {
+    $scope.secciones= urls;
+    $scope.seccion = App.getSeccion();
+    $scope.$on('$locationChangeSuccess', function(event, newVal, olval) {
+       var path = newVal.substr(newVal.indexOf('#')+1, newVal.length);
+       var asig = false;
+        angular.forEach($scope.secciones, function (v,k) {
+            console.log(path, '/'+v.key);
+            if(path == '/'+v.key){
+                App.setSeccion(v);
+                Layers.setModule(v);
+                v.selct = 'btnLine';
+                asig= true;
+                return 0;
             }else{
-                value.selct = 'btnDot';
+                v.selct = 'btnDot';
             }
         });
-    };
-    $scope.$watch('accion.estado', function (newval){
-        if(newval){
-            console.log("data", $scope.accion );
-            var data = $scope.accion.value;
-            if(data.msm){
-                var msm ={to:data.module,from:$scope.seccion.key,msm:data.msm}
+        if(!asig){
+            $scope.secciones[0].selct=  'btnLine';
+        }
 
-                App.setMsm(msm);
-            }
-            if (data.module){
-                var mnew=  angular.copy($filter("customFind")($scope.secciones,data.module,function(current,compare){return current.key==compare})[0]);
-                $scope.seccLink(mnew);
-            }
-        }
     });
-    $scope.$watch('bindBlock.estado' , function(newval){
-        if(newval){
-            $scope.block= App.getBindBloc().value.block;
-            $scope.level= App.getBindBloc().value.level;
-            App.getBindBloc().estado=false;
-        }
-    });
+    $scope.seccLink = function (item){
+         var url = '/'+item.key;
+        $location.path(url);
+
+    };
+
+
+}]);
+
+MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect) {
+    /* $scope.secciones= urls;
+     $scope.binseccion =App.getSeccion();
+
+     $scope.bindBlock=App.getBindBloc();
+     if(Object.keys($location.search()).length  > 0){
+     var params = $location.search();
+     ExtRedirect.set(params);
+     if(params.secc){
+     console.log("redirect ",params);
+     $location.replace('/modules/Pedidos');
+
+
+     }
+     }
+
+     $scope.$watchConlletion('binseccion', function (newVal) {
+     console.log('new val in app', newVal);
+     });
+     $scope.accion = App.getAccion();
+
+     $scope.seccLink = function (item){
+     //$scope.seccion = angular.copy(item);
+     var url = '/'+item.key;
+     $location.path(url);
+
+     App.setSeccion(item);
+     Layers.setModule(item.key);
+     console.log('in app',App.getSeccion());
+
+     };
+     $scope.$watch('bindBlock.estado' , function(newval){
+     if(newval){
+     $scope.block= App.getBindBloc().value.block;
+     $scope.level= App.getBindBloc().value.level;
+     App.getBindBloc().estado=false;
+     }
+     });*/
 
 });
-/*MyApp.config(['$routeProvider', '$locationProvider',
-    function($routeProvider, $locationProvider) {
-        $routeProvider
-            .when('/', {
-                templateUrl: 'modules/home/index'
-            }).when('/modules/Pedidos', {
-                    templateUrl: 'modules/pedidos/index',
-                    controller:'PedidosCtrll'
-                }).otherwise(function () {
-                    console.log("No se consige la ruta");
-                    })
-            ;
 
-        $locationProvider.html5Mode(true);
-    }]);*/
+MyApp.config(['$routeProvider', '$locationProvider',
+    function($routeProvider, $locationProvider) {
+
+
+        angular.forEach(urls, function (v) {
+            var data = { templateUrl:v.url};
+            if(v.controller){
+                data.controller = v.controller;
+            }
+            $routeProvider.when('/'+v.key,data);
+        });
+        $routeProvider.when('/', {
+            templateUrl: 'modules/home/index'
+        });
+        $routeProvider.otherwise({ redirectTo: '/' });
+        //$locationProvider.html5Mode(true);
+    }]);
+
 MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){
 
     $scope.template = "modules/home/files";
@@ -1297,7 +1294,7 @@ MyApp.service('App' ,[function(){
             seccion= data;
         },
         getSeccion : function () {
-          return seccion;
+            return seccion;
         },
         getAccion : function(){
             return accion;
@@ -1471,11 +1468,11 @@ MyApp.service('ExtRedirect' , function($http){
     return {
         load: function (fn) {
             /*$http.get("External/Get").success(function (response) {
-                data= response;
-                if(fn){
-                    fn(response);
-                }
-            });*/
+             data= response;
+             if(fn){
+             fn(response);
+             }
+             });*/
         },
         set: function (redirect) {
             model = redirect;
@@ -1487,12 +1484,12 @@ MyApp.service('ExtRedirect' , function($http){
              });*/
         },
         del : function(fn){
-           /* $http.get("External/Del").success(function (response) {
-                data =null;
-                if(fn){
-                    fn(response);
-                }
-            });*/
+            /* $http.get("External/Del").success(function (response) {
+             data =null;
+             if(fn){
+             fn(response);
+             }
+             });*/
         }, get: function () {
             return model;
         }
@@ -1621,7 +1618,7 @@ MyApp.service('DateParse', function() {
         }
 
     };
-   this.plusDays =  function (compare, plus) {
+    this.plusDays =  function (compare, plus) {
         if(compare){
             return   new Date(compare.getFullYear(),
                 compare.getMonth(),
@@ -1631,7 +1628,7 @@ MyApp.service('DateParse', function() {
                 compare.getSeconds()
             )
         }
-   }
+    }
 });
 /*
  MyApp.service('DateParse', function() {
@@ -1661,13 +1658,14 @@ MyApp.service('DateParse', function() {
  }
 
  });
-*/
+ */
 MyApp.constant('SYSTEM',{
     ROOT:"http://"+window.location.hostname,
     BASE:"/"+window.location.pathname.split("/")[1]+"/",
     PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/",
     noti_autohidden :3000
 });
+
 
 
 

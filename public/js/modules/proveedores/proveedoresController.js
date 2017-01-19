@@ -1249,7 +1249,6 @@ MyApp.controller('valcroNameController', function($scope,setGetProv,$http,provid
     function saveValcroname(preFav,onSuccess){
 
         if(!$scope.nomvalcroForm.$valid){
-//            console.log("adasdasdasdasdasdasdasdasdasdasdasd")
             onSuccess();
             return false;
         }
@@ -3535,7 +3534,7 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
     //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
 });
 
-MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter){
+MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter,App){
     var foreign = {
         currentOrig : {},
         onSuccess : null,
@@ -3551,7 +3550,11 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter
     var next = false;
     var genericSave = function() {
         next = foreign.elem || false;
-
+        var curSecc = App.getSeccion();
+        console.log("foreign",foreign)
+        if(curSecc.key != "proveedores" || foreign.form==undefined){
+            return false;
+        }
         if ((angular.equals(foreign.currentOrig, foreign.model) && foreign.model.id ) || (foreign.form.$pristine )) {
 
             foreign.onSuccess(next);
@@ -3562,9 +3565,9 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter
 
         var isValid = (foreign.valid)?foreign.valid():true;
 
-        //console.log(foreign.form,isValid);
 
-        if (!foreign.form.$valid && !foreign.form.$pristine || (!isValid && foreign.form.$dirty)) {
+
+        if (!foreign.form.$valid && !foreign.form.$pristine || (!isValid && foreign.form.$dirty) ) {
             var prefocus = angular.element(":focus");
             block = "wait";
             $timeout(function () {

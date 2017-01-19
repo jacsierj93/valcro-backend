@@ -12,6 +12,14 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
     var listProv = productos.query({type:'provsProds'});
     var prov ={};
     var prod = {id:false,datos:{}};
+    var prodToSave = {
+        id:false,
+        prov:false,
+        line:false,
+        serie:"",
+        cod:"",
+        desc:""
+    }
     
     
     return{
@@ -33,9 +41,21 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         setProd:function(item){
             prod.id = item.id;
             prod.datos = item;
+            prodToSave.id = item.id || false;
+            prodToSave.prov = item.prov_id || false;
+            prodToSave.line = item.linea_id || false;
+            prodToSave.serie = item.serie || false;
+            prodToSave.cod = item.codigo || false;
+            prodToSave.desc = item.descripcion || false;
         },
         getProd : function(){
             return prod
+        },
+        getToSavedProd:function(){
+            return prodToSave;
+        },
+        setSavedProd : function(){
+
         }
 
     }
@@ -62,7 +82,7 @@ MyApp.controller('gridAllController',['$scope', 'setNotif','productos','products
         filter:{}
     };
     $scope.$watchCollection("prov",function(n,o){
-        $scope.listByProv.data = productos.query({type:'prodsByProv',id:n.id});
+        $scope.listByProv.data = (n.id)?productos.query({type:'prodsByProv',id:n.id}):[];
     });
 
     $scope.testNext = function(){
@@ -101,29 +121,22 @@ MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsService
 }]);
 
 MyApp.controller('createProd',['$scope', 'setNotif','productos','productsServices','masterSrv',function ($scope, setNotif,productos,productsServices,masterSrv) {
-    $scope.prod = productsServices.getProd();
     $scope.listProviders = productsServices.getProvs();
     $scope.lines = masterSrv.getLines();
-
-    $scope.brcdOptions = {
-        width: 3,
-        height: 40,
-        displayValue: false,
-        font: 'monospace',
-        textAlign: 'center',
-        fontSize: 15,
-        backgroundColor: '#ddd',
-        lineColor: '#5cb7eb'
-    }
+    $scope.prod = productsServices.getToSavedProd();
+    console.log("in scope",$scope.prod);
 }]);
 
 MyApp.controller('datCritProds',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
-    $scope.prod = productsServices.getProd();
-   /* $scope.$watchCollection("prod",function(n,o){
-        productos.query({ type:"getCriterio",id:n.datos.linea_id},function(data){
-            $scope.criteria = data;
-        });
-    });*/
+    $scope.prod = productsServices.getToSavedProd();
+    $scope.$watchCollection("prod",function(n,o){
+        if(n.id && n.line){
+            productos.query({ type:"getCriterio",id:n.line},function(data){
+                $scope.criteria = data;
+            });
+        }
+
+    });
     /*productos.query({ type:"getCriterio",id:5},function(data){
         $scope.criteria = data;
     });*/
@@ -141,19 +154,25 @@ MyApp.controller('datCritProds',['$scope', 'setNotif','productos','productsServi
 }]);
 
 
-MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav',function ($scope, setNotif,productos,$mdSidenav) {
+MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
     $scope.nxtAction = null;
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
         $scope.layer = nvo[0];
     });
-    $scope.addProd = function(){
-        $scope.LayersAction({open:{name:"prodLayer3"}});
+
+    $scope.openForm = function(id){
+        $scope.LayersAction({open:{name:"prodLayer3"},before:function(){
+            productsServices.setProd(id);
+        }});
     };
+
     $scope.prevLayer = function(){
         $scope.LayersAction({close:true});
     };
+    $scope.prod = productsServices.getToSavedProd();
+
     $scope.items = []
 }]);
 
@@ -176,6 +195,9 @@ MyApp.directive('showNext', function() {
             }
 
             $scope.$watch("cfg.show",function (status) {
+                if(typeof(status)!="boolean" ){
+                    return false;
+                }
                 if(status){
                     $mdSidenav("NEXT").open();
                 }else{
@@ -218,7 +240,7 @@ MyApp.directive('nextRow', function() {
 MyApp.service("nxtService",function(){
     var cfg = {
         nxtFn : null,
-        show : false
+        show : undefined
     };
 
     return {
