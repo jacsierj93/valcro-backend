@@ -1006,7 +1006,7 @@
                                                      info="Seleccione un proveedor para el documento"
                                                      required
                                                      ng-disabled="( $parent.document.uid == null || $parent.Docsession.block || $parent.document.isAprobado )"
-                                                     ng-click="toEditHead('prov_id', provSelect.id)"
+
                                                      id="prov_id"
                                                      skip-tab
                                                      md-search-text="ctrl.searchProveedor"
@@ -1073,10 +1073,7 @@
                                                      md-no-asterisk
                                                      md-min-length="0"
                                                      md-no-cache="true"
-                                                     md-selected-item-change="toEditHead('document','pais_id',($parent.document.objs.pais_id)  ?  $parent.document.objs.pais_id : undefined );"
-
-
-
+                                                     md-selected-item-change="toEditHead('document','pais_id',($parent.document.objs.pais_id)  ?  $parent.document.objs.pais_id.id : undefined );"
                                     >
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
@@ -1090,7 +1087,7 @@
                                     <label>Direccion Facturacion</label>
                                     <md-autocomplete md-selected-item="$parent.document.objs.direccion_facturacion_id"
                                                      ng-disabled="( $parent.Docsession.block || $parent.provSelec.id == '' ||  !$parent.provSelec.id || $parent.document.isAprobado)"
-                                                     ng-click="toEditHead('direccion_facturacion_id', $parent.document.direccion_facturacion_id)"
+                                                     ng-click="toEditHead('document','direccion_facturacion_id', $parent.document.direccion_facturacion_id.id)"
                                                      info="Selecione la direccion que debe especificarse en la factura "
                                                      skip-tab
                                                      id="direccion_facturacion_id"
@@ -1103,10 +1100,8 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change=" toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_facturacion_id)  ? $parent.document.objs.direccion_facturacion_id.id :undefined );"
-
-
-                                    >
+                                                     md-selected-item-change=" toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_facturacion_id)  ? $parent.document.objs.direccion_facturacion_id.id : undefined );"
+                                   >
                                         <md-item-template>
                                             <span>{{item.direccion}}</span>
                                         </md-item-template>
@@ -1135,7 +1130,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change="toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_almacen_id) ? $parent.document.objs.direccion_almacen_id : undefined );$parent.document.direccion_almacen_id = $parent.document.objs.direccion_almacen_id.id;"
+                                                     md-selected-item-change="toEditHead('document','direccion_almacen_id',($parent.document.objs.direccion_almacen_id) ? $parent.document.objs.direccion_almacen_id.id : undefined );$parent.document.direccion_almacen_id = $parent.document.objs.direccion_almacen_id.id;"
 
                                     >
                                         <md-item-template>
@@ -1162,7 +1157,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change="$parent.document.puerto_id = $parent.document.objs.puerto_id.id; toEditHead('document','puerto_id',($parent.document.objs.puerto_id)  ?  $parent.document.objs.puerto_id: undefined );"
+                                                     md-selected-item-change="$parent.document.puerto_id = $parent.document.objs.puerto_id.id; toEditHead('document','puerto_id',($parent.document.objs.puerto_id)  ?  $parent.document.objs.puerto_id.id: undefined );"
 
                                     >
                                         <md-item-template>
@@ -1194,7 +1189,6 @@
                                     <md-autocomplete md-selected-item="$parent.document.objs.prov_moneda_id"
                                                      ng-disabled="( Docsession.block || provSelec.id == '' ||  !provSelec.id || $parent.document.isAprobado )"
                                                      required
-                                                     ng-click="toEditHead('prov_moneda_id', $parent.document.prov_moneda_id)"
                                                      info="Seleccione la moneda en la que se realizara el pago "
                                                      id="prov_moneda_id"
                                                      skip-tab
@@ -1247,7 +1241,7 @@
                                                      md-input-minlength="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change=" toEditHead('document','condicion_pago_id',($parent.document.objs.condicion_pago_id)  ?  $parent.document.objs.condicion_pago_id: undefined );$parent.document.condicion_pago_id = $parent.document.objs.condicion_pago_id.id;"
+                                                     md-selected-item-change=" toEditHead('document','condicion_pago_id',($parent.document.objs.condicion_pago_id)  ?  $parent.document.objs.condicion_pago_id.id: undefined );$parent.document.condicion_pago_id = $parent.document.objs.condicion_pago_id.id;"
                                     >
                                         <md-item-template>
                                             <span>{{item.titulo}}</span>
@@ -1345,7 +1339,7 @@
                                 <md-input-container class="md-block" flex >
                                     <label>Comentario</label>
                                     <input ng-model="$parent.document.comentario"  ng-disabled="( $parent.Docsession.block || $parent.document.isAprobado)"
-                                           ng-change="$parent.toEditHead('documento','nro_proforma', $parent.document.nro_proforma)"
+                                           ng-change="$parent.toEditHead('documento','comentario', $parent.document.comentario)"
                                            info="Algun texto adicional referente al documento"
                                            skip-tab
 
@@ -1369,7 +1363,7 @@
                         </div>
 
                     </div>
-                    <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5) }">
+                    <div  class="form-style" layout="row" ng-class="{focused: (gridView == 5) }" ng-show="tbl_dtDoc.extend == 0 && document.productos.todos.length > 0 ">
                         <div active-left></div>
                         <div layout="row" flex ng-init="tbl_dtDoc.order = 'id' " class="row">
                             <div flex="5"></div>
@@ -2702,11 +2696,11 @@
 
                                     <div layout="row" flex="40">
                                         <div layout="column" class="divIconRsm"
-                                             ng-show="finalDoc.titulo.estado == 'new' && finalDoc.titulo.trace.length > 0"
+                                             ng-show="finalDoc.document.titulo.estado == 'created'"
                                              layout-align="center center">
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.titulo.estado == 'upd'" layout-align="center center" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.titulo.estado == 'upd'" layout-align="center center" >
                                             <span class="icon-Actualizar" ></span>
                                         </div>
 
@@ -2754,42 +2748,77 @@
                                     <div class="rms" > {{document.prioridad}} </div>
                                 </div>
                                 <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 1">
-                                    <div class="rowRsmTitle" flex="40"> Proveedor: </div>
+                                    <div layout="row" flex="40">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.prov_id == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.prov_id == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle" flex> Proveedor </div>
+                                    </div>
                                     <div  class="rms" flex > {{document.proveedor}} </div>
                                 </div>
                                 <div layout="row" class="rowRsm" ng-show="(document.pais_id && gridViewFinalDoc == 1)" >
                                     <div layout="row" flex="40" >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'created' && finalDoc.pais_id.trace.length"
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.pais_id.estado == 'created' && finalDoc.pais_id.trace.length"
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.pais_id.estado == 'upd'" layout-align="center center">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.pais_id.estado == 'upd'" layout-align="center center">
                                             <span class="icon-Actualizar" ></span>
                                         </div>
                                         <div class="rowRsmTitle"> Pais </div>
                                     </div>
-                                    <div class="rms" flex> {{document.objs.pais.short_name}} </div>
+                                    <div class="rms" flex> {{$parent.document.objs.pais_id.short_name}} </div>
                                 </div>
                                 <div layout="row"  class="rowRsm" ng-show="(document.direccion_almacen_id && gridViewFinalDoc == 1)">
                                     <div layout="row" flex="40" >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'created'"
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.direccion_almacen_id.estado == 'created'"
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.direccion_almacen_id.estado == 'upd'" layout-align="center center">
                                             <span class="icon-Actualizar" ></span>
                                         </div>
                                         <div class="rowRsmTitle"> Almacen </div>
                                     </div>
-                                    <div class="rms" flex> {{document.almacen}} </div>
+                                    <div class="rms" flex> {{$parent.document.objs.direccion_almacen_id.direccion}} </div>
                                 </div>
-                                <div layout="row"  class="rowRsm" ng-show="(document.puerto_id && gridViewFinalDoc == 1)">
+                                <div layout="row"  class="rowRsm" ng-show="(document.direccion_facturacion_id && gridViewFinalDoc == 1)">
                                     <div layout="row" flex="40" >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'created'"
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.direccion_facturacion_id.estado == 'created'"
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.puerto_id.estado == 'upd'" layout-align="center center">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.direccion_facturacion_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Facturacion </div>
+                                    </div>
+                                    <div class="rms" flex> {{$parent.document.objs.direccion_facturacion_id.direccion}} </div>
+                                </div>
+                                <div layout="row"  class="rowRsm" ng-show="(document.condicion_pago_id && gridViewFinalDoc == 1)">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.condicion_pago_id.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.condicion_pago_id.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Pago </div>
+                                    </div>
+                                    <div class="rms" flex> {{$parent.document.objs.condicion_pago_id.titulo}} </div>
+                                </div>
+                                <div layout="row"  class="rowRsm" ng-show="(document.puerto_id && gridViewFinalDoc == 1)">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.puerto_id.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.puerto_id.estado == 'upd'" layout-align="center center">
                                             <span class="icon-Actualizar" ></span>
                                         </div>
                                         <div class="rowRsmTitle"> Puerto </div>
@@ -2798,11 +2827,11 @@
                                 </div>
                                 <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && (document.nro_proforma.doc ||document.nro_proforma.adjs.length > 0 ))" >
                                     <div layout="row" flex="40"  >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'new' && finalDoc.nro_proforma.trace.length > 0 "
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.nro_proforma.estado == 'new' && finalDoc.nro_proforma.trace.length > 0 "
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_proforma.estado == 'upd'" layout-align="center center">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.nro_proforma.estado == 'upd'" layout-align="center center">
                                             <span class="icon-Actualizar" ></span>
                                         </div>
                                         <div class="rowRsmTitle" flex> Proforma </div>
@@ -2814,11 +2843,11 @@
                                 </div>
                                 <div layout="row"  class="rowRsm" ng-show="( gridViewFinalDoc == 1 && ( document.nro_factura.doc || document.nro_factura.adjs.length > 0) )">
                                     <div layout="row" flex="40" >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'created'"
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.nro_factura.estado == 'created'"
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.nro_factura.estado == 'upd'" layout-align="center center">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.nro_factura.estado == 'upd'" layout-align="center center">
                                             <span class="icon-Actualizar" ></span>
                                         </div>
                                         <div class="rowRsmTitle"> Factura </div>
@@ -2831,20 +2860,46 @@
                                 </div>
                                 <div layout="row"  class="rowRsm"  ng-show="( document.monto && gridViewFinalDoc == 1) ">
                                     <div layout="row" flex="40" >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.monto.estado == 'new' && finalDoc.monto.trace.length > 0 "
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.monto.estado == 'created'"
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.direccion_almacen_id.estado == 'upd'" layout-align="center center">
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.monto.estado == 'upd'" layout-align="center center">
                                             <span class="icon-Actualizar" ></span>
                                         </div>
                                         <div class="rowRsmTitle"> Monto </div>
                                     </div>
                                     <div class="rms" flex> {{document.monto}} </div>
                                 </div>
+                                <div layout="row"  class="rowRsm"  ng-show="( document.mt3 && gridViewFinalDoc == 1) ">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.mt3.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.mt3.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> mt3 </div>
+                                    </div>
+                                    <div class="rms" flex> {{document.mt3}} </div>
+                                </div>
+                                <div layout="row"  class="rowRsm"  ng-show="( document.peso && gridViewFinalDoc == 1) ">
+                                    <div layout="row" flex="40" >
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.peso.estado == 'created'"
+                                             layout-align="center center" >
+                                            <span class="icon-Agregar" ></span>
+                                        </div>
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.document.peso.estado == 'upd'" layout-align="center center">
+                                            <span class="icon-Actualizar" ></span>
+                                        </div>
+                                        <div class="rowRsmTitle"> Peso </div>
+                                    </div>
+                                    <div class="rms" flex> {{document.peso}} </div>
+                                </div>
                                 <div layout="row"  class="rowRsm" ng-show="(document.moneda_prov_id && gridViewFinalDoc == 1 ) ">
                                     <div layout="row" flex="40" >
-                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'new' && finalDoc.prov_moneda_id.trace.length > 0 "
+                                        <div layout="column" class="divIconRsm" ng-show="finalDoc.prov_moneda_id.estado == 'created' "
                                              layout-align="center center" >
                                             <span class="icon-Agregar" ></span>
                                         </div>
@@ -2879,10 +2934,10 @@
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 2">
                                 <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.fecha_aprob_compra.estado == 'created' "  layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.fecha_aprob_compra.estado  == 'upd'" layout-align="center center">
                                         <span class="icon-Actualizar" ></span>
                                     </div>
                                     <div class="rowRsmTitle"> Fecha </div>
@@ -2912,10 +2967,10 @@
                             </div>
                             <div layout="row"  class="rowRsm" ng-show="gridViewFinalDoc == 3">
                                 <div layout="row" flex="40">
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'created' && finalDoc.estado_id.trace-length > 0"  layout-align="center center" >
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.fecha_aprob_gerencia.estado == 'created'"  layout-align="center center" >
                                         <span class="icon-Agregar" ></span>
                                     </div>
-                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.estado_id.estado == 'upd'" layout-align="center center">
+                                    <div layout="column" class="divIconRsm" ng-show="finalDoc.fecha_aprob_gerencia.estado == 'upd'" layout-align="center center">
                                         <span class="icon-Actualizar" ></span>
                                     </div>
                                     <div class="rowRsmTitle"> Fecha </div>

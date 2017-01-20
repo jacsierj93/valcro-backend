@@ -765,18 +765,19 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
     $scope.buildfinalDoc = function(){
         var model = {contra:{},kitchen:{},pedidoSusti:{},import:{}, todos:{}, document:{}, fecha_aprob_gerencia:{}, fecha_aprob_compr:{}};
         console.log("setGetOrder.getForm() ", setGetOrder.getForm());
+        console.log("$scope.$parent.document", $scope.document);
         angular.forEach(setGetOrder.getForm(), function(v,k){
                 if(k.startsWith('contra')){
-                    model.contra[v.id] = 'upd';
+                    model.contra[v.id] = (v.original) ? 'upd' : 'created';
                 }
                 if(k.startsWith('kitchen')){
-                    model.kitchen[v.id] = 'upd';
+                    model.kitchen[v.id] = (v.original) ? 'upd' : 'created';
                 }
                 if(k.startsWith('pedidoSusti')){
-                    model.pedidoSusti[v.id] = 'upd';
+                    model.pedidoSusti[v.id] = (v.original) ? 'upd' : 'created';
                 }
                 if(k.startsWith('todos')){
-                    model.todos[v.id] = 'upd';
+                    model.todos[v.id] = (v.original) ? 'upd' : 'created';
                 }
 
 
@@ -793,7 +794,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
         angular.forEach(setGetOrder.getForm('fecha_aprob_compra'), function(v,k){
                 if(v.estado  && v.estado  != 'new'){
                     model.fecha_aprob_compra[k]= v;
-                    model.fecha_aprob_compra.estado = 'upd';
+                    model.fecha_aprob_compra.estado = (v.original) ? 'upd' : 'created';
                 }
             }
 
@@ -801,7 +802,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
         angular.forEach(setGetOrder.getForm('fecha_aprob_gerencia'), function(v,k){
                 if(v.estado  && v.estado  != 'new'){
                     model.fecha_aprob_gerencia[k]= v;
-                    model.fecha_aprob_gerencia.estado = 'upd';
+                    model.fecha_aprob_gerencia.estado = (v.original) ? 'upd' : 'created';
                 }
             }
 
@@ -812,7 +813,6 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
 
     };
 
-    console.log("$scope.", $scope);
 
 }]);
 
@@ -1463,7 +1463,10 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
     $scope.changeProvMoneda = function(newVal ){
 
 
+        if(!$scope.FormHeadDocument.$Pristine){
+
         if(newVal == null){
+
             $scope.document.prov_moneda_id= null;
             if( angular.equals(angular.element("#detalleDoc #prov_moneda_id input[type=search]"),angular.element(":focus"))){
                 setGetOrder.change("document","prov_moneda_id",undefined);
@@ -1478,6 +1481,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             $scope.$parent.document.prov_moneda_id= newVal.id;
             if(!$scope.document.tasa || $scope.isTasaFija){
                 $scope.document.tasa = tasa;
+                setGetOrder.change('document','tasa', tasa);
             }else {
                 if($scope.document.tasa !=  tasa && !$scope.isTasaFija ){
                     $scope.NotifAction("alert","La tasa del "+newVal.nombre+" es diferente de la fijada ¿Que desea hacer? ",
@@ -1490,12 +1494,14 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                             function(){
                                 $scope.document.tasa = tasa;
                                 $scope.isTasaFija=true;
+                                setGetOrder.change('document','tasa', tasa);
                             }}
                         ]
                         ,{block:true});
                 }
             }
 
+        }
         }
     };
 
@@ -1614,14 +1620,14 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
 
     });
-    $scope.$watch('$parent.document.objs.direccion_facturacion_id', function (newVal) {
+  /*  $scope.$watch('$parent.document.objs.direccion_facturacion_id', function (newVal) {
         if(newVal ){
 
             $scope.$parent.document.direccion_facturacion_id = newVal.id;
 
         }
 
-    });
+    });*/
     $scope.$watch('$parent.document.objs.direccion_almacen_id', function (newVal) {
 
 
@@ -1660,6 +1666,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }else{
             if(!$scope.Docsession.block){
                 $scope.document.pais_id= null;
+                $scope.ctrl.searchdirAlmacenSelec= null;
                 $scope.ctrl.direccion_almacen_id= null;
             }
 
@@ -3194,6 +3201,7 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
 
         $scope.LayersAction({search:{name:"finalDoc",after:  function () {
             $scope.finalDoc = $scope.$parent.buildfinalDoc();
+            console.log("in final final doc", $scope.finalDoc);
         }}});
     };
     $scope.toSideNave = function(elem ,msm, data){
@@ -4386,7 +4394,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
         };
 
         if( exist){
-            if(typeof (value) == 'undefined'){
+            if(typeof (value) == 'undefined' &&  forms[form][fiel]){
                 forms[form][fiel].estado='del';
                 forms[form][fiel].trace.push();
             }else if(forms[form][fiel].original != value  ){
@@ -4480,6 +4488,12 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                     order.emision = DateParse.toDate(response.emision);
                     order.monto = parseFloat(response.monto);
                     order.tasa = parseFloat(response.tasa);
+                    forms = {};
+                    forms['document']={};
+                    order['objs'] ={};
+                    forms['document']['monto'] =  {original:response.monto, v:response.monto, estado:'new',trace:[]};
+                    forms['document']['tasa'] =  {original:response.tasa, v:response.tasa, estado:'new',trace:[]};
+
                     if (response.fecha_aprob_compra = !null && response.fecha_aprob_compra) {
                         order.fecha_aprob_compra = DateParse.toDate(response.fecha_aprob_compra);
                     }
@@ -4488,9 +4502,7 @@ MyApp.service('setGetOrder', function(DateParse, Order, providers, $q) {
                         order = DateParse.toDate(response.ult_revision);
                     }
 
-                    forms = {};
-                    forms['document']={};
-                    order['objs'] ={};
+
 
                     angular.forEach(response,function(v,k){
                         if(!order[k]){
