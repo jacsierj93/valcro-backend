@@ -271,6 +271,10 @@ MyApp.controller('vldCMailContacts',['$scope','$timeout','$filter','IsEmail','se
         }
     };
 
+    if(!$scope.asuntos){
+        $scope.asuntos = [];
+    }
+
 
 
 

@@ -937,22 +937,12 @@
                                     Correo
                                 </div>
                             </div>
-                            <!--
-                                                        <div layout="row" layout-align="center end" class="form-row-head-option">
-                                                            <div flex layout="column" layout-align="center center" ng-click="mode = (mode == 'adj') ? 'list': 'adj' ">
-                                                                <img ng-src="{{(mode == 'list') ? 'images/adjunto.png' : 'images/listado.png'}}">
-                            
-                                                                <md-tooltip >
-                                                                    {{(mode == 'adj')  ? 'Redactar' : 'Adjuntar' }}
-                                                                </md-tooltip>
-                                                            </div>
-                                                        </div>-->
                         </div>
                     </div>
                     <div  layout="row" flex >
                         <div active-left ></div>
                         <form name="mail"  class="focused" layout="column" flex  >
-                            <vldh-mail-contacts correos="correos" to="model.to" cc="model.cc" ccb="model.ccb" asunto="model.asunto" funciones="mainFn"></vldh-mail-contacts>
+                            <vldh-mail-contacts correos="correos" to="model.to" cc="model.cc" ccb="model.ccb" asunto="model.asunto" funciones="mainFn" asuntos="[]" ></vldh-mail-contacts>
                             <div layout="row" layout-align="start center"  ng-show="mode != 'adj'" >
                                 <div>
                                     <md-switch class="md-primary" ng-model="model.inMyMail" ng-change="change(model.inMyMail)"> </md-switch>
@@ -1113,7 +1103,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change"toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_facturacion_id)  ? undefined );"
+                                                     md-selected-item-change=" toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_facturacion_id)  ? $parent.document.objs.direccion_facturacion_id.id :undefined );"
 
 
                                     >
@@ -1145,7 +1135,7 @@
                                                      md-min-length="0"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change"toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_almacen_id)  ? undefined );$parent.document.direccion_almacen_id = $parent.document.objs.direccion_almacen_id.id"
+                                                     md-selected-item-change="toEditHead('document','direccion_facturacion_id',($parent.document.objs.direccion_almacen_id) ? $parent.document.objs.direccion_almacen_id : undefined );$parent.document.direccion_almacen_id = $parent.document.objs.direccion_almacen_id.id;"
 
                                     >
                                         <md-item-template>

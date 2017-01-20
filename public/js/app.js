@@ -616,7 +616,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
             if(("src" in  attrs)) {
 
             }*/
-            if(element.is("md-autocomplete")){
+            if(element.is("md-autocomplete") &&  attrs.mdSelectedItemChange){
                 var src = scope.$eval(attrs.mdItems.split(/ in /i)[1]);
                 var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
                 var text = attrs.mdItemText.split(".")[1];
@@ -989,7 +989,6 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
        var path = newVal.substr(newVal.indexOf('#')+1, newVal.length);
        var asig = false;
         angular.forEach($scope.secciones, function (v,k) {
-            console.log(path, '/'+v.key);
             if(path == '/'+v.key){
                 App.setSeccion(v);
                 Layers.setModule(v);
