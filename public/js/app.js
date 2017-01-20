@@ -645,7 +645,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                             }
                         });
                         if(error.length > 0){
-                            console.log("attr",attrs);
+                            
                             angular.forEach(error, function (v, k) {
                                 setNotif.addNotif("error", v,[],{autohidden:7000});
                             });

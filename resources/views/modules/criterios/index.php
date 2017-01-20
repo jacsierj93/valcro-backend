@@ -1,5 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="prodMainController" global>
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="CritMainController" global>
 
 
 
@@ -67,19 +67,19 @@
                 <div layout="column" layout-align="center center">
 
                 </div>
-                <div layout="column" layout-align="center center">
+                <div layout="column" layout-align="center center" ng-show="!line.id">
                     <!--<i class="fa fa-plus"></i>-->
                     <span class="icon-Agregar" ng-click="newCrit()" style="font-size: 23px"></span>
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
-                <div layout="column" layout-align="center center">
-                    <span class="icon-Actualizar" style="font-size: 23px" ng-click="openPopUp('treeLayer')"></span>
+                <div layout="column" layout-align="center center" ng-show="line.id">
+                    <span class="" style="font-size: 23px" ng-click="openPopUp('treeLayer')">Tree</span>
                     <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
-                <div layout="column" layout-align="center center" >
+                <!--<div layout="column" layout-align="center center" >
                     <span class="icon-Filtro" style="font-size: 24px"></span>
 
-                </div>
+                </div>-->
             </div>
 
             <div flex layout="row">
@@ -364,7 +364,7 @@
                                                 </div>
 
                                             </div>
-                                            <div ng-if="critField.type == 2" flex>
+                                            <div ng-if="critField.type == 2 || critField.type == 4" flex>
 
                                                 <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
                                                     <div layout="column" class="optHolder" flex tabindex="0" id="prevMin">

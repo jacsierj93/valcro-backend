@@ -1,10 +1,37 @@
 <div style="display: none" ng-init="createModel(field)"></div>
-<md-input-container id="text"
+<md-input-container id="text-{{$index}}"
                     class="md-block"
                     flex
                     prevText
                     ng-if="(field.type.directive == 'prevText' || field.type.directive == null)"
                     ng-class="{'onlyread' : (field.type.directive == 'prevText')}"
+                    >
+    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
+    <input skip-tab
+           ng-model="crit[field.id].value"
+           info="{{field.options.Info[0].pivot.value || ''}}"
+           autocomplete="off"
+           name="razon_social"
+           ng-required="{{field.options.Requerido[0].pivot.value || false}}"
+           min-length="{{field.options.Minimo[0].pivot.value || 0}}"
+           max-lenght="{{field.options.Max[0].pivot.value || 9999}}"
+           md-no-asterisk
+           erro-listener
+           min-imp-msg = "{t:'error',m:field.options.MinImp[0].pivot.message || ''}"
+           min-length-msg="{t:'alert',m:field.options.Minimo[0].pivot.message || ''}"
+           max-length-msg="{t:'alert',m:field.options.Max[0].pivot.message || ''}"
+           max-imp-msg="{t:'error',m:field.options.MaxImp[0].pivot.message || ''}"
+           id="{{field.id}}">
+
+</md-input-container>
+
+
+<md-input-container id="number-{{$index}}"
+                    class="md-block"
+                    flex
+                    prevNum
+                    ng-if="(field.type.directive == 'prevNum' || field.type.directive == null)"
+                    ng-class="{'onlyread' : (field.type.directive == 'prevNum')}"
                     >
     <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
     <input skip-tab

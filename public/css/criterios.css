@@ -23,6 +23,10 @@
 
 }
 
+md-input-container > label{
+    width: 95% !important;
+}
+
 #critConstruct md-sidenav{
     z-index:70;
 }
