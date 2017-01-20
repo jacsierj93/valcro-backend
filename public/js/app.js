@@ -599,7 +599,7 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
     };
 });
 
-MyApp.directive('info', function($timeout,setNotif, $sce) {
+MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
 
@@ -607,6 +607,24 @@ MyApp.directive('info', function($timeout,setNotif, $sce) {
         restrict: 'A',
         require: '?mdAutocomplete',
         link: function(scope, element, attrs,model) {
+            /*if(("model" in  attrs)){
+                var mod = scope.$eval(attrs.model);
+                model.scope.itemChange = function(){
+                    mod = (model.scope.selectedItem)?model.scope.selectedItem.id : false;
+                }
+            }
+            if(("src" in  attrs)) {
+
+            }*/
+            if(element.is("md-autocomplete")){
+                var src = scope.$eval(attrs.mdItems.split(/ in /i)[1]);
+                var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
+                var text = attrs.mdItemText.split(".")[1];
+                scope.$watch(ngmodel, function (newVall, olVal) {
+                    model.scope.searchText = (newVall)?$filter("filterSearch")(src, [newVall])[0][text] : "";
+
+                });
+            }
 
             if(attrs.lmbRequired){
                 model.scope.$watch("selectedItem", function (newVall, olVal) {

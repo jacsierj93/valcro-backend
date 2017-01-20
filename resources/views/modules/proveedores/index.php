@@ -1468,7 +1468,6 @@
                                                      md-search-text="ctrl.searchCoin"
                                                      md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre'"
                                                      md-item-text="item.nombre"
-
                                                      md-no-asterisk
                                                      ng-disabled="$parent.enabled || coins.length < 1"
                                                      md-min-length="0">

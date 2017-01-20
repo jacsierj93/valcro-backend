@@ -68,12 +68,12 @@
                 <div layout="column" layout-align="center center">
 
                 </div>
-                <div layout="column" layout-align="center center" ng-click="addProd()">
+                <div layout="column" layout-align="center center" ng-click="openForm()">
                     <!--<i class="fa fa-plus"></i>-->
                     <span class="icon-Agregar" style="font-size: 23px"></span>
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
-                <div layout="column" layout-align="center center" ng-click="editProv()" ng-show="prov.id">
+                <div layout="column" layout-align="center center" ng-click="openForm(prod.id)" ng-show="prod.id">
                     <span class="icon-Actualizar" style="font-size: 23px"></span>
                    <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
@@ -480,7 +480,14 @@
                                 <div class="row" layout="row" >
                                     <md-input-container class="md-block" flex="30">
                                         <label>Codigo</label>
-                                        <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                        <input autocomplete="off"
+                                               skip-tab="off"
+                                               name="condHeadTitle"
+                                               duplicate="codes"
+                                               field="titulo"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.cod"
+                                               required>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex="20">
                                         <label>Linea</label>
@@ -504,19 +511,35 @@
                                         </md-autocomplete>
 
                                     </md-input-container>
-                                    <md-input-container class="md-block" flex="20">
+                                    <!--<md-input-container class="md-block" flex="20">
                                         <label>Sublinea</label>
                                         <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
-                                    </md-input-container>
+                                    </md-input-container>-->
                                     <md-input-container class="md-block" flex="30">
                                         <label>Serie</label>
-                                        <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                        <input
+                                            autocomplete="off"
+                                            skip-tab="off" name="
+                                            condHeadTitle"
+                                            duplicate="conditions"
+                                            field="titulo"
+                                            ng-disabled="$parent.enabled"
+                                            ng-model="prod.serie"
+                                            required>
                                     </md-input-container>
                                 </div>
                                 <div class="row" layout="row" >
                                     <md-input-container class="md-block" flex>
                                         <label>Descripcion</label>
-                                        <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                        <input
+                                            autocomplete="off"
+                                            skip-tab="off"
+                                            name="condHeadTitle"
+                                            duplicate="conditions"
+                                            field="titulo"
+                                            ng-disabled="$parent.enabled"
+                                            ng-model="prod.desc"
+                                            required>
                                     </md-input-container>
 
                                 </div>
