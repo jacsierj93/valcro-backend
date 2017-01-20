@@ -812,6 +812,8 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
 
     };
 
+    console.log("$scope.", $scope);
+
 }]);
 
 

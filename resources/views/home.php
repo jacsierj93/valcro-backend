@@ -70,11 +70,13 @@
 
     <!-- ######################### CONTENIDO #############################-->
     <!--<ng-view layout="column" layout-padding flex></ng-view>-->
-    <div id="contentHolder" flex ng-include="seccion.url" layout="column"></div>
+<!--    <div id="contentHolder" flex ng-include="seccion.url" layout="column"></div>
+-->
+    <div id="contentHolder" flex ng-view layout="column"></div>
 
 </div>
 
-<div class="pie" layout="row" layout-align="start center">
+<div class="pie" layout="row" layout-align="start center" ng-controller="AppFoot">
 
     <div layout="column" layout-align="center center" ng-repeat="item in secciones">
         <div class="{{item.selct}}" ng-click="seccLink(item)" title="{{item.secc}}"></div>
