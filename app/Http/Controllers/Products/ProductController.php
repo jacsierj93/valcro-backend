@@ -45,5 +45,45 @@ class ProductController  extends BaseController
 
     }
 
+    public function saveProd(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $prod =  Product::findOrFail($req->id);
+            $result['action']="upd";
+        }else{
+            $prod =  new Product();
+        }
+
+        $prod->prov_id = $req->prov;
+        $prod->codigo = $req->cod;
+        $prod->linea_id = $req->line;
+        $prod->descripcion = $req->desc;
+        $prod->serie = $req->serie;
+
+        $prod->save();
+        $result['id']=$prod->id;
+        return $result;
+    }
+
+    public function saveProdCrit($req){
+        dd($req);
+        /*$result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $prod =  Product::findOrFail($req->id);
+            $result['action']="upd";
+        }else{
+            $prod =  new Product();
+        }
+        $prod->prov_id = $req->prov;
+        $prod->codigo = $req->cod;
+        $prod->linea_id = $req->line;
+        $prod->descripcion = $req->desc;
+        $prod->serie = $req->serie;
+
+        $prod->save();
+        $result['id']=$prod->id;
+        return $result;*/
+    }
+
 
 }

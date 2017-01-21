@@ -682,16 +682,14 @@ MyApp.service('formPreviewSrv',function(){
 
 //directive with controller for draw Criterios FORM (productos and Criterios)
 MyApp.directive('formPreview', function() {
-
     return {
-
         controller:function($scope,$filter,$timeout,formPreviewSrv){
             $scope.crit = formPreviewSrv.getCrits();
             $scope.isShow = formPreviewSrv.getShows();
             $scope.formFilters = formPreviewSrv.getFilters();
             var validators = {};
             $scope.createModel = function(field){
-                $scope.crit[''+field.id] = {value : "",childs:[]};
+                $scope.crit[''+field.id] = {id:"",value : "",childs:[]};
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
                 for(i=0;i<field.deps.length;i++){

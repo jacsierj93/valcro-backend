@@ -445,7 +445,7 @@
                 <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
                     <input type="hidden" md-autofocus>
                     <div style="height: 160px;">
-                        <form ng-controller="createProd" ng-class="{'focused':true}" >
+                        <form name="prodMainFrm" ng-controller="createProd" click-out="saveProd()" ng-class="{'focused':true}" >
                             <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
                                 <div>
                                     Producto
@@ -483,8 +483,7 @@
                                         <input autocomplete="off"
                                                skip-tab="off"
                                                name="condHeadTitle"
-                                               duplicate="codes"
-                                               field="titulo"
+
                                                ng-disabled="$parent.enabled"
                                                ng-model="prod.cod"
                                                required>
@@ -521,8 +520,7 @@
                                             autocomplete="off"
                                             skip-tab="off" name="
                                             condHeadTitle"
-                                            duplicate="conditions"
-                                            field="titulo"
+
                                             ng-disabled="$parent.enabled"
                                             ng-model="prod.serie"
                                             required>
@@ -535,8 +533,7 @@
                                             autocomplete="off"
                                             skip-tab="off"
                                             name="condHeadTitle"
-                                            duplicate="conditions"
-                                            field="titulo"
+                                            
                                             ng-disabled="$parent.enabled"
                                             ng-model="prod.desc"
                                             required>

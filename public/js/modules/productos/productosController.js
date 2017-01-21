@@ -124,6 +124,18 @@ MyApp.controller('createProd',['$scope', 'setNotif','productos','productsService
     $scope.listProviders = productsServices.getProvs();
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();
+
+    $scope.saveProd = function(){
+        if($scope.prodMainFrm.$pristine || $scope.prodMainFrm.$invalid){
+            return false;
+        }
+      productos.put({type:"prodSave"},$scope.prod,function (data) {
+          if(data.action == "new"){
+              $scope.prod.id = data.id;
+              setNotif.addNotif("ok","producto Creado",[],{autohidden:3000});
+          }
+      })
+    };
     console.log("in scope",$scope.prod);
 }]);
 
