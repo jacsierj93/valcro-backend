@@ -51,7 +51,7 @@
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
             <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-                <div class="boxList"  layout="column" list-box flex ng-repeat="item in listProvs.provs | filterSearch : listProvs.withpProv" ng-click="getByProv(item,$event)" ng-class="{'listSel' : (item.id ==prov.id),'listSelTemp' : (!item.id || (item.id ==prov.id && prov.created)), 'reserved':(item.reserved)}">
+                <div class="boxList"  layout="column" list-box flex ng-repeat="item in listProvs.provs | filterSearch : listProvs.withpProv" ng-click="getByProv(item,$event)" ng-class="{'listSel' : (item.id ==prov.id), 'reserved':(item.reserved)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social }}</div>
                   
                     <div style="height:40px;">
@@ -550,7 +550,7 @@
                                     Detalles
                                 </div>
                             </div>
-                            <md-content flex>
+                            <md-content flex crit-model="prodCrit">
                                 <div ng-repeat="field in criteria" class="row"
                                      ng-class="{'field-sel':field.id==formId.id}"
                                      test="{{formId.id}}"

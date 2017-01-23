@@ -30,10 +30,15 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             return listProv;
         },
         setProvprod:function(item){
+
+            if(typeof(item)!="boolean" && typeof(item)!="object" ){
+                item  = $filter("filterSearch")(providers,[item])[0];
+            }
             prov.id = item.id;
             prov.razon_social = item.razon_social;
             prov.siglas = item.siglas;
             prov.tipo_id = item.tipo_id;
+            prodToSave.prov = item.id || false;
         },
         getProv:function(){
             return prov;
@@ -66,6 +71,7 @@ MyApp.controller('listProdController',['$scope', 'setNotif','productos','product
         provs:productsServices.getProvs(),
         withpProv:productsServices.getAssign()
     }
+    $scope.prov = productsServices.getProv();
 
     
     $scope.getByProv = function(prov,e){
@@ -124,6 +130,13 @@ MyApp.controller('createProd',['$scope', 'setNotif','productos','productsService
     $scope.listProviders = productsServices.getProvs();
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();
+console.log($scope.prod)
+    $scope.$watch("prod.prov",function(n,o){
+
+        if(n!=o){
+            productsServices.setProvprod(n);
+        }
+    })
 
     $scope.saveProd = function(){
         if($scope.prodMainFrm.$pristine || $scope.prodMainFrm.$invalid){
@@ -139,13 +152,21 @@ MyApp.controller('createProd',['$scope', 'setNotif','productos','productsService
     console.log("in scope",$scope.prod);
 }]);
 
-MyApp.controller('datCritProds',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
+MyApp.controller('datCritProds',['$scope','$timeout', 'setNotif','productos','productsServices',function ($scope,$timeout, setNotif,productos,productsServices) {
     $scope.prod = productsServices.getToSavedProd();
+    $scope.prodCrit = [];
+
     $scope.$watchCollection("prod",function(n,o){
-        if(n.id && n.line){
-            productos.query({ type:"getCriterio",id:n.line},function(data){
-                $scope.criteria = data;
-            });
+        if(n.id && n.line && (n.line!=o.line)){
+            //console.log($scope.prodCrit)
+            $scope.prodCrit.splice(0,$scope.prodCrit.length);
+            $timeout(function(){
+                productos.query({ type:"getCriterio",id:n.line},function(data){
+                    $scope.criteria = data;
+                });
+                //console.log($scope.prodCrit)
+            },0);
+
         }
 
     });

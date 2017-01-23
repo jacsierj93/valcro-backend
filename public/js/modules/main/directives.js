@@ -768,5 +768,14 @@ MyApp.service('masterSrv',function(masters){
     }
 });
 
+MyApp.directive('critModel', function(formPreviewSrv) {
+    return {
+        link: function(scope, elem, attr){
+            scope[attr.critModel] = formPreviewSrv.getCrits();
+        }
+
+    };
+});
+
 
 
