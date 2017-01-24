@@ -104,11 +104,13 @@
             </div>
 
             <div id="listado" flex  style="overflow-y:auto;">
+
                 <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' as filtreProv "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
                      ng-class="{'listSel' : (item.id == provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
                      click-commit="{{index == 0}} " key="setProveedor"
+                   
                 >
 
                     <div  style="overflow: hidden; text-overflow: ellipsis;" flex>{{item.razon_social}}</div>
@@ -160,19 +162,20 @@
                     </div>
 
                     <div style="height:40px;" layout="row" layout-align="space-between center">
-                        <div flex="" style="overflow: hidden; margin-right: 1px;">{{item.deuda| number:2}}</div>
+                        <div flex="" style="overflow: hidden; margin-right: 1px;opacity: {{(!item.deuda ) ? 0.3 : 1}} ">{{(item.deuda) ? (item.deuda| number:2) : '000,000.00'}}</div>
 
-                        <div flex="30" layout="row" style="height: 19px;" layout-align="end center" ng-show="item.puntoCompra > 0" >
+                        <div  layout="row" style="height: 19px; opacity: {{(!item.puntoCompra  || item.puntoCompra == 0  ) ? 0.3 : 1}};" layout-align="end center"  >
                             <div >{{item.puntoCompra}}</div>
                             <img  style="float: left;" src="images/punto_compra.png"/>
                         </div>
-                        <div flex="30" layout="row"  layout-align="end center" style="height: 19px;" ng-show="item.contrapedido ==  1 " >
+                        <div  layout="row"  layout-align="end center" style="height: 19px;opacity: {{(item.contrapedido !=  1 ) ? 0.3 : 1}};"  >
                             <div >{{item.contraPedido}}</div>
                             <img  style="float: left;" src="images/contra_pedido.png"/>
                         </div>
                     </div>
 
                 </div>
+
             </div>
         </div>
 

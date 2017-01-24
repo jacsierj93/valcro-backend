@@ -621,7 +621,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                 var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
                 var text = attrs.mdItemText.split(".")[1];
                 scope.$watch(ngmodel, function (newVall, olVal) {
-                    model.scope.searchText = (newVall)?$filter("filterSearch")(src, [newVall])[0][text] : "";
+                    //model.scope.searchText = (newVall)?$filter("filterSearch")(src, [newVall])[0][text] : "";
 
                 });
             }
