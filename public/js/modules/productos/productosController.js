@@ -18,7 +18,8 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         line:false,
         serie:"",
         cod:"",
-        desc:""
+        desc:"",
+        prodCrit:[]
     }
     
     
@@ -126,30 +127,59 @@ MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsService
     }
 }]);
 
-MyApp.controller('createProd',['$scope', 'setNotif','productos','productsServices','masterSrv',function ($scope, setNotif,productos,productsServices,masterSrv) {
+MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','productsServices','masterSrv',function ($scope,$timeout, setNotif,productos,productsServices,masterSrv) {
     $scope.listProviders = productsServices.getProvs();
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();
-console.log($scope.prod)
+    $scope.prodCrit = [];
     $scope.$watch("prod.prov",function(n,o){
 
         if(n!=o){
             productsServices.setProvprod(n);
         }
     })
+    $scope.$watchCollection("prod",function(n,o){
+        if(n.id && n.line && (n.line!=o.line)){
+            console.log($scope.prodCrit)
+
+
+                productos.query({ type:"getCriterio",id:n.line},function(data){
+                    $scope.prodCrit.splice(0,$scope.prodCrit.length);
+                    $timeout(function(){
+                        $scope.criteria = data;
+                        console.log($scope.prodCrit)
+                    },50);
+                });
+                //
+
+
+        }
+
+    });
 
     $scope.saveProd = function(){
         if($scope.prodMainFrm.$pristine || $scope.prodMainFrm.$invalid){
             return false;
         }
+        $scope.prod.prodCrit = $scope.prodCrit;
       productos.put({type:"prodSave"},$scope.prod,function (data) {
           if(data.action == "new"){
               $scope.prod.id = data.id;
               setNotif.addNotif("ok","producto Creado",[],{autohidden:3000});
+          }else{
+              setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
           }
       })
     };
-    console.log("in scope",$scope.prod);
+
+    $scope.isValid = function(){
+        console.log("entrooo")
+        console.log($scope.prodMainFrm,$scope.prodCritFrm)
+        if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
+            return false;
+        }
+        return true;
+    }
 }]);
 
 MyApp.controller('datCritProds',['$scope','$timeout', 'setNotif','productos','productsServices',function ($scope,$timeout, setNotif,productos,productsServices) {
@@ -158,14 +188,15 @@ MyApp.controller('datCritProds',['$scope','$timeout', 'setNotif','productos','pr
 
     $scope.$watchCollection("prod",function(n,o){
         if(n.id && n.line && (n.line!=o.line)){
-            //console.log($scope.prodCrit)
+             console.log($scope.prodCrit)
             $scope.prodCrit.splice(0,$scope.prodCrit.length);
+
             $timeout(function(){
                 productos.query({ type:"getCriterio",id:n.line},function(data){
                     $scope.criteria = data;
                 });
-                //console.log($scope.prodCrit)
-            },0);
+                console.log($scope.prodCrit)
+            },50);
 
         }
 

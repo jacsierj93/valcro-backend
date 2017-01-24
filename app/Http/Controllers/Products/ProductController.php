@@ -62,11 +62,12 @@ class ProductController  extends BaseController
 
         $prod->save();
         $result['id']=$prod->id;
+        self::saveProdCrit($prod,$req->prodCrit);
         return $result;
     }
 
-    public function saveProdCrit($req){
-        dd($req);
+    private function saveProdCrit($prod,$data){
+        dd($prod,$data);
         /*$result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
             $prod =  Product::findOrFail($req->id);

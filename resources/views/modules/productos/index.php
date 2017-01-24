@@ -440,12 +440,12 @@
         </md-sidenav>
 
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer3" id="prodLayer3">
-            <div layout="row" flex ng-controller="prodSumary">
+            <div layout="row" flex ng-controller="createProd">
                 <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
                 <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
                     <input type="hidden" md-autofocus>
                     <div style="height: 160px;">
-                        <form name="prodMainFrm" ng-controller="createProd" click-out="saveProd()" ng-class="{'focused':true}" >
+                        <form name="prodMainFrm" ng-class="{'focused':true}" >
                             <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
                                 <div>
                                     Producto
@@ -544,13 +544,13 @@
                         </form>
                     </div>
                     <div flex layout="column">
-                        <form ng-class="{'focused':true}" ng-controller="datCritProds" flex>
+                        <form name="prodCritFrm" ng-class="{'focused':true}" flex>
                             <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
                                 <div>
                                     Detalles
                                 </div>
                             </div>
-                            <md-content flex crit-model="prodCrit">
+                            <md-content flex crit-model="prodCrit" >
                                 <div ng-repeat="field in criteria" class="row"
                                      ng-class="{'field-sel':field.id==formId.id}"
                                      test="{{formId.id}}"
@@ -573,10 +573,10 @@
                         </form>
                     </div>
                 </md-content>
-                <show-next on-next="testNext" valid="isValid"></show-next>
+                <show-next on-next="saveProd" valid="isValid"></show-next>
             </div>
         </md-sidenav>
-
+        <next-row></next-row>
         <div id="blockSection" style="
         position: absolute;
         height: 100%;

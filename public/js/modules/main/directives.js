@@ -689,7 +689,8 @@ MyApp.directive('formPreview', function() {
             $scope.formFilters = formPreviewSrv.getFilters();
             var validators = {};
             $scope.createModel = function(field){
-                $scope.crit[''+field.id] = {id:"",value : "",childs:[]};
+                console.log("created")
+                $scope.crit[''+field.id] = {id:field.id,value : "",childs:[]};
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
                 for(i=0;i<field.deps.length;i++){
@@ -772,6 +773,7 @@ MyApp.directive('critModel', function(formPreviewSrv) {
     return {
         link: function(scope, elem, attr){
             scope[attr.critModel] = formPreviewSrv.getCrits();
+            console.log("linked")
         }
 
     };
