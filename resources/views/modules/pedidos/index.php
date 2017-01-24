@@ -1055,6 +1055,9 @@
                                             required
                                             info="Escriba un titulo para facilitar identificacion del documento"
                                             skip-tab
+                                            erro-listener
+                                            required-msg="{t:'error',m:'Debes colocarle un titulo, este campo no puede estar vacio '}"
+
 
 
                                     >
@@ -1179,11 +1182,15 @@
                                     <input  ng-model="$parent.document.monto"
                                             decimal
                                             ng-disabled="( Docsession.block || $parent.document.isAprobado )"
-                                            required
+                                            ng-required="module.layer == 'detalleDoc'"
                                             ng-change="toEditHead('document', 'monto', $parent.document.monto)"
                                             info="Monto aproximado a pagar"
                                             skip-tab
                                             type="text"
+                                            lmb-min-imp="5"
+                                            erro-listener
+                                            required-msg="{t:'error',m:'Por favor coloca un costo real o aproximado '}"
+                                            min-imp-msg="{t:'error',m:'El monto que has colocado es muy bajo!'}"
                                     >
                                 </md-input-container>
 
@@ -1226,6 +1233,8 @@
                                             skip-tab
                                             id="tasa"
                                             decimal
+                                            required-msg="{t:'error',m:'No puedes dejar la tasa en blanco'}"
+
                                     >
                                 </md-input-container>
 
@@ -1298,6 +1307,8 @@
                                            ng-change="toEditHead('document','mt3', document.mt3)"
                                            info="Metros cubicos"
                                            skip-tab
+                                           lmb-min-imp="0"
+                                           min-imp-msg="{t:'error',m:'no puede tener 0 metros cuadrado '}"
                                     >
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20" >
@@ -1307,6 +1318,8 @@
                                            ng-change="toEditHead('document','peso', $parent.document.peso)"
                                            info="Sumatoria de los pesos de productos"
                                            skip-tab
+                                           lmb-min-imp="1"
+                                           min-imp-msg="{t:'error',m:'Es demasiado raro que solo pese 1kg'}"
                                     >
                                 </md-input-container>
                                 <md-input-container class="md-block" flex ng-click="allowEdit()" ng-show="$parent.formMode.value == '23' ">
@@ -1616,6 +1629,8 @@
                                         <input type="text" class="inputFilter"  ng-minlength="2"
                                                ng-model="tbl_listProducProv.filter.codigo"
                                                skip-tab
+
+
                                         >
                                     </md-input-container>
                                     <grid-order-by ng-model="tbl_listProducProv" key="codigo"></grid-order-by>

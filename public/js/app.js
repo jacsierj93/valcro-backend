@@ -113,6 +113,20 @@ MyApp.config(function ($provide, $httpProvider) {
 
 
 });
+/*MyApp.service('lmbCountRequest', function () {
+    var count =   {
+        query: {in:0,out:0}
+    };
+    var inprocess  = function (data) {
+        return data.in - d
+    };
+
+    return {
+        query: count.query
+    }
+
+});*/
+
 /// agregado por miguel cambio de formato de fecha
 MyApp.config(function($mdDateLocaleProvider) {
     $mdDateLocaleProvider.formatDate = function(date) {
@@ -843,27 +857,31 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
 
         },
         link: function(scope, elm, attrs, ctrl) {
+
             scope.errors = ctrl.$error;
             scope.$watchCollection("errors",function(n,o){
-                angular.forEach(o,function(k,v){
-                    if(!(v in n)){
-                        if(v in scope){
-                            setNotif.hideByContent(scope[v].t,scope[v].m);
+                if(ctrl.$dirty){
+                    angular.forEach(o,function(k,v){
+                        if(!(v in n)){
+                            if(v in scope){
+                                setNotif.hideByContent(scope[v].t,scope[v].m);
+                            }
+
+                        }
+                    });
+                    angular.forEach(n,function(k,v){
+                        if((v in scope)){
+                            btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
+                                ctrl.$setValidity(v, true);
+                                console.log(ctrl.$error)
+                            }}]:[];
+
+                            setNotif.addNotif(scope[v].t,scope[v].m,btn);
                         }
 
-                    }
-                });
-                angular.forEach(n,function(k,v){
-                    if((v in scope)){
-                        btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
-                            ctrl.$setValidity(v, true);
-                            console.log(ctrl.$error)
-                        }}]:[];
+                    })
+                }
 
-                        setNotif.addNotif(scope[v].t,scope[v].m,btn);
-                    }
-
-                })
             });
 
         }
@@ -1014,10 +1032,12 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
 }]);
 
 MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect) {
+
+    $scope.bindBlock=App.getBindBloc();
     /* $scope.secciones= urls;
      $scope.binseccion =App.getSeccion();
 
-     $scope.bindBlock=App.getBindBloc();
+
      if(Object.keys($location.search()).length  > 0){
      var params = $location.search();
      ExtRedirect.set(params);
@@ -1044,13 +1064,15 @@ MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filt
      console.log('in app',App.getSeccion());
 
      };
+     */
      $scope.$watch('bindBlock.estado' , function(newval){
      if(newval){
+         console.log("blocl ",App.getBindBloc());
      $scope.block= App.getBindBloc().value.block;
      $scope.level= App.getBindBloc().value.level;
      App.getBindBloc().estado=false;
      }
-     });*/
+     });
 
 });
 
