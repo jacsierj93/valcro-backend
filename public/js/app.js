@@ -71,12 +71,14 @@ MyApp.config(function ($provide, $httpProvider) {
     // Intercept http calls.
     var path= "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/";
 
-    $provide.factory('MyHttpInterceptor', function ($q) {
+    $provide.factory('MyHttpInterceptor', function ($q, lmbCountRequest) {
 
         return {
             // On request success
             request: function (config) {
                 // console.log(config); // Contains the data about the request before it is sent.
+                //console.log("in config reques", config);
+                lmbCountRequest[(config.method == 'GET') ? 'get' : 'post' ] ++;
                 return config || $q.when(config);
             },
 
@@ -92,11 +94,13 @@ MyApp.config(function ($provide, $httpProvider) {
             response: function (response)
             {
                 // Return the response or promise.
+                lmbCountRequest[(response.config.method == 'GET') ? 'get' : 'post' ]--;
                 return response || $q.when(response);
             },
 
             // On response failture
             responseError: function (rejection) {
+                lmbCountRequest[(rejection.config.method == 'GET') ? 'get' : 'post' ]--;
                 // console.log(rejection); // Contains the data about the error.
                 if(rejection.status == 401){
                     //location.replace(path +'login');
@@ -113,19 +117,18 @@ MyApp.config(function ($provide, $httpProvider) {
 
 
 });
-/*MyApp.service('lmbCountRequest', function () {
+MyApp.service('lmbCountRequest', function () {
     var count =   {
-        query: {in:0,out:0}
-    };
-    var inprocess  = function (data) {
-        return data.in - d
+        get:0,
+        post:0
     };
 
     return {
-        query: count.query
-    }
+        get:0,
+        post:0
+    };
 
-});*/
+});
 
 /// agregado por miguel cambio de formato de fecha
 MyApp.config(function($mdDateLocaleProvider) {
@@ -635,7 +638,8 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                 var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
                 var text = attrs.mdItemText.split(".")[1];
                 scope.$watch(ngmodel, function (newVall, olVal) {
-                    //model.scope.searchText = (newVall)?$filter("filterSearch")(src, [newVall])[0][text] : "";
+                    var aux = (newVall)?$filter("filterSearch")(src, [newVall]) : "";
+                    model.scope.searchText = (aux.length>0)?aux[0][text] : "";
 
                 });
             }
@@ -1067,11 +1071,13 @@ MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filt
      */
      $scope.$watch('bindBlock.estado' , function(newval){
      if(newval){
-         console.log("blocl ",App.getBindBloc());
-     $scope.block= App.getBindBloc().value.block;
-     $scope.level= App.getBindBloc().value.level;
-     App.getBindBloc().estado=false;
-     }
+         $timeout( function () {
+             $scope.block= App.getBindBloc().value.block;
+             $scope.level= App.getBindBloc().value.level;
+             App.getBindBloc().estado=false;
+         },0);
+
+        }
      });
 
 });

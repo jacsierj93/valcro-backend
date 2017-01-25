@@ -1,5 +1,5 @@
 
-MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','$filter','Order','setGetOrder','DateParse','ExtRedirect',function ($scope,$mdSidenav,$timeout,$interval,$filter, Order, setGetOrder, DateParse , ExtRedirect) {
+MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','$filter','Order','setGetOrder','DateParse','ExtRedirect','lmbCountRequest','App',function ($scope,$mdSidenav,$timeout,$interval,$filter, Order, setGetOrder, DateParse , ExtRedirect, lmbCountRequest, App) {
     $scope.permit= Order.get({type:"Permision"});
     // controlers
     $scope.Docsession = {isCopyable:false,global:"new", block:true};
@@ -630,7 +630,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
         if($scope.layer == 'detalleDoc'){
             paso = false;
         }
-        console.log("in exit", paso);
+
         if(!paso){
             paso = $scope.verificExit();
             if(paso){
@@ -768,8 +768,9 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
 
     $scope.buildfinalDoc = function(){
         var model = {contra:{},kitchen:{},pedidoSusti:{},import:{}, todos:{}, document:{}, fecha_aprob_gerencia:{}, fecha_aprob_compr:{}};
-/*        console.log("setGetOrder.getForm() ", setGetOrder.getForm());
+/*
         console.log("$scope.$parent.document", $scope.document);*/
+        console.log("setGetOrder.getForm() ", setGetOrder.getForm());
         angular.forEach(setGetOrder.getForm(), function(v,k){
                 if(k.startsWith('contra')){
                     model.contra[v.id] = (v.original) ? 'upd' : 'created';
@@ -780,7 +781,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
                 if(k.startsWith('pedidoSusti')){
                     model.pedidoSusti[v.id] = (v.original) ? 'upd' : 'created';
                 }
-                if(k.startsWith('todos')){
+                if(k.startsWith('productos')){
                     model.todos[v.id] = (v.original) ? 'upd' : 'created';
                 }
 
@@ -816,6 +817,27 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
 
 
     };
+
+    /// experimento
+    $scope.bindGets = lmbCountRequest;
+    var timeBlock ;
+    $scope.$watchCollection('bindGets', function (newVal, oldVal) {
+        if(newVal.get > 0){
+            if(timeBlock != null){
+                $timeout.cancel(timeBlock);
+            }
+            App.setBlock({block:true, level:  89});
+        }
+        if(newVal.get == 0) {
+            if(timeBlock != null){
+                $timeout.cancel(timeBlock);
+            }
+            timeBlock = $timeout(function () {
+                App.setBlock({block:false, level:  0});
+            },500);
+
+        }
+    })
 
 
 }]);
@@ -1423,7 +1445,6 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
         $scope.LayersAction({search:{name:"detalleDoc" , after: $scope.$parent.reloadDoc}});
 
-        console.log("new val", $scope.FormHeadDocument);
 
 
     };
@@ -1615,8 +1636,13 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                 var data = commitSrv.get();
                 commitSrv.setState(false);
                 if(data.commiter == 'setProveedor'){
+                    //onsole.log("data in commiter", $scope.$parent);
+
                     if($scope.$parent.module.layer == 'detalleDoc' && !$scope.$parent.Docsession.block ){
-                        $scope.$parent.ctrl.provSelec = data.scope.item;
+                        $scope.$parent.ctrl.provSelec =angular.copy( data.scope.item);
+                        //$scope.ctrl.searchProveedor = $scope.$parent.ctrl.provSelec.razon_social;
+                        //console.log("data in commiter asing", $scope.$parent.ctrl.provSelec);
+
                     }
 
                 }
@@ -1637,7 +1663,9 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
     });
     $scope.$watch('$parent.ctrl.provSelec', function (newVal, oldVal) {
+        console.log("new val", newVal)
         if(newVal ){
+
             if( !oldVal || (oldVal.id != newVal.id)){
                 $scope.$parent.provSelec= newVal;
                 $scope.formData.direccionesFact.splice(0,$scope.formData.direccionesFact.length);
@@ -1663,6 +1691,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
                     var elem=angular.element("#prov"+newVal.id);
                     angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
                 },0);
+
             }
         }else{
             $scope.$parent.provSelec= undefined;
@@ -1803,8 +1832,9 @@ MyApp.controller('OrderUnclosetDocCtrl',['$scope','DateParse','Order','masters',
     $scope.tbl= {data:[],order:'id'};
     $scope.$parent.OrderUnclosetDocCtrl = function () {
         $scope.LayersAction({search:{name:"unclosetDoc",
-            before:function(){
-                $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            after:function(){
+
+              //  $scope.tbl.data.splice(0,$scope.tbl.data.length);
                 Order.query({type:"UnClosetDoc"},{}, function(response){
                     angular.forEach(response, function (v, k) {
                         if(v.emision && v.emision != null){
@@ -4787,29 +4817,15 @@ MyApp.service('clickerTime',['$timeout', function($timeout){
  * */
 MyApp.factory('Order', ['$resource','$q','App',
     function ($resource,$q, App) {
-    var qCount = 0;
 
         return $resource('Order/:type/:mod', {}, {
             query: {method: 'GET',params: {type: ""}, isArray: true, interceptor:
             {
-                'request': function(config) {
-                    // do something on success
-                    alert('');
-                    console.log("request", config);
-                    qCount++;
-                    App.setBlock({block:true, level:89});
-                    return config;
-                },
                 'response': function(response) {
-                    qCount--;
-
                     return response.data;
                 },
                 'responseError': function(rejection) {
-                    // do something on error
-                    if (canRecover(rejection)) {
-                        return responseOrNewPromise
-                    }
+
                     return $q.reject(rejection);
                 }
             }

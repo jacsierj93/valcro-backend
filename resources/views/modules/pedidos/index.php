@@ -106,7 +106,7 @@
             <div id="listado" flex  style="overflow-y:auto;">
 
                 <div class="boxList"  layout="column" flex ng-repeat="item in search() | orderBy : 'prioridad' as filtreProv "  list-box ng-click="setProvedor(item, this)" ng-init="item.order = 1"
-                     ng-class="{'listSel' : (item.id == provSelec.id)}"
+                     ng-class="{'listSel' : (item.id == ctrl.provSelec.id)}"
                      id="prov{{item.id}}"
                      class="boxList"
                      click-commit="{{index == 0}} " key="setProveedor"
