@@ -690,7 +690,7 @@ MyApp.directive('formPreview', function() {
             var validators = {};
             $scope.createModel = function(field){
                 console.log("created")
-                $scope.crit[''+field.id] = {id:field.id,value : "",childs:[]};
+                $scope.crit[''+field.id] = {value : "",childs:[]};
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
                 for(i=0;i<field.deps.length;i++){

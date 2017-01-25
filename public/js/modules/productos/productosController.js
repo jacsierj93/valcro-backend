@@ -133,24 +133,24 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.prod = productsServices.getToSavedProd();
     $scope.prodCrit = [];
     $scope.$watch("prod.prov",function(n,o){
+        $timeout(function(){
+            if(typeof(n)== "undefined"){
+                return false;
+            }
+            if(n!=o){
+                productsServices.setProvprod(n);
+            }
+        },0)
 
-        if(n!=o){
-            productsServices.setProvprod(n);
-        }
-    })
+    });
     $scope.$watchCollection("prod",function(n,o){
         if(n.id && n.line && (n.line!=o.line)){
-            console.log($scope.prodCrit)
-
-
                 productos.query({ type:"getCriterio",id:n.line},function(data){
                     $scope.prodCrit.splice(0,$scope.prodCrit.length);
                     $timeout(function(){
                         $scope.criteria = data;
-                        console.log($scope.prodCrit)
                     },50);
                 });
-                //
 
 
         }
@@ -158,10 +158,11 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     });
 
     $scope.saveProd = function(){
-        if($scope.prodMainFrm.$pristine || $scope.prodMainFrm.$invalid){
+        console.log("entroooo")
+        if($scope.prodMainFrm.$invalid || $scope.prodMainFrm.$invalid){
             return false;
         }
-        $scope.prod.prodCrit = $scope.prodCrit;
+      $scope.prod.prodCrit = $scope.prodCrit;
       productos.put({type:"prodSave"},$scope.prod,function (data) {
           if(data.action == "new"){
               $scope.prod.id = data.id;
@@ -173,47 +174,10 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     };
 
     $scope.isValid = function(){
-        console.log("entrooo")
-        console.log($scope.prodMainFrm,$scope.prodCritFrm)
         if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
             return false;
         }
         return true;
-    }
-}]);
-
-MyApp.controller('datCritProds',['$scope','$timeout', 'setNotif','productos','productsServices',function ($scope,$timeout, setNotif,productos,productsServices) {
-    $scope.prod = productsServices.getToSavedProd();
-    $scope.prodCrit = [];
-
-    $scope.$watchCollection("prod",function(n,o){
-        if(n.id && n.line && (n.line!=o.line)){
-             console.log($scope.prodCrit)
-            $scope.prodCrit.splice(0,$scope.prodCrit.length);
-
-            $timeout(function(){
-                productos.query({ type:"getCriterio",id:n.line},function(data){
-                    $scope.criteria = data;
-                });
-                console.log($scope.prodCrit)
-            },50);
-
-        }
-
-    });
-    /*productos.query({ type:"getCriterio",id:5},function(data){
-        $scope.criteria = data;
-    });*/
-
-    $scope.brcdOptions = {
-        width: 3,
-        height: 40,
-        displayValue: false,
-        font: 'monospace',
-        textAlign: 'center',
-        fontSize: 15,
-        backgroundColor: '#fff',
-        lineColor: '#000'
     }
 }]);
 

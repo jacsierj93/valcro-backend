@@ -33,5 +33,11 @@ class Product extends Model
         return $this->hasOne('App\Models\Sistema\Masters\Line','id','linea_id');
     }
 
+    public function prodCrit(){
+        return $this->belongsToMany('App\Models\Sistema\Criterios\CritLinCamTip', 'tbl_prod_crit', 'prod_id', 'crit_id')
+            ->withPivot("valor")
+            ->withTimestamps();
+    }
+
     
 }

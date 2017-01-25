@@ -62,12 +62,22 @@ class ProductController  extends BaseController
 
         $prod->save();
         $result['id']=$prod->id;
-        self::saveProdCrit($prod,$req->prodCrit);
+
+        $crit= self::purge($req->prodCrit);
+        $prod->prodCrit()->syncWithoutDetaching($crit);
+
         return $result;
     }
 
-    private function saveProdCrit($prod,$data){
-        dd($prod,$data);
+    private function purge($data){
+        foreach ($data as $k=>$dat){
+            unset($data[$k]["childs"]);
+            if($data[$k] == null || $data[$k]['value']==""){
+                unset($data[$k]);
+            }
+        }
+        return $data;
+
         /*$result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
             $prod =  Product::findOrFail($req->id);

@@ -638,9 +638,16 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                 var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
                 var text = attrs.mdItemText.split(".")[1];
                 scope.$watch(ngmodel, function (newVall, olVal) {
+                    //console.log(newVall,olVal)
+                    if(typeof(newVall)=="undefined"){
+                        return false;
+                    }
                     var aux = (newVall)?$filter("filterSearch")(src, [newVall]) : "";
-                    model.scope.searchText = (aux.length>0)?aux[0][text] : "";
-
+                    //if((model.scope.selectedItem==null || typeof(model.scope.selectedItem) == "undefined") || (typeof(model.scope.selectedItem)=='object' && model.scope.selectedItem[text]!=aux[0][text])){
+                        $timeout(function(){
+                            model.scope.selectedItem = (aux.length>0)?aux[0] : null;
+                        },0)
+                    //}
                 });
             }
 
@@ -1071,13 +1078,11 @@ MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filt
      */
      $scope.$watch('bindBlock.estado' , function(newval){
      if(newval){
-         $timeout( function () {
-             $scope.block= App.getBindBloc().value.block;
-             $scope.level= App.getBindBloc().value.level;
-             App.getBindBloc().estado=false;
-         },0);
-
-        }
+         console.log("blocl ",App.getBindBloc());
+     $scope.block= App.getBindBloc().value.block;
+     $scope.level= App.getBindBloc().value.level;
+     App.getBindBloc().estado=false;
+     }
      });
 
 });
