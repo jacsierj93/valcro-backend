@@ -1022,7 +1022,7 @@
                                                      md-require-match="true"
                                                      md-no-cache="true"
                                                      md-select-on-match
-                                                     md-selected-item-change="toEditHead('document','prov_id',($parent.ctrl.provSelec)  ?  $parent.ctrl.provSelec.id : undefined );$scope.$parent.document.prov_id = $parent.ctrl.provSelec.id ;"
+                                                     md-selected-item-change="$parent.document.prov_id = $parent.ctrl.provSelec.id ;toEditHead('document','prov_id',($parent.ctrl.provSelec)  ?  $parent.ctrl.provSelec.id : undefined );"
                                                      lmb-required='{"get_provider_coin":"Lo sentimos este proveedor no tiene monedas,s no se puede asignar"}'
                                                      lmb-required-clear-on-fail
 

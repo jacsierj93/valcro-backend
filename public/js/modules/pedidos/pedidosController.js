@@ -822,6 +822,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
     $scope.bindGets = lmbCountRequest;
     var timeBlock ;
     $scope.$watchCollection('bindGets', function (newVal, oldVal) {
+        //console.log('bindGets', newVal);
         if(newVal.get > 0){
             if(timeBlock != null){
                 $timeout.cancel(timeBlock);
@@ -1663,7 +1664,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
     });
     $scope.$watch('$parent.ctrl.provSelec', function (newVal, oldVal) {
-        console.log("new val", newVal)
+
         if(newVal ){
 
             if( !oldVal || (oldVal.id != newVal.id)){
@@ -1831,9 +1832,12 @@ MyApp.controller('OrderUnclosetDocCtrl',['$scope','DateParse','Order','masters',
 
     $scope.tbl= {data:[],order:'id'};
     $scope.$parent.OrderUnclosetDocCtrl = function () {
+
         $scope.LayersAction({search:{name:"unclosetDoc",
             after:function(){
 
+                $scope.$parent.ctrl.provSelec = undefined;
+                console.log("in parent",$scope.$parent);
               //  $scope.tbl.data.splice(0,$scope.tbl.data.length);
                 Order.query({type:"UnClosetDoc"},{}, function(response){
                     angular.forEach(response, function (v, k) {
@@ -1857,10 +1861,11 @@ MyApp.controller('OrderUnclosetDocCtrl',['$scope','DateParse','Order','masters',
         if(oldVal == 'unclosetDoc'){
             $scope.tbl.data.splice(0, $scope.tbl.data.length);
         }
+
     });
 }]);
 
-MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','setGetOrder','form', function ($scope,Order,masters,setGetOrder,formSrv) {
+MyApp.controller('OrderlistProducProvCtrl',['$scope','$timeout', 'Order','masters','setGetOrder','form', function ($scope,$timeout, Order,masters,setGetOrder,formSrv) {
 
     $scope.bindForm = formSrv.bind();
     masters.query({type:"prodLines"},{}, function (response) {
@@ -1868,22 +1873,7 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','setGetOr
     });
 
     $scope.$parent.OrderlistProducProvCtrl = function () {
-        $scope.LayersAction({search:{name:"listProducProv",
-            before:function(){
-            },
-            after: function(){
-                $scope.providerProds = [];
-                Order.query({type:"ProviderProds", id:$scope.$parent.ctrl.provSelec.id,tipo:$scope.$parent.formMode.value, doc_id:$scope.document.id},{}, function(response){
-
-                    angular.forEach(response , function(v,k){
-
-                        v.saldo=parseFloat(v.saldo);
-                        $scope.providerProds.push(v);
-                    });
-                });
-
-            }
-        }});
+        $scope.LayersAction({search:{name:"listProducProv"}});
     };
 
     $scope.$parent.OrderlistCreatedProducProvCtrl = function () {
@@ -1971,17 +1961,6 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','setGetOr
 
     };
 
-    /*    $scope.showNext = function () {
-     if (!$scope.listProductoItems.$valid) {
-
-     $scope.NotifAction("error",
-     "No se pueden asignar productos sin asignarle una cantidad verifique que todos los productos tienen cantidad correctas"
-     ,[],{autohidden:2000});
-
-     return false;
-     }
-     return true;
-     };*/
 
     $scope.next = function () {
         $scope.$parent.OrderAgrPedCtrl();
@@ -2051,10 +2030,24 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','Order','masters','setGetOr
     });
 
     //limpieza
-    $scope.$watch('$parent.module.layer', function (newVal, oldVal) {
-        if(oldVal == 'listProducProv'){
-            $scope.providerProds = [];
+    $scope.$watch('$parent.ctrl.provSelec', function (newVal, oldVal) {
+        if(newVal && newVal != null){
+            $timeout(function () {
+                $scope.providerProds = [];
+                Order.query({type:"ProviderProds", id:newVal.id,tipo:$scope.$parent.formMode.value, doc_id:$scope.document.id},{}, function(response){
+
+                    angular.forEach(response , function(v,k){
+
+                        v.saldo=parseFloat(v.saldo);
+                        $scope.providerProds.push(v);
+                    });
+                });
+
+            },0);
+        }else{
+            //$scope.providerProds = [];
         }
+
     });
 
 }]);

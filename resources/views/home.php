@@ -86,7 +86,7 @@
     </div>
 
 </div>
-<div id="blockXLevel"  style="
+<div id="blockXLevel" ng-controller="AppBlock" style="
     position: absolute;
     top: 0px;
     left: 0px;
@@ -94,8 +94,8 @@
     cursor: default;
     width: 100%;
     height: 100%;
-    z-index:{{level}}
-" ng-show="block">
+    z-index:{{block.level}}
+" ng-show="block.block">
 
 </div>
 <div ng-controller="LayersCtrl"></div>

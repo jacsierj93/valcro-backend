@@ -636,18 +636,21 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
             if(element.is("md-autocomplete") &&  attrs.mdSelectedItemChange){
                 var src = scope.$eval(attrs.mdItems.split(/ in /i)[1]);
                 var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
+
                 var text = attrs.mdItemText.split(".")[1];
+                console.log("ngmodel:", text);
                 scope.$watch(ngmodel, function (newVall, olVal) {
                     //console.log(newVall,olVal)
                     if(typeof(newVall)=="undefined"){
                         return false;
                     }
-                    var aux = (newVall)?$filter("filterSearch")(src, [newVall]) : "";
-                    //if((model.scope.selectedItem==null || typeof(model.scope.selectedItem) == "undefined") || (typeof(model.scope.selectedItem)=='object' && model.scope.selectedItem[text]!=aux[0][text])){
+
+                    var aux = (newVall)? $filter("filterSearch")(src, [newVall]) : [];
+                    if((model.scope.selectedItem==null || typeof(model.scope.selectedItem) == "undefined") || (typeof(model.scope.selectedItem)=='object' && model.scope.selectedItem[text]!=aux[0][text])){
                         $timeout(function(){
-                            model.scope.selectedItem = (aux.length>0)?aux[0] : null;
-                        },0)
-                    //}
+                            //model.scope.selectedItem = (aux.length>0)?aux[0] : null;
+                        },0);
+                    }
                 });
             }
 
@@ -1076,16 +1079,31 @@ MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filt
 
      };
      */
-     $scope.$watch('bindBlock.estado' , function(newval){
+  /*   $scope.$watch('bindBlock.estado' , function(newval){
+         console.log('in app', newval);
      if(newval){
          console.log("blocl ",App.getBindBloc());
      $scope.block= App.getBindBloc().value.block;
      $scope.level= App.getBindBloc().value.level;
+
      App.getBindBloc().estado=false;
      }
-     });
+     });*/
 
 });
+MyApp.controller('AppBlock', ['$scope','App',function ($scope, App){
+    $scope.bindBlock=App.getBindBloc();
+    $scope.$watch('bindBlock.estado' , function(newval){
+        console.log('in app', newval);
+        if(newval){
+
+            $scope.block= App.getBindBloc().value.block;
+            $scope.level= App.getBindBloc().value.level;
+
+        }
+    });
+
+}]);
 
 MyApp.config(['$routeProvider', '$locationProvider',
     function($routeProvider, $locationProvider) {
@@ -1310,7 +1328,7 @@ MyApp.controller('ListHerramientas', function ($scope) {
         }];
 });
 
-MyApp.service('App' ,[function(){
+MyApp.service('App' ,['$timeout',function($timeout){
 
     var accion ={estado :false,value:{}};
     var msm ={};
@@ -1349,6 +1367,10 @@ MyApp.service('App' ,[function(){
         setBlock: function(data){
             bindBloc.estado=true;
             bindBloc.value=data;
+            $timeout(function () {
+                bindBloc.estado=false;
+            },0);
+
         },
         getBindBloc: function(){
             return bindBloc;

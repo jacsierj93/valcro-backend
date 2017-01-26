@@ -121,7 +121,7 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
     $scope.changeLang = function (id) {
         $scope.lang = id;
         $scope.template= '<div></div>';
-        $scope.centerText= 'Dibujando';
+        $scope.centerText= '';
         $scope.template= $sce.trustAsHtml(angular.copy($scope.origenes[id].body));
         $scope.state = 'load';
         $scope.changes= {trace:[], index:0};
