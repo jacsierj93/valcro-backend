@@ -73,8 +73,8 @@
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
                 <div layout="column" layout-align="center center" ng-show="line.id">
-                    <span class="" style="font-size: 23px" ng-click="openPopUp('treeLayer')">Tree</span>
-                    <!-- --><?/*= HTML::image("images/actualizar.png") */?>
+                   <!-- <span class="" style="font-size: 23px" ng-click="openPopUp('treeLayer')">Tree</span>-->
+                    <?= HTML::image("images/Mapa.png","",array("ng-click"=>"openPopUp('treeLayer')")) ?>
                 </div>
                 <!--<div layout="column" layout-align="center center" >
                     <span class="icon-Filtro" style="font-size: 24px"></span>
@@ -286,6 +286,7 @@
                                 lmb-type="list"
                                 lmb-model="critField.type"
                                 lmb-itens="tipos"
+                                lmb-icon="icon"
                                 valid = "{f:checkType,c:callback}"
                                 flex
                             >
@@ -304,7 +305,7 @@
             <md-sidenav  style="margin-top:96px; margin-bottom:48px; width:calc(100% - 1120px);" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyrConst3" id="lyrConst3" >
 
                 <input type="hidden" md-autofocus>
-                <div layout="row" flex style="width:304px;">
+                <div layout="row" flex >
                     <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important; ">
 
                         <div flex layout="column" style="padding:8px;">
@@ -318,16 +319,16 @@
 
                                     <md-content flex layout="column">
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px" class="row">
-                                                <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">
-                                                    <md-input-container class="md-block" flex >
-                                                        <label>info</label>
-                                                        <input skip-tab
-                                                               class="Frm-value"
-                                                               ng-model="opcValue.info.valor"
-                                                               ng-blur="checkSave($event)"
-                                                        >
-                                                    </md-input-container>
-                                                </div>
+                                                    <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">
+                                                        <md-input-container class="md-block" flex >
+                                                            <label>info</label>
+                                                            <input skip-tab
+                                                                   class="Frm-value"
+                                                                   ng-model="opcValue.info.valor"
+                                                                   ng-blur="checkSave($event)"
+                                                            >
+                                                        </md-input-container>
+                                                    </div>
                                             </div>
                                             <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px" class="row">
                                                 <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">

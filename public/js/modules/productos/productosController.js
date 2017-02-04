@@ -132,7 +132,9 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();
     $scope.prodCrit = [];
+    $scope.$criteria = [];
     $scope.$watch("prod.prov",function(n,o){
+        console.log("cambio",n)
         $timeout(function(){
             if(typeof(n)== "undefined"){
                 return false;
@@ -144,12 +146,14 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
 
     });
     $scope.$watchCollection("prod",function(n,o){
+
         if(n.id && n.line && (n.line!=o.line)){
+
                 productos.query({ type:"getCriterio",id:n.line},function(data){
                     $scope.prodCrit.splice(0,$scope.prodCrit.length);
                     $timeout(function(){
                         $scope.criteria = data;
-                    },50);
+                    },0);
                 });
 
 
@@ -158,7 +162,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     });
 
     $scope.saveProd = function(){
-        console.log("entroooo")
+
         if($scope.prodMainFrm.$invalid || $scope.prodMainFrm.$invalid){
             return false;
         }
@@ -171,12 +175,14 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
               setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
           }
       })
+
+        $scope.$parent.LayersAction({open:{name:"prodLayer4"}});
     };
 
     $scope.isValid = function(){
-        if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
+        /*if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
             return false;
-        }
+        }*/
         return true;
     }
 }]);
@@ -202,6 +208,11 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
     $scope.prod = productsServices.getToSavedProd();
 
     $scope.items = []
+}]);
+MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
+    $scope.goToAnalisis = function () {
+        $scope.LayersAction({open:{name:"prodLayer5"}});
+    };
 }]);
 
 MyApp.directive('showNext', function() {
@@ -254,6 +265,7 @@ MyApp.directive('nextRow', function() {
             $scope.cfg = nxtService.getCfg();
             $scope.nxtAction = function(e){
                 $scope.cfg.fn();
+                $scope.hideNext();
             };
             $scope.hideNext = function(){
                 $scope.cfg.show = false;

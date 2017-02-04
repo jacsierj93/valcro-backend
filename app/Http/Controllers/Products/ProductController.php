@@ -64,7 +64,7 @@ class ProductController  extends BaseController
         $result['id']=$prod->id;
 
         $crit= self::purge($req->prodCrit);
-        $prod->prodCrit()->syncWithoutDetaching($crit);
+        $prod->prodCrit()->sync($crit);
 
         return $result;
     }

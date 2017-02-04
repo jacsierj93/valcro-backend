@@ -51,7 +51,6 @@ trait Journal
     public static function bootJournal(){
 
         static::created(function ($model) {
-
             self::audit($model,"new");
         });
 

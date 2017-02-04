@@ -505,7 +505,13 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.checkSave = function(e,model){
         var self = angular.element(e.currentTarget).parents(".optHolder").first();
         var parent = angular.element(e.relatedTarget).parents("#"+self.attr("id"));
+        console.log(self,self.find(".Frm-value").hasClass("ng-pristine"),self.find(".Frm-msg").hasClass("ng-pristine"))
         if(parent.length!=0 || (self.find(".Frm-value").hasClass("ng-pristine") && self.find(".Frm-msg").hasClass("ng-pristine"))){
+            return false;
+        }
+        console.log(parent.length,$scope.optionsForm.$pristine,$scope.optionsForm)
+        if(parent.length ==0 && $scope.optionsForm.$pristine){
+
             return false;
         }
         if(self.find(".Frm-value").val()==""){
@@ -543,6 +549,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                 }
             ]);
         }else{
+
             saveOptions($scope.opcValue);
         }
 
@@ -580,6 +587,8 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                     $scope.opcValue[key].msg = ''
                 }
             });
+            $scope.optionsForm.$setPristine();
+            $scope.optionsForm.$setUntouched();
             setNotif.addNotif("ok", "GUARDADO!!", [
             ],{autohidden:1000});
 
@@ -686,7 +695,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     var advertOpcion = function(){
 
-        if($scope.opcValue.opts.valor.length && $scope.critField.type == 1 && !accept){
+        if($scope.opcValue.opts.valor.length > 4 && $scope.critField.type == 1 && !accept){
             setNotif.addNotif("alert","esta cantidad de opciones no se ve bien en este tipo de campo, desea cambiarlo a selector?",[
                 {
                     name: "SI",
@@ -758,12 +767,12 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         return $filter("customFind")($scope.criteria,field,function(c,v){
             return c.campo_id == v.id;
         }).length > 0
-    }
+    };
 
     $scope.isUsed = function(){
         setNotif.addNotif("error", "no se puede usar este campo dos veces", [
         ],{autohidden:3000});
-    }
+    };
 
 }]);
 
@@ -807,66 +816,6 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         });
     };
     $scope.formId = critForm.getEdit();
-   /* $scope.crit = [];
-    $scope.isShow = [];
-    $scope.formFilters = [];
-    var validators = {};
-    $scope.createModel = function(field){
-        $scope.crit[''+field.id] = {value : "",childs:[]};
-        $scope.isShow[field.id] = true;
-        $scope.formFilters[field.id] = [];
-        for(i=0;i<field.deps.length;i++){
-            var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");+
-            key.childs.push(field.deps[i]);
-            if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
-                $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
-                    //console.log(n)
-                    isShow(n);
-                });
-            }
-
-
-        }
-    };
-    var isShow = function(val){
-
-        angular.forEach(val.childs,function(dep,k){
-            var ret = eval(dep.accion);
-            switch (dep.operador){
-                case "=":
-                    if(typeof(ret) == "boolean"){
-
-                        $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
-                    }else{
-                        $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
-                        $timeout(function(){
-                          $scope.$apply();
-                        },0)
-                        /!*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
-                        if(val.value == dep.valor){
-                            ret.forEach(function(v,a){
-                                $scope.formFilters[dep.sub_lct_id].push(v)
-                            })
-                        }*!/
-                    }
-
-                    break;
-                case ">":
-                    $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
-                    break;
-                case "<":
-                    $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
-                    break;
-                case "!=":
-                    $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
-                    break;
-            }
-
-
-
-        });
-        //return show;
-    };*/
 
     $scope.openConstruct = function(callback){
         $mdSidenav("lyrConst1").open();
@@ -917,7 +866,7 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
             id:'false',
             icon:"icon-Eliminar"
         }
-    ]
+    ];
 
     $scope.saveDependency = function(){
         criterios.put({type:"saveDep"},$scope.configDep,function(data){
@@ -1116,11 +1065,12 @@ MyApp.directive('lmbCollection', function() {
             }
             var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
             attr.filterBy = null;
+            var iconField = "item."+attr.lmbIcon || "";
             if(attr.lmbType=="items"){
                 return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center"><span ng-if="item.icon" class="{{item.icon}}"></span>{{item.'+show+'}}</div></div>';
             }else{
                 return '<md-content flex layout="column">'+
-                    '<div ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> {{item.'+show+'}} </div>'
+                    '<div layout="row" ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> <div flex>{{item.'+show+'}}</div><div ng-show="'+iconField+' != \'\'" flex><img ng-src="images/{{'+iconField+'}}"/></div> </div>'
 
                 +'</md-content>';
             }

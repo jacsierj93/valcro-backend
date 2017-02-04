@@ -8,12 +8,12 @@
 
 namespace App\Models\Sistema\Criterios;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Sistema\SysCustom\customBaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\Journal;
 
 
-class CritLinCamTip extends Model
+class CritLinCamTip extends customBaseModel
 {
     use SoftDeletes;
     use Journal;

@@ -633,23 +633,38 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
             if(("src" in  attrs)) {
 
             }*/
-            if(element.is("md-autocomplete") &&  attrs.mdSelectedItemChange){
-                var src = scope.$eval(attrs.mdItems.split(/ in /i)[1]);
-                var ngmodel = attrs.mdSelectedItemChange.split("=")[0].trim();
+            if(element.is("md-autocomplete") &&  attrs.model){
+                var src = scope.$eval(attrs.mdItems.split(/ in /i)[1].split(/ \| /)[0]);
+                var ngmodel = attrs.model;
+                var local = false;
+
 
                 var text = attrs.mdItemText.split(".")[1];
-                console.log("ngmodel:", text);
+
+                model.scope.itemChange = function(cambio){
+                    if(typeof(cambio)=="undefined"){
+                        return false;
+                    }
+                    local = true;
+                    scope.$eval(attrs.model+"= "+cambio.item.id);
+
+                };
                 scope.$watch(ngmodel, function (newVall, olVal) {
-                    //console.log(newVall,olVal)
+
                     if(typeof(newVall)=="undefined"){
                         return false;
                     }
-
+                    if(local){
+                        local = false;
+                        return false;
+                    }
+                    //console.log(src);
                     var aux = (newVall)? $filter("filterSearch")(src, [newVall]) : [];
-                    if((model.scope.selectedItem==null || typeof(model.scope.selectedItem) == "undefined") || (typeof(model.scope.selectedItem)=='object' && model.scope.selectedItem[text]!=aux[0][text])){
-                        $timeout(function(){
-                            //model.scope.selectedItem = (aux.length>0)?aux[0] : null;
-                        },0);
+                    //console.log(aux);
+                    if(aux.length > 0 && !angular.equals(aux[0],model.mdSelectedItem)){
+                        //$timeout(function(){
+                            model.scope.selectedItem = (aux.length>0)?aux[0] : null;
+                        //},0);
                     }
                 });
             }

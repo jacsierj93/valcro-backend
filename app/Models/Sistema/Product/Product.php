@@ -7,13 +7,13 @@
  */
 
 namespace App\Models\Sistema\Product;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Sistema\SysCustom\customBaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\Journal;
 
 
 
-class Product extends Model
+class Product extends customBaseModel
 {
     use SoftDeletes;
     use Journal;

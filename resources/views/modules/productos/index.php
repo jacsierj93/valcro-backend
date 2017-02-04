@@ -94,7 +94,7 @@
                 <!-- 9) ########################################## AREA CARGA DE LAYERS ########################################## -->
                 <div class="loadArea" ng-class="{'loading':list2()==0}" layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
                     <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; ">
-                        Prods
+                        PR
                     </div>
                     <br> Selecciones un Proveedor
                 </div>
@@ -247,7 +247,7 @@
         </md-sidenav>
 
 
-        <!-- 15) ########################################## LAYER (2) GRID DE PRODUCTOS ASIGNADOS AL PROVEEDOR########################################## -->
+        <!-- 15) ########################################## LAYER CON DETALLE DEL PRODUCTO SELECCIONADO ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer2" id="prodLayer2">
             <div layout="row" flex ng-controller="prodSumary">
             <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
@@ -438,142 +438,619 @@
                 </div>
             </div>
         </md-sidenav>
-
+        <!-- 16) ########################################## Layer Creacion / Edicion de producto ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer3" id="prodLayer3">
             <div layout="row" flex ng-controller="createProd">
                 <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
                 <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
                     <input type="hidden" md-autofocus>
-                    <div style="height: 160px;">
-                        <form name="prodMainFrm" ng-class="{'focused':true}" >
-                            <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
-                                <div>
-                                    Producto
-                                </div>
+                    <div layout="row" flex>
+                        <div active-left ></div>
+                        <div layout="column" flex>
+                            <div style="height: 160px;">
+                                <form name="prodMainFrm" ng-class="{'focused':true}" >
+                                    <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
+                                        <div>
+                                            Producto
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        <div layout="row" class="row">
+                                            <md-input-container class="md-block" flex>
+                                                <label>Proveedor</label>
+                                                <md-autocomplete md-selected-item="ctrl.prov"
+                                                                 flex
+                                                                 id="prodProv"
+                                                                 info="busque el proveedor"
+                                                                 model="prod.prov"
+                                                                 skip-tab
+                                                                 md-search-text="ctrl.searchProv"
+                                                                 md-items="item in listProviders | stringKey : ctrl.searchProv : 'razon_social'"
+                                                                 md-item-text="item.razon_social"
+                                                                 require
+                                                                 require-match="true"
+                                                                 md-no-asterisk
+                                                                 md-min-length="0">
+                                                    <input >
+                                                    <md-item-template>
+                                                        <span>{{item.razon_social}}</span>
+                                                    </md-item-template>
+                                                </md-autocomplete>
+
+                                            </md-input-container>
+
+                                        </div>
+                                        <div class="row" layout="row" >
+                                            <md-input-container class="md-block" flex="30">
+                                                <label>Codigo</label>
+                                                <input autocomplete="off"
+                                                       skip-tab="off"
+                                                       name="condHeadTitle"
+
+                                                       ng-disabled="$parent.enabled"
+                                                       ng-model="prod.cod"
+                                                       required>
+                                            </md-input-container>
+                                            <md-input-container class="md-block" flex="20">
+                                                <label>Linea</label>
+                                                <md-autocomplete md-selected-item="ctrl.line"
+                                                                 flex
+                                                                 id="prodLine"
+                                                                 info="busque la linea"
+                                                                 model = "prod.line"
+                                                                 skip-tab
+                                                                 md-search-text="ctrl.searchLine"
+                                                                 md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
+                                                                 md-item-text="item.linea"
+                                                                 require
+                                                                 require-match="true"
+                                                                 md-no-asterisk
+                                                                 md-min-length="0">
+                                                    <input >
+                                                    <md-item-template>
+                                                        <span>{{item.linea}}</span>
+                                                    </md-item-template>
+                                                </md-autocomplete>
+
+                                            </md-input-container>
+                                            <!--<md-input-container class="md-block" flex="20">
+                                                <label>Sublinea</label>
+                                                <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
+                                            </md-input-container>-->
+                                            <md-input-container class="md-block" flex="30">
+                                                <label>Serie</label>
+                                                <input
+                                                    autocomplete="off"
+                                                    skip-tab="off" name="
+                                                condHeadTitle"
+
+                                                    ng-disabled="$parent.enabled"
+                                                    ng-model="prod.serie"
+                                                    required>
+                                            </md-input-container>
+                                        </div>
+                                        <div class="row" layout="row" >
+                                            <md-input-container class="md-block" flex>
+                                                <label>Descripcion</label>
+                                                <input
+                                                    autocomplete="off"
+                                                    skip-tab="off"
+                                                    name="condHeadTitle"
+
+                                                    ng-disabled="$parent.enabled"
+                                                    ng-model="prod.desc"
+                                                    required>
+                                            </md-input-container>
+
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            <div flex>
-                                <div layout="row" class="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Proveedor</label>
-                                        <md-autocomplete md-selected-item="ctrl.prov"
-                                                         flex
-                                                         id="prodProv"
-                                                         info="busque el proveedor"
-                                                         md-selected-item-change="prod.prov = ctrl.prov.id"
-                                                         skip-tab
-                                                         md-search-text="ctrl.searchProv"
-                                                         md-items="item in listProviders"
-                                                         md-item-text="item.razon_social"
-                                                         require
-                                                         require-match="true"
-                                                         md-no-asterisk
-                                                         md-min-length="0">
-                                            <input >
-                                            <md-item-template>
-                                                <span>{{item.razon_social}}</span>
-                                            </md-item-template>
-                                        </md-autocomplete>
+                            <div flex layout="column">
+                                <form name="prodCritFrm" ng-class="{'focused':true}" flex>
+                                    <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
+                                        <div>
+                                            Detalles
+                                        </div>
+                                    </div>
+                                    <md-content flex crit-model="prodCrit" >
+                                        <div ng-repeat="field in criteria" class="row"
+                                             ng-class="{'field-sel':field.id==formId.id}"
+                                             test="{{formId.id}}"
+                                             form-preview="{{field.type.directive}}"
+                                             ng-dblclick="setEdit(field)"
+                                             ng-show="isShow[field.id]"
+                                             style="width: 30%; float:left;"
+                                        >
 
-                                    </md-input-container>
-                                    
-                                </div>
-                                <div class="row" layout="row" >
-                                    <md-input-container class="md-block" flex="30">
-                                        <label>Codigo</label>
-                                        <input autocomplete="off"
-                                               skip-tab="off"
-                                               name="condHeadTitle"
+                                        </div>
+                                        <!--<div class="row" style="float:left; width:32%;" ng-repeat="item in [1,2,3,4,5,6,7,8,9]">
 
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="prod.cod"
-                                               required>
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex="20">
-                                        <label>Linea</label>
-                                        <md-autocomplete md-selected-item="ctrl.line"
-                                                         flex
-                                                         id="prodLine"
-                                                         info="busque la linea"
-                                                         md-selected-item-change="prod.line = ctrl.line.id"
-                                                         skip-tab
-                                                         md-search-text="ctrl.searchLine"
-                                                         md-items="item in lines"
-                                                         md-item-text="item.linea"
-                                                         require
-                                                         require-match="true"
-                                                         md-no-asterisk
-                                                         md-min-length="0">
-                                            <input >
-                                            <md-item-template>
-                                                <span>{{item.linea}}</span>
-                                            </md-item-template>
-                                        </md-autocomplete>
+                                            <lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-itens="[{id:1,descripcion:'prod1'},{id:2,descripcion:'prod2'},{id:3,descripcion:'prod3'},{id:4,descripcion:'prod4'}]">
 
-                                    </md-input-container>
-                                    <!--<md-input-container class="md-block" flex="20">
-                                        <label>Sublinea</label>
-                                        <input autocomplete="off" skip-tab="off" name="condHeadTitle" duplicate="conditions" field="titulo" ng-disabled="$parent.enabled" ng-model="condHead.title" required>
-                                    </md-input-container>-->
-                                    <md-input-container class="md-block" flex="30">
-                                        <label>Serie</label>
-                                        <input
-                                            autocomplete="off"
-                                            skip-tab="off" name="
-                                            condHeadTitle"
+                                            </lmb-collection>
+                                        </div>
+        -->
 
-                                            ng-disabled="$parent.enabled"
-                                            ng-model="prod.serie"
-                                            required>
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row" >
-                                    <md-input-container class="md-block" flex>
-                                        <label>Descripcion</label>
-                                        <input
-                                            autocomplete="off"
-                                            skip-tab="off"
-                                            name="condHeadTitle"
-                                            
-                                            ng-disabled="$parent.enabled"
-                                            ng-model="prod.desc"
-                                            required>
-                                    </md-input-container>
-
-                                </div>
+                                    </md-content>
+                                </form>
                             </div>
-                        </form>
-                    </div>
-                    <div flex layout="column">
-                        <form name="prodCritFrm" ng-class="{'focused':true}" flex>
-                            <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
-                                <div>
-                                    Detalles
-                                </div>
-                            </div>
-                            <md-content flex crit-model="prodCrit" >
-                                <div ng-repeat="field in criteria" class="row"
-                                     ng-class="{'field-sel':field.id==formId.id}"
-                                     test="{{formId.id}}"
-                                     form-preview="{{field.type.directive}}"
-                                     ng-dblclick="setEdit(field)"
-                                     ng-show="isShow[field.id]"
-                                     style="width: 30%; float:left;"
-                                >
+                        </div>
 
-                                </div>
-                                <!--<div class="row" style="float:left; width:32%;" ng-repeat="item in [1,2,3,4,5,6,7,8,9]">
-
-                                    <lmb-collection class="rad-contain" layout="row"  lmb-type="items" lmb-model="item" lmb-itens="[{id:1,descripcion:'prod1'},{id:2,descripcion:'prod2'},{id:3,descripcion:'prod3'},{id:4,descripcion:'prod4'}]">
-
-                                    </lmb-collection>
-                                </div>
--->
-                                
-                            </md-content>
-                        </form>
                     </div>
                 </md-content>
                 <show-next on-next="saveProd" valid="isValid"></show-next>
+            </div>
+        </md-sidenav>
+        <!-- 16) ########################################## LAYER CON DATA EXTRA DEL PRODUCTO ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer4" id="prodLayer4">
+            <div layout="row" flex ng-controller="extraDataController">
+                <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
+                <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
+                    <input type="hidden" md-autofocus>
+                    <div layout="row" flex>
+                        <div active-left ></div>
+                        <div flex="33" layout="column">
+                            <div flex>
+                                <div layout="row" flex class="form-row-head form-row-head-select">
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Asignacion de Datos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>Punto de Compra</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="indica el punto del stock en que debe solicitarse nuevamente"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required>
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>Punto de Saldo</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="indica el punto del stock en que pasa a cosiderarse Saldo"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div layout="row" flex class="form-row-head form-row-head-select">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Datos de Almacenamiento</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>Almacenaje</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="indica condiciones especiales de almacenaje"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>cantidad Biblioteca</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="que cantidad sera reservada para biblioteca"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex>
+                                        <label>Unidad Biblioteca</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="unidad de esta cantidad"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>cantidad Donaciones</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="que cantidad sera reservada para biblioteca"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex>
+                                        <label>Unidad donaciones</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="unidad de esta cantidad"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>Descarte</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="que cantidad sera reservada para biblioteca"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex>
+                                        <label>Unidad descarte</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="unidad de esta cantidad"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>Requerimientos de Almacenamiento</label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="indique requerimientos de almacenmiento"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                                <div class="row" layout="row">
+                                    <md-input-container class="md-block" flex>
+                                        <label>Herramientas </label>
+                                        <input autocomplete="off"
+                                               skip-tab
+                                               info="Herrameintas o equipas necesarios ara el reempaletado"
+                                               name="pointBuy"
+                                               ng-disabled="$parent.enabled"
+                                               ng-model="prod.pntBuy"
+                                               required
+                                        >
+                                    </md-input-container>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div flex="66" style="margin-right: 4px;" layout="column">
+                            <div flex>
+                                <!--<div layout="column" class="form-row-head form-row-head-select">
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Productos que lo Componen</span>
+                                        </div>
+                                    </div>
+                                </div>-->
+                                <div layout="row" class="focused">
+                                    <div active-left ></div>
+                                    <div layout="row" flex class="form-row-head form-row-head-select">
+                                        <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span >Productos que lo Componen</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div layout="row">
+                                    <div active-left  before="$parent.layerExit"   ></div>
+                                    <div layout="row"  flex style="padding-right: 4px;">
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>codigo</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.codigo"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="codigo"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Descripcion</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.descripcion"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="descripcion"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Proveedor</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.prov.razon_social"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="prov_id"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Linea</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.line.linea"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="linea_id"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Sub-Linea</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.sublinea_id"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="sublinea_id"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Stock</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.stock"
+                                                       decimal
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="stock"></grid-order-by>
+
+                                        </div>
+
+
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Precio</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.precio"
+                                                       decimal
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="precio"></grid-order-by>
+
+                                        </div>
+
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Tipo</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.tipo_producto_id"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="tipo_producto_id"></grid-order-by>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <form layout="row"  class="gridContent" flex>
+                                    <div active-left></div>
+                                    <div layout="column" flex=""   >
+                                        <div   ng-repeat="item in listByProv.data | filter : listByProv.filter:strict | orderBy : listByProv.order as filter">
+                                            <div layout="row" class="cellGridHolder" ng-click="openProd(item)" >
+
+                                                <div flex class="cellGrid" >{{item.codigo}}</div>
+                                                <div flex class="cellGrid" >{{item.descripcion}}</div>
+                                                <div flex class="cellGrid" > {{item.prov.razon_social}}</div>
+                                                <div flex class="cellGrid" >{{item.line.linea}}</div>
+                                                <div flex class="cellGrid" >{{item.subLin.sublinea}}</div>
+                                                <div flex class="cellGrid" >{{item.stock}}</div>
+                                                <div flex class="cellGrid" >{{item.precio}}</div>
+                                                <div flex class="cellGrid" >{{item.getType.descripcion}}</div>
+                                            </div>
+                                        </div>
+                                        <div layout="column" layout-align="center center" flex ng-show="filter == 0">
+                                            No hay datos para mostrar
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div flex>
+                                <!--<div layout="column" class="form-row-head form-row-head-select">
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Productos que lo Componen</span>
+                                        </div>
+                                    </div>
+                                </div>-->
+                                <div layout="row" class="focused">
+                                    <div active-left ></div>
+                                    <div layout="row" flex class="form-row-head form-row-head-select">
+                                        <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span >Productos Complementarios</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div layout="row">
+                                    <div active-left  before="$parent.layerExit"   ></div>
+                                    <div layout="row"  flex style="padding-right: 4px;">
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>codigo</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.codigo"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="codigo"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Descripcion</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.descripcion"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="descripcion"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Proveedor</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.prov.razon_social"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="prov_id"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Linea</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.line.linea"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="linea_id"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Sub-Linea</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.sublinea_id"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="sublinea_id"></grid-order-by>
+
+                                        </div>
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Stock</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.stock"
+                                                       decimal
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="stock"></grid-order-by>
+
+                                        </div>
+
+
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Precio</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.precio"
+                                                       decimal
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="precio"></grid-order-by>
+
+                                        </div>
+
+                                        <div flex layout="row">
+                                            <md-input-container class="md-block"  flex>
+                                                <label>Tipo</label>
+                                                <input type="text" class="inputFilter"  ng-minlength="2"
+                                                       ng-model="listByProv.filter.tipo_producto_id"
+                                                       skip-tab
+                                                >
+                                            </md-input-container>
+                                            <grid-order-by ng-model="listByProv" key="tipo_producto_id"></grid-order-by>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <form layout="row"  class="gridContent" flex>
+                                    <div active-left></div>
+                                    <div layout="column" flex=""   >
+                                        <div   ng-repeat="item in listByProv.data | filter : listByProv.filter:strict | orderBy : listByProv.order as filter">
+                                            <div layout="row" class="cellGridHolder" ng-click="openProd(item)" >
+
+                                                <div flex class="cellGrid" >{{item.codigo}}</div>
+                                                <div flex class="cellGrid" >{{item.descripcion}}</div>
+                                                <div flex class="cellGrid" > {{item.prov.razon_social}}</div>
+                                                <div flex class="cellGrid" >{{item.line.linea}}</div>
+                                                <div flex class="cellGrid" >{{item.subLin.sublinea}}</div>
+                                                <div flex class="cellGrid" >{{item.stock}}</div>
+                                                <div flex class="cellGrid" >{{item.precio}}</div>
+                                                <div flex class="cellGrid" >{{item.getType.descripcion}}</div>
+                                            </div>
+                                        </div>
+                                        <div layout="column" layout-align="center center" flex ng-show="filter == 0">
+                                            No hay datos para mostrar
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </md-content>
+                <show-next on-next="goToAnalisis" ></show-next>
+            </div>
+        </md-sidenav>
+        <!-- 16) ########################################## LAYER ANALISIS DE COSTOS ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer5" id="prodLayer5">
+            <div layout="row" flex >
+                <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
+                <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
+                    <input type="hidden" md-autofocus>
+                    <div layout="row" flex>
+                        <div active-left ></div>
+                        <div layout="column" flex class="focused">
+                            <div layout="row" flex class="form-row-head form-row-head-select">
+                                <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                    <div>
+                                        <span >Analisis de Costo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </md-content>
+                <show-next on-next="goToAnalisis" ></show-next>
             </div>
         </md-sidenav>
         <next-row></next-row>
