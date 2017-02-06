@@ -34,6 +34,28 @@ class ProductController  extends BaseController
 
     public function listByProv($prov){
 
+        $all = Product::with("prov")
+            ->with(array("line"=>function($query){
+                return $query->selectRaw("id,linea");
+            }))
+            ->with(array("subLin"=>function($q){
+                return $q->selectRaw("id,sublinea");
+            }))
+            ->with(array("getType"=>function($q){
+                return $q->selectRaw("id,descripcion");
+            }))
+            ->with(array("prodCrit"=>function($q){
+                return $q->selectRaw("crit_id,value");
+            }))
+            ->where("prov_id",$prov)
+            ->distinct("id")
+            ->get();
+
+        return json_encode($all);
+    }
+/*
+    public function getDetail($prov){
+
         return Product::with("prov")
             ->with("line")
             ->with("subLin")
@@ -43,7 +65,7 @@ class ProductController  extends BaseController
             ->get();
 
 
-    }
+    }*/
 
     public function saveProd(Request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");

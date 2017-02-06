@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\Journal;
 use Carbon;
-class CustomPivot extends Model
+class CustomPivot extends Pivot
 {
     use SoftDeletes;
     use Journal;

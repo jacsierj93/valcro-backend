@@ -35,7 +35,7 @@ class Product extends customBaseModel
 
     public function prodCrit(){
         return $this->belongsToMany('App\Models\Sistema\Criterios\CritLinCamTip', 'tbl_prod_crit', 'prod_id', 'crit_id')
-            ->withPivot("valor")
+            ->withPivot("value")
             ->withTimestamps();
     }
 

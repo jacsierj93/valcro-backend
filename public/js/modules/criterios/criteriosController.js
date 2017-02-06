@@ -505,11 +505,9 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.checkSave = function(e,model){
         var self = angular.element(e.currentTarget).parents(".optHolder").first();
         var parent = angular.element(e.relatedTarget).parents("#"+self.attr("id"));
-        console.log(self,self.find(".Frm-value").hasClass("ng-pristine"),self.find(".Frm-msg").hasClass("ng-pristine"))
         if(parent.length!=0 || (self.find(".Frm-value").hasClass("ng-pristine") && self.find(".Frm-msg").hasClass("ng-pristine"))){
             return false;
         }
-        console.log(parent.length,$scope.optionsForm.$pristine,$scope.optionsForm)
         if(parent.length ==0 && $scope.optionsForm.$pristine){
 
             return false;

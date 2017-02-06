@@ -698,7 +698,7 @@ MyApp.directive('formPreview', function() {
                         key.childs.push(field.deps[i]);
                     if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
                         $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
-                            //console.log(n)
+
                             isShow(n);
                         });
                     }
@@ -713,10 +713,10 @@ MyApp.directive('formPreview', function() {
                     switch (dep.operador){
                         case "=":
                             if(typeof(ret) == "boolean"){
-
-                                $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
+                                $scope.isShow[dep.sub_lct_id] = (val.value == dep.value)?ret:!ret;
+                                console.log($scope.isShow[dep.sub_lct_id])
                             }else{
-                                $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
+                                $scope.formFilters[dep.sub_lct_id] = (val.value == dep.value)?ret:[];
                                 $timeout(function(){
                                     $scope.$apply();
                                 },0)
@@ -730,13 +730,13 @@ MyApp.directive('formPreview', function() {
 
                             break;
                         case ">":
-                            $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
+                            $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.value))?ret:!ret;
                             break;
                         case "<":
-                            $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
+                            $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.value))?ret:!ret;
                             break;
                         case "!=":
-                            $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
+                            $scope.isShow[dep.sub_lct_id] = (val.value != dep.value)?ret:!ret;
                             break;
                     }
 

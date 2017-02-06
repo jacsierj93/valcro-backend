@@ -57,6 +57,9 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         getProd : function(){
             return prod
         },
+        getDataCrit : function(){
+            return prod.datos.prod_crit;
+        },
         getToSavedProd:function(){
             return prodToSave;
         },
@@ -109,11 +112,9 @@ MyApp.controller('gridAllController',['$scope', 'setNotif','productos','products
 }]);
 
 
-MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
+MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsServices','$timeout',function ($scope, setNotif,productos,productsServices,$timeout) {
     $scope.prod = productsServices.getProd();
-    $scope.$watchCollection("prod",function(n,o){
-        
-    });
+
 
     $scope.brcdOptions = {
         width: 3,
@@ -134,7 +135,6 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.prodCrit = [];
     $scope.$criteria = [];
     $scope.$watch("prod.prov",function(n,o){
-        console.log("cambio",n)
         $timeout(function(){
             if(typeof(n)== "undefined"){
                 return false;
@@ -145,8 +145,19 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
         },0)
 
     });
-    $scope.$watchCollection("prod",function(n,o){
+    $scope.$watch("prod.id",function(n,o){
+        if(n){
+            var data = productsServices.getDataCrit();
+            $timeout(function(){
+                angular.forEach(data,function(v,k){
+                    $scope.prodCrit[v.crit_id].value = v.value;
+                })
 
+            },2000)
+        }
+
+    });
+    $scope.$watchCollection("prod",function(n,o){
         if(n.id && n.line && (n.line!=o.line)){
 
                 productos.query({ type:"getCriterio",id:n.line},function(data){
