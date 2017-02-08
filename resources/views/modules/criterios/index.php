@@ -223,7 +223,7 @@
                                         <md-content layout="column" flex style="margin: 0px 4px 0px 4px">
                                             <div ng-repeat="field in criteria" class="row"
                                                  ng-class="{'field-sel':field.id==formId.id}"
-                                                 test="{{formId.id}}"
+                                                 test="{{field.id}}"
                                                  form-preview="{{field.type.directive}}"
                                                  ng-dblclick="setEdit(field)"
                                                  ng-show="isShow[field.id]"

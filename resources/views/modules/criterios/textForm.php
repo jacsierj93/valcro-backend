@@ -58,17 +58,17 @@
 
 <md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')" layout="row">
     <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
-    <md-autocomplete md-selected-item="ctrl.lang"
-                     ng-model="crit[field.id].value"
+    <md-autocomplete md-selected-item="ctrl[field.id].sel"
+                     model="crit[field.id].value"
                      flex
                      skip-tab
                      id="langCont"
                      ng-required="{{field.options.Requerido[0].pivot.value || ''}}"
                      info="{{field.options.Info[0].pivot.value || ''}}"
-                     md-search-text="ctrl.searchLang"
-                     datos = "{{formFilters[field.id]}}"
+                     md-search-text="ctrl[field.id].searchSel"
+                     key="item.elem.id"
                      md-no-cache
-                     md-items="item in field.options.Opcion || [] | filterSearch: formFilters[field.id] : 'elem.id' | stringKey : ctrl.searchLang: 'elem.nombre' "
+                     md-items="item in field.options.Opcion || [] | stringKey : ctrl[field.id].searchSel: 'elem.nombre' | filterSearch: formFilters[field.id] : 'elem.id' "
                      md-item-text="item.elem.nombre"
                      md-no-asterisk
                      md-min-length="0"

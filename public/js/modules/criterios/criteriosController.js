@@ -330,49 +330,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             $mdSidenav("lyrConst3").close()
         },500);
     };
-    var activesPopUp = [];
-    $scope.closePopUp = function(sideNav,fn){
-        idx = activesPopUp.indexOf(sideNav);
-        if(idx != -1){
-            if(fn.before){
-                pre = fn.before();
-            }else{
-                pre = true;
-            }
-
-            if(!pre){
-                return false;
-            }
-            $mdSidenav(sideNav).close().then(function(){
-
-                activesPopUp.splice(idx,1);
-                if(fn.after){
-                    fn.after();
-                }
-            });
-        };
-    };
-
-    $scope.openPopUp = function(sideNav,fn){
-        if(activesPopUp.indexOf(sideNav)==-1){
-            if(fn && fn.before){
-                pre = fn.before();
-            }else{
-                pre = true;
-            }
-
-            if(!pre){
-                return false;
-            }
-            $mdSidenav(sideNav).open().then(function(){
-                activesPopUp.push(sideNav);
-                if(fn && fn.after){
-                    fn.after();
-                }
-            })
-        }
-
-    };
+    
 
     $scope.showNext = function(status,to){
         if(status){

@@ -749,21 +749,16 @@
                         </div>
                         <div flex="66" style="margin-right: 4px;" layout="column">
                             <div flex>
-                                <!--<div layout="column" class="form-row-head form-row-head-select">
-                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
-                                        <div>
-                                            <span>Productos que lo Componen</span>
-                                        </div>
-                                    </div>
-                                </div>-->
+                                
                                 <div layout="row" class="focused">
-                                    <div active-left ></div>
-                                    <div layout="row" flex class="form-row-head form-row-head-select">
+                                    
+                                    <div layout="row" flex class="form-row-head form-row-head-select row">
                                         <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                             <div>
                                                 <span >Productos que lo Componen</span>
                                             </div>
                                         </div>
+                                        <div style="width:24px" layout="column" ng-click="openComponent"><img layout-align="center center" ng-src="images/Agregar.png"/></div>
                                     </div>
                                 </div>
                                 <div layout="row">
@@ -1040,12 +1035,14 @@
                     <div layout="row" flex>
                         <div active-left ></div>
                         <div layout="column" flex class="focused">
-                            <div layout="row" flex class="form-row-head form-row-head-select">
+                            <div layout="row" class="form-row-head form-row-head-select row">
                                 <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                     <div>
                                         <span >Analisis de Costo</span>
                                     </div>
                                 </div>
+                            </div>
+                            <div flex>
                             </div>
                         </div>
                     </div>
@@ -1064,6 +1061,9 @@
         background: rgba(255,255,255,0.2);
         cursor: default;
     " ng-show="secBlock" ng-show="list2()==0"></div>
+
+
+        <div ng-controller="notificaciones" ng-include="template"></div>
 
 
         

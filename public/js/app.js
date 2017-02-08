@@ -616,7 +616,7 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
     };
 });
 
-MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
+MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
 
@@ -637,6 +637,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                 var src = scope.$eval(attrs.mdItems.split(/ in /i)[1].split(/ \| /)[0]);
                 var ngmodel = attrs.model;
                 var local = false;
+                var keyVal = attrs.key || "item.id";
 
 
                 var text = attrs.mdItemText.split(".")[1];
@@ -646,7 +647,9 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                         return false;
                     }
                     local = true;
-                    scope.$eval(attrs.model+"= "+cambio.item.id);
+                    
+                    var valor = eval("cambio."+keyVal)
+                    scope.$eval(attrs.model+" = "+valor);
 
                 };
                 scope.$watch(ngmodel, function (newVall, olVal) {
@@ -658,13 +661,10 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce) {
                         local = false;
                         return false;
                     }
-                    //console.log(src);
-                    var aux = (newVall)? $filter("filterSearch")(src, [newVall]) : [];
-                    //console.log(aux);
+                    var aux = (newVall)? $filter("filterSearch")(src, [newVall],keyVal.replace("item.","")) : [];
+
                     if(aux.length > 0 && !angular.equals(aux[0],model.mdSelectedItem)){
-                        //$timeout(function(){
                             model.scope.selectedItem = (aux.length>0)?aux[0] : null;
-                        //},0);
                     }
                 });
             }

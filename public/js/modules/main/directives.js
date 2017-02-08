@@ -713,13 +713,15 @@ MyApp.directive('formPreview', function() {
                     switch (dep.operador){
                         case "=":
                             if(typeof(ret) == "boolean"){
-                                $scope.isShow[dep.sub_lct_id] = (val.value == dep.value)?ret:!ret;
-                                console.log($scope.isShow[dep.sub_lct_id])
+
+                                $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
+
                             }else{
-                                $scope.formFilters[dep.sub_lct_id] = (val.value == dep.value)?ret:[];
-                                $timeout(function(){
+                                console.log("FILTERRRRR")
+                                $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
+                                /*$timeout(function(){
                                     $scope.$apply();
-                                },0)
+                                },0)*/
                                 /*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
                                  if(val.value == dep.valor){
                                  ret.forEach(function(v,a){
@@ -730,13 +732,13 @@ MyApp.directive('formPreview', function() {
 
                             break;
                         case ">":
-                            $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.value))?ret:!ret;
+                            $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
                             break;
                         case "<":
-                            $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.value))?ret:!ret;
+                            $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
                             break;
                         case "!=":
-                            $scope.isShow[dep.sub_lct_id] = (val.value != dep.value)?ret:!ret;
+                            $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
                             break;
                     }
 
@@ -778,6 +780,60 @@ MyApp.directive('critModel', function(formPreviewSrv) {
 
     };
 });
+
+MyApp.directive('critModel', function(formPreviewSrv) {
+    return {
+        link: function(scope, elem, attr){
+            scope[attr.critModel] = formPreviewSrv.getCrits();
+            console.log("linked")
+        }
+
+    };
+});
+
+var activesPopUp = [];
+$scope.closePopUp = function(sideNav,fn){
+    idx = activesPopUp.indexOf(sideNav);
+    if(idx != -1){
+        if(fn.before){
+            pre = fn.before();
+        }else{
+            pre = true;
+        }
+
+        if(!pre){
+            return false;
+        }
+        $mdSidenav(sideNav).close().then(function(){
+
+            activesPopUp.splice(idx,1);
+            if(fn.after){
+                fn.after();
+            }
+        });
+    };
+};
+
+$scope.openPopUp = function(sideNav,fn){
+    if(activesPopUp.indexOf(sideNav)==-1){
+        if(fn && fn.before){
+            pre = fn.before();
+        }else{
+            pre = true;
+        }
+
+        if(!pre){
+            return false;
+        }
+        $mdSidenav(sideNav).open().then(function(){
+            activesPopUp.push(sideNav);
+            if(fn && fn.after){
+                fn.after();
+            }
+        })
+    }
+
+};
 
 
 
