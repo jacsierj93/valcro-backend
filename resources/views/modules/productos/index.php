@@ -758,7 +758,7 @@
                                                 <span >Productos que lo Componen</span>
                                             </div>
                                         </div>
-                                        <div style="width:24px" layout="column" ng-click="openComponent"><img layout-align="center center" ng-src="images/Agregar.png"/></div>
+                                        <div style="width:24px" layout="column" pop-up-open="{'prodComp':{before:null,after:aft}}"><img layout-align="center center" ng-src="images/Agregar.png"/></div>
                                     </div>
                                 </div>
                                 <div layout="row">
@@ -1025,6 +1025,119 @@
                 </md-content>
                 <show-next on-next="goToAnalisis" ></show-next>
             </div>
+        </md-sidenav>
+
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodComp" id="prodComp" auto-close="{before:null,after:aft}">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+                <input type="hidden" md-autofocus>
+                <div flex>
+                    <div layout="column" class="form-row-head form-row-head-select">
+                        <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                            <div>
+                                <span >Seleccione prductos que lo componen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div flex layout="column">
+                        <md-input-container class="md-block row">
+                            <label>Linea</label>
+                            <md-autocomplete md-selected-item="ctrl.line"
+                                             flex
+                                             id="compProv"
+                                             info="seleccione la linea"
+                                             model = "common.line"
+                                             skip-tab
+                                             md-search-text="ctrl.searchLine"
+                                             md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
+                                             md-item-text="item.linea"
+                                             require
+                                             require-match="true"
+                                             md-no-asterisk
+                                             md-min-length="0">
+                                <input >
+                                <md-item-template>
+                                    <span>{{item.linea}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+
+                        </md-input-container>
+                        <md-input-container class="md-block row">
+                            <label>Sub-Linea</label>
+                            <md-autocomplete md-selected-item="ctrl.sublin"
+                                             flex
+                                             id="commSublin"
+                                             info="seleccione la sub-linea"
+                                             model = "common.sublin"
+                                             skip-tab
+                                             md-search-text="ctrl.searchSubLine"
+                                             md-items="item in sublines | stringKey : ctrl.searchSubLine : 'sublinea' "
+                                             md-item-text="item.sublin"
+                                             require
+                                             require-match="true"
+                                             md-no-asterisk
+                                             md-min-length="0">
+                                <input >
+                                <md-item-template>
+                                    <span>{{item.sublin}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+
+                        </md-input-container>
+                        <md-input-container class="md-block row">
+                            <label>Codigo o Descripcion</label>
+                            <input
+                                autocomplete="off"
+                                skip-tab
+                                name="condHeadTitle"
+                                info="escriba el codigo o la descripcion del producto"
+                                ng-disabled="$parent.enabled"
+                                ng-model="prod.desc"
+                                required>
+                        </md-input-container>
+                        <div flex>
+                            &nbsp;
+                        </div>
+                        <div flex>
+                            <div class="row" layout="row">
+
+                                <div layout-align="center center" style="color:rgb(92, 183, 235); width:150px"  >
+
+                                        <span >codigo</span>
+
+                                </div>
+
+                                <div flex="grow" layout-align="center center">
+                                    000001234
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div layout-align="center center" style="color:rgb(92, 183, 235);width:150px" >
+
+                                    <span >Descripcion</span>
+
+                                </div>
+
+                                <div flex="grow" layout-align="center center">
+                                    una descripcion alli
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div layout-align="center center" style="color:rgb(92, 183, 235);width:150px" >
+
+                                    <span >Serie</span>
+
+                                </div>
+
+                                <div flex="grow" layout-align="center center">
+                                    NC00124ASD
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </md-content>
         </md-sidenav>
         <!-- 16) ########################################## LAYER ANALISIS DE COSTOS ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer5" id="prodLayer5">

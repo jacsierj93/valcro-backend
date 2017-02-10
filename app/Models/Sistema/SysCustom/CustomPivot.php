@@ -17,7 +17,11 @@ class CustomPivot extends Pivot
     use Journal;
     public function delete()
     {
-        dd("hola");
         return $this->getDeleteQuery()->update(array('deleted_at' => Carbon::now()));
+    }
+    public function getUpdatedAtColumn()
+    {
+        dd("dasdadas");
+        return $this->parent->getUpdatedAtColumn();
     }
 }

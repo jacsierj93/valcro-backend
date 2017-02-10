@@ -13,6 +13,7 @@ class customBaseModel extends Model
 {
     public function newPivot(Model $parent, array $attributes, $table, $exists)
     {
+        
         return new CustomPivot($parent, $attributes, $table, $exists);
     }
 }

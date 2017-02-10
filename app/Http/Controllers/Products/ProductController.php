@@ -81,12 +81,17 @@ class ProductController  extends BaseController
         $prod->linea_id = $req->line;
         $prod->descripcion = $req->desc;
         $prod->serie = $req->serie;
-
-        $prod->save();
+        if($prod->isDirty()){
+            $prod->save();
+        }else{
+            $result['action']="equal";
+        }
         $result['id']=$prod->id;
-
         $crit= self::purge($req->prodCrit);
-        $prod->prodCrit()->sync($crit);
+        $afected = $prod->prodCrit()->sync($crit);
+        if(((count($afected['attached'])>0) || (count($afected['detached'])>0) || (count($afected['updated'])>0)) && $result['action']=="equal"){
+            $result['action']="upd";
+        }
 
         return $result;
     }

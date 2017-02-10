@@ -182,7 +182,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
           if(data.action == "new"){
               $scope.prod.id = data.id;
               setNotif.addNotif("ok","producto Creado",[],{autohidden:3000});
-          }else{
+          }else if(data.action == "upd"){
               setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
           }
       })
@@ -224,7 +224,16 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
     $scope.goToAnalisis = function () {
         $scope.LayersAction({open:{name:"prodLayer5"}});
     };
+    $scope.bef=function(){
+        console.log("BEFORE");
+
+    }
+    $scope.aft=function(){
+        console.log("AFTER");
+
+    }
 }]);
+
 
 MyApp.directive('showNext', function() {
 
@@ -300,4 +309,95 @@ MyApp.service("nxtService",function(){
         }
     }
 })
+
+MyApp.service("popUpService",function(){
+    var actives = [];
+
+    return {
+        exist : function(name){
+            return actives.indexOf(name);
+        },
+        remove : function(idx){
+            actives.splice(idx,1);
+        },
+        add:function(name){
+            actives.push(name);
+        }
+    }
+})
+
+
+MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
+
+    return {
+        scope:{
+            side:"=popUpOpen"
+        },
+        link:function(scope,object,attr){
+            scope.open = function(){
+                var sideNav = Object.keys(scope.side)[0];
+                var fn = scope.side[sideNav];
+
+                if(popUpService.exist(sideNav)==-1){
+                    if(fn && fn.before){
+                        pre = fn.before();
+                    }else{
+                        pre = true;
+                    }
+
+                    if(!pre){
+                        return false;
+                    }
+                    $mdSidenav(sideNav).open().then(function(){
+                        popUpService.add(sideNav);
+                        if(fn && fn.after){
+                            fn.after();
+                        }
+                    })
+                }
+
+            };
+            object.bind("click",function(){
+                scope.open();
+            })
+
+        }
+    };
+})
+    .directive('autoClose',function(popUpService,$mdSidenav,$compile){
+    return {
+        terminal: true, //this setting is important, see explanation below
+        priority: 1000, //this setting is important, see explanation below
+        scope:{
+            fn:"=autoClose"
+        },
+        link:function(scope,object,attr){
+            scope.sideNav = attr.mdComponentId;
+            scope.close = function(){
+                idx = popUpService.exist(scope.sideNav);
+                if(idx != -1){
+                    if(scope.fn.before){
+                        pre = scope.fn.before();
+                    }else{
+                        pre = true;
+                    }
+
+                    if(!pre){
+                        return false;
+                    }
+                    $mdSidenav(scope.sideNav).close().then(function(){
+                        popUpService.remove(idx);
+                        if(scope.fn.after){
+                            scope.fn.after();
+                        }
+                    });
+                };
+            };
+             object.attr("click-out","close()")
+             object.removeAttr("auto-close");
+             $compile(object)(scope);
+        },
+    }
+});
+
 

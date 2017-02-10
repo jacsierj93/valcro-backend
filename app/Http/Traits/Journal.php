@@ -12,6 +12,8 @@ use App\Models\Sistema\Audittrail\Audittrail;
 trait Journal
 {
     private static function audit($model,$act){
+        
+        return false;
         $toAudit = array();
         switch ($act){
             case "new":
@@ -55,11 +57,17 @@ trait Journal
         });
 
         static::updated(function ($model) {
+
             self::audit($model,"upd");
         });
 
         static::deleted(function ($model) {
             self::audit($model,"del");
         });
+/*
+        static::updating(function($model){
+            echo "nuevooooo";
+           dd($model);
+        });*/
     }
 }
