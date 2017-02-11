@@ -484,7 +484,7 @@
                                             <md-input-container class="md-block" flex="30">
                                                 <label>Codigo</label>
                                                 <input autocomplete="off"
-                                                       skip-tab="off"
+                                                       skip-tab
                                                        name="condHeadTitle"
 
                                                        ng-disabled="$parent.enabled"
@@ -521,8 +521,8 @@
                                                 <label>Serie</label>
                                                 <input
                                                     autocomplete="off"
-                                                    skip-tab="off" name="
-                                                condHeadTitle"
+                                                    skip-tab
+                                                    name="condHeadTitle"
 
                                                     ng-disabled="$parent.enabled"
                                                     ng-model="prod.serie"
@@ -534,7 +534,7 @@
                                                 <label>Descripcion</label>
                                                 <input
                                                     autocomplete="off"
-                                                    skip-tab="off"
+                                                    skip-tab
                                                     name="condHeadTitle"
 
                                                     ng-disabled="$parent.enabled"
@@ -1030,7 +1030,7 @@
         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodComp" id="prodComp" auto-close="{before:null,after:aft}">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex >
                 <input type="hidden" md-autofocus>
-                <div flex>
+                <div flex layout="column" ng-controller="addCompController">
                     <div layout="column" class="form-row-head form-row-head-select">
                         <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                             <div>
@@ -1046,7 +1046,7 @@
                                              flex
                                              id="compProv"
                                              info="seleccione la linea"
-                                             model = "common.line"
+                                             model = "filtCm.line"
                                              skip-tab
                                              md-search-text="ctrl.searchLine"
                                              md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
@@ -1068,7 +1068,7 @@
                                              flex
                                              id="commSublin"
                                              info="seleccione la sub-linea"
-                                             model = "common.sublin"
+                                             model = "filtCm.sublin"
                                              skip-tab
                                              md-search-text="ctrl.searchSubLine"
                                              md-items="item in sublines | stringKey : ctrl.searchSubLine : 'sublinea' "
@@ -1091,14 +1091,17 @@
                                 skip-tab
                                 name="condHeadTitle"
                                 info="escriba el codigo o la descripcion del producto"
-                                ng-disabled="$parent.enabled"
-                                ng-model="prod.desc"
-                                required>
+                                ng-model="filtCm.desc"
+                                >
                         </md-input-container>
-                        <div flex>
-                            &nbsp;
-                        </div>
-                        <div flex>
+                       <!-- <div flex>-->
+                            <md-content flex layout="column">
+                               <!-- <div ng-repeat="item in [1,2,3,4,5,6,7,8,9,10,11,12]" class="row">
+                                    Articulos {{item}}
+                                </div>-->
+                            </md-content>
+                        <!--</div>-->
+                        <div flex style="padding-top: 40px">
                             <div class="row" layout="row">
 
                                 <div layout-align="center center" style="color:rgb(92, 183, 235); width:150px"  >

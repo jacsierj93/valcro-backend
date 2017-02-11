@@ -158,7 +158,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
 
     });
     $scope.$watchCollection("prod",function(n,o){
-        if(n.id && n.line && (n.line!=o.line)){
+        if(n.line && (n.line!=o.line)){
 
                 productos.query({ type:"getCriterio",id:n.line},function(data){
                     $scope.prodCrit.splice(0,$scope.prodCrit.length);
@@ -232,6 +232,37 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         console.log("AFTER");
 
     }
+}]);
+MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout',function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout) {
+    $scope.filtCm = {
+        line:false,
+        sublin:false,
+        desc:""
+    };
+
+    var timeOut = null;
+    $scope.$watchCollection("filtCm",function(n,o){
+        if(n.line || n.sublin || n.desc != ""){
+            $timeout.cancel(timeOut);
+            timeOut = $timeout(function(){
+                $timeout.cancel(timeOut);
+                console.log("entro en el filtro");
+                /*productos.query({ type:"getFiltersProd"},$scope.filtCm,function(data){
+
+                    /!*$scope.prodCrit.splice(0,$scope.prodCrit.length);
+                     $timeout(function(){
+                     $scope.criteria = data;
+                     },0);*!/
+                });*/
+            },2000);
+
+
+
+        }else{
+            $timeout.cancel(timeOut);
+        }
+
+    });
 }]);
 
 

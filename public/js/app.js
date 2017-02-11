@@ -458,7 +458,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
-
+        console.log(angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))"))
         if(list.index(elem)<list.length-1){
 
             $timeout(function(){
@@ -476,6 +476,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                 }
 
             },50);
+
         }else if(angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))").length>0){
 
             if(!scope.endLayer) {
