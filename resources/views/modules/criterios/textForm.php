@@ -68,7 +68,7 @@
                      md-search-text="ctrl[field.id].searchSel"
                      key="item.elem.id"
                      md-no-cache
-                     md-items="item in field.options.Opcion || [] | stringKey : ctrl[field.id].searchSel: 'elem.nombre' | filterSearch: formFilters[field.id] : 'elem.id' "
+                     md-items="item in field.options.Opcion || []  | filterSearch: formFilters[field.id] : 'elem.id' | stringKey : ctrl[field.id].searchSel: 'elem.nombre'"
                      md-item-text="item.elem.nombre"
                      md-no-asterisk
                      md-min-length="0"

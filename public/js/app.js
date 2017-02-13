@@ -211,7 +211,8 @@ MyApp.filter('stringKey', function() {
 
     return function(data,compare, key) {
         return (!data) ? [] :data.filter(function(val) {
-            return (!val[key] || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  val[key].toLowerCase().indexOf(compare.toLowerCase())!==-1;
+            str = eval("val."+key);
+            return (!str || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  str.toLowerCase().indexOf(compare.toLowerCase())!==-1;
         });
     }
 });

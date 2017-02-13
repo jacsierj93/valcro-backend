@@ -18,6 +18,7 @@ use Session;
 use Validator;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Product\Product;
+use App\Models\Sistema\Product\ProductComponent;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController  extends BaseController
@@ -47,25 +48,54 @@ class ProductController  extends BaseController
             ->with(array("prodCrit"=>function($q){
                 return $q->selectRaw("crit_id,value");
             }))
+            ->with(array("commons"=>function($q){
+                return $q->selectRaw("codigo,descripcion,serie,linea_id")->with(array("line"=>function($query){
+                    return $query->selectRaw("id,linea");
+                }));
+            }))
+
             ->where("prov_id",$prov)
             ->distinct("id")
             ->get();
 
         return json_encode($all);
     }
-/*
-    public function getDetail($prov){
 
-        return Product::with("prov")
-            ->with("line")
-            ->with("subLin")
-            ->with("getType")
-            ->where("prov_id",$prov)
-            ->distinct("id")
-            ->get();
+    public function filterProd(Request $filt){
+
+        $datos =  Product::with(
+            array("prov"=>function($query){
+                return $query->selectRaw("id,razon_social");
+            }))
+            ->with(array("line"=>function($query){
+                return $query->selectRaw("id,linea");
+            }))
+            ->with(array("subLin"=>function($q){
+                return $q->selectRaw("id,sublinea");
+            }))
+            ->with(array("getType"=>function($q){
+                return $q->selectRaw("id,descripcion");
+            }))
+            ->where("id","<>",$filt->prod)
+            ->distinct("id");
+
+            if($filt->line){
+                $datos->where("linea_id",$filt->line);
+            }
+
+            if($filt->sublin){
+                $datos->where("sublinea_id",$filt->sublin);
+            }
+
+            if($filt->desc != ""){
+                $datos->where("codigo","like",$filt->desc."%")
+                ->orWhere("descripcion","like",$filt->desc."%");
+            }
+
+            return $datos->get();
 
 
-    }*/
+    }
 
     public function saveProd(Request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
@@ -93,6 +123,26 @@ class ProductController  extends BaseController
             $result['action']="upd";
         }
 
+        return $result;
+    }
+    
+    public function saveCommon(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        /*if($req->id){
+            $comm =  ProductType::findOrFail($req->id);
+            $result['action']="upd";
+        }else{*/
+            $comm =  new ProductComponent();
+        //}
+        $comm->parent_prod = $req->parent;
+        $comm->comp_prod = $req->prod;
+        $comm->comentario = $req->comment;
+
+        if($comm->isDirty()){
+            $comm->save();
+        }else{
+            $result['action']="equal";
+        }
         return $result;
     }
 

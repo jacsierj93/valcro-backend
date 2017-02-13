@@ -443,7 +443,7 @@
             <div layout="row" flex ng-controller="createProd">
                 <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
                 <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
-                    <input type="hidden" md-autofocus>
+                   <!-- <input type="hidden" md-autofocus>-->
                     <div layout="row" flex>
                         <div active-left ></div>
                         <div layout="column" flex>
@@ -486,7 +486,7 @@
                                                 <input autocomplete="off"
                                                        skip-tab
                                                        name="condHeadTitle"
-
+                                                       md-autofocus
                                                        ng-disabled="$parent.enabled"
                                                        ng-model="prod.cod"
                                                        required>
@@ -862,8 +862,8 @@
                                 <form layout="row"  class="gridContent" flex>
                                     <div active-left></div>
                                     <div layout="column" flex=""   >
-                                        <div   ng-repeat="item in listByProv.data | filter : listByProv.filter:strict | orderBy : listByProv.order as filter">
-                                            <div layout="row" class="cellGridHolder" ng-click="openProd(item)" >
+                                        <div   ng-repeat="item in list.common.data | filter : list.common.filter:strict | orderBy : list.common.order as filter">
+                                            <div layout="row" class="cellGridHolder" ng-dblclick="editCommon(item)" >
 
                                                 <div flex class="cellGrid" >{{item.codigo}}</div>
                                                 <div flex class="cellGrid" >{{item.descripcion}}</div>
@@ -1027,10 +1027,10 @@
             </div>
         </md-sidenav>
 
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodComp" id="prodComp" auto-close="{before:null,after:aft}">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodComp" id="prodComp">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addCompController">
                 <input type="hidden" md-autofocus>
-                <div flex layout="column" ng-controller="addCompController">
+                <div flex layout="column" auto-close="{before:onClose,after:null}">
                     <div layout="column" class="form-row-head form-row-head-select">
                         <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                             <div>
@@ -1040,67 +1040,75 @@
                     </div>
 
                     <div flex layout="column">
-                        <md-input-container class="md-block row">
-                            <label>Linea</label>
-                            <md-autocomplete md-selected-item="ctrl.line"
-                                             flex
-                                             id="compProv"
-                                             info="seleccione la linea"
-                                             model = "filtCm.line"
-                                             skip-tab
-                                             md-search-text="ctrl.searchLine"
-                                             md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
-                                             md-item-text="item.linea"
-                                             require
-                                             require-match="true"
-                                             md-no-asterisk
-                                             md-min-length="0">
-                                <input >
-                                <md-item-template>
-                                    <span>{{item.linea}}</span>
-                                </md-item-template>
-                            </md-autocomplete>
+                        <div ng-if="prodAdd.id">
 
-                        </md-input-container>
-                        <md-input-container class="md-block row">
-                            <label>Sub-Linea</label>
-                            <md-autocomplete md-selected-item="ctrl.sublin"
-                                             flex
-                                             id="commSublin"
-                                             info="seleccione la sub-linea"
-                                             model = "filtCm.sublin"
-                                             skip-tab
-                                             md-search-text="ctrl.searchSubLine"
-                                             md-items="item in sublines | stringKey : ctrl.searchSubLine : 'sublinea' "
-                                             md-item-text="item.sublin"
-                                             require
-                                             require-match="true"
-                                             md-no-asterisk
-                                             md-min-length="0">
-                                <input >
-                                <md-item-template>
-                                    <span>{{item.sublin}}</span>
-                                </md-item-template>
-                            </md-autocomplete>
+                            <md-input-container class="md-block row">
+                                <label>Linea</label>
+                                <md-autocomplete md-selected-item="ctrl.line"
+                                                 flex
+                                                 id="compProv"
+                                                 info="seleccione la linea"
+                                                 model = "filtCm.line"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchLine"
+                                                 md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
+                                                 md-item-text="item.linea"
+                                                 require
+                                                 require-match="true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.linea}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
 
-                        </md-input-container>
-                        <md-input-container class="md-block row">
-                            <label>Codigo o Descripcion</label>
-                            <input
-                                autocomplete="off"
-                                skip-tab
-                                name="condHeadTitle"
-                                info="escriba el codigo o la descripcion del producto"
-                                ng-model="filtCm.desc"
-                                >
-                        </md-input-container>
-                       <!-- <div flex>-->
-                            <md-content flex layout="column">
-                               <!-- <div ng-repeat="item in [1,2,3,4,5,6,7,8,9,10,11,12]" class="row">
-                                    Articulos {{item}}
-                                </div>-->
+                            </md-input-container>
+                            <md-input-container class="md-block row">
+                                <label>Sub-Linea</label>
+                                <md-autocomplete md-selected-item="ctrl.sublin"
+                                                 flex
+                                                 id="commSublin"
+                                                 info="seleccione la sub-linea"
+                                                 model = "filtCm.sublin"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchSubLine"
+                                                 md-items="item in sublines | stringKey : ctrl.searchSubLine : 'sublinea' "
+                                                 md-item-text="item.sublin"
+                                                 require
+                                                 require-match="true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.sublin}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+                            </md-input-container>
+                            <md-input-container class="md-block row">
+                                <label>Codigo o Descripcion</label>
+                                <input
+                                    autocomplete="off"
+                                    skip-tab
+                                    name="condHeadTitle"
+                                    info="escriba el codigo o la descripcion del producto"
+                                    ng-model="filtCm.desc"
+                                    >
+                            </md-input-container>
+
+                            <div ng-if="searching" flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                BUSCANDO...
+                            </div>
+                            <div ng-if="!searching && filterLs.length==0" flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                no hay coincidencia =(
+                            </div>
+                            <md-content ng-if="!searching" flex layout="column">
+                                <div ng-repeat="item in filterLs" class="row" ng-class="{'field-sel':(item.id==prodAdd.prod)}" layout="column" layout-align="center start" style="border-bottom:1px solid #ccc;" ng-click="setDetail(item)">
+                                    {{item.descripcion}}
+                                </div>
                             </md-content>
-                        <!--</div>-->
+                        </div>
                         <div flex style="padding-top: 40px">
                             <div class="row" layout="row">
 
@@ -1111,7 +1119,7 @@
                                 </div>
 
                                 <div flex="grow" layout-align="center center">
-                                    000001234
+                                    {{prodDetail.codigo}}
                                 </div>
                             </div>
                             <div class="row" layout="row">
@@ -1122,7 +1130,7 @@
                                 </div>
 
                                 <div flex="grow" layout-align="center center">
-                                    una descripcion alli
+                                    {{prodDetail.descripcion}}
                                 </div>
                             </div>
                             <div class="row" layout="row">
@@ -1133,7 +1141,26 @@
                                 </div>
 
                                 <div flex="grow" layout-align="center center">
-                                    NC00124ASD
+                                    {{prodDetail.serie}}
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <!--<div layout-align="center center" style="color:rgb(92, 183, 235);width:150px" >
+
+                                    <span >descripcion de complementario</span>
+
+                                </div>
+-->
+                                <div flex="grow" layout-align="center center">
+                                    <md-input-container class="md-block row">
+                                        <label>descripcion de complementario</label>
+                                        <input
+                                            autocomplete="off"
+                                            skip-tab
+                                            info="como complementa este producto al principal"
+                                            ng-model="prodDetail.comment"
+                                        >
+                                    </md-input-container>
                                 </div>
                             </div>
                         </div>

@@ -255,7 +255,7 @@
                                 <div>
                                     Nombre del Campo
                                 </div>
-                                <div style="width: 24px; font-size:24px;" ng-click="openPopUp('newField')">+</div>
+                                <div style="width: 24px; font-size:24px;" pop-up-open="{'newField':{before:null,after:null}}">+</div>
                             </div>
 
                             <md-content flex>
@@ -524,10 +524,10 @@
             </md-sidenav>
 
         </div>
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" style="width:calc(100% - 928px);" md-disable-backdrop="true" md-component-id="newField" id="newField" click-out="closePopUp('newField',$event)">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" style="width:calc(100% - 928px);" md-disable-backdrop="true" md-component-id="newField" id="newField">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="createFieldController">
                 <input type="hidden" >
-                <form name="fieldForm" layout="row" class="focused" ng-controller="createFieldController">
+                <form name="fieldForm" layout="row" class="focused" auto-close="{before:null,after:aftClose}">
                     <div style="width:24px; height: 100%;"></div>
                     <div flex>
                         <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">

@@ -740,6 +740,14 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
         descripcion:"",
         tipo_id:null
     };
+    $scope.aftClose = function(){
+
+        $scope.newField.id = false;
+        $scope.newField.descripcion = "";
+        $scope.newField.tipo_id = null;
+        $scope.fieldForm.$setUntouched();
+        $scope.fieldForm.$setPristine();
+    }
     $scope.$watchGroup(['fieldForm.$valid','fieldForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
             criterios.put({type:"saveNewField"},$scope.newField,function(data){

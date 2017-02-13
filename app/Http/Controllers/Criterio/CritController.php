@@ -68,7 +68,10 @@ class CritController extends BaseController
     }
     
     public function getCriterio($line){
-        $crit = Criterio::where("linea_id",$line)->get();
+        $crit = Criterio::where("linea_id",$line)
+            ->whereNotNull("campo_id")
+            ->whereNotNull("tipo_id")
+            ->get();
         foreach ($crit as $field){
             $field->line;
             $field->field;

@@ -1,17 +1,75 @@
 MyApp.factory('productos', ['$resource',function ($resource) {
         return $resource('productos/:type/:id', {}, {
             query: {method: 'GET', cancellable:true, params: {type: "",id:""}, isArray: true},
+            filt: {method: 'POST', cancellable:true, params: {type: "",id:""}, isArray: true},
             get:   {method: 'POST', params: {type: ""}, isArray: false},
             put:   {method: 'POST', params: {type: ""}, isArray: false}
         });
     }
 ]);
+MyApp.service("popUpService",function($mdSidenav){
+    var actives = [];
 
+    return {
+        exist : function(name){
+            return actives.indexOf(name);
+        },
+        remove : function(idx){
+            actives.splice(idx,1);
+        },
+        add:function(name){
+            actives.push(name);
+        },
+        popUpOpen:function(datos){
+
+            var sideNav = Object.keys(datos)[0];
+            var fn = datos[sideNav];
+
+            if(this.exist(sideNav)==-1){
+                if(fn && fn.before){
+                    pre = fn.before();
+                }else{
+                    pre = true;
+                }
+
+                if(!pre){
+                    return false;
+                }
+                $mdSidenav(sideNav).open().then(function(){
+                    this.add(sideNav);
+                    if(fn && fn.after){
+                        fn.after();
+                    }
+                })
+            }
+
+        }
+    }
+})
 MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,mastersCrit,$filter){
     var providers = masterSrv.getProvs();
     var listProv = productos.query({type:'provsProds'});
     var prov ={};
+
     var prod = {id:false,datos:{}};
+    var extraList = {
+        common:{
+            data:[],
+            filter:{},
+            order:"id"
+        }
+    };
+    var commonDetail = {
+        linea:"",
+        sublinea:"",
+        codigo:"",
+        descripcion:"",
+        serial:"",
+        id:false,
+        parent:false,
+        prod:false,
+        comment:""
+    }
     var prodToSave = {
         id:false,
         prov:false,
@@ -53,6 +111,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             prodToSave.serie = item.serie || false;
             prodToSave.cod = item.codigo || false;
             prodToSave.desc = item.descripcion || false;
+            extraList.common.data = item.commons;
         },
         getProd : function(){
             return prod
@@ -63,8 +122,11 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         getToSavedProd:function(){
             return prodToSave;
         },
-        setSavedProd : function(){
-
+        getLists : function(){
+            return extraList;
+        },
+        getCommon : function(){
+            return commonDetail;
         }
 
     }
@@ -220,49 +282,157 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
 
     $scope.items = []
 }]);
-MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
+MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService) {
     $scope.goToAnalisis = function () {
         $scope.LayersAction({open:{name:"prodLayer5"}});
     };
-    $scope.bef=function(){
-        console.log("BEFORE");
 
+    $scope.list = productsServices.getLists();
+
+    $scope.editCommon = function(data){
+        popUpService.popUpOpen({
+            'prodComp':{
+                before:function(){
+                    var prod = productsServices.getCommon();
+                    prod.linea = data.line.linea;
+                    prod.codigo = data.codigo;
+                    prod.descripcion = data.descripcion;
+                    prod.serial = data.serial;
+                    prod.id = data.pivot.id;
+                    prod.parent = data.pivot.parent_prod;
+                    prod.prod = data.pivot.comp_prod;
+                    prod.comment = data.pivot.comentario;
+                    return true;
+                },
+                after:null
+            }
+        })
     }
+
+    $scope.bef=function(data){
+        productsServices.getCommon();
+
+    };
     $scope.aft=function(){
         console.log("AFTER");
 
     }
 }]);
-MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout',function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout) {
+MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout','masterSrv',function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout,masterSrv) {
+    $scope.prod = productsServices.getToSavedProd();
+    $scope.lines = masterSrv.getLines();
+    $scope.list = productsServices.getLists();
     $scope.filtCm = {
         line:false,
         sublin:false,
-        desc:""
+        desc:"",
+        prod:false
     };
+    $scope.prodDetail = productsServices.getCommon();
+   /* $scope.prodDetail = {
+        linea:"",
+        sublinea:"",
+        codigo:"",
+        descripcion:"",
+        serial:""
+    }
+    $scope.prodAdd ={
+        id:false,
+        parent:false,
+        prod:false,
+        comment:""
+    }*/
+
+    $scope.$watch("prod.id",function(n,o){
+        $scope.filtCm.prod = n;
+        $scope.prodDetail.parent = n;
+    });
+
+    $scope.searching = false;
+
+    $scope.filterLs = [];
 
     var timeOut = null;
     $scope.$watchCollection("filtCm",function(n,o){
+        $scope.searching = true;
+        $timeout.cancel(timeOut);
         if(n.line || n.sublin || n.desc != ""){
-            $timeout.cancel(timeOut);
             timeOut = $timeout(function(){
-                $timeout.cancel(timeOut);
-                console.log("entro en el filtro");
-                /*productos.query({ type:"getFiltersProd"},$scope.filtCm,function(data){
+                productos.filt({ type:"getFiltersProd"},n,function(data){
+                    $scope.filterLs.splice(0,$scope.filterLs.length);
+                    angular.forEach(data,function (v,k) {
+                        $scope.filterLs.push(v);
+                    })
+                    $scope.searching = false;
 
-                    /!*$scope.prodCrit.splice(0,$scope.prodCrit.length);
-                     $timeout(function(){
-                     $scope.criteria = data;
-                     },0);*!/
-                });*/
+                });
             },2000);
-
-
-
         }else{
-            $timeout.cancel(timeOut);
+
+            $scope.filterLs.splice(0,$scope.filterLs.length);
+            $scope.searching = false;
         }
 
     });
+
+    $scope.setDetail = function(dat){
+        $scope.prodDetail.codigo = dat.codigo;
+        $scope.prodDetail.descripcion = dat.descripcion;
+        $scope.prodDetail.linea = dat.line.linea;
+        $scope.prodDetail.serie = dat.serie;
+        $scope.prodDetail.prod = dat.id;
+    }
+
+    var saveCommon = function(){
+        productos.put({type:"prodSaveCommon"},$scope.prodAdd,function (data) {
+            if(data.action == "new"){
+                $scope.prodDetail.id = data.id;
+                setNotif.addNotif("ok","producto Agregado",[],{autohidden:3000});
+                //$scope.list.common.data.push($scope.prodDetail);
+                $scope.list.common.data.push({
+                    pivot:{
+                        id:data.id,
+                        common_id:$scope.prodDetail.prod,
+                        parent_prod:$scope.prodDetail.parent
+                    },
+                    codigo:$scope.prodDetail.codigo,
+                    descripcion:$scope.prodDetail.descripcion,
+                    linea:{linea:$scope.prodDetail.codigo}
+                })
+            }else if(data.action == "upd"){
+                setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
+            }
+        })
+    }
+
+    $scope.onClose = function(){
+
+        if(($scope.filtCm.line || $scope.filtCm.sublin || $scope.filtCm.desc != "" ) && !$scope.prodAdd.prod){
+            var ret = {wait : null};
+
+            setNotif.addNotif("alert","ha realizado una busqueda, pero no selecciono nada, esta seguro?",[
+                {
+                    name:"Si, si lo estoy",
+                    action:function(){
+                       ret.wait=true;
+                    },
+                    default:defaultTime
+                },
+                {
+                    name:"No, dejame cambiarlo",
+                    action:function(){
+                        ret.wait=false;
+                    }
+                }
+            ]);
+            return ret;
+        }else{
+            saveCommon();
+            return true;
+        }
+
+    }
+
 }]);
 
 
@@ -341,21 +511,7 @@ MyApp.service("nxtService",function(){
     }
 })
 
-MyApp.service("popUpService",function(){
-    var actives = [];
 
-    return {
-        exist : function(name){
-            return actives.indexOf(name);
-        },
-        remove : function(idx){
-            actives.splice(idx,1);
-        },
-        add:function(name){
-            actives.push(name);
-        }
-    }
-})
 
 
 MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
@@ -366,6 +522,7 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
         },
         link:function(scope,object,attr){
             scope.open = function(){
+
                 var sideNav = Object.keys(scope.side)[0];
                 var fn = scope.side[sideNav];
 
@@ -395,38 +552,57 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
         }
     };
 })
-    .directive('autoClose',function(popUpService,$mdSidenav,$compile){
+    .directive('autoClose',function(popUpService,$mdSidenav,$compile,$interval){
     return {
         terminal: true, //this setting is important, see explanation below
         priority: 1000, //this setting is important, see explanation below
-        scope:{
-            fn:"=autoClose"
-        },
+
         link:function(scope,object,attr){
-            scope.sideNav = attr.mdComponentId;
+            scope.fn = scope.$eval(attr.autoClose);
+            scope.sideNav = object.parents("md-sidenav").first().attr("md-component-id");
+
+            scope.closer = function(){
+                $mdSidenav(scope.sideNav).close().then(function(){
+                    popUpService.remove(idx);
+                    if(scope.fn.after){
+                        scope.fn.after();
+                    }
+                });
+            };
             scope.close = function(){
+
                 idx = popUpService.exist(scope.sideNav);
                 if(idx != -1){
                     if(scope.fn.before){
-                        pre = scope.fn.before();
+                        pre= scope.fn.before();
                     }else{
                         pre = true;
                     }
 
+
                     if(!pre){
                         return false;
                     }
-                    $mdSidenav(scope.sideNav).close().then(function(){
-                        popUpService.remove(idx);
-                        if(scope.fn.after){
-                            scope.fn.after();
-                        }
-                    });
+                    else if(typeof(pre) == "object" && 'wait' in pre){
+                        var x = $interval(function(){
+                            if(pre.wait===true){
+                                $interval.cancel(x);
+                                scope.closer();
+                            }else if(pre.wait===false){
+                                $interval.cancel(x);
+                                return false;
+                            }
+                        },1000)
+                    }else{
+                        scope.closer();
+                    }
+
                 };
             };
-             object.attr("click-out","close()")
-             object.removeAttr("auto-close");
-             $compile(object)(scope);
+
+            object.attr("click-out","close()")
+            object.removeAttr("auto-close");
+            $compile(object)(scope);
         },
     }
 });
