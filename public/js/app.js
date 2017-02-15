@@ -58,6 +58,13 @@ window.addEventListener("keydown", function(e) {
 
     }
 }, false);
+/*angular.element(document).ready(function(){
+    angular.element("body").on("focus","textarea",function(){
+
+        val = angular.element(this).val();
+        angular.element(this).val("").val(val);
+    })
+})*/
 
 MyApp.config(function ($provide, $httpProvider) {
 
@@ -459,7 +466,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
         var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
-        console.log(angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))"))
+        var genericList = angular.element("[step]:not([disabled]):visible");
         if(list.index(elem)<list.length-1){
 
             $timeout(function(){
@@ -478,10 +485,13 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
 
             },50);
 
-        }else if(angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))").length>0){
+        }else if((angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))").length>0) || (genericList.index(elem)<genericList.length-1)){
 
             if(!scope.endLayer) {
                 var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
+                if(next.length==0){
+                    next = angular.element(genericList[genericList.index(elem)+1]).parents("form").first();
+                }
                 var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
                 $timeout(function () {
                     angular.element(next).click();
@@ -509,10 +519,15 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
             $timeout(function(){
                 if(!angular.element(elem).parents("md-sidenav.popUp").length>0){ //evalua si el sidenav que esta a fnalizar No es un popUp
                     if(!scope.endLayer) {
-                        angular.element(elem).parents("md-sidenav").find(".showNext").trigger('mouseover');
+                        var shower = angular.element(elem).parents("md-sidenav").find(".showNext");
+                        shower.trigger('mouseover');
+                        show = (shower.attr("valid"))?scope.$eval(shower.attr("valid")+"()"):true;
                         angular.element(elem).blur();
                         //angular.element(elem).parents("md-content").delay(200).click();
-                        angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
+                        if(show){
+                            angular.element("[md-component-id='NEXT']").find("img").delay(500).trigger('click');
+                        }
+
                         /*angular.element("[md-component-id='NEXT']").focus();*/
                     }else{
                         scope.endLayer(function(){

@@ -23,6 +23,15 @@
 
 }
 
+.md-resize-wrapper{
+    height: 36px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+.md-resize-wrapper .md-resize-handle{
+    bottom: 0px;
+}
+
 md-input-container > label{
     width: 95% !important;
 }

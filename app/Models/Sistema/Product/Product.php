@@ -41,7 +41,7 @@ class Product extends customBaseModel
     }
     public function commons(){
         return $this->belongsToMany('App\Models\Sistema\Product\Product', 'tbl_prod_comp', 'parent_prod', 'comp_prod')
-            ->withPivot("comentario")
+            ->withPivot("comentario",'id')
             ->withTimestamps()
             ->whereNull("tbl_prod_comp.deleted_at");
     }

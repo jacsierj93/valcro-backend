@@ -128,12 +128,12 @@ class ProductController  extends BaseController
     
     public function saveCommon(Request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
-        /*if($req->id){
-            $comm =  ProductType::findOrFail($req->id);
+        if($req->id){
+            $comm =  ProductComponent::findOrFail($req->id);
             $result['action']="upd";
-        }else{*/
+        }else{
             $comm =  new ProductComponent();
-        //}
+        }
         $comm->parent_prod = $req->parent;
         $comm->comp_prod = $req->prod;
         $comm->comentario = $req->comment;
@@ -144,6 +144,18 @@ class ProductController  extends BaseController
             $result['action']="equal";
         }
         return $result;
+    }
+    public function delCommon(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "upd","id"=>"");
+        if($req->id){
+            $comm =  ProductComponent::findOrFail($req->pivot['id']);
+            if(!$comm->delete()){
+                $result['action']="err";
+            }
+        }else{
+            $result['action']="equal";
+        }
+
     }
 
     private function purge($data){

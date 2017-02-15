@@ -35,8 +35,9 @@ MyApp.service("popUpService",function($mdSidenav){
                 if(!pre){
                     return false;
                 }
+                var serv = this;
                 $mdSidenav(sideNav).open().then(function(){
-                    this.add(sideNav);
+                    serv.add(sideNav);
                     if(fn && fn.after){
                         fn.after();
                     }
@@ -50,6 +51,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
     var providers = masterSrv.getProvs();
     var listProv = productos.query({type:'provsProds'});
     var prov ={};
+    var bckup = null;
 
     var prod = {id:false,datos:{}};
     var extraList = {
@@ -103,15 +105,29 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             return prov;
         },
         setProd:function(item){
+
             prod.id = item.id;
             prod.datos = item;
+            bckup = angular.copy(prod.datos);
+            console.log(angular.equals(bckup,prod.datos,angular))
             prodToSave.id = item.id || false;
             prodToSave.prov = item.prov_id || false;
             prodToSave.line = item.linea_id || false;
             prodToSave.serie = item.serie || false;
             prodToSave.cod = item.codigo || false;
             prodToSave.desc = item.descripcion || false;
-            extraList.common.data = item.commons;
+            extraList.common.data = prod.datos.commons;
+        },
+        syncProd : function(edit){
+            prod.datos.id = edit.id || null;
+            prod.datos.prov_id = edit.prov || null;
+            prod.datos.linea_id = edit.line || null;
+            prod.datos.serie = edit.serie || null;
+            prod.datos.codigo = edit.cod || null;
+            prod.datos.descripcion = edit.desc || null;
+        },
+        showChange:function(){
+            console.log(prod.datos,bckup,angular.equals(prod.datos,bckup));
         },
         getProd : function(){
             return prod
@@ -243,19 +259,22 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
       productos.put({type:"prodSave"},$scope.prod,function (data) {
           if(data.action == "new"){
               $scope.prod.id = data.id;
+              productsServices.syncProd($scope.prod);
               setNotif.addNotif("ok","producto Creado",[],{autohidden:3000});
           }else if(data.action == "upd"){
+              productsServices.syncProd($scope.prod);
               setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
           }
+
       })
 
         $scope.$parent.LayersAction({open:{name:"prodLayer4"}});
     };
 
     $scope.isValid = function(){
-        /*if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
+        if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
             return false;
-        }*/
+        }
         return true;
     }
 }]);
@@ -284,6 +303,7 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
 }]);
 MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService) {
     $scope.goToAnalisis = function () {
+        productsServices.showChange();
         $scope.LayersAction({open:{name:"prodLayer5"}});
     };
 
@@ -309,8 +329,37 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         })
     }
 
+    $scope.delete = function(idx,dato){
+        console.log(dato);
+        setNotif.addNotif("error","va desvincular este producto del compuesto, esta seguro?",[
+            {
+                name:"Si, si lo estoy",
+                action:function(){
+                    productos.put({type:"prodDelCommon"},dato,function (data) {
+                        setNotif.addNotif("ok","producto eliminado",[],{autohidden:3000});
+                        //srch = $filter("filterSearch")($scope.list.common.data,[dato.id],"pivot.id");
+                        $scope.list.common.data.splice(idx,1);
+                    })
+                },
+                default:defaultTime
+            },
+            {
+                name:"No, olvidalo",
+                action:null
+            }
+        ]);
+    }
+    
     $scope.bef=function(data){
-        productsServices.getCommon();
+        var prod = productsServices.getCommon();
+        prod.linea = "";
+        prod.codigo = "";
+        prod.descripcion = "";
+        prod.serial = "";
+        prod.id = false;
+        prod.prod = false
+        prod.comment = "";
+        return true;
 
     };
     $scope.aft=function(){
@@ -318,7 +367,7 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
 
     }
 }]);
-MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout','masterSrv',function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout,masterSrv) {
+MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout','masterSrv',"$filter",function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout,masterSrv,$filter) {
     $scope.prod = productsServices.getToSavedProd();
     $scope.lines = masterSrv.getLines();
     $scope.list = productsServices.getLists();
@@ -329,19 +378,6 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
         prod:false
     };
     $scope.prodDetail = productsServices.getCommon();
-   /* $scope.prodDetail = {
-        linea:"",
-        sublinea:"",
-        codigo:"",
-        descripcion:"",
-        serial:""
-    }
-    $scope.prodAdd ={
-        id:false,
-        parent:false,
-        prod:false,
-        comment:""
-    }*/
 
     $scope.$watch("prod.id",function(n,o){
         $scope.filtCm.prod = n;
@@ -362,13 +398,12 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
                     $scope.filterLs.splice(0,$scope.filterLs.length);
                     angular.forEach(data,function (v,k) {
                         $scope.filterLs.push(v);
-                    })
+                    });
                     $scope.searching = false;
 
                 });
             },2000);
         }else{
-
             $scope.filterLs.splice(0,$scope.filterLs.length);
             $scope.searching = false;
         }
@@ -381,14 +416,13 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
         $scope.prodDetail.linea = dat.line.linea;
         $scope.prodDetail.serie = dat.serie;
         $scope.prodDetail.prod = dat.id;
-    }
+    };
 
     var saveCommon = function(){
-        productos.put({type:"prodSaveCommon"},$scope.prodAdd,function (data) {
+        productos.put({type:"prodSaveCommon"},$scope.prodDetail,function (data) {
             if(data.action == "new"){
                 $scope.prodDetail.id = data.id;
                 setNotif.addNotif("ok","producto Agregado",[],{autohidden:3000});
-                //$scope.list.common.data.push($scope.prodDetail);
                 $scope.list.common.data.push({
                     pivot:{
                         id:data.id,
@@ -403,11 +437,13 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
                 setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
             }
         })
-    }
+    };
+
+
 
     $scope.onClose = function(){
 
-        if(($scope.filtCm.line || $scope.filtCm.sublin || $scope.filtCm.desc != "" ) && !$scope.prodAdd.prod){
+        if(($scope.filtCm.line || $scope.filtCm.sublin || $scope.filtCm.desc != "" ) && !$scope.prodDetail.prod){
             var ret = {wait : null};
 
             setNotif.addNotif("alert","ha realizado una busqueda, pero no selecciono nada, esta seguro?",[
@@ -426,8 +462,10 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
                 }
             ]);
             return ret;
-        }else{
+        }else if($scope.prodDetail.prod){
             saveCommon();
+            return true;
+        }else{
             return true;
         }
 
