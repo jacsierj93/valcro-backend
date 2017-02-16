@@ -63,6 +63,7 @@ class ProductController  extends BaseController
 
     public function filterProd(Request $filt){
 
+        //$aux = Product::find($filt->prod)->commons()->lists("codigo") ;
         $datos =  Product::with(
             array("prov"=>function($query){
                 return $query->selectRaw("id,razon_social");
@@ -77,6 +78,7 @@ class ProductController  extends BaseController
                 return $q->selectRaw("id,descripcion");
             }))
             ->where("id","<>",$filt->prod)
+            ->whereNotIn("codigo",Product::find($filt->prod)->commons()->lists("codigo"))
             ->distinct("id");
 
             if($filt->line){
@@ -147,7 +149,7 @@ class ProductController  extends BaseController
     }
     public function delCommon(Request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "upd","id"=>"");
-        if($req->id){
+        if($req->pivot['id']){
             $comm =  ProductComponent::findOrFail($req->pivot['id']);
             if(!$comm->delete()){
                 $result['action']="err";

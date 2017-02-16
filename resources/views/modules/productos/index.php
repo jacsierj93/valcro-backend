@@ -885,7 +885,7 @@
                                     <div layout="column" flex=""   >
                                         <div   ng-repeat="item in list.common.data | filter : list.common.filter:strict | orderBy : list.common.order as filter">
                                             <div layout="row" class="cellGridHolder" ng-dblclick="editCommon(item)" >
-                                                <div ng-click="delete($index,item)">del</div>
+                                                <div ng-click="delete($index,item)"><img ng-src="" /></div>
                                                 <div flex class="cellGrid" >{{item.codigo}}</div>
                                                 <div flex class="cellGrid" >{{item.descripcion}}</div>
                                                 <div flex class="cellGrid" > {{item.prov.razon_social}}</div>

@@ -89,7 +89,7 @@ class MasterController extends BaseController
 	}
 
 	public function getLines(){
-		return json_encode(Line::all()->prepend(array("id"=>"0","linea"=>"TODAS","siglas"=>"todo")));
+		return json_encode(Line::whereNotNull("linea")->where("linea","<>"," ")->get()->prepend(array("id"=>"0","linea"=>"TODAS","siglas"=>"todo")));
 	}
 	public function getSubLines(Request $req){
 
