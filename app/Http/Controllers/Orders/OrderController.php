@@ -906,7 +906,7 @@ class OrderController extends BaseController
      */
     public function createTemp(Request $req)
     {
-        $prodTemp = MasterProductController::createProduct($req->all());
+        $prodTemp = MasterProductController::createProduct($req->all(),"pedidos");
         $temp = array();
         $temp['id'] = $prodTemp->id;
         $temp['descripcion'] = $prodTemp->descripcion;
