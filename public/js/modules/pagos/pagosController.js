@@ -1,6 +1,15 @@
 
 MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', function ($scope, $mdSidenav, $http,  Upload){
 
+    // funcion para apertura de layer --------
+    $scope.nxtAction = null;
+    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
+        $scope.index = nvo[1];
+        $scope.layerIndex = nvo[0];
+        $scope.layer = nvo[0];
+    });
+
+    // Variables generales -------------
     var historia = [15];
     $scope.index = 0;
     var base = 264;
