@@ -32,7 +32,7 @@ class MasterProductController extends BaseController
     /**
      * crea un producto temporal para el provedor especificado
      **/
-    public static  function createProduct($data){
+    public static  function createProduct($data,$orgn){
         $ser = Product::where("prov_id", $data['prov_id'])
             ->where('tipo_producto_id',3)
             ->first();
@@ -99,6 +99,9 @@ class MasterProductController extends BaseController
         if(array_key_exists('co_cat',$data)){
             $prod->co_cat =$data['co_cat'];
         }
+		// designa el origen como "PEDIDOS" --------------------------------
+		$prod->origen_cre =$orgn;
+			
         $prod->save();
         return Product::find($prod->id) ;
 

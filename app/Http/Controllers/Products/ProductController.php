@@ -79,7 +79,12 @@ class ProductController  extends BaseController
             }))
             ->where("id","<>",$filt->prod)
             ->whereNotIn("codigo",Product::find($filt->prod)->commons()->lists("codigo"))
+            ->whereNotIn("codigo",Product::find($filt->prod)->relationed()->lists("codigo"))
             ->distinct("id");
+
+            if($filt->has("prov") && $filt->prov){
+                $datos->where("prov_id",$filt->prov);
+            }
 
             if($filt->line){
                 $datos->where("linea_id",$filt->line);
@@ -139,12 +144,56 @@ class ProductController  extends BaseController
         $comm->parent_prod = $req->parent;
         $comm->comp_prod = $req->prod;
         $comm->comentario = $req->comment;
+        $comm->cantidad = $req->cant;
 
         if($comm->isDirty()){
             $comm->save();
         }else{
             $result['action']="equal";
         }
+        return $result;
+    }
+    public function savePoint(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $prod =  Product::findOrFail($req->id);
+            $result['action']="upd";
+        }
+
+        $prod->point_buy = $req->pntBuy;
+        $prod->point_credit = $req->pntSald;
+        if($prod->isDirty()){
+            $prod->save();
+        }else{
+            $result['action']="equal";
+        }
+        $result['id']=$prod->id;
+
+        return $result;
+    }
+    public function saveMisc(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $prod =  Product::findOrFail($req->id);
+            $result['action']="upd";
+        }
+
+        $prod->almacen_id = $req->storage;
+        $prod->biblioteca = $req->cantLib;
+        $prod->biblioteca_unit = $req->unitLib;
+        $prod->descarte = $req->cantDis;
+        $prod->descar_unit = $req->unitDis;
+        $prod->donaciones = $req->cantDon;
+        $prod->dona_unit = $req->unitDon;
+        $prod->herramientas = $req->tools;
+        $prod->notas_alma = $req->reqStrg;
+        if($prod->isDirty()){
+            $prod->save();
+        }else{
+            $result['action']="equal";
+        }
+        $result['id']=$prod->id;
+
         return $result;
     }
     public function delCommon(Request $req){

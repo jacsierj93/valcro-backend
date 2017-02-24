@@ -41,9 +41,15 @@ class Product extends customBaseModel
     }
     public function commons(){
         return $this->belongsToMany('App\Models\Sistema\Product\Product', 'tbl_prod_comp', 'parent_prod', 'comp_prod')
-            ->withPivot("comentario",'id')
+            ->withPivot("comentario",'id',"cantidad")
             ->withTimestamps()
             ->whereNull("tbl_prod_comp.deleted_at");
+    }
+    public function relationed(){
+        return $this->belongsToMany('App\Models\Sistema\Product\Product', 'tbl_prod_rela', 'id_prod', 'id_prod_rel')
+            ->withPivot("comentario",'id')
+            ->withTimestamps()
+            ->whereNull("tbl_prod_rela.deleted_at");
     }
 
     

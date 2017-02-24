@@ -94,7 +94,9 @@
                     <span class="icon-Filtro" style="font-size: 24px"></span>
                     <?/*= HTML::image("images/filtro.png") */?>
                 </div>
-                <div layout="row" layout-align="center right" flex id="progress_percent">
+                <vl-progress ng-model="progreso.data" vl-index="progreso.index" ></vl-progress>
+                <div style="width:36px;"></div>
+               <!-- <div layout="row" layout-align="center right" flex id="progress_percent">
                    <div layout="row" layout-align="right center" ng-repeat="i in [0,1,2,3]" flex id="progress_{{i}}">
                        <div style="height: 5px; background: #ccc;" flex>
                            <div class="load_area" style="height: 100%; width:0%; background: #5cb85c;" ng-class="{'lineAnimate':line}"></div>
@@ -104,7 +106,7 @@
                        </span>
 
                    </div>
-                </div>
+                </div>-->
             </div>
 
             <div flex layout="row">
@@ -337,7 +339,7 @@
                                                  md-no-asterisk
 
                                                  md-min-length="0">
-                                    <input >
+
                                     <md-item-template>
                                         <span>{{item.nombre}}</span>
                                     </md-item-template>
@@ -407,7 +409,7 @@
                                                  md-item-text="item.nombre"
                                                  md-no-asterisk
                                                  md-min-length="0">
-                                    <input >
+
                                     <md-item-template>
                                         <span>{{item.nombre}}</span>
                                     </md-item-template>
@@ -482,124 +484,124 @@
                             </div>-->
                         </div>
                         <div ng-hide="$parent.expand && id!=$parent.expand" flex layout="column" class="area-form">
-                        <div layout="row" flex class="row">
-                            <md-input-container class="md-block" flex="20">
-                                <label>Tipo de Direccion</label>
-                                <md-autocomplete md-selected-item="ctrl.dirType"
-                                                 flex
-                                                 required
-                                                 required-match="true"
-                                                 info="es facturacion o Almacen?"
-                                                 md-selected-item-change="dir.tipo = ctrl.dirType.id"
-                                                 skip-tab
-                                                 id="dirType"
-                                                 md-search-text="ctrl.searchType"
-                                                 ng-disabled="$parent.enabled"
-                                                 md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
-                                                 md-item-text="item.descripcion"
-                                                 md-select-on-focus
-                                                 md-no-asterisk
-                                                 md-min-length=0>
-                                    <input >
-                                    <md-item-template>
-                                        <span>{{item.descripcion}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
+                            <div layout="row"  class="row">
+                                <md-input-container class="md-block" flex="20">
+                                    <label>Tipo de Direccion</label>
+                                    <md-autocomplete md-selected-item="ctrl.dirType"
+                                                     flex
+                                                     required
+                                                     required-match="true"
+                                                     info="es facturacion o Almacen?"
+                                                     md-selected-item-change="dir.tipo = ctrl.dirType.id"
+                                                     skip-tab
+                                                     id="dirType"
+                                                     md-search-text="ctrl.searchType"
+                                                     ng-disabled="$parent.enabled"
+                                                     md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
+                                                     md-item-text="item.descripcion"
+                                                     md-select-on-focus
+                                                     md-no-asterisk
+                                                     md-min-length=0>
 
-                                <!--<md-select skip-tab id="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
-                                    <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
-                                        {{tipo.descripcion}}
-                                    </md-option>
-                                </md-select>-->
-                                <!--<div ng-messages="user.tipo.$error">
-                                    <div ng-message="required">Campo Obligatorio.</div>
-                                    <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
-                                </div>-->
-                            </md-input-container>
-                            <md-input-container class="md-block" flex="30">
-                                <label>Pais</label>
-                                <md-autocomplete md-selected-item="ctrl.selPais"
-                                                 flex
-                                                 require
-                                                 require-match="true"
-                                                 id="dirPais"
-                                                 md-selected-item-change="dir.pais = ctrl.selPais.id"
-                                                 info="indica el pais de la direccion"
-                                                 skip-tab
-                                                 md-search-text="ctrl.searchCountry"
-                                                 md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
-                                                 md-item-text="item.short_name"
-                                                
-                                                 md-no-asterisk
-                                                 md-input-minlength="0"
-                                                 md-min-length=0>
-                                    <input >
-                                    <md-item-template>
-                                        <span>{{item.short_name}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
+                                        <md-item-template>
+                                            <span>{{item.descripcion}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
 
-                                <!--<md-select skip-tab id="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
-                                    <md-option ng-repeat="pais in paises" value="{{pais.id}}">
-                                        {{pais.short_name}}
-                                    </md-option>
-                                </md-select>-->
-                                <!--<div ng-messages="user.pais.$error">
-                                    <div ng-message="required">Campo Obligatorio.</div>
+                                    <!--<md-select skip-tab id="dirType" info="es facturacion o Almacen?" ng-model="dir.tipo" md-no-ink ng-disabled="$parent.enabled">
+                                        <md-option ng-repeat="tipo in tipos" value="{{tipo.id}}">
+                                            {{tipo.descripcion}}
+                                        </md-option>
+                                    </md-select>-->
+                                    <!--<div ng-messages="user.tipo.$error">
+                                        <div ng-message="required">Campo Obligatorio.</div>
+                                        <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+                                    </div>-->
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="30">
+                                    <label>Pais</label>
+                                    <md-autocomplete md-selected-item="ctrl.selPais"
+                                                     flex
+                                                     require
+                                                     require-match="true"
+                                                     id="dirPais"
+                                                     md-selected-item-change="dir.pais = ctrl.selPais.id"
+                                                     info="indica el pais de la direccion"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchCountry"
+                                                     md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
+                                                     md-item-text="item.short_name"
 
-                                </div>-->
-                            </md-input-container>
-                            <div style="width:100px; padding: 3px;" ng-show="dir.tipo==2 || dir.tipo==3">
-                                <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">puertos</span>
-                                <div ng-click="$parent.openPopUp('portsLyr')" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
-                                    {{dir.ports.length || 0}}
-                                </div>
-                            </div>
+                                                     md-no-asterisk
+                                                     md-input-minlength="0"
+                                                     md-min-length=0>
 
-                            <md-input-container class="md-block" flex>
-                                <label>Codigo Postal</label>
-                                <input skip-tab id="disZipCode" type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
-                            </md-input-container>
-                            <md-input-container class="md-block" flex="30">
-                                <label>Telefono</label>
-                                <input skip-tab id="dirPhone" phone info="telefono de oficina ej (+58)0001234567" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
-                            </md-input-container>
+                                        <md-item-template>
+                                            <span>{{item.short_name}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
 
-                        </div>
-                        <div layout="row" flex class="row">
-                            <md-input-container class="md-block" flex>
-                                <label>Direccion</label>
-                                <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
-                            </md-input-container>
-                        </div>
-                        <div layout="column" ng-show="(isShow && !isShowMore) && address.length>0" class="row showMore" ng-click="viewExtend(true)">
-                            <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
-                        </div>
+                                    <!--<md-select skip-tab id="dirPais" info="indica el pais de la direccion" ng-model="dir.pais" md-no-ink ng-disabled="$parent.enabled">
+                                        <md-option ng-repeat="pais in paises" value="{{pais.id}}">
+                                            {{pais.short_name}}
+                                        </md-option>
+                                    </md-select>-->
+                                    <!--<div ng-messages="user.pais.$error">
+                                        <div ng-message="required">Campo Obligatorio.</div>
 
-                        <div layout="column" ng-show="isShowMore" flex>
-                            <div layout="row" class="headGridHolder" class="row">
-                                <div flex="10" class="headGrid"> Tipo</div>
-                                <div flex="20" class="headGrid"> Pais</div>
-                                <div flex class="headGrid"> Direccion</div>
-                                <div flex="20" class="headGrid"> Telefono</div>
-                            </div>
-                            <md-content id="grid" flex>
-                                <div flex ng-repeat="add in address" ng-click="toEdit(this)" class="row">
-                                    <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
-                                        <div ng-show="(add.id==dir.id)" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
-                                        <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
-                                        <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div>
-                                        <div flex class="cellGrid">{{add.direccion}}</div>
-                                        <div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                    </div>-->
+                                </md-input-container>
+                                <div style="width:100px; padding: 3px;" ng-show="dir.tipo==2 || dir.tipo==3">
+                                    <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">puertos</span>
+                                    <div ng-click="$parent.openPopUp('portsLyr')" ng-class="{'ng-disable':$parent.enabled}" class="vlc-buttom" style="float:left">
+                                        {{dir.ports.length || 0}}
                                     </div>
                                 </div>
-                            </md-content>
-                            <div layout="column" class="row" ng-click="viewExtend(false)">
-                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+
+                                <md-input-container class="md-block" flex>
+                                    <label>Codigo Postal</label>
+                                    <input skip-tab id="disZipCode" type="number" ng-pattern="/^[\d\-\.]+$/" info="codigo postal (zip code)" autocomplete="off" md-no-asterisk ng-model="dir.zipCode" ng-disabled="$parent.enabled" />
+                                </md-input-container>
+                                <md-input-container class="md-block" flex="30">
+                                    <label>Telefono</label>
+                                    <input skip-tab id="dirPhone" phone info="telefono de oficina ej (+58)0001234567" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                </md-input-container>
+
+                            </div>
+                            <div layout="row"  class="row">
+                                <md-input-container class="md-block" flex>
+                                    <label>Direccion</label>
+                                    <input skip-tab info="indique la direccion de la mejor manera" autocomplete="off"  ng-disabled="$parent.enabled" maxlength="250" ng-minlength="5" required md-no-asterisk name="direccProv" ng-model="dir.direccProv">
+                                </md-input-container>
+                            </div>
+                            <div layout="column" ng-show="(isShow && !isShowMore) && address.length>0" class="row showMore" ng-click="viewExtend(true)">
+                                <div flex style="border: dashed 1px #f1f1f1; text-align: center"><img src="images/Down.png"/></div>
+                            </div>
+
+                            <div layout="column" ng-show="isShowMore" flex>
+                                <div layout="row" class="headGridHolder" class="row">
+                                    <div flex="10" class="headGrid"> Tipo</div>
+                                    <div flex="20" class="headGrid"> Pais</div>
+                                    <div flex class="headGrid"> Direccion</div>
+                                    <div flex="20" class="headGrid"> Telefono</div>
+                                </div>
+                                <md-content id="grid" flex>
+                                    <div flex ng-repeat="add in address" ng-click="toEdit(this)" class="row">
+                                        <div layout="row" layout-wrap class="cellGridHolder" ng-class="{'rowSel':(add.id == dir.id)}">
+                                            <div ng-show="(add.id==dir.id)" class="cellGrid"><span style="margin-left: 8px;" class="icon-Eliminar rm" ng-click="rmAddres(this)"></div>
+                                            <div flex="10" class="cellGrid"> {{add.tipo.descripcion}}</div>
+                                            <div flex="20" class="cellGrid" style="overflow: hidden; text-overflow:ellipsis "> {{add.pais.short_name}}</div>
+                                            <div flex class="cellGrid">{{add.direccion}}</div>
+                                            <div flex="20" class="cellGrid">{{add.telefono}}</div>
+                                        </div>
+                                    </div>
+                                </md-content>
+                                <div layout="column" class="row" ng-click="viewExtend(false)">
+                                    <div flex style="border: dashed 1px #f1f1f1; text-align: center"><span class="icon-Above"></span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                     </div>
                 </form>
                 <!--div class="space"> <img src="images/box_tansparent_16x16.png" width="16" height="16" /> </div>-->
                 <!-- 20) ########################################## FORMULARIO "Contactos del Proveedor" ########################################## -->
@@ -650,7 +652,7 @@
 
                             <div style="height:100%; max-width:200px; width:auto; overflow-x: auto;">
                                 <vlc-group style="display:block; height: 100%; width: {{filt.length * 42}}px">
-                                     <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="lang in languaje | filterSearch: cnt.languaje as filt">
+                                     <span info="{{lang.lang}}" class="iconInput iconCircle" icon-group ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="lang in languaje | filterSearchBlnk: cnt.languaje as filt">
                                          {{lang.lang.substring(0,2)}}
                                      </span>
                                 </vlc-group>
@@ -1076,7 +1078,8 @@
                                                      info="seleccione las monedas"
                                                      skip-tab
                                                      md-search-text="ctrl.searchCoin"
-                                                     md-selected-item-change="cn.coin = ctrl.coin.id; (!setting)?provMoneda.$setDirty():true"
+                                                     model="cn.coin"
+                                                     key="item.id"
                                                      md-items="item in coins | stringKey : ctrl.searchCoin: 'nombre' | customFind:coinAssign:check "
                                                      md-item-text="item.nombre"
                                                      require
@@ -1421,6 +1424,7 @@
 
             </md-content>
         </md-sidenav>
+
         <!-- ########################################## LAYER (4) TIEMPOS (PRODUCCION/TRANSITO) ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 336px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer3" id="layer3">
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
@@ -1647,11 +1651,29 @@
                             <div layout="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>De (Dias)</label>
-                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.from" required>
+                                    <input
+                                        skip-tab
+                                        number
+                                        autocomplete="off"
+                                        ng-disabled="$parent.enabled"
+                                        ng-model="tp.from"
+                                        max="{{tp.to}}"
+                                        erro-listener
+                                        max-msg = "{t:'error',m:'el minimo no puede ser mayor que el maximo '}"
+                                        required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20">
                                     <label>A (Dias)</label>
-                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="tp.to" required>
+                                    <input skip-tab
+                                           number
+                                           type="number"
+                                           autocomplete="off"
+                                           ng-disabled="$parent.enabled"
+                                           ng-model="tp.to"
+                                           min="{{tp.from}}"
+                                           erro-listener
+                                           min-msg = "{t:'error',m:'el maximo no puede ser menor que el minimo'}"
+                                           required>
                                 </md-input-container>
 
                                 <md-input-container class="md-block" flex   >
@@ -1719,11 +1741,29 @@
                             <div layout="row">
                                 <md-input-container class="md-block" flex="20">
                                     <label>De (Dias)</label>
-                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.from" required>
+                                    <input
+                                        skip-tab
+                                        number
+                                        autocomplete="off"
+                                        ng-disabled="$parent.enabled"
+                                        ng-model="ttr.from"
+                                        max="{{ttr.to}}"
+                                        erro-listener
+                                        max-msg = "{t:'error',m:'el minimo no puede ser mayor que el maximo '}"
+                                        required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="20">
                                     <label>A (Dias)</label>
-                                    <input skip-tab number autocomplete="off" ng-disabled="$parent.enabled" ng-model="ttr.to" required>
+                                    <input
+                                        skip-tab
+                                        number
+                                        autocomplete="off"
+                                        ng-disabled="$parent.enabled"
+                                        ng-model="ttr.to"
+                                        min="{{tp.from}}"
+                                        erro-listener
+                                        min-msg = "{t:'error',m:'el maximo no puede ser menor que el minimo'}"
+                                        required>
                                 </md-input-container>
                                 <md-input-container class="md-block" flex>
                                     <label>Pais</label>
@@ -1849,6 +1889,7 @@
                 </div>
             </md-content>
         </md-sidenav>
+
         <!-- ########################################## LAYER (5) RESUMEN FINAL PROVEEDOR ########################################## -->
         <md-sidenav style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);" layout="row" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="layer5" id="layer5">
             <!-- 11) ########################################## CONTENDOR SECCION RESUMEN DEL PROVEEDOR ########################################## -->

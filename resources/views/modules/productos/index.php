@@ -601,178 +601,186 @@
                         <div active-left ></div>
                         <div flex="33" layout="column">
                             <div flex>
-                                <div layout="row" flex class="form-row-head form-row-head-select">
-                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
-                                        <div>
-                                            <span>Asignacion de Datos</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Punto de Compra</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               md-autofocus
-                                               info="indica el punto del stock en que debe solicitarse nuevamente"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="prod.pntBuy"
-                                               required>
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Punto de Saldo</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="indica el punto del stock en que pasa a cosiderarse Saldo"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="prod.pntSald"
-                                               required
-                                        >
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row">
+                                <form name="frmPoints" click-out="saveExtraData('frmPoints')">
                                     <div layout="row" flex class="form-row-head form-row-head-select">
                                         <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
                                             <div>
-                                                <span>Datos de Almacenamiento</span>
+                                                <span>Asignacion de Datos</span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Almacen</label>
-                                        <md-autocomplete md-selected-item="ctrl.stor"
-                                                         flex
-                                                         id="prodStorage"
-                                                         info="seleccione un almacen"
-                                                         model="misc.storage"
-                                                         skip-tab
-                                                         md-search-text="ctrl.searchStorage"
-                                                         md-items="item in [{descripcion:'Los Colorados',id:1},{descripcion:'El Socorro',id:2}] | stringKey : ctrl.searchStorage : 'descripcion'"
-                                                         md-item-text="item.descripcion"
-                                                         require
-                                                         require-match="true"
-                                                         md-no-asterisk
-                                                         md-min-length="0">
-                                            <input >
-                                            <md-item-template>
-                                                <span>{{item.descripcion}}</span>
-                                            </md-item-template>
-                                        </md-autocomplete>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>cantidad Biblioteca</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="que cantidad sera reservada para biblioteca"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="misc.cantLib"
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>Punto de Compra</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   md-autofocus
+                                                   info="indica el punto del stock en que debe solicitarse nuevamente"
+                                                   name="pointBuy"
+                                                   type="number"
+                                                   number
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="prod.pntBuy"
+                                                   required>
+                                        </md-input-container>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>Punto de Saldo</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="indica el punto del stock en que pasa a cosiderarse Saldo"
+                                                   name="pointBuy"
+                                                   type="number"
+                                                   number
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="prod.pntSald"
+                                                   required
+                                            >
+                                        </md-input-container>
+                                    </div>
+                                </form>
+                                <form name="frmMisc" click-out="saveExtraData('frmMisc')">
+                                    <div class="row" layout="row">
+                                        <div layout="row" flex class="form-row-head form-row-head-select">
+                                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                <div>
+                                                    <span>Datos de Almacenamiento</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>Almacen</label>
+                                            <md-autocomplete md-selected-item="ctrl.stor"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="seleccione un almacen"
+                                                             model="misc.storage"
+                                                             skip-tab
+                                                             md-search-text="ctrl.searchStorage"
+                                                             md-items="item in [{descripcion:'Los Colorados',id:1},{descripcion:'El Socorro',id:2}] | stringKey : ctrl.searchStorage : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             require
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>cantidad Biblioteca</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="que cantidad sera reservada para biblioteca"
+                                                   name="pointBuy"
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="misc.cantLib"
 
-                                        >
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex>
-                                        <label>Unidad Biblioteca</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="unidad de esta cantidad"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="misc.unitLib"
+                                            >
+                                        </md-input-container>
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad Biblioteca</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="unidad de esta cantidad"
+                                                   name="pointBuy"
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="misc.unitLib"
 
-                                        >
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>cantidad Donaciones</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="que cantidad sera reservada para biblioteca"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="misc.cantDon"
+                                            >
+                                        </md-input-container>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>cantidad Donaciones</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="que cantidad sera reservada para biblioteca"
+                                                   name="pointBuy"
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="misc.cantDon"
 
-                                        >
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex>
-                                        <label>Unidad donaciones</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="unidad de esta cantidad"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="misc.unitDon"
+                                            >
+                                        </md-input-container>
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad donaciones</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="unidad de esta cantidad"
+                                                   name="pointBuy"
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="misc.unitDon"
 
-                                        >
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Descarte</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="que cantidad sera reservada para biblioteca"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="misc.cantDis"
+                                            >
+                                        </md-input-container>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>Descarte</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="que cantidad sera reservada para biblioteca"
+                                                   name="pointBuy"
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="misc.cantDis"
 
-                                        >
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex>
-                                        <label>Unidad descarte</label>
-                                        <input autocomplete="off"
-                                               skip-tab
-                                               info="unidad de esta cantidad"
-                                               name="pointBuy"
-                                               ng-disabled="$parent.enabled"
-                                               ng-model="misc.unitDis"
+                                            >
+                                        </md-input-container>
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad descarte</label>
+                                            <input autocomplete="off"
+                                                   skip-tab
+                                                   info="unidad de esta cantidad"
+                                                   name="pointBuy"
+                                                   ng-disabled="$parent.enabled"
+                                                   ng-model="misc.unitDis"
 
-                                        >
-                                    </md-input-container>
-                                </div>
-                                <div class="row" layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Requerimientos de Almacenamiento</label>
-                                        <textarea autocomplete="off"
-                                               skip-tab
-                                               row="3"
-                                               wrap="off"
-                                               info="indique requerimientos de almacenmiento"
-                                               name="pointBuy"
-                                               ng-model="misc.reqStrg"
+                                            >
+                                        </md-input-container>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>Requerimientos de Almacenamiento</label>
+                                            <textarea autocomplete="off"
+                                                   skip-tab
+                                                   row="3"
+                                                   wrap="off"
+                                                   info="indique requerimientos de almacenmiento"
+                                                   name="pointBuy"
+                                                   ng-model="misc.reqStrg"
 
-                                        ></textarea>
-                                    </md-input-container>
-                                </div>
-                                <div layout="row">
-                                    <md-input-container class="md-block" flex>
-                                        <label>Herramientas </label>
-                                        <textarea autocomplete="off"
-                                               skip-tab
-                                               row="3"
-                                               col="10"
-                                               wrap="off"
-                                               info="Herrameintas o equipas necesarios ara el reempaletado"
-                                               name="pointBuy"
-                                               ng-model="misc.tools"
-                                        ></textarea>
-                                    </md-input-container>
-                                </div>
+                                            ></textarea>
+                                        </md-input-container>
+                                    </div>
+                                    <div layout="row">
+                                        <md-input-container class="md-block" flex>
+                                            <label>Herramientas </label>
+                                            <textarea autocomplete="off"
+                                                   skip-tab
+                                                   row="3"
+                                                   col="10"
+                                                   wrap="off"
+                                                   info="Herrameintas o equipas necesarios para el reempaletado"
+                                                   name="pointBuy"
+                                                   ng-model="misc.tools"
+                                            ></textarea>
+                                        </md-input-container>
+                                    </div>
+                                </form>
                             </div>
 
                         </div>
                         <div flex="66" style="margin-right: 4px;" layout="column">
                             <div flex>
-                                
+
                                 <div layout="row" class="focused">
-                                    
+
                                     <div layout="row" flex class="form-row-head form-row-head-select row">
                                         <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                             <div>
@@ -885,7 +893,7 @@
                                     <div layout="column" flex=""   >
                                         <div   ng-repeat="item in list.common.data | filter : list.common.filter:strict | orderBy : list.common.order as filter">
                                             <div layout="row" class="cellGridHolder" ng-dblclick="editCommon(item)" >
-                                                <div ng-click="delete($index,item)"><img ng-src="" /></div>
+                                                <div ng-click="delete($index,item)"><span class="icon-Eliminar" style="font-size: 23px"></span></div>
                                                 <div flex class="cellGrid" >{{item.codigo}}</div>
                                                 <div flex class="cellGrid" >{{item.descripcion}}</div>
                                                 <div flex class="cellGrid" > {{item.prov.razon_social}}</div>
@@ -918,6 +926,7 @@
                                                 <span >Productos Complementarios</span>
                                             </div>
                                         </div>
+                                        <div style="width:24px" layout="column"  pop-up-open="{'prodRela':{before:befR ,after:aftR}}"><img layout-align="center center" info="HOLA!!" ng-src="images/Agregar.png"/></div>
                                     </div>
                                 </div>
                                 <div layout="row">
@@ -1129,12 +1138,12 @@
 
                             <md-content ng-if="!searching && filterLs.length>0" flex layout="column">
                                 <div>
-                                    <div ng-repeat="item in filterLs | filterSelect:list.common.data:'pivot.common_id' as listar" class="row" ng-class="{'field-sel':(item.id==prodDetail.prod)}" layout="column" layout-align="center start" style="border-bottom:1px solid #ccc;" ng-click="setDetail(item)">
+                                    <div ng-repeat="item in filterLs" class="row" ng-class="{'field-sel':(item.id==prodDetail.prod)}" layout="column" layout-align="center start" style="border-bottom:1px solid #ccc;" ng-click="setDetail(item)">
                                         {{item.descripcion}}
                                     </div>
                                     {{listar}}
                                 </div>
-                                <div ng-if="!searching && listar.length==0" flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                <div ng-if="!searching && filterLs.length==0" flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
                                     no hay coincidencia =(
                                 </div>
 
@@ -1179,6 +1188,19 @@
                             <div class="row" layout="row">
                                 <div flex="grow" layout-align="center center">
                                     <md-input-container class="md-block row">
+                                        <label>cantidad que compone</label>
+                                        <input
+                                            autocomplete="off"
+                                            skip-tab
+                                            info="que cantidad de este articulo forma parte del compuesto. "
+                                            ng-model="prodDetail.cant"
+                                        >
+                                    </md-input-container>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex="grow" layout-align="center center">
+                                    <md-input-container class="md-block row">
                                         <label>descripcion de complementario</label>
                                         <input
                                             autocomplete="off"
@@ -1195,6 +1217,192 @@
 
             </md-content>
         </md-sidenav>
+
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodRela" id="prodRela">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex ng-controller="addRelaController">
+                <input type="hidden" md-autofocus>
+                <div flex layout="column" auto-close="{before:onClose,after:null}">
+                    <div layout="column" class="form-row-head form-row-head-select">
+                        <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                            <div>
+                                <span >Seleccione productos relacionados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div flex layout="column">
+                        <div ng-if="!prodDetail.id" flex layout="column">
+                            <div class="row">
+                                <md-input-container class="md-block">
+                                    <label>Proveedor</label>
+                                    <md-autocomplete md-selected-item="ctrl.prov"
+                                                     flex
+                                                     id="compProv"
+                                                     info="Seleccione el Proveedor"
+                                                     model = "filtRl.prov"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchProv"
+                                                     md-items="item in provs | stringKey : ctrl.searchProv : 'razon_social' "
+                                                     md-item-text="item.razon_social"
+                                                     require
+                                                     require-match="true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+
+                                        <md-item-template>
+                                            <span>{{item.razon_social}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+
+                                </md-input-container>
+                            </div>
+                            <div class="row">
+                                <md-input-container class="md-block">
+                                    <label>Linea</label>
+                                    <md-autocomplete md-selected-item="ctrl.line"
+                                                     flex
+                                                     id="compProv"
+                                                     info="seleccione la linea"
+                                                     model = "filtRl.line"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchLine"
+                                                     md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
+                                                     md-item-text="item.linea"
+                                                     require
+                                                     require-match="true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+
+                                        <md-item-template>
+                                            <span>{{item.linea}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+
+                                </md-input-container>
+                            </div>
+                           <!-- <div class="row">
+                                <md-input-container class="md-block " >
+                                    <label>Sub-Linea</label>
+                                    <md-autocomplete md-selected-item="ctrl.sublin"
+                                                     flex
+                                                     id="commSublin"
+                                                     info="seleccione la sub-linea"
+                                                     model = "filtRl.sublin"
+                                                     skip-tab
+                                                     md-search-text="ctrl.searchSubLine"
+                                                     md-items="item in sublines | stringKey : ctrl.searchSubLine : 'sublinea' "
+                                                     md-item-text="item.sublin"
+                                                     require
+                                                     require-match="true"
+                                                     md-no-asterisk
+                                                     md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{item.sublin}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
+
+                                </md-input-container>
+                            </div>-->
+                            <div class="row">
+                                <md-input-container class="md-block">
+                                <label>Codigo o Descripcion</label>
+                                <input
+                                    autocomplete="off"
+                                    skip-tab
+                                    name="condHeadTitle"
+                                    info="escriba el codigo o la descripcion del producto"
+                                    ng-model="filtRl.desc"
+                                    >
+                            </md-input-container>
+                            </div>
+
+
+                            <div ng-if="searching" flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                BUSCANDO...
+                            </div>
+
+                            <md-content ng-if="!searching && filterLs.length>0" flex layout="column">
+                                <div>
+                                    <div ng-repeat="item in filterLs" class="row" ng-class="{'field-sel':(item.id==prodDetail.prod)}" layout="column" layout-align="center start" style="border-bottom:1px solid #ccc;" ng-click="setDetail(item)">
+                                        {{item.descripcion}}
+                                    </div>
+                                    {{listar}}
+                                </div>
+                                <div ng-if="!searching && filterLs.length==0" flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                    no hay coincidencia =(
+                                </div>
+
+                            </md-content>
+
+                        </div>
+                        <div flex style="padding-top: 40px">
+                            <div class="row" layout="row">
+
+                                <div layout-align="center center" style="color:rgb(92, 183, 235); width:150px"  >
+
+                                        <span >codigo</span>
+
+                                </div>
+
+                                <div flex="grow" layout-align="center center">
+                                    {{prodDetail.codigo}}
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div layout-align="center center" style="color:rgb(92, 183, 235);width:150px" >
+
+                                    <span >Descripcion</span>
+
+                                </div>
+
+                                <div flex="grow" layout-align="center center">
+                                    {{prodDetail.descripcion}}
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div layout-align="center center" style="color:rgb(92, 183, 235);width:150px" >
+
+                                    <span >Serie</span>
+
+                                </div>
+
+                                <div flex="grow" layout-align="center center">
+                                    {{prodDetail.serie}}
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex="grow" layout-align="center center">
+                                    <md-input-container class="md-block row">
+                                        <label>cantidad que compone</label>
+                                        <input
+                                            autocomplete="off"
+                                            skip-tab
+                                            info="que cantidad de este articulo forma parte del compuesto. "
+                                            ng-model="prodDetail.cant"
+                                        >
+                                    </md-input-container>
+                                </div>
+                            </div>
+                            <div class="row" layout="row">
+                                <div flex="grow" layout-align="center center">
+                                    <md-input-container class="md-block row">
+                                        <label>descripcion de complementario</label>
+                                        <input
+                                            autocomplete="off"
+                                            skip-tab
+                                            info="como complementa este producto al principal"
+                                            ng-model="prodDetail.comment"
+                                        >
+                                    </md-input-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </md-content>
+        </md-sidenav>
+
         <!-- 16) ########################################## LAYER ANALISIS DE COSTOS ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer5" id="prodLayer5">
             <div layout="row" flex >

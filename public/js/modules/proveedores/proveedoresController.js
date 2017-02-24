@@ -268,6 +268,46 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         endProvider(newProv,null);
     };
 
+
+    $scope.progreso ={index:0,
+        data:[
+            {index:1, st:'false', text:
+            {
+                true:'Puedes solicitar presupuestos a este proveedor',
+                false:'este proveedor de momento es inservible',
+                'this':'Estamos esperando la aprobacion de este embarque'
+            }
+            },
+            {index:2, st:'false' ,text:
+            {
+                true:'puedes hacer pedidos a este proveedor',
+                false:'continua dandonos datos de este proveedor para poder hacer mas con el',
+                'this':'Estamos esperando el cumplimiento de la fecha de carga'
+            }
+            },
+            {index:3, st:'false' ,        text:
+            {
+                true:'Este proveedor puede ser asignado a productos',
+                false:'Aun no se ha empezado ha cargar el embarque',
+                'this':'En espera de la llegada a venezuela'
+            }
+            },
+            {index:4, st:'false', text:
+            {
+                true:'Ya esta en Venezuela',
+                false:'Aun no ha llegado a Venezuela',
+                'this':'Esperando la llegada a la tienda'
+            }
+            },
+            {index:5, st:'false',text:
+            {
+                true:'Ya esta en la tienda',
+                false:'Aun no ha llegado a la tienda',
+                'this':'Finalizado, Por favor confirmar recepcion'
+            }
+            }
+        ]};;
+
     var endProvider = function(yes,not,id){
         if($scope.prov.id){
 
@@ -2182,7 +2222,7 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         if(nuevo[0] && !nuevo[1] && !angular.equals(currentOrig, $scope.cn)) {
             //$scope.setting = true;
             providers.put({type: "saveCoin"}, $scope.cn, function (data) {
-                $scope.cn.id = $scope.cn.coin;
+               // $scope.cn.id = $scope.cn.coin;
                 $scope.provMoneda.$setPristine();
                 var newCoin = $filter("filterSearch")($scope.coins,[$scope.cn.coin])[0];
                 newCoin.pivot = {prov_id:$scope.cn.prov_id};
@@ -2204,8 +2244,8 @@ MyApp.controller('coinController', function ($scope,masters,providers,setGetProv
         coin = coin.coinSel;
         $scope.cn.id=coin.id;
         $scope.cn.coin=coin.id;
-        $scope.cn.coin=$scope.prov.id;
-        $scope.ctrl.coin = $scope.coin;
+        $scope.cn.prov_id=$scope.prov.id;
+        //$scope.ctrl.coin = $scope.coin;
         currentOrig = angular.copy($scope.cn);
         setGetProv.addToRllBck($scope.cn,"provCoin")
         // $timeout(function(){$scope.setting = false;},100)
@@ -3551,7 +3591,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter
     var genericSave = function() {
         next = foreign.elem || false;
         var curSecc = App.getSeccion();
-        console.log("foreign",foreign)
+
         if(curSecc.key != "proveedores" || foreign.form==undefined){
             return false;
         }

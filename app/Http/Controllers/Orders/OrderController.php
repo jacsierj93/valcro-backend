@@ -85,7 +85,7 @@ class OrderController extends BaseController
         $model= Order::findOrFail(23);
         $user = $this->user;
         $model->makedebt();
-       $data =  [
+        $data =  [
             'subjet'=>'daee',
             'model'=>$model,
             'texto'=>'sadfsadf',
@@ -906,7 +906,7 @@ class OrderController extends BaseController
      */
     public function createTemp(Request $req)
     {
-        $prodTemp = MasterProductController::createProduct($req->all());
+        $prodTemp = MasterProductController::createProduct($req->all(),"pedidos");
         $temp = array();
         $temp['id'] = $prodTemp->id;
         $temp['descripcion'] = $prodTemp->descripcion;
@@ -1139,7 +1139,7 @@ class OrderController extends BaseController
                 $e['langs'] = array_map('strtolower', $aux->idiomas()->lists('iso_lang')->toarray());
                 $correos[] =$e ;
                 if($aux->pivot->default == 1){
-                   $to[] = $e;
+                    $to[] = $e;
                 }
             }
 
@@ -2357,7 +2357,7 @@ class OrderController extends BaseController
 
     /**
      * Make the payments doc the order
-    */
+     */
     public function MakePaymentsOrder(Request $req){
         $model = Order::findOrFail($req->id);
         $result = [];
@@ -3797,13 +3797,13 @@ class OrderController extends BaseController
             $items = $items->whereNull('pago_factura_id');
         }
         $items = $items->get();
-     /*   $type = OrderType::get();
-        $prov = Provider::findOrFail($req->prov_id);
-        $coin = Monedas::get();
-        $motivo = OrderReason::get();
-        $prioridad = OrderPriority::get();
-        $estados = OrderStatus::get();
-        $paises = Country::get();*/
+        /*   $type = OrderType::get();
+           $prov = Provider::findOrFail($req->prov_id);
+           $coin = Monedas::get();
+           $motivo = OrderReason::get();
+           $prioridad = OrderPriority::get();
+           $estados = OrderStatus::get();
+           $paises = Country::get();*/
         foreach ($items as $aux) {
             $aux->diasEmit = $aux->daysCreate();
             $data[] = $aux;
@@ -4615,7 +4615,7 @@ class OrderController extends BaseController
             $result['nofs']=  $mail->sendMail($options['template'], $options);
 
 
-       }
+        }
         return $result;
     }
 
@@ -6098,9 +6098,9 @@ class OrderController extends BaseController
         $emails =  User::selectRaw(' distinct tbl_usuario.email as email,concat(tbl_usuario.nombre, \' \' ,tbl_departamento.nombre) as nombre')
             ->join('tbl_cargo','tbl_cargo.id','=','tbl_usuario.cargo_id')
             ->join('tbl_departamento','tbl_departamento.id','=','tbl_cargo.departamento_id');
-          if($condicion != null){
-              $emails = $emails->whereRaw($condicion);
-          }
+        if($condicion != null){
+            $emails = $emails->whereRaw($condicion);
+        }
         $emails= $emails->get();
         foreach ($emails as $aux){
             $dest = new MailModuleDestinations();

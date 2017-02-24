@@ -99,7 +99,6 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
 
     function openLayer(layr) {
-        console.log(layr);
         $scope.showNext(false);
         var layer = layr || $scope.nextLyr;
         if (historia.indexOf(layer) == -1 && layer != "END") {

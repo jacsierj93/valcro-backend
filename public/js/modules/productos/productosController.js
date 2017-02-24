@@ -71,7 +71,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         parent:false,
         prod:false,
         comment:""
-    }
+    };
     var prodToSave = {
         id:false,
         prov:false,
@@ -80,7 +80,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         cod:"",
         desc:"",
         prodCrit:[]
-    }
+    };
     
     
     return{
@@ -109,7 +109,6 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             prod.id = item.id;
             prod.datos = item;
             bckup = angular.copy(prod.datos);
-            console.log(angular.equals(bckup,prod.datos,angular))
             prodToSave.id = item.id || false;
             prodToSave.prov = item.prov_id || false;
             prodToSave.line = item.linea_id || false;
@@ -146,7 +145,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         }
 
     }
-})
+});
 
 MyApp.controller('listProdController',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
     $scope.listProvs = {
@@ -301,7 +300,43 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
 
     $scope.items = []
 }]);
-MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService) {
+MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService','App',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService,App) {
+    $scope.prodMain = productsServices.getProd();
+    $scope.$watch("prod.id",function(n,o){
+        //console.log("entrooo", $scope.prod )
+        if(n){
+            $scope.prod.pntBuy = parseFloat($scope.prodMain.datos.point_buy);
+            $scope.prod.pntSald = parseFloat($scope.prodMain.datos.point_cred);
+            $scope.misc.storage = $scope.prodMain.datos.almacen_id;
+            $scope.misc.cantDis = $scope.prodMain.datos.descarte;
+            $scope.misc.unitDis = $scope.prodMain.datos.descar_unit;
+            $scope.misc.cantLib = $scope.prodMain.datos.biblioteca;
+            $scope.misc.unitLib = $scope.prodMain.datos.biblioteca_unit;
+            $scope.misc.cantDon = $scope.prodMain.datos.donaciones;
+            $scope.misc.unitDon = $scope.prodMain.datos.dona_unit;
+            $scope.misc.reqStrg = $scope.prodMain.datos.notas_alma;
+            $scope.misc.tools = $scope.prodMain.datos.herramientas;
+        }
+    });
+
+    $scope.saveExtraData = function(frm){
+       if(!$scope.$eval(frm).$pristine && $scope.$eval(frm).$valid){
+           if(frm=="frmPoints"){
+               productos.put({type:"savePoints"},$scope.prod,function (data) {
+                   if(data.action!="equal"){
+                       setNotif.addNotif("ok","datos guardados",[],{autohidden:1500});
+                       $scope.$eval(frm).$setPristine();
+                       $scope.$eval(frm).$setUntouched();
+                   }
+                   /*$scope.list.common.data.splice(idx,1);*/
+               })
+           }else if(frm=="frmMisc"){
+
+           }
+
+       }
+    }
+
     $scope.goToAnalisis = function () {
         productsServices.showChange();
         $scope.LayersAction({open:{name:"prodLayer5"}});
@@ -322,6 +357,7 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
                     prod.parent = data.pivot.parent_prod;
                     prod.prod = data.pivot.comp_prod;
                     prod.comment = data.pivot.comentario;
+                    prod.cant = data.pivot.cantidad;
                     return true;
                 },
                 after:null
@@ -330,14 +366,12 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
     }
 
     $scope.delete = function(idx,dato){
-        console.log(dato);
         setNotif.addNotif("error","va desvincular este producto del compuesto, esta seguro?",[
             {
                 name:"Si, si lo estoy",
                 action:function(){
                     productos.put({type:"prodDelCommon"},dato,function (data) {
                         setNotif.addNotif("ok","producto eliminado",[],{autohidden:3000});
-                        //srch = $filter("filterSearch")($scope.list.common.data,[dato.id],"pivot.id");
                         $scope.list.common.data.splice(idx,1);
                     })
                 },
@@ -350,7 +384,8 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         ]);
     }
     
-    $scope.bef=function(data){
+    $scope.bef=function(){
+
         var prod = productsServices.getCommon();
         prod.linea = "";
         prod.codigo = "";
@@ -359,12 +394,12 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         prod.id = false;
         prod.prod = false
         prod.comment = "";
+        prod.cant = 1;
         return true;
 
     };
     $scope.aft=function(){
         console.log("AFTER");
-
     }
 }]);
 MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout','masterSrv',"$filter",function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout,masterSrv,$filter) {
@@ -382,7 +417,22 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
     $scope.$watch("prod.id",function(n,o){
         $scope.filtCm.prod = n;
         $scope.prodDetail.parent = n;
+       /* if(o && !n){
+            $scope.filtCm.line=false;
+            $scope.filtCm.sublin=false;
+            $scope.filtCm.prod=false;
+            $scope.filtCm.desc="";
+            $scope.filterLs.splice(0,$scope.filterLs.length);
+        }*/
     });
+
+    var clear = function(){
+        $scope.filtCm.line=false;
+        $scope.filtCm.sublin=false;
+        $scope.filtCm.prod=false;
+        $scope.filtCm.desc="";
+        $scope.filterLs.splice(0,$scope.filterLs.length);
+    }
 
     $scope.searching = false;
 
@@ -436,6 +486,9 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
             }else if(data.action == "upd"){
                 setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
             }
+            $timeout(function(){
+                clear();
+            },500)
         })
     };
 
@@ -450,6 +503,7 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
                 {
                     name:"Si, si lo estoy",
                     action:function(){
+                        clear();
                        ret.wait=true;
                     },
                     default:defaultTime
@@ -466,8 +520,135 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
             saveCommon();
             return true;
         }else{
+            clear();
             return true;
         }
+
+    }
+
+}]);
+
+MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout','masterSrv',"$filter",function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout,masterSrv,$filter) {
+    $scope.prod = productsServices.getToSavedProd();
+    $scope.lines = masterSrv.getLines();
+    $scope.list = productsServices.getLists();
+    $scope.provs = productsServices.getProvs(),
+
+    $scope.filtRl = {
+        line:false,
+        sublin:false,
+        prov:false,
+        desc:"",
+        prod:false
+    };
+    $scope.prodDetail = productsServices.getCommon();
+
+    $scope.$watch("prod.id",function(n,o){
+        $scope.filtRl.prod = n;
+        $scope.prodDetail.parent = n;
+
+    });
+
+    var clear = function(){
+        $scope.filtRl.line=false;
+        $scope.filtRl.sublin=false;
+        $scope.filtRl.prov=false;
+        $scope.filtRl.prod=false;
+        $scope.filtRl.desc="";
+        $scope.filterLs.splice(0,$scope.filterLs.length);
+    };
+
+    $scope.searching = false;
+
+    $scope.filterLs = [];
+
+    var timeOut = null;
+    $scope.$watchCollection("filtRl",function(n,o){
+        $scope.searching = true;
+        $timeout.cancel(timeOut);
+        if(n.prov ||n.line || n.sublin || n.desc != ""){
+            timeOut = $timeout(function(){
+                productos.filt({ type:"getFiltersProd"},n,function(data){
+                    $scope.filterLs.splice(0,$scope.filterLs.length);
+                    angular.forEach(data,function (v,k) {
+                        $scope.filterLs.push(v);
+                    });
+                    $scope.searching = false;
+
+                });
+            },2000);
+        }else{
+            $scope.filterLs.splice(0,$scope.filterLs.length);
+            $scope.searching = false;
+        }
+
+    });
+
+    $scope.setDetail = function(dat){
+        $scope.prodDetail.codigo = dat.codigo;
+        $scope.prodDetail.descripcion = dat.descripcion;
+        $scope.prodDetail.linea = dat.line.linea;
+        $scope.prodDetail.serie = dat.serie;
+        $scope.prodDetail.prod = dat.id;
+    };
+
+    var saveCommon = function(){
+        productos.put({type:"prodSaveCommon"},$scope.prodDetail,function (data) {
+            if(data.action == "new"){
+                $scope.prodDetail.id = data.id;
+                setNotif.addNotif("ok","producto Agregado",[],{autohidden:3000});
+                $scope.list.common.data.push({
+                    pivot:{
+                        id:data.id,
+                        common_id:$scope.prodDetail.prod,
+                        parent_prod:$scope.prodDetail.parent
+                    },
+                    codigo:$scope.prodDetail.codigo,
+                    descripcion:$scope.prodDetail.descripcion,
+                    linea:{linea:$scope.prodDetail.codigo}
+                })
+            }else if(data.action == "upd"){
+                setNotif.addNotif("ok","se actualizaron los datos",[],{autohidden:3000});
+            }
+            $timeout(function(){
+                clear();
+            },500)
+        })
+    };
+
+
+
+    $scope.onClose = function(){
+            return true;
+/*
+        if(($scope.filtCm.line || $scope.filtCm.sublin || $scope.filtCm.desc != "" ) && !$scope.prodDetail.prod){
+            var ret = {wait : null};
+
+            setNotif.addNotif("alert","ha realizado una busqueda, pero no selecciono nada, esta seguro?",[
+                {
+                    name:"Si, si lo estoy",
+                    action:function(){
+                        clear();
+                       ret.wait=true;
+                    },
+                    default:defaultTime
+                },
+                {
+                    name:"No, dejame cambiarlo",
+                    action:function(){
+                        ret.wait=false;
+                    }
+                }
+            ]);
+            return ret;
+        }else if($scope.prodDetail.prod){
+            saveCommon();
+            return true;
+        }else{
+            clear();
+            return true;
+        }
+*/
 
     }
 
@@ -644,5 +825,3 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
         },
     }
 });
-
-
