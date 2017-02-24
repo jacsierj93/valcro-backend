@@ -1,5 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
-<div layout="column" class="md-whiteframe-1dp" flex ng-controller="pagosCtrll">
+<div layout="column" class="md-whiteframe-1dp" flex ng-controller="pagosCtrll" global>
 
     <!-- 2) ########################################## AREA DEL MENU ########################################## -->
     <div layout="row" flex="none" class="menuBarHolder">
@@ -507,11 +507,36 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo Pago</label>
-                                <md-select ng-model="abono.tipo_id" required md-no-ink>
-                                    <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
-                                        {{tipoPago.descripcion}}
-                                    </md-option>
-                                </md-select>
+								<!--<md-select ng-model="abono.tipo_id" required md-no-ink>
+									<md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
+										{{tipoPago.descripcion}}
+									</md-option>
+								</md-select>-->
+                                
+                                
+								<md-autocomplete
+									md-selected-item="abono.tipo_id"
+									flex
+									id="tipoPago"
+									info="Seleccione el tipo de Pago"
+									model="tipoDocsPago"
+									skip-tab
+									
+									md-items="item in tipoDocsPago"
+									md-item-text="item.descripcion"
+									require
+									require-match="true"
+									md-no-asterisk
+									md-min-length="0">
+									<input >
+									<md-item-template>
+										<span>{{item.descripcion}}</span>
+									</md-item-template>
+								</md-input-container>
+                                
+                                
+                                
+                                
                             </md-input-container>
 
 
@@ -557,20 +582,36 @@
 
                             <md-input-container ng-hide="abono.tipo_id==1" class="md-block" flex>
                                 <label>Nro. Documento Origen</label>
-                                <input ng-model="abono.org_factura"/>
+                                <input skip-tab ng-model="abono.org_factura"
+                                info="Indique el numero del documento al que pertenese." />
                             </md-input-container>
 
 
                             <md-input-container class="md-block" flex>
                                 <label>Nro. Documento</label>
-                                <input info="por favor introduzca el nro de documento del abono"
-                                       ng-model="abono.nro_doc"
-                                       required/>
+                                <input skip-tab
+                                    info="por favor introduzca el nro de documento del abono"
+                                    ng-model="abono.nro_doc"
+                                    required/>
                             </md-input-container>
 
-                            <div layout="column" flex>
-                                <md-datepicker ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+							<div layout="column" flex>
+								<md-datepicker skip-tab required ng-model="abono.fecha" required md-placeholder="fecha"></md-datepicker>
+							</div>
+                            
+                            <!--<div layout="row" class="date-row vlc-date row"  ng-class="{'vlc-date-no-edit':$parent.Docsession.block}">
+                            <div layout="column" class="md-block" layout-align="center center" >
+                                <div>Fecha Aprobación</div>
                             </div>
+                            <md-datepicker ng-model="abono.fecha"
+                                           ng-disabled="($parent.Docsession.block || $parent.document.isAprobado)"
+                                           skip-tab
+                                           required
+                                           ng-change="toEditHead('fecha_aprob_compra', ($parent.document.fecha_aprob_compra) ? $parent.document.fecha_aprob_compra.toString(): undefined)"
+                            ></md-datepicker >
+                        	</div>-->
+                            
+                            
 
                             <md-input-container ng-show="abono.tipo_id==2" class="md-block" flex>
                                 <label>Nro. Reclamo</label>
@@ -980,16 +1021,20 @@
 
 
         <!-- boton para registrar pago nuevo-->
-        <md-sidenav
+        <!--<md-sidenav
             style="margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');"
             layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true"
             md-component-id="NEXT" ng-mouseleave="showNext(false)">
             <?= HTML::image("images/btn_nextArrow.png", "", array('ng-click' => "openLayer()")) ?>
-        </md-sidenav>
+        </md-sidenav>-->
         <!-- boton para registrar pago nuevo-->
+        
+        <next-row></next-row>
 
-
+        <show-next on-next="" valid=""></show-next>
+        
     </div>
 
+    <div ng-controller="notificaciones" ng-include="template"></div>
 
 </div>
