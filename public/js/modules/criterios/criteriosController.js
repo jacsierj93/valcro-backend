@@ -383,6 +383,20 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.listOptions = critForm.getOptions();
 
     $scope.opcValue = {
+        coder: {
+            opc_id: 10,
+            field_id: $scope.critField.id,
+            id: false,
+            valor: '',
+            msg: ''
+        },
+        multi: {
+            opc_id: 11,
+            field_id: $scope.critField.id,
+            id: false,
+            valor: '',
+            msg: ''
+        },
         info: {
             opc_id: 8,
             field_id: $scope.critField.id,
@@ -594,9 +608,20 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
     $scope.$watch("line.id",chngLine);
     $scope.$watch("critField.id",function(val){
+
         $timeout(function(){
             //accept = false;
             $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
+            $scope.opcValue.coder.field_id= val;
+            $scope.opcValue.coder.id= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.id : false;
+            $scope.opcValue.coder.valor= ("codificador" in $scope.critField.opcs)?parseInt($scope.critField.opcs.codificador[0].pivot.value): 0;
+            $scope.opcValue.coder.msg= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.message : "";
+
+            $scope.opcValue.multi.field_id= val;
+            $scope.opcValue.multi.id= ("multi" in $scope.critField.opcs)?$scope.critField.opcs.multi[0].pivot.id : false;
+            $scope.opcValue.multi.valor= ("multi" in $scope.critField.opcs)?parseInt($scope.critField.opcs.multi[0].pivot.value): 0;
+            $scope.opcValue.multi.msg= ("multi" in $scope.critField.opcs)?$scope.critField.opcs.multi[0].pivot.message : "";
+
             $scope.opcValue.info.field_id= val;
             $scope.opcValue.info.id= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.id : false;
             $scope.opcValue.info.valor= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.value : "";
@@ -609,7 +634,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
             $scope.opcValue.req.field_id= val;
             $scope.opcValue.req.id= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.id : false;
-            $scope.opcValue.req.valor= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.value : "";
+            $scope.opcValue.req.valor= ("Requerido" in $scope.critField.opcs)?parseInt($scope.critField.opcs.Requerido[0].pivot.value): "";
             $scope.opcValue.req.msg= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.message : "";
 
             $scope.opcValue.min.field_id= val;
@@ -877,19 +902,19 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
             descripcion:"es Igual"
         },{
             op:">",
-            cfg:"texto",
+            cfg:["texto","numerico"],
             descripcion:"es Mayor"
         },{
             op:"<",
-            cfg:"texto",
+            cfg:["texto","numerico"],
             descripcion:"es Menor"
         },{
             op:"!=",
-            cfg:"texto",
+            cfg:["texto","numerico"],
             descripcion:"es diferente"
         },{
             op:">>",
-            cfg:"texto",
+            cfg:["texto","numerico"],
             descripcion:"existe en"
         }
     ];
@@ -1021,6 +1046,14 @@ MyApp.directive('lmbCollection', function() {
                     elem.css("color","#000");
                 }
             });
+            attr.$observe('multiple', function (newValue) {
+                console.log(newValue);
+                if(newValue){
+                    scope.multi = true;
+                }else{
+                    scope.multi = false;
+                }
+            });
         },
         template: function(elem,attr){
             var show = "descripcion"
@@ -1031,7 +1064,7 @@ MyApp.directive('lmbCollection', function() {
             attr.filterBy = null;
             var iconField = "item."+attr.lmbIcon || "";
             if(attr.lmbType=="items"){
-                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center"><span ng-if="item.icon" class="{{item.icon}}"></span>{{item.'+show+'}}</div></div>';
+                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" info="{{item.'+show+'}}" layout-align="center center"><span ng-if="item.icon" class="{{item.icon}}"></span>{{item.'+show+'}}</div></div>';
             }else{
                 return '<md-content flex layout="column">'+
                     '<div layout="row" ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> <div flex>{{item.'+show+'}}</div><div ng-show="'+iconField+' != \'\'" flex><img ng-src="images/{{'+iconField+'}}"/></div> </div>'

@@ -118,8 +118,10 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             extraList.common.data = prod.datos.commons;
         },
         syncProd : function(edit){
+            prod.id = edit.id || null;
             prod.datos.id = edit.id || null;
             prod.datos.prov_id = edit.prov || null;
+            prod.datos.prov = {id:edit.prov,razon_social: $filter("filterSearch")(providers,[edit.prov])[0].razon_social}
             prod.datos.linea_id = edit.line || null;
             prod.datos.serie = edit.serie || null;
             prod.datos.codigo = edit.cod || null;
@@ -296,26 +298,74 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
     $scope.prevLayer = function(){
         $scope.LayersAction({close:true});
     };
+    
+    
+    // Acciones de la capa resumen -------------------------
+    $scope.goToResumen = function(id){
+		$scope.LayersAction({open:{name:"prodLayer6"}});
+    };
+	
+	$scope.goToEnd = function(id){
+		alert("Guardar Producto");
+	};
+    // -------------------------------------------------------
+    
+    
     $scope.prod = productsServices.getToSavedProd();
 
     $scope.items = []
+
 }]);
-MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService','App',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService,App) {
+MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService','App','generic',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService,App,generic) {
+    $scope.prod = {
+        id:false,
+        pntBuy:"",
+        pntSald:""
+    };
+    $scope.misc = {
+        id:false,
+        storage:"",
+        cantDis:"",
+        unitDis:"",
+        cantLib:"",
+        unitLib:"",
+        cantDon:"",
+        unitDon:"",
+        reqStrg:"",
+        tools:""
+    };
+    $scope.units  = generic.units();
     $scope.prodMain = productsServices.getProd();
-    $scope.$watch("prod.id",function(n,o){
-        //console.log("entrooo", $scope.prod )
+    $scope.prodEdit = productsServices.getToSavedProd();
+    $scope.$watch("prodMain.id",function(n,o){
+        if(App.getSeccion().key!=="productos"){
+            return false;
+        }
         if(n){
+            $scope.prod.id = n;
+            $scope.misc.id = n;
             $scope.prod.pntBuy = parseFloat($scope.prodMain.datos.point_buy);
-            $scope.prod.pntSald = parseFloat($scope.prodMain.datos.point_cred);
+            $scope.prod.pntSald = parseFloat($scope.prodMain.datos.point_credit);
             $scope.misc.storage = $scope.prodMain.datos.almacen_id;
             $scope.misc.cantDis = $scope.prodMain.datos.descarte;
-            $scope.misc.unitDis = $scope.prodMain.datos.descar_unit;
+            $scope.misc.unitDis = parseInt($scope.prodMain.datos.descar_unit);
             $scope.misc.cantLib = $scope.prodMain.datos.biblioteca;
-            $scope.misc.unitLib = $scope.prodMain.datos.biblioteca_unit;
+            $scope.misc.unitLib = parseInt($scope.prodMain.datos.biblioteca_unit);
             $scope.misc.cantDon = $scope.prodMain.datos.donaciones;
-            $scope.misc.unitDon = $scope.prodMain.datos.dona_unit;
+            $scope.misc.unitDon = parseInt($scope.prodMain.datos.dona_unit);
             $scope.misc.reqStrg = $scope.prodMain.datos.notas_alma;
             $scope.misc.tools = $scope.prodMain.datos.herramientas;
+            
+        }
+    });
+
+    $scope.$watch("prodEdit.id",function(n,o){
+        if(App.getSeccion().key!=="productos"){
+            return false;
+        }
+        if(n) {
+            $scope.prod.id = n;
+            $scope.misc.id = n;
         }
     });
 
@@ -324,6 +374,8 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
            if(frm=="frmPoints"){
                productos.put({type:"savePoints"},$scope.prod,function (data) {
                    if(data.action!="equal"){
+                       $scope.prodMain.datos.point_buy = $scope.prod.pntBuy;
+                       $scope.prodMain.datos.point_cred = $scope.prod.pntSald;
                        setNotif.addNotif("ok","datos guardados",[],{autohidden:1500});
                        $scope.$eval(frm).$setPristine();
                        $scope.$eval(frm).$setUntouched();
@@ -331,7 +383,14 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
                    /*$scope.list.common.data.splice(idx,1);*/
                })
            }else if(frm=="frmMisc"){
-
+               productos.put({type:"saveMisc"},$scope.misc,function (data) {
+                   if(data.action!="equal"){
+                       setNotif.addNotif("ok","datos guardados",[],{autohidden:1500});
+                       $scope.$eval(frm).$setPristine();
+                       $scope.$eval(frm).$setUntouched();
+                   }
+                   /*$scope.list.common.data.splice(idx,1);*/
+               })
            }
 
        }
@@ -825,3 +884,40 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
         },
     }
 });
+
+
+MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout',function ($scope, setNotif,productos,productsServices,$timeout) {
+    $scope.prod = productsServices.getProd();
+
+
+	$scope.prodCrir = 
+	[{
+		"campo" : "Serie",
+		"valor" : "Algo"
+	},{
+		"campo" : "Codigo",
+		"valor" : "Algo"
+	},{
+		"campo" : "Ancho",
+		"valor" : "111"
+	},{
+		"campo" : "Profundidad",
+		"valor" : "111"
+	},{
+		"campo" : "Unidas",
+		"valor" : "Pieza"
+	},{
+		"campo" : "Caracteristicas",
+		"valor" : "Mesedora"
+	},{
+		"campo" : "Voltaje",
+		"valor" : "220V"
+	},{
+		"campo" : "Acabdo",
+		"valor" : "Pulido"
+	},{
+		"campo" : "Acabado Base",
+		"valor" : "Cromo"
+	}];
+
+}]);

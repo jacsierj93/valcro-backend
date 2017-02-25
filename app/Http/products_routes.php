@@ -12,6 +12,7 @@ $app->get("productos/getCriterio/{line}",'Criterio\CritController@getCriterio');
 
 $app->post("productos/prodSave",'Products\ProductController@saveProd');
 $app->post("productos/savePoints",'Products\ProductController@savePoint');
+$app->post("productos/saveMisc",'Products\ProductController@saveMisc');
 $app->post("productos/prodSaveCommon",'Products\ProductController@saveCommon');
 $app->post("productos/prodDelCommon",'Products\ProductController@delCommon');
 $app->post("productos/getFiltersProd",'Products\ProductController@filterProd');

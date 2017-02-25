@@ -686,14 +686,24 @@
                                         </md-input-container>
                                         <md-input-container class="md-block" flex>
                                             <label>Unidad Biblioteca</label>
-                                            <input autocomplete="off"
-                                                   skip-tab
-                                                   info="unidad de esta cantidad"
-                                                   name="pointBuy"
-                                                   ng-disabled="$parent.enabled"
-                                                   ng-model="misc.unitLib"
-
-                                            >
+                                            <md-autocomplete md-selected-item="ctrl.unitLib"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad de biblioteca"
+                                                             model="misc.unitLib"
+                                                             skip-tab
+                                                             md-search-text="ctrl.searchLib"
+                                                             md-items="item in units | stringKey : ctrl.searchLib : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             ng-require="misc.cantLib!=''"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
                                         </md-input-container>
                                     </div>
                                     <div class="row" layout="row">
@@ -710,14 +720,24 @@
                                         </md-input-container>
                                         <md-input-container class="md-block" flex>
                                             <label>Unidad donaciones</label>
-                                            <input autocomplete="off"
-                                                   skip-tab
-                                                   info="unidad de esta cantidad"
-                                                   name="pointBuy"
-                                                   ng-disabled="$parent.enabled"
-                                                   ng-model="misc.unitDon"
-
-                                            >
+                                            <md-autocomplete md-selected-item="ctrl.unitDon"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad de biblioteca"
+                                                             model="misc.unitDon"
+                                                             skip-tab
+                                                             md-search-text="ctrl.searchDon"
+                                                             md-items="item in units | stringKey : ctrl.searchDon : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             ng-require="misc.cantDon!=''"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
                                         </md-input-container>
                                     </div>
                                     <div class="row" layout="row">
@@ -734,14 +754,24 @@
                                         </md-input-container>
                                         <md-input-container class="md-block" flex>
                                             <label>Unidad descarte</label>
-                                            <input autocomplete="off"
-                                                   skip-tab
-                                                   info="unidad de esta cantidad"
-                                                   name="pointBuy"
-                                                   ng-disabled="$parent.enabled"
-                                                   ng-model="misc.unitDis"
-
-                                            >
+                                            <md-autocomplete md-selected-item="ctrl.unitDis"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad de biblioteca"
+                                                             model="misc.unitDis"
+                                                             skip-tab
+                                                             md-search-text="ctrl.searchDis"
+                                                             md-items="item in units | stringKey : ctrl.searchDis : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             ng-require="misc.cantDis!=''"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
                                         </md-input-container>
                                     </div>
                                     <div class="row" layout="row">
@@ -1424,9 +1454,239 @@
                         </div>
                     </div>
                 </md-content>
-                <show-next on-next="goToAnalisis" ></show-next>
+                <show-next on-next="goToResumen" ></show-next>
             </div>
         </md-sidenav>
+        
+        
+        
+        <!-- 15) ########################################## LAYER RESUMEN FINAL DE PRODUCTO ########################################## -->
+        <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer6" id="prodLayer6">
+            <div layout="row" flex ng-controller="prodResumen">
+            <!-- 16) ########################################## CONTENEDOR RESUMEN FINAL (Permite scroll) ########################################## -->
+                <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                    <input type="hidden" md-autofocus>
+
+
+                    <div layout="row" flex>
+                        <div active-left ></div>
+                        <!-- ############################################ Primera Columna del resumen ############################################ -->
+                        <div flex="33" style="margin-right: 4px;" layout="column">
+                            <div layout="column" class="form-row-head form-row-head-select">
+                                <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                    <div>
+                                        <span>Resumen</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div flex layout="row">
+                                <div flex layout="column">
+                                    <div style="height: 80px" layout="row">
+                                        <div flex="40" layout="column" layout-align="start start">
+                                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                    <span>Proveedor</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div flex="60">
+                                            {{prod.datos.prov.razon_social}}
+                                        </div>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <div flex layout="column" layout-align="start start">
+                                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                    <span>Codigo</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div flex>
+                                            {{prod.datos.codigo}}
+                                        </div>
+                                    </div>
+                                    <div style="height: 80px" layout="row">
+                                        <div flex layout="column" layout-align="start start">
+                                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                    <span>Descripcion</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div flex>
+                                            {{prod.datos.descripcion}}
+                                        </div>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <div flex layout="column" layout-align="start start">
+                                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                    <span>Linea</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div flex>
+                                            {{prod.datos.line.linea}}
+                                        </div>
+                                    </div>
+                                    <div class="row" layout="row">
+                                        <div flex layout="column" layout-align="start start">
+                                            <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                    <span>Sub-Linea</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div flex>
+                                            {{prod.datos.subLin.sublinea}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						<!-- ############################################ Segunda Columna del resumen ############################################ -->
+						<div flex="33" layout="column">
+							<div layout="row" class="form-row-head form-row-head-select">
+                                <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                    <div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div flex layout="column">
+                            	<!-- ----------------------- CAMPOS DEL CRITERIO ----------------------- -->
+                                <div style="height: 40px" layout="row" ng-repeat="data in prodCrir">
+                                    <div flex layout="column" layout-align="start start">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                <span>{{data.campo}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex>
+                                        {{data.valor}}
+                                    </div>
+                                </div>
+                            	
+                            </div>
+						</div>
+
+                        <div flex="33" layout="column">
+                            <div flex>
+                                <div layout="row" flex class="form-row-head form-row-head-select">
+                                    <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <!--<span>Detalles</span>-->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex>
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Stock</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div flex>
+                                        {{prod.datos.stock}}
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex>
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Precio Venta</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex layout="column" layout-align="center center">
+                                        <div>{{prod.datos.precio}}</div>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex>
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Cod Barras</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex layout="column" layout-align="center center">
+                                       <io-barcode flex code="{{prod.datos.codigo}}" type="CODE128B" options="brcdOptions"></io-barcode>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex>
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Punto de Compra</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex layout="column" layout-align="center center">
+                                        <div>{{prod.datos.point_buy}}</div>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex>
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Punto de Saldo</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex layout="column" layout-align="center center">
+                                        <div>{{prod.datos.point_credit}}</div>
+                                    </div>
+                                </div>
+                                <div class="row" layout="row">
+                                    <div flex>
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Biblioteca</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div flex layout="column" layout-align="center center">
+                                        <div>{{prod.datos.biblioteca}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div flex>
+                                <div layout="row" flex class="form-row-head form-row-head-select">
+                                    <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
+                                        <div>
+                                            <span>Complementarios</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <md-content flex>
+                                    <div class="row" ng-repeat="common in prod.datos.commons" layout="row">
+                                        <div flex style="font-weight: bolder">
+                                            {{common.codigo}}
+                                        </div>
+                                        <div flex>
+                                            {{common.descripcion}}
+                                        </div>
+                                    </div>
+                                </md-content>
+                            </div>
+                        </div>
+                    </div>
+
+                </md-content>
+                
+                <show-next on-next="goToEnd" ></show-next>
+                <!-- <div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,saveDependency)">
+                </div> -->
+            </div>
+        </md-sidenav>
+        
+        
+        
+        
+        
         <next-row></next-row>
         <div id="blockSection" style="
         position: absolute;

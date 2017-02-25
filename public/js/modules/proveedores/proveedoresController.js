@@ -239,6 +239,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     var chngProv = function(prov){
         if($scope.module.index>0){
             $scope.LayersAction({close:{all:true,after:function(){
+                resetProgress();
                 setProvider(prov)
             }}});
         }else{
@@ -261,6 +262,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         $scope.edit = false;
         $scope.enabled = true;
         setGetProv.setProv(false);
+        resetProgress()
         $scope.secBlock = false;
     };
 
@@ -273,40 +275,55 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
         data:[
             {index:1, st:'false', text:
             {
-                true:'Puedes solicitar presupuestos a este proveedor',
-                false:'este proveedor de momento es inservible',
-                'this':'Estamos esperando la aprobacion de este embarque'
+                true:'Sos un GROSO! le diste una razon social al proveedor',
+                false:'ummm que tal si escribes algo?',
+                'this':'Estas empezando a crear el proveedor, SIGUE ADELANTE'
             }
             },
             {index:2, st:'false' ,text:
             {
-                true:'puedes hacer pedidos a este proveedor',
-                false:'continua dandonos datos de este proveedor para poder hacer mas con el',
-                'this':'Estamos esperando el cumplimiento de la fecha de carga'
+                true:'Este proveedor ya posee los datos minimos para el sistema',
+                false:'debe suministrar al menos los datos minimos para hacer Algo',
+                'this':' Solo existen los datos minimos por favor complete este proveedor'
             }
             },
-            {index:3, st:'false' ,        text:
+            {index:3, st:'false' ,text:
             {
-                true:'Este proveedor puede ser asignado a productos',
-                false:'Aun no se ha empezado ha cargar el embarque',
-                'this':'En espera de la llegada a venezuela'
+                true:'Ya puedes hacer solicitudes de presupuesto y proformas al proveedor',
+                false:'A este lo conozco pero aun no tengo como contactar con el asi que es solo un bonito nombre en la lista',
+                'this':'Ya puedes hacer solicitudes de presupuesto y proformas al proveedor'
             }
             },
             {index:4, st:'false', text:
             {
-                true:'Ya esta en Venezuela',
-                false:'Aun no ha llegado a Venezuela',
-                'this':'Esperando la llegada a la tienda'
+                true:'El proveedor esta disponoble para generar compras.',
+                false:'faltan algunos datos como para poder comprarle algo a este proveedor,... querra comprarnos algo??',
+                'this':'El proveedor esta disponible para generar compras.'
             }
             },
             {index:5, st:'false',text:
             {
-                true:'Ya esta en la tienda',
-                false:'Aun no ha llegado a la tienda',
-                'this':'Finalizado, Por favor confirmar recepcion'
+                true:'Los datos estan casi completos, esto te permite crear Embarques.',
+                false:'puedo comprarle pero esun gran misterio para mi cuanto tarda en fabricar o traer algo',
+                'this':'Los datos estan casi completos, esto te permite crear Ebarques.'
+            }
+            },
+            {index:6, st:'false',text:
+            {
+                true:'Felicidades el proveedor esta cargado completamente esto te permite hacer cualquier operacion dentro del sistema.',
+                false:'VAMOS VAMOS! ya casi... solo un par de datos mas y te ganas... algo! ',
+                'this':'Felicidades el proveedor esta cargado completamente esto te permite hacer cualquier operacion dentro del sistema.'
             }
             }
-        ]};;
+        ]};
+
+    var resetProgress = function(){
+        angular.forEach($scope.progreso.data,function(v,k){
+
+            v.st = false;
+        })
+    }
+
 
     var endProvider = function(yes,not,id){
         if($scope.prov.id){
@@ -349,6 +366,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     var instanceNew = function(){
+        resetProgress();
         setGetProv.setProv(false);
         //console.log("entroooo")
         $scope.edit = false;
@@ -455,8 +473,35 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
     };
 
     $scope.statusProv = setGetProv.getStatus();
-    $scope.$watch('statusProv.change',function(nvo,old) {
-       console.log("status",$scope.statusProv);
+    $scope.$watchCollection('statusProv',function(nvo,old) {
+        if(nvo.length == old.length){
+            false;
+        }
+        resetProgress();
+        if($scope.prov.id){
+            $scope.progreso.data[0].st='this';
+            if(nvo.valcroName){
+                $scope.progreso.data[0].st='true';
+                $scope.progreso.data[1].st='this';
+                if(nvo.address && nvo.contact){
+                    $scope.progreso.data[1].st='true';
+                    $scope.progreso.data[2].st='this';
+                    if(nvo.bank && nvo.coin && nvo.limits && nvo.conditions && nvo.points){
+                        $scope.progreso.data[2].st='true';
+                        $scope.progreso.data[3].st='this';
+                        if(nvo.timesP && nvo.timesT ){
+                            $scope.progreso.data[3].st='true';
+                            $scope.progreso.data[4].st='this';
+                            if(nvo.factors){
+                                $scope.progreso.data[4].st='true';
+                                $scope.progreso.data[5].st='this';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     });
 
 
@@ -648,7 +693,7 @@ MyApp.service("setGetProv",function($http,providers,$q){
                     delete statusProv[field];
                 }
             }
-            statusProv.change = !statusProv.change;
+            //statusProv.change = !statusProv.change;
         },
         getStatus : function(){
             return statusProv;
@@ -2613,12 +2658,16 @@ MyApp.controller('provPointController', function ($scope,providers,setGetProv,li
     $scope.prov = setGetProv.getProv();
     $scope.lines = masterLists.getLines();
     $scope.setting = false;
+
     $scope.$watch('prov.id',function(nvo){
         $scope.coins = (nvo)?listCoins.getCoins():[];
         $scope.pnt = {id:false,cost:"",coin:"",line:"",id_prov: $scope.prov.id||0};
         $scope.points =  setGetProv.getPoints()//(nvo)?providers.query({type:"provPoint",id_prov:$scope.prov.id||0}):[];
     });
 
+    $scope.$watch('points.length',function(nvo){
+        setGetProv.setComplete("points",nvo);
+    });
     var point = {};
     var currentOrig = {};
     var savePoint = function(onSuccess,elem)    {
@@ -3032,6 +3081,9 @@ MyApp.controller('condPayList', function ($scope,$mdSidenav,masterLists,setGetPr
     $scope.$watch('prov.id',function(nvo) {
         $scope.condHead = {id:false,title:"",line:"",items:[],id_prov:$scope.prov.id||0};
         $scope.conditions = setGetProv.getPayCond();//(nvo)?providers.query({type:"payConditions",id_prov:$scope.prov.id}):[];
+    });
+    $scope.$watch('conditions.length',function(nvo){
+        setGetProv.setComplete("conditions",nvo);
     });
 
     /* $scope.$watch('ctrl.line.id',function(nvo) {

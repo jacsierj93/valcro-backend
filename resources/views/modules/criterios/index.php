@@ -349,6 +349,8 @@
 
                                                         <md-switch ng-model="opcValue.req.valor"
                                                                    ng-blur="checkSave($event)"
+                                                                   ng-true-value="1"
+                                                                   ng-false-value="0"
                                                                    class="Frm-value"
                                                         >
                                                             &nbsp;Requerido
@@ -358,10 +360,29 @@
                                                         <label>Requerido mensaje</label>
                                                         <input skip-tab
                                                                ng-model="opcValue.req.msg"
+
                                                                class="Frm-msg"
                                                                ng-blur="checkSave($event)"
                                                         >
                                                     </md-input-container>
+                                                </div>
+
+                                            </div>
+
+                                            <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px" >
+                                                <div layout="column" flex tabindex="0" id="prevReq" >
+                                                    <md-input-container class="md-block" class="row">
+
+                                                        <md-switch ng-model="opcValue.coder.valor"
+                                                                   ng-true-value="1"
+                                                                   ng-false-value="0"
+                                                                   ng-blur="checkSave($event)"
+                                                                   class="Frm-value"
+                                                        >
+                                                            &nbsp;codificador
+                                                        </md-switch>
+                                                    </md-input-container>
+
                                                 </div>
 
                                             </div>
@@ -452,7 +473,23 @@
                                             </div flex>
 
                                             <div ng-if="critField.type == 1 || critField.type == 3" flex>
+                                                <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px" >
+                                                    <div layout="column" flex tabindex="0" id="prevReq" >
+                                                        <md-input-container class="md-block" class="row">
 
+                                                            <md-switch ng-model="opcValue.multi.valor"
+                                                                       ng-true-value="1"
+                                                                       ng-false-value="0"
+                                                                       ng-blur="checkSave($event)"
+                                                                       class="Frm-value"
+                                                            >
+                                                                &nbsp;Multiple?
+                                                            </md-switch>
+                                                        </md-input-container>
+
+                                                    </div>
+
+                                                </div>
                                                 <div style="border-bottom: 1px solid #f1f1f1; margin-bottom: 4px">
                                                     <div layout="column" class="optHolder row" flex tabindex="0" id="prevOpc">
                                                         <md-input-container flex>
@@ -608,7 +645,7 @@
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
                                 <div flex layout="column">
                                     <md-content >
-                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || oper.cfg==currentParent.type.descripcion" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
+                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || (oper.cfg.indexOf(currentParent.type.descripcion) != -1)" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
                                             {{oper.descripcion}}
                                         </div>
                                     </md-content>
@@ -638,7 +675,7 @@
                                                     {{getoptSet(opt.pivot.value).nombre}}
                                                 </div>
                                             </md-content>
-                                            <md-input-container id="text" class="md-block" flex prevText ng-if="currentParent.type.descripcion == 'texto'" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
+                                            <md-input-container id="text" class="md-block" flex prevText ng-if="currentParent.type.descripcion == 'texto' || currentParent.type.descripcion == 'numerico'" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
                                                 <label>valor</label>
                                                 <input skip-tab
                                                        info="ingrese el valor contra el que se comparara"

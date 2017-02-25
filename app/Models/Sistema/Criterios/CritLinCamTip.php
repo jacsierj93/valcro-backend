@@ -30,8 +30,10 @@ class CritLinCamTip extends customBaseModel
     }
 
     public function options(){
-        return $this->belongsToMany('App\Models\Sistema\Criterios\CritOption','tbl_crit_lct_opc','lct_id','opc_id')->withPivot("value","id","message")->whereNull('tbl_crit_lct_opc.deleted_at') // Table `group_user` has column `deleted_at`
-        ->withTimestamps();
+        return $this->belongsToMany('App\Models\Sistema\Criterios\CritOption','tbl_crit_lct_opc','lct_id','opc_id')
+            ->withPivot("value","id","message")
+            ->whereNull('tbl_crit_lct_opc.deleted_at') // Table `group_user` has column `deleted_at`
+            ->withTimestamps();
     }
 
     public function dependency(){

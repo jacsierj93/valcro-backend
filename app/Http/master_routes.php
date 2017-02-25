@@ -35,3 +35,4 @@ $app->get("master/files/getFiles",'Masters\FilesController@getFiles'); ///obtien
 
 $app->get("master/mailModule/resend",'Masters\FilesController@resendMailModulo'); ///obtiene todos los archivo
 
+$app->get("master/getUnits",'Masters\MasterController@getUnits'); ///obtener listado de unidades

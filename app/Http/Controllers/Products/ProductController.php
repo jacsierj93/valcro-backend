@@ -46,6 +46,7 @@ class ProductController  extends BaseController
                 return $q->selectRaw("id,descripcion");
             }))
             ->with(array("prodCrit"=>function($q){
+                //dd($q->selectRaw("crit_id,value"));
                 return $q->selectRaw("crit_id,value");
             }))
             ->with(array("commons"=>function($q){
@@ -57,6 +58,15 @@ class ProductController  extends BaseController
             ->where("prov_id",$prov)
             ->distinct("id")
             ->get();
+        //dd($all);
+        foreach ($all as  $prod){
+            foreach($prod->prodCrit as $crit){
+               if(strpos($crit['value'],'>>' )){
+                   $crit['value'] = explode(">>",$crit['value']);
+               }
+            }
+
+        }
 
         return json_encode($all);
     }
@@ -125,6 +135,7 @@ class ProductController  extends BaseController
         }
         $result['id']=$prod->id;
         $crit= self::purge($req->prodCrit);
+        //dd($crit);
         $afected = $prod->prodCrit()->sync($crit);
         if(((count($afected['attached'])>0) || (count($afected['detached'])>0) || (count($afected['updated'])>0)) && $result['action']=="equal"){
             $result['action']="upd";
@@ -210,13 +221,22 @@ class ProductController  extends BaseController
     }
 
     private function purge($data){
+        $ret = [];
         foreach ($data as $k=>$dat){
             unset($data[$k]["childs"]);
+            unset($dat["childs"]);
             if($data[$k] == null || $data[$k]['value']==""){
                 unset($data[$k]);
+            }else if(gettype($data[$k]['value']) == "array"){
+                $ret[$k]= array('value'=>implode(">>",$dat['value']));
+
+                //$data[$k]['value']= implode(",",$dat);dd($data[$k]);
+            }else{
+                $ret[$k] = $dat;
             }
+
         }
-        return $data;
+        return $ret;
 
         /*$result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){

@@ -177,6 +177,16 @@ MyApp.factory('masters', ['$resource',
     }
 ]);
 
+MyApp.service("generic",function(masters){
+    var units = masters.query({ type:"getUnits"});
+    return {
+        units : function(){
+            return units;
+        }
+    }
+
+})
+
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
     return function(arr1, arr2,id) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -669,7 +679,6 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 var local = false;
                 var keyVal = attrs.key || "item.id";
 
-
                 var text = attrs.mdItemText.split(".")[1];
 
                 model.scope.itemChange = function(cambio){
@@ -758,7 +767,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 }
             };
 
-            if(element.is("span")){
+            if(element.is("span") || element.is("div")){
                 element.on("mouseover", function(e) {
                     $timeout(function(){
                         showInfo();
@@ -1764,6 +1773,8 @@ MyApp.constant('SYSTEM',{
     PATHAPP : "http://"+window.location.hostname+"/"+window.location.pathname.split("/")[1]+"/",
     noti_autohidden :3000
 });
+
+
 
 
 

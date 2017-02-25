@@ -716,28 +716,30 @@ MyApp.directive('formPreview', function() {
                                 $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
 
                             }else{
-                                console.log("FILTERRRRR")
                                 $scope.formFilters[dep.sub_lct_id] = (val.value == dep.valor)?ret:[];
-                                /*$timeout(function(){
-                                    $scope.$apply();
-                                },0)*/
-                                /*$scope.formFilters[dep.sub_lct_id].splice(0,$scope.formFilters[dep.sub_lct_id].length);
-                                 if(val.value == dep.valor){
-                                 ret.forEach(function(v,a){
-                                 $scope.formFilters[dep.sub_lct_id].push(v)
-                                 })
-                                 }*/
                             }
 
                             break;
                         case ">":
-                            $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
+                            if(typeof(ret) == "boolean"){
+                                $scope.isShow[dep.sub_lct_id] = (val.value > parseFloat(dep.valor))?ret:!ret;
+                            }else{
+                                $scope.formFilters[dep.sub_lct_id] = (val.value > dep.valor)?ret:[];
+                            }
                             break;
                         case "<":
-                            $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
+                            if(typeof(ret) == "boolean"){
+                                $scope.isShow[dep.sub_lct_id] = (val.value < parseFloat(dep.valor))?ret:!ret;
+                            }else{
+                                $scope.formFilters[dep.sub_lct_id] = (val.value < dep.valor)?ret:[];
+                            }
                             break;
                         case "!=":
-                            $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
+                            if(typeof(ret) == "boolean"){
+                                $scope.isShow[dep.sub_lct_id] = (val.value != dep.valor)?ret:!ret;
+                            }else{
+                                $scope.formFilters[dep.sub_lct_id] = (val.value != dep.valor)?ret:[];
+                            }
                             break;
                     }
 
@@ -779,6 +781,7 @@ MyApp.directive('critModel', function(formPreviewSrv) {
 
     };
 });
+/*
 
 MyApp.directive('critModel', function(formPreviewSrv) {
     return {
@@ -790,6 +793,7 @@ MyApp.directive('critModel', function(formPreviewSrv) {
     };
 });
 
+*/
 
 
 

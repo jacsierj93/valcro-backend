@@ -6,6 +6,7 @@ use App\Models\Sistema\Alerts\Alert;
 use App\Models\Sistema\Alerts\AlertItem;
 use App\Models\Sistema\MailModels\MailModule;
 use App\Models\Sistema\Masters\StoreValcro;
+use App\Models\Sistema\Masters\Units;
 use App\Models\Sistema\Product\SubLine;
 use App\Models\Sistema\Order\OrderCondition;
 use App\Models\Sistema\Order\OrderReason;
@@ -27,6 +28,7 @@ use App\Models\Sistema\Masters\Line;
 use App\Models\Sistema\Masters\Language;
 use App\Models\Sistema\Providers\CargoContact;
 use App\Models\Sistema\Masters\City;
+use App\Models\Sistema\Masters\Unit;
 use Illuminate\Database\Eloquent\Collection;
 
 
@@ -161,6 +163,10 @@ class MasterController extends BaseController
 		$coin->save();
 		$result['id'] = $coin->id;
 		return $result;
+	}
+
+	public function getUnits(){
+		return json_encode(Unit::all());
 	}
 
 	public function saveAlert(Request $req){
