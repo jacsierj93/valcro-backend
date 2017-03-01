@@ -74,7 +74,7 @@
                 </div>
                 <div layout="column" layout-align="center center" ng-show="line.id">
                    <!-- <span class="" style="font-size: 23px" ng-click="openPopUp('treeLayer')">Tree</span>-->
-                    <?= HTML::image("images/Mapa.png","",array("ng-click"=>"openPopUp('treeLayer')")) ?>
+                    <?= HTML::image("images/Mapa.png","",array("pop-up-open"=>"{'treeLayer':{before:null,after:null}}")) ?>
                 </div>
                 <!--<div layout="column" layout-align="center center" >
                     <span class="icon-Filtro" style="font-size: 24px"></span>
@@ -239,6 +239,7 @@
                     <div flex></div>
 
                 </md-content>
+                <show-next on-next="endCriterio" ></show-next>
             </div>
         </md-sidenav>
 
@@ -259,7 +260,7 @@
                             </div>
 
                             <md-content flex>
-                                <div ng-repeat="field in fields" class="row" ng-class="{'assign':(used(field) && field.id != critField.field),'field-sel':field.id == critField.field}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                <div ng-repeat="field in fields" class="row" ng-class="{'assign':(used(field) && field.id != critField.field),'field-sel':field.id == critField.field}" layout="column" layout-align="center left" style="border-bottom: 1px solid #ccc; padding-left: 4px;">
                                     <div ng-click="(!used(field))?createField(field,'field'):isUsed()">{{field.descripcion}}</div>
                                 </div>
                             </md-content>
@@ -306,7 +307,7 @@
 
                 <input type="hidden" md-autofocus>
                 <div layout="row" flex >
-                    <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important; ">
+                    <md-content class="cntLayerHolder" layout="row" style="padding: 0 0 0 0 !important; width: 246px;">
 
                         <div flex layout="column" style="padding:8px;">
                             <form name="optionsForm" layout="column" flex="70">
@@ -555,8 +556,7 @@
 
                         </div>
                     </md-content>
-                    <!--<div class="showNext" style="width: 16px;" ng-mouseover="showNext(true,'END')">
-                    </div>-->
+                    <show-next on-next="endCriterio" ></show-next>
                 </div>
             </md-sidenav>
 
@@ -612,7 +612,7 @@
             </md-content>
         </md-sidenav>
 
-        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 952px); z-index:80;" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" click-out="closeDepend()" md-component-id="lyrConfig" id="lyrConfig" >
+        <md-sidenav  style="margin-top:96px; margin-bottom:48px; width: calc(100% - 894px); z-index:80;" layout="column" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" click-out="closeDepend()" md-component-id="lyrConfig" id="lyrConfig" >
             <!-- 11) ########################################## MINI LAYER SELECTOR TIPO DE CAMPO ########################################## -->
 
             <input type="hidden" md-autofocus>
@@ -628,18 +628,14 @@
                             <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)"> - </div>
                         </div>
                         <div layout="row" flex>
-                            <div layout="row" flex="25">
+                            <div layout="row" flex="40">
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px">
-
                                 </div>
-
-                                    <md-content flex layout="column">
-                                        <div ng-repeat="field in criteria | filterSelect: configDep.lct_id" id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center center">
-                                            {{field.field.descripcion}}
-                                        </div>
-                                    </md-content>
-
-
+                                <md-content flex layout="column">
+                                    <div ng-repeat="field in criteria | filterSelect: configDep.lct_id" id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center left" style="padding: 4px;">
+                                        {{field.field.descripcion}}
+                                    </div>
+                                </md-content>
                             </div>
                             <div layout="row" flex="25">
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
@@ -650,7 +646,6 @@
                                         </div>
                                     </md-content>
                                 </div>
-
                             </div>
                             <div layout="row" flex>
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
@@ -699,7 +694,7 @@
                                                             style="width:100px;"
                                                             lmb-type="items"
                                                             lmb-model="configDep.action"
-                                                            lmb-display="elem.nombre"
+                                                            lmb-display="nombre"
                                                             lmb-itens="visibility"
                                                             lmb-key="id"
 
@@ -756,7 +751,7 @@
                 <input type="hidden" >
                 <form name="fieldForm" layout="row" class="focused" ng-controller="treeController">
                     <div style="width:24px; height: 100%;"></div>
-                    <div flex>
+                    <div flex auto-close="{before:null,after:null}">
                         <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
                             <div>
                                 Tree
@@ -782,9 +777,8 @@
             </md-content>
         </md-sidenav>
     </div>
-    <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
-        <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nxtAction(nextLyr,\$event)")) ?>
-    </md-sidenav>
+
+    <next-row></next-row>
 
     <div ng-controller="notificaciones" ng-include="template"></div>
 </div>

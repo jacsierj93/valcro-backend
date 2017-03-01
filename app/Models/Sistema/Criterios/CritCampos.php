@@ -11,9 +11,11 @@ namespace App\Models\Sistema\Criterios;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Http\Traits\Journal;
 class CritCampos extends Model
 {
     use SoftDeletes;
+    use Journal;
     protected $table = "tbl_crit_campos";
 
     public function getLine(){

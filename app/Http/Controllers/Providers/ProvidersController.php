@@ -87,7 +87,7 @@ class ProvidersController extends BaseController
         }
         $data->direcciones=$data->address()->get();
         foreach ($data->direcciones as $dir){
-            $dir->pais = $dir->country()->first();
+            $dir->country;
             $dir->tipo;
             $dir->ports = $dir->ports()->lists("puerto_id");
         }

@@ -512,6 +512,7 @@
                                                                  md-search-text="ctrl.searchLine"
                                                                  md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
                                                                  md-item-text="item.linea"
+                                                                 ng-disabled="dataCrit.length > 0 || prodCritFrm.$dirty"
                                                                  require
                                                                  require-match="true"
                                                                  md-no-asterisk
@@ -569,7 +570,8 @@
                                              form-preview="{{field.type.directive}}"
                                              ng-dblclick="setEdit(field)"
                                              ng-show="isShow[field.id]"
-                                             style="width: 30%; float:left;"
+                                             style="width: {{(field.type.descripcion=='opciones')?(field.options.Opcion.length * 80)+'px':'30%'}}; float:left;"
+
                                         >
 
                                         </div>

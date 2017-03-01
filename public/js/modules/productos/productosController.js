@@ -52,6 +52,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
     var listProv = productos.query({type:'provsProds'});
     var prov ={};
     var bckup = null;
+    var criteria = {line:false,criteria:[]};
 
     var prod = {id:false,datos:{}};
     var extraList = {
@@ -95,27 +96,31 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             if(typeof(item)!="boolean" && typeof(item)!="object" ){
                 item  = $filter("filterSearch")(providers,[item])[0];
             }
-            prov.id = item.id;
-            prov.razon_social = item.razon_social;
-            prov.siglas = item.siglas;
-            prov.tipo_id = item.tipo_id;
+            prov.id = item.id || false;
+            prov.razon_social = item.razon_social|| "";
+            prov.siglas = item.siglas|| "";
+            prov.tipo_id = item.tipo_id|| false;
             prodToSave.prov = item.id || false;
+            //console.log(item)
+            //if(!item){
+
+            //}
         },
         getProv:function(){
             return prov;
         },
         setProd:function(item){
-
-            prod.id = item.id;
-            prod.datos = item;
+            console.log("entrooo")
+            prod.id = item.id || false;
+            prod.datos = item || [];
             bckup = angular.copy(prod.datos);
             prodToSave.id = item.id || false;
-            prodToSave.prov = item.prov_id || false;
+            //prodToSave.prov = item.prov_id || false;
             prodToSave.line = item.linea_id || false;
             prodToSave.serie = item.serie || false;
             prodToSave.cod = item.codigo || false;
             prodToSave.desc = item.descripcion || false;
-            extraList.common.data = prod.datos.commons;
+            extraList.common.data = prod.datos.commons || [];
         },
         syncProd : function(edit){
             prod.id = edit.id || null;
@@ -128,7 +133,8 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             prod.datos.descripcion = edit.desc || null;
         },
         showChange:function(){
-            console.log(prod.datos,bckup,angular.equals(prod.datos,bckup));
+            console.log(prod.datos,bckup)
+           return !angular.equals(prod.datos,bckup);
         },
         getProd : function(){
             return prod
@@ -144,6 +150,10 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         },
         getCommon : function(){
             return commonDetail;
+        },
+
+        getCriteria:function(){
+            return criteria;
         }
 
     }
@@ -158,8 +168,51 @@ MyApp.controller('listProdController',['$scope', 'setNotif','productos','product
 
     
     $scope.getByProv = function(prov,e){
-        productsServices.setProvprod(prov);
-        $scope.$parent.LayersAction({open:{name:"prodLayer1"}});
+        console.log(productsServices.showChange(), $scope.prov.id)
+        if(productsServices.showChange() && $scope.prov.id){
+            setNotif.addNotif("alert","ha realizado cambios en el producto, desea cambiarse",[
+                {
+                    name:"Si",
+                    action:function(){
+                        $scope.$parent.LayersAction({close:{all:true,before:function(){
+                            productsServices.setProvprod(prov);
+                            productsServices.setProd(false);
+
+                        },
+                            after:function(){
+                                $scope.$parent.LayersAction({open:{name:"prodLayer1"}});
+                            }}});
+
+
+                    },
+                    default:defaultTime
+                },
+                {
+                    name:"No",
+                    action:function(){
+
+                    }
+                }
+            ]);
+        }else {
+            if($scope.$parent.index > 0){
+                $scope.$parent.LayersAction({close:{all:true,before:function(){
+                    productsServices.setProvprod(prov);
+                    productsServices.setProd(false);
+                },
+                    after:function(){
+                        $scope.$parent.LayersAction({open:{name:"prodLayer1"}});
+                    }}});
+            }else{
+                $scope.$parent.LayersAction({open:{name:"prodLayer1",before:function(){
+                    productsServices.setProvprod(prov);
+                    productsServices.setProd(false);
+                }}});
+            }
+
+
+        }
+
     };
 }]);
 
@@ -212,7 +265,9 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();
     $scope.prodCrit = [];
-    $scope.$criteria = [];
+    $scope.criteria = [];
+    $scope.dataCrit = [];
+    $scope.criterioShared = productsServices.getCriteria()
     $scope.$watch("prod.prov",function(n,o){
         $timeout(function(){
             if(typeof(n)== "undefined"){
@@ -226,9 +281,9 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     });
     $scope.$watch("prod.id",function(n,o){
         if(n){
-            var data = productsServices.getDataCrit();
+            $scope.dataCrit = productsServices.getDataCrit();
             $timeout(function(){
-                angular.forEach(data,function(v,k){
+                angular.forEach($scope.dataCrit,function(v,k){
                     $scope.prodCrit[v.crit_id].value = v.value;
                 })
 
@@ -243,6 +298,8 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
                     $scope.prodCrit.splice(0,$scope.prodCrit.length);
                     $timeout(function(){
                         $scope.criteria = data;
+                        $scope.criterioShared.line = n.line;
+                        $scope.criterioShared.criteria = data;
                     },0);
                 });
 
@@ -283,7 +340,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
 
 MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
     $scope.nxtAction = null;
-    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
+    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old) {
         $scope.index = nvo[1];
         $scope.layerIndex = nvo[0];
         $scope.layer = nvo[0];
@@ -296,7 +353,28 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
     };
 
     $scope.prevLayer = function(){
-        $scope.LayersAction({close:true});
+        if($scope.index==1 && productsServices.showChange()){
+            setNotif.addNotif("alert","ha realizado cambios en el producto, desea salir",[
+                {
+                    name:"Si",
+                    action:function(){
+                        $scope.LayersAction({close:true,before:function(){
+                            productsServices.setProvprod(false);
+                        }});
+                    },
+                    default:defaultTime
+                },
+                {
+                    name:"No",
+                    action:function(){
+
+                    }
+                }
+            ]);
+        }else{
+            $scope.LayersAction({close:true});
+        }
+
     };
     
     
@@ -305,8 +383,14 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
 		$scope.LayersAction({open:{name:"prodLayer6"}});
     };
 	
-	$scope.goToEnd = function(id){
-		alert("Guardar Producto");
+	$scope.goToEnd = function(){
+        $scope.LayersAction({close:{all:true,before:function(){
+            //critForm.setLine(false);
+        },
+        after:function(){
+            setNotif.addNotif("ok", "El producto se ha finalizado correctamente", [
+            ],{autohidden:2000});
+        }}});
 	};
     // -------------------------------------------------------
     
@@ -370,6 +454,9 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
     });
 
     $scope.saveExtraData = function(frm){
+        if(App.getSeccion().key!=="productos"){
+            return false;
+        }
        if(!$scope.$eval(frm).$pristine && $scope.$eval(frm).$valid){
            if(frm=="frmPoints"){
                productos.put({type:"savePoints"},$scope.prod,function (data) {
@@ -886,9 +973,11 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
 });
 
 
-MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout',function ($scope, setNotif,productos,productsServices,$timeout) {
+MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout', function ($scope, setNotif,productos,productsServices,$timeout) {
     $scope.prod = productsServices.getProd();
 
+    $scope.crit = productsServices.getCriteria();
+    console.log($scope.crit.criteria)
 
 	$scope.prodCrir = 
 	[{

@@ -10,9 +10,11 @@ namespace App\Models\Sistema\Criterios;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Http\Traits\Journal;
 class CritCampoOption extends Model
 {
     use SoftDeletes;
+    use Journal;
     protected $table = "tbl_crit_lct_opc";
 
     public function opciones(){

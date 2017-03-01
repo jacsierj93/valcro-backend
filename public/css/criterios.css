@@ -11,7 +11,9 @@
     white-space: nowrap;
     display: inline-block;
 }
-
+/*.bigField {
+    width: 60% !important;
+}*/
 .itemCrit{
     border-bottom: 1px solid #eee;
 }
@@ -90,4 +92,9 @@ treecontrol  li  li  li  li  li  li  li  li  li  li  li{
 }
 treecontrol  li  li  li  li  li  li  li  li  li  li  li  li{
     background-color: #223e54;
+}
+.eye_true{
+	width: 24px !important;
+	height: 24px !important;
+	background-image:url("images/eye_true.png");
 }

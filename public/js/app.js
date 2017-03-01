@@ -767,7 +767,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 }
             };
 
-            if(element.is("span") || element.is("div")){
+            if(element.is("span")){
                 element.on("mouseover", function(e) {
                     $timeout(function(){
                         showInfo();
@@ -840,10 +840,10 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
                     modelValue = modelValue.toString();
                     if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].toUpperCase() == compare.toUpperCase() && (scope.localId !=current.id)}).length<1) {
                         // it is valid
-                        setNotif.hideByContent("alert",attrs.duplicateMsg);
+                        //setNotif.hideByContent("alert",attrs.duplicateMsg);
                         def.resolve();
                     }else{
-                        setNotif.addNotif("alert",attrs.duplicateMsg,[]);
+                        //setNotif.addNotif("alert",attrs.duplicateMsg,[]);
 
                         def.reject();
                     }
@@ -921,13 +921,16 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
             month:"=?monthMsg",
             minImp:"=?minImpMsg",
             maxImp:"=?maxImpMsg",
-            mdMinLength:"=?mdMinLength"
+            mdMinLength:"=?mdMinLength",
+            duplicate:"=?duplicateMsg"
 
         },
         link: function(scope, elm, attrs, ctrl) {
 
             scope.errors = ctrl.$error;
+           // console.log(ctrl)
             scope.$watchCollection("errors",function(n,o){
+                //console.log(ctrl)
                 if(ctrl.$dirty){
                     angular.forEach(o,function(k,v){
                         if(!(v in n)){
@@ -941,7 +944,7 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
                         if((v in scope)){
                             btn = (scope[v].t == "alert")?[{name:"ok",action:function(){
                                 ctrl.$setValidity(v, true);
-                                console.log(ctrl.$error)
+                                //console.log(ctrl.$error)
                             }}]:[];
 
                             setNotif.addNotif(scope[v].t,scope[v].m,btn);

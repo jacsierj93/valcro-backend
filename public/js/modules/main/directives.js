@@ -689,6 +689,7 @@ MyApp.directive('formPreview', function() {
             $scope.formFilters = formPreviewSrv.getFilters();
             var validators = {};
             $scope.createModel = function(field){
+                
                 $scope.crit[''+field.id] = {value : "",childs:[]};
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
@@ -697,7 +698,6 @@ MyApp.directive('formPreview', function() {
                         key.childs.push(field.deps[i]);
                     if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
                         $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
-
                             isShow(n);
                         });
                     }

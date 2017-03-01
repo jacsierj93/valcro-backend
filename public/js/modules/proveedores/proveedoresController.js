@@ -526,12 +526,17 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };
 });
-MyApp.controller('resumenProv', function ($scope,setGetProv,providers) {
+MyApp.controller('resumenProv', function ($scope,setGetProv,providers,masterLists) {
     $scope.provider = setGetProv.getProv();
     $scope.prov = {tiemposP:[],tiemposT:[],direcciones:[]};
+    $scope.pais = masterLists.getCountries();
+
     $scope.$watch('provider.id',function(nvo){
         $scope.prov = setGetProv.getFullProv();
+        console.log($scope.prov)
     })
+
+
 });
 MyApp.controller('provCoins', function ($scope,listCoins,setGetProv) {
     $scope.prov = setGetProv.getProv();
@@ -1213,6 +1218,7 @@ MyApp.controller('portsControllers', function ($scope,masterLists,asignPort,setN
         $scope.asignPorts.ports.push(port.id);
         setNotif.addNotif("ok", "puerto añadido", [
         ],{autohidden:3000});
+        $scope.portFilter = "";
     };
 
     $scope.remove = function(index){
@@ -2084,10 +2090,12 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
     $scope.$watch('ctrl.pais.id', function(nvo) {
         //$scope.bnk.pais = nvo;
         $scope.states = (nvo)?masters.query({ type:"getStates",id:nvo||0}):[];
+        $scope.ctrl.state = undefined;
     });
     $scope.$watch('ctrl.state.id', function(nvo) {
         //$scope.bnk.est = nvo;
         $scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
+        $scope.ctrl.city = undefined;
     });
     var account = {};
     var saveBank = function(onSuccess,elem){

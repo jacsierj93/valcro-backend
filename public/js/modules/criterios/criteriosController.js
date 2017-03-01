@@ -302,7 +302,7 @@ MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidena
     
 }]);
 
-MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout) {
+MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout","App",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout,App) {
     $scope.nxtAction = null;
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
@@ -322,6 +322,9 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     });
 
     $scope.closeConstruct = function(){
+        if(App.getSeccion().key!=="criterios"){
+            return false;
+        }
         $mdSidenav("lyrConst1").close();
         $timeout(function(){
             $mdSidenav("lyrConst2").close()
@@ -330,6 +333,17 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             $mdSidenav("lyrConst3").close()
         },500);
     };
+
+    $scope.endCriterio = function(){
+        $scope.LayersAction({close:{all:true,before:function(){
+            critForm.setLine(false);
+        },
+        after:function(){
+            setNotif.addNotif("ok", "El Criterio se ha guardado satisfactoriamente", [
+            ],{autohidden:2000});
+        }}});
+
+    }
     
 
     $scope.showNext = function(status,to){
@@ -849,11 +863,11 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     $scope.visibility = [
         {
             id:'true',
-            icon:"icon-checkMark"
+            icon:"eye_true.png"
         },
         {
             id:'false',
-            icon:"icon-Eliminar"
+            icon:"eye_false.png"
         }
     ];
 
@@ -986,6 +1000,7 @@ MyApp.directive('lmbCollection', function() {
         scope: {
             itens: '=lmbItens',
             model: '=lmbModel',
+            label: '=lmbLabel',
             valid: '=?valid',
             dis: '=?ngDisabled'
         },
@@ -1047,7 +1062,6 @@ MyApp.directive('lmbCollection', function() {
                 }
             });
             attr.$observe('multiple', function (newValue) {
-                console.log(newValue);
                 if(newValue){
                     scope.multi = true;
                 }else{
@@ -1064,7 +1078,11 @@ MyApp.directive('lmbCollection', function() {
             attr.filterBy = null;
             var iconField = "item."+attr.lmbIcon || "";
             if(attr.lmbType=="items"){
-                return '<div><div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" info="{{item.'+show+'}}" layout-align="center center"><span ng-if="item.icon" class="{{item.icon}}"></span>{{item.'+show+'}}</div></div>';
+                return '<div>' +
+                    '<div flex layout="column">' +
+                    '<div style="height:10px; font-size: 10px; color:rgba(0,0,0,0.54); font-weight:bold; text-transform: uppercase">{{label}}</div>' +
+                    '<div style="height:27px;margin-top: 3px" layout="row">' +
+                    '<div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center"><md-tooltip>{{item.'+show+'}}</md-tooltip><div ng-if="item.icon" layout="column" layout-align="center center" class="{{item.icon}}"><img ng-if="item.icon.indexOf(\'.png\')!=-1" ng-src="images/{{item.icon}}"/></div>{{item.'+show+'}}</div></div></div></div>';
             }else{
                 return '<md-content flex layout="column">'+
                     '<div layout="row" ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> <div flex>{{item.'+show+'}}</div><div ng-show="'+iconField+' != \'\'" flex><img ng-src="images/{{'+iconField+'}}"/></div> </div>'

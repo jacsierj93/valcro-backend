@@ -90,10 +90,10 @@
                     <span class="icon-Actualizar" style="font-size: 23px"></span>
                    <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
-                <div layout="column" layout-align="center center" ng-click="showAlert()" ng-show="prov.id">
+                <!--<div layout="column" layout-align="center center" ng-click="showAlert()" ng-show="prov.id">
                     <span class="icon-Filtro" style="font-size: 24px"></span>
-                    <?/*= HTML::image("images/filtro.png") */?>
-                </div>
+
+                </div>-->
                 <vl-progress ng-model="progreso.data" vl-index="progreso.index" ></vl-progress>
                 <div style="width:36px;"></div>
                <!-- <div layout="row" layout-align="center right" flex id="progress_percent">
@@ -137,34 +137,51 @@
                     <div style="width:24px"></div>
                     <!-- 12) ########################################## COLUMNA 1 RESUMEN ########################################## -->
                     <div layout="column" flex style="margin-right:8px;">
-                        <div class="titulo_formulario" style="height:39px;">
-                            <div>
-                                Proveedor
+                        <div class="titulo_formulario row" layout="row">
+                            <div flex="initial">
+                                Proveedor / Siglas
+                            </div>
+                            <div style="width:120px" layout="row">
+                                <div flex ng-if="(prov.contrapedido==1)" layout-align="end center">
+                                    <md-tooltip>Acepta Contrapedidos</md-tooltip>
+                                    <span  class=" icon-Contrapedidos" style="font-size: 23px"></span>
+                                </div>
+                                <div flex ng-if="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" layout-align="end center">
+                                    <md-tooltip>Acepta Fletes Aereo</md-tooltip>
+                                    <span  style="font-size: 23px" class="icon-Aereo"></span>
+                                </div>
+                                <div flex ng-if="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)"  layout-align="end center">
+                                    <md-tooltip>Acepta Fletes Maritimo</md-tooltip>
+                                    <span style="font-size: 23px" class="icon-Barco" /></span>
+                                </div>
+
+                                <!-- <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
+                                 <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />-->
                             </div>
                         </div>
-                        <div style="height:39px;">
-                            <div class="textResm" style="width:calc(70% - 8px); height:39px; float:left;">
+                        <div class="row" layout="row">
+                            <div flex class="resumEm">
                                 {{prov.razon_social}}
-
                             </div>
-
-                            <div class="textResm" style="width:calc(30% - 40px); height:39px; float:left;">
+                            <div flex="initial" class="resumEm">
                                 {{prov.siglas}}
                             </div>
-                            <span ng-show="(prov.contrapedido==1)" class=" icon-contrapedidos" style="font-size: 23px"></span>
 
                         </div>
-                        <div class="titulo_formulario" style="height:39px;" layout-align="start start">
-                            <div>
-                                Nombres Valcro
+                        <div flex layout="column">
+                            <div class="titulo_formulario row" layout-align="start start">
+                                <div>
+                                    Nombres Valcro
+                                </div>
                             </div>
+                            <md-content flex >
+                                <div class="itemName" ng-repeat="name in prov.nomValc">
+                                    {{name.name}}
+                                </div>
+                            </md-content>
                         </div>
-                        <div flex style="overflow-y:auto;">
-                            <div class="itemName" ng-repeat="name in prov.nomValc">
-                                {{name.name}}
-                            </div>
-                        </div>
-                        <div class="titulo_formulario" style="height:39px;">
+
+                 <!--       <div class="titulo_formulario" style="height:39px;">
                             <div>
                                 Tipo de envio
                             </div>
@@ -174,70 +191,85 @@
                                 <span ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
                                 <span ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" style="font-size: 23px" class="icon-Barco" /></span>
 
-                               <!-- <img ng-show="(prov.tipo_envio_id==1 || prov.tipo_envio_id==3)" src="images/aereo.png" />
-                                <img ng-show="(prov.tipo_envio_id==2 || prov.tipo_envio_id==3)" src="images/maritimo.png" />-->
+                               </div>
+                        </div>-->
+                        <div flex layout="column">
+                            <div class="titulo_formulario row">
+                                <div>
+                                    Tiempos Estimados
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="titulo_formulario" style="height:39px;">
-                            <div>
-                                Tiempos Estimados
+                            <div class="row resumEm">
+                                Produccion:
                             </div>
-                        </div>
-                        <div style="height:24px;">
-                            Produccion:
-                        </div>
-                        <div flex style="overflow-y: auto;">
-                            <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposP">
-                                de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
+                            <md-content flex>
+                                <div class="row resumBlock" layout="row" layout-align="start center" style="overflow: hidden; text-overflow: ellipsis;" ng-repeat="tiempo in prov.tiemposP">
+                                    de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
+                                </div>
+                            </md-content>
+                            <div class="row resumEm">
+                                Transito:
                             </div>
-                        </div>
-                        <div style="height:24px;">
-                            Transito:
-                        </div>
-                        <div flex style="overflow-y: auto;">
-                            <div style="height:23px; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; margin-bottom: 8px;" ng-repeat="tiempo in prov.tiemposT">
-                                de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> desde <b>{{tiempo.country.short_name}}</b>
-                            </div>
+                            <md-content flex >
+                                <div class="row resumBlock" layout="row" layout-align="start center" style="overflow: hidden; text-overflow: ellipsis;" ng-repeat="tiempo in prov.tiemposT">
+                                    de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> desde <b>{{tiempo.country.short_name}}</b>
+                                </div>
+                            </md-content>
                         </div>
 
                     </div>
                     <!-- 13) ########################################## COLUMNA 2 RESUMEN ########################################## -->
                     <div layout="column" flex style="margin-right:8px;">
-                        <div flex>
-                            <div class="titulo_formulario" style="height: 39px;">
+                        <div flex layout="column">
+                            <div class="titulo_formulario row" >
                                 <div>
                                     Direcciones
                                 </div>
                             </div>
-                            <div style="overflow-y: auto; height: calc(100% - 39px);">
-                                <div ng-repeat="direccion in prov.direcciones" style="height: 60px; width:100%;">
-                                    <div style="width: 30%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis; font-weight:bold;">
-                                        {{direccion.tipo.descripcion}}
+                            <md-content flex>
+                                <div ng-repeat="direccion in prov.direcciones" class="resumBlock" layout="column">
+                                    <div class="row" layout="row">
+                                        <div flex style="overflow: hidden; text-overflow: ellipsis;" class="resumEm">
+                                            {{direccion.tipo.descripcion}}
+                                        </div>
+                                        <div flex="initial">
+                                            (venezuela)
+                                        </div>
+
                                     </div>
-                                    <div style="width: 70%; height: 20px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                        {{direccion.country.short_name}}
-                                    </div>
-                                    <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
+
+                                    <div class="row" style="overflow: hidden;">
                                         {{direccion.direccion}}
                                     </div>
                                 </div>
-                            </div>
+                            </md-content>
                         </div>
-                        <div flex>
-                            <div class="titulo_formulario" style="height: 39px;">
+                        <div flex layout="column">
+                            <div class="titulo_formulario row">
                                 <div>
                                     Contactos
                                 </div>
                             </div>
-                            <div style="overflow-y: auto; height: calc(100% - 39px);">
-                                <div ng-repeat="contact in prov.contacts" style="height: 39px;">
-                                    <div style="width: 100%; height: 39px; float: left; overflow: hidden; text-overflow: ellipsis;">
-                                        <span style="font-weight: bold !important; float:left;">{{contact.nombre}}: </span>
-                                        <span style="float:left;" ng-repeat="cargo in contact.cargos">{{cargo.cargo}},</span>
+                            <md-content>
+                                <div ng-repeat="contact in prov.contacts"  class="resumBlock" layout="column">
+                                    <div class="row" flex layout="row" layout-align="start center">
+                                        <div class="resumEm" style=" overflow: hidden; text-overflow: ellipsis" flex>{{contact.nombre}} </div>
+                                        <div flex="grown">
+                                            ({{contact.country.short_name}})
+                                        </div>
+                                    </div>
+
+                                    <div class="row" flex>
+                                        {{contact.emails[0].valor}}
+                                    </div>
+                                    <div class="row" flex layout="row">
+                                       <!-- <div style=" overflow: hidden; text-overflow: ellipsis" flex>{{contact.country.short_name}}</div>-->
+                                        <div flex>
+                                            {{contact.phones[0].valor}}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </md-content>
                         </div>
                     </div>
                     <!-- 14) ########################################## COLUMNA 3 RESUMEN ########################################## -->
@@ -281,18 +313,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div flex>
-                            <div class="titulo_formulario" style="height: 39px;">
+                        <div flex layout="column">
+                            <div class="titulo_formulario row" >
                                 <div>
                                     Cuentas Bancarias
                                 </div>
                             </div>
-                            <div style="overflow-y: auto; height:calc(100% - 39px); posi">
-                                <div ng-repeat="bank in prov.banks" style="width: 100%;">
-                                    <div style="width: 100%; height:24px; font-weight:bold;">{{bank.banco}}</div>
-                                    <div style="width: 100%; height:24px;">{{bank.cuenta}}</div>
+                            <md-content flex>
+                                <div ng-repeat="bank in prov.banks" class="resumBlock">
+                                    <div class="row">{{bank.banco}}</div>
+                                    <div class="row resumEm">{{bank.cuenta}}</div>
                                 </div>
-                            </div>
+                            </md-content>
                         </div>
                     </div>
 
@@ -356,6 +388,7 @@
                                        autocomplete="off" 
                                        ng-blur="check('razon_social')"
                                        duplicate="list"
+
                                        duplicate-msg="ya existe un proveedor con esta razon social"
                                        field="razon_social"
                                        name="razon_social"
@@ -381,6 +414,7 @@
                                        autocomplete="off"
                                        ng-blur="check('siglas')"
                                        duplicate="list"
+
                                        duplicate-msg="ya existe un proveedor con estas siglas"
                                        field="siglas"
                                        maxlength="6"
@@ -454,9 +488,9 @@
                             <div layout="row" id="valNameContainer">
                                 <md-input-container flex id="valcroName">
                                     <label>Nombre...</label>
-                                    <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" duplicateMsg="este nombre Vacro ya existe" field="nombre" ng-minlength="3" required name="name" id="name" ng-model="valName.name" ng-disabled="$parent.enabled">
+                                    <input skip-tab info="indique el o los nombre(s) o marca(s) con el que se conoce este proveedor en los departamentos" autocomplete="off" duplicate="allName" erro-listener duplicate-msg="{t:'error',m:'este nombre Valcro ya existe'}" field="nombre" ng-minlength="3" required name="name" id="name" ng-model="valName.name" ng-disabled="$parent.enabled">
                                 </md-input-container>
-                                <span class="icon-Lupa" style="width:24px;" ng-click="$parent.openPopUp('nomValLyr')" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
+                                <span class="icon-Lupa" style="width:36px;" ng-click="$parent.openPopUp('nomValLyr')" ng-show="coinc.length>0" ng-bind="coinc.length"> </span>
                                 <vlc-group class="iconValName" skip-tab>
                                     <span ng-repeat="dep in deps" icon-group info="{{dep.desc}}" ng-class="{'iconActive':(exist(dep.id,0)),'iconFav':(exist(dep.id,1))}" ng-click="setDepa(this,$event)" ng-dblclick="setFav(this)" class="{{dep.icon}} iconInactive iconInput" style="font-size: 18px; margin-left: 8px; color:black"></span>
                                 </vlc-group>
@@ -848,8 +882,26 @@
                                     </div>-->
                                 </md-input-container>
                             </div>
+                            <div class="row" layout="row">
+                                <md-input-container class="md-block" flex>
+                                    <input skip-tab
+                                           info="escriba parte del nombre del puerto"
+                                           ng-disabled="$parent.enabled"
+                                           autocomplete="off"
+                                           name="razon_social"
+                                           maxlength="80"
+                                           ng-minlength="3"
+                                           md-no-asterisk
+                                           ng-model="portFilter"
+                                    >
+                                    <!--<div ng-messages="user.pais.$error">
+                                        <div ng-message="required">Campo Obligatorio.</div>
+
+                                    </div>-->
+                                </md-input-container>
+                            </div>
                             <md-content flex style="max-height: 200px;">
-                                <div ng-repeat="port in ports | customFind : country.default : searchPort" style="border-bottom: 1px solid #f1f1f1; height: 32px;" ng-dblclick="assign(port)">
+                                <div ng-repeat="port in ports | customFind : country.default : searchPort | stringKey : portFilter : 'Main_port_name' " style="border-bottom: 1px solid #f1f1f1; height: 32px;" ng-dblclick="assign(port)">
                                     <div layout="column" >
                                         <div layout="row" flex="grow">
                                             <div flex>

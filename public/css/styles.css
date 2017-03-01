@@ -1119,9 +1119,18 @@ div.activeleft{
     background-color: #fff;
 }
 
-.resumCell{
+.resumCell {
     border-bottom: 1px solid #f1f1f1;
     margin-right: 8px;
+}
+
+.resumEm {
+    color:#9d9d9d;
+    font-weight: bold !important;
+}
+
+.resumBlock{
+    border-bottom:1px solid #ccc;
 }
 
 .reserved{

@@ -88,6 +88,7 @@
                 lmb-model="crit[field.id].value"
                 lmb-display="elem.nombre"
                 lmb-itens="field.options.Opcion"
+                lmb-label="field.options.placeholder[0].pivot.value || field.field.descripcion"
                 lmb-key="elem.id"
                 ng-attr-multiple="field.options.multi[0].pivot.value==1"
                 data="{{formFilters[field.id]}}"
