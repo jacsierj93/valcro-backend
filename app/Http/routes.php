@@ -90,7 +90,11 @@ if (Request::is('master/*'))
 {
     require __DIR__.'/master_routes.php';
 }
-
+//////enrutador para servicios de usuarios
+if (Request::is('usrs/*'))
+{
+    require __DIR__.'/usrs_routes.php';
+}
 
 //$app->get('/', 'Account\AccountController@main'); ///pagina principal
 $app->get('/', [

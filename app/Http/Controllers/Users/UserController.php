@@ -25,7 +25,12 @@ class UserController extends BaseController
         $this->middleware('auth');
     }
 
-
+    public function getUsuarios()
+    {
+        $data = User::all();
+        return $data;
+    }
+    
     public function getList()
     {
 

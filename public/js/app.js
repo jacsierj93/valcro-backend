@@ -36,6 +36,11 @@ var urls = [
         key:'productos',
         url: 'modules/productos/index',
         selct: 'btnDot'
+    }, {
+        secc: 'Usuarios',
+        key:'usuarios',
+        url: 'modules/usuarios/index',
+        selct: 'btnDot'
     }];
 
 var MyApp = angular.module('MyApp', dependency, function() {
