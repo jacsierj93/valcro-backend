@@ -94,8 +94,8 @@
     cursor: default;
     width: 100%;
     height: 100%;
-    z-index:{{block.level}}
-" ng-show="block.block">
+    z-index:{{block}}
+" ng-show="block != 0 ">
 
 </div>
 <div ng-controller="LayersCtrl"></div>

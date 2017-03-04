@@ -97,7 +97,7 @@
 
                     </div>
                     <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;" ng-click="FilterLateralMas()">
-                        <img ng-src="{{imgLateralFilter}}">
+                        <span class="icon-Up" style="font-size: 24px; width: 24px; height: 24px; color:#ccc" ></span>
                         <!--<span class="icon-Down" style="font-size: 24px; width: 24px; height: 24px;" ></span>-->
                     </div>
                 </div>
@@ -479,7 +479,7 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="fecha_envio"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="send"></grid-order-by>
                             </div>
                             <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
@@ -491,7 +491,7 @@
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="Asunto"></grid-order-by>
                             </div>
-                            <div flex layout="row">
+                           <!-- <div flex layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Contenido</label>
                                     <input type="text" class="inputFilter"  ng-minlength="2"
@@ -500,7 +500,7 @@
                                     >
                                 </md-input-container>
                                 <grid-order-by ng-model="tbl" key="contenido"></grid-order-by>
-                            </div>
+                            </div>-->
                             <div layout="row" style="width: 80px;">
                                 <md-input-container class="md-block"  flex>
                                     <label>Adjs.</label>
@@ -509,17 +509,17 @@
                                            skip-tab
                                     >
                                 </md-input-container>
-                                <grid-order-by ng-model="tbl" key="adjs"></grid-order-by>
+                                <grid-order-by ng-model="tbl" key="countAttachments"></grid-order-by>
                             </div>
                         </div>
                     </div>
                     <div class="gridContent" flex   >
                         <div   ng-repeat="item in tbl.data" ng-click="test('email')">
                             <div layout="row" class="cellGridHolder" >
-                                <div flex class="cellGrid"  >{{item.fecha_envio}}</div>
-                                <div flex class="cellGrid"  >{{item.asunto}}</div>
-                                <div flex= class="cellGrid" > {{item.contenido}}</div>
-                                <div  style="width: 80px;" > {{item.adjs}}</div>
+                                <div active-left ></div>
+                                <div flex class="cellGrid"  ng-click="open(item)">{{item.send | date : 'dd/MM/yyyy'}}</div>
+                                <div flex class="cellGrid"  ng-click="open(item)" >{{item.asunto}}</div>
+                                <div style="width: 80px;" class="cellGrid"  ng-click="open(item)"> {{item.countAttachments}}</div>
                             </div>
                         </div>
                     </div>
@@ -535,11 +535,21 @@
                 <div layout="column" flex>
                     <div layout="row" class="focused">
                         <div active-left ></div>
+
                         <div layout="row" flex class="form-row-head form-row-head-select">
                             <div class="titulo_formulario" style="height: 39px;color: rgb(92, 183, 235);" flex>
                                 <div>
                                     <span >{{provSelec.razon_social}}</span>
                                 </div>
+                            </div>
+                            <div layout="row" layout-align="start center"   style="width:56px">
+                                <div>
+                                    <md-switch class="md-primary" ng-model="tbl.sender.all" ng-change="tbl.actionLoad(tbl.sender)" ng-init="tbl.all = false;" > </md-switch>
+                                </div>
+                                <md-tooltip >
+                                    ¿Mostra todos?
+                                </md-tooltip>
+                                <!--<span>¿Mostra todos?</span>-->
                             </div>
                         </div>
                     </div>
@@ -548,6 +558,18 @@
                         <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
                         <div layout="row" class="row" flex ng-init="docOrder.order == id " tyle="padding-right: 4px;">
                             <div class="cellEmpty"> </div>
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nro. Doc</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="id"></grid-order-by>
+
+
+                            </div>
                             <div layout="row" style="width: 120px;" >
                                 <md-select ng-model="tbl.filter.documento" ng-init="tbl.filter.documento ='-1'" flex style="">
                                     <md-option value="-1" layout="row" style="overflow: hidden;">
@@ -697,7 +719,9 @@
                             <div   ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : tbl.order as filter"   id="doc{{$index}}"  >
                                 <div layout="row" class="cellGridHolder" >
                                     <div  class=" cellEmpty" ng-mouseenter="hoverpedido(item)" ng-mouseleave="hoverpedido()" ng-mouseover="notCloseSumary()" ng-click="DtPedido(item)"> </div>
-                                    <div style="width: 120px;" class="cellEmpty cellSelect"  tabindex="{{$index + 1}}">
+                                    <div flex="10" class="cellGrid"  ng-click="DtPedido(item)"> {{item.id}}</div>
+
+                                    <div style="width: 120px;" class="cellEmpty "  tabindex="{{$index + 1}}">
 
                                         <div layout-align="center center"  style="text-align: center; width: 100%; ">
                                             <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
@@ -875,7 +899,7 @@
                         <div  layout="column" flex="">
                             <div flex>
                                 <div layout="row" class="cellGridHolder" ng-repeat="item in resumen.productos.todos |filter: tblResumenPe.filter:strict | orderBy :tblResumenPe.order as filterResumenPed" id="resumenPeItem{{$index}}" row-select>
-                                    <div flex="15" class="cellSelect cellEmpty" tabindex="{{$index + 1}}" > {{item.cod_producto}}</div>
+                                    <div flex="15" class=" cellEmpty" tabindex="{{$index + 1}}" > {{item.cod_producto}}</div>
                                     <div flex class="cellGrid">  {{item.descripcion}}</div>
                                     <div flex class="cellGrid"> {{item.documento}}</div>
                                     <div flex="10" class="cellGrid"> {{item.saldo}}</div>
@@ -1439,7 +1463,7 @@
                                             <md-switch class="md-primary"
                                                        ng-disabled="true" ng-model="item.asignado"> </md-switch>
                                         </div>
-                                        <div flex="10" class="cellSelect" ng-click="openProd(item)" > {{item.codigo}}</div>
+                                        <div flex="10" class="" ng-click="openProd(item)" > {{item.codigo}}</div>
                                         <div flex class="cellGrid" ng-click="openProd(item)">  {{item.descripcion}}</div>
                                         <div flex class="cellGrid" ng-click="openProd(item)" > {{item.documento}}</div>
                                         <div flex="10" class="cellGrid"  ng-click="openProd(item)" > {{item.saldo}}</div>
@@ -1686,7 +1710,7 @@
                             <div   ng-repeat="item in providerProds | filter:tbl_listProducProv.filter:strict | orderBy : tbl_listProducProv.order  as filterProductProv"
                                    ng-mouseenter = "mouseEnterProd(item) " row-select >
                                 <div layout="row" class="cellGridHolder" >
-                                    <div flex="5" class="cellEmpty cellSelect">
+                                    <div flex="5" class="cellEmpty ">
                                         <md-switch class="md-primary"  ng-click="change(item, $event)"  ng-disabled="(true)" ng-model="item.asignado"></md-switch>
                                     </div>
                                     <div flex="20" class="cellGrid" ng-click="openItem(item, $index)"> {{item.codigo}}</div>
@@ -3191,7 +3215,7 @@
                             <div flex >
                                 <div  ng-repeat="item in $parent.document.productos.todos | filter:filter.filter:strict |orderBy : tbl_finalDoc.order  "  >
                                     <div layout="row" class="cellGridHolder" >
-                                        <div flex="20" class="cellSelect" ng-class="{'cellSelect':( finalProdSelec.id  != item.id) ,'cellSelect-select':(finalProdSelec.id  == item.id )}" >
+                                        <div flex="20" class="" ng-class="{'':( finalProdSelec.id  != item.id) ,'-select':(finalProdSelec.id  == item.id )}" >
                                             {{item.codigo}}
                                         </div>
                                         <div flex="20" class="cellGrid" > {{item.codigo_fabrica}}</div>
@@ -3231,6 +3255,19 @@
                     <div layout="row" class="table-filter">
                         <div active-left  before="verificExit"></div>
                         <div layout="row" class="row" flex ng-init="docOrder.order == id " tyle="padding-right: 4px;">
+
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nro. Doc</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="id"></grid-order-by>
+
+
+                            </div>
                             <div layout="row" style="width: 120px;" >
                                 <md-select ng-model="tbl.filter.documento" ng-init="tbl.filter.documento ='-1'" flex style="">
                                     <md-option value="-1" layout="row" style="overflow: hidden;">
@@ -3320,14 +3357,17 @@
                             <div  flex >
                                 <div   ng-repeat="item in filterDocuments(tbl.data ,tbl.filter) | orderBy : tbl.order "  >
                                     <div layout="row" class="cellGridHolder" ng-click="open(item)">
-                                        <div style="width: 120px;" class="cellEmpty cellSelect"  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
+                                        <div flex class="cellGrid" > {{item.id}}</div>
+                                        <div style="width: 120px;" class="cellEmpty "  ng-mouseover="hoverPreview(true)" tabindex="{{$index + 1}}">
                                             <div>
                                                 <div layout-align="center center"  style="text-align: center;     margin-left: 12px;">
                                                     <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
                                                 </div>
                                             </div>
                                         </div>
-                                        <div flex="5" class="cellSelect"  tabindex="{{$index + 1}}" > {{item.id}}</div>
+
+
+                                        <div flex="5" class=""  tabindex="{{$index + 1}}" > {{item.id}}</div>
                                         <div flex class="cellGrid"> {{item.proveedor}}</div>
                                         <div flex class="cellGrid" > {{item.titulo}}</div>
                                         <div flex="10" class="cellGrid" > {{item.emision| date:'dd/MM/yyyy' }}</div>
@@ -3365,6 +3405,19 @@
                         <div active-left  ng-show="(!preview && layer != 'listPedido')" before="verificExit"></div>
                         <div layout="row" class="row" flex ng-init="docOrder.order == id " tyle="padding-right: 4px;">
                             <div active-left  before="verificExit" ></div>
+
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nro. Doc</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="id"></grid-order-by>
+
+
+                            </div>
                             <div layout="row" style="width: 120px;" >
                                 <md-select ng-model="tbl.filter.documento" ng-init="tbl.filter.documento ='-1'" flex style="">
                                     <md-option value="-1" layout="row" style="overflow: hidden;">
@@ -3453,16 +3506,18 @@
                             <div flex>
                                 <div ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : tbl.order "  row-select>
                                     <div layout="row" class="cellGridHolder" >
-
-                                        <div style="width: 120px;" ng-click="openTempDoc(item)" class="cellEmpty cellSelect" tabindex="{{$index + 1}}">
+                                        <div flex class="cellGrid" ng-click="openTempDoc(item)" > {{item.id}}</div>
+                                        <div style="width: 120px;" ng-click="openTempDoc(item)" class="cellEmpty " tabindex="{{$index + 1}}">
                                             <div>
                                                 <div layout-align="center center"  style="text-align: center;     margin-left: 12px;">
                                                     <img style="width: 20px;" ng-src="{{transforDocToImg(item.documento)}}" />
                                                 </div>
                                             </div>
                                         </div>
-                                        <div flex="5" class="cellSelect" ng-click="openTempDoc(item)"
-                                             ng-class="{'cellGrid':( addAnswer.doc_id  != item.id) ,'cellSelect-select':(addAnswer.doc_id  == item.id )}"
+
+
+                                        <div flex="5" class="" ng-click="openTempDoc(item)"
+                                             ng-class="{'cellGrid':( addAnswer.doc_id  != item.id) ,'-select':(addAnswer.doc_id  == item.id )}"
                                              tabindex="{{$index + 1}}"
                                         > {{item.id}}
                                         </div>
@@ -3508,6 +3563,19 @@
                         <div layout="row" flex>
 
                             <div style="width: 48px;"></div>
+
+                            <div flex="10" layout="row">
+                                <md-input-container class="md-block"  flex>
+                                    <label>Nro. Doc</label>
+                                    <input type="text" class="inputFilter"  ng-minlength="2"
+                                           ng-model="tbl.filter.id"
+                                           skip-tab
+                                    >
+                                </md-input-container>
+                                <grid-order-by ng-model="tbl" key="id"></grid-order-by>
+
+
+                            </div>
                             <div flex="10" layout="row">
                                 <md-input-container class="md-block"  flex>
                                     <label>Version</label>
@@ -3578,11 +3646,13 @@
                                 <div ng-repeat="item in filterDocuments(tbl.data, tbl.filter) | orderBy : tbl.order "  row-select>
                                     <div layout="row" class="cellGridHolder" >
 
-                                        <div style="width: 48px;" class="cellEmpty cellSelect"  tabindex="{{$index + 1}}" ng-click="open(item);">
+                                        <div style="width: 48px;" class="cellEmpty "  tabindex="{{$index + 1}}" ng-click="open(item);">
                                             <div layout-align="center center"  style="text-align: center; width: 100%; ">
                                                 <img style="width: 20px;" ng-src="images/lupa.png" />
                                             </div>
                                         </div>
+                                        <div flex class="cellGrid" ng-click="restore(item)" > {{item.id}}</div>
+
                                         <div flex="10" class="cellGrid"  ng-click="restore(item);"  > {{item.version}}</div>
                                         <div flex class="cellGrid"  ng-click="restore(item);" > {{item.proveedor}}</div>
                                         <div flex class="cellGrid"  ng-click="restore(item);" > {{item.titulo}}</div>

@@ -88,6 +88,11 @@ class Order extends Model
     public function docPayment(){
         return $this->belongsTo('App\Models\Sistema\Payments', 'pago_factura_id');
     }
+
+    //TODO normalizar
+    public function estado(){
+        return $this->belongsTo('App\Models\Sistema\Order\OrderStatus', 'estado_id');
+    }
     /****************************** FIN RELACIONALES *****************************/
     /******************************  RELACIONAL FOR QUERYS *****************************/
 

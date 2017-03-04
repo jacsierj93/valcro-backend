@@ -61,12 +61,28 @@ class MailModule extends Model
     protected $dates = ['deleted_at'];
 
 
+    /************************************************** Relaciones ************************************************/
     /**
      *sennder
      */
     public function senders(){
         return $this->hasMany('App\Models\Sistema\MailModels\MailModuleDestinations', 'doc_id');
     }
+ /**
+     *adjuntos
+     */
+    public function attachments(){
+        return $this->hasMany('App\Models\Sistema\MailModels\MailModuleAttachment', 'doc_id');
+    }
+/**
+     *adjuntos
+     */
+    public function countAttachments(){
+        return $this->attachments()->count();
+    }
+
+
+    /************************************************** Funciones ************************************************/
 
     public function sendMail ($template,$sender =  []){
 

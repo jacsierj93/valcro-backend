@@ -28,6 +28,10 @@ class PurchaseItem extends Model
     public function document(){
         return $this->belongsTo('App\Models\Sistema\Purchase\Purchase', 'doc_id');
     }
+    //TODO normalizar
+    public function tipo_producto(){
+        return $this->belongsTo('App\Models\Sistema\Produc\ProductType', 'tipo_producto_id');
+    }
 /*
     public  function getAdvancePaymentProvider(){
 

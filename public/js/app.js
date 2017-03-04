@@ -1110,57 +1110,16 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
 MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect) {
 
     $scope.bindBlock=App.getBindBloc();
-    /* $scope.secciones= urls;
-     $scope.binseccion =App.getSeccion();
-
-
-     if(Object.keys($location.search()).length  > 0){
-     var params = $location.search();
-     ExtRedirect.set(params);
-     if(params.secc){
-     console.log("redirect ",params);
-     $location.replace('/modules/Pedidos');
-
-
-     }
-     }
-
-     $scope.$watchConlletion('binseccion', function (newVal) {
-     console.log('new val in app', newVal);
-     });
-     $scope.accion = App.getAccion();
-
-     $scope.seccLink = function (item){
-     //$scope.seccion = angular.copy(item);
-     var url = '/'+item.key;
-     $location.path(url);
-
-     App.setSeccion(item);
-     Layers.setModule(item.key);
-     console.log('in app',App.getSeccion());
-
-     };
-     */
-  /*   $scope.$watch('bindBlock.estado' , function(newval){
-         console.log('in app', newval);
-     if(newval){
-         console.log("blocl ",App.getBindBloc());
-     $scope.block= App.getBindBloc().value.block;
-     $scope.level= App.getBindBloc().value.level;
-
-     App.getBindBloc().estado=false;
-     }
-     });*/
 
 });
 MyApp.controller('AppBlock', ['$scope','App',function ($scope, App){
     $scope.bindBlock=App.getBindBloc();
     $scope.$watch('bindBlock.estado' , function(newval){
-        console.log('in app', newval);
-        if(newval){
 
-            $scope.block= App.getBindBloc().value.block;
-            $scope.level= App.getBindBloc().value.level;
+        if(newval){
+            $scope.block= App.getBindBloc().value;
+            console.log('in app', $scope.block);
+
 
         }
     });

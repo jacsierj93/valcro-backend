@@ -31,4 +31,10 @@ class SolicitudeItem extends Model
     public function customOrder(){
         return $this->belongsTo('App\Models\Sistema\CustomOrders\CustomOrder', 'uid');
     }
+    //TODO normalizar
+    public function tipo_producto(){
+        return $this->belongsTo('App\Models\Sistema\Produc\ProductType', 'tipo_producto_id');
+    }
+
+
 }

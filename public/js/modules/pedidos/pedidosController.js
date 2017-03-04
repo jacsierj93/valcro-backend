@@ -47,7 +47,6 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
     $scope.showFilterPed=false;
     $scope.showLateralFilter=false;
     $scope.showLateralFilterCpl=false;
-    $scope.imgLateralFilter="images/Down.png";
 
     $scope.preview=true;
     $scope.provSelec ={};
@@ -109,6 +108,23 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
                             return false;
                         }
                         if( current.nro_proforma.toLowerCase().indexOf(compare.nro_proforma)== -1){
+                            return false;
+                        }
+
+                    }
+                    if(compare.nro_doc){
+                        if(!current.nro_doc){
+                            return false;
+                        }
+                        if( current.nro_doc.toLowerCase().indexOf(compare.nro_doc)== -1){
+                            return false;
+                        }
+
+                    }if(compare.id){
+                        if(!current.id){
+                            return false;
+                        }
+                        if( current.id.toLowerCase().indexOf(compare.id)== -1){
                             return false;
                         }
 
@@ -249,25 +265,10 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
     };
     // amplia  el filtro de proveedores
     $scope.FilterLateralMas = function(){
-        if(!$scope.showLateralFilterCpl){
-            var ele= jQuery("#barraLateral");
-            var newHeight =ele.height() - (176);
-            if(newHeight >= 176){
-                jQuery("#menu").animate({height:newHeight},400);
-            }else{
-                jQuery("#menu").animate({height:"100%"},400);
-            }
+        jQuery("#menu").animate({height:"48px"},400);
+        $scope.showLateralFilter=false;
+        $scope.showLateralFilterCpl=false;
 
-
-            $scope.showLateralFilterCpl=true;
-            $scope.imgLateralFilter="images/Down.png";
-        }else {
-            jQuery("#menu").animate({height:"48px"},400);
-            $scope.showLateralFilter=false;
-            $scope.showLateralFilterCpl=false;
-
-
-        }
     };
 
     // verifiaca la salida del layers
@@ -827,14 +828,14 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
             if(timeBlock != null){
                 $timeout.cancel(timeBlock);
             }
-            App.setBlock({block:true, level:  89});
+            App.setBlock(150);
         }
-        if(newVal.get == 0) {
+        if(newVal.get == 0 && App.getBindBloc().value == 150) {
             if(timeBlock != null){
                 $timeout.cancel(timeBlock);
             }
             timeBlock = $timeout(function () {
-                App.setBlock({block:false, level:  0});
+                App.setBlock(0);
             },500);
 
         }
@@ -985,22 +986,14 @@ MyApp.controller('OrderOldDocsCtrl',['$scope','$timeout', 'DateParse','Order','s
 
 MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse','clickCommitSrv','Order', function ($scope,$timeout,$filter,DateParse,commitSrv, Order) {
 
-    $scope.clikBind = commitSrv.bind();
-    $scope.tbl = {
-        data: [],
-        order:'id'
-    };
-    $scope.resumen  ={};
-    $scope.$parent.OrderlistPedidoCtrl = function () {
-        $scope.isHover = false;
-        $scope.LayersAction({open:{name:"listPedido", after:function(){
-            $scope.load( $scope.$parent.ctrl.provSelec.id);
-        }}});
-    };
 
-    $scope.load = function(id){
+    /*todo
+        cambiar por un objeto de tipo tbl
+    * */
+    function load(sender) {
+
         $scope.tbl.data.splice(0, $scope.tbl.data.length);
-        Order.query({type:"OrderProvOrder", id:id}, {},function(response){
+        Order.query(sender, {},function(response){
 
             angular.forEach(response, function (v, k) {
                 v.emision= DateParse.toDate(v.emision);
@@ -1012,7 +1005,24 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
                 $scope.tbl.data.push(v);
             });
         });
+    }
+
+    $scope.clikBind = commitSrv.bind();
+    $scope.tbl = {
+        data: [],
+        order:'id',
+        sender:{type: 'OrderProvOrder'},
+        actionLoad : load
     };
+    $scope.resumen  ={};
+    $scope.$parent.OrderlistPedidoCtrl = function () {
+        $scope.tbl.sender.id= angular.copy($scope.$parent.ctrl.provSelec.id);
+        $scope.isHover = false;
+        $scope.LayersAction({open:{name:"listPedido", after:function(){
+            $scope.tbl.actionLoad($scope.tbl.sender);
+        }}});
+    };
+
 
     $scope.$watch('clikBind.state', function (newVal) {
         if(newVal){
@@ -1076,10 +1086,23 @@ MyApp.controller('OrderlistPedidoCtrl',['$scope','$timeout','$filter','DateParse
 
 }]);
 
-MyApp.controller('OrderlistEmailsImportCtrl',['$scope','$timeout','DateParse','Order','providers','setGetOrder','clickCommitSrv',  function ($scope,$timeout,DateParse, Order,providers, setGetOrder,commitSrv) {
+MyApp.controller('OrderlistEmailsImportCtrl',['$scope','$timeout','App', 'DateParse','Order','providers','setGetOrder','clickCommitSrv',  function ($scope,$timeout,App, DateParse, Order,providers, setGetOrder,commitSrv) {
 
+    function load (){
+        Order.query({type:'emails'},{}, function (response) {
+            $scope.tbl.data.splice(0,$scope.tbl.data.length);
+            angular.forEach(response, function (v,k) {
+                if(v.send){
+                    v.send = DateParse.toDate(v.send);
+                    $scope.tbl.data.push(v);
+                }
+
+            });
+        });
+    }
     $scope.tbl = {data:[], order:'id'};
     $scope.$parent.OrderlistEmailsImportCtrl = function () {
+        load ();
         $scope.LayersAction({search:{name:"listEmailsImport" }});
     };
     //limpieza
@@ -1088,6 +1111,28 @@ MyApp.controller('OrderlistEmailsImportCtrl',['$scope','$timeout','DateParse','O
             $scope.tbl.data.splice(0, $scope.tbl.data.length);
         }
     });
+
+    $scope.open = function (doc) {
+        $scope.NotifAction('alert',"Desea asignar el correo \'"+doc.asunto+"\' como el origen de la solicitud",
+            [
+                {name:"Si, eso quiero",action:function () {
+                    Order.post({mod:"SetParent",type:$scope.$parent.formMode.mod},
+                        {doc_parent_id:doc.id,doc_parent_origen_id:$scope.$parent.formMode.value - 1 , princ_id : $scope.document.id}, function (response) {
+                            $scope.NotifAction("ok","Se a asigado el correo como origen",[], {autohidden:2500});
+                            App.setBlock(89);
+
+                            setGetOrder.reload();
+                            $timeout(function () {
+                                $scope.LayersAction({close:true});
+                                App.setBlock(0);
+                            },2500);
+                        });
+
+            }
+                },{name:"Cancelar", action:function () {}}]
+            ,{block:true});
+
+    }
 }]);
 
 MyApp.controller('OrderlistDocImportCtrl',['$scope','$timeout','DateParse','Order','providers','setGetOrder','clickCommitSrv',  function ($scope,$timeout,DateParse, Order,providers, setGetOrder,commitSrv) {
@@ -2031,8 +2076,9 @@ MyApp.controller('OrderlistProducProvCtrl',['$scope','$timeout', 'Order','master
 
     //limpieza
     $scope.$watch('$parent.ctrl.provSelec', function (newVal, oldVal) {
-        if(newVal && newVal != null){
+        if(newVal && newVal != null && $scope.document.id && $scope.$parent.formMode.value){
             $timeout(function () {
+
                 $scope.providerProds = [];
                 Order.query({type:"ProviderProds", id:newVal.id,tipo:$scope.$parent.formMode.value, doc_id:$scope.document.id},{}, function(response){
 
@@ -2737,10 +2783,10 @@ MyApp.controller('OrderfinalDocCtrl',['$scope','$timeout', 'App','Order','clicke
 
     $scope.OnlySave= function (fn ) {
         $scope.inProcess = true;
-        App.setBlock({block:true,level:89});
+        App.setBlock(89);
         Order.postMod({type:$scope.formMode.mod, mod:"Close"},{id:$scope.document.id }, function(response){
             $scope.inProcess = false;
-            App.setBlock({block:false});
+            App.setBlock(0);
             $scope.NotifAction("ok","Realizado",[],{autohidden:1500});
             $scope.updateProv();
             $timeout(function(){
@@ -2861,7 +2907,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
         $scope.model.content =$sce.getTrustedHtml($scope.template);
         $scope.model.id = angular.copy($scope.$parent.document.id);
         $scope.inProgress=true;
-        App.setBlock({block:true,level:89});
+        App.setBlock(89);
         Order.postMod({type:$scope.formMode.mod, mod:"Send"},$scope.model, function(response){
             if(response.email.is){
                 $scope.$parent.NotifAction("ok","Correo enviado",[], {autohidden:2000});
@@ -2872,7 +2918,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
                         $scope.LayersAction({close:{first:true, search:true}});
                     }
                     $scope.inProgress=false;
-                    App.setBlock({block:false,level:0});
+                    App.setBlock(0);
                 },2200);
             }else{
                 $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrados, ¿Desea intentar enviar el correo nuevamente? ",
@@ -2899,7 +2945,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
                         $scope.LayersAction({close:{first:true, search:true}});
                     }
                     $scope.inProgress=false;
-                    App.setBlock({block:false,level:0});
+                    App.setBlock(0);
                 },2200);
             }else{
                 $scope.$parent.NotifAction("error", "Ocurrio un error al enviar el correo, si el problema persiste por favor contacte con el administrados, ¿Desea intentar enviar el correo nuevamente? ",
@@ -2922,7 +2968,7 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
 /**
  * controller for mdsidenav mail, this controller is responsable de send correo option
  * */
-MyApp.controller('MailCtrl',['$scope','masters','Order', function($scope, masters,Order){
+MyApp.controller('MailCtrl',['$scope','App','masters','Order', function($scope,App, masters,Order){
     $scope.model = {to:[], cc:[], ccb:[],adjs:[], asunto:undefined};
     $scope.inProgress=false;
     $scope.mailSystem =  masters.get({type:"SystemMail"});
@@ -2962,6 +3008,8 @@ MyApp.controller('MailCtrl',['$scope','masters','Order', function($scope, master
 
     $scope.send = function () {
         $scope.inProgress=true;
+        App.setBlock(89);
+        console.log("sen mail ", App.getBindBloc());
         Order.post({type:"Mail", mod:"send"},$scope.model, function (response) {
             if(response.email.is){
                 $scope.NotifAction("ok","Correo enviado, ¿desea enviar otro?",
@@ -2986,7 +3034,8 @@ MyApp.controller('MailCtrl',['$scope','masters','Order', function($scope, master
                             $scope.resend(response.email.id);
                         }},
                         {name:"Cancelar, lo hare mas tarde", action: function () {
-
+                            $scope.inProgress=false;
+                            App.setBlock(0);
                         }}
                     ]
                     ,{block:true});
@@ -3385,10 +3434,10 @@ MyApp.controller('OrderCancelDocCtrl',['$scope','$sce','$timeout',  'App','Order
             {name: "Si",
                 action:function(){
                     $scope.inProgress = true;
-                    App.setBlock({block:true,level:89});
+                    App.setBlock(89);
                     Order.postMod({type:$scope.formMode.mod, mod:"Cancel"},$scope.model, function(response){
 
-                        App.setBlock({block:false});
+                        //App.setBlock(0);
                         if (response.success) {
                             $scope.NotifAction("ok","La "+$scope.formMode.name +" a sido cancelada ",[],{autohidden:2000});
                             $timeout(function () {

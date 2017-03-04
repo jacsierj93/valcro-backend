@@ -102,6 +102,11 @@ class Solicitude extends Model
     public function getTypeOrder(){
         return $this->belongsTo('App\Models\Sistema\Order\OrderType', 'tipo_pedido_id');
     }
+
+    //TODO normalizar
+    public function estado(){
+        return $this->belongsTo('App\Models\Sistema\Order\OrderStatus', 'estado_id');
+    }
     /****************************** FIN RELACIONALES *****************************/
 
     /******************************  RELACIONAL FOR QUERYS *****************************/

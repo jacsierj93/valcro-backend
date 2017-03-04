@@ -308,7 +308,7 @@ class OrderController extends BaseController
         $mail->asunto =$req->has('asunto') ? $req->asunto : '' ;
         $mail->usuario_id = $req->session()->get('DATAUSER')['id'];
         $mail->tipo = 'user';
-        $mail->modulo = 'solicitude';
+        $mail->modulo = 'email';
         $adjs = [];
         $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto,'from'=>$req->from];
 
@@ -360,6 +360,23 @@ class OrderController extends BaseController
         $resul['email'] = $mail->sendMail($req->content, $destinations);
         return $resul;
     }
+
+    public function getSenderEmails(Request $req){
+        $models= MailModule::
+        whereNotnull('send')
+            ->where('tipo','user')
+           // ->where('modulo','email')
+            ->with('senders')
+            ->get()
+        ;
+
+        foreach ($models as $model){
+            $model->countAttachments = $model->countAttachments();
+        }
+
+        return $models;
+    }
+
     /*********************** PROVIDER ************************/
 
     public function getProvidersEmails (Request $req){
@@ -601,9 +618,21 @@ class OrderController extends BaseController
         $prov = Provider::findOrFail($req->id);
 
         $docs = Collection::make(array());
-        $solic = $prov->solicitude()->where('disponible', 1);
-        $odc = $prov->purchase()->where('disponible', 1);
-        $order = $prov->Order()->where('disponible', 1);
+
+
+        $solic = $prov->solicitude();
+        $odc = $prov->purchase();
+        $order = $prov->Order();
+        /**
+         * Aquellos que han sido asignados a otros documentos se marcan como disponibles 0 (No disponibles para asignacion)
+         * en caso contrario se marcan como disponibles 1 (disponibles para asignacion)
+         */
+        if(!$req->has('all')|| !$req->all){
+            $solic = $prov->solicitude()->where('disponible', 1);
+            $odc = $prov->purchase()->where('disponible', 1);
+            $order = $prov->Order()->where('disponible', 1);
+        }
+
         if ($this->user->cargo_id == $this->profile['trabajador']) {
             $solic = $solic->where('usuario_id', $req->session()->get('DATAUSER')['id']);
             $odc = $odc->where('usuario_id', $req->session()->get('DATAUSER')['id']);
@@ -626,76 +655,46 @@ class OrderController extends BaseController
         $paises = Country::get();
         foreach ($items as $aux) {
             //para maquinas
-            $tem = array();
-            $tem['id'] = $aux->id;
-            //$tem['tipo_id']=$aux->tipo_pedido_id;
-            $tem['pais_id'] = $aux->pais_id;
-            $tem['direccion_almacen_id'] = $aux->direccion_almacen_id;
-            $tem['condicion_pago_id'] = $aux->condicion_pago_id;
-            $tem['motivo_pedido_id'] = $aux->motivo_pedido_id;
-            $tem['prioridad_id'] = $aux->prioridad_id;
-            $tem['condicion_pedido_id'] = $aux->condicion_pedido_id;
-            $tem['prov_moneda_id'] = $aux->prov_moneda_id;
-            $tem['estado_id'] = $aux->estado_id;
-            $tem['final_id'] = $aux->final_id;
-            $tem['nro_proforma'] = $aux->nro_proforma;
-            $tem['nro_factura'] = $aux->nro_factura;
-            $tem['tasa'] = $aux->tasa;
-            $tem['ult_revision'] = $aux->ult_revision;
-            // $tem['tipo_value']=$aux->typevalue;
-            // pra humanos
-            $tem['comentario'] = $aux->comentario;
-            $tem['tasa'] = $aux->tasa;
-            $tem['proveedor'] = $prov->razon_social;
-            $tem['titulo'] = $aux->titulo;
-            $tem['documento'] = $aux->getTipo();
-            $tem['tipo'] = $aux->getTipoId();
-            $tem['diasEmit'] = $aux->daysCreate();
-            $tem['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
-            $tem['fecha_aprob_compra'] = $aux->fecha_aprob_compra;
-            $tem['fecha_aprob_gerencia'] = $aux->fecha_aprob_compra;
-            $tem['img_aprob'] = $aux->fecha_aprob_compra;
+
+            $aux['proveedor'] = $prov->razon_social;
+            $aux['documento'] = $aux->getTipo();
+            $aux['tipo'] = $aux->getTipoId();
+            $aux['diasEmit'] = $aux->daysCreate();
+            $aux['estado'] = $estados->where('id', $aux->estado_id)->first()->estado;
+
 
             if ($aux->motivo_id) {
-                $tem['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
+                $aux['motivo'] = $motivo->where('id', $aux->motivo_id)->first()->motivo;
             }
             if ($aux->pais_id) {
-                $tem['pais'] = $paises->where('id', $aux->pais_id)->first()->short_name;
+                $aux['pais'] = $paises->where('id', $aux->pais_id)->first()->short_name;
             }
             if ($aux->prioridad_id) {
-                $tem['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
+                $aux['prioridad'] = $prioridad->where('id', $aux->prioridad_id)->first()->descripcion;
             }
             if ($aux->prov_moneda_id) {
-                $tem['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
+                $aux['moneda'] = $coin->where('id', $aux->prov_moneda_id)->first()->nombre;
             }
             if ($aux->prov_moneda_id) {
-                $tem['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
+                $aux['symbol'] = $coin->where('id', $aux->prov_moneda_id)->first()->simbolo;
             }
             if ($aux->tipo_id != null) {
-                $tem['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
+                $aux['tipo'] = $type->where('id', $aux->tipo_id)->first()->tipo;
             }
 
 
-            $tem['productos'] = $this->getProductoItem($aux);
+           // $tem['productos'] = $this->getProductoItem($aux);
 
-
-            $tem['nro_proforma'] = $aux->nro_proforma;
-            $tem['nro_factura'] = $aux->nro_factura;
-            $tem['img_proforma'] = $aux->img_proforma;
-            $tem['img_factura'] = $aux->img_factura;
-            $tem['mt3'] = $aux->mt3;
-            $tem['peso'] = $aux->peso;
-            $tem['emision'] = $aux->emision;
-            $tem['monto'] = $aux->monto;
 
             /**actualizar cuando este el final**/
             $tem['almacen'] = "Desconocido";
 
-            // modificar cuando se sepa la logica
-            $tem['aero'] = 1;
+            // TODO modificar cuando se sepa la logica
+          /*  $tem['aero'] = 1;
             $tem['version'] = 1;
             $tem['maritimo'] = 1;
-            $data[] = $tem;
+          */
+            $data[] = $aux;
         }
 
         return $data;
@@ -870,33 +869,41 @@ class OrderController extends BaseController
             ->proveedor_product()
             ->where('tipo_producto_id', '<>', 3)
             ->get();
-        $types = ProductType::get();
 
         $model = $this->getDocumentIntance($req->tipo);
         $model = $model->findOrFail($req->doc_id);
         $modelIts = $model->items()->where('tipo_origen_id', '1')->get();
+
         foreach ($items as $aux) {
-            $aux->puntoCompra = false;
-            $aux->cantidad = 0;
-            $aux->saldo = 0;
-            $aux->tipo_producto = $types->where('id', $aux->tipo_producto_id)->first()->descripcion;
-            $aux->asignado = false;
-            $itMo = $modelIts->where('producto_id', $aux->id)->first();
-            $aux->otre = $itMo;
-            $aux->descripcion = ($aux->descripcion == null || $aux->descripcion == '') ? $aux->descripcion_profit : $aux->descripcion;
+            try{
 
-            if ($itMo != null) {
-                $aux->asignado = true;
-                $aux->saldo = $itMo->saldo;
-                $aux->cantidad = $itMo->cantidad;
+                $aux->puntoCompra = false;
+                $aux->cantidad = 0;
+                $aux->saldo = 0;
+                $aux->asignado = false;
+                $itMo = $modelIts->where('producto_id', $aux->id)->first();
+                $aux->otre = $itMo;
+                $aux->descripcion = ($aux->descripcion == null || $aux->descripcion == '') ? $aux->descripcion_profit : $aux->descripcion;
 
-                $aux->reng_id = $itMo->id;
-                $aux->costo_unitario = $itMo->costo_unitario;
-                $aux->uid = $itMo->uid;
+                if ($itMo != null) {
+                    $aux->asignado = true;
+                    $aux->saldo = $itMo->saldo;
+                    $aux->cantidad = $itMo->cantidad;
 
-            }
-            $data[] = $aux;
+                    $aux->reng_id = $itMo->id;
+                    $aux->costo_unitario = $itMo->costo_unitario;
+                    $aux->uid = $itMo->uid;
+
+                }
+                $data[] = $aux;
+
         }
+        catch (\Exception $e){
+            dd($aux);
+        }
+        }
+
+
         return $data;
 
     }
@@ -933,7 +940,7 @@ class OrderController extends BaseController
         return $prodTemp;
     }
 
-    /**************************************************************SOLICITUD **************************************************************/
+    /**************************************************************SOLICITUD**************************************************************/
 
     /**** SOLICITUD GET *********/
 
@@ -2109,6 +2116,20 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * Asigna el parent a un pedido(proforma)
+     */
+    public function setParentSolicitude(Request $req){
+
+        $resul = array();
+        $model = Solicitude::findOrFail($req->princ_id);
+        $model->doc_parent_id= $req->doc_parent_id;
+        $model->doc_parent_origen_id= $req->doc_parent_origen_id;
+        $model->save();
+        $resul['accion']='upd';
+
+        return $resul;
+    }
 
     /************************************************************** FIN DE SOLICITUD **************************************************************/
 
@@ -5118,19 +5139,7 @@ class OrderController extends BaseController
     }
 
 
-    /**
-     * Asigna el parent a un pedido(proforma)
-     */
-    public function setParentSolicitude(Request $req){
-        $resul = array();
-        $princ = Solicitude::findOrFail($req->princ_id);
-        $princ->doc_parent_id = $req->doc_parent_id;
-        $princ->doc_parent_origen_id = 21;
-        $princ->save();
-        $resul['accion']='upd';
 
-        return $resul;
-    }
     /**
      * cambio el estado de una solicitud
      */

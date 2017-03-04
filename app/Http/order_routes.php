@@ -40,6 +40,8 @@ $app->get("Order/ProviderAdressStore",'Orders\OrderController@getProviderAdressS
 $app->get("Order/ProviderCountry",'Orders\OrderController@getProviderCountry'); ///obtine los paises donde un proveedor tiene almacenes
 $app->get("Order/AdrressPorts",'Orders\OrderController@getAddressrPort'); ///obtine lospuertos de un proveedor
 
+$app->get("Order/emails",'Orders\OrderController@getSenderEmails'); ///obtine los paises donde un proveedor tiene almacenes
+
 $app->get("Order/CustomOrders",'Orders\OrderController@getCustomOrders'); /// obtiene los contra pedidos de proveedor
 $app->get("Order/CustomOrder",'Orders\OrderController@getCustomOrder'); ///trae tod el detalle de contraPedido
 
@@ -86,11 +88,11 @@ $app->post("Order/Solicitude/AddAttachments",'Orders\OrderController@addAttachme
 $app->post("Order/Solicitude/Close",'Orders\OrderController@CloseSolicitude'); // cierra el documento y notifica por correo
 $app->post("Order/Solicitude/Copy",'Orders\OrderController@copySolicitude'); ///crea un a copia de la solicutd sin adjuntos
 $app->post("Order/Solicitude/Send",'Orders\OrderController@sendSolicitude'); /// envia la solicitud al proveedor
+$app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // asigna un nuevo paren(correo) al docuemnto
 
 /*** sin uso aparente**********************/
 $app->post("Order/Solicitude/AdddRemoveItems",'Orders\OrderController@addRemoveSolicitudItems'); // agrega y quita items a la solicud por lotes
 $app->post("Order/Solicitude/SetStatus",'Orders\OrderController@setStatusSolicitude'); // cambia el estado del documento
-$app->post("Order/Solicitude/SetParent",'Orders\OrderController@setParentSolicitude'); // asigna un nuevo paren al docuemnto
 $app->post("Order/Solicitude/Create",'Orders\OrderController@CreateSolicitude'); /// envia la solicitud al proveedor
 /*** sin uso aparente********* */
 
@@ -134,7 +136,7 @@ $app->post("Order/Order/AddAttachments",'Orders\OrderController@addAttachmentsOr
 $app->post("Order/Order/Close",'Orders\OrderController@CloseOrder'); // cierra el documento y notifica por correo
 $app->post("Order/Order/Copy",'Orders\OrderController@copyOrder'); /// crea una copia sin adjuntos
 $app->post("Order/Order/Send",'Orders\OrderController@sendOrder'); /// envia la solicitud al proveedor
-$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); // cierra el documento y notifica por correo
+$app->post("Order/Order/SetParent",'Orders\OrderController@setParentOrder'); //
 $app->post("Order/Order/MakePayments",'Orders\OrderController@MakePaymentsOrder'); // cierra el documento y notifica por correo
 
 
