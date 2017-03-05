@@ -1,107 +1,114 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="pagosCtrll" global>
 
-    <!-- 2) ########################################## AREA DEL MENU ########################################## -->
-    <div layout="row" flex="none" class="menuBarHolder">
-        <!-- 3) ########################################## MENU ########################################## -->
-        <div layout="row" layout-align="start center" class="menu">
-            <div flex layout-align="center center">
-                Menu
-            </div>
-            <div layout="column" style="width: 48px; height: 48px;" layout-align="center center">
-                <?= HTML::image("images/btn_nextArrow.png") ?>
-            </div>
-        </div>
-
-        <!-- 4) ########################################## BOTONERA ########################################## -->
-        <div class="botonera" layout layout-align="start center">
-            <div layout="column" layout-align="center center">
-
-            </div>
-            <div ng-show="provData.id!=''" layout="column" layout-align="center center" ng-click="setFormAdelanto()">
-                <span class="icon-Agregar" style="font-size: 24px"></span>
-            </div>
-            <div ng-show="false" layout="column" layout-align="center center">
-                <?= HTML::image("images/actualizar.png") ?>
-            </div>
-            <div ng-show="false" layout="column" layout-align="center center">
-                <?= HTML::image("images/filtro.png") ?>
-            </div>
-            <div ng-show="true" layout="column" layout-align="center center" ng-click="getAbonos()"
-                 style="width: 144px;">
-                Documentos de Pago
-            </div>
-
-        </div>
-
-
-    </div>
-
     <!-- 5) ########################################## AREA CONTENEDORA DE LA INFOMACION ########################################## -->
     <div class="contentHolder" layout="row" flex>
+        
+        <!-- 2) ########################################## AREA DEL MENU ########################################## -->
+<!--        <div layout="row" flex="none" class="menuBarHolder">
+
+        </div>-->
+        
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
-        <md-content class="barraLateral" data-ng-init="getProvs()">
-            <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
-            <div data-ng-repeat="prov in provs" class="boxList" layout="column" flex ng-click="setProv(prov)"
-                 ng-class="{'listSel' : (prov.id ==provData.id)}">
-                <div style="overflow: hidden; text-overflow: ellipsis" flex>{{prov.razon_social}}</div>
-                <div layout="row" style="height: 24px;">
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb v0">
-                            {{prov.vencido}}
+        <div class="barraLateral" layout="column">
+        <!-- 3) ########################################## MENU ########################################## -->
+            <div layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
+                <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
+                    Menu
+                </div>
+                <div style="width: calc(100% - 16px); height: 24px; cursor: pointer; text-align: center;">
+                    <img ng-src="images/Down.png">
+                </div>
+            </div>
+        
+            <!--<md-content data-ng-init="getProvs()" style="background-color: #ffffff;">-->
+            <div style="overflow-y:auto;" data-ng-init="getProvs()" ng-click="showAlert(45)" >
+                <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
+                <div data-ng-repeat="prov in provs" class="boxList" layout="column" flex ng-click="setProv(prov)" ng-class="{'listSel' : (prov.id ==provData.id)}">
+                    <div style="overflow: hidden; text-overflow: ellipsis" flex>{{prov.razon_social}}</div>
+                    <div layout="row" style="height: 24px;">
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb v0">
+                                {{prov.vencido}}
+                            </div>
                         </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb v7">
+                                {{prov.vence7}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb v30">
+                                {{prov.vence30}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb v60">
+                                {{prov.vence60}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb v90">
+                                {{prov.vence90}}
+                            </div>
+                        </div>
+                        <div flex layout layout-align="center center">
+                            <div layout layout-align="center center" class="cantFactDeb v90">
+                                {{prov.vence100}}
+                            </div>
+                        </div>
+
                     </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb v7">
-                            {{prov.vence7}}
-                        </div>
+                    <div style="height: 32px; text-align: right;">
+                        Deudas {{prov.tdeuda | currency : $ : 2}}
                     </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb v30">
-                            {{prov.vence30}}
-                        </div>
-                    </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb v60">
-                            {{prov.vence60}}
-                        </div>
-                    </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb v90">
-                            {{prov.vence90}}
-                        </div>
-                    </div>
-                    <div flex layout layout-align="center center">
-                        <div layout layout-align="center center" class="cantFactDeb v90">
-                            {{prov.vence100}}
-                        </div>
+                    <div style="height: 32px; text-align: right;">
+                        Abonos {{prov.tabono | currency : $ : 2}}
                     </div>
 
                 </div>
-                <div style="height: 32px; text-align: right;">
-                    Deudas {{prov.tdeuda | currency : $ : 2}}
+            <!--</md-content>-->
+            </div>
+        </div>
+        
+        <div layout="column" flex class="md-whiteframe-1dp">
+            <!-- 4) ########################################## BOTONERA ########################################## -->
+            <div class="botonera" layout layout-align="start center">
+                <div layout="column" layout-align="center center">
+
                 </div>
-                <div style="height: 32px; text-align: right;">
-                    Abonos {{prov.tabono | currency : $ : 2}}
+                <div ng-show="provData.id!=''" layout="column" layout-align="center center" ng-click="setFormAdelanto()">
+                    <span class="icon-Agregar" style="font-size: 24px"></span>
+                </div>
+                <div ng-show="false" layout="column" layout-align="center center">
+                    <?= HTML::image("images/actualizar.png") ?>
+                </div>
+                <div ng-show="false" layout="column" layout-align="center center">
+                    <?= HTML::image("images/filtro.png") ?>
+                </div>
+                <div ng-show="true" layout="column" layout-align="center center" ng-click="getAbonos()"
+                     style="width: 144px;">
+                    Documentos de Pago
                 </div>
 
             </div>
-        </md-content>
+            
+            <div flex layout="row">
+                <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
+                <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
+                    <?= HTML::image("images/btn_prevArrow.png", "", array("ng-click" => "closeLayer()", "ng-show" => "(index>0)")) ?>
+                </div>
 
-        <!-- 8) ########################################## BOTON REGRESAR ########################################## -->
-        <div style="width: 48px; background-color: #ffffff;" layout="column" layout-align="center center">
-            <?= HTML::image("images/btn_prevArrow.png", "", array("ng-click" => "closeLayer()", "ng-show" => "(index>0)")) ?>
-        </div>
-
-        <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
-            <div
-                style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
-                PG
+                <div layout="column" layout-align="center center" flex style="color: rgba(0,0,0,0.22);">
+                    <div
+                        style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; color: rgba(0,0,0,0.22);">
+                        PG
+                    </div>
+                    <br>
+                    Selecciones un Proveedor
+                </div>
             </div>
-            <br>
-            Selecciones un Proveedor
         </div>
-
 
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 288px);"
                     class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="lyr1pag"
@@ -109,7 +116,7 @@
 
             <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
 
-                <md-tabs md-dynamic-height md-border-bottom md-no-ink>
+                <md-tabs md-dynamic-height md-border-bottom md-no-ink flex>
                     <md-tab label="Deudas" md-no-ink>
                         <md-content style="padding-top: 10px;">
                             <form layout="row">
@@ -133,7 +140,7 @@
                                         <div flex class="headGrid"> Pagado</div>
                                         <div flex class="headGrid"> Saldo</div>
                                     </div>
-                                    <div id="grid">
+                                    <md-content id="grid" style="height: calc(100% - 150px);">
                                         <div ng-repeat="deuda in provData.deudas" flex>
                                             <div layout="row" class="cellGridHolder" ng-click="setDeduda(deuda)">
                                                 <div flex="10" class="cellGrid"> {{deuda.nro_factura}}</div>
@@ -144,18 +151,14 @@
                                                          class="{{deuda.vencido}}"></div>
                                                 </div>
                                                 <div flex class="cellGrid"> {{deuda.cuotas}}</div>
-                                                <div flex class="cellGrid"> {{deuda.monto | currency : $ : 2}}$</div>
+                                                <div flex class="cellGrid"> {{deuda.m<md-content id="grid" flex class="_md flex">onto | currency : $ : 2}}$</div>
                                                 <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}$</div>
                                                 <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}$</div>
                                             </div>
                                         </div>
-
-                                    </div>
+                                    </md-content>
                                 </div>
-
-
                             </form>
-
                         </md-content>
                     </md-tab>
                     <md-tab label="Pagos">
