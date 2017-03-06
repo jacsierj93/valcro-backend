@@ -12,7 +12,7 @@
         <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
         <div class="barraLateral" layout="column">
         <!-- 3) ########################################## MENU ########################################## -->
-            <div layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
+            <div layout="column" class="menu_shadow" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
                 <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
                     Menu
                 </div>
@@ -78,7 +78,10 @@
 
                 </div>
                 <div ng-show="provData.id!=''" layout="column" layout-align="center center" ng-click="setFormAdelanto()">
-                    <span class="icon-Agregar" style="font-size: 24px"></span>
+                    <span class="icon-Agregar" style="font-size: 23px"></span>
+                    <md-tooltip >
+                        Agregar
+                    </md-tooltip>
                 </div>
                 <div ng-show="false" layout="column" layout-align="center center">
                     <?= HTML::image("images/actualizar.png") ?>
@@ -86,9 +89,11 @@
                 <div ng-show="false" layout="column" layout-align="center center">
                     <?= HTML::image("images/filtro.png") ?>
                 </div>
-                <div ng-show="true" layout="column" layout-align="center center" ng-click="getAbonos()"
-                     style="width: 144px;">
-                    Documentos de Pago
+                <div ng-show="true" layout="column" layout-align="center center" ng-click="getAbonos()" style="width: 24px;">
+                   <img ng-src="images/documento_pago.gif" style="width:24px;">
+                   <md-tooltip >
+                        Documentos de Pago
+                    </md-tooltip>
                 </div>
 
             </div>
