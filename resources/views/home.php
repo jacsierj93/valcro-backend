@@ -79,11 +79,13 @@
 <div class="pie" layout="row" layout-align="start center" ng-controller="AppFoot">
 
     <div layout="column" layout-align="center center" ng-repeat="item in secciones">
-        <div class="{{item.selct}}" ng-click="seccLink(item)" title="{{item.secc}}"></div>
+        <div class="{{item.selct}}" ng-click="seccLink(item)" title="{{item.secc}}">
+            {{item.secc}}
+        </div>
     </div>
-    <div flex layout="row" layout-align="end center" style="font-size: 24px; font-weight: 100; color: #999999; padding-right: 24px;">
+    <!--<div flex layout="row" layout-align="end center" style="font-size: 24px; font-weight: 100; color: #999999; padding-right: 24px;">
         {{seccion.secc}}
-    </div>
+    </div>-->
 
 </div>
 <div id="blockXLevel" ng-controller="AppBlock" style="
@@ -95,7 +97,7 @@
     width: 100%;
     height: 100%;
     z-index:{{block}}
-" ng-show="block != 0 ">
+" ng-show="block">
 
 </div>
 <div ng-controller="LayersCtrl"></div>

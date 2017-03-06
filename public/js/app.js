@@ -4,43 +4,42 @@ var urls = [
         secc: 'Inicio',
         key:'inicio',
         url: 'modules/home/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Proveedores',
         key:'proveedores',
         url: 'modules/proveedores/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Embarques',
         key:'embarques',
         url: 'modules/embarques/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Pagos',
         key: 'pagos',
         url: 'modules/pagos/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Pedidos',
         key:'order',
         url: 'modules/pedidos/index',
-
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Criterios',
         key:'criterios',
         url: 'modules/criterios/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Productos',
         key:'productos',
         url: 'modules/productos/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }, {
         secc: 'Usuarios',
         key:'usuarios',
         url: 'modules/usuarios/index',
-        selct: 'btnDot'
+        selct: 'btnPie'
     }];
 
 var MyApp = angular.module('MyApp', dependency, function() {
@@ -188,9 +187,9 @@ MyApp.service("generic",function(masters){
         units : function(){
             return units;
         }
-    }
+    };
 
-})
+});
 
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
@@ -205,7 +204,7 @@ MyApp.filter('filterSelect', function() {
         return arr1.filter(function(val) {
             return arr2.indexOf(eval("val."+id)) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
-    }
+    };
 });
 
 MyApp.filter('filterSearch', function() {
@@ -219,7 +218,7 @@ MyApp.filter('filterSearch', function() {
         return arr1.filter(function(val) {
             return (arr2.indexOf(eval("val."+id+".toString()")) !== -1 || arr2.indexOf(parseInt(eval("val."+id))) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
-    }
+    };
 });
 MyApp.filter('filterSearchBlnk', function() {
     return function(arr1, arr2,id) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -232,7 +231,7 @@ MyApp.filter('filterSearchBlnk', function() {
         return arr1.filter(function(val) {
             return (arr2.indexOf(eval("val."+id+".toString()")) !== -1 || arr2.indexOf(parseInt(eval("val."+id))) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
-    }
+    };
 });
 
 /**
@@ -249,7 +248,7 @@ MyApp.filter('stringKey', function() {
             str = eval("val."+key);
             return (!str || !compare || typeof(compare)=='undefined' || compare.length == 0 ) ? true:  str.toLowerCase().indexOf(compare.toLowerCase())!==-1;
         });
-    }
+    };
 });
 MyApp.filter('customFind', function() {
 
@@ -259,7 +258,7 @@ MyApp.filter('customFind', function() {
         return arr1.filter(function(val) {
             return  (func) ? func(val,arr2) : true;
         });
-    }
+    };
 });
 
 MyApp.filter('filtCountry', function() {
@@ -270,7 +269,7 @@ MyApp.filter('filtCountry', function() {
         return lists.filter(function(val) {
             return val.short_name.toLowerCase().indexOf(search.toLowerCase()) != -1 ;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
-    }
+    };
 });
 
 MyApp.directive('global', function (Layers, setNotif) {
@@ -304,7 +303,7 @@ MyApp.directive('listBox', function ($timeout) {
                     if(e.which=="40"){
                         $timeout(function(){
                             angular.element('#listado').find(".boxList").first().focus();
-                        },50)
+                        },50);
                     }
                 }else{
                     if(e.which=="40"){
@@ -323,7 +322,7 @@ MyApp.directive('listBox', function ($timeout) {
             elem.bind("click",function(e){
                 $timeout(function(){
                     angular.element(elem).parent().scrollTop(angular.element(elem).outerHeight()*angular.element(elem).index());
-                },0)
+                },0);
             });
 
         }
@@ -430,7 +429,7 @@ MyApp.directive('chip', function ($timeout) {
 
             elem.bind("click",function(){
                 $timeout(function(){elem[0].focus();},0);
-            })
+            });
 
         }
     };
@@ -538,7 +537,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         } else {
                             angular.element(nextFrm[0]).focus();
                         }
-                    }, 500)
+                    }, 500);
                 }, 0);
             }else{
                 scope.endLayer();
@@ -576,7 +575,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                         });
                     }
                 }
-            },0)
+            },0);
 
         }
     };
@@ -612,7 +611,7 @@ MyApp.directive('skipTab', function ($compile,$timeout) {
                     var elem =this;
                     //console.log("ELEMENT ==>",elem)
                     if(e.which == "13"){
-                        skip(elem,scope)
+                        skip(elem,scope);
                     }else if((e.which == "39" || e.which == "37") && angular.element(elem).is("div")){
                         angular.element(elem).parents("form").first().find("[chip]").first().focus().click();
                     }else if(e.which=="40"){
@@ -652,7 +651,9 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
                         element.parent().find("[skip-notif]").last().focus();
                     }
                 }else if(e.which=="13"){
-                    $timeout(function(){element.click()},0);
+                    $timeout(function(){
+                        element.click();
+                    },0);
                     scope.$parent.prevFocus.focus();
                 }
             });
@@ -692,7 +693,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                     }
                     local = true;
                     
-                    var valor = eval("cambio."+keyVal)
+                    var valor = eval("cambio."+keyVal);
                     scope.$eval(attrs.model+" = "+valor);
 
                 };
@@ -814,12 +815,12 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
             }else{
                 element.bind("focus", function(e){
                     showInfo();
-                })
+                });
             }
 
 
         }
-    }
+    };
 });
 
 MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
@@ -955,7 +956,7 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
                             setNotif.addNotif(scope[v].t,scope[v].m,btn);
                         }
 
-                    })
+                    });
                 }
 
             });
@@ -1086,15 +1087,15 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
             if(path == '/'+v.key){
                 App.setSeccion(v);
                 Layers.setModule(v);
-                v.selct = 'btnLine';
+                v.selct = 'btnPieSelc';
                 asig= true;
                 return 0;
             }else{
-                v.selct = 'btnDot';
+                v.selct = 'btnPie';
             }
         });
         if(!asig){
-            $scope.secciones[0].selct=  'btnLine';
+            $scope.secciones[0].selct=  'btnPieSelc';
         }
 
     });
