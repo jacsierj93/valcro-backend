@@ -1123,7 +1123,6 @@ MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filt
     
      users.query({ type:"usr"},function(data){
          $scope.usr = data.nombre;
-        $
     });
 
     
