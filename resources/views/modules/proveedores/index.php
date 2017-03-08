@@ -12,7 +12,7 @@
     <div class="contentHolder" layout="row" flex>
 
         <div class="barraLateral" layout="column" ng-controller="ListProv">
-            <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
+            <div id="menu" layout="column" class="menu_shadow" style="height: 48px; overflow: hidden; background-color: #f1f1f1; min-height: 48px;">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div class="menu" style="min-height: 48px; width: 100%;">
                     <div style="width: calc(100% - 16px); text-align: center; padding-top: 8px; height: 16px;">
@@ -723,7 +723,8 @@
                         </div>
                         <div class="row" layout="row">
 
-                            <md-chips skip-tab flex ng-required="true"  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-add-on-blur="true" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
+                            <md-chips skip-tab flex ng-required="true" ng-disabled="$parent.enabled "  info="email de contacto ej. fulano@valcro.co" name="emailCont" autocomplete="off" ng-disabled="$parent.enabled " id="emailCont" ng-model="cnt.emailCont"  class="md-block"  md-require-match="false" md-separator-keys="[13,32]" placeholder="Email" md-on-add="addContEmail(this)" md-add-on-blur="true" md-transform-chip="transformChipEmail($chip)" md-on-remove="rmContEmail(this,$chip)">
+                                <input ng-disabled="$parent.enabled "  placeholder="fulano@valcro.co" id="contactEmail">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
@@ -731,8 +732,8 @@
                                 </md-chip-template>
                             </md-chips>
 
-                            <md-chips skip-tab flex ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" ng-disabled="$parent.enabled " md-add-on-blur="true" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip,$event)"  md-separator-keys="[13,32]">
-                                <input phone placeholder="Telefonos Contacto" id="contactPhone">
+                            <md-chips skip-tab flex ng-disabled="$parent.enabled " ng-required="true" info="telefono de contacto (en formato internacional)"  name="contTelf" autocomplete="off" md-add-on-blur="true" id="contTelf" ng-model="cnt.contTelf"  class="md-block"  md-require-match="false" md-transform-chip="transformChipTlf($chip,$event)"  md-separator-keys="[13,32]">
+                                <input phone ng-disabled="$parent.enabled "  placeholder="Telefonos Contacto" id="contactPhone">
                                 <md-chip-template ng-dblclick="editChip($chip,$event)">
                                     <span>
                                       <strong>{{$chip.valor}}</strong>
@@ -1003,6 +1004,7 @@
                                                  require-match="true"
                                                  md-no-asterisk
                                                  name="state"
+                                                 md-no-cache
                                                  ng-disabled = "$parent.enabled"
                                                  ng-readonly="states.length==0"
                                                  md-min-length="0">
@@ -1032,7 +1034,8 @@
                                                  required
                                                  require-match="true"
                                                  md-no-asterisk
-                                                 name="state"
+                                                 name="city"
+                                                 md-no-cache
                                                  ng-disabled = "$parent.enabled"
                                                  ng-readonly="cities.length==0"
                                                  md-min-length="0">
@@ -1156,7 +1159,7 @@
                                 <!--<div ng-repeat="name in valcroName | orderBy:order:true" chip class="itemName" ng-click="toEdit(this); $event.stopPropagation();" ng-class="{'gridSel':(name.id==valName.id)}" ng-mouseleave="over(false)" ng-mouseover="over(this)"><span ng-class="{'rm' : (name.id==valName.id) || (name.id==overId)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmValName(this)"></span>{{name.name}} </div>-->
                                 <div flex layout="column">
                                     <div flex>
-                                        <div class="itemName" style="width:80px" ng-repeat="coinSel in coinAssign" ng-click="toEdit(this);" ng-class="{'gridSel':(coinSel.id==cn.id)}" layout="row"><span ng-class="{'rm' : (coinSel.id==cn.id)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmCoin(this)"></span><div flex>{{coinSel.nombre}}</div> <!--<div style="width:16px">{{coinSel.simbolo}}</div>--></div>
+                                        <div class="itemName" style="width:80px; overflow:hidden; text-overflow:ellipsis" ng-repeat="coinSel in coinAssign" ng-click="toEdit(this);" ng-class="{'gridSel':(coinSel.id==cn.id)}" layout="row"><span ng-class="{'rm' : (coinSel.id==cn.id)}" style="font-size:11px; margin-right: 8px; color: #f1f1f1;" class="icon-Eliminar" ng-click="rmCoin(this)"></span><div flex>{{coinSel.nombre}}</div> <!--<div style="width:16px">{{coinSel.simbolo}}</div>--></div>
                                     </div>
 
                                 </div>
@@ -1387,13 +1390,13 @@
                                              flex
                                              skip-tab
                                              id="condItem"
-                                             ng-required="(cnt.languaje.length==0)"
-                                             md-selected-item-change="condItem.condit = ctrl.cond.id;"
+                                             model="condItem.condit"
                                              info="condicion que aplica"
                                              md-search-text="ctrl.searchCond"
-                                             md-items="item in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},] | stringKey : ctrl.searchCond: 'name'"
+                                             md-items="item in [{name:'adelanto',id:0},{name:'contra BL',id:1},{name:'despues de carga',id:2},{name:'antes carga',id:3},] | stringKey : ctrl.searchCond: 'name' | customFind : conditions : setted"
                                              md-item-text="item.name"
                                              md-no-asterisk
+                                             md-no-cache
                                              ng-disabled="$parent.enabled || max<=0"
                                              md-min-length="0">
                                 <input >
@@ -2048,7 +2051,7 @@
                                     <div ng-show="name.action =='upd'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Actualizar"></span></div>
                                     <div ng-show="name.action =='del'" style="margin-right: 8px; font-size: 18px;"><span class="icon-Eliminar"></span></div>
                                     <div layout="row" class="row">
-                                        <div flex="30">
+                                        <div flex>
                                             {{getDato(dir.datos.tipo,'typeDir','descripcion')}}
                                         </div>
                                         <div flex style="overflow: hidden; text-overflow: ellipsis; height: 32px; white-space:nowrap;">
