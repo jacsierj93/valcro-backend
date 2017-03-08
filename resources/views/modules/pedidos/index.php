@@ -4,7 +4,7 @@
         <div class="barraLateral" layout="column" id="barraLateral" >
 
 
-            <div id="menu" layout="column" class="md-whiteframe-1dp" style="height: 48px; overflow: hidden; background-color: #f1f1f1;
+            <div id="menu" layout="column" class="menu_shadow" style="height: 48px; overflow: hidden; background-color: #f1f1f1;
              min-height: 48px;">
                 <!-- 3) ########################################## MENU ########################################## -->
                 <div class="menu" style="min-height: 48px; width: 100%;">
@@ -186,7 +186,7 @@
                     <div layout="column" layout-align="center center"></div>
 
                     <div layout="column" ng-show="((module.index < 1 || module.layer == 'listPedido') && permit.created)" layout-align="center center" ng-click="OrderMenuAgrCtrl()">
-                        <span class="icon-Agregar" style="font-size: 24px"></span>
+                        <span class="icon-Agregar" style="font-size: 23px"></span>
                         <md-tooltip >
                             Crear un nuevo documento
                         </md-tooltip>
@@ -194,13 +194,13 @@
                     <div layout="column" layout-align="center center"
                          ng-controller="OrderUpdateDoc"
                          ng-show="(document.id && Docsession.block )" ng-click="updateForm()">
-                        <span class="icon-Actualizar" style="font-size: 24px"></span>
+                        <span class="icon-Actualizar" style="font-size: 23px"></span>
                         <md-tooltip >
                             Actualizar la  {{formMode.name}}
                         </md-tooltip>
                     </div>
                     <div layout="column" ng-click="allowEdit();OrderlistCreatedProducProvCtrl(); " layout-align="center center" ng-show="( module.layer == 'listProducProv' && !Docsession.block  && !$parent.document.isAprobado)" >
-                        <span class="icon-Agregar" style="font-size: 24px; float: right; color: #0a0a0a"></span>
+                        <span class="icon-Agregar" style="font-size: 23px; float: right; color: #0a0a0a"></span>
                                                <md-tooltip >
                             Crear Producto
                         </md-tooltip>
@@ -208,7 +208,7 @@
                     <div layout="column"
                          ng-show="(!document.doc_parent_id && provSelec.id && module.layer == 'detalleDoc' && !document.isAprobado)"
                          layout-align="center center" ng-click="openImport()">
-                        <span class="icon-Importar" style="font-size: 24px"></span>
+                        <span class="icon-Importar" style="font-size: 20px"></span>
                         <md-tooltip >
                             Importar
                         </md-tooltip>
@@ -216,21 +216,21 @@
                     <div layout="column" layout-align="center center" ng-controller="OrderAccCopyDoc"
                          ng-show="( document.id && Docsession.isCopyableable && document.permit.update )"
                          ng-click="copyDoc()">
-                        <span class="icon-Copiado" style="font-size: 24px"> </span>
+                        <span class="icon-Copiado" style="font-size: 20px"> </span>
                         <md-tooltip >
                             Crear una copia (Sin adjuntos)
                         </md-tooltip>
                     </div>
 
                     <div layout="column" layout-align="center center"  ng-click="OrderAprobCtrl();" ng-class="{'blue':document.isAprobado}"  ng-show="(document.isAprobable && formMode.value !=  21 ) || document.isAprobado " >
-                        <span class="icon-checkMark" style="font-size: 24px"></span>
+                        <span class="icon-checkMark" style="font-size: 23px"></span>
                         <md-tooltip >
                             Aprobar
                         </md-tooltip>
                     </div>
                     <div layout="column" layout-align="center center"
                          ng-show="document.id"  ng-click="OrderCancelDocCtrl();" >
-                        <img src="images/CancelarDocumento.png">
+                        <img src="images/CancelarDocumento.gif" width="20">
                         <md-tooltip>
                             Cancelar
                         </md-tooltip>
@@ -238,7 +238,7 @@
                     <div layout="column" layout-align="center center"
                          ng-show="( document.id &&  document.version && document.version > 1 && module.layer == 'detalleDoc' )"
                          ng-click="OrderOldDocsCtrl()">
-                        <span style="font-size: 24px"> OLD </span>
+                        <span style="font-size: 23px"> OLD </span>
                         <md-tooltip >
                             Ver las versiones anteriores de la {{formMode.name}}
                         </md-tooltip>
@@ -2740,7 +2740,7 @@
                                         <div layout="column" class="divIconRsm"
                                              ng-show="finalDoc.document.titulo.estado == 'created'"
                                              layout-align="center center">
-                                            <span class="icon-Agregar" ></span>
+                                            <span class="icon-Agregar" style="font-size: 23px; float: right; color: #0a0a0a"></span>
                                         </div>
                                         <div layout="column" class="divIconRsm" ng-show="finalDoc.document.titulo.estado == 'upd'" layout-align="center center" >
                                             <span class="icon-Actualizar" ></span>
