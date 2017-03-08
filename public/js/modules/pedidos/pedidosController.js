@@ -2,7 +2,7 @@
 MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','$filter','Order','setGetOrder','DateParse','ExtRedirect','lmbCountRequest','App',function ($scope,$mdSidenav,$timeout,$interval,$filter, Order, setGetOrder, DateParse , ExtRedirect, lmbCountRequest, App) {
     $scope.permit= Order.get({type:"Permision"});
     // controlers
-    $scope.Docsession = {isCopyable:false,global:"new", block:true};
+    $scope.Docsession = {isCopyable:false,global:"new", block:false};
     $scope.formMode ={};
     $scope.layer= undefined;
     $scope.index= 0;
