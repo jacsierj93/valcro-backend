@@ -30,11 +30,11 @@ use App\Models\Sistema\Criterios\CritDependencyAction;
 
 class CritController extends BaseController
 {
-    public function __construct()
+    /*public function __construct()
     {
 
         $this->middleware('auth');
-    }
+    }*/
 
     public function getCampos(){
         $fields  = Campos::all();

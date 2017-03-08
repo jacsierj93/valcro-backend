@@ -518,7 +518,8 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
             }
             $mdSidenav(sideNav).open().then(function(){
                 activesPopUp.push(sideNav);
-                if(fn.after){
+                //console.log(fn)
+                if(fn && fn.after){
                     fn.after();
                 }
             })
@@ -558,6 +559,10 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
             jQuery("#menu").animate({height:"176px"},500);
             $scope.showLateralFilter=true;
         }else{
+            $scope.filterProv.razon_social="";
+            $scope.filterProv.contraped=null;
+            $scope.filterProv.aereo=null;
+            $scope.filterProv.maritimo=null;
             jQuery("#menu").animate({height:jQuery("#menu").height()-176+"px"},500);
             $scope.showLateralFilter=false;
         }
@@ -568,6 +573,9 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
         }
     };
     $scope.filterList = function(prov,filt){
+        if(prov.id == $scope.prov.id){
+            return true;
+        }
         var valid = prov.razon_social.toLowerCase().indexOf(filt.razon_social.toLowerCase())!=-1;
         if(filt.contraped && valid){
             valid = prov.contrapedido == filt.contraped;
@@ -1790,15 +1798,16 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
                 if(angular.element(":focus").parents("#contTelf").length>0){
                     if(chip!="" && chip != $scope.ctrl.pais.area_code.phone){
                         setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
-                        ],{autohidden:5000});
+                        ],{autohidden:2000});
+
                     }else{
                         setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
-                        ],{autohidden:5000});
+                        ],{autohidden:2000});
                         angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
                     }
                 }
 
-            },500)
+            },0)
 
 
             return null ;
@@ -3323,6 +3332,11 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
         }
     }
 
+    $scope.setted = function(a,x){
+        //console.log(x,a,$filter('filterSearch')(x,[a.id],'id_condicion').length == 0)
+        return $filter('filterSearch')(x,[a.id],'id_condicion').length == 0;
+    }
+
     $scope.endLayer = function(callFn){
 
 
@@ -3346,10 +3360,8 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
             $scope.ctrl.searchCond=undefined;
             item = {};
             calcMax();
-
             $scope.itemCondForm.$setPristine();
             $scope.itemCondForm.$setUntouched();
-            //console.log($scope.max)
             $timeout(function(){
                 if($scope.max==0){
                     $scope.closeCondition();

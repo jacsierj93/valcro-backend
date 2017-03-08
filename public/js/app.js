@@ -845,12 +845,8 @@ MyApp.directive('duplicate', function($filter,$q,$timeout,setNotif) {
 
                     modelValue = modelValue.toString();
                     if ($filter("customFind")(scope[srcScope],modelValue,function(current,compare){return current[fld].toUpperCase() == compare.toUpperCase() && (scope.localId !=current.id)}).length<1) {
-                        // it is valid
-                        //setNotif.hideByContent("alert",attrs.duplicateMsg);
                         def.resolve();
                     }else{
-                        //setNotif.addNotif("alert",attrs.duplicateMsg,[]);
-
                         def.reject();
                     }
                 }, 50);
