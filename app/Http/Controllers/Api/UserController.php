@@ -82,5 +82,9 @@ class UserController extends BaseController
         return Hash::make($word);
     }
 
+    public function actlUser(Request $request){
+        $user = $request->session()->get('DATAUSER');
+        return $user;
+    }
 
 }

@@ -53,10 +53,11 @@
     <div flex>
 
     </div>
-    <div layout layout-align="start center" style="width: 132px; height: 48px;">
-        <a ng-href="logout">
-            Salir
+    <div layout layout-align="start center" style="width: 132px; height: 48px; font-size: 12px; color: #999999;">
+        <a ng-href="logout" style="text-decoration: none; color: #999999;">
+            Salir,
         </a>
+        <span id="usrLoged">&nbsp;&nbsp;{{usr}}</span>
     </div>
 </div>
 

@@ -191,6 +191,15 @@ MyApp.service("generic",function(masters){
 
 });
 
+MyApp.factory('users', ['$resource',
+    function ($resource) {
+        return $resource('usrs/:type/:id', {}, {
+            query: {method: 'GET', params: {type: "",id:""}, isArray: false},
+            post: {method: 'POST', params: {type: "",id:""}, isArray: false}
+        });
+    }
+]);
+
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
     return function(arr1, arr2,id) { //arr2 SIEMPRE debe ser un array de tipo vector (solo numeros)
@@ -1108,11 +1117,18 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
 
 }]);
 
-MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect) {
+MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect, users) {
 
     $scope.bindBlock=App.getBindBloc();
+    
+     users.query({ type:"usr"},function(data){
+         $scope.usr = data.nombre;
+        $
+    });
 
+    
 });
+
 MyApp.controller('AppBlock', ['$scope','App',function ($scope, App){
     $scope.bindBlock=App.getBindBloc();
     $scope.$watch('bindBlock.estado' , function(newval){
