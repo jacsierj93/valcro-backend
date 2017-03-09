@@ -190,15 +190,15 @@ MyApp.service("generic",function(masters){
     };
 
 });
-
-MyApp.factory('users', ['$resource',
+MyApp.factory('user', ['$resource',
     function ($resource) {
         return $resource('usrs/:type/:id', {}, {
+            get: {method: 'GET', params: {type: "",id:""}, isArray: false},
             query: {method: 'GET', params: {type: "",id:""}, isArray: false},
-            post: {method: 'POST', params: {type: "",id:""}, isArray: false}
         });
     }
 ]);
+
 
 /*filtro para filtrar los option de los selects basandose en un array */
 MyApp.filter('filterSelect', function() {
@@ -1113,11 +1113,11 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
 
 }]);
 
-MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect, users) {
+MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect, user) {
 
     $scope.bindBlock=App.getBindBloc();
     
-     users.query({ type:"usr"},function(data){
+     user.get({ type:"usr"},function(data){
          $scope.usr = data.nombre;
     });
 

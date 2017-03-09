@@ -1164,6 +1164,14 @@ div.activeleft{
 .resumBlock{
     border-bottom:1px solid #ccc;
 }
+.resumBlock.aprov{
+
+    background-color: rgba(5,206,124,0.4)
+}
+.resumBlock.deny{
+
+    background-color: rgba(221,44,0,0.4)
+}
 
 .reserved{
     opacity:0.5;
