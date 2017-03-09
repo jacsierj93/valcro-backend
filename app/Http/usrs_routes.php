@@ -12,4 +12,5 @@ $app->get('usrs/listUsrs', function() {
 
 $app->get('usrs/listUsuarios','Users\UserController@getUsuarios');
 $app->get('usrs/usr', 'Api\UserController@actlUser');
+$app->get('usrs/cargos', 'Users\UserController@getCargos');
 

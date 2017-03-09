@@ -111,7 +111,7 @@
 
 
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="userLayer3" id="userLayer3">
-            <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
+            <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex ng-controller="userForm">
 
                 <!--############## FORMULARIO DE INFORMACION DEL USUARIO ##########################-->
                 <form name="userInfoForm" layout="row" global ng-class="{'focused':isShow, 'required':!prov.id,'modified':$parent.changeForm('dataProv') > 0}" ng-disabled="true" ng-click="isShow = true" click-out="isShow = false; userInfoForm.$setUntouched()">
@@ -163,7 +163,7 @@
                                                      skip-tab
                                                      id="cargos"
                                                      md-search-text="cargos"
-                                                     md-items="item in filter = (types | stringKey : cargos: 'nombre')"
+                                                     md-items="item in cargos"
                                                      valid = "filter"
                                                      md-item-text="item.nombre"
                                                      md-no-asterisk
@@ -173,6 +173,7 @@
                                         </md-item-template>
                                     </md-autocomplete>
                                 </md-input-container>
+ 
                             </div>
 
                             <div class="row" layout="row">

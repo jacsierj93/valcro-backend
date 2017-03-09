@@ -9,6 +9,7 @@ use App\Models\Sistema\Sucursal;
 use App\Models\Sistema\User;
 use App\Models\Sistema\UserLevel;
 use App\Models\Sistema\UserPreference;
+use App\Models\Sistema\Deparment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -23,12 +24,6 @@ class UserController extends BaseController
     {
 
         $this->middleware('auth');
-    }
-
-    public function getUsuarios()
-    {
-        $data = User::all();
-        return $data;
     }
     
     public function getList()
@@ -204,6 +199,19 @@ class UserController extends BaseController
         $model->destroy($id);
 
 
+    }
+    
+    public function getUsuarios()
+    {
+        $data = User::all();
+        return $data->toJson();
+    }
+    
+    public function getCargos()
+    {
+        //$cargos = Position::lists('nombre', 'id')->all();
+        $cargos = Position::all();
+        return $cargos->toJson();
     }
 
 

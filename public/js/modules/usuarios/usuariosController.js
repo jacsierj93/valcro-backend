@@ -4,6 +4,14 @@
  * and open the template in the editor.
  */
 
+MyApp.factory('users', ['$resource',
+    function ($resource) {
+        return $resource('usrs/:type/:id', {}, {
+            query: {method: 'GET', params: {type: "",id:""}, isArray: true},
+            post: {method: 'POST', params: {type: "",id:""}, isArray: false}
+        });
+    }
+]);
 
 MyApp.controller('mainUsersController', ['$scope', 'setNotif', function ($scope, setNotif) {
         $scope.index = 1;
@@ -14,17 +22,19 @@ MyApp.controller('mainUsersController', ['$scope', 'setNotif', function ($scope,
 
     }]);
 
-MyApp.controller('listUsersController', ['$scope', 'setNotif', function ($scope, setNotif) {
-
+MyApp.controller('listUsersController', ['$scope', 'setNotif' ,'users' , function ($scope, setNotif, users) {
         ////lista de USUARIOS
-//        $scope.getUsuarios = function () {
-//            $http.get('usrs/listUsuarios').success(function (response) {
-//                $scope.users = response;
-//                console.log("lista de proveedores");
-//            });
-//        };
-        
-        $scope.users = [{"id":"1","0":"1","cargo_id":"6","1":"6","nivel_id":"1","2":"1","user":"admin","3":"admin","password":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","4":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"Administrador","6":"Administrador","apellido":"Valcro","7":"Valcro","responsabilidades":"","8":"","status":"1","9":"1","co_us":null,"10":null,"admin":"1","11":"1","created_at":"2016-03-01 17:29:22","12":"2016-03-01 17:29:22","updated_at":"2016-04-08 17:05:31","13":"2016-04-08 17:05:31","deleted_at":null,"14":null},{"id":"3","0":"3","cargo_id":"1","1":"1","nivel_id":"1","2":"1","user":"ninguno","3":"ninguno","password":"$2y$10$4sEgUCI2DSoKmPsIT.FjUOHNajdtZaHlhY6sLPr67Lpm2.pXsl5hm","4":"$2y$10$4sEgUCI2DSoKmPsIT.FjUOHNajdtZaHlhY6sLPr67Lpm2.pXsl5hm","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"Luis","6":"Luis","apellido":"Lima","7":"Lima","responsabilidades":null,"8":null,"status":"0","9":"0","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-25 22:35:09","12":"2016-03-25 22:35:09","updated_at":"2016-03-25 22:47:05","13":"2016-03-25 22:47:05","deleted_at":null,"14":null},{"id":"4","0":"4","cargo_id":"4","1":"4","nivel_id":"1","2":"1","user":"lnavarro","3":"lnavarro","password":"$2y$10$rs7\/pzOoP9T.Nuxl9ue5H.WrSExiD36RxEqF5mmvN3ci8sOwHgK5a","4":"$2y$10$rs7\/pzOoP9T.Nuxl9ue5H.WrSExiD36RxEqF5mmvN3ci8sOwHgK5a","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"Luis","6":"Luis","apellido":"Navarro","7":"Navarro","responsabilidades":"todo lo de sistemas","8":"todo lo de sistemas","status":"1","9":"1","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-25 23:04:27","12":"2016-03-25 23:04:27","updated_at":"2016-03-25 23:08:53","13":"2016-03-25 23:08:53","deleted_at":null,"14":null},{"id":"5","0":"5","cargo_id":"1","1":"1","nivel_id":"1","2":"1","user":"fulano","3":"fulano","password":"$2y$10$kRqVGwsmMEUiFD4.NhxArOu3MQY.0o2ApCdoAZR1mgeFb6OmkKnea","4":"$2y$10$kRqVGwsmMEUiFD4.NhxArOu3MQY.0o2ApCdoAZR1mgeFb6OmkKnea","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"Fulano","6":"Fulano","apellido":"Detal","7":"Detal","responsabilidades":"Programar","8":"Programar","status":"1","9":"1","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-26 12:19:49","12":"2016-03-26 12:19:49","updated_at":"2016-03-26 12:31:03","13":"2016-03-26 12:31:03","deleted_at":null,"14":null},{"id":"6","0":"6","cargo_id":"1","1":"1","nivel_id":"1","2":"1","user":"luis","3":"luis","password":"$2y$10$saiogNCP0Ls.PjTuQ01xLeX3Qzf2r76hxyU92Ya5\/e8RfU2BhlD4K","4":"$2y$10$saiogNCP0Ls.PjTuQ01xLeX3Qzf2r76hxyU92Ya5\/e8RfU2BhlD4K","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"Luis","6":"Luis","apellido":"Navarro","7":"Navarro","responsabilidades":null,"8":null,"status":"1","9":"1","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-26 12:19:49","12":"2016-03-26 12:19:49","updated_at":"2016-03-26 12:19:49","13":"2016-03-26 12:19:49","deleted_at":null,"14":null},{"id":"7","0":"7","cargo_id":"6","1":"6","nivel_id":"1","2":"1","user":"gerente","3":"gerente","password":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","4":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"gerente","6":"gerente","apellido":"compras","7":"compras","responsabilidades":"","8":"","status":"1","9":"1","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-01 17:29:22","12":"2016-03-01 17:29:22","updated_at":"2016-04-08 17:05:31","13":"2016-04-08 17:05:31","deleted_at":null,"14":null},{"id":"8","0":"8","cargo_id":"9","1":"9","nivel_id":"1","2":"1","user":"jefe","3":"jefe","password":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","4":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"jefe","6":"jefe","apellido":"compras","7":"compras","responsabilidades":null,"8":null,"status":"1","9":"1","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-26 12:19:49","12":"2016-03-26 12:19:49","updated_at":"2016-03-26 12:19:49","13":"2016-03-26 12:19:49","deleted_at":null,"14":null},{"id":"9","0":"9","cargo_id":"10","1":"10","nivel_id":"1","2":"1","user":"trabajador","3":"trabajador","password":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","4":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"empleado","6":"empleado","apellido":"compras","7":"compras","responsabilidades":null,"8":null,"status":"1","9":"1","co_us":null,"10":null,"admin":"0","11":"0","created_at":"2016-03-01 17:29:22","12":"2016-03-01 17:29:22","updated_at":"2016-03-01 17:29:22","13":"2016-03-01 17:29:22","deleted_at":null,"14":null},{"id":"10","0":"10","cargo_id":"8","1":"8","nivel_id":"1","2":"1","user":"dueno","3":"dueno","password":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","4":"$2y$10$baDZ0Gg.EEf0qMw7jGj9few8QSTeU8j.3TB2EIhUnwXSm6JebjkbC","email":"meqh1992@gmail.com","5":"meqh1992@gmail.com","nombre":"Due\u00f1o","6":"Due\u00f1o","apellido":"Empresa","7":"Empresa","responsabilidades":null,"8":null,"status":"0","9":"0","co_us":null,"10":null,"admin":"0","11":"0","created_at":"-0001-11-30 00:00:00","12":"0000-00-00 00:00:00","updated_at":"-0001-11-30 00:00:00","13":"0000-00-00 00:00:00","deleted_at":null,"14":null}];
-        $scope.cargos = [{"id": 1, "nombre": "Programador"}, {"id": 2, "nombre": "Gerente"}, {"id": 3, "nombre": "Ventas"}];
+        users.query({ type:"listUsuarios"},function(data){
+            $scope.users = data;
+            console.log($scope.users);
+        });
+    }]);
 
+
+MyApp.controller('userForm', ['$scope', 'setNotif', 'users', function ($scope, setNotif, users) {
+        ////lista de USUARIOS
+        users.query({ type:"cargos"},function(data){
+            $scope.cargos = data;
+            console.log($scope.cargos);
+        });
     }]);
