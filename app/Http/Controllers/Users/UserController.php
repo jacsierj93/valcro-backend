@@ -201,18 +201,119 @@ class UserController extends BaseController
 
     }
     
-    public function getUsuarios()
-    {
-        $data = User::all();
-        return $data->toJson();
-    }
-    
-    public function getCargos()
-    {
-        //$cargos = Position::lists('nombre', 'id')->all();
-        $cargos = Position::all();
-        return $cargos->toJson();
+    public function getUsuarios() {
+        $usuarios = User::select('id', 'nombre', 'apellido', 'user')->get();
+        return $usuarios->toJson();
     }
 
+    public function seltdUser($usr) {
+        $usuarios = User::where('id', $usr)
+                ->get(['id', 'nombre AS usr_nombre', 'apellido AS usr_apellido', 'user', 'password', 'admin', 'cargo_id AS crg_id', 'co_us', 'email', 'nivel_id AS nvl_id', 'responsabilidades', 'status', 'user']);
+        /*$usuarios = User::where('tbl_usuario.id', $usr)
+                    ->join('tbl_cargo', 'tbl_usuario.cargo_id', '=', 'tbl_cargo.id')
+                    ->join('tbl_nivel', 'tbl_usuario.nivel_id', '=', 'tbl_nivel.id')
+                    ->get(['tbl_usuario.id', 'tbl_usuario.nombre AS usr_nombre', 'tbl_usuario.apellido AS usr_apellido', 'user', 'admin', 'cargo_id AS crg_id', 'tbl_cargo.nombre AS crg_nombre', 'co_us', 'email', 'nivel_id AS nvl_id', 'tbl_nivel.nombre AS nvl_nombre', 'responsabilidades', 'status', 'user']);*/
+
+ 
+        foreach ($usuarios as $usuario) {
+            $usuario->password = "";
+            $usuario[4] = "";
+        }
+
+        return $usuarios->toJson();
+        //return $usuarios;
+
+    }
+
+    public function getCargos($ide) {
+        if($ide == 0){
+            $cargos = Position::select('id', 'nombre', 'descripcion')->get();
+        }else{
+            $cargos = Position::where('id', $ide)->get(['id', 'nombre', 'descripcion']);
+        }
+        return $cargos->toJson();
+    }
+    
+    public function getNiveles($ide) {
+        if($ide == 0){
+            $niveles = UserLevel::select('id', 'nombre', 'descripcion')->get();
+        }else{
+            $niveles = UserLevel::where('id', $ide)->get(['id', 'nombre', 'descripcion']);
+        }
+        return $niveles->toJson();
+    }
+
+    public function getEstatus($ide) {
+        $data = array(array("id" => 1, "nombre" => "Activo"), array("id" => 0, "nombre" => "Inactivo"));
+        if ($ide == -1) {
+            return json_encode($data);
+        } else {
+            foreach ($data as $clave => $valor) {
+                if($valor["id"] == $ide){
+                    $estatus = $valor;
+                    return json_encode($estatus);
+                }
+            }
+        }
+    }
+    
+    public function saveUser(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $user =  User::findOrFail($req->id);
+            
+            /*User::where('id', $req->id)->update([
+                'nombre' => $req->usr_nombre,
+                'apellido' => $req->usr_apellido,
+                'user' => $req->user,
+                'password' => Hash::make($req->password),
+                'admin' => $req->admin,
+                'cargo_id' => $req->crg_id,
+                'co_us' => $req->co_us,
+                'email' => $req->email,
+                'nivel_id' => $req->nvl_id,
+                'responsabilidades' => $req->responsabilidades,
+                'status' => $req->status]);*/
+            $result['action']="upd";
+            $result['id']=$req->id;
+        }else{
+            $user =  new User();
+            /*$id = User::insertGetId([
+                'nombre' => $req->usr_nombre,
+                'apellido' => $req->usr_apellido,
+                'user' => $req->user,
+                'password' => Hash::make($req->password),
+                'admin' => $req->admin,
+                'cargo_id' => $req->crg_id,
+                'co_us' => $req->co_us,
+                'email' => $req->email,
+                'nivel_id' => $req->nvl_id,
+                'responsabilidades' => $req->responsabilidades,
+                'status' => $req->status]);
+            $result['id']=$id;*/
+        }
+
+        
+        $user->nombre = $req->usr_nombre;
+        $user->apellido = $req->usr_apellido;
+        $user->user = $req->user;
+        $user->password = Hash::make($req->password); ///hashing
+        $user->admin = $req->admin;
+        $user->cargo_id = $req->crg_id;
+        $user->co_us = $req->co_us;
+        $user->email = $req->email;
+        $user->nivel_id = $req->nvl_id;
+        $user->responsabilidades = $req->responsabilidades;
+        $user->status = $req->status;
+        
+        if($user->isDirty()){
+            $user->save();
+        }else{
+            $result['action']="equal";
+        }
+        $result['id']=$user->id;
+
+        return $result;
+    }
 
 }
