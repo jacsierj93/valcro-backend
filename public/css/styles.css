@@ -1160,17 +1160,26 @@ div.activeleft{
     color:#9d9d9d;
     font-weight: bold !important;
 }
-
+/*
 .resumBlock{
     border-bottom:1px solid #ccc;
+}*/
+.resumBlock > .aprov{
+    background-color: rgba(0, 255, 0, 0.36)
 }
-.resumBlock.aprov{
-
-    background-color: rgba(5,206,124,0.4)
-}
-.resumBlock.deny{
-
+.resumBlock > .deny{
     background-color: rgba(221,44,0,0.4)
+}
+.resumBlock > .wait{
+    background-color: #eee;
+}
+
+.resumBlock > div{
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin:5px;
 }
 
 .reserved{

@@ -29,6 +29,7 @@ use App\Models\Sistema\Masters\Language;
 use App\Models\Sistema\Providers\CargoContact;
 use App\Models\Sistema\Masters\City;
 use App\Models\Sistema\Masters\Unit;
+use App\Models\Sistema\Masters\UnitCompra;
 use Illuminate\Database\Eloquent\Collection;
 
 
@@ -142,6 +143,10 @@ class MasterController extends BaseController
 	}
 	public function getPorts(){
 		return json_encode(Ports::select("id","Main_port_name","pais_id")->get());
+	}
+
+	public function getUnitCompra(){
+		return json_encode(UnitCompra::select("id","descripcion")->get());
 	}
 
 	/*Maestros para modulo de pedido**/

@@ -1005,6 +1005,7 @@ MyApp.directive('lmbCollection', function() {
             dis: '=?ngDisabled'
         },
         controller:function($scope){
+
             $scope.curVal = {};
             if(!("valid" in $scope)){
                 $scope.valid = {
@@ -1013,6 +1014,7 @@ MyApp.directive('lmbCollection', function() {
                 }
             }
             $scope.setIten=function(dat){
+                console.log($scope)
                 $scope.curVal = dat;
                 if($scope.valid.f(dat)){
                     done()
@@ -1080,9 +1082,18 @@ MyApp.directive('lmbCollection', function() {
             if(attr.lmbType=="items"){
                 return '<div>' +
                     '<div flex layout="column">' +
-                    '<div style="height:10px; font-size: 10px; color:rgba(0,0,0,0.54); font-weight:bold; text-transform: uppercase">{{label}}</div>' +
-                    '<div style="height:27px;margin-top: 3px" layout="row">' +
-                    '<div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="column" layout-align="center center"><md-tooltip>{{item.'+show+'}}</md-tooltip><div ng-if="item.icon" layout="column" layout-align="center center" class="{{item.icon}}"><img ng-if="item.icon.indexOf(\'.png\')!=-1" ng-src="images/{{item.icon}}"/></div>{{item.'+show+'}}</div></div></div></div>';
+                        '<div style="height:10px; font-size: 10px; color:rgba(0,0,0,0.54); font-weight:bold; text-transform: uppercase">{{label}}</div>' +
+                            '<div style="height:27px;margin-top: 3px" layout="row">' +
+                                '<div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="row" layout-align="center center">' +
+                                    '<md-tooltip>{{item.'+show+'}}</md-tooltip>' +
+                                '<div ng-if="item.icon" layout="column" layout-align="center center" class="{{item.icon}}">' +
+                                    '<img ng-if="item.icon.indexOf(\'.png\')!=-1" ng-src="images/{{item.icon}}"/>' +
+                                '</div>' +
+                                    '<span>{{item.'+show+'}}</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
             }else{
                 return '<md-content flex layout="column">'+
                     '<div layout="row" ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> <div flex>{{item.'+show+'}}</div><div ng-show="'+iconField+' != \'\'" flex><img ng-src="images/{{'+iconField+'}}"/></div> </div>'

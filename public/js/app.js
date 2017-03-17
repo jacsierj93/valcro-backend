@@ -758,7 +758,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 });
 
             }
-
+/*
             element.bind("blur", function(e) {
                 $timeout(function() {
                     setNotif.hideByContent("info",attrs.info);
@@ -825,7 +825,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 element.bind("focus", function(e){
                     showInfo();
                 });
-            }
+            }*/
 
 
         }
@@ -1113,11 +1113,22 @@ MyApp.controller('AppFoot',['$scope','$location',  'App','Layers',function ($sco
 
 }]);
 
-MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,setGetProv, Layers,App,$routeParams, ExtRedirect, user) {
+MyApp.service("common",function(){
+    var data = {
+        user:null
+    }
+    return {
+        getCommon:function(){
+            return data;
+        }
+    }
+})
+MyApp.controller('AppMain', function ($scope,$timeout,$mdSidenav,$location,$filter,common, Layers,App,$routeParams, ExtRedirect, user) {
 
     $scope.bindBlock=App.getBindBloc();
-    
+    var common = common.getCommon();
      user.get({ type:"usr"},function(data){
+         common.user = data;
          $scope.usr = data.nombre;
     });
 

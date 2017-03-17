@@ -61,3 +61,6 @@ $app->post("provider/delCondition",'Providers\ProvidersController@delHeadConditi
 $app->post("provider/delPoint",'Providers\ProvidersController@delPoint');//desvicula un contacto de un proveedor
 $app->post("provider/delProdTime",'Providers\ProvidersController@delProdTime');//desvicula un contacto de un proveedor
 $app->post("provider/delTransTime",'Providers\ProvidersController@delTransTime');//desvicula un contacto de un proveedor
+
+/*RUTAS DE APROVACION DE PROVEEDORES*/
+$app->post("provider/aprov_address",'Providers\ProvidersController@aprovProvDir');//desvicula un contacto de un proveedor
