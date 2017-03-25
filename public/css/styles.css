@@ -1218,8 +1218,23 @@ md-progress-linear ._md-container,md-progress-linear .md-container{
 /**********************EDITADO POR MIGUEL 27/05/2016****************************/
 md-datepicker{
     background-color: transparent;
+    /****** EDITADO LUIS 22/03/2017 ********/
+
 }
 
+.md-datepicker-input{
+    height: 20px;
+    line-height: 20px;
+}
+
+.md-datepicker-input-container.md-datepicker-focused{
+    border-bottom-width: 1px !important;
+    border-bottom-color: rgb(84, 180, 234) !important;
+    
+}
+.md-icon-button + .md-datepicker-input-container{
+    margin-left: 0 !important;
+}
 
 /**********************EDITADO POR MIGUEL 14/05/2016****************************
 *********************************************************************************
