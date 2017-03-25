@@ -60,10 +60,10 @@
 
                     </div>
                     <div style="height: 32px; text-align: right;">
-                        Deudas {{prov.tdeuda | currency : $ : 2}}
+                        Deudas {{prov.tdeuda | currency : "$" : 2}}
                     </div>
                     <div style="height: 32px; text-align: right;">
-                        Abonos {{prov.tabono | currency : $ : 2}}
+                        Abonos {{prov.tabono | currency : "$" : 2}}
                     </div>
 
                 </div>
@@ -84,10 +84,10 @@
                     </md-tooltip>
                 </div>
                 <div ng-show="false" layout="column" layout-align="center center">
-                    <?= HTML::image("images/actualizar.png") ?>
+                    <?= HTML::image("images/Actualizar.png") ?>
                 </div>
                 <div ng-show="false" layout="column" layout-align="center center">
-                    <?= HTML::image("images/filtro.png") ?>
+                    <?= HTML::image("images/Filtro.png") ?>
                 </div>
                 <div ng-show="true" layout="column" layout-align="center center" ng-click="getAbonos()" style="width: 24px;">
                    <img ng-src="images/documento_pago.gif" style="width:24px;">
@@ -152,13 +152,12 @@
                                                 <div flex="10" class="cellGrid">{{deuda.fecha}}</div>
                                                 <div flex="10" class="cellGrid">{{deuda.vence}}</div>
                                                 <div flex="5" class="cellGrid" style="text-align: right;">
-                                                    <div style="width: 16px; height: 16px; border-radius: 50%"
-                                                         class="{{deuda.vencido}}"></div>
+                                                    <div style="width: 16px; height: 16px; border-radius: 50%" class="{{deuda.vencido}}"></div>
                                                 </div>
                                                 <div flex class="cellGrid"> {{deuda.cuotas}}</div>
-                                                <div flex class="cellGrid"> {{deuda.m<md-content id="grid" flex class="_md flex">onto | currency : $ : 2}}$</div>
-                                                <div flex class="cellGrid"> {{deuda.pagado | currency : $ : 2}}$</div>
-                                                <div flex class="cellGrid"> {{deuda.saldo | currency : $ : 2}}$</div>
+                                                <div flex class="cellGrid"> {{deuda.monto | currency : "$" : 2}}</div>
+                                                <div flex class="cellGrid"> {{deuda.pagado | currency : "$" : 2}}</div>
+                                                <div flex class="cellGrid"> {{deuda.saldo | currency : "$" : 2}}</div>
                                             </div>
                                         </div>
                                     </md-content>
@@ -197,7 +196,7 @@
                                                 <div flex="20" class="cellGrid">{{pago.nro_factura}}</div>
                                                 <div flex="10" class="cellGrid">{{pago.fecha}}</div>
                                                 <div flex class="cellGrid">{{pago.tipo}}</div>
-                                                <div flex class="cellGrid">{{pago.pagado | currency : $ : 2}}</div>
+                                                <div flex class="cellGrid">{{pago.pagado | currency : "$" : 2}}</div>
                                                 <div flex class="cellGrid"> Data 5</div>
                                                 <div flex class="cellGrid"> Data 6</div>
                                             </div>
@@ -263,7 +262,7 @@
                                         <div style="width: 16px; height: 16px; border-radius: 50%"
                                              class="{{cuota.vencimiento}}"></div>
                                     </div>
-                                    <div flex="10" class="cellGrid">{{cuota.saldo | currency : $ : 2}}</div>
+                                    <div flex="10" class="cellGrid">{{cuota.saldo | currency : "$" : 2}}</div>
                                 </div>
                             </div>
                         </div>
@@ -296,30 +295,44 @@
 
                     <div flex layout="column">
 
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                        <div class="titulo_formulario" style="height: 40px;" layout="column" layout-align="start start">
                             <div>
-                                Pago: <span style="color: #000;"><span ng-show="debData.factura_tipo=='cc'">CUOTA Nro. {{debData.actual+1}}, </span>
-                                Factura Nro. {{debData.factura}}, Proveedor: {{debData.provname}}</span>
+                                Pago:
+                                <span style="color: #000;">
+                                    <span ng-show="debData.factura_tipo=='cc'">CUOTA Nro. <b>{{debData.actual+1}}</b>, </span>
+                                    Factura Nro. <b>{{debData.factura}}</b>, Proveedor: <b>{{debData.provname}}</b>
+                                </span>
                             </div>
                         </div>
-                        <div layout="row">
+                        <div layout="row" style="height:40px;">
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Nro. Documento</label>
-                                <input ng-model="pago.nro_doc" required/>
+                                <input skip-tab ng-model="pago.nro_doc" required/>
                             </md-input-container>
 
-
-                            <div layout="column" flex>
+                            <md-input-container class="md-block" flex="15">
+                                <label>Fecha</label>
+                               <md-datepicker
+                                   skip-tab
+                                   ng-model="pago.fecha"
+                                   md-hide-icons="all"
+                                   md-open-on-focus
+                                   required >
+                                       
+                               </md-datepicker>
+                            </md-input-container>
+                            
+<!--                            <div layout="column" flex>
                                 <md-datepicker ng-model="pago.fecha" required md-placeholder="fecha"></md-datepicker>
-                            </div>
+                            </div>-->
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Monto</label>
-                                <input ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
+                                <input  type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="10">
+<!--                            <md-input-container class="md-block" flex="10">
                                 <label>Moneda</label>
                                 <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')"
                                            required md-no-ink>
@@ -327,7 +340,40 @@
                                         {{moneda.nombre}}
                                     </md-option>
                                 </md-select>
+                            </md-input-container>-->
+
+
+
+                            <md-input-container class="md-block" flex>
+                                <label>Moneda</label>
+                                <md-autocomplete 
+                                                     flex
+                                                     id="moneda_pago"
+                                                     
+                                                     info="moneda de este factor"
+                                                     skip-tab
+                                                     required
+                                                     md-require-match="true"
+                                                     md-selected-item="ctrl.searchCoin"
+                                                     md-search-text="ctrl.searchCoin"
+                                                     md-items="moneda in monedas | stringKey : ctrl.searchCoin: 'nombre'"
+                                                     md-item-text="moneda.nombre"
+                                                     md-no-asterisk
+                                                    
+                                                     md-min-length="0">
+                                        <input >
+                                        <md-item-template>
+                                            <span>{{item.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
                             </md-input-container>
+
+
+
+
+
+
+
 
                             <md-input-container class="md-block" flex="10">
                                 <label>Tasa</label>
@@ -348,7 +394,7 @@
 
                         </div>
 
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                        <div class="titulo_formulario" style="height:40px;" layout="column" layout-align="start start">
                             <div>
                                 Adelantos y Notas de credito
                             </div>
@@ -377,19 +423,17 @@
                                     <div flex="10" class="cellGrid"> {{abono.tipo}}</div>
                                     <div flex="10" class="cellGrid"> {{abono.fecha}}</div>
                                     <div flex class="cellGrid"> {{abono.fact_orig}}</div>
-                                    <div flex="10" class="cellGrid"> {{abono.monto}}</div>
-                                    <div flex="10" class="cellGrid"> {{abono.saldo}}</div>
+                                    <div flex="10" class="cellGrid"> {{abono.monto | currency : "$" : 2}}</div>
+                                    <div flex="10" class="cellGrid"> {{abono.saldo | currency : "$" : 2}}</div>
                                     <div flex="10" class="cellGrid">
-                                        <input type="number" ng-model="abono.montoUsado"
-                                               ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado"
-                                               ng-value="abono.saldo"/>
+                                        <input type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-model="abono.montoUsado" ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado" ng-value="abono.saldo" />
                                     </div>
                                 </div>
 
                             </div>
                         </div>
 
-                        <div class="titulo_formulario" layout="column" layout-align="start start" flex>
+                        <div class="titulo_formulario" layout="column" layout-align="start start">
                             <div>
 
                             </div>
@@ -401,14 +445,14 @@
                             </div>
                             <md-input-container class="md-block" flex>
                                 <label>Saldo</label>
-                                <input ng-readonly="true" ng-model="debData.saldo"/>
+                                <input type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-readonly="true" ng-model="debData.saldo"/>
                             </md-input-container>
                             <div flex="5">
 
                             </div>
                             <md-input-container class="md-block" flex>
                                 <label>Total A Pagar</label>
-                                <input ng-readonly="true" ng-model="debData.total"/>
+                                <input type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-readonly="true" ng-model="debData.total"/>
                             </md-input-container>
 
                         </div>
@@ -497,7 +541,7 @@
             <md-content class="cntLayerHolder" layout="column" style="margin-top: 0;" flex>
 
 
-                <form layout="row">
+                <form name="fmrAbonos" layout="row">
 
                     <div active-left></div>
 
@@ -515,38 +559,30 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo Pago</label>
-								<!--<md-select ng-model="abono.tipo_id" required md-no-ink>
-									<md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
-										{{tipoPago.descripcion}}
-									</md-option>
-								</md-select>-->
-                                
-                                
-								<md-autocomplete
-									md-selected-item="abono.tipo_id"
-									flex
-									id="tipoPago"
-									info="Seleccione el tipo de Pago"
-									model="tipoDocsPago"
-									skip-tab
-									
-									md-items="item in tipoDocsPago"
-									md-item-text="item.descripcion"
-									require
-									require-match="true"
-									md-no-asterisk
-									md-min-length="0">
-									<input >
-									<md-item-template>
-										<span>{{item.descripcion}}</span>
-									</md-item-template>
-								</md-input-container>
-                                
-                                
-                                
-                                
-                            </md-input-container>
+                                <!--<md-select ng-model="abono.tipo_id" required md-no-ink>
+                                        <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
+                                                {{tipoPago.descripcion}}
+                                        </md-option>
+                                </md-select>-->
 
+                                <md-autocomplete flex
+                                                md-selected-item="abono.tipo_id"
+                                                id="tipoPago"
+                                                name="tipoPago"
+                                                info="Seleccione el tipo de Pago"
+                                                model="tipoDocsPago"
+                                                skip-tab
+                                                md-items="item in tipoDocsPago"
+                                                md-item-text="item.descripcion"
+                                                require
+                                                require-match="true"
+                                                md-no-asterisk
+                                                md-min-length="0">
+                                                <md-item-template>
+                                                        <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                </md-autocomplete>
+                            </md-input-container>
 
                             <!--espacio-->
                             <span style="padding-right: 300px">&nbsp; </span>

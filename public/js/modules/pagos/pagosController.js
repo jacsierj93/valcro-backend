@@ -1,4 +1,3 @@
-
 MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', function ($scope, $mdSidenav, $http, Upload) {
 
         // funcion para apertura de layer --------
@@ -14,7 +13,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
         $scope.index = 0;
         var base = 264;
         $scope.toolBar = {"add": true, "edit": false, "filter": false}; ///botonera
-        $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
+        $scope.provData = {"id": '', "nombre": '', "pagos": [], "deudas": [], "deudas2": []};
 
 
         /**
@@ -27,7 +26,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
             if (opc == 'all') {
                 ////elementos
-                $scope.provData = {"id": '', "nombre": '', "pagos": {}, "deudas": {}, "deudas2": {}};
+                $scope.provData = {"id": '', "nombre": '', "pagos": [], "deudas": [], "deudas2": []};
                 $scope.debData = {
                     "id": '',
                     "provname": '',
@@ -42,10 +41,10 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
                 };
                 $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
                 $scope.pago = {"monto": ''};
-                $scope.abonos = {};
+                $scope.abonos = [];
                 $scope.abonos2 = [];
                 $scope.abono = {"monto": '', "monto_rec": 0.0, "monto_recp": 0.0};
-                $scope.provSelected = {};
+                $scope.provSelected = [];
                 $scope.deudaList = [];
             }
 
@@ -87,7 +86,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
          * @param montoUsado
          */
         $scope.calculateDeuda2 = function (abonos2, pago) {
-
+            console.log(abonos2);
             var tempAbono = 0;
             var tempSaldo = 0;
             var tempPago = (pago.monto == undefined) ? 0 : pago.monto;
@@ -347,7 +346,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             $http.get('payments/getAbonos/all').success(function (response) {
 
                 $scope.abonos = response;
-                //  $scope.abono = {};
+                //  $scope.abono = [];
 
                 console.log("trayendo Abonos");
             });
@@ -360,7 +359,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             $http.get('payments/getAbonos/new').success(function (response) {
 
                 $scope.abonos2 = response;
-                //  $scope.abono = {};
+                //  $scope.abono = [];
 
                 console.log("trayendo Abonos sin procesar");
             });
@@ -410,8 +409,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
         /////formulario de registro de pago
         $scope.saveFormPago = function () {
-            $http.post('payments/savePay', $scope.pago)
-                    .success(function (data, status, headers, config) {
+            $http.post('payments/savePay', $scope.pago).success(function (data, status, headers, config) {
 
                         console.log(data);
 
