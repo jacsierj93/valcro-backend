@@ -23,16 +23,20 @@
     <?= HTML::script("components/angular-ui-mask/dist/mask.js") ?>
     <?= HTML::script("components/angular-input-masks/angular-input-masks-standalone.min.js") ?>
     <?= HTML::script("components/angular-sanitize/angular-sanitize.min.js") ?>
-
     <?= HTML::script("components/angular-io-barcode/build/angular-io-barcode.min.js") ?>
-
     <!--    custom click-out library, more ifo in file-->
     <?= HTML::script('js/modules/main/vlcClickOut.js') ?>
     <!--    demo file upload-->
     <?= HTML::script("components/ng-file-upload/ng-file-upload.min.js") ?>
     <!--    angular tree controller (criterios)-->
     <?= HTML::script("components/angular-tree-control/angular-tree-control.js") ?>
+    
+    <!--    Localizacion para Venezuela -->
+    <?= HTML::script("js/angular-locale_es-ve.js") ?>
 
+    <!--    dynamic-number formateo de numeros -->
+    <?= HTML::script("js/dynamic-number.min.js") ?>
+    
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>
 

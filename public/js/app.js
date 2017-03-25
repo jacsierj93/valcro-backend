@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload','io-barcode','treeControl'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload','io-barcode','treeControl','dynamicNumber'];
 var urls = [
     {
         secc: 'Inicio',

@@ -40,6 +40,12 @@
     <!--    angular tree controller (criterios)-->
     <?= HTML::script("components/angular-tree-control/angular-tree-control.js") ?>
 
+    <!--    Localizacion para Venezuela -->
+    <?= HTML::script("js/angular-locale_es-ve.js") ?>
+
+    <!--    dynamic-number formateo de numeros -->
+    <?= HTML::script("js/dynamic-number.min.js") ?>
+    
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>
 
